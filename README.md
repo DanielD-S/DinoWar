@@ -14,9 +14,11 @@ y se revela **a la vez**: la tensión del juego es la información oculta, no el
 
 | Vía | Cómo |
 |---|---|
-| **Registro fósil** | Reúne 12 trofeos. Cada dinosaurio rival que muere te da uno. |
-| **Colapso del hábitat** | Derriba el hábitat rival, que empieza con 26 de Vida. |
-| **Extinción** | Si al rival le toca robar y no le quedan cartas, pierde. El descarte **no se rebaraja**. |
+| **Registro fósil** | Reúne 6 trofeos. Cada dinosaurio rival que muere te da uno. |
+| **Colapso del hábitat** | Derriba el hábitat rival, que empieza con 34 de Vida. |
+| **Extinción** | Quien se queda sin mazo pierde. El descarte **no se rebaraja**, y hay cartas que le comen el mazo al rival. |
+
+Sobre 2.000 partidas las tres se reparten **28 % / 44 % / 28 %**: ninguna es decorado.
 
 Y de ahí sale la decisión de cada turno: **una fila llena tapa tu hábitat pero regala
 trofeos; una fila corta niega trofeos pero deja pasar el daño**. No hay postura segura.
@@ -37,7 +39,20 @@ Los cuatro clados no son un triángulo arbitrario, son una red trófica: los ter
 hacen daño extra a los ornitópodos, los tireóforos devuelven daño con las púas caudales,
 y la Defensa de cada carta sale de su morfología antipredatoria real.
 
-Ver **[SET_DE_CARTAS.md](SET_DE_CARTAS.md)** para las 23 cartas con su referencia.
+Ver **[SET_DE_CARTAS.md](SET_DE_CARTAS.md)** para las 25 cartas con su referencia.
+
+## Colección, sobres y mazos
+
+Empiezas con las 50 cartas del mazo de referencia y 240 dinomonedas. Se ganan
+jugando —60 por victoria, 20 por derrota— y se gastan en sobres de cinco cartas,
+con la garantía de una rara o mejor. Las copias que superan el máximo de su
+rareza no caben en ningún mazo legal, así que se funden por monedas.
+
+Un mazo son 50 cartas exactas y de cada carta caben tantas copias como diga su
+rareza: 3 común, 3 rara, 2 épica, 1 legendaria. Tú llevas el tuyo; la IA lleva
+siempre el de referencia, que es el que mide `BALANCE.md`.
+
+Todo se guarda en el navegador, en `localStorage`. No hay cuenta ni servidor.
 
 ## Correrlo en local
 
@@ -50,7 +65,7 @@ python -m http.server 8000
 y abrir <http://localhost:8000>.
 
 ```bash
-npm test        # 37 tests del motor de reglas
+npm test        # 47 tests del motor y de la colección
 npm run sim     # 2.000 partidas IA vs IA → BALANCE.md
 node sim/set.js # regenera SET_DE_CARTAS.md desde el código
 ```
@@ -67,9 +82,10 @@ un solo binario en el repositorio.
 ```
 src/data/      cartas y números de balance — ninguna constante suelta fuera de aquí
 src/engine/    motor de reglas: (estado, acción) → estado. Puro, sin DOM, corre en Node
-src/ui/        interfaz: sólo lee el estado, nunca lo muta
+src/ui/        interfaz: sólo lee el estado, nunca lo muta. almacen.js es el
+               único fichero que toca localStorage
 sim/           simulador de balance y generador del set
-test/          37 tests
+test/          47 tests
 v1/            versión anterior, jugable y congelada (ver v1/LEEME.md)
 ```
 

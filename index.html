@@ -19,7 +19,13 @@
       <h1>DinoWar</h1>
       <p class="menu-lema">Formación Morrison.<br>Dos poblaciones, un campo, <b>tres formas de ganar</b>.</p>
       <button id="btn-jugar" class="boton-grande">Empezar partida</button>
+      <div class="menu-fila">
+        <button id="btn-coleccion" class="boton-secundario">Colección</button>
+        <button id="btn-sobres" class="boton-secundario">Sobres</button>
+        <button id="btn-mazos" class="boton-secundario">Mazos</button>
+      </div>
       <button id="btn-ayuda-menu" class="boton-secundario">Cómo se juega</button>
+      <p class="menu-monedas"><b id="menu-moneda">0</b> dinomonedas · mazo <b id="menu-mazo">—</b></p>
       <p class="menu-record" id="menu-record"></p>
       <p class="menu-nota">Todos los taxones proceden de la Formación Morrison y están descritos formalmente. Cada rasgo declara su nivel de evidencia.</p>
     </div>
@@ -121,6 +127,46 @@
   </div>
 
   <!-- --------------------------------------------------------------- FIN -->
+  <section id="coleccion" class="pantalla oculta meta">
+    <header class="meta-barra">
+      <button class="meta-volver" data-volver>‹ Menú</button>
+      <h2>Colección</h2>
+      <span class="meta-moneda"><b class="moneda">0</b></span>
+    </header>
+    <div class="meta-filtros" id="col-filtros"></div>
+    <div class="meta-cuerpo" id="col-rejilla"></div>
+    <footer class="meta-pie">
+      <p class="meta-nota" id="col-resumen"></p>
+      <button id="btn-fundir" class="boton-grande" disabled>Fundir sobrantes</button>
+    </footer>
+  </section>
+
+  <section id="sobres" class="pantalla oculta meta">
+    <header class="meta-barra">
+      <button class="meta-volver" data-volver>‹ Menú</button>
+      <h2>Sobres</h2>
+      <span class="meta-moneda"><b class="moneda">0</b></span>
+    </header>
+    <div class="meta-cuerpo sobre-cuerpo">
+      <div class="sobre-tirada" id="sobre-tirada"></div>
+      <p class="meta-nota" id="sobre-aviso"></p>
+      <table class="sobre-odds" id="sobre-odds"></table>
+    </div>
+    <footer class="meta-pie">
+      <button id="btn-abrir" class="boton-grande">Abrir sobre</button>
+    </footer>
+  </section>
+
+  <section id="mazos" class="pantalla oculta meta">
+    <header class="meta-barra">
+      <button class="meta-volver" data-volver>‹ Menú</button>
+      <h2 id="mazos-titulo">Mazos</h2>
+      <span class="meta-moneda"><b class="moneda">0</b></span>
+    </header>
+    <div class="meta-cuerpo" id="mazos-cuerpo"></div>
+    <footer class="meta-pie" id="mazos-pie"></footer>
+  </section>
+
   <section id="fin" class="pantalla oculta">
     <div class="menu-caja">
       <h1 id="fin-titulo"></h1>

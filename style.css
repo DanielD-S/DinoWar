@@ -108,6 +108,154 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   color: var(--tenue); font-size: 12px; line-height: 1.5;
 }
 
+/* ------------------------------------------------- colección, sobres, mazos */
+
+.menu-fila { display: flex; gap: 8px; }
+.menu-fila .boton-secundario { margin-top: 10px; }
+.menu-monedas { margin-top: 12px; color: var(--tenue); font-size: 12px; }
+.menu-monedas b { color: var(--bio); }
+
+.meta { background: var(--fondo); }
+.meta-barra {
+  display: flex; align-items: center; gap: 10px; flex: 0 0 auto;
+  padding: calc(var(--seguro-arriba) + 10px) 12px 10px;
+  border-bottom: 1px solid var(--borde);
+}
+.meta-barra h2 { flex: 1; font-size: 16px; font-weight: 700; text-align: center; }
+.meta-volver { color: var(--tenue); font-size: 14px; padding: 6px 4px; }
+.meta-volver:active { color: var(--texto); }
+.meta-moneda { font-size: 13px; color: var(--tenue); min-width: 54px; text-align: right; }
+.meta-moneda b { color: var(--bio); font-size: 15px; }
+.meta-moneda::after { content: ' ◈'; color: var(--bio); }
+
+.meta-cuerpo {
+  flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  touch-action: pan-y; padding: 10px 12px 14px;
+}
+.meta-pie {
+  flex: 0 0 auto; padding: 10px 12px calc(var(--seguro-abajo) + 12px);
+  border-top: 1px solid var(--borde); background: var(--panel);
+}
+.meta-nota { color: var(--tenue); font-size: 12px; line-height: 1.45; margin-bottom: 8px; }
+.meta-nota.mal { color: var(--vida); }
+.boton-grande[disabled] { opacity: .4; }
+
+.meta-filtros {
+  flex: 0 0 auto; display: flex; gap: 6px; padding: 9px 12px 0; flex-wrap: wrap;
+}
+.chip {
+  padding: 6px 11px; border: 1px solid var(--borde); border-radius: 999px;
+  font-size: 12px; color: var(--tenue);
+}
+.chip.on { border-color: var(--bio); color: var(--bio); }
+
+/* Rejilla de colección: la carta se ve, el contador manda. */
+/* grid-auto-rows explícito: con filas "auto" dentro de un contenedor de altura
+   definida, Chrome las reparte y la carta se aplasta a la altura del texto. */
+.col-rejilla {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  align-content: start; grid-auto-rows: max-content;
+}
+.col-carta {
+  /* Flex en columna, no bloque: un <button> no crece con su contenido y la
+     rejilla lo aplasta a la altura de una línea. */
+  display: flex; flex-direction: column; align-items: stretch;
+  border: 1px solid var(--borde); border-radius: var(--radio);
+  background: var(--panel); overflow: hidden; text-align: left; padding: 0;
+}
+.col-arte { flex: 0 0 auto; }
+.col-pie { flex: 1 1 auto; }
+.col-carta.ninguna { opacity: .32; filter: grayscale(1); }
+/* Altura en píxeles, no aspect-ratio: dentro de una rejilla, un aspect-ratio
+   sobre anchura indefinida aporta cero a la altura intrínseca y la fila se
+   colapsa a la altura del texto. El recorte lo hace object-fit. */
+.col-arte {
+  height: 118px; background: #191510; display: flex; align-items: center; justify-content: center;
+}
+.col-arte svg, .col-arte .foto { width: 100%; height: 100%; object-fit: cover; display: block; }
+.col-pie { padding: 5px 6px 6px; }
+.col-nombre {
+  font-size: 10px; line-height: 1.15; height: 2.3em; overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.col-carta.dino .col-nombre { font-style: italic; }
+.col-cuenta { display: flex; justify-content: space-between; align-items: center; margin-top: 3px; }
+.col-cuenta b { font-size: 12px; }
+.col-cuenta .sobra { color: var(--trof); }
+.col-rar {
+  font-size: 8px; letter-spacing: .08em; text-transform: uppercase;
+}
+.rar-COMUN { color: #8f8878; }
+.rar-RARO { color: #6fa3c4; }
+.rar-EPICO { color: #b083d0; }
+.rar-LEGENDARIO { color: var(--bio); }
+
+/* Sobres */
+.sobre-cuerpo { display: flex; flex-direction: column; }
+.sobre-tirada {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;
+  min-height: 118px; align-content: start; grid-auto-rows: max-content; margin-bottom: 12px;
+}
+.sobre-carta {
+  border: 1px solid var(--borde); border-radius: 6px; background: var(--panel);
+  overflow: hidden; opacity: 0; transform: translateY(8px);
+  animation: revelar .32s ease forwards;
+}
+@keyframes revelar { to { opacity: 1; transform: none; } }
+.sobre-carta .col-arte { height: 88px; }
+.sobre-carta .col-nombre { font-size: 8px; height: 2.3em; }
+.sobre-carta.nueva { border-color: var(--bio); box-shadow: 0 0 0 1px var(--bio) inset; }
+.sobre-nueva { font-size: 8px; color: var(--bio); letter-spacing: .06em; }
+.sobre-vacio {
+  grid-column: 1 / -1; color: var(--tenue); font-size: 13px; text-align: center;
+  padding: 34px 10px; border: 1px dashed var(--borde); border-radius: var(--radio);
+}
+.sobre-odds { width: 100%; border-collapse: collapse; font-size: 12px; color: var(--tenue); }
+.sobre-odds th { text-align: left; font-weight: 400; padding: 4px 0; }
+.sobre-odds td { text-align: right; padding: 4px 0; }
+.sobre-odds tr + tr { border-top: 1px solid var(--borde); }
+
+/* Mazos */
+.mazo-ficha {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  border: 1px solid var(--borde); border-radius: var(--radio);
+  background: var(--panel); padding: 11px 12px; margin-bottom: 8px; text-align: left;
+}
+.mazo-ficha.activo { border-color: var(--bio); }
+.mazo-ficha .nom { flex: 1; min-width: 0; font-size: 14px; }
+.mazo-ficha .n { font-size: 12px; color: var(--tenue); }
+.mazo-ficha .n.mal { color: var(--vida); }
+.mazo-ficha .accion { font-size: 12px; color: var(--bio); padding: 4px 6px; }
+
+.mazo-nombre {
+  width: 100%; padding: 10px 12px; margin-bottom: 10px; font: inherit;
+  background: var(--panel-alto); color: var(--texto);
+  border: 1px solid var(--borde); border-radius: var(--radio);
+  -webkit-user-select: text; user-select: text;
+}
+.mazo-fila {
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid var(--borde); padding: 7px 2px;
+}
+.mazo-fila .mini { width: 34px; height: 34px; flex: 0 0 auto; border-radius: 4px; overflow: hidden; background: #191510; }
+.mazo-fila .mini svg, .mazo-fila .mini .foto { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mazo-fila .nom { flex: 1; min-width: 0; font-size: 12px; line-height: 1.2; }
+.mazo-fila .nom.dino { font-style: italic; }
+.mazo-fila .sub { font-size: 9px; color: var(--tenue); font-style: normal; }
+.mazo-paso { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
+.mazo-paso button {
+  width: 30px; height: 30px; border: 1px solid var(--borde); border-radius: 6px;
+  font-size: 17px; line-height: 1; color: var(--texto);
+}
+.mazo-paso button[disabled] { opacity: .3; }
+.mazo-paso b { min-width: 30px; text-align: center; font-size: 12px; }
+.mazo-paso b.lleno { color: var(--bio); }
+.mazo-total { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
+.mazo-total b.mal { color: var(--vida); }
+.mazo-total b.bien { color: var(--propio); }
+.meta-pie .fila { display: flex; gap: 8px; }
+.meta-pie .fila .boton-grande, .meta-pie .fila .boton-secundario { margin-top: 0; }
+
 /* ------------------------------------------------------------------- hud */
 
 #hud {
@@ -493,3 +641,5 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+.fin-premio { color: var(--bio); }
+.mazo-nombre { touch-action: auto; }

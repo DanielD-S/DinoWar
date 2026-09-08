@@ -23,6 +23,8 @@ export function montar() {
     descarte: id('descarte'), descarteCuerpo: id('descarte-cuerpo'),
     descarteTitulo: id('descarte-titulo'), descarteTexto: id('descarte-texto'),
     descarteCerrar: id('descarte-cerrar'),
+    coleccion: id('coleccion'), sobres: id('sobres'), mazos: id('mazos'),
+    btnColeccion: id('btn-coleccion'), btnSobres: id('btn-sobres'), btnMazos: id('btn-mazos'),
     rHabitat: id('r-habitat'), pHabitat: id('p-habitat'), rBarra: id('r-barra'), pBarra: id('p-barra'),
     turno: id('turno'), estacion: id('btn-estacion'),
     campo: id('campo'), franjaCampo: id('btn-campo'), franjaNota: id('franja-nota'),

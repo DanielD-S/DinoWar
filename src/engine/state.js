@@ -48,7 +48,13 @@ function nuevaInstancia(iid, cardId, dueno) {
   };
 }
 
-export function crearPartida(seedEntrada = 1) {
+/**
+ * @param {number} [seedEntrada]
+ * @param {Array<Array<[string, number]>>} [mazos] lista por jugador de pares
+ *   [cardId, copias]. Sin ella los dos juegan el mazo por defecto, que es lo
+ *   que mide el simulador; con ella entra el mazo que el jugador ha montado.
+ */
+export function crearPartida(seedEntrada = 1, mazos = null) {
   let rng = semilla(seedEntrada);
   const instancias = {};
   let siguienteInstId = 1;
@@ -56,7 +62,7 @@ export function crearPartida(seedEntrada = 1) {
 
   for (let j = 0; j < 2; j++) {
     const mazo = [];
-    for (const [cardId, copias] of MAZO) {
+    for (const [cardId, copias] of (mazos?.[j] ?? MAZO)) {
       for (let k = 0; k < copias; k++) {
         const iid = siguienteInstId++;
         instancias[iid] = nuevaInstancia(iid, cardId, j);

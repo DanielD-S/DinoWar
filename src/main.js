@@ -13,11 +13,15 @@ import {
 } from './ui/render.js';
 import { tomarEntrada, soltarEntrada } from './ui/input.js';
 import { detectarFotos } from './ui/art.js';
+import { montarMeta, abrirColeccion, abrirSobres, abrirMazos, pintarMenu, recompensar } from './ui/meta.js';
+import { mazoActivo } from './ui/almacen.js';
+import { aListaDeMazo } from './data/coleccion.js';
 import { animarCombate, cancelarAnimaciones, esperar, lineasDeLog } from './ui/animate.js';
 import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio } from './ui/audio.js';
 
 const APP = Object.freeze({
   BOOT: 'BOOT', MENU: 'MENU', PLAYING: 'PLAYING', RESOLVING: 'RESOLVING', GAME_OVER: 'GAME_OVER',
+  COLECCION: 'COLECCION', SOBRES: 'SOBRES', MAZOS: 'MAZOS',
 });
 
 const params = new URLSearchParams(location.search);
@@ -64,6 +68,9 @@ function irA(nuevo) {
   el.menu.classList.toggle('oculta', nuevo !== APP.MENU);
   el.partida.classList.toggle('oculta', nuevo !== APP.PLAYING && nuevo !== APP.RESOLVING);
   el.fin.classList.toggle('oculta', nuevo !== APP.GAME_OVER);
+  el.coleccion.classList.toggle('oculta', nuevo !== APP.COLECCION);
+  el.sobres.classList.toggle('oculta', nuevo !== APP.SOBRES);
+  el.mazos.classList.toggle('oculta', nuevo !== APP.MAZOS);
 }
 
 const interactivo = () => app === APP.PLAYING && estado?.fase === FASE.DESPLIEGUE;
@@ -297,6 +304,8 @@ function finPartida() {
     + ` · Hábitat <b>${Math.max(0, p.habitat)}</b> – <b>${Math.max(0, r.habitat)}</b><br>${estado.turno} turnos`;
 
   anotarResultado(gane, estado.turno);
+  const premio = recompensar(gane);
+  el.finDetalle.innerHTML += `<br><span class="fin-premio">+${premio} dinomonedas</span>`;
   sonido(gane ? 'gana' : 'pierde');
 }
 
@@ -308,7 +317,9 @@ function nuevaPartida() {
   registro = [];
 
   const s = Number(params.get('seed')) || (Date.now() & 0x7fffffff);
-  estado = crearPartida(s);
+  // Tú llevas tu mazo; la IA lleva el de referencia, que es el que mide el
+  // simulador. Así el balance publicado sigue significando algo.
+  estado = crearPartida(s, [aListaDeMazo(mazoActivo()), null]);
   rngIA = semilla(s ^ 0x5bf03635);
 
   irA(APP.PLAYING);
@@ -347,7 +358,12 @@ function iniciar() {
   pintarRecord();
   irA(APP.MENU);
 
+  montarMeta(() => irA(APP.MENU));
+
   el.btnJugar.addEventListener('click', () => { desbloquear(); nuevaPartida(); });
+  el.btnColeccion.addEventListener('click', () => { abrirColeccion(); irA(APP.COLECCION); });
+  el.btnSobres.addEventListener('click', () => { abrirSobres(); irA(APP.SOBRES); });
+  el.btnMazos.addEventListener('click', () => { abrirMazos(); irA(APP.MAZOS); });
   el.btnOtra.addEventListener('click', () => { pintarRecord(); nuevaPartida(); });
   el.btnListo.addEventListener('click', alPulsarListo);
   el.btnLog.addEventListener('click', abrirLog);
