@@ -1,12 +1,12 @@
 {
-  "name": "formacion-morrison",
+  "name": "dinowar",
   "version": "0.1.0",
-  "description": "Demo TCG territorial ambientado en la Formación Morrison (Jurásico Superior)",
+  "description": "Juego de cartas por turnos ambientado en la Formación Morrison (Jurásico Superior)",
   "type": "module",
   "private": true,
   "scripts": {
     "test": "node --test \"test/**/*.test.js\"",
     "sim": "node sim/run.js",
-    "serve": "python3 -m http.server 8000"
+    "serve": "python -m http.server 8000"
   }
 }
