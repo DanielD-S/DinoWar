@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { BALANCE, TOTAL_MAZO } from '../src/data/balance.js';
-import { CARTAS, CLADO, RASGO, carta } from '../src/data/cards.js';
+import { CARTAS, CLADO, RASGO, TIPO, carta } from '../src/data/cards.js';
 import {
   crearPartida, FASE, MOTIVO_FIN,
   unidadEn, unidadesDe, ataqueEfectivo, vidaActual, danoEntre,
@@ -555,4 +555,48 @@ test('Una unidad sin nada encima no tiene efectos que enseñar', () => {
   const iid = poner(s, 'stegosaurus', 0, 0);
   assert.deepEqual(efectosDe(s, iid), []);
   assert.deepEqual(adheridasA(s, iid), []);
+});
+
+// --------------------------------------------- la ranura de clima es sólo eso
+
+test('Un clima no elige objetivo, y todo lo que sí se juega elige uno', () => {
+  for (const c of Object.values(CARTAS)) {
+    if (c.tipo === TIPO.CLIMA) {
+      assert.equal(c.objetivo, undefined,
+        `${c.id}: un clima ocupa su ranura por ser clima, no por su objetivo`);
+    } else if (c.tipo !== TIPO.DINOSAURIO) {
+      assert.ok(c.objetivo, `${c.id}: un evento o un recurso tiene que decir sobre qué cae`);
+    }
+  }
+});
+
+test('Un clima y un evento caben en el mismo turno', () => {
+  const s = tablero();
+  s.fase = FASE.DESPLIEGUE;
+  s.jugadores[0].biomasa = 9;
+  const victima = poner(s, 'allosaurus', 1, 0);
+  const cl = enMano(s, 'sabana', 0);
+  const ev = enMano(s, 'fractura', 0);
+
+  let r = reduce(s, { tipo: ACCION.CLIMA, jugador: 0, iid: cl });
+  assert.equal(validar(r, { tipo: ACCION.EVENTO, jugador: 0, iid: ev, objetivo: victima }), null,
+    'poner clima no puede impedir jugar un evento');
+
+  r = reduce(r, { tipo: ACCION.EVENTO, jugador: 0, iid: ev, objetivo: victima });
+  r = ejecutar(r, FASE.REVELACION);
+
+  assert.equal(r.campo, 'sabana', 'el clima queda puesto');
+  assert.equal(ataqueEfectivo(r, victima), carta('allosaurus').ataque - BALANCE.rasgos.fracturaAtaque,
+    'y el evento también surtió efecto');
+});
+
+test('Dos climas en el mismo turno, no', () => {
+  const s = tablero();
+  s.fase = FASE.DESPLIEGUE;
+  s.jugadores[0].biomasa = 9;
+  const uno = enMano(s, 'sabana', 0);
+  const dos = enMano(s, 'canal', 0);
+
+  const r = reduce(s, { tipo: ACCION.CLIMA, jugador: 0, iid: uno });
+  assert.match(validar(r, { tipo: ACCION.CLIMA, jugador: 0, iid: dos }), /clima/);
 });

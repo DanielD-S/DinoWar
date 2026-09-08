@@ -125,7 +125,7 @@ const DESTINO = {
   [OBJETIVO.PROPIO]: 'sobre un dinosaurio tuyo',
   [OBJETIVO.RIVAL]: 'sobre un dinosaurio del rival',
   [OBJETIVO.CLADO]: 'sobre un clado rival que eliges',
-  [OBJETIVO.CAMPO]: 'sobre el campo entero',
+  [OBJETIVO.NINGUNO]: 'sobre la mesa entera, sin elegir objetivo',
 };
 for (const [id, c] of Object.entries(CARTAS)) {
   if (c.tipo !== TIPO.EVENTO) continue;

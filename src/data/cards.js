@@ -27,7 +27,12 @@ export const OBJETIVO = Object.freeze({
   PROPIO: 'PROPIO',   // un dinosaurio tuyo
   RIVAL: 'RIVAL',     // un dinosaurio del rival
   CLADO: 'CLADO',     // todos los rivales de un clado que eliges
-  CAMPO: 'CAMPO',     // el campo entero
+  // No se elige nada: la carta cae sobre la mesa entera. Antes esto se llamaba
+  // CAMPO y valía a la vez para «no tiene objetivo» y para «ocupa la ranura de
+  // clima», que son cosas distintas: por eso una Mortandad se podía soltar
+  // sobre la franja del clima y parecía que la estabas poniendo de clima.
+  // Qué ocupa la ranura lo dice el tipo de la carta, no su objetivo.
+  NINGUNO: 'NINGUNO',
 });
 
 /**
@@ -105,11 +110,12 @@ export const RASGO = Object.freeze({
 
 const dino = (o) => Object.freeze({ tipo: TIPO.DINOSAURIO, ...o });
 const evento = (o) => Object.freeze({ tipo: TIPO.EVENTO, ataque: 0, defensa: 0, vida: 0, ...o });
-const clima = (o) => Object.freeze({ tipo: TIPO.CLIMA, objetivo: OBJETIVO.CAMPO, ataque: 0, defensa: 0, vida: 0, coste: 2, ...o });
+// Un clima no elige objetivo: ocupa la ranura de clima, y eso lo dice su tipo.
+const clima = (o) => Object.freeze({ tipo: TIPO.CLIMA, ataque: 0, defensa: 0, vida: 0, coste: 2, ...o });
 // Los pulsos se juegan BOCA ARRIBA y surten efecto al instante: dar Biomasa
 // "este turno" no sirve de nada si se resuelve después del despliegue. A cambio
 // el rival los ve venir, que es parte de su precio.
-const recurso = (o) => Object.freeze({ tipo: TIPO.RECURSO, objetivo: OBJETIVO.CAMPO, ataque: 0, defensa: 0, vida: 0, coste: 0, ...o });
+const recurso = (o) => Object.freeze({ tipo: TIPO.RECURSO, objetivo: OBJETIVO.NINGUNO, ataque: 0, defensa: 0, vida: 0, coste: 0, ...o });
 
 export const CARTAS = Object.freeze({
 
@@ -327,7 +333,7 @@ export const CARTAS = Object.freeze({
 
   trampa: evento({
     id: 'trampa', rareza: RAREZA.RARO, binomial: 'Trampa de depredadores', coste: 1,
-    objetivo: OBJETIVO.CAMPO,
+    objetivo: OBJETIVO.NINGUNO,
     rasgo: RASGO.TRAMPA, rasgoNombre: 'Trampa de depredadores',
     rasgoTexto: 'El rival pierde 12 cartas de su mazo. Tú pierdes 3: el fango no distingue.',
     nivel_evidencia: EVIDENCIA.DEBATIDO,
@@ -336,7 +342,7 @@ export const CARTAS = Object.freeze({
 
   mortandad: evento({
     id: 'mortandad', rareza: RAREZA.LEGENDARIO, binomial: 'Mortandad estacional', coste: 1,
-    objetivo: OBJETIVO.CAMPO,
+    objetivo: OBJETIVO.NINGUNO,
     rasgo: RASGO.MORTANDAD, rasgoNombre: 'Mortandad estacional',
     rasgoTexto: '2 de daño a TODOS los dinosaurios del campo, incluidos los tuyos.',
     nivel_evidencia: EVIDENCIA.DEBATIDO,

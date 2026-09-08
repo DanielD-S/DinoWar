@@ -108,11 +108,16 @@ function admite(cardId, destino) {
   if (c.tipo === TIPO.DINOSAURIO) {
     return destino.tipo === 'ranura' && destino.bando === JUGADOR && destino.libre;
   }
+  // La franja es la ranura del clima y sólo eso. Antes cualquier carta sin
+  // objetivo se podía soltar ahí —Mortandad, Trampa, los recursos— y parecía
+  // que la estabas poniendo de clima, cuando lo que hacía era resolverse y
+  // marcharse al descarte.
   if (c.tipo === TIPO.CLIMA) return destino.tipo === 'franja';
+  if (destino.tipo === 'franja') return false;
   if (c.tipo === TIPO.RECURSO) return true;   // se sueltan en cualquier parte del campo
   if (c.objetivo === OBJETIVO.PROPIO) return destino.tipo === 'unidad' && destino.propia;
   if (c.objetivo === OBJETIVO.RIVAL) return destino.tipo === 'unidad' && !destino.propia;
-  return true;   // los que afectan al campo entero
+  return true;   // los que caen sobre la mesa entera
 }
 
 function soltar(iid, cardId, destino) {
@@ -120,11 +125,12 @@ function soltar(iid, cardId, destino) {
 
   if (!admite(cardId, destino)) {
     const pista = c.tipo === TIPO.DINOSAURIO ? 'Suelta los dinosaurios en una de tus ranuras libres.'
-      : c.tipo === TIPO.CLIMA ? 'Las cartas de clima van a la franja del centro.'
-        : c.tipo === TIPO.RECURSO ? 'Las cartas de recurso se sueltan en cualquier parte del campo.'
-          : c.objetivo === OBJETIVO.PROPIO ? 'Este evento se suelta sobre un dinosaurio tuyo.'
-            : c.objetivo === OBJETIVO.RIVAL ? 'Este evento se suelta sobre un dinosaurio del rival.'
-              : 'Suéltala sobre el campo.';
+      : c.tipo === TIPO.CLIMA ? 'Los climas van a la ranura de Clima, la franja del centro.'
+        : destino?.tipo === 'franja' ? 'Esa franja es sólo para los climas. Suéltala en el campo.'
+          : c.tipo === TIPO.RECURSO ? 'Las cartas de recurso se sueltan en cualquier parte del campo.'
+            : c.objetivo === OBJETIVO.PROPIO ? 'Este evento se suelta sobre un dinosaurio tuyo.'
+              : c.objetivo === OBJETIVO.RIVAL ? 'Este evento se suelta sobre un dinosaurio del rival.'
+                : 'Suéltala sobre el campo, fuera de la franja del clima.';
     mensaje(pista, true);
     sonido('error');
     return;
@@ -150,7 +156,7 @@ function soltar(iid, cardId, destino) {
   }
   if (c.objetivo === OBJETIVO.CLADO) { pedirClado(iid, c); return; }
 
-  const objetivo = c.objetivo === OBJETIVO.CAMPO ? undefined : destino.iid;
+  const objetivo = c.objetivo === OBJETIVO.NINGUNO ? undefined : destino.iid;
   if (aplicar({ tipo: ACCION.EVENTO, jugador: JUGADOR, iid, objetivo })) {
     mensaje(`${c.rasgoNombre} preparado.`);
   }

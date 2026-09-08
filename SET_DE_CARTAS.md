@@ -254,13 +254,13 @@ Se juega **sobre un clado rival que eliges**. −2 Poder a todos los dinosaurios
 
 ### Trampa de depredadores · Rara · coste 1 · 3 copias
 
-Se juega **sobre el campo entero**. El rival pierde 12 cartas de su mazo. Tú pierdes 3: el fango no distingue.
+Se juega **sobre la mesa entera, sin elegir objetivo**. El rival pierde 12 cartas de su mazo. Tú pierdes 3: el fango no distingue.
 
 `DEBATIDO` · La cantera Cleveland-Lloyd, en la Morrison de Utah, acumula decenas de individuos de Allosaurus en una proporción de depredadores frente a presas que no se da en un ecosistema vivo. La trampa de depredadores es una de las explicaciones; también se ha propuesto sequía o agua envenenada. El yacimiento es un hecho, su mecanismo no.
 
 ### Mortandad estacional · Legendaria · coste 1 · 1 copia
 
-Se juega **sobre el campo entero**. 2 de daño a TODOS los dinosaurios del campo, incluidos los tuyos.
+Se juega **sobre la mesa entera, sin elegir objetivo**. 2 de daño a TODOS los dinosaurios del campo, incluidos los tuyos.
 
 `DEBATIDO` · Algunas acumulaciones óseas de la Morrison se han interpretado como mortandades masivas asociadas a sequía o a eventos de crecida. La causa concreta de cada yacimiento sigue discutiéndose.
 

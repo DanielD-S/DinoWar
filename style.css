@@ -721,16 +721,25 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   background: linear-gradient(90deg, rgba(217,164,65,.07), rgba(217,164,65,.02));
   font-size: 12px; min-height: 32px;
 }
+/* Se llama Clima porque es lo único que admite. Cuando ponía «Campo» se leía
+   como «el sitio donde se juegan las cartas al campo» y ahí se soltaba de
+   todo: una Mortandad, un recurso, cualquier cosa sin objetivo. */
 .franja::before {
-  content: 'Campo'; flex: 0 0 auto;
+  content: 'Clima'; flex: 0 0 auto;
   font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--tenue);
 }
 .franja-campo {
   flex: 1; text-align: left; color: var(--tenue-2);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+/* Vacía se ve como un hueco por llenar; con clima puesto, como una carta. */
+.franja:not(:has(.franja-campo.puesto)) { border-style: dashed; }
+.franja:has(.franja-campo.puesto) {
+  border-color: var(--borde-fuerte);
+  background: linear-gradient(90deg, rgba(217,164,65,.13), rgba(217,164,65,.04));
+}
 .franja-campo.puesto { color: var(--texto); }
-.franja.destino { border-color: var(--bio); background: rgba(217,164,65,.12); }
+.franja.destino { border-style: solid; border-color: var(--bio); background: rgba(217,164,65,.16); }
 .franja-nota { color: var(--tenue-2); font-size: 10px; flex: 0 0 auto; }
 /* Lo tuyo comprometido: se puede tocar, así que tiene que parecer un botón. */
 .franja-mias {

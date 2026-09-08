@@ -275,7 +275,7 @@ function pintarFranja(estado) {
     el.franjaCampo.dataset.card = estado.campo;
     el.franjaCampo.classList.add('puesto');
   } else {
-    el.franjaCampo.textContent = 'Sin carta de campo';
+    el.franjaCampo.textContent = 'Sin clima';
     delete el.franjaCampo.dataset.card;
     el.franjaCampo.classList.remove('puesto');
   }
@@ -677,7 +677,7 @@ export function ayudaHTML() {
     <div class="ayuda-h">Las otras cartas</div>
     <ul class="ayuda-lista">
       <li><span class="k">Evento</span><span class="v">Mejora a un dinosaurio <b>tuyo</b> o le mete una presión a uno <b>del rival</b>. La carta dice sobre qué se suelta.</span></li>
-      <li><span class="k">Clima</span><span class="v">Un paleoambiente activo a la vez, que cambia las reglas <b>para los dos</b>. Se suelta en la franja central.</span></li>
+      <li><span class="k">Clima</span><span class="v">Un paleoambiente activo a la vez, que cambia las reglas <b>para los dos</b> y <b>se queda</b> hasta que otro clima lo sustituya. Tiene su propia ranura, la franja del centro, y es lo único que cabe ahí: puedes poner un clima y jugar eventos el mismo turno, pero <b>un solo clima por turno</b>.</span></li>
       <li><span class="k">Recurso</span><span class="v">Biomasa al instante a cambio de un inconveniente. Se juega <b>boca arriba</b>: el rival la ve.</span></li>
     </ul>
 
