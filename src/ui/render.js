@@ -125,7 +125,8 @@ function claseFamilia(cardId) {
 
 function nodoCarta(estado, cardId, { variante, dueno = null, iid = null, clases = [], datos = {} }) {
   const n = document.createElement('div');
-  n.className = `carta carta--${variante}${claseFamilia(cardId)}${clases.length ? ' ' + clases.join(' ') : ''}`;
+  n.className = `carta carta--${variante}${claseFamilia(cardId)} rareza-${carta(cardId).rareza}`
+    + `${clases.length ? ' ' + clases.join(' ') : ''}`;
   if (dueno !== null) n.classList.add(dueno === JUGADOR ? 'propio' : 'rival');
   if (iid !== null) n.dataset.iid = iid;
   n.dataset.card = cardId;
@@ -149,7 +150,11 @@ function pintarRanuras(estado) {
       const clave = inst ? `u${inst.iid}` : pendiente ? `p${pendiente.iid}` : null;
 
       if (nodo.dataset.clave === clave) {
-        if (inst) actualizarCarta(estado, nodo.firstElementChild, inst);
+        if (inst) {
+          actualizarCarta(estado, nodo.firstElementChild, inst);
+          const libre = unidadEn(estado, bando === JUGADOR ? RIVAL : JUGADOR, r) === null;
+          nodo.firstElementChild?.classList.toggle('pasa', libre);
+        }
         continue;
       }
 
@@ -158,8 +163,12 @@ function pintarRanuras(estado) {
       nodo.classList.toggle('ocupada', clave !== null);
 
       if (inst) {
+        // Enfrente no hay nadie: tal y como está el campo, esta unidad pega al
+        // hábitat. Es una foto del momento —el rival aún puede desplegar ahí en
+        // secreto— y por eso se marca con el borde y no con una promesa escrita.
+        const libre = unidadEn(estado, bando === JUGADOR ? RIVAL : JUGADOR, r) === null;
         nodo.appendChild(nodoCarta(estado, inst.cardId, {
-          variante: 'ranura', dueno: bando, iid: inst.iid, clases: ['entra'],
+          variante: 'ranura', dueno: bando, iid: inst.iid, clases: libre ? ['entra', 'pasa'] : ['entra'],
           datos: {
             poder: ataqueEfectivo(estado, inst.iid),
             defensa: reduccionDe(estado, inst.iid),

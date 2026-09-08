@@ -55,6 +55,11 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Foco de teclado visible y del color del juego. Sin esto, quien navega con
+   teclado no sabe dónde está: el anillo azul del navegador desaparecía sobre
+   el fondo oscuro y :focus-visible no estaba definido en ninguna parte. */
+:focus-visible { outline: 2px solid var(--bio); outline-offset: 2px; }
+
 html, body {
   height: 100%;
   overflow: hidden;
@@ -343,7 +348,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;
   min-height: 118px; align-content: start; grid-auto-rows: max-content; margin-bottom: 12px;
 }
-.sobre-nueva { font-size: 8px; color: var(--bio); letter-spacing: .06em; }
 .sobre-vacio {
   grid-column: 1 / -1; color: var(--tenue); font-size: 13px; text-align: center;
   padding: 34px 10px; border: 1px dashed var(--borde); border-radius: var(--radio);
@@ -366,32 +370,74 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .mazo-ficha .accion { font-size: 12px; color: var(--acento-claro); padding: 6px 8px; }
 
 .mazo-nombre {
-  width: 100%; padding: 10px 12px; margin-bottom: 10px; font: inherit;
-  background: var(--panel-alto); color: var(--texto);
+  width: 100%; padding: 12px 13px; margin-bottom: 10px; font: inherit; font-size: 15px;
+  background: rgba(244,236,224,.04); color: var(--texto);
   border: 1px solid var(--borde); border-radius: var(--radio);
   -webkit-user-select: text; user-select: text;
 }
+
+/* Marcador del mazo: la cifra manda y la barra dice cuánto falta. */
+.mazo-marcador { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 12px; }
+.mazo-marcador b { font-size: 20px; font-weight: 500; color: var(--peligro); }
+.mazo-marcador b.bien { color: var(--acento-claro); }
+.mazo-marcador span { color: var(--tenue); }
+.mazo-barra {
+  flex: 1; height: 6px; border-radius: 3px; background: rgba(244,236,224,.07); overflow: hidden;
+}
+.mazo-barra i { display: block; height: 100%; background: var(--borde-fuerte); transition: width .25s; }
+.mazo-barra i.bien { background: linear-gradient(90deg, var(--borde-fuerte), var(--bio)); }
+.mazo-distintas { flex: 0 0 auto; font-size: 10px; color: var(--tenue-2); }
+
+/* Curva de coste: dónde se acumula el mazo, de un vistazo. */
+.mazo-curva {
+  display: flex; align-items: flex-end; gap: 4px; height: 58px; margin-bottom: 12px;
+  padding: 6px 8px; border-radius: var(--radio);
+  background: rgba(244,236,224,.03); border: 1px solid var(--linea);
+}
+.mazo-curva .cb { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; }
+.mazo-curva .cb i {
+  width: 100%; margin-top: auto; min-height: 2px; border-radius: 2px; background: #3a2f22;
+  transition: height .25s;
+}
+.mazo-curva .cb i.n1 { background: #6b552d; }
+.mazo-curva .cb i.n2 { background: #8a6c38; }
+.mazo-curva .cb i.n3 { background: var(--bio); }
+.mazo-curva .cb em {
+  font-style: normal; font-size: 9px; color: var(--tenue-2); margin-top: 3px;
+}
+
+.mazo-pestanas { display: flex; gap: 6px; margin-bottom: 10px; }
+.mazo-pestanas .chip { flex: 1; font-size: 11.5px; padding: 7px 4px; }
+
 .mazo-fila {
-  display: flex; align-items: center; gap: 9px;
+  display: flex; align-items: center; gap: 8px;
   border-bottom: 1px solid var(--superficie-2); padding: 8px 2px;
 }
-.mazo-fila .mini { width: 34px; height: 34px; flex: 0 0 auto; border-radius: 4px; overflow: hidden; background: #191510; }
+.mazo-fila.lleno { opacity: .55; }
+.mazo-fila .coste {
+  flex: 0 0 auto; width: 20px; height: 20px; border-radius: 50%;
+  border: 1px solid var(--borde); color: var(--texto-2); font-size: 10px;
+  display: grid; place-items: center;
+}
+.mazo-fila .mini { width: 32px; height: 32px; flex: 0 0 auto; border-radius: 4px; overflow: hidden; background: #14100c; }
 .mazo-fila .mini svg, .mazo-fila .mini .foto { width: 100%; height: 100%; object-fit: cover; display: block; }
 .mazo-fila .nom { flex: 1; min-width: 0; font-size: 12px; line-height: 1.2; }
 .mazo-fila .nom.dino { font-style: italic; }
-.mazo-fila .sub { font-size: 9px; color: var(--tenue); font-style: normal; }
-.mazo-paso { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
+.mazo-fila .sub { display: block; font-size: 9px; color: var(--tenue); font-style: normal; margin-top: 2px; }
+.mazo-chip {
+  flex: 0 0 auto; padding: 3px 7px; border-radius: 3px; font-size: 9.5px; white-space: nowrap;
+  color: var(--tenue); box-shadow: 0 0 0 1px var(--borde);
+}
+.mazo-chip.puestas { background: var(--bio); box-shadow: none; color: #191410; }
+.mazo-paso { display: flex; align-items: center; gap: 5px; flex: 0 0 auto; }
 .mazo-paso button {
   width: 30px; height: 30px; border: 1px solid var(--borde); border-radius: 6px;
-  font-size: 17px; line-height: 1; color: var(--texto);
+  font-size: 17px; line-height: 1; color: var(--texto-2);
 }
+.mazo-paso button:active:not([disabled]) { border-color: var(--borde-fuerte); }
 .mazo-paso button[disabled] { opacity: .3; }
-.mazo-paso b { min-width: 30px; text-align: center; font-size: 12px; }
-.mazo-paso b.lleno { color: var(--acento-claro); }
-.mazo-total { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
-.mazo-total b.mal { color: var(--vida); }
-.mazo-total b.bien { color: var(--propio); }
-.meta-pie .fila { display: flex; gap: 8px; }
+.meta-pie .fila { display: flex; gap: 8px; margin-bottom: 9px; }
+.meta-pie .fila .boton-secundario { flex: 1; font-size: 12px; padding: 11px 4px; min-height: 42px; }
 .meta-pie .fila .boton-grande, .meta-pie .fila .boton-secundario { margin-top: 0; }
 
 /* ------------------------------------------------------------ animaciones */
@@ -445,7 +491,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* ---------------------------------------------------------- sobre abierto */
 
-.sobre-tirada.abierto { display: grid; grid-template-columns: repeat(5, 1fr); }
+.sobre-tirada.abierto {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;
+  align-items: start; padding-top: 10px;
+}
 
 .sobre-carta {
   perspective: 620px; background: none; border: 0; overflow: visible;
@@ -494,6 +543,25 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   40%      { box-shadow: 0 0 26px 2px rgba(217,164,65,.5); }
 }
 .sobre-carta.nueva .sobre-frente { box-shadow: 0 0 0 1px var(--bio) inset; }
+
+/* La mejor de la tirada sale la última, más grande y elevada: abrir un sobre
+   tiene que tener un momento, y ese es. */
+.sobre-carta.mejor { z-index: 2; }
+.sobre-carta.mejor .sobre-giro { transform: rotateY(180deg) scale(1.16) translateY(-8px); }
+.sobre-carta.mejor.gira .sobre-giro { transform: scale(1.16) translateY(-8px); }
+.sobre-carta.mejor .sobre-frente {
+  border-color: var(--bio); box-shadow: 0 0 26px rgba(217,164,65,.3);
+}
+
+/* Qué es esta carta para tu colección. Sin esto, la cuarta copia de algo que
+   ya no cabe se ve igual que la primera. */
+.sobre-estado {
+  display: block; margin-top: 5px; font-size: 8.5px; line-height: 1.2;
+  color: var(--tenue-2); text-align: center;
+}
+.sobre-estado.nueva { color: var(--acento-claro); }
+.sobre-estado.sobra { color: var(--peligro); }
+.sobre-carta.mejor .sobre-estado { margin-top: 10px; }
 
 /* ------------------------------------------------------------------- hud */
 
@@ -743,6 +811,29 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Las cifras al pie de la carta: la ranura es más alta que su contenido y
    dejarlas pegadas al nombre abría un hueco muerto debajo. */
 .carta--ranura .c-stats { margin-top: auto; }
+
+/* Ranura de enfrente vacía: por ahí pasa el daño. En lo tuyo se enciende en
+   ámbar, en lo del rival en rojo, y es lo único encendido del tablero. */
+.carta--ranura.propio.pasa { box-shadow: 0 0 0 1px var(--bio), 0 0 14px rgba(217,164,65,.2); }
+.carta--ranura.rival.pasa { box-shadow: 0 0 0 1px var(--rival); }
+.carta--ranura.pasa .c-arte::before {
+  content: '›'; position: absolute; z-index: 2; top: 2px; right: 4px;
+  font-size: 13px; line-height: 1; color: var(--acento-claro);
+  text-shadow: 0 1px 3px #000;
+}
+.carta--ranura.rival.pasa .c-arte::before { color: var(--rival); transform: rotate(90deg); }
+.carta--ranura.propio.pasa .c-arte::before { transform: rotate(-90deg); }
+
+/* La rareza se lee en el borde, en la escala ámbar: común apagada, rara y
+   épica firmes, legendaria encendida. */
+.carta.rareza-RARO, .carta.rareza-EPICO { box-shadow: 0 0 0 1px var(--borde-fuerte); }
+.carta.rareza-LEGENDARIO { box-shadow: 0 0 0 1px var(--bio); }
+.col-carta.rareza-RARO, .col-carta.rareza-EPICO { box-shadow: 0 0 0 1px var(--borde-fuerte); }
+.col-carta.rareza-LEGENDARIO { box-shadow: 0 0 0 1px var(--bio), 0 0 18px rgba(217,164,65,.12); }
+/* El bando y la marca de paso mandan sobre la rareza: en el tablero importa
+   más de quién es la carta y por dónde entra el daño. */
+.carta--ranura.propio { box-shadow: 0 0 0 1px var(--propio-tenue); }
+.carta--ranura.rival { box-shadow: 0 0 0 1px var(--rival-tenue); }
 .carta--ranura.propio { box-shadow: 0 0 0 1px var(--propio-tenue); }
 .carta--ranura.rival { box-shadow: 0 0 0 1px var(--rival-tenue); }
 /* El retardo lo pone animarRevelacion() para que las cartas se abran en

@@ -131,7 +131,8 @@ function pintarColeccion() {
         </div>
       </div>`;
     }
-    return `<div class="col-carta ${esDino(c) ? 'dino' : ''}" role="button" tabindex="0" data-card="${c.id}">
+    return `<div class="col-carta rareza-${c.rareza} ${esDino(c) ? 'dino' : ''}"
+                 role="button" tabindex="0" data-card="${c.id}">
       <div class="col-arte">${arte(c.id)}</div>
       <span class="col-copias${extra ? ' sobra' : ''}">${n}/${limiteDe(c.id)}</span>
       <div class="col-pie">
@@ -182,7 +183,32 @@ export function abrirSobres() {
   return dom.sobres;
 }
 
-function pintarSobres(tirada = null, nuevas = new Set()) {
+/**
+ * Qué significa esta carta para tu colección. Es la línea que convierte cinco
+ * cartas en una recompensa legible: sin ella, abrir un sobre y sacar la cuarta
+ * copia de algo que ya no cabe se ve igual que sacar la primera.
+ * @param {string} cardId
+ * @param {number} antes copias que tenías ANTES de abrir
+ * @param {number} enEsteSobre cuántas han salido en esta tirada
+ */
+function estadoDeCopia(cardId, antes, enEsteSobre) {
+  const tope = limiteDe(cardId);
+  const total = antes + enEsteSobre;
+  if (antes === 0 && enEsteSobre === 1) return { texto: 'Primera copia', clase: 'nueva' };
+  if (total > tope) return { texto: `Ya tenías ${antes} · sobrante`, clase: 'sobra' };
+  return { texto: `Copia ${total} de ${tope}`, clase: '' };
+}
+
+/** La rareza más alta de la tirada: es la carta que se enseña en grande. */
+function mejorDeLaTirada(tirada) {
+  let mejor = 0;
+  for (let i = 1; i < tirada.length; i++) {
+    if (ORDEN.indexOf(carta(tirada[i]).rareza) < ORDEN.indexOf(carta(tirada[mejor]).rareza)) mejor = i;
+  }
+  return mejor;
+}
+
+function pintarSobres(tirada = null, nuevas = new Set(), antesDeAbrir = {}) {
   const p = cargarPerfil();
   pintarMonedas();
 
@@ -204,11 +230,16 @@ function pintarSobres(tirada = null, nuevas = new Set()) {
     // variable CSS para que la animación de reparto y la de volteo compartan
     // el mismo reloj sin encadenar temporizadores en JS.
     dom.tirada.className = 'sobre-tirada abierto';
+    // La mejor de la tirada entra la última y en grande: es la que hay que ver.
+    const mejor = mejorDeLaTirada(tirada);
+    const cuenta = {};
     dom.tirada.innerHTML = tirada.map((cid, i) => {
       const c = carta(cid);
-      const nueva = nuevas.has(cid);
-      return `<div class="sobre-carta rareza-${c.rareza} ${nueva ? 'nueva' : ''}"
-                   data-card="${cid}" style="--retardo:${i * 220}ms">
+      cuenta[cid] = (cuenta[cid] ?? 0) + 1;
+      const est = estadoDeCopia(cid, antesDeAbrir[cid] ?? 0, cuenta[cid]);
+      const retardo = (i === mejor ? tirada.length - 1 : i - (i > mejor ? 1 : 0)) * 220;
+      return `<div class="sobre-carta rareza-${c.rareza} ${nuevas.has(cid) ? 'nueva' : ''} ${i === mejor ? 'mejor' : ''}"
+                   data-card="${cid}" style="--retardo:${retardo}ms">
         <div class="sobre-giro">
           <div class="sobre-dorso"></div>
           <div class="sobre-frente">
@@ -216,10 +247,10 @@ function pintarSobres(tirada = null, nuevas = new Set()) {
             <div class="col-pie">
               <div class="col-nombre">${nombreHTML(c)}</div>
               <div class="col-rar rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</div>
-              ${nueva ? '<div class="sobre-nueva">NUEVA</div>' : ''}
             </div>
           </div>
         </div>
+        <span class="sobre-estado ${est.clase}">${est.texto}</span>
       </div>`;
     }).join('');
   }
@@ -244,13 +275,14 @@ function comprarSobre() {
 
   const tirada = abrirSobre(Math.random);
   const nuevas = new Set(tirada.filter((cid) => (p.cartas[cid] ?? 0) === 0));
+  const antesDeAbrir = { ...p.cartas };
 
   actualizarPerfil({
     monedas: PRUEBAS ? p.monedas : p.monedas - ECONOMIA.precioSobre,
     sobresAbiertos: p.sobresAbiertos + 1,
   });
   anadirCartas(tirada);
-  pintarSobres(tirada, nuevas);
+  pintarSobres(tirada, nuevas, antesDeAbrir);
   pintarMenu();
 
   // El volteo se dispara en el fotograma siguiente al pintado, para que el
@@ -304,52 +336,102 @@ function pintarMazos() {
   };
 }
 
+/** Reparto de costes del mazo, en cubos de 0 a 7+. */
+function curvaDeCoste(mazo) {
+  const cubos = Array.from({ length: 8 }, () => 0);
+  for (const [cardId, copias] of Object.entries(mazo)) {
+    if (!CARTAS[cardId] || copias <= 0) continue;
+    cubos[Math.min(7, carta(cardId).coste)] += copias;
+  }
+  return cubos;
+}
+
+function curvaHTML(mazo) {
+  const cubos = curvaDeCoste(mazo);
+  const alto = Math.max(1, ...cubos);
+  return `<div class="mazo-curva">${cubos.map((n, i) => {
+    const pct = Math.round((100 * n) / alto);
+    // El color sube con la barra: dice de un vistazo dónde se acumula el mazo.
+    const nivel = n === 0 ? 0 : Math.min(3, Math.floor((4 * n) / (alto + 0.01)));
+    return `<span class="cb" title="${n} cartas de coste ${i === 7 ? '7 o más' : i}">
+      <i class="n${nivel}" style="height:${pct}%"></i>
+      <em>${i === 7 ? '7+' : i}</em>
+    </span>`;
+  }).join('')}</div>`;
+}
+
+/**
+ * Una fila del editor. `libres` = copias que aún caben. El apagado de las que
+ * están al máximo sólo tiene sentido mirando la colección —ahí dice «de esta ya
+ * no puedes meter más»—; en la lista del mazo apagaría casi todo.
+ */
+function filaEditor(c, n, tope, p, apagarLlenas) {
+  const libres = tope - n;
+  return `<div class="mazo-fila ${apagarLlenas && n >= tope ? 'lleno' : ''}">
+    <span class="coste">${c.coste}</span>
+    <span class="mini" data-card="${c.id}">${arte(c.id)}</span>
+    <span class="nom ${esDino(c) ? 'dino' : ''}">${c.binomial}
+      <span class="sub"><span class="col-rar rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span> · ${familia(c)}
+        · tienes ${p.cartas[c.id]}</span></span>
+    <span class="mazo-chip ${n > 0 ? 'puestas' : ''}">${n > 0 ? `${n} en mazo` : `${libres} libre${libres === 1 ? '' : 's'}`}</span>
+    <span class="mazo-paso">
+      <button data-menos="${c.id}" ${n === 0 ? 'disabled' : ''} aria-label="Quitar una copia">−</button>
+      <button data-mas="${c.id}" ${n >= tope ? 'disabled' : ''} aria-label="Añadir una copia">+</button>
+    </span>
+  </div>`;
+}
+
 function pintarEditor() {
   const p = cargarPerfil();
   const v = validarMazo(editando.cartas, p.cartas);
   dom.mazosTitulo.textContent = 'Editar mazo';
+  const pestana = editando.pestana ?? 'mazo';
 
   // Sólo se listan las cartas que tienes: un editor que enseña lo que no
   // puedes poner es un catálogo, y para eso está la colección.
   const tuyas = catalogo().filter((c) => (p.cartas[c.id] ?? 0) > 0);
+  const topeDe = (c) => Math.min(limiteDe(c.id), p.cartas[c.id] ?? 0);
+  const enMazo = tuyas.filter((c) => (editando.cartas[c.id] ?? 0) > 0)
+    .sort((a, b) => a.coste - b.coste || a.binomial.localeCompare(b.binomial));
+  const lista = pestana === 'mazo' ? enMazo : tuyas;
+  const distintas = enMazo.length;
 
   dom.mazosCuerpo.innerHTML = `
     <input class="mazo-nombre" id="mazo-nombre" maxlength="24" value="${editando.nombre.replace(/"/g, '&quot;')}">
-    <div class="mazo-total">
-      <span>Cartas en el mazo</span>
-      <b class="${v.total === TAM_MAZO ? 'bien' : 'mal'}">${v.total} / ${TAM_MAZO}</b>
+    <div class="mazo-marcador">
+      <b class="${v.total === TAM_MAZO ? 'bien' : 'mal'}">${v.total}</b><span>/${TAM_MAZO}</span>
+      <span class="mazo-barra"><i style="width:${Math.min(100, (100 * v.total) / TAM_MAZO).toFixed(0)}%"
+            class="${v.total === TAM_MAZO ? 'bien' : ''}"></i></span>
+      <span class="mazo-distintas">${distintas} distintas</span>
     </div>
-    ${tuyas.map((c) => {
-    const tope = Math.min(limiteDe(c.id), p.cartas[c.id] ?? 0);
-    const n = editando.cartas[c.id] ?? 0;
-    return `<div class="mazo-fila">
-        <span class="mini" data-card="${c.id}">${arte(c.id)}</span>
-        <span class="nom ${esDino(c) ? 'dino' : ''}">${c.binomial}
-          <span class="sub col-rar rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]} · ${familia(c)} · tienes ${p.cartas[c.id]}</span></span>
-        <span class="mazo-paso">
-          <button data-menos="${c.id}" ${n === 0 ? 'disabled' : ''}>−</button>
-          <b class="${n === tope ? 'lleno' : ''}">${n}/${tope}</b>
-          <button data-mas="${c.id}" ${n >= tope ? 'disabled' : ''}>+</button>
-        </span>
-      </div>`;
-  }).join('')}`;
+    ${curvaHTML(editando.cartas)}
+    <div class="mazo-pestanas">
+      <button class="chip ${pestana === 'mazo' ? 'on' : ''}" data-pestana="mazo">En el mazo · ${v.total}</button>
+      <button class="chip ${pestana === 'anadir' ? 'on' : ''}" data-pestana="anadir">Tu colección · ${tuyas.length}</button>
+    </div>
+    ${lista.length === 0
+    ? '<p class="desc-vacio">El mazo está vacío. Cambia a «Tu colección» para ir metiendo cartas.</p>'
+    : lista.map((c) => filaEditor(c, editando.cartas[c.id] ?? 0, topeDe(c), p, pestana === 'anadir')).join('')}`;
 
   dom.mazosPie.innerHTML = `
     ${v.problemas.length ? `<p class="meta-nota mal">${v.problemas[0]}</p>` : '<p class="meta-nota">Listo para jugar.</p>'}
     <div class="fila">
       <button class="boton-secundario" data-rellenar>Autocompletar</button>
+      <button class="boton-secundario" data-vaciar ${v.total === 0 ? 'disabled' : ''}>Vaciar</button>
       <button class="boton-secundario" data-cancelar>Cancelar</button>
-      <button class="boton-grande" data-guardar ${v.valido ? '' : 'disabled'}>Guardar</button>
-    </div>`;
+    </div>
+    <button class="boton-grande" data-guardar ${v.valido ? '' : 'disabled'}>Guardar y usar</button>`;
 
   const nombre = id('mazo-nombre');
   nombre.oninput = () => { editando.nombre = nombre.value; };
 
   dom.mazosCuerpo.onclick = (e) => {
+    const tab = e.target.closest('[data-pestana]');
     const mas = e.target.closest('[data-mas]');
     const menos = e.target.closest('[data-menos]');
     const mini = e.target.closest('.mini[data-card]');
-    if (mas) { const c = mas.dataset.mas; editando.cartas[c] = (editando.cartas[c] ?? 0) + 1; pintarEditor(); }
+    if (tab) { editando.pestana = tab.dataset.pestana; pintarEditor(); }
+    else if (mas) { const c = mas.dataset.mas; editando.cartas[c] = (editando.cartas[c] ?? 0) + 1; pintarEditor(); }
     else if (menos) {
       const c = menos.dataset.menos;
       editando.cartas[c] = Math.max(0, (editando.cartas[c] ?? 0) - 1);
@@ -361,13 +443,17 @@ function pintarEditor() {
   dom.mazosPie.onclick = (e) => {
     if (e.target.closest('[data-cancelar]')) { editando = null; pintarMazos(); return; }
     if (e.target.closest('[data-rellenar]')) { autocompletar(); return; }
+    if (e.target.closest('[data-vaciar]')) { editando.cartas = {}; pintarEditor(); return; }
     const g = e.target.closest('[data-guardar]');
     if (!g || g.disabled) return;
     const perfil = cargarPerfil();
     const mazos = perfil.mazos.slice();
     const entrada = { nombre: editando.nombre.trim() || 'Sin nombre', cartas: editando.cartas };
-    if (editando.indice < 0) mazos.push(entrada); else mazos[editando.indice] = entrada;
-    actualizarPerfil({ mazos });
+    const indice = editando.indice < 0 ? mazos.length : editando.indice;
+    if (editando.indice < 0) mazos.push(entrada); else mazos[indice] = entrada;
+    // Guardar y USAR: guardarlo y dejarlo sin activar obligaba a un segundo
+    // viaje a la lista para hacer lo único que se quería hacer.
+    actualizarPerfil({ mazos, activo: indice });
     editando = null;
     pintarMazos();
     pintarMenu();
