@@ -23,6 +23,7 @@ export function perfilInicial() {
     mazos: [{ nombre: 'Morrison', cartas: mazoPorDefecto() }],
     activo: 0,
     sobresAbiertos: 0,
+    dificultad: 'heuristica',
   };
 }
 
@@ -56,6 +57,7 @@ function sanear(bruto) {
     mazos: mazos.length ? mazos : base.mazos,
     activo: Number.isFinite(bruto.activo) ? Math.max(0, Math.floor(bruto.activo)) : 0,
     sobresAbiertos: Number.isFinite(bruto.sobresAbiertos) ? Math.floor(bruto.sobresAbiertos) : 0,
+    dificultad: bruto.dificultad === 'aleatoria' ? 'aleatoria' : base.dificultad,
   };
 }
 

@@ -2,7 +2,7 @@
 // La interfaz sólo LEE el estado; toda mutación pasa por reduce().
 
 import { BALANCE } from './data/balance.js';
-import { TIPO, OBJETIVO, CLADO, CLADO_NOMBRE, carta } from './data/cards.js';
+import { TIPO, OBJETIVO, CLADO, CLADO_NOMBRE, ESTACIONES, carta } from './data/cards.js';
 import { crearPartida, vistaDe, FASE, MOTIVO_FIN, unidadesDe } from './engine/state.js';
 import { reduce, ACCION, legales, validar } from './engine/actions.js';
 import { decidir, PERFIL } from './engine/ai.js';
@@ -15,10 +15,10 @@ import {
 import { tomarEntrada, soltarEntrada } from './ui/input.js';
 import { detectarFotos, vigilarFotos, calentarFotos } from './ui/art.js';
 import { montarMeta, abrirColeccion, abrirSobres, abrirMazos, pintarMenu, recompensar } from './ui/meta.js';
-import { mazoActivo } from './ui/almacen.js';
+import { mazoActivo, cargarPerfil, actualizarPerfil } from './ui/almacen.js';
 import { aListaDeMazo } from './data/coleccion.js';
 import {
-  animarCombate, animarRevelacion, cancelarAnimaciones, esperar, lineasDeLog,
+  animarCombate, animarRevelacion, animarEstacion, cancelarAnimaciones, esperar, lineasDeLog,
 } from './ui/animate.js';
 import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio } from './ui/audio.js';
 
@@ -29,7 +29,10 @@ const APP = Object.freeze({
 
 const params = new URLSearchParams(location.search);
 const DEBUG = params.get('debug') === '1';
-const PERFIL_IA = params.get('ia') ?? PERFIL.HEURISTICA;
+// El parámetro de la URL sigue mandando —es lo que usan las pruebas— pero ya no
+// es la única manera de bajar la dificultad: eso está en el menú.
+const IA_FORZADA = params.get('ia');
+const perfilIA = () => IA_FORZADA ?? (cargarPerfil().dificultad ?? PERFIL.HEURISTICA);
 
 let app = APP.BOOT;
 let estado = null;
@@ -184,7 +187,7 @@ function turnoDelJugador() {
 function jugarIA() {
   let guardia = 0;
   while (!estado.jugadores[RIVAL].listo && guardia++ < 80) {
-    const d = decidir(vistaDe(estado, RIVAL), RIVAL, rngIA, PERFIL_IA);
+    const d = decidir(vistaDe(estado, RIVAL), RIVAL, rngIA, perfilIA());
     rngIA = d.rng;
     if (!d.accion) break;
     estado = reduce(estado, d.accion);
@@ -200,6 +203,13 @@ async function alPulsarListo() {
   estado = reduce(estado, { tipo: ACCION.PASAR, jugador: JUGADOR });
   jugarIA();
   await bucle();
+}
+
+/** Qué ha hecho la estación, en una línea. */
+function resumenEstacion(heridos, bajas) {
+  if (heridos === 0) return 'Los dinosaurios curan 1 herida y los hábitats no reciben daño este turno.';
+  const h = heridos === 1 ? '1 dinosaurio pasa sed' : `${heridos} dinosaurios pasan sed`;
+  return bajas === 0 ? `${h}.` : `${h} y ${bajas === 1 ? 'cae 1' : `caen ${bajas}`}.`;
 }
 
 /**
@@ -226,7 +236,7 @@ async function bucle() {
 
     if (estado.fase === FASE.DESCARTE) {
       if (estado.jugadores[RIVAL].mano.length > BALANCE.manoMaxima) {
-        const d = decidir(vistaDe(estado, RIVAL), RIVAL, rngIA, PERFIL_IA);
+        const d = decidir(vistaDe(estado, RIVAL), RIVAL, rngIA, perfilIA());
         rngIA = d.rng;
         estado = reduce(estado, d.accion);
         continue;
@@ -262,6 +272,26 @@ async function bucle() {
       mensaje('Combate…');
       if (nuevos.some((e) => e.tipo === 'MUERTE')) sonido('muerte');
       await new Promise((r) => animarCombate(previo, estado, nuevos, r));
+      continue;
+    }
+
+    // La estación se resolvía dentro del avance genérico, sin decir nada: todos
+    // los dinosaurios amanecían heridos y el jugador no sabía por qué.
+    if (estado.fase === FASE.ESTACION) {
+      const desde = estado.eventos.length;
+      estado = reduce(estado, { tipo: ACCION.AVANZAR });
+      render(estado);
+      const nuevos = estado.eventos.slice(desde);
+      const cambio = nuevos.find((e) => e.tipo === 'ESTACION');
+      if (cambio) {
+        irA(APP.RESOLVING);
+        const e = ESTACIONES[cambio.estacion];
+        const bajas = nuevos.filter((x) => x.tipo === 'MUERTE').length;
+        const heridos = nuevos.filter((x) => x.tipo === 'DANO').length;
+        mensaje(`${e.nombre}. ${resumenEstacion(heridos, bajas)}`);
+        sonido(heridos > 0 ? 'muerte' : 'revelar');
+        await animarEstacion(nuevos);
+      }
       continue;
     }
 
@@ -405,12 +435,26 @@ function nuevaPartida() {
   bucle();
 }
 
+/**
+ * El rival blando existía desde V2-2 pero sólo se llegaba a él escribiendo
+ * `?ia=aleatoria` en la barra de direcciones, que es tanto como no existir.
+ * La IA heurística no se ha tocado: lo que cambia es cuál de las dos juega.
+ */
+function pintarDificultad() {
+  const actual = perfilIA();
+  el.dificultad.innerHTML = [
+    [PERFIL.ALEATORIA, 'Fácil'],
+    [PERFIL.HEURISTICA, 'Normal'],
+  ].map(([id, n]) => `<button class="chip ${id === actual ? 'on' : ''}" data-ia="${id}">${n}</button>`).join('');
+  el.dificultad.classList.toggle('fijada', !!IA_FORZADA);
+}
+
 function pintarDebug() {
   if (!DEBUG || !estado) return;
   el.debug.textContent = [
     `app   ${app}`,
     `fase  ${estado.fase}  turno ${estado.turno}`,
-    `IA    ${PERFIL_IA} · mano ${estado.jugadores[RIVAL].mano.length}`,
+    `IA    ${perfilIA()} · mano ${estado.jugadores[RIVAL].mano.length}`,
     `trof  tú ${estado.jugadores[0].trofeos} · rival ${estado.jugadores[1].trofeos}`,
     `habitat tú ${estado.jugadores[0].habitat} · rival ${estado.jugadores[1].habitat}`,
     `seed  ${estado.seed}`,
@@ -447,6 +491,14 @@ function iniciar() {
     irA(APP.MENU);
   });
   el.btnRendirse.addEventListener('click', preguntarRendicion);
+
+  pintarDificultad();
+  el.dificultad.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-ia]');
+    if (!b) return;
+    actualizarPerfil({ dificultad: b.dataset.ia });
+    pintarDificultad();
+  });
 
   // Marcha atrás del despliegue. Sin esto, soltar una carta en la ranura
   // equivocada costaba el turno entero y la Biomasa.

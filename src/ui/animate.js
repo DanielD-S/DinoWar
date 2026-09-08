@@ -53,6 +53,22 @@ export function animarRevelacion(previo, actual) {
       n += 1;
     }
   }
+
+  // La clase se quedaba puesta para siempre y el volteo se rearmaba solo más
+  // tarde —basta con que el navegador reevalúe la animación— dejando cartas de
+  // canto en mitad de otra cosa. Volteada una vez, se limpia.
+  if (n > 0) {
+    const mia = generacion;
+    const t = setTimeout(() => {
+      temporizadores.delete(t);
+      if (mia !== generacion) return;
+      for (const nodo of document.querySelectorAll('.carta--ranura.entra')) {
+        nodo.classList.remove('entra');
+        nodo.style.removeProperty('--retardo');
+      }
+    }, 400 + n * 90 + 60);
+    temporizadores.add(t);
+  }
   return n;
 }
 
@@ -140,6 +156,22 @@ export async function animarCombate(estadoPrevio, estadoPosterior, eventos, alTe
 
 const bando = (j) => (j === JUGADOR ? 'Tu bando' : 'El rival');
 const clase = (j) => (j === JUGADOR ? 'propio' : 'rival');
+
+/**
+ * La estación pasaba en silencio: aparecían heridas en media docena de cartas y
+ * nada decía de dónde salían. Se marcan una a una, como en el combate.
+ * @returns {Promise<number>} cuántas unidades han acusado el golpe
+ */
+export async function animarEstacion(eventos) {
+  const golpes = eventos.filter((e) => e.tipo === 'DANO' && e.causa === CAUSA.SEQUIA);
+  const mia = generacion;
+  for (const g of golpes) {
+    if (mia !== generacion) return golpes.length;
+    golpear(g.iid, g.cantidad);
+  }
+  if (golpes.length > 0) await pausa(760);
+  return golpes.length;
+}
 
 const CAUSA_TEXTO = {
   [CAUSA.COMBATE]: 'en combate',

@@ -35,6 +35,7 @@ export function montar() {
     btnListo: id('btn-listo'), btnLog: id('btn-log'), btnMute: id('btn-mute'),
     btnAyuda: id('btn-ayuda'), btnAyudaMenu: id('btn-ayuda-menu'),
     btnJugar: id('btn-jugar'), btnOtra: id('btn-otra'), btnFinMenu: id('btn-fin-menu'),
+    dificultad: id('dificultad'),
     btnRendirse: id('btn-rendirse'),
     arrastre: id('arrastre'),
     ficha: id('ficha'), fichaCuerpo: id('ficha-cuerpo'), fichaCerrar: id('ficha-cerrar'),
