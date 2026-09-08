@@ -10,6 +10,7 @@ import { semilla } from './engine/rng.js';
 import {
   montar, render, mensaje, el, JUGADOR, RIVAL,
   fichaHTML, fichaEstacionHTML, ayudaHTML, abrirFicha, abrirDescarte, cerrarHojas,
+  abrirVisor, cambiarModoVisor, cerrarVisor,
 } from './ui/render.js';
 import { tomarEntrada, soltarEntrada } from './ui/input.js';
 import { detectarFotos, vigilarFotos } from './ui/art.js';
@@ -301,7 +302,7 @@ function finPartida() {
 
   const motivo = {
     [MOTIVO_FIN.TROFEOS]: 'por registro fósil',
-    [MOTIVO_FIN.HABITAT]: 'por colapso del habitat',
+    [MOTIVO_FIN.HABITAT]: 'por colapso del hábitat',
     [MOTIVO_FIN.EXTINCION]: 'por extinción: alguien se quedó sin cartas',
     [MOTIVO_FIN.LIMITE_TURNOS]: 'por límite de turnos',
   }[estado.motivoFin] ?? '';
@@ -383,6 +384,26 @@ function iniciar() {
     if (f) abrirFicha(fichaHTML(f.dataset.card));
   });
   el.fichaCerrar.addEventListener('click', cerrarHojas);
+
+  // Ampliar una carta: desde la ficha, y la ficha se abre desde el tablero, la
+  // colección, el descarte y el editor de mazos, así que con un sitio basta.
+  el.fichaCuerpo.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-zoom]');
+    // La miniatura abre lo que enseña —la ilustración— y el botón la carta.
+    if (b) abrirVisor(b.dataset.zoom, b.dataset.modo ?? 'carta');
+  });
+  el.visorModos.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-modo]');
+    if (b) cambiarModoVisor(b.dataset.modo);
+  });
+  el.visorCerrar.addEventListener('click', cerrarVisor);
+  // Tocar fuera cierra: el visor tapa la pantalla entera y no hay otra salida
+  // evidente en un móvil. Fuera es todo menos la carta, la ilustración y el pie
+  // —el lienzo ocupa el hueco entero, así que también cuenta como fondo.
+  el.visor.addEventListener('click', (e) => {
+    if (e.target === el.visor || e.target === el.visorLienzo
+        || e.target.classList.contains('visor-marco')) cerrarVisor();
+  });
   el.ayudaCerrar.addEventListener('click', cerrarHojas);
   el.eleccionCerrar.addEventListener('click', () => {
     // Cancelar sólo es legal cuando la elección no bloquea el turno.

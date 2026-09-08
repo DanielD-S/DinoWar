@@ -100,7 +100,7 @@ es legendario.
 
 **5 de coste · 6 de Ataque · 5 de Vida** · Defensa propuesta: *1*
 
-**Depredador dominante** — Si mata a su rival, el daño sobrante pasa al habitat enemigo.
+**Depredador dominante** — Si mata a su rival, el daño sobrante pasa al hábitat enemigo.
 
 `ESTABLECIDO` · Taxón de terópodo más abundante de la Morrison. Marcas de mordida atribuidas a Allosaurus aparecen en huesos de saurópodos y de Stegosaurus.
 
@@ -200,7 +200,7 @@ es legendario.
 
 **4 de coste · 3 de Ataque · 3 de Vida** · Defensa propuesta: *0*
 
-**Vuelo** — Sobrevuela la ranura: golpea siempre al habitat rival y no recibe daño de combate.
+**Vuelo** — Sobrevuela la ranura: golpea siempre al hábitat rival y no recibe daño de combate.
 
 `ESTABLECIDO` · Formación Jiufotang, Liaoning, China, Aptiense (~120 Ma). No es un dinosaurio: es un pterosaurio tapejárido, sin dientes y con cresta craneal. Los tapejáridos conservan picnofibras, filamentos tegumentarios reales — la razón por la que este juego no pone plumas a los dinosaurios es que ellos no las tienen, no una regla estética.
 
@@ -334,7 +334,7 @@ ve venir, y eso es parte de su precio. Cuestan 0 y todos traen inconveniente.
 
 ### Lago efímero · Épica · fuera del mazo de referencia
 
-+2 Biomasa ahora mismo. Tu habitat pierde 1.
++2 Biomasa ahora mismo. Tu hábitat pierde 1.
 
 `INFERIDO` · La Morrison conserva depósitos de lagos alcalinos efímeros de gran extensión, como el llamado lago T’oo’dichi’. Concentran recursos mientras duran; al secarse dejan salinas que el paisaje tarda en recuperar.
 

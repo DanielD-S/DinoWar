@@ -5,7 +5,7 @@ import { CARTAS, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, ESTACIONES, carta } from '../d
 import {
   unidadEn, unidadesDe, ataqueEfectivo, reduccionDe, vidaMaxima, vidaActual, rentaDe,
 } from '../engine/state.js';
-import { arte } from './art.js';
+import { arte, hayFoto, rutaFoto } from './art.js';
 
 export const JUGADOR = 0;
 export const RIVAL = 1;
@@ -34,6 +34,8 @@ export function montar() {
     btnJugar: id('btn-jugar'), btnOtra: id('btn-otra'),
     arrastre: id('arrastre'),
     ficha: id('ficha'), fichaCuerpo: id('ficha-cuerpo'), fichaCerrar: id('ficha-cerrar'),
+    visor: id('visor'), visorLienzo: id('visor-lienzo'), visorModos: id('visor-modos'),
+    visorCerrar: id('visor-cerrar'),
     ayuda: id('ayuda'), ayudaCuerpo: id('ayuda-cuerpo'), ayudaCerrar: id('ayuda-cerrar'),
     log: id('log'), logCuerpo: id('log-cuerpo'), logCerrar: id('log-cerrar'),
     eleccion: id('eleccion'), eleccionTitulo: id('eleccion-titulo'),
@@ -42,6 +44,11 @@ export function montar() {
     finTitulo: id('fin-titulo'), finDetalle: id('fin-detalle'),
     debug: id('debug'), record: id('menu-record'),
   });
+
+  // El objetivo va junto al marcador: «0/8» dice a qué se juega, «0» no.
+  for (const m of document.querySelectorAll('[data-meta="trofeos"]')) {
+    m.textContent = `/${BALANCE.trofeosParaGanar}`;
+  }
 
   for (const bando of [0, 1]) {
     const fila = id(`fila-${bando}`);
@@ -177,7 +184,7 @@ function pintarHabitat(estado) {
   for (const [bando, num, barra] of [[RIVAL, el.rHabitat, el.rBarra], [JUGADOR, el.pHabitat, el.pBarra]]) {
     const v = Math.max(0, estado.jugadores[bando].habitat);
     num.textContent = v;
-    barra.style.width = `${(100 * v) / BALANCE.vidaBioma}%`;
+    barra.style.width = `${(100 * v) / BALANCE.vidaHabitat}%`;
   }
 }
 
@@ -283,7 +290,10 @@ export function fichaHTML(cardId) {
 
   return `
     <div class="ficha-cab">
-      <div class="ficha-arte">${arte(cardId)}</div>
+      <button class="ficha-arte" data-zoom="${cardId}" data-modo="${hayFoto(cardId) ? 'foto' : 'carta'}"
+              aria-label="${hayFoto(cardId) ? 'Ver la ilustración en grande' : 'Ver la carta en grande'}">
+        ${arte(cardId)}<span class="ficha-lupa" aria-hidden="true">⤢</span>
+      </button>
       <div>
         <div class="ficha-binomial${dino ? '' : ' recto'}">${c.binomial}</div>
         <div class="ficha-clado">${familia}</div>
@@ -294,6 +304,7 @@ export function fichaHTML(cardId) {
           ${dino ? `<span>Vida <b>${c.vida}</b></span>` : ''}
           ${dino && c.consumoHidrico ? `<span>Agua <b>${c.consumoHidrico}</b></span>` : ''}
         </div>
+        <button class="ficha-ampliar" data-zoom="${cardId}" data-modo="carta">Ver la carta en grande</button>
       </div>
     </div>
     <div class="ficha-rasgo">
@@ -320,7 +331,61 @@ export function abrirFicha(html) {
   el.ficha.classList.remove('oculta');
 }
 
+/**
+ * La carta como se ve en el tablero, pero legible. No se recalculan tamaños:
+ * se escala el marco entero, así que lo que se amplía es exactamente la carta
+ * que se juega, con su proporción y su composición.
+ */
+export function cartaGrandeHTML(cardId) {
+  return `<div class="visor-marco">
+    <div class="carta${claseFamilia(cardId)}">${marcoCarta(null, cardId)}</div>
+  </div>`;
+}
+
+let visorCarta = null;
+
+/**
+ * Ampliación de una carta. Dos modos, porque no son la misma pregunta: leer la
+ * carta (cifras y rasgo) o mirar la ilustración. Sin ilustración hay un modo
+ * solo y no se enseña el selector.
+ * @param {string} cardId
+ * @param {'carta'|'foto'} [modo]
+ */
+export function abrirVisor(cardId, modo = 'carta') {
+  const c = carta(cardId);
+  const foto = hayFoto(cardId);
+  const m = foto ? modo : 'carta';
+  visorCarta = cardId;
+
+  el.visorLienzo.innerHTML = m === 'foto'
+    ? `<img class="visor-foto" src="${rutaFoto(cardId)}" alt="Ilustración de ${c.binomial}">`
+    : cartaGrandeHTML(cardId);
+
+  el.visorModos.innerHTML = foto
+    ? [['carta', 'Carta'], ['foto', 'Ilustración']]
+      .map(([k, n]) => `<button class="chip ${k === m ? 'on' : ''}" data-modo="${k}">${n}</button>`)
+      .join('')
+    : '';
+
+  el.visor.classList.remove('oculta');
+}
+
+export function cambiarModoVisor(modo) {
+  if (visorCarta) abrirVisor(visorCarta, modo);
+}
+
+export function cerrarVisor() {
+  el.visor.classList.add('oculta');
+  el.visorLienzo.innerHTML = '';
+  visorCarta = null;
+}
+
+export function visorAbierto() {
+  return !el.visor.classList.contains('oculta');
+}
+
 export function cerrarHojas() {
+  cerrarVisor();
   for (const h of [el.ficha, el.log, el.eleccion, el.ayuda, el.descarte]) h.classList.add('oculta');
 }
 
@@ -374,7 +439,7 @@ export function ayudaHTML() {
     <div class="ayuda-h">Las tres formas de ganar</div>
     <ul class="ayuda-lista">
       <li><span class="k">Registro fósil</span><span class="v">Reúne <b>${BALANCE.trofeosParaGanar} trofeos</b>. Cada dinosaurio rival que muere te da uno.</span></li>
-      <li><span class="k">Hábitat</span><span class="v">Derriba el habitat rival, que empieza con <b>${BALANCE.vidaBioma}</b> de Vida.</span></li>
+      <li><span class="k">Hábitat</span><span class="v">Derriba el hábitat rival, que empieza con <b>${BALANCE.vidaHabitat}</b> de Vida.</span></li>
       <li><span class="k">Extinción</span><span class="v">Si al rival le toca robar y no le quedan cartas, pierde. <b>El descarte no se rebaraja</b>: el mazo es un reloj.</span></li>
     </ul>
 
@@ -384,7 +449,7 @@ export function ayudaHTML() {
       dinosaurio los dos, combaten. Si el rival la tiene <b>vacía</b>, el tuyo golpea su habitat.
     </p>
     <p class="ayuda-p">
-      De ahí sale la decisión de cada turno: <b>una fila llena tapa tu habitat pero regala trofeos;
+      De ahí sale la decisión de cada turno: <b>una fila llena tapa tu hábitat pero regala trofeos;
       una fila corta niega trofeos pero deja pasar el daño</b>. No hay postura segura.
     </p>
 

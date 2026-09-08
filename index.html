@@ -34,26 +34,28 @@
   <!-- ---------------------------------------------------------- PARTIDA -->
   <section id="partida" class="pantalla oculta">
 
+    <!-- Una fila por bando y el turno en su propia columna: en una sola fila
+         los diez recursos no caben a 360 px y las etiquetas se pisaban. -->
     <header id="hud">
       <div class="hud-bando rival">
         <span class="hud-etiqueta">Rival</span>
-        <span class="rec trof"><b id="r-trof">0</b><i>trofeos</i></span>
+        <span class="rec trof"><span class="rec-cifra"><b id="r-trof">0</b><span class="meta" data-meta="trofeos"></span></span><i>trofeos</i></span>
         <span class="rec bio"><b id="r-bio">0</b><i>biomasa</i></span>
         <span class="rec mano"><b id="r-mano">0</b><i>mano</i></span>
         <span class="rec mazo"><b id="r-mazo">0</b><i>mazo</i></span>
         <button class="rec desc" id="r-desc-btn"><b id="r-desc">0</b><i>descarte</i></button>
       </div>
-      <div class="hud-centro">
-        <span id="turno">Turno 1</span>
-        <button id="btn-estacion" class="estacion" hidden></button>
-      </div>
       <div class="hud-bando propio">
-        <span class="rec trof"><b id="p-trof">0</b><i>trofeos</i></span>
+        <span class="hud-etiqueta">Tú</span>
+        <span class="rec trof"><span class="rec-cifra"><b id="p-trof">0</b><span class="meta" data-meta="trofeos"></span></span><i>trofeos</i></span>
         <span class="rec bio"><b id="p-bio">0</b><i>biomasa</i></span>
         <span class="rec mano"><b id="p-mano">0</b><i>mano</i></span>
         <span class="rec mazo"><b id="p-mazo">0</b><i>mazo</i></span>
         <button class="rec desc" id="p-desc-btn"><b id="p-desc">0</b><i>descarte</i></button>
-        <span class="hud-etiqueta">Tú</span>
+      </div>
+      <div class="hud-centro">
+        <span id="turno">Turno 1</span>
+        <button id="btn-estacion" class="estacion" hidden></button>
       </div>
     </header>
 
@@ -174,6 +176,17 @@
       <button id="btn-otra" class="boton-grande">Otra partida</button>
     </div>
   </section>
+
+  <!-- Carta a tamaño de lectura: la ficha la enseña a 74 px y la ilustración
+       merece más. Dos modos, porque no es lo mismo leer la carta que ver el
+       dibujo. -->
+  <div id="visor" class="visor oculta" role="dialog" aria-modal="true" aria-label="Carta ampliada">
+    <div class="visor-lienzo" id="visor-lienzo"></div>
+    <div class="visor-pie">
+      <div class="visor-modos" id="visor-modos"></div>
+      <button class="visor-cerrar" id="visor-cerrar">Cerrar</button>
+    </div>
+  </div>
 
   <div id="debug" class="debug oculta"></div>
 </div>
