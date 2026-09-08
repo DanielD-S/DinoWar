@@ -172,9 +172,13 @@ function turnoDelJugador() {
   render(estado);
   el.btnListo.disabled = false;
   const puede = legales(estado, JUGADOR).some((a) => a.tipo !== ACCION.PASAR);
-  mensaje(puede
-    ? 'Arrastra cartas al campo. Mantén pulsada una para ver su ficha.'
-    : `Sin Biomasa suficiente (${estado.jugadores[JUGADOR].biomasa}). Pulsa Listo.`);
+  const bio = estado.jugadores[JUGADOR].biomasa;
+  // La renta no es una hucha: cada turno la Biomasa se REEMPLAZA por el número
+  // de turno. Verlo sólo como una cifra en el marcador se lee como un fallo de
+  // contador, así que el turno se abre diciéndolo.
+  mensaje(!puede ? `Sin Biomasa suficiente (${bio}). Pulsa Listo.`
+    : estado.turno === 1 ? 'Arrastra cartas al campo. Mantén pulsada una para ver su ficha.'
+      : `Cobras ${bio} de Biomasa este turno. No se acumula: lo que no gastes se pierde.`);
 }
 
 function jugarIA() {

@@ -3,7 +3,7 @@
 import { BALANCE } from '../data/balance.js';
 import { CARTAS, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, ESTACIONES, carta } from '../data/cards.js';
 import {
-  unidadEn, unidadesDe, ataqueEfectivo, reduccionDe, vidaMaxima, vidaActual, rentaDe,
+  unidadEn, unidadesDe, ataqueEfectivo, reduccionDe, vidaMaxima, vidaActual,
 } from '../engine/state.js';
 import { arte, hayFoto, rutaFoto } from './art.js';
 
@@ -460,9 +460,13 @@ export function ayudaHTML() {
 
     <div class="ayuda-h">La Biomasa</div>
     <p class="ayuda-p">
-      Recibes <b>tanta Biomasa como el número de turno</b>, hasta ${BALANCE.rentaTope}, y lo mismo recibe el rival
-      vaya ganando o perdiendo. No se acumula: lo que no gastas se pierde. En el turno ${Math.min(4, BALANCE.rentaTope)}
-      tendrás ${Math.min(4, BALANCE.rentaTope)}, ahora mismo ${rentaDe({ turno: 1, campo: null })}.
+      <b>No es una hucha.</b> Al empezar cada turno tu Biomasa se <b>reemplaza</b> por el número de turno,
+      hasta ${BALANCE.rentaTope}: en el turno 3 tienes 3 hayas gastado o no, y en el 4 tienes 4.
+      Lo que no gastas <b>se pierde</b>.
+    </p>
+    <p class="ayuda-p">
+      El rival cobra exactamente lo mismo, vaya ganando o perdiendo. Es la corrección central de esta
+      versión: en la anterior la renta dependía de ir por delante y la ventaja se realimentaba sola.
     </p>
 
     <div class="ayuda-h">Qué significa cada número</div>
