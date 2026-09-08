@@ -61,7 +61,9 @@ export function montar() {
 
 // ----------------------------------------------------------------- cartas
 
-function marcoCarta(estado, cardId, { poder = null, defensa = null, vidaAct = null, vidaMax = null, adaptada = false } = {}) {
+function marcoCarta(estado, cardId, {
+  poder = null, defensa = null, vidaAct = null, vidaMax = null, adaptada = false, mermada = false,
+} = {}) {
   const c = carta(cardId);
   const dino = c.tipo === TIPO.DINOSAURIO;
   const atq = poder ?? c.ataque;
@@ -86,7 +88,8 @@ function marcoCarta(estado, cardId, { poder = null, defensa = null, vidaAct = nu
       <span class="c-vida-barra"><i style="width:${Math.max(0, (100 * va) / vm).toFixed(0)}%"></i></span>
       <span class="c-vida-num">${va}/${vm}</span>
     </div>` : ''}
-    ${adaptada ? '<span class="c-adap"></span>' : ''}`;
+    ${adaptada ? '<span class="c-adap"></span>' : ''}
+    ${mermada ? '<span class="c-merma" title="Bajo una presión rival"></span>' : ''}`;
 }
 
 function claseFamilia(cardId) {
@@ -140,6 +143,7 @@ function pintarRanuras(estado) {
             vidaAct: vidaActual(estado, inst.iid),
             vidaMax: vidaMaxima(estado, inst.iid),
             adaptada: inst.adherencias.length > 0,
+            mermada: ataqueEfectivo(estado, inst.iid) < carta(inst.cardId).ataque,
           },
         }));
       } else if (pendiente) {
@@ -179,6 +183,14 @@ function actualizarCarta(estado, nodo, inst) {
   const tiene = !!nodo.querySelector('.c-adap');
   if (inst.adherencias.length && !tiene) nodo.insertAdjacentHTML('beforeend', '<span class="c-adap"></span>');
   if (!inst.adherencias.length && tiene) nodo.querySelector('.c-adap').remove();
+
+  // Una unidad mermada por una presión rival sólo se distinguía por el color de
+  // una cifra de 9 px: se le pone marca, como a la adaptada.
+  const merma = !!nodo.querySelector('.c-merma');
+  if (p < c.ataque && !merma) {
+    nodo.insertAdjacentHTML('beforeend', '<span class="c-merma" title="Bajo una presión rival"></span>');
+  }
+  if (p >= c.ataque && merma) nodo.querySelector('.c-merma').remove();
 }
 
 function pintarHabitat(estado) {

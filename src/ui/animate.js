@@ -59,10 +59,10 @@ export function animarRevelacion(previo, actual) {
 const ranuraNodo = (bando, r) => el.filas[bando]?.children[r] ?? null;
 const cartaNodo = (iid) => document.querySelector(`.carta--ranura[data-iid="${iid}"]`);
 
-function flotante(nodo, texto) {
+function flotante(nodo, texto, clase = '') {
   if (!nodo) return;
   const n = document.createElement('span');
-  n.className = 'dano-flotante';
+  n.className = `dano-flotante${clase ? ` ${clase}` : ''}`;
   n.textContent = texto;
   nodo.appendChild(n);
   const mia = generacion;
@@ -106,9 +106,15 @@ export async function animarCombate(estadoPrevio, estadoPosterior, eventos, alTe
     } else {
       const c = cartaNodo(avance.iid);
       c?.classList.add('golpeada');
-      const habitat = avance.bando === JUGADOR ? el.campo.querySelector('.habitat.rival') : el.campo.querySelector('.habitat.propio');
-      habitat?.classList.add('golpe');
-      flotante(ranuraNodo(avance.bando, r), `−${avance.dano}`);
+      // Con el Ataque a 0 —una presión rival encima— la unidad avanza y no hace
+      // nada. Sacudir la barra del hábitat entonces mentía: parecía que pegaba
+      // y el número no se movía. Se dice que no hace daño y no se toca la barra.
+      if (avance.dano > 0) {
+        const habitat = avance.bando === JUGADOR ? el.campo.querySelector('.habitat.rival') : el.campo.querySelector('.habitat.propio');
+        habitat?.classList.add('golpe');
+      }
+      if (avance.dano > 0) flotante(ranuraNodo(avance.bando, r), `−${avance.dano}`);
+      else flotante(ranuraNodo(avance.bando, r), 'sin daño', 'nulo');
     }
     await pausa(430);
   }

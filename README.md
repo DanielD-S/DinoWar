@@ -83,7 +83,7 @@ python -m http.server 8000
 y abrir <http://localhost:8000>.
 
 ```bash
-npm test        # 52 tests del motor y de la colección
+npm test        # 53 tests del motor y de la colección
 npm run sim     # 2.000 partidas IA vs IA → BALANCE.md
 node sim/set.js # regenera SET_DE_CARTAS.md desde el código
 ```
@@ -109,7 +109,7 @@ src/engine/    motor de reglas: (estado, acción) → estado. Puro, sin DOM, cor
 src/ui/        interfaz: sólo lee el estado, nunca lo muta. almacen.js es el
                único fichero que toca localStorage
 sim/           simulador de balance y generador del set
-test/          52 tests
+test/          53 tests
 tools/         utilidades de desarrollo, fuera del juego servido
 v1/            versión anterior, jugable y congelada (ver v1/LEEME.md)
 ```

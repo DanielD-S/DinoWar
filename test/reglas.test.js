@@ -294,6 +294,26 @@ test('Carroña abundante también da Biomasa al rival', () => {
   assert.equal(r.jugadores[1].biomasa, BALANCE.recursos.carronaBiomasaRival);
 });
 
+test('Ranuras cruzadas: cada uno pega al hábitat contrario, y con el Ataque a 0 no pega', () => {
+  const s = tablero();
+  s.turno = BALANCE.turnoPrimerCombate;
+  const mio = poner(s, 'dryosaurus', 0, 3);     // Ataque 1, nadie enfrente
+  poner(s, 'dryosaurus', 1, 0);                 // Ataque 1, nadie enfrente
+
+  const r = ejecutar(s, FASE.COMBATE);
+  assert.equal(r.jugadores[0].habitat, BALANCE.vidaHabitat - 1);
+  assert.equal(r.jugadores[1].habitat, BALANCE.vidaHabitat - 1, 'el cruce es simétrico');
+
+  // Una Fractura consolidada encima deja el Ataque en 0: avanza y no hace nada.
+  s.instancias[mio].modAtaque = -BALANCE.rasgos.fracturaAtaque;
+  assert.equal(ataqueEfectivo(s, mio), 0);
+  const r2 = ejecutar(s, FASE.COMBATE);
+  assert.equal(r2.jugadores[1].habitat, BALANCE.vidaHabitat, 'sin Ataque no hay daño al hábitat');
+  assert.equal(r2.jugadores[0].habitat, BALANCE.vidaHabitat - 1, 'el suyo sí pega');
+  const avance = r2.eventos.find((e) => e.tipo === 'AVANCE' && e.bando === 0);
+  assert.equal(avance.dano, 0, 'el evento se emite igual, con 0: el registro lo cuenta');
+});
+
 // -------------------------------------------------------------- estaciones
 
 test('Sequía: cobra heridas según la Vida, y Camarasaurus es inmune', () => {

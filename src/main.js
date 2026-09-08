@@ -202,6 +202,22 @@ async function alPulsarListo() {
   await bucle();
 }
 
+/**
+ * Resumen de lo que el rival ha jugado SOBRE lo tuyo en esta revelación.
+ * Devuelve null si no ha jugado nada de eso.
+ */
+function presionesRivales(nuevos) {
+  const textos = nuevos
+    .filter((e) => e.tipo === 'PRESION' && e.jugador === RIVAL)
+    .map((e) => {
+      const c = carta(e.cardId);
+      if (e.objetivoCardId) return `${c.rasgoNombre} sobre tu ${carta(e.objetivoCardId).binomial}`;
+      if (e.clado) return `${c.rasgoNombre} a tus ${CLADO_NOMBRE[e.clado].toLowerCase()}s`;
+      return c.rasgoNombre;
+    });
+  return textos.length === 0 ? null : `El rival juega ${textos.join(' y ')}.`;
+}
+
 async function bucle() {
   let guardia = 0;
   while (guardia++ < 400) {
@@ -222,9 +238,13 @@ async function bucle() {
     if (estado.fase === FASE.REVELACION) {
       irA(APP.RESOLVING);
       const antes = estado;
+      const desdeRev = estado.eventos.length;
       estado = reduce(estado, { tipo: ACCION.AVANZAR });
       render(estado);
-      mensaje('Revelación simultánea…');
+      // Lo que el rival te ha jugado encima se resuelve aquí y hasta ahora sólo
+      // quedaba escrito en el registro: en el tablero eran dos cifras que
+      // cambiaban de color. Si te ha metido una presión, se dice.
+      mensaje(presionesRivales(estado.eventos.slice(desdeRev)) ?? 'Revelación simultánea…');
       sonido('revelar');
       // Se espera a que terminen los volteos, no un tiempo fijo: con el campo
       // lleno son diez cartas y 700 ms las cortaba por la mitad.

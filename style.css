@@ -551,6 +551,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .c-adap { position: absolute; right: 3px; top: 17px; width: 7px; height: 7px; border-radius: 50%;
           background: var(--bio); box-shadow: 0 0 0 1px #17120e; }
+/* Presión rival encima: cuadrado y rojo, distinto de la adaptación a propósito
+   —a 67 px de ancho el color solo no basta para decir qué le pasa a la carta. */
+.c-merma { position: absolute; right: 3px; top: 27px; width: 7px; height: 7px;
+           background: var(--vida); box-shadow: 0 0 0 1px #17120e; }
 
 .carta-dorso {
   position: absolute; inset: 0; border-radius: 6px;
@@ -576,6 +580,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   text-shadow: 0 1px 3px #000; pointer-events: none; z-index: 20;
   animation: subeDano .8s ease-out forwards;
 }
+/* «sin daño» no es un golpe: ni el tamaño ni el rojo de una cifra de daño. */
+.dano-flotante.nulo { font-size: 10px; font-weight: 700; color: var(--tenue); white-space: nowrap; }
+
 @keyframes subeDano {
   0% { opacity: 0; transform: translate(-50%, 8px) scale(.7); }
   25% { opacity: 1; transform: translate(-50%, -4px) scale(1.15); }
