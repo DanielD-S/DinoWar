@@ -1,7 +1,8 @@
 # DinoWar v1 — copia congelada
 
 Versión jugable anterior al rediseño (`PLAN_V2.md`). Se guarda para poder
-comparar o volver. No está en git: es una copia de archivos.
+comparar o volver: es una copia de archivos congelada, versionada con el resto
+del repositorio pero fuera del juego que se sirve.
 
 Para jugarla:
 

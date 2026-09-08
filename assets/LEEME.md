@@ -8,14 +8,13 @@ proyecto. Los originales sin reducir (`src/dinos/`, 29 MB) no: no hacen falta
 para jugar y sólo sirven para regenerar esta carpeta.
 
 El juego no depende de ellas. `src/ui/art.js` pide `indice.json` una vez al
-arrancar: si no está —y en el sitio publicado no lo está— falla esa única
-petición y todo se dibuja con las siluetas SVG generadas por código. Si el
-índice menciona una imagen que no existe, esa carta vuelve sola a su silueta.
-Quien clone el repositorio ve el juego entero, sin huecos.
+arrancar: si no está, falla esa única petición y todo se dibuja con las
+siluetas SVG generadas por código. Si el índice menciona una imagen que no
+existe, esa carta vuelve sola a su silueta. Quien clone el repositorio ve el
+juego entero, sin huecos, tenga o no la carpeta.
 
-Para que la versión publicada lleve ilustración hace falta arte con licencia:
-obra propia, dominio público, o Creative Commons con la atribución puesta en la
-ficha de cada carta.
+Toca la ilustración en la ficha de una carta y se abre a pantalla completa; el
+mismo visor enseña también la carta entera a 3,1×.
 
 ## Añadir o cambiar ilustraciones
 

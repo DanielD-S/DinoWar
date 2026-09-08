@@ -8,9 +8,9 @@
 > **Sed**: heridas que recibe cuando sale *Sequía estacional*. **No es un
 > segundo coste**: no se paga al jugarla, sólo cuando el clima lo cobra.
 
-El set tiene **31 cartas distintas**. Un mazo son **50 cartas exactas**, así que no caben todas: el de referencia lleva 30 dinosaurios, 12 eventos, 2 de recurso y 6 de clima.
+El set tiene **31 cartas distintas**. Un mazo son **50 cartas exactas**, así que no caben todas: el de referencia lleva 30 dinosaurios, 14 eventos, 3 de recurso y 3 de clima.
 
-Fuera del mazo de referencia, y por tanto sin medir aquí: Neumaticidad ósea, Competencia trófica, Carroña abundante, Lago efímero, Llanura de inundación, Bosque de coníferas ribereño. Se juegan igual, pero su calibración no está comprobada.
+Fuera del mazo de referencia, y por tanto sin medir aquí: Carroña abundante, Lago efímero, Llanura de inundación, Bosque de coníferas ribereño. Se juegan igual, pero su calibración no está comprobada.
 
 **Qué revisar sobre todo:** los eventos de presión y las cartas de recurso.
 Son lo único del set que no describe un animal sino una presión sobre él, y
@@ -27,9 +27,9 @@ es legendario.
 
 | Rareza | Copias máximas | Cartas distintas | En el mazo de referencia |
 |---|---|---|---|
-| Común | 3 | 4 | 12 |
-| Rara | 3 | 4 | 11 |
-| Épica | 2 | 15 | 20 |
+| Común | 3 | 4 | 10 |
+| Rara | 3 | 4 | 12 |
+| Épica | 2 | 15 | 21 |
 | Legendaria | 1 | 8 | 7 |
 
 ---
@@ -234,7 +234,7 @@ Se juega **sobre un dinosaurio tuyo**. +2 Poder y +2 Vida permanentes.
 
 `ESTABLECIDO` · La osteohistología muestra tasas de crecimiento altas y sostenidas en saurópodos y en Allosaurus, alcanzando talla adulta en pocas décadas o menos.
 
-### Neumaticidad ósea · Épica · coste 2 · fuera del mazo de referencia
+### Neumaticidad ósea · Épica · coste 2 · 1 copia
 
 Se juega **sobre un dinosaurio tuyo**. +2 Poder. Sólo sobre terópodos y saurópodos.
 
@@ -246,7 +246,7 @@ Se juega **sobre un dinosaurio del rival**. −2 Poder permanente a un dinosauri
 
 `ESTABLECIDO` · El registro patológico de la Morrison es abundante: costillas fracturadas y consolidadas, infecciones óseas y lesiones por estrés, especialmente documentadas en ejemplares de Allosaurus. Un animal cojo caza peor, pero sigue vivo.
 
-### Competencia trófica · Épica · coste 2 · fuera del mazo de referencia
+### Competencia trófica · Épica · coste 2 · 1 copia
 
 Se juega **sobre un clado rival que eliges**. −2 Poder a todos los dinosaurios rivales del clado que elijas.
 
@@ -282,7 +282,7 @@ El objetivo cura 1 herida al final de cada turno.
 
 `ESTABLECIDO` · La osteohistología muestra tasas de crecimiento altas y sostenidas en saurópodos y en Allosaurus, alcanzando talla adulta en pocas décadas o menos.
 
-### Neumaticidad ósea · Épica · coste 2 · fuera del mazo de referencia
+### Neumaticidad ósea · Épica · coste 2 · 1 copia
 
 +2 Poder. Sólo sobre terópodos y saurópodos.
 
@@ -294,7 +294,7 @@ El objetivo cura 1 herida al final de cada turno.
 
 `ESTABLECIDO` · El registro patológico de la Morrison es abundante: costillas fracturadas y consolidadas, infecciones óseas y lesiones por estrés, especialmente documentadas en ejemplares de Allosaurus. Un animal cojo caza peor, pero sigue vivo.
 
-### Competencia trófica · Épica · coste 2 · fuera del mazo de referencia
+### Competencia trófica · Épica · coste 2 · 1 copia
 
 −2 Poder a todos los dinosaurios rivales del clado que elijas.
 
@@ -320,7 +320,7 @@ Se juegan **boca arriba y surten efecto al instante**: dar Biomasa «este
 turno» no serviría de nada si esperasen a la revelación. A cambio el rival los
 ve venir, y eso es parte de su precio. Cuestan 0 y todos traen inconveniente.
 
-### Rebrote tras incendio · Rara · 2 copias
+### Rebrote tras incendio · Rara · 3 copias
 
 +3 Biomasa ahora mismo. Todos tus dinosaurios reciben 1 herida.
 

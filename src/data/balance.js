@@ -142,8 +142,8 @@ export const BALANCE = Object.freeze({
  * lo que hace que construir mazos signifique algo — pero obliga a escribirlo,
  * así que la comprobación de más abajo vigila que no se descuadre.
  *
- * Fuera se quedan seis cartas, jugables por el jugador pero no medidas aquí:
- * neumaticidad, competencia, bosque, llanura, carroña y lago.
+ * Fuera se quedan cuatro cartas, jugables por el jugador pero no medidas aquí:
+ * bosque, llanura, carroña y lago.
  */
 export const MAZO = Object.freeze([
   // dinosaurios — 30
@@ -153,9 +153,19 @@ export const MAZO = Object.freeze([
   ['riparovenator', 2], ['lokiceratops', 2], ['brachylophosaurus', 2], ['huaxiadraco', 2],
   ['diplodocus', 1], ['apatosaurus', 1], ['torvosaurus', 1], ['tyrannotitan', 1],
   // soporte — 20
-  ['sabana', 3], ['gregarismo', 3], ['trampa', 3], ['rebrote', 2],
-  ['gastrolitos', 2], ['fractura', 2], ['aridez', 2],
-  ['mortandad', 1], ['crecimiento_acelerado', 1], ['canal', 1],
+  //
+  // Los climas van a UNA copia. Sólo puede haber un paleoambiente activo, así
+  // que la segunda copia en la mano no tiene dónde ir: llevar tres Sabanas no
+  // hacía peor a la carta, hacía peor al mazo, y el índice lo cobraba a la
+  // carta (0,50 con tres copias, 0,68 con una).
+  //
+  // Las cuatro plazas que eso libera van a Rebrote y a las dos cartas que el
+  // mazo de referencia nunca había medido. Salen calibradas a la primera:
+  // neumaticidad 0,98 y competencia 1,05.
+  ['gregarismo', 3], ['trampa', 3], ['rebrote', 3],
+  ['gastrolitos', 2], ['fractura', 2],
+  ['sabana', 1], ['aridez', 1], ['canal', 1],
+  ['mortandad', 1], ['crecimiento_acelerado', 1], ['neumaticidad', 1], ['competencia', 1],
 ].map((e) => Object.freeze(e)));
 
 export const TOTAL_MAZO = MAZO.reduce((n, [, copias]) => n + copias, 0);

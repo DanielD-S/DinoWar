@@ -385,3 +385,103 @@ Un fallo encontrado y corregido: con 9 cartas la curva del abanico metía las de
 | V2-2 IA heurística | ✅ |
 | V2-3 tablero jugable | ✅ |
 | V2-4 pulido y publicación | ⬜ |
+
+---
+
+## 14. V2-4 — la meta, el set abierto y la calibración
+
+La v2 se publicó, se le añadió la capa de fuera de la partida (colección,
+sobres y mazos), el set creció a 31 cartas y se abrió a formaciones que no son
+la Morrison. Lo que sigue son las decisiones que quedaban sueltas y cómo se han
+cerrado.
+
+### 14.1 El Consumo hídrico se va
+
+Cada dinosaurio llevaba un cuarto número —Consumo hídrico— que sólo existía
+para un momento del turno: la Sequía estacional. El jugador lo veía en la ficha
+sin poder hacer nada con él y sin poder preverlo desde el tablero, porque en la
+carta jugada no se enseña.
+
+La Sequía pasa a cobrar según la **Vida**: 1 herida, y 2 a partir de 7. Dice lo
+mismo que decía —el cuerpo grande necesita más agua— con un dato que ya está en
+la carta y en la ranura. *Camarasaurus* sigue inmune y el Canal fluvial sigue
+anulándola.
+
+Efecto medido: ninguno reseñable en las seis métricas. Y un efecto lateral que
+sí importa: la **Mortandad estacional**, fuera de banda desde V2-0, entra sola
+(0,74). Sus heridas ya no se solapaban con las de la Sequía.
+
+### 14.2 El índice medía el mazo, no la carta
+
+La pregunta abierta de §12.5 era si la banda 0,70–1,30 vale para cartas
+situacionales. La respuesta resultó ser otra: **para tres de las cartas fuera de
+banda el problema no era la carta, era cuántas copias llevaba el mazo**.
+
+Sólo puede haber un paleoambiente activo. Llevar tres Sabanas de helechos
+significa que la segunda y la tercera no tienen dónde ir; el índice —cuota de
+jugadas contra peso en el mazo— cobraba a la carta lo que era un defecto de la
+lista. Bajando los climas a una copia, la Sabana pasa de **0,50 a 0,68** sin
+tocarle un solo número.
+
+Para separar las dos cosas, el simulador mide ahora una segunda cifra, el
+**uso**: de las copias que llegaron a una mano, cuántas se jugaron. No lo mueve
+la lista. Con él, veintitrés de las veinticinco cartas del mazo caen entre el
+75 % y el 92 %, y las dos que no lo hacen se ven de un vistazo.
+
+Las cuatro plazas que liberan los climas van a Rebrote y a dos cartas que el
+mazo de referencia nunca había medido —Neumaticidad y Competencia trófica—, que
+salen calibradas a la primera (0,98 y 1,05). Quedan cuatro sin medir: bosque,
+llanura, carroña y lago.
+
+### 14.3 Deriva árida: fuera de banda y aun así imprescindible
+
+Es la única que resiste. Índice 0,46 y uso 40 % después de probarle tres
+variantes —coste 1, mordida de 8 cartas, y mordida proporcional al tamaño de los
+dinosaurios en juego—: ninguna la mueve. La IA la evalúa bien. Muele el mazo de
+los dos bandos por igual, así que no cambia quién gana la carrera; sólo la
+acorta, y eso sólo interesa si ya vas por delante.
+
+La tentación era sacarla del mazo de referencia. Se probó: **sin ella la
+extinción cae del 21 % al 9 %** (800 partidas), fuera del objetivo de que cada
+vía valga entre el 15 % y el 60 %. La carta que casi nunca se juega es la que
+sostiene una de las tres formas de ganar — existir como amenaza es su función, y
+el índice no sabe medir eso.
+
+Así que se queda, y el objetivo de «0 cartas mal calibradas» se declara
+**incumplido a propósito**, con una carta y con el motivo escrito. Bajar la
+banda para que pase sería cambiar el termómetro.
+
+### 14.4 Interfaz
+
+- El marcador se pisaba a sí mismo: diez recursos con su nombre no caben en una
+  fila de 360 px. Pasa a una fila por bando, con el turno en columna propia.
+- La barra de hábitat nunca bajaba: se dividía por una constante que no existe
+  (`vidaBioma` en vez de `vidaHabitat`), el ancho salía `NaN%` y el navegador
+  descartaba la declaración.
+- Las cartas se pueden ampliar: la ilustración a pantalla completa y la carta
+  entera a 3,1× desde la ficha.
+- Se puede **rendirse** y se puede **volver al menú** al terminar. Antes, la
+  única salida de la pantalla de fin era empezar otra partida.
+- La ayuda explica cómo interactúan Ataque, Defensa y Vida, con el choque de
+  ejemplo calculado desde las cartas reales.
+
+### 14.5 Pendiente
+
+- **Tamaño del mazo.** Medido: a 40 cartas las seis métricas siguen dentro
+  (10,3 turnos, inicial 51,7 %, bola 56,9 %) y el reparto se mueve a
+  30/29/41 — la extinción pasa a ser la vía dominante. Es una decisión de
+  diseño, no de balance, y cambia los mazos guardados de quien ya juega.
+- **Cuatro cartas sin medir**: bosque, llanura, carroña y lago. Están en la
+  colección y no en el mazo de referencia.
+- **Sin CI**: `npm test`, `npm run sim` y `node sim/set.js` se corren a mano.
+
+### 14.6 Estado
+
+| Hito | Estado |
+|---|---|
+| V2-0 motor + simulador | ✅ |
+| V2-1 set de cartas | ✅ 31 cartas, todas con referencia |
+| V2-2 IA heurística | ✅ |
+| V2-3 tablero jugable | ✅ |
+| V2-4 pulido y publicación | ✅ publicado, con la meta encima |
+| V2-5 calibración | 🟡 1 de 25 fuera de banda, documentada en §14.3 |

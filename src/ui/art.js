@@ -207,10 +207,11 @@ const TONO = {
  */
 /**
  * Ilustraciones opcionales. `assets/dinos/indice.json` dice cuáles hay; lo
- * genera `tools/imagenes.py` a partir de lo que dejes en `src/dinos/`. Esa
- * carpeta no viaja en el repositorio por licencia (ver assets/LEEME.md), así
- * que en el sitio publicado el índice no está, la petición falla una vez y
- * todo se dibuja con las siluetas SVG, que siempre están.
+ * genera `tools/imagenes.py` a partir de los originales, que no viajan en el
+ * repositorio porque pesan 29 MB y sólo sirven para regenerar la carpeta (ver
+ * assets/LEEME.md). Las ilustraciones reducidas sí viajan, pero el juego no
+ * depende de ellas: si el índice no está, la petición falla una vez y todo se
+ * dibuja con las siluetas SVG, que siempre están.
  *
  * Vale para CUALQUIER carta, no sólo para los dinosaurios: si algún día hay
  * arte de un clima, basta con dejarlo en src/dinos/ con el id de la carta.

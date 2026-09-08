@@ -223,8 +223,10 @@ function informe(m, r) {
   L.push('');
   L.push('`Índice` = cuota de jugadas / peso en el mazo. 1,00 = se juega en proporción exacta a lo que aparece; < 0,70 = los jugadores la evitan; > 1,30 = la juegan siempre que la ven.');
   L.push('');
-  L.push('| Carta | Familia | Coste | % partidas | Índice | |');
-  L.push('|---|---|---|---|---|---|');
+  L.push('`Uso` = de las copias que llegaron a una mano, cuántas se jugaron. El índice compara la carta con su peso en el mazo y por eso lo mueve la lista tanto como la carta; el uso mira sólo la carta: cuántas veces, teniéndola, se prefirió no jugarla.');
+  L.push('');
+  L.push('| Carta | Familia | Coste | % partidas | Índice | Uso | |');
+  L.push('|---|---|---|---|---|---|---|');
   for (const f of r.frecuencias.slice().sort((a, b) => b.indice - a.indice)) {
     const c = CARTAS[f.cardId];
     const familia = c.tipo === TIPO.DINOSAURIO ? CLADO_NOMBRE[c.clado]
@@ -232,7 +234,8 @@ function informe(m, r) {
         : c.tipo === TIPO.PRESION ? 'Presión' : 'Campo';
     const sano = f.indice >= OBJETIVOS.indice.min && f.indice <= OBJETIVOS.indice.max;
     const nombre = c.tipo === TIPO.DINOSAURIO ? `*${c.binomial}*` : c.binomial;
-    L.push(`| ${nombre} | ${familia} | ${c.coste} | ${f.pct.toFixed(1)} % | ${f.indice.toFixed(2)} | ${ok(sano)} |`);
+    L.push(`| ${nombre} | ${familia} | ${c.coste} | ${f.pct.toFixed(1)} % | ${f.indice.toFixed(2)}`
+      + ` | ${(100 * f.uso).toFixed(0)} % | ${ok(sano)} |`);
   }
   L.push('');
 
@@ -243,7 +246,8 @@ function informe(m, r) {
     if (r.malCalibradas.length > 0) {
       L.push('');
       for (const f of r.malCalibradas.sort((a, b) => a.indice - b.indice)) {
-        L.push(`  - ${CARTAS[f.cardId].binomial} — índice ${f.indice.toFixed(2)} (coste ${CARTAS[f.cardId].coste})`);
+        L.push(`  - ${CARTAS[f.cardId].binomial} — índice ${f.indice.toFixed(2)}, uso ${(100 * f.uso).toFixed(0)} %`
+          + ` (coste ${CARTAS[f.cardId].coste})`);
       }
     }
     L.push('');

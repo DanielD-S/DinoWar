@@ -18,7 +18,7 @@ y se revela **a la vez**: la tensión del juego es la información oculta, no el
 | **Colapso del hábitat** | Derriba el hábitat rival, que empieza con 34 de Vida. |
 | **Extinción** | Quien se queda sin mazo pierde. El descarte **no se rebaraja**, y hay cartas que le comen el mazo al rival. |
 
-Sobre 2.000 partidas las tres se reparten **29 % / 44 % / 27 %**: ninguna es decorado.
+Sobre 2.000 partidas las tres se reparten **39 % / 39 % / 22 %**: ninguna es decorado.
 
 Y de ahí sale la decisión de cada turno: **una fila llena tapa tu hábitat pero regala
 trofeos; una fila corta niega trofeos pero deja pasar el daño**. No hay postura segura.
@@ -44,6 +44,13 @@ discutida no significa que el animal lo esté.
 Los clados no son un triángulo arbitrario, son una red trófica: los terópodos
 hacen daño extra a los ornitópodos, los tireóforos devuelven daño con las púas caudales,
 y la Defensa de cada carta sale de su morfología antipredatoria real.
+
+Cada dinosaurio se resume en tres números y nada más: **Ataque** es el daño que
+reparte una vez por turno, **Defensa** se resta de cada golpe que recibe —no de
+la Vida— y **Vida** es cuántas heridas aguanta antes de morir. Las heridas se
+acumulan y no se curan salvo que una carta lo diga, así que dos dinosaurios que
+no se atraviesan la Defensa se quedan bloqueados: ninguno muere y ninguno pega
+al hábitat.
 
 Ver **[SET_DE_CARTAS.md](SET_DE_CARTAS.md)** para las 31 cartas con su referencia.
 
