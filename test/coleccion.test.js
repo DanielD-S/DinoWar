@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { CARTAS, RAREZA } from '../src/data/cards.js';
 import { MAZO, TOTAL_MAZO } from '../src/data/balance.js';
 import {
-  ECONOMIA, PROBABILIDAD, GARANTIA, TAM_MAZO, POR_RAREZA,
+  ECONOMIA, PROBABILIDAD, GARANTIA, TAM_MAZO, POR_RAREZA, CUOTA, COLECCION_COMPLETA,
   abrirSobre, excedente, valorFusion, limiteDe, validarMazo,
   mazoPorDefecto, coleccionInicial, aListaDeMazo,
 } from '../src/data/coleccion.js';
@@ -50,15 +50,92 @@ test('Un sobre trae cinco cartas y siempre una rara o mejor', () => {
   }
 });
 
-test('Cuanto más rara, menos sale', () => {
+// Lo que se compara es la frecuencia POR CARTA, no por rareza: el set tiene 15
+// épicas y sólo 4 raras, así que las épicas suman más aunque cada una concreta
+// salga bastante menos. Por rareza la comparación diría lo contrario y estaría
+// midiendo el tamaño del grupo, no lo rara que es una carta.
+test('Cuanto más rara una carta, menos sale esa carta', () => {
   const azar = azarDe(7);
-  const cuenta = { COMUN: 0, RARO: 0, EPICO: 0, LEGENDARIO: 0 };
-  const N = 4000;
-  for (let i = 0; i < N; i++) for (const id of abrirSobre(azar)) cuenta[CARTAS[id].rareza] += 1;
+  const cuenta = {};
+  const N = 8000;
+  for (let i = 0; i < N; i++) for (const id of abrirSobre(azar)) cuenta[id] = (cuenta[id] ?? 0) + 1;
 
-  assert.ok(cuenta.COMUN > cuenta.RARO, 'las comunes deberían salir más que las raras');
-  assert.ok(cuenta.RARO > cuenta.EPICO, 'las raras deberían salir más que las épicas');
-  assert.ok(cuenta.EPICO > cuenta.LEGENDARIO, 'las épicas deberían salir más que las legendarias');
+  const media = (r) => {
+    const ids = POR_RAREZA[r];
+    return ids.reduce((n, id) => n + (cuenta[id] ?? 0), 0) / ids.length;
+  };
+  assert.ok(media(RAREZA.COMUN) > media(RAREZA.RARO), 'una común debería salir más que una rara');
+  assert.ok(media(RAREZA.RARO) > media(RAREZA.EPICO), 'una rara debería salir más que una épica');
+  assert.ok(media(RAREZA.EPICO) > media(RAREZA.LEGENDARIO), 'una épica debería salir más que una legendaria');
+});
+
+test('Las probabilidades siguen la forma del set y suman 1', () => {
+  const total = Object.values(RAREZA).reduce((n, r) => n + PROBABILIDAD[r], 0);
+  assert.ok(Math.abs(total - 1) < 1e-9, `las probabilidades suman ${total}`);
+
+  // Ninguna rareza puede recibir menos de lo que le hace falta para completarse
+  // antes que las demás: si una recibe menos cuota de la que aporta al set,
+  // la colección se queda esperándola para siempre.
+  for (const r of Object.values(RAREZA)) {
+    const aporta = CUOTA[r] / COLECCION_COMPLETA;
+    assert.ok(PROBABILIDAD[r] > aporta / 4,
+      `${r} aporta el ${(aporta * 100).toFixed(0)} % del set y sólo recibe el ${(PROBABILIDAD[r] * 100).toFixed(0)} %`);
+  }
+});
+
+test('Con la colección delante, el sobre no da copias que ya no caben en un mazo', () => {
+  const azar = azarDe(31);
+  // Al tope todo menos una carta de cada rareza. La rareza se sortea igual que
+  // siempre; lo que cambia es que, salga la que salga, ha de tocarle a la única
+  // que aún falta de ese grupo.
+  const pendiente = {};
+  const llenas = {};
+  for (const r of Object.values(RAREZA)) {
+    const ids = POR_RAREZA[r];
+    pendiente[r] = ids[ids.length - 1];
+    for (const id of ids) if (id !== pendiente[r]) llenas[id] = limiteDe(id);
+  }
+
+  let inservibles = 0;
+  for (let i = 0; i < 400; i++) {
+    // Se lleva la cuenta dentro del sobre igual que la lleva abrirSobre: si la
+    // única carta que faltaba de una rareza se completa a mitad del sobre, que
+    // el resto salga repetido es lo correcto, no un fallo.
+    const cuenta = { ...llenas };
+    for (const id of abrirSobre(azar, llenas)) {
+      const grupo = POR_RAREZA[CARTAS[id].rareza];
+      const quedaba = grupo.some((x) => (cuenta[x] ?? 0) < limiteDe(x));
+      if (quedaba && (cuenta[id] ?? 0) >= limiteDe(id)) inservibles += 1;
+      cuenta[id] = (cuenta[id] ?? 0) + 1;
+    }
+  }
+  assert.equal(inservibles, 0, `salieron ${inservibles} copias inservibles habiendo alternativa`);
+});
+
+test('Dos cartas del mismo sobre se tienen en cuenta entre sí', () => {
+  const azar = azarDe(1234);
+  // Sólo queda por completar una legendaria, de la que falta una única copia.
+  // Aunque el sobre saque la rareza legendaria cinco veces, no puede dar cinco
+  // copias de esa carta como si cada tirada empezara de cero.
+  const casi = Object.fromEntries(Object.keys(CARTAS).map((id) => [id, limiteDe(id)]));
+  const hueco = POR_RAREZA[RAREZA.LEGENDARIO][0];
+  casi[hueco] = 0;
+
+  let veces = 0;
+  for (let i = 0; i < 300; i++) {
+    const s = abrirSobre(azar, casi);
+    veces = Math.max(veces, s.filter((id) => id === hueco).length);
+  }
+  assert.ok(veces <= limiteDe(hueco),
+    `un solo sobre dio ${veces} copias de ${hueco}, que admite ${limiteDe(hueco)}`);
+});
+
+test('Cuando una rareza está completa el sobre vuelve a repartirla: la fusión sigue teniendo de qué comer', () => {
+  const azar = azarDe(77);
+  const todo = Object.fromEntries(Object.keys(CARTAS).map((id) => [id, limiteDe(id)]));
+  const s = abrirSobre(azar, todo);
+  assert.equal(s.length, ECONOMIA.cartasPorSobre);
+  assert.ok(s.every((id) => CARTAS[id]), 'con la colección llena el sobre debe seguir dando cartas');
 });
 
 test('Abrir sobres no es rentable: fundirlo entero devuelve menos de lo que cuesta', () => {

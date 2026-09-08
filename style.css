@@ -354,6 +354,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .sobre-odds th { text-align: left; font-weight: 400; padding: 4px 0; }
 .sobre-odds td { text-align: right; padding: 4px 0; }
 .sobre-odds tr + tr { border-top: 1px solid var(--superficie-2); }
+.sobre-odds td:last-child { width: 5.2em; color: var(--tenue-2); }
+/* Una rareza que ya tienes entera deja de ser una probabilidad y pasa a ser
+   material de fusión: se apaga para que se vea de un vistazo qué falta. */
+.sobre-odds tr.completa { opacity: .42; }
+.sobre-odds tr.completa th::after { content: ' · completa'; color: var(--tenue-2); }
+.sobre-nota { display: inline-block; margin-top: 8px; color: var(--tenue-2); font-size: 12px; }
 
 /* Mazos */
 .mazo-ficha {

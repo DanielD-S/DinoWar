@@ -9,7 +9,7 @@ import {
   CARTAS, RAREZA, RAREZA_NOMBRE, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, carta,
 } from '../data/cards.js';
 import {
-  ECONOMIA, PROBABILIDAD, GARANTIA, TAM_MAZO,
+  ECONOMIA, PROBABILIDAD, GARANTIA, TAM_MAZO, POR_RAREZA,
   abrirSobre, excedente, valorFusion, limiteDe, validarMazo, mazoPorDefecto,
 } from '../data/coleccion.js';
 import {
@@ -212,10 +212,30 @@ function pintarSobres(tirada = null, nuevas = new Set(), antesDeAbrir = {}) {
   const p = cargarPerfil();
   pintarMonedas();
 
-  dom.odds.innerHTML = `<tr><th>Rareza</th><td>por carta</td><td>cartas</td></tr>`
-    + ORDEN.map((r) => `<tr><th class="col-rar rar-${r}">${RAREZA_NOMBRE[r]}</th>
+  // Dos columnas porque son dos preguntas distintas y antes se daban mezcladas:
+  // «cuántas de las cinco» es la del grupo, y «cuándo me tocará la que me
+  // falta» es la que de verdad le importa a quien abre el sobre. Con sólo la
+  // primera, el 4 % de las legendarias parecía la respuesta a la segunda.
+  //
+  // La espera se calcula sobre las que le faltan al jugador, no sobre las ocho
+  // legendarias del set, porque eso es lo que hace el sobre: si sólo te falta
+  // una, cada legendaria que salga es ésa. Y por eso el número mejora según
+  // completas la rareza, que es la parte que el jugador nota.
+  const faltanDe = (r) => POR_RAREZA[r].filter((id) => (p.cartas[id] ?? 0) < limiteDe(id)).length;
+  const espera = (r) => Math.max(1, Math.round(faltanDe(r) / (PROBABILIDAD[r] * ECONOMIA.cartasPorSobre)));
+
+  dom.odds.innerHTML = '<tr><th>Rareza</th><td>del sobre</td><td>la que te falta</td><td>cartas</td></tr>'
+    + ORDEN.map((r) => {
+      const quedan = faltanDe(r);
+      const cuando = quedan === 0
+        ? 'ya la tienes toda'
+        : `1 de cada ${espera(r)} ${espera(r) === 1 ? 'sobre' : 'sobres'}`;
+      return `<tr class="${quedan ? '' : 'completa'}">
+        <th class="col-rar rar-${r}">${RAREZA_NOMBRE[r]}</th>
         <td>${(PROBABILIDAD[r] * 100).toFixed(0)} %</td>
-        <td>${Object.values(CARTAS).filter((c) => c.rareza === r).length}</td></tr>`).join('');
+        <td>${cuando}</td>
+        <td>${quedan ? `faltan ${quedan}` : POR_RAREZA[r].length}</td></tr>`;
+    }).join('');
 
   if (!tirada) {
     dom.tirada.className = 'sobre-tirada cerrado';
@@ -224,7 +244,9 @@ function pintarSobres(tirada = null, nuevas = new Set(), antesDeAbrir = {}) {
         <div class="sobre-sello">◆</div>
       </div>
       <p class="sobre-vacio">Cinco cartas al azar.<br>
-        Al menos una ${RAREZA_NOMBRE[GARANTIA].toLowerCase()} o mejor, garantizada.</p>`;
+        Al menos una ${RAREZA_NOMBRE[GARANTIA].toLowerCase()} o mejor, garantizada.<br>
+        <span class="sobre-nota">Mientras te falte alguna de esa rareza, no te dará
+        una copia que ya no te cabe en el mazo.</span></p>`;
   } else {
     // Cada carta cae boca abajo y se voltea por turnos. El retardo va en una
     // variable CSS para que la animación de reparto y la de volteo compartan
@@ -273,7 +295,7 @@ function comprarSobre() {
   const p = cargarPerfil();
   if (!PRUEBAS && p.monedas < ECONOMIA.precioSobre) return;
 
-  const tirada = abrirSobre(Math.random);
+  const tirada = abrirSobre(Math.random, p.cartas);
   const nuevas = new Set(tirada.filter((cid) => (p.cartas[cid] ?? 0) === 0));
   const antesDeAbrir = { ...p.cartas };
 
