@@ -83,13 +83,19 @@ python -m http.server 8000
 y abrir <http://localhost:8000>.
 
 ```bash
-npm test        # 53 tests del motor y de la colección
+npm test        # 57 tests del motor y de la colección
 npm run sim     # 2.000 partidas IA vs IA → BALANCE.md
 node sim/set.js # regenera SET_DE_CARTAS.md desde el código
 ```
 
 Parámetros de URL: `?debug=1` (overlay de estado), `?seed=N` (partida reproducible),
-`?ia=aleatoria` (rival más blando).
+`?ia=aleatoria` (fuerza el rival blando por encima de lo elegido en el menú),
+`?pruebas=1` (sobres gratis).
+
+Instalable: lleva manifiesto y service worker, así que se puede añadir a la
+pantalla de inicio y **se juega sin conexión** una vez cargado. La estrategia es
+red primero: el sitio se publica empujando a `main`, así que la caché es la red
+de seguridad para cuando no hay red, nunca una versión vieja servida de tapadillo.
 
 ## Cómo está hecho
 
@@ -104,12 +110,13 @@ está, el juego entero cae a ellas sin un solo hueco (ver
 [assets/LEEME.md](assets/LEEME.md)).
 
 ```
+.github/       CI: los tests y el set generado se comprueban en cada push
 src/data/      cartas y números de balance — ninguna constante suelta fuera de aquí
 src/engine/    motor de reglas: (estado, acción) → estado. Puro, sin DOM, corre en Node
 src/ui/        interfaz: sólo lee el estado, nunca lo muta. almacen.js es el
                único fichero que toca localStorage
 sim/           simulador de balance y generador del set
-test/          53 tests
+test/          57 tests
 tools/         utilidades de desarrollo, fuera del juego servido
 v1/            versión anterior, jugable y congelada (ver v1/LEEME.md)
 ```

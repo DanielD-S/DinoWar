@@ -654,6 +654,27 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   filter: drop-shadow(0 8px 18px rgba(0,0,0,.7));
 }
 
+/* -------------------------------------------------------------- tutorial */
+
+/* Encima del pie y por debajo de las hojas: explica el tablero, así que no
+   puede taparlo entero ni robarle el sitio a la mano. */
+.tutorial {
+  position: absolute; z-index: 60; left: 8px; right: 8px; bottom: 190px;
+  background: var(--panel); border: 1px solid var(--bio); border-radius: var(--radio);
+  padding: 11px 12px; box-shadow: 0 8px 26px rgba(0,0,0,.6);
+  animation: subir .2s ease-out;
+}
+.tutorial p { font-size: 13px; line-height: 1.45; color: var(--texto); }
+.tutorial b { color: var(--bio); }
+.tutorial-pie { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.tutorial-saltar {
+  flex: 1; text-align: left; font-size: 11.5px; color: var(--tenue); min-height: 34px;
+}
+.tutorial-siguiente {
+  flex: 0 0 auto; min-height: 38px; padding: 0 18px; border-radius: var(--radio);
+  background: var(--bio); color: #191308; font-weight: 700; font-size: 13px;
+}
+
 /* ----------------------------------------------------------------- hojas */
 
 .hoja {

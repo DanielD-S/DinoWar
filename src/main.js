@@ -13,6 +13,10 @@ import {
   abrirVisor, cambiarModoVisor, cerrarVisor, abrirComprometidas,
 } from './ui/render.js';
 import { tomarEntrada, soltarEntrada } from './ui/input.js';
+import {
+  montarTutorial, empezarTutorial, terminarTutorial, tutorialHecho, tutorialActivo,
+  tutorialEspera, pasoTutorial,
+} from './ui/tutorial.js';
 import { detectarFotos, vigilarFotos, calentarFotos } from './ui/art.js';
 import { montarMeta, abrirColeccion, abrirSobres, abrirMazos, pintarMenu, recompensar } from './ui/meta.js';
 import { mazoActivo, cargarPerfil, actualizarPerfil } from './ui/almacen.js';
@@ -125,6 +129,7 @@ function soltar(iid, cardId, destino) {
   if (c.tipo === TIPO.DINOSAURIO) {
     if (aplicar({ tipo: ACCION.DESPLEGAR, jugador: JUGADOR, iid, ranura: destino.ranura })) {
       mensaje(`${c.binomial} queda boca abajo en la ranura ${destino.ranura + 1}.`);
+      pasoTutorial('desplegada');
     }
     return;
   }
@@ -173,6 +178,7 @@ function pedirClado(iid, c) {
 function turnoDelJugador() {
   irA(APP.PLAYING);
   render(estado);
+  pasoTutorial('turno', { turno: estado.turno });
   el.btnListo.disabled = false;
   const puede = legales(estado, JUGADOR).some((a) => a.tipo !== ACCION.PASAR);
   const bio = estado.jugadores[JUGADOR].biomasa;
@@ -228,6 +234,15 @@ function presionesRivales(nuevos) {
   return textos.length === 0 ? null : `El rival juega ${textos.join(' y ')}.`;
 }
 
+/**
+ * Para el bucle mientras el jugador lee un cartel del tutorial. El combate se
+ * explica justo cuando ocurre, y si sigue corriendo por debajo se explica solo
+ * lo que ya no está en pantalla.
+ */
+async function esperarTutorial() {
+  while (tutorialEspera() && app === APP.RESOLVING) await esperar(120);
+}
+
 async function bucle() {
   let guardia = 0;
   while (guardia++ < 400) {
@@ -260,6 +275,8 @@ async function bucle() {
       // lleno son diez cartas y 700 ms las cortaba por la mitad.
       const volteadas = animarRevelacion(antes, estado);
       await esperar(volteadas > 0 ? 480 + volteadas * 90 : 500);
+      pasoTutorial('revelado');
+      await esperarTutorial();
       continue;
     }
 
@@ -272,6 +289,8 @@ async function bucle() {
       mensaje('Combate…');
       if (nuevos.some((e) => e.tipo === 'MUERTE')) sonido('muerte');
       await new Promise((r) => animarCombate(previo, estado, nuevos, r));
+      pasoTutorial('combate');
+      await esperarTutorial();
       continue;
     }
 
@@ -352,6 +371,7 @@ function abrirLog() {
  */
 function rendirse() {
   cerrarHojas();
+  if (tutorialActivo()) terminarTutorial();
   irA(APP.GAME_OVER);
   soltarEntrada();
   cancelarAnimaciones();
@@ -389,6 +409,7 @@ function finPartida() {
   irA(APP.GAME_OVER);
   soltarEntrada();
   cancelarAnimaciones();
+  if (tutorialActivo()) terminarTutorial();
 
   const gane = estado.ganador === JUGADOR;
   const [p, r] = estado.jugadores;
@@ -417,6 +438,9 @@ function nuevaPartida() {
   cancelarAnimaciones();
   soltarEntrada();
   registro = [];
+  // La primera partida de todas se juega con el tutorial encima. Después no
+  // vuelve a aparecer solo: está en el menú.
+  if (!tutorialHecho() && !leerRecord()) empezarTutorial();
 
   const s = Number(params.get('seed')) || (Date.now() & 0x7fffffff);
   // Tú llevas tu mazo; la IA lleva el de referencia, que es el que mide el
@@ -426,6 +450,7 @@ function nuevaPartida() {
 
   irA(APP.PLAYING);
   render(estado);
+  if (tutorialActivo()) pasoTutorial('inicio');
   tomarEntrada({
     interactivo,
     admite,
@@ -468,6 +493,7 @@ function bucleDebug() {
 
 function iniciar() {
   montar();
+  montarTutorial();
   // Las ilustraciones son opcionales: si están servidas se repinta con ellas,
   // si no, se juega con las siluetas y nadie ve un hueco.
   vigilarFotos();
@@ -555,6 +581,11 @@ function iniciar() {
   const abrirAyuda = () => { el.ayudaCuerpo.innerHTML = ayudaHTML(); el.ayuda.classList.remove('oculta'); };
   el.btnAyuda.addEventListener('click', abrirAyuda);
   el.btnAyudaMenu.addEventListener('click', abrirAyuda);
+  el.btnTutorial.addEventListener('click', () => {
+    desbloquear();
+    empezarTutorial();
+    nuevaPartida();
+  });
 
   el.estacion.addEventListener('click', () => {
     if (estado?.estacion.actual) abrirFicha(fichaEstacionHTML(estado.estacion.actual));

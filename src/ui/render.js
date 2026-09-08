@@ -33,7 +33,7 @@ export function montar() {
     comprometidasCerrar: id('comprometidas-cerrar'),
     mano: id('mano'), mensaje: id('mensaje'),
     btnListo: id('btn-listo'), btnLog: id('btn-log'), btnMute: id('btn-mute'),
-    btnAyuda: id('btn-ayuda'), btnAyudaMenu: id('btn-ayuda-menu'),
+    btnAyuda: id('btn-ayuda'), btnAyudaMenu: id('btn-ayuda-menu'), btnTutorial: id('btn-tutorial'),
     btnJugar: id('btn-jugar'), btnOtra: id('btn-otra'), btnFinMenu: id('btn-fin-menu'),
     dificultad: id('dificultad'),
     btnRendirse: id('btn-rendirse'),
