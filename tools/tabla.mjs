@@ -40,6 +40,7 @@ function escribir() {
       dino ? c.vida : '',
       c.rasgoNombre,
       esc(c.rasgoTexto),
+      '',
     ].map((x) => ` ${x} `).join('|').replace(/^/, '|').replace(/$/, '|');
   });
 
@@ -68,6 +69,17 @@ Es un espejo del set: lo que hay en \`src/data/cards.js\` ahora mismo. «Coste
 nuevo» arranca igual que «Coste actual» y lo que escribas ahí es lo que se
 aplica.
 
+**«Texto del rasgo» es lo que la carta DICE, no lo que HACE.** Lo que hace sale
+de una constante del código sobre la que el motor decide en sesenta sitios; el
+texto sólo se pinta. Así que editarlo sirve para redactar mejor una regla que
+ya existe, y si se le escribe una regla distinta la carta seguirá haciendo lo
+de antes y el texto mentirá.
+
+Para pedir una regla distinta está **«Mecánica nueva»**: se escribe ahí, en
+lenguaje llano, qué debería hacer la carta. Esa columna no la aplica ninguna
+herramienta —hay que escribirla en el motor y medirla—, pero \`aplicar\` la lee
+y la lista al terminar para que no se quede olvidada.
+
 La renta es de **1 de Biomasa por turno acumulativa**, con un tope de
 ${BALANCE.rentaTope} de ahorro. Eso da un presupuesto de unas doce Biomasas por
 partida de once turnos, que es la escala que tienen que respetar los costes: hoy
@@ -86,8 +98,8 @@ que correr \`npm test\` y \`npm run sim\`: los seis objetivos del balance salen 
 estos números, y el que hoy falla —cartas descalibradas— es justo el que esta
 revisión viene a arreglar.
 
-| id | Carta | Familia | Rareza | Coste actual | Coste nuevo | A | D | V | Rasgo | Texto del rasgo |
-|---|---|---|---|---|---|---|---|---|---|---|
+| id | Carta | Familia | Rareza | Coste actual | Coste nuevo | A | D | V | Rasgo | Texto del rasgo | Mecánica nueva |
+|---|---|---|---|---|---|---|---|---|---|---|---|
 `;
   writeFileSync(RUTA, cabecera + filas.join('\n') + '\n');
   console.log(`RECOSTE.md escrito: ${filas.length} cartas`);
@@ -107,9 +119,14 @@ function aplicar() {
 
   let src = readFileSync(CARDS, 'utf8');
   let tocadas = 0;
+  // «Mecánica nueva» no se puede aplicar: describe algo que el motor todavía no
+  // sabe hacer. Se recoge y se avisa, porque una carta con la mecánica escrita
+  // y sin implementar es justo el desajuste que esta columna viene a evitar.
+  const pedidos = [];
 
   for (const cols of filas) {
-    const [id, , , rarezaTexto, , costeNuevo, a, d, v, rasgoNombre, rasgoTexto] = cols;
+    const [id, , , rarezaTexto, , costeNuevo, a, d, v, rasgoNombre, rasgoTexto, mecanica] = cols;
+    if (mecanica) pedidos.push(`${id}: ${mecanica}`);
     const c = CARTAS[id];
     const bloque = bloqueDe(src, id);
     let nuevo = bloque;
@@ -138,6 +155,13 @@ function aplicar() {
   comprobar(src);
   writeFileSync(CARDS, src);
   console.log(`cards.js actualizado: ${tocadas} carta(s) con cambios`);
+
+  if (pedidos.length) {
+    console.log(`\n${pedidos.length} carta(s) piden mecánica nueva. Eso NO lo aplica esta`);
+    console.log('herramienta: hay que escribirlo en el motor y medirlo.\n');
+    for (const p of pedidos) console.log(`  · ${p}`);
+    console.log('');
+  }
 }
 
 /**

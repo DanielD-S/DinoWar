@@ -22,12 +22,13 @@ MD = RAIZ / 'RECOSTE.md'
 XLSX = RAIZ / 'RECOSTE.xlsx'
 
 CABECERA = ['id', 'Carta', 'Familia', 'Rareza', 'Coste actual', 'Coste nuevo',
-            'Δ', 'A', 'D', 'V', 'Rasgo', 'Texto del rasgo']
-EDITABLES = {'Rareza', 'Coste nuevo', 'A', 'D', 'V', 'Rasgo', 'Texto del rasgo'}
+            'Δ', 'A', 'D', 'V', 'Rasgo', 'Texto del rasgo', 'Mecánica nueva']
+EDITABLES = {'Rareza', 'Coste nuevo', 'A', 'D', 'V', 'Rasgo', 'Texto del rasgo',
+             'Mecánica nueva'}
 RAREZAS = ('Común', 'Rara', 'Épica', 'Legendaria')
 ANCHOS = {'id': 20, 'Carta': 30, 'Familia': 16, 'Rareza': 11, 'Coste actual': 13,
           'Coste nuevo': 13, 'Δ': 5, 'A': 5, 'D': 5, 'V': 5, 'Rasgo': 24,
-          'Texto del rasgo': 78}
+          'Texto del rasgo': 62, 'Mecánica nueva': 52}
 
 FUENTE = 'Arial'
 TINTA = Font(name=FUENTE, size=10)
@@ -68,14 +69,13 @@ def escribir():
 
     hoja['A1'] = 'DinoWar — recoste del set'
     hoja['A1'].font = TITULO
-    hoja['A2'] = ('Edita las columnas amarillas: Rareza, Coste nuevo, A, D, V, Rasgo y '
-                  'Texto del rasgo. La rareza se elige del desplegable; los costes son '
-                  'enteros de 0 a 8 (ej. 2) y A, D y V van de 0 a 20 (ej. 6). Las columnas '
-                  'grises son de referencia y se ignoran al aplicar.')
-    hoja['A3'] = ('No cambies el id, no borres ni añadas filas y no reordenes: el id es la '
-                  'llave con la que cada fila vuelve a su carta. Los eventos, climas y '
-                  'recursos no tienen A/D/V y se quedan en blanco. Cambiar la rareza mueve '
-                  'las copias que caben en un mazo, lo que sale en los sobres y la fusión.')
+    hoja['A2'] = ('Edita las columnas amarillas. La rareza se elige del desplegable; los '
+                  'costes son enteros de 0 a 8 (ej. 2) y A, D y V van de 0 a 20 (ej. 6). '
+                  'Las columnas grises son de referencia y se ignoran al aplicar.')
+    hoja['A3'] = ('«Texto del rasgo» es lo que la carta DICE: sirve para redactar mejor una '
+                  'regla que ya existe. Para pedir una regla DISTINTA, descríbela en '
+                  '«Mecánica nueva» — eso hay que escribirlo en el motor, no lo aplica la '
+                  'herramienta. No cambies el id ni reordenes filas: el id es la llave.')
     for f in ('A2', 'A3'):
         hoja[f].font = TINTA
         hoja[f].alignment = Alignment(wrap_text=True, vertical='top')
@@ -94,7 +94,7 @@ def escribir():
     for i, fila in enumerate(filas):
         r = PRIMERA + i
         # La fila markdown no trae la Δ: se calcula en la hoja.
-        valores = fila[:6] + [None] + fila[6:11]
+        valores = fila[:6] + [None] + fila[6:12]
         for col, (nombre, valor) in enumerate(zip(CABECERA, valores), start=1):
             c = hoja.cell(row=r, column=col)
             if nombre == 'Δ':
@@ -113,9 +113,10 @@ def escribir():
             # Los textos van con formato de texto explícito: un rasgo que empieza
             # por «+1 Ataque…» o por «-2 Poder…» lo lee Excel como una fórmula
             # rota y se niega a aceptarlo.
-            if nombre in ('Rasgo', 'Texto del rasgo', 'id', 'Carta', 'Familia'):
+            if nombre in ('Rasgo', 'Texto del rasgo', 'Mecánica nueva',
+                          'id', 'Carta', 'Familia'):
                 c.number_format = '@'
-            if nombre == 'Texto del rasgo':
+            if nombre in ('Texto del rasgo', 'Mecánica nueva'):
                 c.alignment = Alignment(wrap_text=True, vertical='top')
             elif nombre in ('Coste actual', 'Coste nuevo', 'Δ', 'A', 'D', 'V'):
                 c.alignment = Alignment(horizontal='center')
@@ -196,7 +197,8 @@ def leer():
         # markdown; el resto sale de la hoja, que es lo que se ha editado.
         campos = [previa[0], previa[1], previa[2], celda('Rareza') or previa[3], previa[4],
                   celda('Coste nuevo'), celda('A'), celda('D'), celda('V'),
-                  celda('Rasgo'), celda('Texto del rasgo').replace('|', '\\|')]
+                  celda('Rasgo'), celda('Texto del rasgo').replace('|', '\\|'),
+                  celda('Mecánica nueva').replace('|', '\\|')]
         lineas.append('| ' + ' | '.join(campos) + ' |')
 
     tabla = ('| ' + ' | '.join(n for n in CABECERA if n != 'Δ') + ' |\n'
