@@ -1,0 +1,160 @@
+// DinoWar — entrada con Pointer Events exclusivamente. Sin ratón, sin táctil,
+// sin gestos propietarios: un solo camino de código para dedo y puntero.
+//
+// Este módulo no sabe reglas. Sólo dice QUÉ carta se ha soltado y DÓNDE;
+// main.js decide qué acción es según la familia de la carta.
+
+import { el } from './render.js';
+
+const UMBRAL_ARRASTRE = 8;   // px antes de considerar que se está arrastrando
+const LARGA = 400;           // ms de pulsación larga
+
+let api = null;
+let gesto = null;
+let temporizadorLargo = null;
+const listeners = [];
+
+function on(nodo, tipo, fn, opciones) {
+  nodo.addEventListener(tipo, fn, opciones);
+  listeners.push([nodo, tipo, fn, opciones]);
+}
+
+/** Quita todos los listeners: sin residuos entre partidas. */
+export function soltarEntrada() {
+  for (const [nodo, tipo, fn, opciones] of listeners) nodo.removeEventListener(tipo, fn, opciones);
+  listeners.length = 0;
+  clearTimeout(temporizadorLargo);
+  gesto = null;
+  api = null;
+  el.arrastre.classList.add('oculta');
+}
+
+/** Qué hay bajo el puntero, en orden de prioridad. */
+function destinoBajo(x, y) {
+  const pila = document.elementsFromPoint(x, y);
+
+  const carta = pila.find((n) => n.classList?.contains('carta--ranura') && n.dataset.iid);
+  if (carta && !carta.classList.contains('pendiente')) {
+    return {
+      tipo: 'unidad',
+      iid: Number(carta.dataset.iid),
+      propia: carta.classList.contains('propio'),
+      nodo: carta.closest('.ranura') ?? carta,
+    };
+  }
+
+  const ranura = pila.find((n) => n.classList?.contains('ranura'));
+  if (ranura) {
+    return {
+      tipo: 'ranura',
+      bando: Number(ranura.dataset.bando),
+      ranura: Number(ranura.dataset.ranura),
+      libre: !ranura.classList.contains('ocupada'),
+      nodo: ranura,
+    };
+  }
+
+  const franja = pila.find((n) => n.classList?.contains('franja'));
+  if (franja) return { tipo: 'franja', nodo: franja };
+
+  if (pila.some((n) => n === el.campo)) return { tipo: 'campo', nodo: el.campo };
+  return null;
+}
+
+function limpiarDestinos() {
+  for (const n of document.querySelectorAll('.destino')) n.classList.remove('destino');
+}
+
+function empezarArrastre(e) {
+  gesto.arrastrando = true;
+  clearTimeout(temporizadorLargo);
+  gesto.nodo.classList.add('arrastrando');
+  el.arrastre.innerHTML = gesto.nodo.innerHTML;
+  el.arrastre.className = `arrastre carta ${gesto.nodo.className.replace(/carta--mano|alzada|arrastrando|carta/g, '')}`.trim();
+  el.arrastre.classList.remove('oculta');
+  moverFantasma(e);
+}
+
+function moverFantasma(e) {
+  el.arrastre.style.left = `${e.clientX}px`;
+  el.arrastre.style.top = `${e.clientY}px`;
+}
+
+function alBajar(e) {
+  if (!api?.interactivo()) return;
+  const nodo = e.target.closest('.carta');
+  if (!nodo) return;
+
+  e.preventDefault();
+  gesto = {
+    iid: Number(nodo.dataset.iid),
+    cardId: nodo.dataset.card,
+    nodo,
+    x0: e.clientX,
+    y0: e.clientY,
+    arrastrando: false,
+  };
+  try { nodo.setPointerCapture(e.pointerId); } catch { /* puntero ya liberado */ }
+  nodo.classList.add('alzada');
+
+  clearTimeout(temporizadorLargo);
+  temporizadorLargo = setTimeout(() => {
+    if (gesto && !gesto.arrastrando) {
+      api.ficha(gesto.cardId);
+      gesto.consumido = true;
+      gesto.nodo.classList.remove('alzada');
+    }
+  }, LARGA);
+}
+
+function alMover(e) {
+  if (!gesto || gesto.consumido) return;
+  const dx = e.clientX - gesto.x0;
+  const dy = e.clientY - gesto.y0;
+
+  if (!gesto.arrastrando && Math.hypot(dx, dy) > UMBRAL_ARRASTRE) empezarArrastre(e);
+  if (!gesto.arrastrando) return;
+
+  e.preventDefault();
+  moverFantasma(e);
+  limpiarDestinos();
+  const d = destinoBajo(e.clientX, e.clientY);
+  if (d && api.admite(gesto.cardId, d)) d.nodo.classList.add('destino');
+}
+
+function alSoltar(e) {
+  if (!gesto) return;
+  const g = gesto;
+  gesto = null;
+  clearTimeout(temporizadorLargo);
+  g.nodo.classList.remove('alzada', 'arrastrando');
+  el.arrastre.classList.add('oculta');
+  limpiarDestinos();
+
+  if (g.consumido) return;
+  if (!g.arrastrando) { api.ficha(g.cardId); return; }
+
+  const d = destinoBajo(e.clientX, e.clientY);
+  api.soltar(g.iid, g.cardId, d);
+}
+
+function alTocarCampo(e) {
+  const c = e.target.closest('.carta--ranura');
+  if (c?.dataset.card) { api.ficha(c.dataset.card); return; }
+  const f = e.target.closest('.franja-campo');
+  if (f?.dataset.card) api.ficha(f.dataset.card);
+}
+
+export function tomarEntrada(nuevaApi) {
+  soltarEntrada();
+  api = nuevaApi;
+
+  on(el.mano, 'pointerdown', alBajar);
+  on(el.mano, 'pointermove', alMover, { passive: false });
+  on(el.mano, 'pointerup', alSoltar);
+  on(el.mano, 'pointercancel', alSoltar);
+  on(el.campo, 'pointerup', alTocarCampo);
+  on(document, 'contextmenu', (e) => e.preventDefault());
+  on(document, 'gesturestart', (e) => e.preventDefault());
+  on(document, 'dblclick', (e) => e.preventDefault());
+}

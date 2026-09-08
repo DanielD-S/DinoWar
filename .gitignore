@@ -1,0 +1,14 @@
+# Salida temporal del simulador
+balance_tmp.md
+_set_tmp.mjs
+nul
+
+# Sistema
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+*.swp
