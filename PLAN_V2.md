@@ -535,7 +535,37 @@ cifra y ocupaba más.
   caben; se usa la ficha reducida de dos capas que el propio paquete describe
   para móvil.
 
-### 15.4 Fallos que salieron al aplicarlo
+### 15.4 Lo que quedaba, y lo que sigue quedando
+
+En la primera pasada se aplicó el núcleo —paleta, tipografía, carta, tablero,
+menú, colección, ficha, visor y fin—. Después se cerraron cuatro pantallas más:
+
+- **Constructor de mazos** con marcador, barra de progreso, curva de coste en
+  ocho cubos y dos pestañas. El panel lateral del diseño es de escritorio; en
+  vertical las pestañas hacen el mismo trabajo y arreglan de paso algo que no
+  era de diseño: para ver qué llevabas había que recorrer la colección entera
+  buscando los contadores en no cero.
+- **Tirada de sobres** con la mejor carta en grande y una línea por carta que
+  dice qué es para tu colección.
+- **Rareza en el borde** de las cartas, salvo en el tablero, donde manda el
+  bando.
+- **Ranura de enfrente vacía** marcada en la unidad que tiene el carril libre.
+  Sin la etiqueta «Ataca» del diseño: durante el despliegue el rival puede tapar
+  ese carril en secreto, así que la etiqueta prometería algo que puede no
+  cumplirse. El borde dice «tal y como está el campo», que es lo único cierto.
+
+Queda sin portar, y no por olvido:
+
+- El **reverso 4d** (fotografía en duotono). Se usa el 4c, el de escamas, que es
+  el que comparten la pila, el sobre y el reverso y no obliga a cargar otra
+  imagen.
+- La **disposición de escritorio** con el corte en 720 px. El juego es vertical
+  y se queda en su marco centrado.
+- Detalles: la leyenda A/D/V en la franja de campo, el descarte como carta con
+  la última descartada en gris, y los filtros «Sólo repetidas» y de orden en la
+  colección.
+
+### 15.5 Fallos que salieron al aplicarlo
 
 - La mano en fila trajo desbordamiento lateral, y con él un fallo nuevo: al
   desplazarla, el navegador se queda el gesto y manda `pointercancel`, que caía
