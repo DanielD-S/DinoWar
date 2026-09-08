@@ -126,7 +126,7 @@ export const CARTAS = Object.freeze({
     binomial: 'Dryosaurus altus',
     coste: 0, ataque: 1, defensa: 0, vida: 2,
     rasgo: RASGO.GREGARIO, rasgoNombre: 'Gregario',
-    rasgoTexto: '+1 Poder por cada otro Dryosaurus propio en el campo.',
+    rasgoTexto: '+1 de Ataque por cada otro Dryosaurus propio en el campo.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: 'Ornitópodo pequeño y cursorial. El gregarismo se infiere de acumulaciones multiindividuo, no está demostrado.',
   }),
@@ -134,7 +134,7 @@ export const CARTAS = Object.freeze({
   ornitholestes: dino({
     id: 'ornitholestes', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,
     binomial: 'Ornitholestes hermanni',
-    coste: 1, ataque: 2, defensa: 0, vida: 2,
+    coste: 1, ataque: 1, defensa: 1, vida: 1,
     rasgo: RASGO.OPORTUNISTA, rasgoNombre: 'Oportunista',
     rasgoTexto: '+1 Vida permanente cada vez que muere un dinosaurio en el campo.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -144,7 +144,7 @@ export const CARTAS = Object.freeze({
   ceratosaurus: dino({
     id: 'ceratosaurus', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,
     binomial: 'Ceratosaurus nasicornis',
-    coste: 1, ataque: 4, defensa: 1, vida: 3,
+    coste: 1, ataque: 3, defensa: 0, vida: 3,
     rasgo: RASGO.RIBERENO, rasgoNombre: 'Ribereño',
     rasgoTexto: '+2 Poder mientras el campo activo sea Canal fluvial trenzado.',
     nivel_evidencia: EVIDENCIA.DEBATIDO,
@@ -152,9 +152,9 @@ export const CARTAS = Object.freeze({
   }),
 
   stegosaurus: dino({
-    id: 'stegosaurus', rareza: RAREZA.EPICO, clado: CLADO.TIREOFORO,
+    id: 'stegosaurus', rareza: RAREZA.COMUN, clado: CLADO.TIREOFORO,
     binomial: 'Stegosaurus stenops',
-    coste: 2, ataque: 3, defensa: 3, vida: 6,
+    coste: 2, ataque: 1, defensa: 4, vida: 5,
     rasgo: RASGO.TAGOMIZADOR, rasgoNombre: 'Tagomizador',
     rasgoTexto: 'Devuelve 2 de daño adicional a quien lo ataque, además del que ya devuelve su clado.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -162,9 +162,9 @@ export const CARTAS = Object.freeze({
   }),
 
   allosaurus: dino({
-    id: 'allosaurus', rareza: RAREZA.EPICO, clado: CLADO.TEROPODO,
+    id: 'allosaurus', rareza: RAREZA.RARO, clado: CLADO.TEROPODO,
     binomial: 'Allosaurus fragilis',
-    coste: 2, ataque: 6, defensa: 1, vida: 5,
+    coste: 3, ataque: 5, defensa: 2, vida: 3,
     rasgo: RASGO.DEPREDADOR_DOMINANTE, rasgoNombre: 'Depredador dominante',
     rasgoTexto: 'Si mata a su rival, el daño sobrante pasa al hábitat enemigo.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -172,9 +172,9 @@ export const CARTAS = Object.freeze({
   }),
 
   camarasaurus: dino({
-    id: 'camarasaurus', rareza: RAREZA.EPICO, clado: CLADO.SAUROPODO,
+    id: 'camarasaurus', rareza: RAREZA.RARO, clado: CLADO.SAUROPODO,
     binomial: 'Camarasaurus grandis',
-    coste: 2, ataque: 3, defensa: 2, vida: 7,
+    coste: 3, ataque: 2, defensa: 3, vida: 4,
     rasgo: RASGO.MIGRADOR, rasgoNombre: 'Migrador',
     rasgoTexto: 'Puede cambiar de ranura en vez de desplegar.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -182,19 +182,19 @@ export const CARTAS = Object.freeze({
   }),
 
   diplodocus: dino({
-    id: 'diplodocus', rareza: RAREZA.LEGENDARIO, clado: CLADO.SAUROPODO,
+    id: 'diplodocus', rareza: RAREZA.EPICO, clado: CLADO.SAUROPODO,
     binomial: 'Diplodocus carnegii',
-    coste: 2, ataque: 3, defensa: 2, vida: 10,
+    coste: 2, ataque: 3, defensa: 3, vida: 10,
     rasgo: RASGO.RAMONEO_BAJO, rasgoNombre: 'Ramoneo bajo',
-    rasgoTexto: 'Cura 1 herida al final de cada turno.',
+    rasgoTexto: 'Recupera +1 de vida al final de cada uno de tus turnos',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'El desgaste dental y la postura del cuello sustentan una partición de nicho por ramoneo bajo respecto de otros saurópodos coexistentes.',
   }),
 
   apatosaurus: dino({
-    id: 'apatosaurus', rareza: RAREZA.LEGENDARIO, clado: CLADO.SAUROPODO,
+    id: 'apatosaurus', rareza: RAREZA.EPICO, clado: CLADO.SAUROPODO,
     binomial: 'Apatosaurus louisae',
-    coste: 3, ataque: 4, defensa: 3, vida: 12,
+    coste: 3, ataque: 2, defensa: 5, vida: 10,
     rasgo: RASGO.MASA_COLOSAL, rasgoNombre: 'Masa colosal',
     rasgoTexto: '+1 de Defensa adicional: es la mayor masa del set.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -204,7 +204,7 @@ export const CARTAS = Object.freeze({
   torvosaurus: dino({
     id: 'torvosaurus', rareza: RAREZA.LEGENDARIO, clado: CLADO.TEROPODO,
     binomial: 'Torvosaurus tanneri',
-    coste: 3, ataque: 8, defensa: 1, vida: 6,
+    coste: 4, ataque: 7, defensa: 1, vida: 5,
     rasgo: RASGO.ESCASO, rasgoNombre: 'Escaso',
     rasgoTexto: 'Sólo 1 copia en el mazo. No admite adaptaciones.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -216,7 +216,7 @@ export const CARTAS = Object.freeze({
   nodosaurus: dino({
     id: 'nodosaurus', rareza: RAREZA.RARO, clado: CLADO.TIREOFORO,
     binomial: 'Nodosaurus textilis',
-    coste: 2, ataque: 2, defensa: 4, vida: 6,
+    coste: 2, ataque: 2, defensa: 3, vida: 5,
     rasgo: RASGO.CORAZA, rasgoNombre: 'Coraza dorsal',
     rasgoTexto: '+2 de Defensa. La coraza protege; no es un arma, a diferencia de la cola del estegosaurio.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -226,9 +226,9 @@ export const CARTAS = Object.freeze({
   riparovenator: dino({
     id: 'riparovenator', rareza: RAREZA.EPICO, clado: CLADO.TEROPODO,
     binomial: 'Riparovenator milnerae',
-    coste: 2, ataque: 5, defensa: 1, vida: 5,
+    coste: 2, ataque: 4, defensa: 1, vida: 4,
     rasgo: RASGO.RIBERENO, rasgoNombre: 'Ribereño',
-    rasgoTexto: '+2 Poder mientras el Canal fluvial esté en el campo.',
+    rasgoTexto: '+2 de ataque mientras el Canal fluvial esté en el campo.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: 'Formación Wessex, isla de Wight, Barremiense (~125 Ma), descrito en 2021. Espinosáurido de hocico alargado y dientes cónicos, morfología asociada a capturar peces. En su pariente Baryonyx se conservaron escamas de pez en la cavidad abdominal; para este género es inferencia por morfología.',
   }),
@@ -236,7 +236,7 @@ export const CARTAS = Object.freeze({
   lokiceratops: dino({
     id: 'lokiceratops', rareza: RAREZA.EPICO, clado: CLADO.MARGINOCEFALO,
     binomial: 'Lokiceratops rangiformis',
-    coste: 2, ataque: 4, defensa: 2, vida: 7,
+    coste: 3, ataque: 4, defensa: 1, vida: 7,
     rasgo: RASGO.GOLA, rasgoNombre: 'Gola ornamentada',
     rasgoTexto: '+2 de Defensa.',
     nivel_evidencia: EVIDENCIA.DEBATIDO,
@@ -244,9 +244,9 @@ export const CARTAS = Object.freeze({
   }),
 
   brachylophosaurus: dino({
-    id: 'brachylophosaurus', rareza: RAREZA.EPICO, clado: CLADO.ORNITOPODO,
+    id: 'brachylophosaurus', rareza: RAREZA.RARO, clado: CLADO.ORNITOPODO,
     binomial: 'Brachylophosaurus canadensis',
-    coste: 2, ataque: 3, defensa: 1, vida: 6,
+    coste: 2, ataque: 2, defensa: 1, vida: 6,
     rasgo: RASGO.GREGARIO, rasgoNombre: 'Gregario',
     rasgoTexto: '+1 Poder por cada copia suya que tengas en el campo.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -256,7 +256,7 @@ export const CARTAS = Object.freeze({
   tyrannotitan: dino({
     id: 'tyrannotitan', rareza: RAREZA.LEGENDARIO, clado: CLADO.TEROPODO,
     binomial: 'Tyrannotitan chubutensis',
-    coste: 3, ataque: 9, defensa: 1, vida: 7,
+    coste: 4, ataque: 10, defensa: 1, vida: 5,
     rasgo: RASGO.DESGARRO, rasgoNombre: 'Desgarro',
     rasgoTexto: 'A quien hiere no se le cura ninguna herida ese turno.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -264,9 +264,9 @@ export const CARTAS = Object.freeze({
   }),
 
   huaxiadraco: dino({
-    id: 'huaxiadraco', rareza: RAREZA.EPICO, clado: CLADO.PTEROSAURIO,
+    id: 'huaxiadraco', rareza: RAREZA.RARO, clado: CLADO.PTEROSAURIO,
     binomial: 'Huaxiadraco corollatus',
-    coste: 2, ataque: 3, defensa: 0, vida: 3,
+    coste: 2, ataque: 2, defensa: 2, vida: 2,
     rasgo: RASGO.VUELO, rasgoNombre: 'Vuelo',
     rasgoTexto: 'Sobrevuela la ranura: golpea siempre al hábitat rival y no recibe daño de combate.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -279,7 +279,7 @@ export const CARTAS = Object.freeze({
     id: 'gregarismo', rareza: RAREZA.RARO, binomial: 'Gregarismo', coste: 1,
     objetivo: OBJETIVO.PROPIO,
     rasgo: RASGO.GREGARISMO, rasgoNombre: 'Gregarismo',
-    rasgoTexto: '+2 Poder a todos tus dinosaurios de la misma especie que el objetivo.',
+    rasgoTexto: '+1 de Ataque a todos tus dinosaurios de la misma especie que el objetivo.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: 'Acumulaciones monoespecíficas en la Morrison sugieren agregación en varios taxones. La interpretación de estos yacimientos es discutida (¿manada viva o concentración tafonómica?).',
   }),
@@ -288,7 +288,7 @@ export const CARTAS = Object.freeze({
     id: 'gastrolitos', rareza: RAREZA.EPICO, binomial: 'Gastrolitos', coste: 1,
     objetivo: OBJETIVO.PROPIO,
     rasgo: RASGO.GASTROLITOS, rasgoNombre: 'Gastrolitos',
-    rasgoTexto: 'El objetivo cura 1 herida al final de cada turno.',
+    rasgoTexto: 'Cura +1 de vida a un dinosaurio al final del turno',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Piedras de molleja asociadas a esqueletos de saurópodos jurásicos. Su función exacta en la digestión sigue en debate.',
   }),
@@ -297,7 +297,7 @@ export const CARTAS = Object.freeze({
     id: 'crecimiento_acelerado', rareza: RAREZA.LEGENDARIO, binomial: 'Crecimiento acelerado', coste: 1,
     objetivo: OBJETIVO.PROPIO,
     rasgo: RASGO.CRECIMIENTO_ACELERADO, rasgoNombre: 'Crecimiento acelerado',
-    rasgoTexto: '+2 Poder y +2 Vida permanentes.',
+    rasgoTexto: '+2 Poder y +2 Vida permanentes a un dinosaurio que elijas.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'La osteohistología muestra tasas de crecimiento altas y sostenidas en saurópodos y en Allosaurus, alcanzando talla adulta en pocas décadas o menos.',
   }),
@@ -314,7 +314,7 @@ export const CARTAS = Object.freeze({
   // ------------------------------------- eventos: presiones sobre el rival
 
   fractura: evento({
-    id: 'fractura', rareza: RAREZA.EPICO, binomial: 'Fractura consolidada', coste: 1,
+    id: 'fractura', rareza: RAREZA.EPICO, binomial: 'Fractura consolidada', coste: 2,
     objetivo: OBJETIVO.RIVAL,
     rasgo: RASGO.FRACTURA, rasgoNombre: 'Fractura consolidada',
     rasgoTexto: '−2 Poder permanente a un dinosaurio rival.',
@@ -323,7 +323,7 @@ export const CARTAS = Object.freeze({
   }),
 
   competencia: evento({
-    id: 'competencia', rareza: RAREZA.EPICO, binomial: 'Competencia trófica', coste: 1,
+    id: 'competencia', rareza: RAREZA.EPICO, binomial: 'Competencia trófica', coste: 3,
     objetivo: OBJETIVO.CLADO,
     rasgo: RASGO.COMPETENCIA, rasgoNombre: 'Competencia trófica',
     rasgoTexto: '−2 Poder a todos los dinosaurios rivales del clado que elijas.',
@@ -335,7 +335,7 @@ export const CARTAS = Object.freeze({
     id: 'trampa', rareza: RAREZA.RARO, binomial: 'Trampa de depredadores', coste: 1,
     objetivo: OBJETIVO.NINGUNO,
     rasgo: RASGO.TRAMPA, rasgoNombre: 'Trampa de depredadores',
-    rasgoTexto: 'El rival pierde 12 cartas de su mazo. Tú pierdes 3: el fango no distingue.',
+    rasgoTexto: 'El rival pierde 5 cartas de su mazo. Tú pierdes 3: el fango no distingue.',
     nivel_evidencia: EVIDENCIA.DEBATIDO,
     nota_cientifica: 'La cantera Cleveland-Lloyd, en la Morrison de Utah, acumula decenas de individuos de Allosaurus en una proporción de depredadores frente a presas que no se da en un ecosistema vivo. La trampa de depredadores es una de las explicaciones; también se ha propuesto sequía o agua envenenada. El yacimiento es un hecho, su mecanismo no.',
   }),
@@ -344,7 +344,7 @@ export const CARTAS = Object.freeze({
     id: 'mortandad', rareza: RAREZA.LEGENDARIO, binomial: 'Mortandad estacional', coste: 1,
     objetivo: OBJETIVO.NINGUNO,
     rasgo: RASGO.MORTANDAD, rasgoNombre: 'Mortandad estacional',
-    rasgoTexto: '2 de daño a TODOS los dinosaurios del campo, incluidos los tuyos.',
+    rasgoTexto: '3 de daño a TODOS los dinosaurios del campo, incluidos los tuyos.',
     nivel_evidencia: EVIDENCIA.DEBATIDO,
     nota_cientifica: 'Algunas acumulaciones óseas de la Morrison se han interpretado como mortandades masivas asociadas a sequía o a eventos de crecida. La causa concreta de cada yacimiento sigue discutiéndose.',
   }),
@@ -354,13 +354,13 @@ export const CARTAS = Object.freeze({
   rebrote: recurso({
     id: 'rebrote', rareza: RAREZA.RARO, binomial: 'Rebrote tras incendio',
     rasgo: RASGO.REBROTE, rasgoNombre: 'Rebrote tras incendio',
-    rasgoTexto: '+3 Biomasa ahora mismo. Todos tus dinosaurios reciben 1 herida.',
+    rasgoTexto: '+2 Biomasa ahora mismo. Todos tus dinosaurios reciben 1 herida.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: 'Los sedimentos de la Morrison contienen fusaíta —carbón vegetal fósil—, prueba directa de incendios recurrentes. El rebrote nutritivo posterior se infiere por analogía con sabanas actuales, no está medido en el registro.',
   }),
 
   carrona: recurso({
-    id: 'carrona', rareza: RAREZA.EPICO, binomial: 'Carroña abundante',
+    id: 'carrona', rareza: RAREZA.LEGENDARIO, binomial: 'Carroña abundante',
     rasgo: RASGO.CARRONA, rasgoNombre: 'Carroña abundante',
     rasgoTexto: '+3 Biomasa ahora mismo. El rival gana 1 Biomasa.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -370,7 +370,7 @@ export const CARTAS = Object.freeze({
   lago: recurso({
     id: 'lago', rareza: RAREZA.EPICO, binomial: 'Lago efímero',
     rasgo: RASGO.LAGO, rasgoNombre: 'Lago efímero',
-    rasgoTexto: '+2 Biomasa ahora mismo. Tu hábitat pierde 1.',
+    rasgoTexto: '+2 Biomasa ahora mismo. Tu hábitat pierde 2 puntos.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: 'La Morrison conserva depósitos de lagos alcalinos efímeros de gran extensión, como el llamado lago T’oo’dichi’. Concentran recursos mientras duran; al secarse dejan salinas que el paisaje tarda en recuperar.',
   }),
@@ -380,7 +380,7 @@ export const CARTAS = Object.freeze({
   llanura: clima({
     id: 'llanura', coste: 1, rareza: RAREZA.EPICO, binomial: 'Llanura de inundación',
     rasgo: RASGO.CAMPO_LLANURA, rasgoNombre: 'Llanura de inundación',
-    rasgoTexto: '+1 Biomasa por turno a los dos bandos.',
+    rasgoTexto: '+1 Biomasa para ambos jugadores',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Las llanuras de inundación de la Morrison concentran la mayor productividad vegetal estacional de la formación.',
   }),
@@ -402,9 +402,9 @@ export const CARTAS = Object.freeze({
   }),
 
   aridez: clima({
-    id: 'aridez', coste: 1, rareza: RAREZA.EPICO, binomial: 'Deriva árida',
+    id: 'aridez', coste: 1, rareza: RAREZA.LEGENDARIO, binomial: 'Deriva árida',
     rasgo: RASGO.CAMPO_ARIDEZ, rasgoNombre: 'Deriva árida',
-    rasgoTexto: 'Cada turno, los dos bandos pierden 5 cartas del mazo.',
+    rasgoTexto: 'Ambos jugadores pierden 5 cartas del mazo',
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: 'Los paleosuelos calcáreos, las evaporitas y los depósitos eólicos de la Morrison documentan un clima semiárido y muy estacional que se acentúa hacia el techo de la formación. Que esa deriva mermara las poblaciones es una inferencia razonable, no una medida.',
   }),

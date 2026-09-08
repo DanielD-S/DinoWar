@@ -5,8 +5,8 @@ import { CARTAS, CLADO, RAREZA } from './cards.js';
 
 export const BALANCE = Object.freeze({
   // ------------------------------------------------------------- victorias
-  trofeosParaGanar: 6,      // registro fósil
-  vidaHabitat: 90,            // colapso del habitat
+  trofeosParaGanar: 7,      // registro fósil
+  vidaHabitat: 70,            // colapso del habitat
   // la tercera, extinción, no tiene número: es quedarse sin cartas al robar
 
   // ---------------------------------------------------------------- campo
@@ -66,29 +66,29 @@ export const BALANCE = Object.freeze({
     masaColosalDefensa: 1,   // adicional a la Defensa de su carta
     oportunistaVidaPorMuerte: 1,
     ramoneoBajoCura: 1,
-    gregarismoAtaque: 2,
+    gregarismoAtaque: 1,
     gastrolitosCura: 1,
     crecimientoAtaque: 2,
     crecimientoVida: 2,
     neumaticidadAtaque: 2,
     fracturaAtaque: 2,
     competenciaAtaque: 2,
-    mortandadDano: 2,
+    mortandadDano: 3,
     corazaDefensa: 2,
     golaDefensa: 2,
-    trampaMazoRival: 12,
+    trampaMazoRival: 5,
     trampaMazoPropio: 3,
   }),
 
   // Cartas de recurso: Biomasa inmediata con inconveniente. Atacan el atasco de mano,
   // que venía de robar 2 por turno con una renta de 1 acumulativo.
   recursos: Object.freeze({
-    rebroteBiomasa: 3,
+    rebroteBiomasa: 2,
     rebroteHeridas: 1,
     carronaBiomasa: 3,
     carronaBiomasaRival: 1,
     lagoBiomasa: 2,
-    lagoHabitat: 1,
+    lagoHabitat: 2,
   }),
 
   efectosCampo: Object.freeze({

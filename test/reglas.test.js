@@ -78,11 +78,11 @@ test('Ranuras enfrentadas: se hacen daño a la vez', () => {
 
 test('Ranura enfrentada vacía: el ocupante golpea el habitat rival', () => {
   const s = tablero();
-  const a = poner(s, 'allosaurus', 0, 2);   // Poder 6
+  const a = poner(s, 'allosaurus', 0, 2);
 
   const r = ejecutar(s, FASE.COMBATE);
 
-  assert.equal(r.jugadores[1].habitat, BALANCE.vidaHabitat - 6);
+  assert.equal(r.jugadores[1].habitat, BALANCE.vidaHabitat - carta('allosaurus').ataque);
   assert.equal(r.jugadores[0].habitat, BALANCE.vidaHabitat, 'el tuyo no se toca');
   assert.equal(vivo(r, a), true);
 });
@@ -95,8 +95,9 @@ test('Sólo se enfrentan las ranuras del mismo índice', () => {
   const r = ejecutar(s, FASE.COMBATE);
 
   // Ninguno tiene rival enfrente: los dos biomas reciben.
-  assert.equal(r.jugadores[0].habitat, BALANCE.vidaHabitat - 6);
-  assert.equal(r.jugadores[1].habitat, BALANCE.vidaHabitat - 6);
+  const atq = carta('allosaurus').ataque;
+  assert.equal(r.jugadores[0].habitat, BALANCE.vidaHabitat - atq);
+  assert.equal(r.jugadores[1].habitat, BALANCE.vidaHabitat - atq);
 });
 
 test('Las heridas persisten entre turnos', () => {
@@ -120,8 +121,12 @@ test('Terópodo contra ornitópodo: bonificación de depredación', () => {
   const otro = poner(s, 'stegosaurus', 1, 1);
 
   // El Dryosaurus no tiene Defensa; el Stegosaurus sí, y además no es su presa.
-  assert.equal(danoEntre(s, teropodo, presa), 4 + BALANCE.clados.bonusDepredacion);
-  assert.equal(danoEntre(s, teropodo, otro), 4 - CARTAS.stegosaurus.defensa, 'sólo aplica sobre su presa');
+  const atq = carta('ceratosaurus').ataque;
+  assert.equal(danoEntre(s, teropodo, presa), atq + BALANCE.clados.bonusDepredacion);
+  // Sin la bonificación, el Ceratosaurus no llega a atravesar la coraza del
+  // Stegosaurus: el daño no baja de cero.
+  assert.equal(danoEntre(s, teropodo, otro), Math.max(0, atq - CARTAS.stegosaurus.defensa),
+    'sólo aplica sobre su presa');
 });
 
 test('La Defensa sale de la carta, no del clado', () => {
@@ -275,13 +280,13 @@ test('Fractura consolidada baja el Ataque de un rival, no de un propio', () => {
   s.jugadores[0].biomasa = 10;
   const propio = poner(s, 'allosaurus', 0, 0);
   const ajeno = poner(s, 'allosaurus', 1, 0);
-  const carta = enMano(s, 'fractura', 0);
+  const evento = enMano(s, 'fractura', 0);
 
-  assert.match(validar(s, { tipo: ACCION.EVENTO, jugador: 0, iid: carta, objetivo: propio }), /no es del rival/);
+  assert.match(validar(s, { tipo: ACCION.EVENTO, jugador: 0, iid: evento, objetivo: propio }), /no es del rival/);
 
-  let r = reduce(s, { tipo: ACCION.EVENTO, jugador: 0, iid: carta, objetivo: ajeno });
+  let r = reduce(s, { tipo: ACCION.EVENTO, jugador: 0, iid: evento, objetivo: ajeno });
   r = ejecutar(r, FASE.REVELACION);
-  assert.equal(ataqueEfectivo(r, ajeno), 6 - BALANCE.rasgos.fracturaAtaque);
+  assert.equal(ataqueEfectivo(r, ajeno), carta('allosaurus').ataque - BALANCE.rasgos.fracturaAtaque);
 });
 
 test('Las cartas de recurso resuelven al instante: la Biomasa se puede gastar este turno', () => {
