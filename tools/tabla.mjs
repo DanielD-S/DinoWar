@@ -7,14 +7,19 @@
 // vuelta, en vez de tocar treinta y una cartas en el código una por una. Sólo
 // se aplican las columnas numéricas y los textos; el id nunca cambia.
 import { readFileSync, writeFileSync } from 'node:fs';
-import { CARTAS, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, RAREZA_NOMBRE } from '../src/data/cards.js';
+import { spawnSync } from 'node:child_process';
+import { CARTAS, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, RAREZA, RAREZA_NOMBRE } from '../src/data/cards.js';
+import { BALANCE } from '../src/data/balance.js';
+
+/** Del nombre que se lee en la tabla a la constante del código. */
+const RAREZA_DE = Object.fromEntries(
+  Object.entries(RAREZA_NOMBRE).map(([clave, nombre]) => [nombre.toLowerCase(), clave]),
+);
 
 const RUTA = new URL('../RECOSTE.md', import.meta.url);
 const CARDS = new URL('../src/data/cards.js', import.meta.url);
 const esc = (t) => String(t).replace(/\|/g, '\\|');
 
-/** Propuesta de partida: la escala 0–8 comprimida a 0–3. */
-const PROPUESTA = { 0: 0, 1: 0, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2, 7: 3, 8: 3 };
 
 function escribir() {
   const filas = Object.values(CARTAS).map((c) => {
@@ -25,7 +30,11 @@ function escribir() {
       dino ? CLADO_NOMBRE[c.clado] : TIPO_NOMBRE[c.tipo],
       RAREZA_NOMBRE[c.rareza],
       c.coste,
-      PROPUESTA[c.coste] ?? c.coste,
+      // «Coste nuevo» arranca igual que el actual: la tabla es un espejo del
+      // set, no una propuesta. Cuando llevaba una regla de compresión, volver
+      // a generarla después de aplicarla la aplicaba otra vez y los costes
+      // bajaban solos en cada vuelta.
+      c.coste,
       dino ? c.ataque : '',
       dino ? c.defensa : '',
       dino ? c.vida : '',
@@ -36,9 +45,13 @@ function escribir() {
 
   const cabecera = `# RECOSTE.md — la tabla editable del set
 
-> La genera y la aplica \`node tools/tabla.mjs\`. **Edita sólo las columnas
-> «Coste nuevo», «A», «D», «V», «Rasgo» y «Texto del rasgo»**: el id es la
-> llave y las demás columnas se ignoran al aplicar.
+> La genera y la aplica \`node tools/tabla.mjs\`. **Edita «Rareza», «Coste
+> nuevo», «A», «D», «V», «Rasgo» y «Texto del rasgo»**: el id es la llave, y
+> «Carta», «Familia» y «Coste actual» son de referencia y se ignoran.
+>
+> Cambiar la rareza mueve tres cosas a la vez: cuántas copias caben en un mazo,
+> cada cuánto sale la carta en un sobre y lo que da al fundirla. Si el mazo de
+> referencia deja de ser legal, \`aplicar\` lo dice y no escribe nada.
 >
 > - \`node tools/tabla.mjs escribir\` regenera esta tabla desde el código.
 > - \`node tools/tabla.mjs aplicar\` mete lo editado en \`src/data/cards.js\`.
@@ -49,40 +62,29 @@ function escribir() {
 > Después de aplicar hay que correr \`npm test\` y \`npm run sim\`: los números
 > del balance salen de aquí.
 
-## Por qué se recostea
+## Qué es esta tabla
 
-Con la renta actual —la Biomasa vale el número de turno y no se acumula— cada
-bando gasta **47 de Biomasa en 14,7 cartas** por partida, a un coste medio de
-3,22. Si la renta pasa a **+1 acumulativo**, el presupuesto de la partida entera
-baja a **11**: cuatro veces menos. Por eso la columna «Coste nuevo» arranca con
-la escala 0–8 comprimida a **0–3**, que es la única que cabe en ese presupuesto.
+Es un espejo del set: lo que hay en \`src/data/cards.js\` ahora mismo. «Coste
+nuevo» arranca igual que «Coste actual» y lo que escribas ahí es lo que se
+aplica.
 
-La propuesta de partida es mecánica (0-1→0, 2-3→1, 4-6→2, 7-8→3). Lo que hay que
-revisar a mano es lo que una regla no sabe: qué carta merece costar más que otra
-del mismo tramo.
+La renta es de **1 de Biomasa por turno acumulativa**, con un tope de
+${BALANCE.rentaTope} de ahorro. Eso da un presupuesto de unas doce Biomasas por
+partida de once turnos, que es la escala que tienen que respetar los costes: hoy
+van de 0 a 3 y el gasto medido es de 12,1 en 10,8 cartas por bando.
 
-## Qué mide la propuesta mecánica
+Cambiar la **rareza** mueve tres cosas a la vez: cuántas copias caben en un mazo
+(3 común y rara, 2 épica, 1 legendaria), cada cuánto sale la carta en un sobre
+—las probabilidades salen de la forma del set, así que mover una carta reajusta
+la tabla entera— y lo que da al fundirla.
 
-Aplicada tal cual, con la renta acumulativa de +1, sobre 800 partidas:
+## Lo que hay que mirar después
 
-| Métrica | Hoy | Recoste 0–3 + renta +1 | Objetivo |
-|---|---|---|---|
-| Duración | 11,0 turnos | **9,6** | 10 – 14 |
-| Victorias del inicial | 52,9 % | 49,0 % | 48 – 55 % |
-| Bola de nieve | 61,5 % | 66,7 % | 55 – 70 % |
-| Reparto trofeos/hábitat/extinción | 36/40/24 | **4 / 74 / 22** | cada una 15 – 60 % |
-| Cartas descalibradas | 1 de 25 | **14 de 25** | 0 |
-| Cartas jugadas por bando | 14,7 | 10,8 | — |
-
-Tres objetivos fuera, y la causa es la misma en los tres: con un presupuesto de
-doce Biomasas el campo se queda más vacío (1,86 unidades vivas por bando frente
-a 2,24), así que **el hábitat cae antes de que dé tiempo a reunir ocho trofeos**
-y el registro fósil casi desaparece como vía.
-
-Eso no se arregla sólo con los costes: hay que mover también **trofeos para
-ganar** y **vida del hábitat**, que son los dos números que fijan cuánto dura la
-partida. Esa calibración va después de esta revisión, con el simulador, y es
-trabajo mío: aquí sólo hacen falta los costes que tú consideres justos.
+Al aplicar, \`aplicar\` comprueba que el mazo de referencia siga siendo legal y
+que no se quede ninguna rareza vacía; si algo falla no escribe nada. Después hay
+que correr \`npm test\` y \`npm run sim\`: los seis objetivos del balance salen de
+estos números, y el que hoy falla —cartas descalibradas— es justo el que esta
+revisión viene a arreglar.
 
 | id | Carta | Familia | Rareza | Coste actual | Coste nuevo | A | D | V | Rasgo | Texto del rasgo |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -107,10 +109,16 @@ function aplicar() {
   let tocadas = 0;
 
   for (const cols of filas) {
-    const [id, , , , , costeNuevo, a, d, v, rasgoNombre, rasgoTexto] = cols;
+    const [id, , , rarezaTexto, , costeNuevo, a, d, v, rasgoNombre, rasgoTexto] = cols;
     const c = CARTAS[id];
     const bloque = bloqueDe(src, id);
     let nuevo = bloque;
+
+    const rareza = RAREZA_DE[rarezaTexto.trim().toLowerCase()];
+    if (rarezaTexto && !rareza) {
+      throw new Error(`«${rarezaTexto}» no es una rareza (${id}). Válidas: ${Object.values(RAREZA_NOMBRE).join(', ')}`);
+    }
+    if (rareza && rareza !== c.rareza) nuevo = sustituirConstante(nuevo, 'rareza', `RAREZA.${rareza}`);
 
     const num = (x) => (x === '' || Number.isNaN(Number(x)) ? null : Number(x));
     const coste = num(costeNuevo);
@@ -127,8 +135,43 @@ function aplicar() {
     if (nuevo !== bloque) { src = src.replace(bloque, nuevo); tocadas += 1; }
   }
 
+  comprobar(src);
   writeFileSync(CARDS, src);
   console.log(`cards.js actualizado: ${tocadas} carta(s) con cambios`);
+}
+
+/**
+ * Carga el set resultante antes de escribirlo. balance.js valida el mazo de
+ * referencia al importarse, así que si una rareza nueva deja el mazo con más
+ * copias de las que admite, esto salta y cards.js se queda como estaba: mejor
+ * negarse que dejar el repositorio sin arrancar.
+ *
+ * Va en un proceso aparte a propósito. Importar aquí con un sello de caché no
+ * sirve: balance.js pide `./cards.js` sin sello y se le entrega el módulo ya
+ * cargado, así que la comprobación miraba el set viejo y daba el visto bueno
+ * a cualquier cosa. Un proceso nuevo empieza con el registro vacío.
+ */
+function comprobar(src) {
+  const previo = readFileSync(CARDS, 'utf8');
+  writeFileSync(CARDS, src);
+
+  const guion = "const {CARTAS} = await import('../src/data/cards.js');"
+    + "await import('../src/data/balance.js');"
+    + "const {POR_RAREZA} = await import('../src/data/coleccion.js');"
+    + "const v = Object.entries(POR_RAREZA).filter(([,i]) => i.length === 0).map(([r]) => r);"
+    + "if (v.length) throw new Error('ninguna carta queda en: ' + v.join(', '));"
+    + "console.log(Object.keys(CARTAS).length);";
+  const r = spawnSync(process.execPath, ['--input-type=module', '-e', guion],
+    { cwd: new URL('.', import.meta.url).pathname, encoding: 'utf8' });
+
+  if (r.status !== 0) {
+    writeFileSync(CARDS, previo);
+    // Del volcado del subproceso interesa la línea del error, no su pila.
+    const motivo = (r.stderr || '').split('\n')
+      .find((l) => /^\s*(?:[A-Za-z]*Error):/.test(l))?.replace(/^\s*[A-Za-z]*Error:\s*/, '');
+    throw new Error(`la tabla deja el set incoherente y no se ha escrito nada.\n  ${motivo ?? r.stderr.trim()}`);
+  }
+  console.log(`comprobado: ${r.stdout.trim()} cartas, mazo de referencia legal`);
 }
 
 /** El trozo de cards.js que define una carta, de su id hasta el cierre. */
@@ -150,6 +193,13 @@ const sustituirCampo = (bloque, campo, valor) => {
   return bloque.replace(/(id: '[a-z_]+',)/, `$1 ${campo}: ${valor},`);
 };
 
+/** Cambia un campo cuyo valor es una constante del código, como RAREZA.EPICO. */
+const sustituirConstante = (bloque, campo, valor) => {
+  const re = new RegExp(`(\\b${campo}: )[A-Z_]+\\.[A-Z_]+`);
+  if (re.test(bloque)) return bloque.replace(re, `$1${valor}`);
+  return bloque.replace(/(id: '[a-z_]+',)/, `$1 ${campo}: ${valor},`);
+};
+
 const sustituirTexto = (bloque, campo, valor) => {
   const re = new RegExp(`(\\b${campo}: ')(?:[^'\\\\]|\\\\.)*(')`);
   if (!re.test(bloque)) throw new Error(`el campo ${campo} no está escrito en la carta`);
@@ -158,5 +208,8 @@ const sustituirTexto = (bloque, campo, valor) => {
 
 const orden = process.argv[2];
 if (orden === 'escribir') escribir();
-else if (orden === 'aplicar') aplicar();
+else if (orden === 'aplicar') {
+  // Un error de la tabla es del usuario, no del programa: el mensaje basta.
+  try { aplicar(); } catch (e) { console.error(`\n${e.message}\n`); process.exit(1); }
+}
 else console.log('uso: node tools/tabla.mjs escribir|aplicar');

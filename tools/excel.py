@@ -13,7 +13,7 @@ from pathlib import Path
 
 from openpyxl import Workbook, load_workbook
 from openpyxl.comments import Comment
-from openpyxl.styles import Alignment, Border, Font, PatternFill, Protection, Side
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.datavalidation import DataValidation
 
@@ -23,7 +23,8 @@ XLSX = RAIZ / 'RECOSTE.xlsx'
 
 CABECERA = ['id', 'Carta', 'Familia', 'Rareza', 'Coste actual', 'Coste nuevo',
             'Δ', 'A', 'D', 'V', 'Rasgo', 'Texto del rasgo']
-EDITABLES = {'Coste nuevo', 'A', 'D', 'V', 'Rasgo', 'Texto del rasgo'}
+EDITABLES = {'Rareza', 'Coste nuevo', 'A', 'D', 'V', 'Rasgo', 'Texto del rasgo'}
+RAREZAS = ('Común', 'Rara', 'Épica', 'Legendaria')
 ANCHOS = {'id': 20, 'Carta': 30, 'Familia': 16, 'Rareza': 11, 'Coste actual': 13,
           'Coste nuevo': 13, 'Δ': 5, 'A': 5, 'D': 5, 'V': 5, 'Rasgo': 24,
           'Texto del rasgo': 78}
@@ -67,12 +68,14 @@ def escribir():
 
     hoja['A1'] = 'DinoWar — recoste del set'
     hoja['A1'].font = TITULO
-    hoja['A2'] = ('Edita sólo las columnas amarillas: Coste nuevo, A, D, V, Rasgo y '
-                  'Texto del rasgo. Los costes son enteros de 0 a 8 (ej. 2); A, D y V, '
-                  'de 0 a 20 (ej. 6). Las columnas grises son de referencia y se ignoran.')
+    hoja['A2'] = ('Edita las columnas amarillas: Rareza, Coste nuevo, A, D, V, Rasgo y '
+                  'Texto del rasgo. La rareza se elige del desplegable; los costes son '
+                  'enteros de 0 a 8 (ej. 2) y A, D y V van de 0 a 20 (ej. 6). Las columnas '
+                  'grises son de referencia y se ignoran al aplicar.')
     hoja['A3'] = ('No cambies el id, no borres ni añadas filas y no reordenes: el id es la '
                   'llave con la que cada fila vuelve a su carta. Los eventos, climas y '
-                  'recursos no tienen A/D/V y se quedan en blanco.')
+                  'recursos no tienen A/D/V y se quedan en blanco. Cambiar la rareza mueve '
+                  'las copias que caben en un mazo, lo que sale en los sobres y la fusión.')
     for f in ('A2', 'A3'):
         hoja[f].font = TINTA
         hoja[f].alignment = Alignment(wrap_text=True, vertical='top')
@@ -107,7 +110,6 @@ def escribir():
             c.font = TINTA if editable and not hueco else FIJO
             c.fill = AMARILLO if editable and not hueco else GRIS
             c.border = MARCO
-            c.protection = Protection(locked=not (editable and not hueco))
             if nombre == 'Texto del rasgo':
                 c.alignment = Alignment(wrap_text=True, vertical='top')
             elif nombre in ('Coste actual', 'Coste nuevo', 'Δ', 'A', 'D', 'V'):
@@ -128,18 +130,22 @@ def escribir():
                            allow_blank=True, showErrorMessage=True,
                            errorTitle='Estadística fuera de rango',
                            error='Ataque, Defensa y Vida van de 0 a 20.')
+    rarezas = DataValidation(type='list', formula1=f'"{",".join(RAREZAS)}"',
+                             allow_blank=False, showErrorMessage=True,
+                             errorTitle='Rareza no válida',
+                             error='Elige una de: ' + ', '.join(RAREZAS))
     hoja.add_data_validation(costes)
     hoja.add_data_validation(stats)
+    hoja.add_data_validation(rarezas)
     costes.add(f'F{PRIMERA}:F{ultima}')
     stats.add(f'H{PRIMERA}:J{ultima}')
+    rarezas.add(f'D{PRIMERA}:D{ultima}')
 
     hoja.freeze_panes = 'B6'
     hoja.auto_filter.ref = f'A5:L{ultima}'
-    # Bloqueo sin contraseña: evita romper el id sin querer y se quita desde
-    # Revisar → Desproteger hoja si hace falta tocar algo más.
-    hoja.protection.sheet = True
-    hoja.protection.autoFilter = False
-    hoja.protection.sort = False
+    # Sin bloqueo de hoja: protegía el id, pero obligaba a ir a Revisar →
+    # Desproteger para tocar cualquier otra celda y Excel avisaba de una
+    # contraseña que no existía. El color ya dice qué se edita y qué no.
 
     notas = wb.create_sheet('Notas')
     notas.column_dimensions['A'].width = 110
@@ -181,7 +187,9 @@ def leer():
         def celda(n, fila=fila):
             v = fila[indice[n]]
             return '' if v is None else str(v).strip()
-        campos = [previa[0], previa[1], previa[2], previa[3], previa[4],
+        # id, nombre, familia y coste actual son de referencia y vienen del
+        # markdown; el resto sale de la hoja, que es lo que se ha editado.
+        campos = [previa[0], previa[1], previa[2], celda('Rareza') or previa[3], previa[4],
                   celda('Coste nuevo'), celda('A'), celda('D'), celda('V'),
                   celda('Rasgo'), celda('Texto del rasgo').replace('|', '\\|')]
         lineas.append('| ' + ' | '.join(campos) + ' |')
