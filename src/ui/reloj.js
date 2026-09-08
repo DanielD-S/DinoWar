@@ -84,8 +84,8 @@ export function parar() {
   alLatir = null;
 }
 
-/** ¿Está el reloj en marcha para alguien? */
-export const enMarcha = () => corriendo !== null;
+/** De quién es el reloj que avanza ahora mismo, o null si no corre ninguno. */
+export const deQuien = () => corriendo;
 
 /**
  * Dejar el móvil en el bolsillo no es pensarse la jugada. El reloj se congela

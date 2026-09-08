@@ -213,12 +213,20 @@ function turnoDelJugador() {
   reloj.correr(JUGADOR);
 }
 
-/** El marcador del reloj. Sólo aparece cuando hay partida en marcha. */
+/**
+ * Los dos marcadores, uno por bando. Se enseñan los dos siempre porque un
+ * reloj sin el del contrario no dice nada: lo que importa es quién va sobrado
+ * y quién no, y de quién es el turno de pensar ahora mismo.
+ */
 function pintarReloj() {
-  const ms = reloj.restanteDe(JUGADOR);
-  el.reloj.hidden = false;
-  el.reloj.textContent = reloj.comoTexto(ms);
-  el.reloj.classList.toggle('apremia', ms <= BALANCE.relojAviso * 1000);
+  for (const bando of [JUGADOR, RIVAL]) {
+    const nodo = el.relojes[bando];
+    const ms = reloj.restanteDe(bando);
+    nodo.hidden = false;
+    nodo.textContent = reloj.comoTexto(ms);
+    nodo.classList.toggle('apremia', ms <= BALANCE.relojAviso * 1000);
+    nodo.classList.toggle('corre', reloj.deQuien() === bando);
+  }
 }
 
 /**
@@ -226,7 +234,7 @@ function pintarReloj() {
  * un estado de «partida perdida por reloj» en las reglas y no hace falta
  * inventarlo — cuenta como derrota y paga lo que paga una derrota.
  */
-function seAcaboElTiempo() {
+function seAcaboElTiempo(bando) {
   if (app !== APP.PLAYING && app !== APP.RESOLVING) return;
   pintarReloj();
   cerrarHojas();
@@ -235,18 +243,26 @@ function seAcaboElTiempo() {
   soltarEntrada();
   cancelarAnimaciones();
 
+  const gane = bando === RIVAL;
+  const minutos = Math.round(BALANCE.relojPorJugador / 60);
   pintarFin({
     via: 'Se agotó el tiempo',
-    gane: false,
-    titular: 'Derrota',
-    frase: `Cada bando tiene ${Math.round(BALANCE.relojPorJugador / 60)} minutos para toda la partida, y gastaste los tuyos.`,
+    gane,
+    titular: gane ? 'Victoria' : 'Derrota',
+    frase: gane
+      ? `Al rival se le acabaron sus ${minutos} minutos.`
+      : `Cada bando tiene ${minutos} minutos para toda la partida, y gastaste los tuyos.`,
   });
-  anotarResultado(false, estado.turno);
-  el.finPremio.textContent = `+${recompensar(false)} dinomonedas`;
-  sonido('pierde');
+  anotarResultado(gane, estado.turno);
+  el.finPremio.textContent = `+${recompensar(gane)} dinomonedas`;
+  sonido(gane ? 'gana' : 'pierde');
 }
 
 function jugarIA() {
+  // La máquina decide en milisegundos, así que su reloj apenas se mueve. Corre
+  // igual: es el mismo mecanismo que necesita un rival humano, y verlo quieto
+  // mientras el tuyo baja es lo que explica de quién es el tiempo.
+  reloj.correr(RIVAL);
   let guardia = 0;
   while (!estado.jugadores[RIVAL].listo && guardia++ < 80) {
     const d = decidir(vistaDe(estado, RIVAL), RIVAL, rngIA, perfilIA());
@@ -255,6 +271,7 @@ function jugarIA() {
     estado = reduce(estado, d.accion);
   }
   if (!estado.jugadores[RIVAL].listo) estado = reduce(estado, { tipo: ACCION.PASAR, jugador: RIVAL });
+  reloj.detener();
 }
 
 async function alPulsarListo() {
@@ -302,9 +319,11 @@ async function bucle() {
 
     if (estado.fase === FASE.DESCARTE) {
       if (estado.jugadores[RIVAL].mano.length > BALANCE.manoMaxima) {
+        reloj.correr(RIVAL);
         const d = decidir(vistaDe(estado, RIVAL), RIVAL, rngIA, perfilIA());
         rngIA = d.rng;
         estado = reduce(estado, d.accion);
+        reloj.detener();
         continue;
       }
       render(estado);
@@ -312,6 +331,8 @@ async function bucle() {
     }
 
     if (estado.fase === FASE.REVELACION) {
+      // Resolver no es decidir: mientras se anima, los dos relojes están quietos.
+      reloj.detener();
       irA(APP.RESOLVING);
       const antes = estado;
       const desdeRev = estado.eventos.length;
@@ -370,10 +391,12 @@ function pedirDescarte() {
       <small>coste ${c.coste}${dino ? ` · ${c.ataque} de Ataque · ${c.vida} de Vida` : ''}</small></button>`;
   }).join('');
   el.eleccion.classList.remove('oculta');
+  reloj.correr(JUGADOR);
 
   el.eleccionCuerpo.onclick = async (e) => {
     const b = e.target.closest('[data-iid]');
     if (!b) return;
+    reloj.detener();
     el.eleccion.classList.add('oculta');
     el.eleccionCuerpo.onclick = null;
     estado = reduce(estado, { tipo: ACCION.DESCARTAR, jugador: JUGADOR, iid: Number(b.dataset.iid) });

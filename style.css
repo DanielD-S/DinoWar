@@ -603,19 +603,25 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 #turno { font-size: 12px; color: var(--texto-2); white-space: nowrap; }
 
-/* Reloj de partida. Cifra tabular para que no baile al pasar de 10:00 a 9:59,
-   y apagado hasta que apremia: es información de fondo casi toda la partida. */
+/* Un reloj por bando, en su propia fila del marcador. Cifra tabular para que
+   no baile al pasar de 10:00 a 9:59, y apagado mientras no le toca: casi toda
+   la partida es información de fondo. */
 .reloj {
-  font-variant-numeric: tabular-nums; font-size: 12px; letter-spacing: .02em;
-  color: var(--tenue); padding: 1px 7px; border-radius: 10px;
-  box-shadow: 0 0 0 1px var(--linea);
+  font-variant-numeric: tabular-nums; font-size: 11.5px; letter-spacing: .02em;
+  color: var(--tenue-2); padding: 1px 7px; border-radius: 10px;
+  box-shadow: 0 0 0 1px var(--linea); margin-right: auto; margin-left: 10px;
 }
+/* El que corre es el que hay que mirar: se enciende y marca de quién es el
+   tiempo. Sin esto, dos cifras iguales no dicen quién está pensando. */
+.reloj.corre { color: var(--texto); box-shadow: 0 0 0 1px var(--borde-fuerte); }
+.hud-bando.rival .reloj.corre { color: var(--rival); box-shadow: 0 0 0 1px var(--rival); }
+.hud-bando.propio .reloj.corre { color: var(--acento-claro); box-shadow: 0 0 0 1px var(--bio); }
 .reloj.apremia {
   color: var(--peligro); box-shadow: 0 0 0 1px var(--peligro);
-  animation: latir 1s ease-in-out infinite;
 }
+.reloj.apremia.corre { animation: latir 1s ease-in-out infinite; }
 @keyframes latir { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
-@media (prefers-reduced-motion: reduce) { .reloj.apremia { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .reloj.apremia.corre { animation: none; } }
 
 
 /* Lista del descarte: qué ha jugado y perdido cada bando. */

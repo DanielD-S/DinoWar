@@ -30,7 +30,7 @@ export function montar() {
     btnColeccion: id('btn-coleccion'), btnSobres: id('btn-sobres'), btnMazos: id('btn-mazos'),
     rHabitat: id('r-habitat'), pHabitat: id('p-habitat'), rBarra: id('r-barra'), pBarra: id('p-barra'),
     rPila: id('r-pila'), pPila: id('p-pila'),
-    turno: id('turno'), reloj: id('reloj'),
+    turno: id('turno'), relojes: [id('p-reloj'), id('r-reloj')],
     campo: id('campo'), franjaCampo: id('btn-campo'), franjaNota: id('franja-nota'),
     franjaMias: id('btn-mias'),
     comprometidas: id('comprometidas'), comprometidasCuerpo: id('comprometidas-cuerpo'),
@@ -690,10 +690,14 @@ export function ayudaHTML() {
 
     <div class="ayuda-h">El reloj</div>
     <p class="ayuda-p">
-      Cada bando tiene <b>${Math.round(BALANCE.relojPorJugador / 60)} minutos para toda la partida</b>, no por turno,
-      como en ajedrez: puedes pensarte una jugada difícil si luego resuelves las fáciles al vuelo.
-      Sólo corre <b>mientras te toca decidir a ti</b> —ni las animaciones ni el turno del rival te cuestan
-      tiempo— y se para si dejas la pestaña. Quien lo agota, pierde.
+      <b>Un reloj por bando</b>, de ${Math.round(BALANCE.relojPorJugador / 60)} minutos para <b>toda la partida</b> y no por
+      turno, como en ajedrez: puedes pensarte una jugada difícil si luego resuelves las fáciles al vuelo.
+    </p>
+    <p class="ayuda-p">
+      Sólo corre el de quien tiene que decidir, y se ve encendido en su fila del marcador. El tuyo se
+      <b>congela en cuanto pulsas Listo</b> y no vuelve a correr hasta tu turno siguiente, así que lo que
+      tarde el rival no te cuesta nada. Tampoco cuentan las animaciones ni el tiempo con la pestaña
+      cerrada. <b>Quien agota su reloj, pierde.</b>
     </p>
 
     <div class="ayuda-h">Cómo va un turno</div>
