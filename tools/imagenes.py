@@ -41,8 +41,10 @@ DESTINO = RAIZ / 'assets' / 'dinos'
 # Lado mayor en píxeles. Las cartas del tablero miden 56 px y la ficha 74, así
 # que 460 da margen de sobra para pantallas de densidad 3x sin que una partida
 # se coma varios megabytes.
-LADO = 460
-CALIDAD = 80
+# 900 px de lado mayor: la ventana más grande es la carta a tamaño de lectura,
+# 268x168 css, que a DPR 3 son 804x504 px reales. Con 460 se veían blandas.
+LADO = 900
+CALIDAD = 82
 
 
 def ids_de_cartas():
@@ -107,8 +109,21 @@ def main():
         hechas.append(cid)
         print(f'  {cid:15s} {ancho}x{alto} → {im.size[0]}x{im.size[1]}  {kb:5.0f} KB')
 
-    (DESTINO / 'indice.json').write_text(
-        json.dumps(sorted(hechas), indent=2) + '\n', encoding='utf-8')
+    # El índice conserva los puntos focales ya escritos a mano: regenerar las
+    # imágenes no puede borrar el trabajo de encuadre de nadie.
+    indice_ruta = DESTINO / 'indice.json'
+    foco = {}
+    if indice_ruta.exists():
+        try:
+            previo = json.loads(indice_ruta.read_text(encoding='utf-8'))
+            if isinstance(previo, dict):
+                foco = {k: v for k, v in previo.get('foco', {}).items() if k in hechas}
+        except json.JSONDecodeError:
+            pass
+
+    indice_ruta.write_text(
+        json.dumps({'cartas': sorted(hechas), 'foco': foco}, ensure_ascii=False, indent=2) + '\n',
+        encoding='utf-8')
 
     print(f'\n{len(hechas)} ilustraciones, {kb_total:.0f} KB en total → assets/dinos/')
     if ignoradas:

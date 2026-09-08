@@ -217,9 +217,18 @@ const TONO = {
  * arte de un clima, basta con dejarlo en src/dinos/ con el id de la carta.
  */
 const conFoto = new Set();
+/**
+ * Punto focal por carta. Las ventanas de arte no tienen todas la misma
+ * proporción —1,00 en la miniatura de la ficha, 1,60 en el visor y en la mano—,
+ * así que `object-fit: cover` recorta por sitios distintos y un animal que no
+ * esté centrado se queda fuera. Esto permite decir por dónde recortar sin
+ * volver a exportar la imagen.
+ */
+const focos = new Map();
 
 export const rutaFoto = (cardId) => `assets/dinos/${cardId}.jpg`;
 export const hayFoto = (cardId) => conFoto.has(cardId);
+export const focoDe = (cardId) => focos.get(cardId) ?? null;
 
 /**
  * Mira una sola vez qué ilustraciones hay servidas. No rechaza nunca: no tener
@@ -227,15 +236,21 @@ export const hayFoto = (cardId) => conFoto.has(cardId);
  * @param {() => void} [alCambiar] se llama sólo si hay algo que repintar.
  */
 export async function detectarFotos(alCambiar) {
-  let ids = [];
+  let indice = null;
   try {
     const r = await fetch('assets/dinos/indice.json', { cache: 'no-cache' });
-    if (r.ok) ids = await r.json();
+    if (r.ok) indice = await r.json();
   } catch {
-    ids = [];
+    indice = null;
   }
+  // Dos formas válidas: la lista pelada de siempre, o un objeto con la lista y
+  // los puntos focales. Se aceptan las dos para no romper un índice viejo.
+  const ids = Array.isArray(indice) ? indice : indice?.cartas;
   if (!Array.isArray(ids) || ids.length === 0) return;
   for (const id of ids) if (typeof id === 'string') conFoto.add(id);
+  for (const [id, foco] of Object.entries(indice?.foco ?? {})) {
+    if (typeof foco === 'string') focos.set(id, foco);
+  }
   if (alCambiar) alCambiar();
 }
 
@@ -282,7 +297,9 @@ export function arte(cardId, color = null) {
     // Sin loading="lazy": el juego entero pesa unos 200 KB de ilustración y,
     // diferida, una imagen que falta no se sustituye por su silueta hasta que
     // aparece en pantalla, que es justo cuando se nota el hueco.
-    return `<img class="foto" data-carta="${cardId}" src="${rutaFoto(cardId)}" alt="">`;
+    const foco = focoDe(cardId);
+    return `<img class="foto" data-carta="${cardId}" src="${rutaFoto(cardId)}" alt=""`
+      + `${foco ? ` style="object-position:${foco}"` : ''}>`;
   }
   const plan = PLAN[cardId] ?? 'teropodo';
   const [tono, escala] = TONO[cardId] ?? ['#a89170', 1];
