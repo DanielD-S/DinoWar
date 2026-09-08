@@ -227,9 +227,10 @@ function pintarSobres(tirada = null, nuevas = new Set(), antesDeAbrir = {}) {
   dom.odds.innerHTML = '<tr><th>Rareza</th><td>del sobre</td><td>la que te falta</td><td>cartas</td></tr>'
     + ORDEN.map((r) => {
       const quedan = faltanDe(r);
-      const cuando = quedan === 0
-        ? 'ya la tienes toda'
-        : `1 de cada ${espera(r)} ${espera(r) === 1 ? 'sobre' : 'sobres'}`;
+      const cada = espera(r);
+      const cuando = quedan === 0 ? 'ya la tienes toda'
+        : cada === 1 ? 'casi en cada sobre'
+        : `1 de cada ${cada} sobres`;
       return `<tr class="${quedan ? '' : 'completa'}">
         <th class="col-rar rar-${r}">${RAREZA_NOMBRE[r]}</th>
         <td>${(PROBABILIDAD[r] * 100).toFixed(0)} %</td>

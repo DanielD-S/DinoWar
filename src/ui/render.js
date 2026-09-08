@@ -573,9 +573,10 @@ export function ayudaHTML() {
 
     <div class="ayuda-h">La Biomasa</div>
     <p class="ayuda-p">
-      <b>No es una hucha.</b> Al empezar cada turno tu Biomasa se <b>reemplaza</b> por el número de turno,
-      hasta ${BALANCE.rentaTope}: en el turno 3 tienes 3 hayas gastado o no, y en el 4 tienes 4.
-      Lo que no gastas <b>se pierde</b>.
+      <b>Es una hucha.</b> Al empezar cada turno entra <b>${BALANCE.rentaPorTurno} de Biomasa</b>, siempre
+      la misma, y <b>lo que no gastas se queda</b> hasta un tope de ${BALANCE.rentaTope}. Si en el turno 2
+      tienes 2 y te los gastas, en el 3 tendrás 1; si no gastas nada, tendrás 3. Aguantar un turno es lo
+      que te permite pagar algo caro al siguiente.
     </p>
     <p class="ayuda-p">
       El rival cobra exactamente lo mismo, vaya ganando o perdiendo. Es la corrección central de esta

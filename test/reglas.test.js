@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { BALANCE, TOTAL_MAZO } from '../src/data/balance.js';
-import { CARTAS, CLADO, RASGO } from '../src/data/cards.js';
+import { CARTAS, CLADO, RASGO, carta } from '../src/data/cards.js';
 import {
   crearPartida, FASE, MOTIVO_FIN,
   unidadEn, unidadesDe, ataqueEfectivo, vidaActual, danoEntre,
@@ -15,14 +15,22 @@ import { tablero, poner, enMano, ejecutar, vivo } from './helpers.js';
 
 // --------------------------------------------------------------- economía
 
-test('La renta sube por turno hasta el tope y es igual para los dos bandos', () => {
+test('La renta es plana y es igual para los dos bandos', () => {
   const s = tablero();
-  for (const [turno, esperado] of [[1, 1], [4, 4], [8, 8], [12, BALANCE.rentaTope]]) {
+  for (const turno of [1, 4, 8, 12]) {
     s.turno = turno;
-    assert.equal(rentaDe(s), Math.min(turno, BALANCE.rentaTope));
+    assert.equal(rentaDe(s), BALANCE.rentaPorTurno, 'la renta no depende del turno');
     const r = ejecutar(s, FASE.RENTA);
-    assert.equal(r.jugadores[0].biomasa, esperado);
-    assert.equal(r.jugadores[1].biomasa, esperado, 'los dos cobran lo mismo');
+    assert.equal(r.jugadores[0].biomasa, r.jugadores[1].biomasa, 'los dos cobran lo mismo');
+  }
+});
+
+test('Acumula: turno tras turno la Biomasa sube de una en una', () => {
+  let s = tablero();
+  for (let turno = 1; turno <= 5; turno++) {
+    s.turno = turno;
+    s = ejecutar(s, FASE.RENTA);
+    assert.equal(s.jugadores[0].biomasa, turno, `en el turno ${turno} sin gastar debería haber ${turno}`);
   }
 });
 
@@ -37,12 +45,20 @@ test('La renta NO depende de ir ganando: es la corrección central de la v2', ()
   assert.equal(r.jugadores[0].biomasa, r.jugadores[1].biomasa);
 });
 
-test('La renta no se acumula: lo que no gastas se pierde', () => {
+test('Lo que no gastas sigue ahí al turno siguiente', () => {
   const s = tablero();
   s.turno = 6;
-  s.jugadores[0].biomasa = 99;
+  s.jugadores[0].biomasa = 3;
   const r = ejecutar(s, FASE.RENTA);
-  assert.equal(r.jugadores[0].biomasa, 6);
+  assert.equal(r.jugadores[0].biomasa, 4, 'gastar poco un turno tiene que valer para el siguiente');
+});
+
+test('Lo ahorrado tiene tope: no se puede acampar veinte turnos', () => {
+  const s = tablero();
+  s.turno = 30;
+  s.jugadores[0].biomasa = BALANCE.rentaTope;
+  const r = ejecutar(s, FASE.RENTA);
+  assert.equal(r.jugadores[0].biomasa, BALANCE.rentaTope);
 });
 
 // ---------------------------------------------------------------- combate
@@ -489,7 +505,7 @@ test('El despliegue permanece oculto hasta la revelación', () => {
 
   const r = reduce(s, { tipo: ACCION.DESPLEGAR, jugador: 0, iid, ranura: 2 });
   assert.equal(r.ranuras[0][2], null, 'todavía no está en el campo');
-  assert.equal(r.jugadores[0].biomasa, 10 - 5, 'pero ya se ha pagado');
+  assert.equal(r.jugadores[0].biomasa, 10 - carta('allosaurus').coste, 'pero ya se ha pagado');
 
   const rev = ejecutar(r, FASE.REVELACION);
   assert.equal(rev.ranuras[0][2], iid);

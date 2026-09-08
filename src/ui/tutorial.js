@@ -21,7 +21,7 @@ const PASOS = [
     evento: 'inicio',
     texto: 'El círculo dorado de cada carta es lo que cuesta, y hoy tienes <b>1 de Biomasa</b>. '
       + '<b>Arrastra un dinosaurio a una de tus ranuras</b>, las de abajo. Si no te llega para ninguna, '
-      + 'pulsa Listo: en el turno 2 tendrás 2.',
+      + 'pulsa Listo: la Biomasa se guarda y mañana tendrás 2.',
   },
   {
     evento: 'desplegada',
@@ -43,8 +43,9 @@ const PASOS = [
   {
     evento: 'turno',
     turno: 2,
-    texto: 'Turno 2: cobras <b>2 de Biomasa</b>. No es una hucha — cada turno vale el número de turno, '
-      + `hasta ${BALANCE.rentaTope}, hayas gastado o no. Lo que no gastes <b>se pierde</b>.`,
+    texto: `Turno 2: entra <b>${BALANCE.rentaPorTurno} de Biomasa</b> más. `
+      + 'Es una hucha: entra la misma cantidad cada turno y <b>lo que no gastas se queda</b>, '
+      + `hasta ${BALANCE.rentaTope}. Aguantar un turno es la forma de pagar algo caro.`,
   },
   {
     evento: 'turno',

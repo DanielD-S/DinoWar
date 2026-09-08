@@ -495,8 +495,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* ---------------------------------------------------------- sobre abierto */
 
+/* Tres columnas, no cinco: a cinco por fila cada carta se queda en 62 px y su
+   ventana de arte salía en vertical (62x88), que en una ilustración apaisada
+   enseña una tira del bicho y poco más. A tres caben 105 px y la ventana ya es
+   del mismo formato que la de la colección. */
 .sobre-tirada.abierto {
-  display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
   align-items: start; padding-top: 10px;
 }
 
@@ -530,7 +534,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   background-position: 0 0, 8px 5.5px;
   border-color: var(--borde-fuerte);
 }
-.sobre-frente .col-arte { height: 88px; }
+.sobre-frente .col-arte { height: auto; aspect-ratio: 3 / 2; }
 .sobre-frente .col-nombre { font-size: 8px; height: 2.3em; }
 
 /* El brillo se reserva a lo que de verdad es raro: si todo destella, nada lo es. */
@@ -832,7 +836,17 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 /* Las cifras al pie de la carta: la ranura es más alta que su contenido y
    dejarlas pegadas al nombre abría un hueco muerto debajo. */
-.carta--ranura .c-stats { margin-top: auto; }
+/* La ranura es la carta más estrecha del juego y las tres cifras han de caber
+   en una línea: si se parten, la Vida se sale por abajo del recorte y
+   desaparece. `justify-content: space-between` reparte lo que sobre en vez de
+   dejarlo todo al final, y el hueco mínimo evita que ninguna se corte. */
+.carta--ranura .c-stats { margin-top: auto; justify-content: space-between; gap: 1px; }
+.carta--ranura .st { gap: 1px; }
+/* Los 54 px de la ranura tienen que aguantar el peor caso del set, que es
+   Apatosaurus: 4 · 3 · 12, con la Vida de dos cifras. Un glifo algo menor y un
+   punto menos de margen es lo que hace falta para que quepa sin partirse. */
+.carta--ranura .st i { width: .92em; height: .92em; }
+.carta--ranura .c-cuerpo { padding: 4px 3px; }
 
 /* Ranura de enfrente vacía: por ahí pasa el daño. En lo tuyo se enciende en
    ámbar, en lo del rival en rojo, y es lo único encendido del tablero. */

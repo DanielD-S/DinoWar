@@ -5,8 +5,8 @@ import { CARTAS, CLADO, RAREZA } from './cards.js';
 
 export const BALANCE = Object.freeze({
   // ------------------------------------------------------------- victorias
-  trofeosParaGanar: 8,      // registro fósil
-  vidaHabitat: 34,            // colapso del habitat
+  trofeosParaGanar: 6,      // registro fósil
+  vidaHabitat: 54,            // colapso del habitat
   // la tercera, extinción, no tiene número: es quedarse sin cartas al robar
 
   // ---------------------------------------------------------------- campo
@@ -16,9 +16,14 @@ export const BALANCE = Object.freeze({
   // La renta NO depende de dominar el campo. Es la corrección central de la v2:
   // en la v1, atarla al control hacía que el 87,6 % de las partidas las ganase
   // quien iba por delante en el turno 6.
-  rentaPorTurno: 1,         // Biomasa = turno × esto, hasta el tope
-  rentaTope: 8,
-  rentaAcumula: false,      // lo que no gastas se pierde
+  // La renta es +1 por turno y se acumula: lo que no gastas sigue ahí al turno
+  // siguiente. Antes la Biomasa se ponía al número de turno y se perdía el
+  // resto, así que gastar 2 en el turno 2 te dejaba con 3 en el turno 3 —el
+  // jugador leía «+3» y tenía razón—. Ahora un turno sin gastar es un turno
+  // ahorrado, que es lo que hace que guardar sea una decisión.
+  rentaPorTurno: 1,         // se suma a lo que ya tenías
+  rentaTope: 12,            // tope de lo ahorrado, no de la renta
+  rentaAcumula: true,
 
   manoInicial: 6,
   manoMaxima: 7,

@@ -147,7 +147,11 @@ export function faseEstacion(s) {
 export function faseRenta(s) {
   const renta = rentaDe(s);
   for (const jug of s.jugadores) {
-    jug.biomasa = BALANCE.rentaAcumula ? jug.biomasa + renta : renta;
+    // El tope es de lo ahorrado, no de la renta: nadie puede sentarse veinte
+    // turnos a acumular, pero guardar dos o tres turnos sí tiene que valer.
+    jug.biomasa = BALANCE.rentaAcumula
+      ? Math.min(jug.biomasa + renta, BALANCE.rentaTope)
+      : Math.min(renta, BALANCE.rentaTope);
   }
   ev(s, 'RENTA', { biomasa: renta });
   s.fase = FASE.ROBO;
