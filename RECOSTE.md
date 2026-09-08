@@ -7,6 +7,9 @@
 > - `node tools/tabla.mjs escribir` regenera esta tabla desde el código.
 > - `node tools/tabla.mjs aplicar` mete lo editado en `src/data/cards.js`.
 >
+> Si prefieres editarla en una hoja de cálculo, `python tools/excel.py escribir`
+> la saca a `RECOSTE.xlsx` y `python tools/excel.py leer` la trae de vuelta aquí.
+>
 > Después de aplicar hay que correr `npm test` y `npm run sim`: los números
 > del balance salen de aquí.
 

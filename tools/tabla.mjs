@@ -43,6 +43,9 @@ function escribir() {
 > - \`node tools/tabla.mjs escribir\` regenera esta tabla desde el código.
 > - \`node tools/tabla.mjs aplicar\` mete lo editado en \`src/data/cards.js\`.
 >
+> Si prefieres editarla en una hoja de cálculo, \`python tools/excel.py escribir\`
+> la saca a \`RECOSTE.xlsx\` y \`python tools/excel.py leer\` la trae de vuelta aquí.
+>
 > Después de aplicar hay que correr \`npm test\` y \`npm run sim\`: los números
 > del balance salen de aquí.
 
@@ -93,8 +96,9 @@ function aplicar() {
   const filas = texto.split('\n')
     .filter((l) => l.startsWith('|') && !l.startsWith('| id') && !l.startsWith('|---'))
     // La fila empieza y acaba en «|», así que el primer y el último trozo del
-    // split están vacíos: fuera los dos antes de leer columnas.
-    .map((l) => l.split('|').slice(1, -1).map((x) => x.trim()))
+    // split están vacíos: fuera los dos antes de leer columnas. La barra
+    // escapada («\\|») va dentro de una celda y no la parte.
+    .map((l) => l.split(/(?<!\\)\|/).slice(1, -1).map((x) => x.trim()))
     .filter((cols) => cols.length >= 11 && CARTAS[cols[0]]);
 
   if (filas.length === 0) throw new Error('RECOSTE.md no tiene filas reconocibles');
