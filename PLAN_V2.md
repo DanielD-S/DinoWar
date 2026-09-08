@@ -468,8 +468,11 @@ banda para que pase sería cambiar el termómetro.
 ### 14.5 Pendiente
 
 - **Cuatro cartas sin medir**: bosque, llanura, carroña y lago. Están en la
-  colección y no en el mazo de referencia.
-- **Sin CI**: `npm test`, `npm run sim` y `node sim/set.js` se corren a mano.
+  colección y no en el mazo de referencia, así que `BALANCE.md` no dice nada de
+  ellas. Se cerraría con un segundo mazo de referencia que las lleve.
+
+*(El «sin CI» que figuraba aquí se resolvió en V2-5: `.github/workflows/test.yml`
+corre los tests y comprueba `SET_DE_CARTAS.md` en cada push.)*
 
 ### 14.6 El mazo se queda en 50
 
