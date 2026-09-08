@@ -90,6 +90,13 @@ export const BALANCE = Object.freeze({
 
   estacion: Object.freeze({
     crecidaCura: 1,
+    // La sequía cobraba un «Consumo hídrico» que cada carta llevaba escrito: un
+    // cuarto número que sólo servía para esto y que el jugador tenía que
+    // recordar. Ahora sale de la Vida, que ya está en la carta y en el tablero:
+    // el cuerpo grande necesita más agua.
+    sequiaHerida: 1,
+    sequiaHeridaGrande: 2,
+    sequiaVidaGrande: 7,
   }),
 
   // ------------------------------------------------------------------- mazo

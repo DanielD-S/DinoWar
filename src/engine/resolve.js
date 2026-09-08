@@ -9,7 +9,7 @@ import {
   FASE, MOTIVO_FIN, CAUSA, rival,
   unidadEn, unidadesDe, todasLasUnidades,
   ataqueEfectivo, vidaActual, danoEntre, danoAlHabitat, espinasDe,
-  curacionDe, rentaDe, inmuneSequia, haySequia, hayCrecida, hayAridez, campoEs, vuela,
+  curacionDe, rentaDe, inmuneSequia, sedDe, haySequia, hayCrecida, hayAridez, campoEs, vuela,
 } from './state.js';
 
 export function ev(s, tipo, datos = {}) {
@@ -129,12 +129,14 @@ export function faseEstacion(s) {
     ev(s, 'ESTACION', { estacion: s.estacion.actual });
   }
 
-  // La sequía ya no cobra un recurso de bolsillo: cobra heridas. El Canal
-  // fluvial, con agua permanente, la anula por completo.
+  // La sequía cobra heridas, y las cobra según la Vida: el cuerpo grande
+  // necesita más agua. Antes salían de un «Consumo hídrico» propio de cada
+  // carta, un número que sólo existía para este momento. El Canal fluvial, con
+  // agua permanente, la anula por completo.
   if (haySequia(s) && !campoEs(s, RASGO.CAMPO_CANAL)) {
     for (const inst of todasLasUnidades(s)) {
       if (inmuneSequia(inst)) continue;
-      herir(s, inst.iid, carta(inst.cardId).consumoHidrico, CAUSA.SEQUIA, null);
+      herir(s, inst.iid, sedDe(s, inst.iid), CAUSA.SEQUIA, null);
     }
     recogerBajas(s, CAUSA.SEQUIA);
   }

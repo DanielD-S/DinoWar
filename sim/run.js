@@ -50,12 +50,14 @@ function percentil(xs, p) {
   return o[Math.min(o.length - 1, Math.max(0, Math.round((p / 100) * (o.length - 1))))];
 }
 
-export function correr({ n, seed, perfiles }) {
+export function correr({ n, seed, perfiles, mazo = null }) {
   const cardIds = Object.keys(CARTAS);
   const m = {
     n, seed, perfiles,
     turnos: [], victorias: [0, 0], motivos: {},
     jugadaEnPartida: Object.fromEntries(cardIds.map((c) => [c, 0])),
+    robadaEnPartida: Object.fromEntries(cardIds.map((c) => [c, 0])),
+    copiasRobadas: Object.fromEntries(cardIds.map((c) => [c, 0])),
     jugadasPorCarta: Object.fromEntries(cardIds.map((c) => [c, 0])),
     jugadasTotales: 0,
     ventajaAcertada: 0, ventajaTotal: 0,
@@ -67,7 +69,7 @@ export function correr({ n, seed, perfiles }) {
 
   for (let i = 0; i < n; i++) {
     const fotos = [];
-    const { estado, jugadas } = jugarPartida(seed + i, perfiles, (s) => fotos.push(foto(s)));
+    const { estado, jugadas, robadas } = jugarPartida(seed + i, perfiles, (s) => fotos.push(foto(s)), true, mazo);
 
     m.turnos.push(estado.turno);
     if (estado.ganador !== null) m.victorias[estado.ganador] += 1;
@@ -77,6 +79,8 @@ export function correr({ n, seed, perfiles }) {
 
     const vistas = new Set(jugadas.map((j) => j.cardId));
     for (const c of vistas) m.jugadaEnPartida[c] += 1;
+    for (const c of robadas) m.copiasRobadas[c] += 1;
+    for (const c of new Set(robadas)) m.robadaEnPartida[c] += 1;
     for (const j of jugadas) { m.jugadasPorCarta[j.cardId] += 1; m.jugadasTotales += 1; }
 
     for (const f of fotos) m.unidadesPorTurno.push((f.unidades[0] + f.unidades[1]) / 2);
@@ -96,21 +100,30 @@ export function correr({ n, seed, perfiles }) {
   return m;
 }
 
-export function resumir(m) {
-  // Sólo se califican las cartas que el mazo de referencia lleva. Una carta que
-  // no está en el mazo no se puede jugar, así que su índice sería 0 por
+export function resumir(m, mazo = MAZO) {
+  // Sólo se califican las cartas que el mazo medido lleva. Una carta que no
+  // está en el mazo no se puede jugar, así que su índice sería 0 por
   // construcción: contarla como descalibrada es medir el mazo, no la carta.
-  const cardIds = MAZO.map(([c]) => c);
-  const copias = Object.fromEntries(MAZO);
+  const cardIds = mazo.map(([c]) => c);
+  const copias = Object.fromEntries(mazo);
+  const total = mazo.reduce((a, [, c]) => a + c, 0);
   const frecuencias = cardIds.map((c) => {
     const cuota = pct(m.jugadasPorCarta[c], m.jugadasTotales);
-    const esperado = pct(copias[c] ?? 0, TOTAL_MAZO);
+    const esperado = pct(copias[c] ?? 0, total);
     return {
       cardId: c,
       pct: pct(m.jugadaEnPartida[c], m.n),
       cuota,
       esperado,
       indice: esperado === 0 ? 0 : cuota / esperado,
+      // Uso: de las copias que llegaron a una mano, cuántas se jugaron. El
+      // índice mide cuota de jugadas contra peso en el mazo, y eso castiga por
+      // igual a lo que nadie quiere y a lo que no admite dos copias en juego;
+      // el uso mide si la carta se queda muerta en la mano, que es la pregunta
+      // que de verdad importa. Va por copias, no por partidas, para que no lo
+      // falsee llevar tres.
+      uso: m.copiasRobadas[c] === 0 ? 0 : m.jugadasPorCarta[c] / m.copiasRobadas[c],
+      robadaPct: pct(m.robadaEnPartida[c], m.n),
     };
   });
 

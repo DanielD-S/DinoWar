@@ -190,6 +190,16 @@ export function vidaMaxima(state, iid) {
 export const vidaActual = (state, iid) => vidaMaxima(state, iid) - state.instancias[iid].heridas;
 
 /**
+ * Heridas que le cuesta la Sequía. Sale de la Vida —el cuerpo grande necesita
+ * más agua— y no de un número aparte en la carta: el jugador ve el dato que
+ * decide, y no hay una cuarta cifra que memorizar.
+ */
+export function sedDe(state, iid) {
+  const { sequiaHerida, sequiaHeridaGrande, sequiaVidaGrande } = BALANCE.estacion;
+  return vidaMaxima(state, iid) >= sequiaVidaGrande ? sequiaHeridaGrande : sequiaHerida;
+}
+
+/**
  * Defensa: reducción plana del daño recibido. Sale de la propia carta —masa,
  * osteodermos, placas—, no del clado.
  */

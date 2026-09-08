@@ -38,21 +38,21 @@ es legendario.
 
 | Taxón | Clado | Rareza | Copias | Coste | Ataque | Defensa | Vida | Sed |
 |---|---|---|---|---|---|---|---|---|
-| *Dryosaurus altus* | Ornitópodo | Común | 3 | 1 | 1 | 0 | 2 | 0 |
-| *Ornitholestes hermanni* | Terópodo | Común | 3 | 2 | 2 | 0 | 2 | 0 |
-| *Ceratosaurus nasicornis* | Terópodo | Común | 3 | 3 | 4 | 1 | 3 | 2 |
-| *Stegosaurus stenops* | Tireóforo | Épica | 2 | 4 | 3 | 3 | 6 | 1 |
-| *Allosaurus fragilis* | Terópodo | Épica | 2 | 5 | 6 | 1 | 5 | 1 |
-| *Camarasaurus grandis* | Saurópodo | Épica | 2 | 5 | 3 | 2 | 7 | 2 |
-| *Diplodocus carnegii* | Saurópodo | Legendaria | 1 | 5 | 3 | 2 | 10 | 3 |
-| *Apatosaurus louisae* | Saurópodo | Legendaria | 1 | 7 | 4 | 3 | 12 | 3 |
-| *Torvosaurus tanneri* | Terópodo | Legendaria | 1 | 7 | 8 | 1 | 6 | 2 |
-| *Nodosaurus textilis* | Tireóforo | Rara | 3 | 4 | 2 | 4 | 6 | 1 |
-| *Riparovenator milnerae* | Terópodo | Épica | 2 | 5 | 5 | 1 | 5 | 1 |
-| *Lokiceratops rangiformis* | Marginocéfalo | Épica | 2 | 5 | 4 | 2 | 7 | 1 |
-| *Brachylophosaurus canadensis* | Ornitópodo | Épica | 2 | 4 | 3 | 1 | 6 | 1 |
-| *Tyrannotitan chubutensis* | Terópodo | Legendaria | 1 | 8 | 9 | 1 | 7 | 2 |
-| *Huaxiadraco corollatus* | Pterosaurio | Épica | 2 | 4 | 3 | 0 | 3 | 0 |
+| *Dryosaurus altus* | Ornitópodo | Común | 3 | 1 | 1 | 0 | 2 | undefined |
+| *Ornitholestes hermanni* | Terópodo | Común | 3 | 2 | 2 | 0 | 2 | undefined |
+| *Ceratosaurus nasicornis* | Terópodo | Común | 3 | 3 | 4 | 1 | 3 | undefined |
+| *Stegosaurus stenops* | Tireóforo | Épica | 2 | 4 | 3 | 3 | 6 | undefined |
+| *Allosaurus fragilis* | Terópodo | Épica | 2 | 5 | 6 | 1 | 5 | undefined |
+| *Camarasaurus grandis* | Saurópodo | Épica | 2 | 5 | 3 | 2 | 7 | undefined |
+| *Diplodocus carnegii* | Saurópodo | Legendaria | 1 | 5 | 3 | 2 | 10 | undefined |
+| *Apatosaurus louisae* | Saurópodo | Legendaria | 1 | 7 | 4 | 3 | 12 | undefined |
+| *Torvosaurus tanneri* | Terópodo | Legendaria | 1 | 7 | 8 | 1 | 6 | undefined |
+| *Nodosaurus textilis* | Tireóforo | Rara | 3 | 4 | 2 | 4 | 6 | undefined |
+| *Riparovenator milnerae* | Terópodo | Épica | 2 | 5 | 5 | 1 | 5 | undefined |
+| *Lokiceratops rangiformis* | Marginocéfalo | Épica | 2 | 5 | 4 | 2 | 7 | undefined |
+| *Brachylophosaurus canadensis* | Ornitópodo | Épica | 2 | 4 | 3 | 1 | 6 | undefined |
+| *Tyrannotitan chubutensis* | Terópodo | Legendaria | 1 | 8 | 9 | 1 | 7 | undefined |
+| *Huaxiadraco corollatus* | Pterosaurio | Épica | 2 | 4 | 3 | 0 | 3 | undefined |
 
 *Camarasaurus* es inmune a la Sed: sus isótopos indican que migraba.
 
@@ -383,7 +383,7 @@ Baraja neutral y compartida, aparte del mazo. Se voltea una carta por turno desd
 
 ### Sequía estacional
 
-Cada dinosaurio debe pagar su Consumo hídrico en heridas. Camarasaurus es inmune; el Canal fluvial protege a todos.
+Cada dinosaurio recibe 1 herida, y 2 si tiene 7 o más de Vida: el cuerpo grande necesita más agua. Camarasaurus es inmune; el Canal fluvial protege a todos.
 
 `ESTABLECIDO` · Los paleosuelos, los depósitos evaporíticos y la estructura de los yacimientos de la Morrison indican un clima marcadamente estacional, semiárido, con precipitación concentrada.
 

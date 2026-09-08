@@ -8,7 +8,7 @@ import { BALANCE } from '../data/balance.js';
 import { TIPO, OBJETIVO, CLADO, RASGO, carta } from '../data/cards.js';
 import {
   FASE, rival, unidadEn, unidadesDe,
-  ataqueEfectivo, vidaActual, reduccionDe, espinasDe, danoAlHabitat, campoEs, vuela,
+  ataqueEfectivo, vidaActual, reduccionDe, espinasDe, danoAlHabitat, campoEs, vuela, sedDe,
 } from './state.js';
 import { ACCION, legales } from './actions.js';
 import { elegir } from './rng.js';
@@ -221,7 +221,7 @@ function valorDeAccion(vista, j, a) {
         // Lo que de verdad hace: anular la Sequía. Se valora por las heridas
         // que ahorraría a los propios, más el empujón a los ribereños.
         const enRiesgo = unidadesDe(vista, j)
-          .reduce((n, u) => n + carta(u.cardId).consumoHidrico, 0);
+          .reduce((n, u) => n + sedDe(vista, u.iid), 0);
         valor = enRiesgo * IA.pesoDano * 1.5
           + unidadesDe(vista, j).filter((u) => carta(u.cardId).rasgo === RASGO.RIBERENO).length
             * BALANCE.rasgos.riberenoAtaque * IA.pesoDano;

@@ -290,6 +290,47 @@ function abrirLog() {
 
 // --------------------------------------------------------------------- fin
 
+/**
+ * Rendirse: la partida se abandona en la interfaz, no en el motor. Un estado
+ * de partida rendida no existe en las reglas y no hacía falta inventarlo —
+ * cuenta como derrota en el récord y paga lo que paga una derrota, que es lo
+ * único que la rendición tiene que decidir.
+ */
+function rendirse() {
+  cerrarHojas();
+  irA(APP.GAME_OVER);
+  soltarEntrada();
+  cancelarAnimaciones();
+
+  const [p, r] = estado.jugadores;
+  el.finTitulo.textContent = 'Te has retirado';
+  el.finTitulo.style.color = 'var(--rival)';
+  el.finDetalle.innerHTML = 'abandonas el campo en el turno '
+    + `<b>${estado.turno}</b><br>Trofeos <b>${p.trofeos}</b> – <b>${r.trofeos}</b>`
+    + ` · Hábitat <b>${Math.max(0, p.habitat)}</b> – <b>${Math.max(0, r.habitat)}</b>`;
+
+  anotarResultado(false, estado.turno);
+  const premio = recompensar(false);
+  el.finDetalle.innerHTML += `<br><span class="fin-premio">+${premio} dinomonedas</span>`;
+  sonido('pierde');
+}
+
+function preguntarRendicion() {
+  el.eleccionTitulo.textContent = '¿Abandonar la partida?';
+  el.eleccionTexto.textContent = 'Cuenta como derrota en tu récord y cobra la recompensa de derrota.';
+  el.eleccionCuerpo.innerHTML = `
+    <button class="opcion" data-rendirse="si">Rendirse<small>La partida termina aquí.</small></button>
+    <button class="opcion" data-rendirse="no">Seguir jugando<small>Vuelve al tablero.</small></button>`;
+  el.eleccion.classList.remove('oculta');
+  el.eleccionCuerpo.onclick = (e) => {
+    const b = e.target.closest('[data-rendirse]');
+    if (!b) return;
+    el.eleccion.classList.add('oculta');
+    el.eleccionCuerpo.onclick = null;
+    if (b.dataset.rendirse === 'si') rendirse();
+  };
+}
+
 function finPartida() {
   irA(APP.GAME_OVER);
   soltarEntrada();
@@ -373,6 +414,15 @@ function iniciar() {
   el.btnSobres.addEventListener('click', () => { abrirSobres(); irA(APP.SOBRES); });
   el.btnMazos.addEventListener('click', () => { abrirMazos(); irA(APP.MAZOS); });
   el.btnOtra.addEventListener('click', () => { pintarRecord(); nuevaPartida(); });
+  // Terminar una partida no obligaba a jugar otra, pero lo parecía: no había
+  // más salida que «Otra partida».
+  el.btnFinMenu.addEventListener('click', () => {
+    estado = null;
+    pintarRecord();
+    pintarMenu();
+    irA(APP.MENU);
+  });
+  el.btnRendirse.addEventListener('click', preguntarRendicion);
   el.btnListo.addEventListener('click', alPulsarListo);
   el.btnLog.addEventListener('click', abrirLog);
   el.logCerrar.addEventListener('click', cerrarHojas);

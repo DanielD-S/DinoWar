@@ -31,7 +31,8 @@ export function montar() {
     mano: id('mano'), mensaje: id('mensaje'),
     btnListo: id('btn-listo'), btnLog: id('btn-log'), btnMute: id('btn-mute'),
     btnAyuda: id('btn-ayuda'), btnAyudaMenu: id('btn-ayuda-menu'),
-    btnJugar: id('btn-jugar'), btnOtra: id('btn-otra'),
+    btnJugar: id('btn-jugar'), btnOtra: id('btn-otra'), btnFinMenu: id('btn-fin-menu'),
+    btnRendirse: id('btn-rendirse'),
     arrastre: id('arrastre'),
     ficha: id('ficha'), fichaCuerpo: id('ficha-cuerpo'), fichaCerrar: id('ficha-cerrar'),
     visor: id('visor'), visorLienzo: id('visor-lienzo'), visorModos: id('visor-modos'),
@@ -302,7 +303,6 @@ export function fichaHTML(cardId) {
           ${dino ? `<span>Ataque <b>${c.ataque}</b></span>` : ''}
           ${dino ? `<span>Defensa <b>${c.defensa}</b></span>` : ''}
           ${dino ? `<span>Vida <b>${c.vida}</b></span>` : ''}
-          ${dino && c.consumoHidrico ? `<span>Agua <b>${c.consumoHidrico}</b></span>` : ''}
         </div>
         <button class="ficha-ampliar" data-zoom="${cardId}" data-modo="carta">Ver la carta en grande</button>
       </div>
@@ -431,6 +431,11 @@ export function abrirDescarte(estado, bando) {
 export function ayudaHTML() {
   const ejemplo = 'allosaurus';
   const c = carta(ejemplo);
+  // El ejemplo del choque sale de dos cartas reales: si sus números cambian,
+  // cambia la cuenta que se enseña.
+  const a = carta('allosaurus');
+  const d = carta('stegosaurus');
+  const espinas = BALANCE.clados.espinasTireoforo + BALANCE.rasgos.tagomizadorExtra;   // púas + Tagomizador
   const n = document.createElement('div');
   n.className = 'carta carta--ranura';
   n.innerHTML = marcoCarta(null, ejemplo);
@@ -471,11 +476,34 @@ export function ayudaHTML() {
       </div>
       <div class="anatomia-notas">
         <div><span class="n">1</span><span><b>Coste</b> en Biomasa.</span></div>
-        <div><span class="n">2</span><span><b>Defensa</b>: resta de todo daño que reciba.</span></div>
-        <div><span class="n">3</span><span><b>Ataque</b>: daño que hace cada turno.</span></div>
-        <div><span class="n">4</span><span><b>Vida</b>: lo que aguanta. Las heridas <b>no se curan</b> salvo carta que lo diga.</span></div>
+        <div><span class="n">2</span><span><b>Defensa</b>: se resta de <b>cada</b> golpe que recibe, no de la Vida.</span></div>
+        <div><span class="n">3</span><span><b>Ataque</b>: daño que reparte, una vez por turno.</span></div>
+        <div><span class="n">4</span><span><b>Vida</b>: heridas que aguanta antes de morir. <b>No se curan</b> salvo carta que lo diga.</span></div>
       </div>
     </div>
+
+    <div class="ayuda-h">Cómo se resuelve un choque</div>
+    <p class="ayuda-p">
+      Los dos dinosaurios de una misma ranura se golpean <b>a la vez y una vez por turno</b>. El daño de
+      cada uno se calcula sobre el estado de antes del choque, así que un intercambio puede matar a los dos.
+    </p>
+    <p class="ayuda-p">
+      <b>Daño = Ataque del que pega − Defensa del que recibe</b>, nunca menos de 0. Lo que pasa se queda
+      como herida y <b>se acumula turno tras turno</b>: muere quien acumula tantas heridas como Vida tiene.
+    </p>
+    <ul class="ayuda-lista">
+      <li><span class="k">Ejemplo</span><span class="v"><i>${a.binomial}</i> (Ataque ${a.ataque}, Defensa ${a.defensa}, Vida ${a.vida})
+        choca con <i>${d.binomial}</i> (Ataque ${d.ataque}, Defensa ${d.defensa}, Vida ${d.vida}).
+        Le hace ${a.ataque} − ${d.defensa} = <b>${Math.max(0, a.ataque - d.defensa)}</b>.
+        Recibe ${d.ataque} − ${a.defensa} = ${Math.max(0, d.ataque - a.defensa)}, y encima ${espinas} de púas
+        caudales, que <b>no</b> las para la Defensa: <b>${Math.max(0, d.ataque - a.defensa) + espinas}</b> en total.
+        Con ${a.vida} de Vida, el depredador cae y el ${'tireóforo'} se queda en pie con
+        ${d.vida - Math.max(0, a.ataque - d.defensa)} de ${d.vida}.</span></li>
+      <li><span class="k">Bloqueo</span><span class="v">Si ninguno pasa la Defensa del otro, los dos se quedan
+        mirándose: no muere nadie y el hábitat no recibe nada. Un muro no gana, <b>tapa</b>.</span></li>
+      <li><span class="k">Sin rival</span><span class="v">Ranura de enfrente vacía: el Ataque entero va al
+        hábitat contrario. La Defensa sólo cuenta contra dinosaurios.</span></li>
+    </ul>
     <p class="ayuda-p">
       Mantén pulsada cualquier carta para leer su ficha con la nota científica.
       Ejemplo: <i>${c.binomial}</i> cuesta ${c.coste}, pega ${c.ataque}, para ${c.defensa} y aguanta ${c.vida}.

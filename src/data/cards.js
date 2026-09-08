@@ -104,12 +104,12 @@ export const RASGO = Object.freeze({
 });
 
 const dino = (o) => Object.freeze({ tipo: TIPO.DINOSAURIO, ...o });
-const evento = (o) => Object.freeze({ tipo: TIPO.EVENTO, ataque: 0, defensa: 0, vida: 0, consumoHidrico: 0, ...o });
-const clima = (o) => Object.freeze({ tipo: TIPO.CLIMA, objetivo: OBJETIVO.CAMPO, ataque: 0, defensa: 0, vida: 0, consumoHidrico: 0, coste: 2, ...o });
+const evento = (o) => Object.freeze({ tipo: TIPO.EVENTO, ataque: 0, defensa: 0, vida: 0, ...o });
+const clima = (o) => Object.freeze({ tipo: TIPO.CLIMA, objetivo: OBJETIVO.CAMPO, ataque: 0, defensa: 0, vida: 0, coste: 2, ...o });
 // Los pulsos se juegan BOCA ARRIBA y surten efecto al instante: dar Biomasa
 // "este turno" no sirve de nada si se resuelve después del despliegue. A cambio
 // el rival los ve venir, que es parte de su precio.
-const recurso = (o) => Object.freeze({ tipo: TIPO.RECURSO, objetivo: OBJETIVO.CAMPO, ataque: 0, defensa: 0, vida: 0, consumoHidrico: 0, coste: 0, ...o });
+const recurso = (o) => Object.freeze({ tipo: TIPO.RECURSO, objetivo: OBJETIVO.CAMPO, ataque: 0, defensa: 0, vida: 0, coste: 0, ...o });
 
 export const CARTAS = Object.freeze({
 
@@ -118,7 +118,7 @@ export const CARTAS = Object.freeze({
   dryosaurus: dino({
     id: 'dryosaurus', rareza: RAREZA.COMUN, clado: CLADO.ORNITOPODO,
     binomial: 'Dryosaurus altus',
-    coste: 1, ataque: 1, defensa: 0, vida: 2, consumoHidrico: 0,
+    coste: 1, ataque: 1, defensa: 0, vida: 2,
     rasgo: RASGO.GREGARIO, rasgoNombre: 'Gregario',
     rasgoTexto: '+1 Poder por cada otro Dryosaurus propio en el campo.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -128,7 +128,7 @@ export const CARTAS = Object.freeze({
   ornitholestes: dino({
     id: 'ornitholestes', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,
     binomial: 'Ornitholestes hermanni',
-    coste: 2, ataque: 2, defensa: 0, vida: 2, consumoHidrico: 0,
+    coste: 2, ataque: 2, defensa: 0, vida: 2,
     rasgo: RASGO.OPORTUNISTA, rasgoNombre: 'Oportunista',
     rasgoTexto: '+1 Vida permanente cada vez que muere un dinosaurio en el campo.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -138,7 +138,7 @@ export const CARTAS = Object.freeze({
   ceratosaurus: dino({
     id: 'ceratosaurus', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,
     binomial: 'Ceratosaurus nasicornis',
-    coste: 3, ataque: 4, defensa: 1, vida: 3, consumoHidrico: 2,
+    coste: 3, ataque: 4, defensa: 1, vida: 3,
     rasgo: RASGO.RIBERENO, rasgoNombre: 'Ribereño',
     rasgoTexto: '+2 Poder mientras el campo activo sea Canal fluvial trenzado.',
     nivel_evidencia: EVIDENCIA.DEBATIDO,
@@ -148,7 +148,7 @@ export const CARTAS = Object.freeze({
   stegosaurus: dino({
     id: 'stegosaurus', rareza: RAREZA.EPICO, clado: CLADO.TIREOFORO,
     binomial: 'Stegosaurus stenops',
-    coste: 4, ataque: 3, defensa: 3, vida: 6, consumoHidrico: 1,
+    coste: 4, ataque: 3, defensa: 3, vida: 6,
     rasgo: RASGO.TAGOMIZADOR, rasgoNombre: 'Tagomizador',
     rasgoTexto: 'Devuelve 2 de daño adicional a quien lo ataque, además del que ya devuelve su clado.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -158,7 +158,7 @@ export const CARTAS = Object.freeze({
   allosaurus: dino({
     id: 'allosaurus', rareza: RAREZA.EPICO, clado: CLADO.TEROPODO,
     binomial: 'Allosaurus fragilis',
-    coste: 5, ataque: 6, defensa: 1, vida: 5, consumoHidrico: 1,
+    coste: 5, ataque: 6, defensa: 1, vida: 5,
     rasgo: RASGO.DEPREDADOR_DOMINANTE, rasgoNombre: 'Depredador dominante',
     rasgoTexto: 'Si mata a su rival, el daño sobrante pasa al hábitat enemigo.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -168,7 +168,7 @@ export const CARTAS = Object.freeze({
   camarasaurus: dino({
     id: 'camarasaurus', rareza: RAREZA.EPICO, clado: CLADO.SAUROPODO,
     binomial: 'Camarasaurus grandis',
-    coste: 5, ataque: 3, defensa: 2, vida: 7, consumoHidrico: 2,
+    coste: 5, ataque: 3, defensa: 2, vida: 7,
     rasgo: RASGO.MIGRADOR, rasgoNombre: 'Migrador',
     rasgoTexto: 'Puede cambiar de ranura en vez de desplegar. Inmune a Sequía estacional.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -178,7 +178,7 @@ export const CARTAS = Object.freeze({
   diplodocus: dino({
     id: 'diplodocus', rareza: RAREZA.LEGENDARIO, clado: CLADO.SAUROPODO,
     binomial: 'Diplodocus carnegii',
-    coste: 5, ataque: 3, defensa: 2, vida: 10, consumoHidrico: 3,
+    coste: 5, ataque: 3, defensa: 2, vida: 10,
     rasgo: RASGO.RAMONEO_BAJO, rasgoNombre: 'Ramoneo bajo',
     rasgoTexto: 'Cura 1 herida al final de cada turno.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -188,7 +188,7 @@ export const CARTAS = Object.freeze({
   apatosaurus: dino({
     id: 'apatosaurus', rareza: RAREZA.LEGENDARIO, clado: CLADO.SAUROPODO,
     binomial: 'Apatosaurus louisae',
-    coste: 7, ataque: 4, defensa: 3, vida: 12, consumoHidrico: 3,
+    coste: 7, ataque: 4, defensa: 3, vida: 12,
     rasgo: RASGO.MASA_COLOSAL, rasgoNombre: 'Masa colosal',
     rasgoTexto: '+1 de Defensa adicional: es la mayor masa del set.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -198,7 +198,7 @@ export const CARTAS = Object.freeze({
   torvosaurus: dino({
     id: 'torvosaurus', rareza: RAREZA.LEGENDARIO, clado: CLADO.TEROPODO,
     binomial: 'Torvosaurus tanneri',
-    coste: 7, ataque: 8, defensa: 1, vida: 6, consumoHidrico: 2,
+    coste: 7, ataque: 8, defensa: 1, vida: 6,
     rasgo: RASGO.ESCASO, rasgoNombre: 'Escaso',
     rasgoTexto: 'Sólo 1 copia en el mazo. No admite adaptaciones.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -210,7 +210,7 @@ export const CARTAS = Object.freeze({
   nodosaurus: dino({
     id: 'nodosaurus', rareza: RAREZA.RARO, clado: CLADO.TIREOFORO,
     binomial: 'Nodosaurus textilis',
-    coste: 4, ataque: 2, defensa: 4, vida: 6, consumoHidrico: 1,
+    coste: 4, ataque: 2, defensa: 4, vida: 6,
     rasgo: RASGO.CORAZA, rasgoNombre: 'Coraza dorsal',
     rasgoTexto: '+2 de Defensa. La coraza protege; no es un arma, a diferencia de la cola del estegosaurio.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -220,7 +220,7 @@ export const CARTAS = Object.freeze({
   riparovenator: dino({
     id: 'riparovenator', rareza: RAREZA.EPICO, clado: CLADO.TEROPODO,
     binomial: 'Riparovenator milnerae',
-    coste: 5, ataque: 5, defensa: 1, vida: 5, consumoHidrico: 1,
+    coste: 5, ataque: 5, defensa: 1, vida: 5,
     rasgo: RASGO.RIBERENO, rasgoNombre: 'Ribereño',
     rasgoTexto: '+2 Poder mientras el Canal fluvial esté en el campo.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -230,7 +230,7 @@ export const CARTAS = Object.freeze({
   lokiceratops: dino({
     id: 'lokiceratops', rareza: RAREZA.EPICO, clado: CLADO.MARGINOCEFALO,
     binomial: 'Lokiceratops rangiformis',
-    coste: 5, ataque: 4, defensa: 2, vida: 7, consumoHidrico: 1,
+    coste: 5, ataque: 4, defensa: 2, vida: 7,
     rasgo: RASGO.GOLA, rasgoNombre: 'Gola ornamentada',
     rasgoTexto: '+2 de Defensa.',
     nivel_evidencia: EVIDENCIA.DEBATIDO,
@@ -240,7 +240,7 @@ export const CARTAS = Object.freeze({
   brachylophosaurus: dino({
     id: 'brachylophosaurus', rareza: RAREZA.EPICO, clado: CLADO.ORNITOPODO,
     binomial: 'Brachylophosaurus canadensis',
-    coste: 4, ataque: 3, defensa: 1, vida: 6, consumoHidrico: 1,
+    coste: 4, ataque: 3, defensa: 1, vida: 6,
     rasgo: RASGO.GREGARIO, rasgoNombre: 'Gregario',
     rasgoTexto: '+1 Poder por cada copia suya que tengas en el campo.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -250,7 +250,7 @@ export const CARTAS = Object.freeze({
   tyrannotitan: dino({
     id: 'tyrannotitan', rareza: RAREZA.LEGENDARIO, clado: CLADO.TEROPODO,
     binomial: 'Tyrannotitan chubutensis',
-    coste: 8, ataque: 9, defensa: 1, vida: 7, consumoHidrico: 2,
+    coste: 8, ataque: 9, defensa: 1, vida: 7,
     rasgo: RASGO.DESGARRO, rasgoNombre: 'Desgarro',
     rasgoTexto: 'A quien hiere no se le cura ninguna herida ese turno.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -260,7 +260,7 @@ export const CARTAS = Object.freeze({
   huaxiadraco: dino({
     id: 'huaxiadraco', rareza: RAREZA.EPICO, clado: CLADO.PTEROSAURIO,
     binomial: 'Huaxiadraco corollatus',
-    coste: 4, ataque: 3, defensa: 0, vida: 3, consumoHidrico: 0,
+    coste: 4, ataque: 3, defensa: 0, vida: 3,
     rasgo: RASGO.VUELO, rasgoNombre: 'Vuelo',
     rasgoTexto: 'Sobrevuela la ranura: golpea siempre al hábitat rival y no recibe daño de combate.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -415,7 +415,7 @@ export const CARTAS = Object.freeze({
 export const ESTACIONES = Object.freeze({
   SEQUIA: Object.freeze({
     id: 'SEQUIA', nombre: 'Sequía estacional',
-    texto: 'Cada dinosaurio debe pagar su Consumo hídrico en heridas. Camarasaurus es inmune; el Canal fluvial protege a todos.',
+    texto: 'Cada dinosaurio recibe 1 herida, y 2 si tiene 7 o más de Vida: el cuerpo grande necesita más agua. Camarasaurus es inmune; el Canal fluvial protege a todos.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Los paleosuelos, los depósitos evaporíticos y la estructura de los yacimientos de la Morrison indican un clima marcadamente estacional, semiárido, con precipitación concentrada.',
   }),

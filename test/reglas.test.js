@@ -296,15 +296,17 @@ test('Carroña abundante también da Biomasa al rival', () => {
 
 // -------------------------------------------------------------- estaciones
 
-test('Sequía: cobra heridas según el Consumo hídrico, y Camarasaurus es inmune', () => {
+test('Sequía: cobra heridas según la Vida, y Camarasaurus es inmune', () => {
   const s = tablero();
   s.turno = BALANCE.turnoPrimeraEstacion;
   s.estacion.mazo = ['SEQUIA'];
-  const diplo = poner(s, 'diplodocus', 0, 0);     // consumo 3
+  const diplo = poner(s, 'diplodocus', 0, 0);     // 10 de Vida: cuerpo grande
+  const dryo = poner(s, 'dryosaurus', 0, 2);      // 2 de Vida
   const cama = poner(s, 'camarasaurus', 0, 1);    // inmune
 
   const r = ejecutar(s, FASE.ESTACION);
-  assert.equal(r.instancias[diplo].heridas, 3);
+  assert.equal(r.instancias[diplo].heridas, BALANCE.estacion.sequiaHeridaGrande);
+  assert.equal(r.instancias[dryo].heridas, BALANCE.estacion.sequiaHerida);
   assert.equal(r.instancias[cama].heridas, 0);
 });
 

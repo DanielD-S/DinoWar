@@ -634,6 +634,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hoja-texto { font-size: 13px; color: var(--tenue); margin-bottom: 10px; }
 .hoja-cuerpo { overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; }
 .hoja-cerrar { margin-top: 12px; min-height: 46px; border: 1px solid var(--borde); border-radius: var(--radio); color: var(--tenue); }
+/* Rendirse vive en la hoja de registro, no en la barra: es una salida, no una
+   jugada, y en la barra competiría con Listo. En rojo porque termina la partida. */
+.hoja-accion {
+  margin-top: 12px; min-height: 46px; border: 1px solid var(--vida-tenue, var(--borde));
+  border-radius: var(--radio); color: var(--vida); font-size: 14px;
+}
+.hoja-accion:active { border-color: var(--vida); }
 
 .ficha-cab { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px; }
 .ficha-arte {
