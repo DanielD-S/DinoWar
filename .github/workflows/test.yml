@@ -1,0 +1,27 @@
+# El sitio publicado es la rama main servida por GitHub Pages: lo que se
+# mergea aquí sale en producción sin más pasos. Esto es lo único que hay
+# entre un test roto y el jugador.
+name: tests
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # Sin dependencias: no hay npm install que hacer, ni lockfile que cachear.
+      - name: Tests del motor y de la colección
+        run: npm test
+      # El set se genera desde el código; si el fichero commiteado no coincide,
+      # es que alguien cambió una carta y no lo regeneró.
+      - name: SET_DE_CARTAS.md está al día
+        run: |
+          node sim/set.js
+          git diff --exit-code SET_DE_CARTAS.md

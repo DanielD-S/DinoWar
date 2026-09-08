@@ -13,7 +13,7 @@ import {
   abrirVisor, cambiarModoVisor, cerrarVisor,
 } from './ui/render.js';
 import { tomarEntrada, soltarEntrada } from './ui/input.js';
-import { detectarFotos, vigilarFotos } from './ui/art.js';
+import { detectarFotos, vigilarFotos, calentarFotos } from './ui/art.js';
 import { montarMeta, abrirColeccion, abrirSobres, abrirMazos, pintarMenu, recompensar } from './ui/meta.js';
 import { mazoActivo } from './ui/almacen.js';
 import { aListaDeMazo } from './data/coleccion.js';
@@ -427,7 +427,7 @@ function iniciar() {
   // Las ilustraciones son opcionales: si están servidas se repinta con ellas,
   // si no, se juega con las siluetas y nadie ve un hueco.
   vigilarFotos();
-  detectarFotos(() => { if (estado) render(estado); });
+  detectarFotos(() => { if (estado) render(estado); }).then(calentarFotos);
   pintarRecord();
   irA(APP.MENU);
 
@@ -507,6 +507,20 @@ function iniciar() {
 
   if (DEBUG) { el.debug.classList.remove('oculta'); bucleDebug(); }
 }
+
+/**
+ * Instalable y jugable sin conexión. Falla en silencio a propósito: servido
+ * desde file:// o en un navegador sin service workers, el juego funciona igual
+ * —no hay nada del otro lado— y no tiene sentido molestar con un error.
+ */
+function registrarServiceWorker() {
+  if (!('serviceWorker' in navigator)) return;
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => { /* se juega igual */ });
+  });
+}
+
+registrarServiceWorker();
 
 window.addEventListener('pagehide', () => {
   cancelarAnimaciones();

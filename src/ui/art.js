@@ -240,6 +240,29 @@ export async function detectarFotos(alCambiar) {
 }
 
 /**
+ * Calienta la caché del service worker con las ilustraciones que aún no se han
+ * pedido, para que sin conexión no aparezcan siluetas donde antes había dibujo.
+ * Sólo si hay service worker: sin él no hay caché que llenar y bajar medio mega
+ * para nada sería cobrarle datos al jugador a cambio de nada.
+ *
+ * Va en tiempo muerto y de una en una: son 470 KB que no corren prisa.
+ */
+export function calentarFotos() {
+  if (!navigator.serviceWorker?.controller) return;
+  const cola = [...conFoto];
+  const siguiente = () => {
+    const id = cola.shift();
+    if (!id) return;
+    fetch(rutaFoto(id), { cache: 'no-cache' }).catch(() => {}).finally(() => ocioso(siguiente));
+  };
+  ocioso(siguiente);
+}
+
+const ocioso = (fn) => (window.requestIdleCallback
+  ? window.requestIdleCallback(fn, { timeout: 4000 })
+  : setTimeout(fn, 300));
+
+/**
  * Una imagen que no carga vuelve a su silueta. Los eventos `error` de <img> no
  * burbujean, así que se escuchan en captura, y con uno basta para toda la
  * página: el índice puede quedarse desfasado y ninguna carta se queda en blanco.
