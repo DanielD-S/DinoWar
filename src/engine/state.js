@@ -33,13 +33,23 @@ export const CAUSA = Object.freeze({
 
 export const rival = (j) => (j === 0 ? 1 : 0);
 
-function nuevaInstancia(iid, cardId, dueno) {
+/**
+ * Una carta puesta en juego. Se exporta para que los tests no tengan que
+ * repetir esta forma: cuando la repetían, añadir un campo aquí dejaba a los
+ * tests construyendo instancias a medias y fallando por sitios raros.
+ */
+export function nuevaInstancia(iid, cardId, dueno) {
   return {
     iid, cardId, dueno,
     ranura: null,
     heridas: 0,
     modAtaque: 0,
     modVida: 0,
+    // Qué le ha cambiado las cifras y quién se lo hizo. modAtaque y modVida son
+    // dos números sin memoria: dicen «−2» pero no de dónde salió, y en la mesa
+    // eso deja al jugador mirando una carta mermada sin saber qué le cayó
+    // encima. Cada apunte es { cardId, ataque, vida }.
+    marcas: [],
     adherencias: [],
     adheridoA: null,
     desplegadoEnTurno: null,
@@ -236,6 +246,75 @@ export function curacionDe(state, iid) {
     cura += BALANCE.efectosCampo.bosqueCura;
   }
   return cura;
+}
+
+/**
+ * Todo lo que separa las cifras de esta unidad de las que trae impresas, con
+ * nombre y signo. Es lo que hace legible una carta modificada: el tablero
+ * enseña «4 · 1 · 2/3» y esto dice por qué no es «4 · 1 · 3».
+ *
+ * Mezcla dos clases de efecto y da igual desde fuera: los permanentes, que ya
+ * están sumados en modAtaque y modVida y se recuerdan en `marcas`, y los vivos,
+ * que se recalculan cada vez porque dependen del campo o de quién sigue en pie.
+ *
+ * @returns {{fuente: string, ataque: number, vida: number, nota: string, veces: number}[]}
+ */
+export function efectosDe(state, iid) {
+  const inst = state.instancias[iid];
+  const c = carta(inst.cardId);
+  if (c.tipo !== TIPO.DINOSAURIO) return [];
+  const fuera = [];
+
+  for (const m of inst.marcas) {
+    if (m.ataque === 0 && m.vida === 0) continue;
+    fuera.push({
+      fuente: carta(m.cardId).binomial,
+      ataque: m.ataque, vida: m.vida, veces: m.veces,
+      nota: m.cardId === inst.cardId ? 'su propio rasgo' : '',
+    });
+  }
+
+  if (c.rasgo === RASGO.GREGARIO) {
+    const companeros = unidadesDe(state, inst.dueno)
+      .filter((o) => o.iid !== inst.iid && o.cardId === inst.cardId).length;
+    if (companeros > 0) {
+      fuera.push({
+        fuente: 'Gregario',
+        ataque: companeros * BALANCE.rasgos.gregarioAtaquePorCompanero, vida: 0, veces: 1,
+        nota: `${companeros} de los suyos en el campo`,
+      });
+    }
+  }
+
+  if (c.rasgo === RASGO.RIBERENO && campoEs(state, RASGO.CAMPO_CANAL)) {
+    fuera.push({
+      fuente: 'Ribereño', ataque: BALANCE.rasgos.riberenoAtaque, vida: 0, veces: 1,
+      nota: 'el campo activo es el canal',
+    });
+  }
+
+  if (!sinSinergias(inst)) {
+    let n = 0;
+    for (const otro of unidadesDe(state, inst.dueno)) {
+      if (otro.cardId === inst.cardId) n += adherenciasCon(state, otro, RASGO.GREGARISMO);
+    }
+    if (n > 0) {
+      fuera.push({
+        fuente: 'Gregarismo', ataque: n * BALANCE.rasgos.gregarismoAtaque, vida: 0, veces: n,
+        nota: 'sobre un congénere',
+      });
+    }
+  }
+
+  return fuera;
+}
+
+/** Cartas pegadas a esta unidad que no le cambian las cifras pero sí lo que hace. */
+export function adheridasA(state, iid) {
+  return state.instancias[iid].adherencias
+    .map((aid) => state.instancias[aid])
+    .filter(Boolean)
+    .map((a) => a.cardId);
 }
 
 /** Ranuras propias libres. */

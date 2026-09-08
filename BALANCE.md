@@ -5,7 +5,7 @@
 - Partidas: **2000** · semilla base **1** · perfiles **heuristica vs heuristica**
 - Ranuras: **5** · Habitat: **90** · Trofeos para ganar: **6**
 - Renta: **1/turno hasta 12**, acumula · Mazo: **50**
-- Tiempo: 56.7 s
+- Tiempo: 64.9 s
 
 ## Objetivos (PLAN_V2.md §8)
 

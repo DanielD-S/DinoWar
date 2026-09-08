@@ -48,6 +48,7 @@ function recogerBajas(s, causa) {
       inst.heridas = 0;
       inst.modAtaque = 0;
       inst.modVida = 0;
+      inst.marcas = [];
       inst.desplegadoEnTurno = null;
       s.jugadores[inst.dueno].descarte.push(iid);
 
@@ -64,10 +65,22 @@ function recogerBajas(s, causa) {
     for (const inst of todasLasUnidades(s)) {
       if (carta(inst.cardId).rasgo !== RASGO.OPORTUNISTA) continue;
       inst.modVida += ganancia;
+      marcar(inst, inst.cardId, 0, ganancia);
       ev(s, 'OPORTUNISTA', { iid: inst.iid, dueno: inst.dueno, vida: ganancia });
     }
   }
   return muertes;
+}
+
+/**
+ * Deja constancia de quién le ha cambiado las cifras a una unidad. Varias
+ * copias de la misma carta se acumulan en un solo apunte: «Competencia trófica
+ * ×2, −4 de Ataque» se lee mejor que dos renglones iguales.
+ */
+export function marcar(inst, cardId, ataque, vida) {
+  const previo = inst.marcas.find((m) => m.cardId === cardId);
+  if (previo) { previo.ataque += ataque; previo.vida += vida; previo.veces += 1; return; }
+  inst.marcas.push({ cardId, ataque, vida, veces: 1 });
 }
 
 export function golpearHabitat(s, bando, cantidad) {
@@ -190,8 +203,12 @@ export function faseRevelacion(s) {
       if (r === RASGO.CRECIMIENTO_ACELERADO) {
         objetivo.modAtaque += BALANCE.rasgos.crecimientoAtaque;
         objetivo.modVida += BALANCE.rasgos.crecimientoVida;
+        marcar(objetivo, inst.cardId, BALANCE.rasgos.crecimientoAtaque, BALANCE.rasgos.crecimientoVida);
       }
-      if (r === RASGO.NEUMATICIDAD) objetivo.modAtaque += BALANCE.rasgos.neumaticidadAtaque;
+      if (r === RASGO.NEUMATICIDAD) {
+        objetivo.modAtaque += BALANCE.rasgos.neumaticidadAtaque;
+        marcar(objetivo, inst.cardId, BALANCE.rasgos.neumaticidadAtaque, 0);
+      }
       ev(s, 'ADAPTACION', {
         jugador: p.jugador, iid: p.iid, cardId: inst.cardId,
         objetivo: objetivo.iid, objetivoCardId: objetivo.cardId,
@@ -216,6 +233,7 @@ function aplicarPresion(s, p) {
     const objetivo = s.instancias[p.objetivo];
     if (!objetivo || objetivo.ranura === null) return;
     objetivo.modAtaque -= BALANCE.rasgos.fracturaAtaque;
+    marcar(objetivo, cardId, -BALANCE.rasgos.fracturaAtaque, 0);
     ev(s, 'PRESION', { jugador: p.jugador, cardId, objetivo: objetivo.iid, objetivoCardId: objetivo.cardId });
 
   } else if (r === RASGO.COMPETENCIA) {
@@ -223,6 +241,7 @@ function aplicarPresion(s, p) {
     for (const inst of unidadesDe(s, contrario)) {
       if (carta(inst.cardId).clado !== p.clado) continue;
       inst.modAtaque -= BALANCE.rasgos.competenciaAtaque;
+      marcar(inst, cardId, -BALANCE.rasgos.competenciaAtaque, 0);
       n += 1;
     }
     ev(s, 'PRESION', { jugador: p.jugador, cardId, clado: p.clado, afectados: n });

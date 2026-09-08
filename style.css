@@ -595,13 +595,27 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .rec .meta { font-size: 10px; color: var(--tenue-2); margin-left: -2px; }
 .rec i { font-style: normal; font-size: 11px; color: var(--tenue); }
 
-/* El turno y la estación, centrados entre las dos filas y con su propio filete:
+/* El turno y el reloj, centrados entre las dos filas y con su propio filete:
    es la línea que separa un bando del otro. */
 .hud-centro {
   display: flex; align-items: center; justify-content: center; gap: 9px;
   padding: 5px 0; border-top: 1px solid var(--superficie-2); border-bottom: 1px solid var(--superficie-2);
 }
 #turno { font-size: 12px; color: var(--texto-2); white-space: nowrap; }
+
+/* Reloj de partida. Cifra tabular para que no baile al pasar de 10:00 a 9:59,
+   y apagado hasta que apremia: es información de fondo casi toda la partida. */
+.reloj {
+  font-variant-numeric: tabular-nums; font-size: 12px; letter-spacing: .02em;
+  color: var(--tenue); padding: 1px 7px; border-radius: 10px;
+  box-shadow: 0 0 0 1px var(--linea);
+}
+.reloj.apremia {
+  color: var(--peligro); box-shadow: 0 0 0 1px var(--peligro);
+  animation: latir 1s ease-in-out infinite;
+}
+@keyframes latir { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { .reloj.apremia { animation: none; } }
 
 
 /* Lista del descarte: qué ha jugado y perdido cada bando. */
@@ -1133,6 +1147,28 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .cifra.ca i::before { background: var(--acento-claro); }
 .cifra.cd i::before { background: var(--agua); }
 .cifra.cv i::before { background: var(--vida); }
+
+/* Lo que le está pasando a esta copia concreta. Va entre la cabecera y el
+   rasgo porque es lo que decide la jugada de ahora, no lo que dice la carta. */
+.ficha-juego {
+  margin: 12px 0; padding: 11px 12px; border-radius: var(--radio);
+  background: rgba(244, 236, 224, .035); box-shadow: 0 0 0 1px var(--linea);
+}
+.ficha-juego h3 {
+  font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--tenue); margin-bottom: 8px;
+}
+.ficha-juego .ficha-cifras { grid-template-columns: repeat(3, 1fr); margin-top: 0; }
+.ficha-efectos { list-style: none; margin-top: 10px; display: grid; gap: 6px; }
+.ficha-efectos li {
+  display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: baseline;
+  font-size: 12px; color: var(--tenue); padding-left: 8px;
+  border-left: 2px solid var(--linea);
+}
+.ficha-efectos li b { font-weight: 500; color: var(--texto-2); }
+.ficha-efectos li.bueno { border-left-color: var(--bio); }
+.ficha-efectos li.malo { border-left-color: var(--peligro); }
+.ficha-efectos li.malo b { color: var(--peligro); }
 
 .ficha-rasgo {
   border-radius: var(--radio); padding: 10px 12px; margin-bottom: 12px;

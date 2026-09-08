@@ -110,6 +110,11 @@ def escribir():
             c.font = TINTA if editable and not hueco else FIJO
             c.fill = AMARILLO if editable and not hueco else GRIS
             c.border = MARCO
+            # Los textos van con formato de texto explícito: un rasgo que empieza
+            # por «+1 Ataque…» o por «-2 Poder…» lo lee Excel como una fórmula
+            # rota y se niega a aceptarlo.
+            if nombre in ('Rasgo', 'Texto del rasgo', 'id', 'Carta', 'Familia'):
+                c.number_format = '@'
             if nombre == 'Texto del rasgo':
                 c.alignment = Alignment(wrap_text=True, vertical='top')
             elif nombre in ('Coste actual', 'Coste nuevo', 'Δ', 'A', 'D', 'V'):

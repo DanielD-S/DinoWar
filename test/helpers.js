@@ -1,6 +1,6 @@
 // Utilidades para montar escenarios de campo sin jugar una partida entera.
 
-import { crearPartida } from '../src/engine/state.js';
+import { crearPartida, nuevaInstancia } from '../src/engine/state.js';
 import { reduce, ACCION } from '../src/engine/actions.js';
 
 /**
@@ -19,12 +19,7 @@ export function tablero(seed = 42) {
 
 function nueva(s, cardId, dueno, extra = {}) {
   const iid = s.siguienteInstId++;
-  s.instancias[iid] = {
-    iid, cardId, dueno,
-    ranura: null, heridas: 0, modAtaque: 0, modVida: 0,
-    adherencias: [], adheridoA: null, desplegadoEnTurno: null,
-    ...extra,
-  };
+  s.instancias[iid] = { ...nuevaInstancia(iid, cardId, dueno), ...extra };
   return iid;
 }
 

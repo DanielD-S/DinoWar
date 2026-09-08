@@ -35,6 +35,12 @@ export const BALANCE = Object.freeze({
   // Con despliegue simultáneo no hay ventaja de iniciativa que compensar.
   compensacionSegundoJugador: Object.freeze({ cartas: 0 }),
 
+  // Reloj de partida al modo del ajedrez: un presupuesto para toda la partida,
+  // no por turno. Sólo corre mientras te toca decidir a ti, así que las
+  // animaciones y el turno de la IA no te cuestan tiempo. En segundos.
+  relojPorJugador: 15 * 60,
+  relojAviso: 60,             // por debajo de esto, el marcador apremia
+
   // Como en Pokémon: en el primer turno no se ataca. Con 1 sola Biomasa era
   // normal que sólo un bando llegase a desplegar, y ese golpeaba un habitat
   // vacío gratis. La apertura pasa a ser de montar, no de arañar daño.

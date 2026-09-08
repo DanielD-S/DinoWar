@@ -6,6 +6,7 @@ import {
 } from '../data/cards.js';
 import {
   unidadEn, unidadesDe, ataqueEfectivo, reduccionDe, vidaMaxima, vidaActual,
+  efectosDe, adheridasA,
 } from '../engine/state.js';
 import { arte, hayFoto, rutaFoto } from './art.js';
 
@@ -29,7 +30,7 @@ export function montar() {
     btnColeccion: id('btn-coleccion'), btnSobres: id('btn-sobres'), btnMazos: id('btn-mazos'),
     rHabitat: id('r-habitat'), pHabitat: id('p-habitat'), rBarra: id('r-barra'), pBarra: id('p-barra'),
     rPila: id('r-pila'), pPila: id('p-pila'),
-    turno: id('turno'),
+    turno: id('turno'), reloj: id('reloj'),
     campo: id('campo'), franjaCampo: id('btn-campo'), franjaNota: id('franja-nota'),
     franjaMias: id('btn-mias'),
     comprometidas: id('comprometidas'), comprometidasCuerpo: id('comprometidas-cuerpo'),
@@ -387,7 +388,67 @@ export function mensaje(texto, aviso = false) {
 
 // ------------------------------------------------------------------ fichas
 
-export function fichaHTML(cardId) {
+/**
+ * Lo que le está pasando a ESTA copia y no a la carta del set: qué le han
+ * jugado encima, qué le suma el campo y en cuánto le deja las cifras. Sin
+ * esto, una carta con un punto en la esquina decía «algo te han hecho» y no
+ * había forma de saber el qué.
+ */
+function estadoEnJuegoHTML(estado, iid) {
+  const inst = estado?.instancias?.[iid];
+  if (!inst || inst.ranura === null) return '';
+
+  const c = carta(inst.cardId);
+  if (c.tipo !== TIPO.DINOSAURIO) return '';
+
+  const efectos = efectosDe(estado, iid);
+  const pegadas = adheridasA(estado, iid).filter((id) => {
+    // Las que ya salen como efecto no se repiten; quedan las que no tocan
+    // cifras, como los Gastrolitos, que curan y no se verían en ningún sitio.
+    const b = carta(id).binomial;
+    return !efectos.some((e) => e.fuente === b);
+  });
+
+  const atq = ataqueEfectivo(estado, iid);
+  const vm = vidaMaxima(estado, iid);
+  const va = vidaActual(estado, iid);
+  const heridas = vm - va;
+
+  if (efectos.length === 0 && pegadas.length === 0 && heridas === 0) return '';
+
+  // Signo menos de verdad (U+2212), no un guion: alineado con el «+» y sin
+  // el hueco que deja el guion delante de una cifra.
+  const signo = (n) => (n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`);
+  const cifra = (e) => [
+    e.ataque ? `${signo(e.ataque)} de Ataque` : '',
+    e.vida ? `${signo(e.vida)} de Vida` : '',
+  ].filter(Boolean).join(' y ');
+
+  const filas = efectos.map((e) => `<li class="${e.ataque + e.vida < 0 ? 'malo' : 'bueno'}">
+      <b>${e.fuente}${e.veces > 1 ? ` ×${e.veces}` : ''}</b>
+      <span>${cifra(e)}${e.nota ? ` · ${e.nota}` : ''}</span></li>`);
+
+  for (const id of pegadas) {
+    filas.push(`<li class="bueno"><b>${carta(id).binomial}</b><span>${carta(id).rasgoTexto}</span></li>`);
+  }
+  if (heridas > 0) {
+    filas.push(`<li class="malo"><b>Heridas</b><span>${heridas} de ${vm} de Vida${
+      heridas >= vm ? '' : ` · le quedan ${va}`}</span></li>`);
+  }
+
+  return `
+    <div class="ficha-juego">
+      <h3>En el campo ahora mismo</h3>
+      <div class="ficha-cifras">
+        ${statHTML('a', 'Ataque', atq, atq === c.ataque ? '' : (atq > c.ataque ? ' mejorado' : ' mermado'))}
+        ${statHTML('d', 'Defensa', reduccionDe(estado, iid))}
+        ${statHTML('v', 'Vida', `${va}${heridas ? `<em>/${vm}</em>` : ''}`, heridas ? ' herido' : '')}
+      </div>
+      <ul class="ficha-efectos">${filas.join('')}</ul>
+    </div>`;
+}
+
+export function fichaHTML(cardId, iid = null, estado = null) {
   const c = carta(cardId);
   const dino = c.tipo === TIPO.DINOSAURIO;
   const familia = dino ? `Dinosaurio · ${CLADO_NOMBRE[c.clado]}` : TIPO_NOMBRE[c.tipo];
@@ -411,6 +472,7 @@ export function fichaHTML(cardId) {
       </div>
       <button class="ficha-ampliar" data-zoom="${cardId}" data-modo="carta">Ver la carta en grande</button>
     </div>
+    ${iid === null ? '' : estadoEnJuegoHTML(estado, iid)}
     <div class="ficha-rasgo">
       <h3>${c.rasgoNombre}</h3>
       <p>${c.rasgoTexto}</p>
@@ -624,6 +686,14 @@ export function ayudaHTML() {
       En el turno 1 puedes <b>cambiar la mano entera</b>. El primer cambio es gratis y roba las mismas
       cartas; a partir de ahí cada cambio roba una menos. La mano vuelve al mazo y se baraja todo,
       así que nadie puede contar lo que has devuelto.
+    </p>
+
+    <div class="ayuda-h">El reloj</div>
+    <p class="ayuda-p">
+      Cada bando tiene <b>${Math.round(BALANCE.relojPorJugador / 60)} minutos para toda la partida</b>, no por turno,
+      como en ajedrez: puedes pensarte una jugada difícil si luego resuelves las fáciles al vuelo.
+      Sólo corre <b>mientras te toca decidir a ti</b> —ni las animaciones ni el turno del rival te cuestan
+      tiempo— y se para si dejas la pestaña. Quien lo agota, pierde.
     </p>
 
     <div class="ayuda-h">Cómo va un turno</div>

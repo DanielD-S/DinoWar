@@ -8,7 +8,7 @@ import { CARTAS, CLADO, RASGO, carta } from '../src/data/cards.js';
 import {
   crearPartida, FASE, MOTIVO_FIN,
   unidadEn, unidadesDe, ataqueEfectivo, vidaActual, danoEntre,
-  espinasDe, reduccionDe, rentaDe, curacionDe,
+  espinasDe, reduccionDe, rentaDe, curacionDe, efectosDe, adheridasA,
 } from '../src/engine/state.js';
 import { reduce, ACCION, avanzar, validar } from '../src/engine/actions.js';
 import { tablero, poner, enMano, ejecutar, vivo } from './helpers.js';
@@ -494,4 +494,65 @@ test('Reparto inicial y arranque del turno 1', () => {
   const tras = avanzar(s);
   assert.equal(tras.fase, FASE.DESPLIEGUE);
   assert.equal(tras.jugadores[0].biomasa, 1, 'turno 1 → 1 de Biomasa');
+});
+
+// ------------------------------------------------------- lectura de efectos
+
+test('efectosDe dice quién le ha cambiado las cifras a una unidad', () => {
+  const s = tablero();
+  s.fase = FASE.DESPLIEGUE;
+  s.jugadores[0].biomasa = 9;
+  const victima = poner(s, 'allosaurus', 1, 0);
+  const fractura = enMano(s, 'fractura', 0);
+
+  const jugada = reduce(s, { tipo: ACCION.EVENTO, jugador: 0, iid: fractura, objetivo: victima });
+  const r = ejecutar(jugada, FASE.REVELACION);
+
+  const efectos = efectosDe(r, victima);
+  assert.equal(efectos.length, 1, 'una sola causa');
+  assert.equal(efectos[0].fuente, carta('fractura').binomial);
+  assert.equal(efectos[0].ataque, -BALANCE.rasgos.fracturaAtaque);
+  assert.equal(
+    ataqueEfectivo(r, victima),
+    carta('allosaurus').ataque - BALANCE.rasgos.fracturaAtaque,
+    'lo que dice el efecto y lo que vale la carta tienen que cuadrar',
+  );
+});
+
+test('efectosDe suma las copias de una misma carta en un solo apunte', () => {
+  const s = tablero();
+  s.fase = FASE.DESPLIEGUE;
+  s.jugadores[0].biomasa = 20;
+  const victima = poner(s, 'allosaurus', 1, 0);
+
+  let r = s;
+  for (let i = 0; i < 2; i++) {
+    const f = enMano(r, 'fractura', 0);
+    r = reduce(r, { tipo: ACCION.EVENTO, jugador: 0, iid: f, objetivo: victima });
+  }
+  r = ejecutar(r, FASE.REVELACION);
+
+  const efectos = efectosDe(r, victima);
+  assert.equal(efectos.length, 1, 'dos Fracturas son un renglón, no dos');
+  assert.equal(efectos[0].veces, 2);
+  assert.equal(efectos[0].ataque, -2 * BALANCE.rasgos.fracturaAtaque);
+});
+
+test('efectosDe recoge lo que depende del campo, no sólo lo permanente', () => {
+  const s = tablero();
+  const cera = poner(s, 'ceratosaurus', 0, 0);
+  assert.deepEqual(efectosDe(s, cera), [], 'sin campo no hay nada que explicar');
+
+  s.campo = 'canal';
+  const efectos = efectosDe(s, cera);
+  assert.equal(efectos.length, 1);
+  assert.equal(efectos[0].ataque, BALANCE.rasgos.riberenoAtaque);
+  assert.match(efectos[0].nota, /canal/);
+});
+
+test('Una unidad sin nada encima no tiene efectos que enseñar', () => {
+  const s = tablero();
+  const iid = poner(s, 'stegosaurus', 0, 0);
+  assert.deepEqual(efectosDe(s, iid), []);
+  assert.deepEqual(adheridasA(s, iid), []);
 });

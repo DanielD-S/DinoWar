@@ -13,6 +13,7 @@ import {
   abrirVisor, cambiarModoVisor, cerrarVisor, abrirComprometidas,
 } from './ui/render.js';
 import { tomarEntrada, soltarEntrada } from './ui/input.js';
+import * as reloj from './ui/reloj.js';
 import {
   montarTutorial, empezarTutorial, terminarTutorial, tutorialHecho, tutorialActivo,
   tutorialEspera, pasoTutorial,
@@ -203,12 +204,46 @@ function turnoDelJugador() {
   el.btnListo.disabled = false;
   const puede = legales(estado, JUGADOR).some((a) => a.tipo !== ACCION.PASAR);
   const bio = estado.jugadores[JUGADOR].biomasa;
-  // La renta no es una hucha: cada turno la Biomasa se REEMPLAZA por el número
-  // de turno. Verlo sólo como una cifra en el marcador se lee como un fallo de
-  // contador, así que el turno se abre diciéndolo.
-  mensaje(!puede ? `Sin Biomasa suficiente (${bio}). Pulsa Listo.`
+  mensaje(!puede ? `Sin Biomasa suficiente (${bio}). Pulsa Listo y se te guarda para el turno que viene.`
     : estado.turno === 1 ? 'Arrastra cartas al campo. Mantén pulsada una para ver su ficha.'
-      : `Cobras ${bio} de Biomasa este turno. No se acumula: lo que no gastes se pierde.`);
+      : `Tienes ${bio} de Biomasa. Lo que no gastes se guarda.`);
+
+  // El reloj sólo corre mientras te toca decidir a ti: ni las animaciones ni
+  // el turno de la máquina te cuestan tiempo.
+  reloj.correr(JUGADOR);
+}
+
+/** El marcador del reloj. Sólo aparece cuando hay partida en marcha. */
+function pintarReloj() {
+  const ms = reloj.restanteDe(JUGADOR);
+  el.reloj.hidden = false;
+  el.reloj.textContent = reloj.comoTexto(ms);
+  el.reloj.classList.toggle('apremia', ms <= BALANCE.relojAviso * 1000);
+}
+
+/**
+ * Se acabó el tiempo. Como la rendición, se resuelve en la interfaz: no hay
+ * un estado de «partida perdida por reloj» en las reglas y no hace falta
+ * inventarlo — cuenta como derrota y paga lo que paga una derrota.
+ */
+function seAcaboElTiempo() {
+  if (app !== APP.PLAYING && app !== APP.RESOLVING) return;
+  pintarReloj();
+  cerrarHojas();
+  if (tutorialActivo()) terminarTutorial();
+  irA(APP.GAME_OVER);
+  soltarEntrada();
+  cancelarAnimaciones();
+
+  pintarFin({
+    via: 'Se agotó el tiempo',
+    gane: false,
+    titular: 'Derrota',
+    frase: `Cada bando tiene ${Math.round(BALANCE.relojPorJugador / 60)} minutos para toda la partida, y gastaste los tuyos.`,
+  });
+  anotarResultado(false, estado.turno);
+  el.finPremio.textContent = `+${recompensar(false)} dinomonedas`;
+  sonido('pierde');
 }
 
 function jugarIA() {
@@ -224,6 +259,7 @@ function jugarIA() {
 
 async function alPulsarListo() {
   if (!interactivo()) return;
+  reloj.detener();
   desbloquear();
   el.btnListo.disabled = true;
   el.mulligan.classList.add('oculta');
@@ -365,6 +401,7 @@ function abrirLog() {
  * único que la rendición tiene que decidir.
  */
 function rendirse() {
+  reloj.parar();
   cerrarHojas();
   if (tutorialActivo()) terminarTutorial();
   irA(APP.GAME_OVER);
@@ -417,6 +454,7 @@ function preguntarRendicion() {
 }
 
 function finPartida() {
+  reloj.parar();
   irA(APP.GAME_OVER);
   soltarEntrada();
   cancelarAnimaciones();
@@ -463,6 +501,8 @@ function nuevaPartida() {
   // simulador. Así el balance publicado sigue significando algo.
   estado = crearPartida(s, [aListaDeMazo(mazoActivo()), null]);
   rngIA = semilla(s ^ 0x5bf03635);
+  reloj.arrancar({ alAgotarse: seAcaboElTiempo, alLatir: pintarReloj });
+  pintarReloj();
 
   irA(APP.PLAYING);
   render(estado);
@@ -471,7 +511,7 @@ function nuevaPartida() {
     interactivo,
     admite,
     soltar,
-    ficha: (cardId) => abrirFicha(fichaHTML(cardId)),
+    ficha: (cardId, iid = null) => abrirFicha(fichaHTML(cardId, iid, estado)),
   });
   bucle();
 }

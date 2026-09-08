@@ -100,7 +100,7 @@ function alBajar(e) {
   clearTimeout(temporizadorLargo);
   temporizadorLargo = setTimeout(() => {
     if (gesto && !gesto.arrastrando) {
-      api.ficha(gesto.cardId);
+      api.ficha(gesto.cardId, gesto.iid);
       gesto.consumido = true;
       gesto.nodo.classList.remove('alzada');
     }
@@ -132,7 +132,7 @@ function alSoltar(e) {
   limpiarDestinos();
 
   if (g.consumido) return;
-  if (!g.arrastrando) { api.ficha(g.cardId); return; }
+  if (!g.arrastrando) { api.ficha(g.cardId, g.iid); return; }
 
   const d = destinoBajo(e.clientX, e.clientY);
   api.soltar(g.iid, g.cardId, d);
@@ -155,7 +155,7 @@ function alCancelar() {
 
 function alTocarCampo(e) {
   const c = e.target.closest('.carta--ranura');
-  if (c?.dataset.card) { api.ficha(c.dataset.card); return; }
+  if (c?.dataset.card) { api.ficha(c.dataset.card, Number(c.dataset.iid)); return; }
   const f = e.target.closest('.franja-campo');
   if (f?.dataset.card) api.ficha(f.dataset.card);
 }
