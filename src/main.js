@@ -4,7 +4,7 @@
 import { BALANCE } from './data/balance.js';
 import { TIPO, OBJETIVO, CLADO, CLADO_NOMBRE, ESTACIONES, carta } from './data/cards.js';
 import { crearPartida, vistaDe, FASE, MOTIVO_FIN, unidadesDe } from './engine/state.js';
-import { reduce, ACCION, legales, validar } from './engine/actions.js';
+import { reduce, ACCION, legales, validar, cartasTrasMulligan } from './engine/actions.js';
 import { decidir, PERFIL } from './engine/ai.js';
 import { semilla } from './engine/rng.js';
 import {
@@ -90,6 +90,9 @@ function aplicar(accion) {
   if (motivo) { mensaje(motivo, true); sonido('error'); return false; }
   estado = reduce(estado, accion);
   render(estado);
+  // Comprometer una carta cierra el cambio de mano: a partir de ahí el rival ya
+  // sabe algo de lo que llevas.
+  el.mulligan.classList.add('oculta');
   sonido('carta');
   return true;
 }
@@ -175,9 +178,27 @@ function pedirClado(iid, c) {
 
 // -------------------------------------------------------------- turno y bucle
 
+/**
+ * La mano inicial se decide antes de jugar. Se ofrece sola en el turno 1: una
+ * mano de la que no puedes pagar nada no es mala suerte, es un turno perdido y
+ * el jugador no tenía ninguna manera de evitarlo.
+ */
+function pintarMulligan() {
+  const puede = estado && !validar(estado, { tipo: ACCION.MULLIGAN, jugador: JUGADOR });
+  el.mulligan.classList.toggle('oculta', !puede);
+  if (!puede) return;
+  const jug = estado.jugadores[JUGADOR];
+  const cuantas = cartasTrasMulligan(jug);
+  el.mulliganTexto.innerHTML = jug.mulligans === 0
+    ? `¿Te sirve esta mano? Puedes cambiarla y robar <b>${cuantas}</b> nuevas, sin coste.`
+    : `Van ${jug.mulligans}. El siguiente cambio roba <b>${cuantas}</b>: cada cambio cuesta una carta.`;
+  el.btnMulligan.textContent = `Cambiar · ${cuantas}`;
+}
+
 function turnoDelJugador() {
   irA(APP.PLAYING);
   render(estado);
+  pintarMulligan();
   pasoTutorial('turno', { turno: estado.turno });
   el.btnListo.disabled = false;
   const puede = legales(estado, JUGADOR).some((a) => a.tipo !== ACCION.PASAR);
@@ -205,6 +226,7 @@ async function alPulsarListo() {
   if (!interactivo()) return;
   desbloquear();
   el.btnListo.disabled = true;
+  el.mulligan.classList.add('oculta');
   cerrarHojas();
   estado = reduce(estado, { tipo: ACCION.PASAR, jugador: JUGADOR });
   jugarIA();
@@ -538,6 +560,16 @@ function iniciar() {
     irA(APP.MENU);
   });
   el.btnRendirse.addEventListener('click', preguntarRendicion);
+
+  el.btnQuedarse.addEventListener('click', () => { el.mulligan.classList.add('oculta'); });
+  el.btnMulligan.addEventListener('click', () => {
+    if (!interactivo()) return;
+    const antes = estado.jugadores[JUGADOR].mano.length;
+    if (!aplicar({ tipo: ACCION.MULLIGAN, jugador: JUGADOR })) return;
+    const ahora = estado.jugadores[JUGADOR].mano.length;
+    mensaje(`Mano nueva: ${ahora} cartas${ahora < antes ? ` (una menos que antes)` : ''}.`);
+    pintarMulligan();
+  });
 
   pintarDificultad();
   el.dificultad.addEventListener('click', (e) => {

@@ -314,6 +314,52 @@ test('Ranuras cruzadas: cada uno pega al hábitat contrario, y con el Ataque a 0
   assert.equal(avance.dano, 0, 'el evento se emite igual, con 0: el registro lo cuenta');
 });
 
+// --------------------------------------------------------------- mulligan
+
+test('Cambiar la mano: el primero sale gratis y los siguientes cuestan una carta', () => {
+  // avanzar() deja la partida en el despliegue del turno 1, con el robo hecho:
+  // es el momento en que el jugador ve su mano por primera vez.
+  const s = avanzar(crearPartida(7));
+  assert.equal(s.fase, FASE.DESPLIEGUE);
+  const inicial = s.jugadores[0].mano.length;
+
+  const uno = reduce(s, { tipo: ACCION.MULLIGAN, jugador: 0 });
+  assert.equal(uno.jugadores[0].mano.length, inicial, 'el primero roba las mismas');
+  assert.equal(uno.jugadores[0].mulligans, 1);
+
+  const dos = reduce(uno, { tipo: ACCION.MULLIGAN, jugador: 0 });
+  assert.equal(dos.jugadores[0].mano.length, inicial - 1, 'el segundo, una menos');
+  const tres = reduce(dos, { tipo: ACCION.MULLIGAN, jugador: 0 });
+  assert.equal(tres.jugadores[0].mano.length, inicial - 2);
+});
+
+test('La mano vuelve al mazo entera: ni se pierden cartas ni se cuelan copias', () => {
+  const s = avanzar(crearPartida(11));
+  const antes = s.jugadores[0].mano.length + s.jugadores[0].mazo.length;
+
+  const r = reduce(s, { tipo: ACCION.MULLIGAN, jugador: 0 });
+  assert.equal(r.jugadores[0].mano.length + r.jugadores[0].mazo.length, antes);
+  const iids = new Set([...r.jugadores[0].mano, ...r.jugadores[0].mazo]);
+  assert.equal(iids.size, antes, 'sin duplicados');
+});
+
+test('La mano sólo se cambia en el turno 1 y antes de comprometer nada', () => {
+  const s = avanzar(crearPartida(3));
+  s.jugadores[0].biomasa = 9;
+
+  const tarde = structuredClone(s);
+  tarde.turno = 2;
+  assert.ok(validar(tarde, { tipo: ACCION.MULLIGAN, jugador: 0 }));
+
+  // Con una carta ya comprometida tampoco: el rival ya sabe algo de tu mano.
+  const dino = s.jugadores[0].mano.find((iid) => CARTAS[s.instancias[iid].cardId].tipo === 'DINOSAURIO'
+    && CARTAS[s.instancias[iid].cardId].coste <= 9);
+  if (dino) {
+    const puesto = reduce(s, { tipo: ACCION.DESPLEGAR, jugador: 0, iid: dino, ranura: 0 });
+    assert.ok(validar(puesto, { tipo: ACCION.MULLIGAN, jugador: 0 }));
+  }
+});
+
 // ---------------------------------------------------------------- retirar
 
 test('Retirar devuelve la carta a la mano y la Biomasa, y libera la ranura', () => {

@@ -54,6 +54,10 @@ al hábitat.
 
 Ver **[SET_DE_CARTAS.md](SET_DE_CARTAS.md)** para las 31 cartas con su referencia.
 
+La mano inicial se puede **cambiar entera en el turno 1**: el primer cambio es
+gratis y roba las mismas cartas, y cada cambio siguiente roba una menos. Una mano
+de la que no puedes pagar nada no es mala suerte, es un turno perdido.
+
 ## Colección, sobres y mazos
 
 Empiezas con las 50 cartas del mazo de referencia y 240 dinomonedas. Se ganan
@@ -83,7 +87,7 @@ python -m http.server 8000
 y abrir <http://localhost:8000>.
 
 ```bash
-npm test        # 57 tests del motor y de la colección
+npm test        # 60 tests del motor y de la colección
 npm run sim     # 2.000 partidas IA vs IA → BALANCE.md
 node sim/set.js # regenera SET_DE_CARTAS.md desde el código
 ```
@@ -120,7 +124,7 @@ src/engine/    motor de reglas: (estado, acción) → estado. Puro, sin DOM, cor
 src/ui/        interfaz: sólo lee el estado, nunca lo muta. almacen.js es el
                único fichero que toca localStorage
 sim/           simulador de balance y generador del set
-test/          57 tests
+test/          60 tests
 tools/         utilidades de desarrollo, fuera del juego servido
 v1/            versión anterior, jugable y congelada (ver v1/LEEME.md)
 ```

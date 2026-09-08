@@ -40,6 +40,8 @@ export function montar() {
     btnJugar: id('btn-jugar'), btnOtra: id('btn-otra'), btnFinMenu: id('btn-fin-menu'),
     dificultad: id('dificultad'),
     btnRendirse: id('btn-rendirse'),
+    mulligan: id('mulligan'), mulliganTexto: id('mulligan-texto'),
+    btnMulligan: id('btn-mulligan'), btnQuedarse: id('btn-quedarse'),
     arrastre: id('arrastre'),
     ficha: id('ficha'), fichaCuerpo: id('ficha-cuerpo'), fichaCerrar: id('ficha-cerrar'),
     visor: id('visor'), visorLienzo: id('visor-lienzo'), visorModos: id('visor-modos'),
@@ -600,6 +602,13 @@ export function ayudaHTML() {
       <li><span class="k">Clima</span><span class="v">Un paleoambiente activo a la vez, que cambia las reglas <b>para los dos</b>. Se suelta en la franja central.</span></li>
       <li><span class="k">Recurso</span><span class="v">Biomasa al instante a cambio de un inconveniente. Se juega <b>boca arriba</b>: el rival la ve.</span></li>
     </ul>
+
+    <div class="ayuda-h">La mano inicial</div>
+    <p class="ayuda-p">
+      En el turno 1 puedes <b>cambiar la mano entera</b>. El primer cambio es gratis y roba las mismas
+      cartas; a partir de ahí cada cambio roba una menos. La mano vuelve al mazo y se baraja todo,
+      así que nadie puede contar lo que has devuelto.
+    </p>
 
     <div class="ayuda-h">Cómo va un turno</div>
     <ol class="ayuda-pasos">

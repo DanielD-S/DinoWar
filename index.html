@@ -108,6 +108,16 @@
       </div>
     </main>
 
+    <!-- La mano inicial se decide antes de jugar, y con la mano a la vista: por
+         eso es una barra sobre el pie y no una hoja que la tape. -->
+    <div id="mulligan" class="mulligan oculta" role="group" aria-label="Mano inicial">
+      <p id="mulligan-texto"></p>
+      <div class="mulligan-botones">
+        <button id="btn-mulligan" class="mulligan-cambiar"></button>
+        <button id="btn-quedarse" class="mulligan-quedarse">Me la quedo</button>
+      </div>
+    </div>
+
     <div id="tutorial" class="tutorial oculta" role="status">
       <p id="tutorial-texto"></p>
       <div class="tutorial-pie">

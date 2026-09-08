@@ -253,6 +253,11 @@ function peorCartaDeMano(vista, j) {
 }
 
 /** @returns {{rng:number, accion:object|null}} */
+/** ¿Hay algo en la mano que se pueda pagar en los dos primeros turnos? */
+function manoImpagable(vista, j) {
+  return !vista.jugadores[j].mano.some((iid) => carta(vista.instancias[iid].cardId).coste <= 2);
+}
+
 export function decidir(vista, j, rng, perfil = PERFIL.HEURISTICA) {
   const opciones = legales(vista, j);
   if (opciones.length === 0) return { rng, accion: null };
@@ -265,6 +270,13 @@ export function decidir(vista, j, rng, perfil = PERFIL.HEURISTICA) {
   if (vista.fase === FASE.DESCARTE) {
     return { rng, accion: { tipo: ACCION.DESCARTAR, jugador: j, iid: peorCartaDeMano(vista, j) } };
   }
+
+  // Cambiar la mano inicial es una decisión de sí o no, no una jugada que se
+  // pueda puntuar contra las demás: se resuelve con una regla y aparte. Una
+  // mano de la que no puedes pagar nada en los dos primeros turnos no es una
+  // mano, es un turno perdido.
+  const cambiar = opciones.find((a) => a.tipo === ACCION.MULLIGAN);
+  if (cambiar && manoImpagable(vista, j)) return { rng, accion: cambiar };
 
   let mejor = null;
   let mejorValor = IA.umbralJugar;

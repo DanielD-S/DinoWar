@@ -580,3 +580,50 @@ Queda sin portar, y no por olvido:
 - El tutorial era una cola estricta: un turno 1 sin Biomasa para desplegar lo
   dejaba parado para siempre en el paso del despliegue. Pasa a ser una lista de
   pasos pendientes y se enseña el primero que encaje con lo que acaba de pasar.
+
+---
+
+## 16. V2-7 — la mano inicial y la renta
+
+### 16.1 Cambiar la mano
+
+Petición del autor, y con razón: si en el turno 1 te salen siete cartas de coste
+alto no puedes hacer nada, y no había ninguna manera de arreglarlo. Eso no es
+mala suerte, es un turno perdido que el jugador no podía evitar.
+
+En el turno 1, y sólo antes de comprometer nada, la mano se puede cambiar
+entera. El primer cambio roba las mismas cartas; a partir de ahí, una menos por
+cambio. Sin penalización, el jugador barajaría hasta encontrar la mano perfecta
+y el azar dejaría de contar.
+
+La mano vuelve al mazo y **se baraja todo**: si volviera al fondo, contar cartas
+bastaría para saber qué le viene al rival. Y sólo antes de comprometer una
+carta, porque a partir de ahí el rival ya sabe algo de lo que llevas.
+
+La IA lo usa con una regla y no con la heurística de puntuar jugadas: cambia si
+no tiene nada que pueda pagar en los dos primeros turnos. Medido sobre 2.000, no
+mueve el balance: 11,02 turnos, inicial 50,9 %, bola 61,4 %, reparto 38/40/22.
+
+### 16.2 La renta acumulativa, medida
+
+El autor pidió por segunda vez que la Biomasa **sume 1 por turno** en vez de
+valer el número de turno: «en el turno 3 tengo 1 y en el 4 tengo 4; debería
+tener 2». Antes de cambiarlo se midió, sobre 800 partidas, exactamente eso —
+renta de +1 acumulativa:
+
+| | Actual | +1 acumulativo |
+|---|---|---|
+| Duración | 11,0 turnos | **14,6** (máximo 30) |
+| Reparto de victorias | 36/40/24 | **1 / 91 / 9** |
+| Cartas descalibradas | 1 de 25 | **24 de 25** |
+| Unidades vivas por bando | 2,24 | 1,41 |
+
+*Tyrannotitan* se juega el **0 %** de las veces; *Apatosaurus* y *Torvosaurus*,
+el 1 %. La razón es aritmética: con renta acumulativa de +1, el presupuesto de
+toda la partida son unas once Biomasas, y ahora mismo el jugador gasta unas
+sesenta. Con costes de 0 a 8, la mitad superior del set deja de existir y el
+registro fósil desaparece como vía de victoria.
+
+Para que esa regla funcione habría que **recostar las 31 cartas** a una escala
+de 0 a 2, que es tanto como rehacer el juego. Queda medido y escrito; la
+decisión es del autor.

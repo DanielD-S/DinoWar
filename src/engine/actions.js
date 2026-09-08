@@ -8,6 +8,7 @@ import {
   FASE, FASES_INTERACTIVAS, rival,
   ranuraValida, unidadesDe, ranurasLibres, sinSinergias,
 } from './state.js';
+import { barajar } from './rng.js';
 import {
   ev, descartarDeMano,
   faseEstacion, faseRenta, faseRobo, faseRevelacion, faseCombate, faseChequeo,
@@ -20,12 +21,22 @@ export const ACCION = Object.freeze({
   CLIMA: 'CLIMA',
   RECURSO: 'RECURSO',
   RETIRAR: 'RETIRAR',
+  MULLIGAN: 'MULLIGAN',
   PASAR: 'PASAR',
   DESCARTAR: 'DESCARTAR',
   AVANZAR: 'AVANZAR',
 });
 
 const CLADOS = Object.values(CLADO);
+
+/**
+ * Cuántas cartas roba este cambio de mano. El primero sale gratis y a partir de
+ * ahí cuesta una carta: sin penalización, el jugador barajaría hasta encontrar
+ * la mano perfecta y el azar dejaría de existir.
+ */
+export function cartasTrasMulligan(jug) {
+  return BALANCE.manoInicial + BALANCE.robo.normal - jug.mulligans;
+}
 
 /** Ranura que ocupará una unidad tras revelar, contando el despliegue oculto. */
 function ranuraProyectada(s, jugador, iid) {
@@ -58,6 +69,15 @@ export function validar(s, a) {
   if (s.fase !== FASE.DESPLIEGUE) return 'fuera de la fase de despliegue';
   if (jug.listo) return 'ya has pasado';
   if (a.tipo === ACCION.PASAR) return null;
+
+  // Cambiar la mano inicial. Sólo en el turno 1 y antes de tocar nada: una vez
+  // has comprometido una carta, el rival ya sabe algo de tu mano.
+  if (a.tipo === ACCION.MULLIGAN) {
+    if (s.turno !== 1) return 'la mano sólo se cambia en el primer turno';
+    if (jug.pendientes.length > 0) return 'ya has comprometido una carta este turno';
+    if (cartasTrasMulligan(jug) <= 0) return 'no quedan cambios de mano';
+    return null;
+  }
 
   const inst = s.instancias[a.iid];
   if (!inst) return 'carta inexistente';
@@ -240,6 +260,20 @@ export function reduce(state, action) {
       break;
     }
 
+    case ACCION.MULLIGAN: {
+      const cuantas = cartasTrasMulligan(jug);
+      // La mano vuelve al mazo y se baraja todo: si volviera al fondo, contar
+      // cartas bastaría para saber qué le viene al rival.
+      const b = barajar([...jug.mazo, ...jug.mano], s.rng);
+      s.rng = b.rng;
+      jug.mazo = b.lista;
+      jug.mano = [];
+      jug.mulligans += 1;
+      for (let k = 0; k < cuantas && jug.mazo.length > 0; k++) jug.mano.push(jug.mazo.shift());
+      ev(s, 'MULLIGAN', { jugador: action.jugador, cartas: jug.mano.length, numero: jug.mulligans });
+      break;
+    }
+
     case ACCION.PASAR:
       jug.listo = true;
       if (s.jugadores.every((j) => j.listo)) s.fase = FASE.REVELACION;
@@ -280,6 +314,9 @@ export function legales(state, j) {
 
   if (s.fase !== FASE.DESPLIEGUE || jug.listo) return salida;
   salida.push({ tipo: ACCION.PASAR, jugador: j });
+
+  const cambiar = { tipo: ACCION.MULLIGAN, jugador: j };
+  if (!validar(s, cambiar)) salida.push(cambiar);
 
   const libres = ranurasLibres(s, j).filter((r) => !ranuraReservada(s, j, r));
   const propias = [

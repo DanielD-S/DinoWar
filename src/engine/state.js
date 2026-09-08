@@ -82,6 +82,7 @@ export function crearPartida(seedEntrada = 1, mazos = null) {
       pendientes: [],
       listo: false,
       sinCartas: false,
+      mulligans: 0,
     });
   }
 
