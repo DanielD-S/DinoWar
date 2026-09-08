@@ -467,15 +467,22 @@ banda para que pase sería cambiar el termómetro.
 
 ### 14.5 Pendiente
 
-- **Tamaño del mazo.** Medido: a 40 cartas las seis métricas siguen dentro
-  (10,3 turnos, inicial 51,7 %, bola 56,9 %) y el reparto se mueve a
-  30/29/41 — la extinción pasa a ser la vía dominante. Es una decisión de
-  diseño, no de balance, y cambia los mazos guardados de quien ya juega.
 - **Cuatro cartas sin medir**: bosque, llanura, carroña y lago. Están en la
   colección y no en el mazo de referencia.
 - **Sin CI**: `npm test`, `npm run sim` y `node sim/set.js` se corren a mano.
 
-### 14.6 Estado
+### 14.6 El mazo se queda en 50
+
+Se planteó bajarlo. Medido, a 40 cartas las seis métricas siguen dentro
+—10,3 turnos, inicial 51,7 %, bola 56,9 %— pero el reparto se mueve a
+**30/29/41**: la extinción deja de ser una de tres vías y pasa a ser la vía. No
+es un problema de balance, es otro juego, y además invalidaría los mazos
+guardados de quien ya juega.
+
+**Decisión del autor del proyecto: se queda en 50.** Queda medido por si algún
+día interesa un formato corto.
+
+### 14.7 Estado
 
 | Hito | Estado |
 |---|---|
