@@ -14,8 +14,11 @@
 //
 // Al cambiar cualquier fichero servido hay que subir VERSION: activa la limpieza
 // de las cachés anteriores.
-const VERSION = 'dinowar-v1';
-const ESENCIALES = ['./', './index.html', './style.css', './manifest.json', './src/main.js'];
+const VERSION = 'dinowar-v2';
+const ESENCIALES = [
+  './', './index.html', './style.css', './manifest.json', './src/main.js',
+  './assets/fuentes/inter-latin.woff2',
+];
 
 const esIlustracion = (url) => url.pathname.includes('/assets/dinos/');
 

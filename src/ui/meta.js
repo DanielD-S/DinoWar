@@ -120,15 +120,28 @@ function pintarColeccion() {
   dom.rejilla.innerHTML = cartas.map((c) => {
     const n = p.cartas[c.id] ?? 0;
     const extra = sobra[c.id] ?? 0;
-    return `<div class="col-carta ${esDino(c) ? 'dino' : ''} ${n === 0 ? 'ninguna' : ''}"
-                 role="button" tabindex="0" data-card="${c.id}">
+    // Sin ejemplares no se enseña la carta apagada: se enseña su hueco. Una
+    // carta al 30 % de opacidad se lee como un fallo de pintado.
+    if (n === 0) {
+      return `<div class="col-carta ninguna" role="button" tabindex="0" data-card="${c.id}">
+        <span class="col-hueco">◆</span>
+        <div class="col-pie">
+          <div class="col-nombre">${nombreHTML(c)}</div>
+          <div class="col-meta">Sin ejemplares</div>
+        </div>
+      </div>`;
+    }
+    return `<div class="col-carta ${esDino(c) ? 'dino' : ''}" role="button" tabindex="0" data-card="${c.id}">
       <div class="col-arte">${arte(c.id)}</div>
+      <span class="col-copias${extra ? ' sobra' : ''}">${n}/${limiteDe(c.id)}</span>
       <div class="col-pie">
         <div class="col-nombre">${nombreHTML(c)}</div>
-        <div class="col-cuenta">
-          <span class="col-rar rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span>
-          <b>${n}<span class="col-rar">/${limiteDe(c.id)}</span>${extra ? `<span class="sobra"> +${extra}</span>` : ''}</b>
-        </div>
+        <div class="col-meta"><span class="col-rar rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span> · ${familia(c)}</div>
+        ${esDino(c) ? `<div class="c-stats fila">
+          <span class="st st-a"><i>A</i><b>${c.ataque}</b></span>
+          <span class="st st-d"><i>D</i><b>${c.defensa}</b></span>
+          <span class="st st-v"><i>V</i><b>${c.vida}</b></span>
+        </div>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -182,7 +195,7 @@ function pintarSobres(tirada = null, nuevas = new Set()) {
     dom.tirada.className = 'sobre-tirada cerrado';
     dom.tirada.innerHTML = `<div class="sobre-paquete" id="sobre-paquete">
         <div class="sobre-solapa"></div>
-        <div class="sobre-sello">DW</div>
+        <div class="sobre-sello">◆</div>
       </div>
       <p class="sobre-vacio">Cinco cartas al azar.<br>
         Al menos una ${RAREZA_NOMBRE[GARANTIA].toLowerCase()} o mejor, garantizada.</p>`;

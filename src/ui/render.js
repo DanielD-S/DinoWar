@@ -1,7 +1,9 @@
 // DinoWar — renderizado. Lee el estado, nunca lo muta.
 
 import { BALANCE } from '../data/balance.js';
-import { CARTAS, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, ESTACIONES, carta } from '../data/cards.js';
+import {
+  CARTAS, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, RAREZA_NOMBRE, ESTACIONES, carta,
+} from '../data/cards.js';
 import {
   unidadEn, unidadesDe, ataqueEfectivo, reduccionDe, vidaMaxima, vidaActual,
 } from '../engine/state.js';
@@ -26,6 +28,7 @@ export function montar() {
     coleccion: id('coleccion'), sobres: id('sobres'), mazos: id('mazos'),
     btnColeccion: id('btn-coleccion'), btnSobres: id('btn-sobres'), btnMazos: id('btn-mazos'),
     rHabitat: id('r-habitat'), pHabitat: id('p-habitat'), rBarra: id('r-barra'), pBarra: id('p-barra'),
+    rPila: id('r-pila'), pPila: id('p-pila'),
     turno: id('turno'), estacion: id('btn-estacion'),
     campo: id('campo'), franjaCampo: id('btn-campo'), franjaNota: id('franja-nota'),
     franjaMias: id('btn-mias'),
@@ -47,12 +50,17 @@ export function montar() {
     eleccionTexto: id('eleccion-texto'), eleccionCuerpo: id('eleccion-cuerpo'),
     eleccionCerrar: id('eleccion-cerrar'),
     finTitulo: id('fin-titulo'), finDetalle: id('fin-detalle'),
+    finVia: id('fin-via'), finResumen: id('fin-resumen'), finPremio: id('fin-premio'),
     debug: id('debug'), record: id('menu-record'),
   });
 
-  // El objetivo va junto al marcador: «0/8» dice a qué se juega, «0» no.
+  // El objetivo va junto al marcador: «0/8» dice a qué se juega, «0» no. Lo
+  // mismo con el hábitat: sin el máximo, la cifra no dice cuánto queda.
   for (const m of document.querySelectorAll('[data-meta="trofeos"]')) {
     m.textContent = `/${BALANCE.trofeosParaGanar}`;
+  }
+  for (const m of document.querySelectorAll('[data-meta="habitat"]')) {
+    m.textContent = `/${BALANCE.vidaHabitat}`;
   }
 
   for (const bando of [0, 1]) {
@@ -65,8 +73,17 @@ export function montar() {
 
 // ----------------------------------------------------------------- cartas
 
+/**
+ * La cara de una carta. Misma estructura en la ranura, en la mano y en el
+ * visor: cambia el tamaño, no la composición.
+ *
+ * Las tres cifras llevan glifo y color fijos —A ámbar, D acero, V arcilla—
+ * porque sin eso eran tres números iguales en fila y nadie sabía cuál era cuál.
+ * La Vida sólo enseña el máximo cuando hay heridas: «5» de sano, «2/6» herido.
+ */
 function marcoCarta(estado, cardId, {
-  poder = null, defensa = null, vidaAct = null, vidaMax = null, adaptada = false, mermada = false,
+  poder = null, defensa = null, vidaAct = null, vidaMax = null,
+  adaptada = false, mermada = false, grande = false,
 } = {}) {
   const c = carta(cardId);
   const dino = c.tipo === TIPO.DINOSAURIO;
@@ -81,17 +98,19 @@ function marcoCarta(estado, cardId, {
   if (dino && atq < c.ataque) clasePoder = ' mermado';
 
   return `
-    <div class="c-top">
-      <span class="c-coste">${c.coste}</span>
-      ${dino ? `<span class="c-def">${def}</span>` : ''}
-      <span class="c-poder${clasePoder}">${dino ? atq : ''}</span>
-    </div>
     <div class="c-arte">${arte(cardId)}</div>
-    <div class="c-nombre">${c.binomial}</div>
-    ${dino ? `<div class="c-vida${herido ? ' herido' : ''}">
-      <span class="c-vida-barra"><i style="width:${Math.max(0, (100 * va) / vm).toFixed(0)}%"></i></span>
-      <span class="c-vida-num">${va}/${vm}</span>
-    </div>` : ''}
+    <span class="c-coste">${c.coste}</span>
+    ${grande ? `<span class="c-rareza rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span>` : ''}
+    <div class="c-cuerpo">
+      <div class="c-nombre">${c.binomial}</div>
+      ${grande ? `<div class="c-clado">${dino ? CLADO_NOMBRE[c.clado] : TIPO_NOMBRE[c.tipo]}</div>` : ''}
+      ${dino ? `<div class="c-stats">
+        <span class="st st-a${clasePoder}"><i>A</i><b>${atq}</b></span>
+        <span class="st st-d"><i>D</i><b>${def}</b></span>
+        <span class="st st-v${herido ? ' herido' : ''}"><i>V</i><b>${va}${herido ? `<em>/${vm}</em>` : ''}</b></span>
+      </div>` : `<div class="c-tipo">${TIPO_NOMBRE[c.tipo]}</div>`}
+      ${grande ? `<div class="c-rasgo"><b>${c.rasgoNombre}</b><p>${c.rasgoTexto}</p></div>` : ''}
+    </div>
     ${adaptada ? '<span class="c-adap"></span>' : ''}
     ${mermada ? '<span class="c-merma" title="Bajo una presión rival"></span>' : ''}`;
 }
@@ -168,20 +187,20 @@ function actualizarCarta(estado, nodo, inst) {
   const va = vidaActual(estado, inst.iid);
   const vm = vidaMaxima(estado, inst.iid);
 
-  const poderNodo = nodo.querySelector('.c-poder');
-  if (poderNodo && poderNodo.textContent !== String(p)) poderNodo.textContent = p;
-  if (poderNodo) {
-    poderNodo.classList.toggle('mejorado', p > c.ataque);
-    poderNodo.classList.toggle('mermado', p < c.ataque);
+  const atqNodo = nodo.querySelector('.st-a');
+  if (atqNodo) {
+    atqNodo.querySelector('b').textContent = p;
+    atqNodo.classList.toggle('mejorado', p > c.ataque);
+    atqNodo.classList.toggle('mermado', p < c.ataque);
   }
-  const defNodo = nodo.querySelector('.c-def');
+  const defNodo = nodo.querySelector('.st-d b');
   if (defNodo) defNodo.textContent = reduccionDe(estado, inst.iid);
 
-  const vidaNodo = nodo.querySelector('.c-vida');
+  const vidaNodo = nodo.querySelector('.st-v');
   if (vidaNodo) {
-    vidaNodo.querySelector('i').style.width = `${Math.max(0, (100 * va) / vm).toFixed(0)}%`;
-    vidaNodo.querySelector('.c-vida-num').textContent = `${va}/${vm}`;
-    vidaNodo.classList.toggle('herido', va < vm);
+    const herido = va < vm;
+    vidaNodo.querySelector('b').innerHTML = `${va}${herido ? `<em>/${vm}</em>` : ''}`;
+    vidaNodo.classList.toggle('herido', herido);
   }
 
   const tiene = !!nodo.querySelector('.c-adap');
@@ -281,26 +300,14 @@ function pintarMano(estado) {
     el.mano.appendChild(nodoCarta(estado, estado.instancias[iid].cardId, { variante: 'mano', iid }));
   }
 
-  const nodos = mano.map((iid) => el.mano.querySelector(`[data-iid="${iid}"]`));
-  const n = nodos.length;
-  const centro = (n - 1) / 2;
-  // El presupuesto descuenta el ancho de carta y el ensanche del giro.
-  const ancho = el.mano.clientWidth || 360;
-  const separacion = Math.min(52, (ancho - 110) / Math.max(1, n - 1 || 1));
-  const paso = n > 1 ? Math.min(6.5, 30 / n) : 0;
+  // Sin abanico: la mano es una fila y el orden es el del mazo. Lo único que
+  // se calcula aquí es qué cartas no puedes pagar.
   const biomasa = estado.jugadores[JUGADOR].biomasa;
-
-  nodos.forEach((nodo, i) => {
-    if (!nodo) return;
-    const d = i - centro;
-    // El descuelgue se limita: con 9 cartas en mano (7 de límite + 2 de robo)
-    // la curva cuadrática metía las cartas de los extremos dentro del botón.
-    const caida = Math.min(14, Math.abs(d) ** 2 * 2.2);
-    nodo.style.transform =
-      `translateX(${(d * separacion).toFixed(1)}px) translateY(${caida.toFixed(1)}px) rotate(${(d * paso).toFixed(2)}deg)`;
-    nodo.style.zIndex = String(10 + i);
+  for (const iid of mano) {
+    const nodo = el.mano.querySelector(`[data-iid="${iid}"]`);
+    if (!nodo) continue;
     nodo.classList.toggle('impagable', carta(nodo.dataset.card).coste > biomasa);
-  });
+  }
 }
 
 // ----------------------------------------------------------------- general
@@ -321,8 +328,8 @@ export function render(estado) {
   el.turno.textContent = `Turno ${estado.turno}`;
 
   // Quedarse sin mazo es perder: hay que poder verlo venir.
-  el.pMazo.parentElement.classList.toggle('aviso', p.mazo.length <= 4);
-  el.rMazo.parentElement.classList.toggle('aviso', r.mazo.length <= 4);
+  el.pPila.classList.toggle('aviso', p.mazo.length <= 4);
+  el.rPila.classList.toggle('aviso', r.mazo.length <= 4);
 
   const est = estado.estacion.actual;
   el.estacion.hidden = !est;
@@ -357,12 +364,12 @@ export function fichaHTML(cardId) {
       </button>
       <div>
         <div class="ficha-binomial${dino ? '' : ' recto'}">${c.binomial}</div>
-        <div class="ficha-clado">${familia}</div>
+        <div class="ficha-clado">${familia} <span class="ficha-rareza rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span></div>
         <div class="ficha-cifras">
-          <span>Coste <b>${c.coste}</b></span>
-          ${dino ? `<span>Ataque <b>${c.ataque}</b></span>` : ''}
-          ${dino ? `<span>Defensa <b>${c.defensa}</b></span>` : ''}
-          ${dino ? `<span>Vida <b>${c.vida}</b></span>` : ''}
+          <span class="cifra"><i>Coste</i><b>${c.coste}</b></span>
+          ${dino ? `<span class="cifra ca"><i>Ataque</i><b>${c.ataque}</b></span>` : ''}
+          ${dino ? `<span class="cifra cd"><i>Defensa</i><b>${c.defensa}</b></span>` : ''}
+          ${dino ? `<span class="cifra cv"><i>Vida</i><b>${c.vida}</b></span>` : ''}
         </div>
         <button class="ficha-ampliar" data-zoom="${cardId}" data-modo="carta">Ver la carta en grande</button>
       </div>
@@ -398,7 +405,7 @@ export function abrirFicha(html) {
  */
 export function cartaGrandeHTML(cardId) {
   return `<div class="visor-marco">
-    <div class="carta${claseFamilia(cardId)}">${marcoCarta(null, cardId)}</div>
+    <div class="carta carta--visor${claseFamilia(cardId)}">${marcoCarta(null, cardId, { grande: true })}</div>
   </div>`;
 }
 
@@ -533,18 +540,12 @@ export function ayudaHTML() {
 
     <div class="ayuda-h">Qué significa cada número</div>
     <div class="anatomia">
-      <div class="anatomia-carta">
-        ${n.outerHTML}
-        <span class="llamada" style="left:-6px; top:-6px">1</span>
-        <span class="llamada" style="left:32px; top:-6px">2</span>
-        <span class="llamada" style="right:-6px; top:-6px">3</span>
-        <span class="llamada" style="right:-6px; bottom:-6px">4</span>
-      </div>
+      <div class="anatomia-carta">${n.outerHTML}</div>
       <div class="anatomia-notas">
-        <div><span class="n">1</span><span><b>Coste</b> en Biomasa.</span></div>
-        <div><span class="n">2</span><span><b>Defensa</b>: se resta de <b>cada</b> golpe que recibe, no de la Vida.</span></div>
-        <div><span class="n">3</span><span><b>Ataque</b>: daño que reparte, una vez por turno.</span></div>
-        <div><span class="n">4</span><span><b>Vida</b>: heridas que aguanta antes de morir. <b>No se curan</b> salvo carta que lo diga.</span></div>
+        <div><span class="n c">${c.coste}</span><span><b>Coste</b> en Biomasa. Va en el círculo, sobre el arte.</span></div>
+        <div><span class="n st-a">A</span><span><b>Ataque</b>: daño que reparte, una vez por turno.</span></div>
+        <div><span class="n st-d">D</span><span><b>Defensa</b>: se resta de <b>cada</b> golpe que recibe, no de la Vida.</span></div>
+        <div><span class="n st-v">V</span><span><b>Vida</b>: heridas que aguanta antes de morir. Herida enseña <b>actual/máximo</b>, y <b>no se cura</b> salvo carta que lo diga.</span></div>
       </div>
     </div>
 

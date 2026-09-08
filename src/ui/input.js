@@ -138,6 +138,21 @@ function alSoltar(e) {
   api.soltar(g.iid, g.cardId, d);
 }
 
+/**
+ * El navegador se ha quedado el gesto: la mano se desplaza de lado y esto ya no
+ * es un toque. Se limpia sin abrir nada — antes esto caía en alSoltar y cada
+ * desplazamiento de la mano abría una ficha.
+ */
+function alCancelar() {
+  if (!gesto) return;
+  const g = gesto;
+  gesto = null;
+  clearTimeout(temporizadorLargo);
+  g.nodo.classList.remove('alzada', 'arrastrando');
+  el.arrastre.classList.add('oculta');
+  limpiarDestinos();
+}
+
 function alTocarCampo(e) {
   const c = e.target.closest('.carta--ranura');
   if (c?.dataset.card) { api.ficha(c.dataset.card); return; }
@@ -152,7 +167,7 @@ export function tomarEntrada(nuevaApi) {
   on(el.mano, 'pointerdown', alBajar);
   on(el.mano, 'pointermove', alMover, { passive: false });
   on(el.mano, 'pointerup', alSoltar);
-  on(el.mano, 'pointercancel', alSoltar);
+  on(el.mano, 'pointercancel', alCancelar);
   on(el.campo, 'pointerup', alTocarCampo);
   on(document, 'contextmenu', (e) => e.preventDefault());
   on(document, 'gesturestart', (e) => e.preventDefault());

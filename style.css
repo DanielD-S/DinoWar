@@ -1,22 +1,50 @@
-/* DinoWar — hoja única. Móvil vertical, 360×640 a 430×932. */
+/* DinoWar — hoja única. Móvil vertical, 360×640 a 430×932.
+ *
+ * Paleta «resina»: un solo acento cálido sobre tierra oscura. Los nombres
+ * antiguos de las variables se conservan —los usa medio fichero— pero apuntan a
+ * los valores nuevos, así que el cambio de piel no obliga a renombrar clases. */
+
+/* Inter va vendorizada, no traída de un CDN: el juego no pide nada a terceros.
+ * Es la variable, un solo fichero de 48 KB para los pesos 300–600. */
+@font-face {
+  font-family: 'Inter';
+  src: url('assets/fuentes/inter-latin.woff2') format('woff2');
+  font-weight: 300 600;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
-  --fondo: #14110d;
-  --panel: #1f1a13;
-  --panel-alto: #2a2318;
-  --borde: #3d3427;
-  --texto: #ece3d2;
-  --tenue: #9a8c74;
+  --fondo: #191410;
+  --fondo-alto: #1d1710;
+  --panel: #1d1610;
+  --panel-alto: #241c15;
+  --superficie-2: #2a2118;
+  --linea: #33291d;
+  --borde: #4a3c2a;
+  --borde-fuerte: #8a6c38;
+  --texto: #f4ece0;
+  --texto-2: #d6c8b4;
+  --tenue: #a6957e;
+  --tenue-2: #8a7a64;
+  --apagado: #6e6151;
 
-  --bio: #d0a53a;
-  --trof: #dd7c33;
-  --vida: #c05f40;
-  --agua: #5aa7c9;
+  --bio: #d9a441;
+  --acento-claro: #e8c079;
+  --acento-vivo: #f4d99b;
+  --trof: #e8c079;
+  --vida: #e08a67;
+  --peligro: #c8674a;
+  --agua: #b2b6ca;
 
-  --propio: #8fae6e;
-  --propio-tenue: #33402a;
-  --rival: #c05f40;
-  --rival-tenue: #46281e;
+  --propio: #e8c079;
+  --propio-tenue: #8a6c38;
+  --rival: #c8674a;
+  --rival-tenue: #5a3a2c;
+
+  /* Escamas: el motivo del reverso, de las ranuras ocultas y de las pilas. */
+  --escamas: radial-gradient(circle at 50% 100%, rgba(217,164,65,.13) 0 5px, transparent 6px),
+             radial-gradient(circle at 50% 100%, rgba(217,164,65,.13) 0 5px, transparent 6px);
 
   --radio: 8px;
   --seguro-arriba: env(safe-area-inset-top, 0px);
@@ -41,8 +69,9 @@ html, body {
 body {
   background: var(--fondo);
   color: var(--texto);
-  font: 400 15px/1.35 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font: 400 15px/1.4 'Inter', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* El juego es vertical: en pantallas anchas se queda en su marco, centrado. */
@@ -54,7 +83,7 @@ body {
   padding: var(--seguro-arriba) var(--seguro-der) var(--seguro-abajo) var(--seguro-izq);
   display: flex;
   flex-direction: column;
-  background: var(--fondo);
+  background: linear-gradient(180deg, var(--fondo-alto), var(--fondo) 45%, var(--fondo-alto));
   overflow: hidden;
 }
 
@@ -76,59 +105,148 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* ------------------------------------------------------------------ menú */
 
-#menu, #fin {
-  padding: calc(var(--seguro-arriba) + 24px) 24px calc(var(--seguro-abajo) + 24px);
-  align-items: center; justify-content: center;
-  background: radial-gradient(120% 80% at 50% 0%, #2b2317 0%, transparent 60%), var(--fondo);
+/* Héroe a sangre y acciones ancladas abajo: el menú deja de ser una lista
+   centrada de botones y pasa a ser una portada. */
+#menu {
+  position: absolute; inset: 0; overflow: hidden;
+  background: var(--fondo);
 }
-.menu-caja { max-width: 380px; text-align: center; }
-.menu-epigrafe { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--tenue); margin-bottom: 10px; }
+.menu-heroe {
+  position: absolute; inset: 0; width: 100%; height: 70%;
+  object-fit: cover; object-position: 44% 42%;
+  filter: saturate(.85) contrast(1.05) brightness(.72) sepia(.18);
+}
+.menu-velo {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(25,20,16,.55) 0%, rgba(25,20,16,.1) 24%,
+              rgba(25,20,16,.86) 50%, var(--fondo) 64%);
+}
+.menu-caja {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  padding: calc(var(--seguro-arriba) + 48px) 24px calc(var(--seguro-abajo) + 22px);
+  text-align: left;
+}
+.menu-epigrafe {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--acento-claro);
+}
+.menu-epigrafe .filete { width: 18px; height: 1px; background: var(--bio); flex: 0 0 auto; }
 .menu-caja h1 {
-  font-size: clamp(38px, 13vw, 54px); line-height: 1; font-weight: 700;
-  letter-spacing: -.03em; color: var(--bio); margin-bottom: 18px;
+  margin-top: 8px;
+  font-size: clamp(42px, 13vw, 52px); line-height: .94; font-weight: 500;
+  letter-spacing: -.035em; color: var(--texto);
 }
-.menu-lema { color: var(--texto); margin-bottom: 26px; }
-.menu-lema b { color: var(--trof); }
+.menu-caja h1 span { color: var(--acento-claro); }
+.menu-lema {
+  margin-top: 10px; max-width: 270px;
+  font-size: 14px; line-height: 1.5; color: var(--texto-2);
+}
+.menu-acciones { margin-top: auto; display: flex; flex-direction: column; gap: 9px; }
 
+/* Botón perfilado, no macizo: el ámbar sólido gritaba más que el juego. */
 .boton-grande {
-  display: block; width: 100%; min-height: 52px; padding: 14px 20px;
-  background: var(--bio); color: #191308; font-weight: 700; font-size: 17px; border-radius: var(--radio);
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  width: 100%; min-height: 52px; padding: 15px 20px;
+  background: rgba(217,164,65,.12); border: 1px solid var(--bio); border-radius: var(--radio);
+  color: var(--texto); font-size: 17px;
+  box-shadow: 0 0 24px rgba(217,164,65,.18);
 }
-.boton-grande:active { transform: translateY(1px); filter: brightness(.92); }
+.boton-grande span { color: var(--acento-claro); }
+.boton-grande:active { background: rgba(217,164,65,.22); }
+/* Deshabilitado: sin brillo y sin acento. Un botón apagado no puede seguir
+   pareciendo la acción principal. */
+.boton-grande[disabled] {
+  opacity: .55; box-shadow: none; background: none;
+  border-color: var(--borde); color: var(--tenue-2);
+}
 
 .boton-secundario {
-  display: block; width: 100%; margin-top: 10px; min-height: 46px; padding: 12px;
-  border: 1px solid var(--borde); border-radius: var(--radio); color: var(--tenue); font-size: 14px;
+  display: block; width: 100%; min-height: 46px; padding: 13px 6px;
+  background: rgba(244,236,224,.04); border: 1px solid var(--borde); border-radius: var(--radio);
+  color: var(--texto-2); font-size: 13px;
 }
-.boton-secundario:active { border-color: var(--bio); color: var(--texto); }
+.boton-secundario:active { border-color: var(--borde-fuerte); color: var(--texto); }
 
-.menu-dificultad {
-  display: flex; align-items: center; gap: 10px; margin-top: 14px;
-  font-size: 12px; color: var(--tenue); text-transform: uppercase; letter-spacing: .08em;
+.boton-fantasma {
+  flex: 1; min-height: 42px; padding: 12px 6px;
+  border: 1px solid transparent; border-radius: var(--radio);
+  color: var(--tenue); font-size: 13px;
 }
-.menu-chips { display: flex; gap: 6px; }
-.menu-chips .chip { padding: 5px 12px; }
-
-.menu-record { margin-top: 14px; color: var(--tenue); font-size: 13px; min-height: 18px; }
-.menu-nota {
-  margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--borde);
-  color: var(--tenue); font-size: 12px; line-height: 1.5;
-}
-
-/* ------------------------------------------------- colección, sobres, mazos */
+.boton-fantasma:active { border-color: var(--borde); color: var(--texto-2); }
 
 .menu-fila { display: flex; gap: 8px; }
-.menu-fila .boton-secundario { margin-top: 10px; }
-.menu-monedas { margin-top: 12px; color: var(--tenue); font-size: 12px; }
-.menu-monedas b { color: var(--bio); }
+.menu-fila .boton-secundario { flex: 1; }
+
+.menu-dificultad {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--tenue);
+}
+.menu-chips { display: flex; gap: 6px; }
+.menu-chips .chip { padding: 5px 12px; letter-spacing: 0; text-transform: none; font-size: 12px; }
+
+.menu-monedas {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: 12px; color: var(--tenue);
+}
+.menu-monedas b { color: var(--texto); font-weight: 500; }
+.menu-monedas .punto {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--acento-claro);
+  box-shadow: 0 0 8px rgba(232,192,121,.6);
+}
+.menu-monedas .sep { width: 1px; height: 12px; background: var(--borde); }
+.menu-record {
+  text-align: center; color: var(--tenue-2); font-size: 11px; min-height: 14px;
+}
+
+/* Fin de partida: misma portada, otro titular. */
+#fin {
+  padding: calc(var(--seguro-arriba) + 24px) 24px calc(var(--seguro-abajo) + 24px);
+  align-items: center; justify-content: center;
+  background: radial-gradient(120% 70% at 50% 0%, rgba(217,164,65,.10), transparent 60%), var(--fondo);
+}
+#fin .menu-caja {
+  position: static; padding: 0; max-width: 380px; text-align: center;
+  align-items: stretch; gap: 0;
+}
+#fin h1 {
+  font-size: 46px; line-height: 1; font-weight: 500; letter-spacing: -.03em;
+}
+.fin-via {
+  font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--acento-claro); margin-bottom: 10px;
+}
+#fin .menu-lema { max-width: none; margin: 12px 0 22px; text-align: center; font-size: 14px; }
+
+.fin-resumen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.fin-caja {
+  padding: 10px 6px; border-radius: var(--radio);
+  border: 1px solid var(--linea); background: rgba(244,236,224,.03);
+}
+.fin-caja b { display: block; font-size: 19px; font-weight: 500; }
+.fin-caja b .sep { color: var(--tenue-2); margin: 0 4px; font-size: 14px; }
+.fin-caja i {
+  font-style: normal; display: block; margin-top: 3px;
+  font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--tenue);
+}
+
+.fin-premio {
+  padding: 10px; margin-bottom: 16px; border-radius: var(--radio);
+  border: 1px solid var(--borde-fuerte); background: rgba(217,164,65,.08);
+  color: var(--acento-claro); font-size: 13px;
+}
+#fin .boton-secundario { margin-top: 9px; }
+
+/* ------------------------------------------------- colección, sobres, mazos */
 
 .meta { background: var(--fondo); }
 .meta-barra {
   display: flex; align-items: center; gap: 10px; flex: 0 0 auto;
-  padding: calc(var(--seguro-arriba) + 10px) 12px 10px;
-  border-bottom: 1px solid var(--borde);
+  padding: calc(var(--seguro-arriba) + 14px) 16px 14px;
+  border-bottom: 1px solid var(--linea);
+  background: rgba(15,11,8,.55);
 }
-.meta-barra h2 { flex: 1; font-size: 16px; font-weight: 700; text-align: center; }
+.meta-barra h2 { flex: 1; font-size: 19px; font-weight: 500; letter-spacing: -.01em; text-align: center; }
 .meta-volver { color: var(--tenue); font-size: 14px; padding: 6px 4px; }
 .meta-volver:active { color: var(--texto); }
 .meta-moneda { font-size: 13px; color: var(--tenue); min-width: 54px; text-align: right; }
@@ -140,61 +258,83 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   touch-action: pan-y; padding: 10px 12px 14px;
 }
 .meta-pie {
-  flex: 0 0 auto; padding: 10px 12px calc(var(--seguro-abajo) + 12px);
-  border-top: 1px solid var(--borde); background: var(--panel);
+  flex: 0 0 auto; padding: 12px 16px calc(var(--seguro-abajo) + 14px);
+  border-top: 1px solid var(--linea); background: rgba(15,11,8,.6);
 }
 .meta-nota { color: var(--tenue); font-size: 12px; line-height: 1.45; margin-bottom: 8px; }
-.meta-nota.mal { color: var(--vida); }
-.boton-grande[disabled] { opacity: .4; }
+.meta-nota.mal { color: var(--peligro); }
+
 
 .meta-filtros {
   flex: 0 0 auto; display: flex; gap: 6px; padding: 9px 12px 0; flex-wrap: wrap;
 }
 .chip {
-  padding: 6px 11px; border: 1px solid var(--borde); border-radius: 999px;
-  font-size: 12px; color: var(--tenue);
+  padding: 6px 13px; border: 1px solid var(--borde); border-radius: 20px;
+  font-size: 12px; color: var(--texto-2);
 }
-.chip.on { border-color: var(--bio); color: var(--bio); }
+.chip:active { border-color: var(--borde-fuerte); }
+/* El filtro activo va macizo: es el único ámbar sólido de la pantalla. */
+.chip.on { background: var(--bio); border-color: var(--bio); color: #191410; }
 
-/* Rejilla de colección: la carta se ve, el contador manda. */
+/* Rejilla de colección: la misma carta compacta del tablero, con el contador
+   de copias encima. */
 /* grid-auto-rows explícito: con filas "auto" dentro de un contenedor de altura
    definida, Chrome las reparte y la carta se aplasta a la altura del texto. */
 .col-rejilla {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
   align-content: start; grid-auto-rows: max-content;
 }
 .col-carta {
+  position: relative;
   /* Flex en columna, no bloque: un <button> no crece con su contenido y la
      rejilla lo aplasta a la altura de una línea. */
   display: flex; flex-direction: column; align-items: stretch;
-  border: 1px solid var(--borde); border-radius: var(--radio);
-  background: var(--panel); overflow: hidden; text-align: left; padding: 0;
+  border-radius: 9px; box-shadow: 0 0 0 1px var(--borde);
+  background: linear-gradient(180deg, var(--superficie-2), var(--panel-alto) 40%, var(--panel));
+  overflow: hidden; text-align: left; padding: 0;
 }
-.col-arte { flex: 0 0 auto; }
-.col-pie { flex: 1 1 auto; }
-.col-carta.ninguna { opacity: .32; filter: grayscale(1); }
+.col-carta:active { box-shadow: 0 0 0 1px var(--borde-fuerte); }
+
 /* Altura en píxeles, no aspect-ratio: dentro de una rejilla, un aspect-ratio
    sobre anchura indefinida aporta cero a la altura intrínseca y la fila se
    colapsa a la altura del texto. El recorte lo hace object-fit. */
 .col-arte {
-  height: 118px; background: #191510; display: flex; align-items: center; justify-content: center;
+  flex: 0 0 auto; height: 96px; background: #14100c;
+  display: flex; align-items: center; justify-content: center;
 }
 .col-arte svg, .col-arte .foto { width: 100%; height: 100%; object-fit: cover; display: block; }
-.col-pie { padding: 5px 6px 6px; }
+.col-arte .foto { filter: saturate(.9) brightness(.85); }
+
+.col-copias {
+  position: absolute; top: 5px; right: 5px;
+  padding: 2px 6px; border-radius: 3px; font-size: 9.5px;
+  background: rgba(20,15,11,.85); box-shadow: 0 0 0 1px var(--borde); color: var(--texto-2);
+}
+/* Ámbar macizo = te sobran copias, y eso es justo lo que se puede fundir. */
+.col-copias.sobra { background: var(--bio); box-shadow: none; color: #191410; }
+
+.col-pie { flex: 1 1 auto; padding: 7px 8px 8px; display: flex; flex-direction: column; gap: 4px; }
 .col-nombre {
-  font-size: 10px; line-height: 1.15; height: 2.3em; overflow: hidden;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  font-size: 11px; line-height: 1.15; color: var(--texto);
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
 }
 .col-carta.dino .col-nombre { font-style: italic; }
-.col-cuenta { display: flex; justify-content: space-between; align-items: center; margin-top: 3px; }
-.col-cuenta b { font-size: 12px; }
-.col-cuenta .sobra { color: var(--trof); }
-.col-rar {
-  font-size: 8px; letter-spacing: .08em; text-transform: uppercase;
+.col-meta { font-size: 9px; color: var(--tenue); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.c-stats.fila { flex-direction: row; gap: 8px; margin-top: auto; }
+.c-stats.fila .st { justify-content: flex-start; gap: 2px; }
+
+/* Una especie que no tienes es un hueco, no una carta apagada. */
+.col-carta.ninguna { background: #1a1410; box-shadow: 0 0 0 1px #2e2519; }
+.col-hueco {
+  height: 96px; display: grid; place-items: center;
+  color: #3a2f22; font-size: 20px;
 }
-.rar-COMUN { color: #8f8878; }
-.rar-RARO { color: #6fa3c4; }
-.rar-EPICO { color: #b083d0; }
+.col-carta.ninguna .col-nombre { color: var(--apagado); }
+
+.col-rar { font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
+.rar-COMUN { color: var(--tenue); }
+.rar-RARO { color: var(--texto-2); }
+.rar-EPICO { color: var(--acento-claro); }
 .rar-LEGENDARIO { color: var(--bio); }
 
 /* Sobres */
@@ -211,19 +351,19 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .sobre-odds { width: 100%; border-collapse: collapse; font-size: 12px; color: var(--tenue); }
 .sobre-odds th { text-align: left; font-weight: 400; padding: 4px 0; }
 .sobre-odds td { text-align: right; padding: 4px 0; }
-.sobre-odds tr + tr { border-top: 1px solid var(--borde); }
+.sobre-odds tr + tr { border-top: 1px solid var(--superficie-2); }
 
 /* Mazos */
 .mazo-ficha {
   display: flex; align-items: center; gap: 10px; width: 100%;
-  border: 1px solid var(--borde); border-radius: var(--radio);
-  background: var(--panel); padding: 11px 12px; margin-bottom: 8px; text-align: left;
+  border: 1px solid var(--linea); border-radius: var(--radio);
+  background: rgba(244,236,224,.03); padding: 12px 13px; margin-bottom: 8px; text-align: left;
 }
 .mazo-ficha.activo { border-color: var(--bio); }
 .mazo-ficha .nom { flex: 1; min-width: 0; font-size: 14px; }
 .mazo-ficha .n { font-size: 12px; color: var(--tenue); }
-.mazo-ficha .n.mal { color: var(--vida); }
-.mazo-ficha .accion { font-size: 12px; color: var(--bio); padding: 4px 6px; }
+.mazo-ficha .n.mal { color: var(--peligro); }
+.mazo-ficha .accion { font-size: 12px; color: var(--acento-claro); padding: 6px 8px; }
 
 .mazo-nombre {
   width: 100%; padding: 10px 12px; margin-bottom: 10px; font: inherit;
@@ -232,8 +372,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   -webkit-user-select: text; user-select: text;
 }
 .mazo-fila {
-  display: flex; align-items: center; gap: 8px;
-  border-bottom: 1px solid var(--borde); padding: 7px 2px;
+  display: flex; align-items: center; gap: 9px;
+  border-bottom: 1px solid var(--superficie-2); padding: 8px 2px;
 }
 .mazo-fila .mini { width: 34px; height: 34px; flex: 0 0 auto; border-radius: 4px; overflow: hidden; background: #191510; }
 .mazo-fila .mini svg, .mazo-fila .mini .foto { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -247,7 +387,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .mazo-paso button[disabled] { opacity: .3; }
 .mazo-paso b { min-width: 30px; text-align: center; font-size: 12px; }
-.mazo-paso b.lleno { color: var(--bio); }
+.mazo-paso b.lleno { color: var(--acento-claro); }
 .mazo-total { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
 .mazo-total b.mal { color: var(--vida); }
 .mazo-total b.bien { color: var(--propio); }
@@ -275,10 +415,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 14px; min-height: 190px;
 }
+/* El sobre lleva el reverso del juego: escamas y emblema. Es el mismo objeto
+   que la pila del mazo y la ranura oculta. */
 .sobre-paquete {
-  position: relative; width: 96px; height: 132px; border-radius: 8px;
-  background: linear-gradient(160deg, #3a2f1d 0%, #241d13 55%, #171208 100%);
-  border: 1px solid var(--bio); overflow: hidden;
+  position: relative; width: 116px; height: 162px; border-radius: 9px;
+  background-color: #1c1610;
+  background-image: var(--escamas);
+  background-size: 22px 16px, 22px 16px;
+  background-position: 0 0, 11px 8px;
+  box-shadow: 0 0 0 1px var(--bio), 0 0 34px rgba(217,164,65,.26); overflow: hidden;
   animation: respirar 2.8s ease-in-out infinite;
 }
 @keyframes respirar {
@@ -286,16 +431,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   50%      { transform: translateY(-6px) rotate(1.5deg); }
 }
 .sobre-solapa {
-  position: absolute; inset: 0 0 auto 0; height: 34px;
-  background: linear-gradient(180deg, rgba(208,165,58,.35), transparent);
-  border-bottom: 1px dashed rgba(208,165,58,.5);
+  position: absolute; inset: 0;
+  background: radial-gradient(72% 52% at 46% 40%, rgba(217,164,65,.12), rgba(23,17,12,.4) 66%, rgba(23,17,12,.9) 100%);
 }
 .sobre-sello {
-  position: absolute; left: 50%; top: 52%; transform: translate(-50%, -50%);
-  width: 40px; height: 40px; border-radius: 50%;
-  border: 1px solid var(--bio); color: var(--bio);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 800; letter-spacing: .04em;
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 52px; height: 52px; border-radius: 50%;
+  border: 1px solid var(--borde-fuerte); color: var(--acento-claro);
+  background: rgba(23,17,12,.7);
+  display: grid; place-items: center; font-size: 20px;
 }
 .sobre-tirada.cerrado .sobre-vacio { border: 0; padding: 0; }
 
@@ -322,274 +466,327 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .sobre-dorso, .sobre-frente {
   backface-visibility: hidden; -webkit-backface-visibility: hidden;
-  border: 1px solid var(--borde); border-radius: 6px; overflow: hidden;
-  background: var(--panel);
+  border: 1px solid var(--borde); border-radius: 7px; overflow: hidden;
+  background: linear-gradient(180deg, var(--superficie-2), var(--panel-alto) 40%, var(--panel));
 }
 .sobre-dorso {
   position: absolute; inset: 0; transform: rotateY(180deg);
-  background: repeating-linear-gradient(45deg, #241d13 0 5px, #2c2418 5px 10px);
-  border-color: var(--bio);
+  background-color: #1c1610;
+  background-image: var(--escamas);
+  background-size: 16px 11px, 16px 11px;
+  background-position: 0 0, 8px 5.5px;
+  border-color: var(--borde-fuerte);
 }
 .sobre-frente .col-arte { height: 88px; }
 .sobre-frente .col-nombre { font-size: 8px; height: 2.3em; }
 
 /* El brillo se reserva a lo que de verdad es raro: si todo destella, nada lo es. */
-.sobre-carta.rareza-EPICO .sobre-frente { border-color: #b083d0; }
+/* La rareza se lee en el borde, en la misma escala ámbar del resto: común
+   apagado, rara y épica firmes, legendaria encendida. */
+.sobre-carta.rareza-RARO .sobre-frente,
+.sobre-carta.rareza-EPICO .sobre-frente { border-color: var(--borde-fuerte); }
 .sobre-carta.rareza-LEGENDARIO .sobre-frente { border-color: var(--bio); }
 .sobre-carta.rareza-LEGENDARIO.gira .sobre-frente {
   animation: destello 1s ease-out calc(var(--retardo, 0ms) + 700ms) 2;
 }
 @keyframes destello {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(208,165,58,0); }
-  40%      { box-shadow: 0 0 12px 2px rgba(208,165,58,.75); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(217,164,65,0); }
+  40%      { box-shadow: 0 0 26px 2px rgba(217,164,65,.5); }
 }
 .sobre-carta.nueva .sobre-frente { box-shadow: 0 0 0 1px var(--bio) inset; }
 
 /* ------------------------------------------------------------------- hud */
 
-/* Un bando por fila. En una sola fila no caben diez recursos con su nombre a
-   360 px: las columnas de 1fr no pueden encoger lo que lleva white-space:nowrap
-   y el marcador del turno acababa pisado por «descarte» y «trofeos». */
+/* Tres líneas y sólo tres cifras por bando. El mazo y el descarte se han ido a
+   la mesa, y con eso la fila cabe sin apreturas y sin solapes. */
 #hud {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: auto auto;
-  align-items: center; column-gap: 8px; row-gap: 2px; padding: 4px 8px;
-  background: var(--panel); border-bottom: 1px solid var(--borde); font-size: 12px;
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 9px 14px 8px;
+  border-bottom: 1px solid var(--linea);
+  background: rgba(15,11,8,.55);
+  font-size: 12px;
 }
-/* Rejilla propia por bando: las cinco cifras quedan alineadas en columna entre
-   la fila del rival y la tuya, que es lo que hace la comparación inmediata. */
-.hud-bando {
-  display: grid; grid-template-columns: 30px repeat(5, minmax(0, 1fr));
-  align-items: center; min-width: 0;
-}
+.hud-bando { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .hud-etiqueta {
-  font-size: 9px; text-transform: uppercase; letter-spacing: .06em;
-  font-weight: 700; text-align: left; min-width: 0;
+  font-size: 9px; letter-spacing: .18em; text-transform: uppercase; flex: 0 0 auto;
 }
 .rival .hud-etiqueta { color: var(--rival); }
-.propio .hud-etiqueta { color: var(--propio); }
+.propio .hud-etiqueta { color: var(--acento-claro); }
 
+.hud-recs { display: flex; gap: 12px; }
+.rec { display: flex; align-items: baseline; gap: 3px; white-space: nowrap; }
+.rec b { font-size: 13px; font-weight: 500; }
+.rec .meta { font-size: 10px; color: var(--tenue-2); margin-left: -2px; }
+.rec i { font-style: normal; font-size: 11px; color: var(--tenue); }
+
+/* El turno y la estación, centrados entre las dos filas y con su propio filete:
+   es la línea que separa un bando del otro. */
 .hud-centro {
-  grid-column: 2; grid-row: 1 / span 2;
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  padding-left: 8px; border-left: 1px solid var(--borde);
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  padding: 5px 0; border-top: 1px solid var(--superficie-2); border-bottom: 1px solid var(--superficie-2);
 }
+#turno { font-size: 12px; color: var(--texto-2); white-space: nowrap; }
 
-/* Un número sin nombre no se entiende: cada recurso lleva su etiqueta. */
-.rec {
-  display: flex; flex-direction: column; align-items: center; line-height: 1;
-  min-width: 0; white-space: nowrap;
+.estacion {
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--acento-claro); white-space: nowrap;
+  padding-left: 9px; border-left: 1px solid var(--borde);
 }
-.rec b { font-size: 13px; font-weight: 700; }
-.rec-cifra { display: flex; align-items: baseline; gap: 1px; }
-.rec .meta { font-size: 9px; font-weight: 600; color: var(--tenue); }
-.rec i {
-  font-style: normal; font-size: 7px; letter-spacing: .03em;
-  text-transform: uppercase; color: var(--tenue); margin-top: 2px;
-  max-width: 100%; overflow: hidden; text-overflow: ellipsis;
-}
-.rec.trof b { font-size: 15px; color: var(--trof); }
-.rec.trof i { color: var(--trof); opacity: .75; }
-.rec.bio b { color: var(--bio); }
-.rec.mano b { color: var(--texto); }
-.rec.mazo b { color: var(--tenue); }
-.rec.mazo.aviso b, .rec.mazo.aviso i { color: var(--vida); }
-.rec.desc b { color: var(--tenue); }
-.rec.desc { cursor: pointer; }
-.rec.desc:active b { color: var(--bio); }
+.estacion.sequia { color: var(--acento-claro); }
+.estacion.crecida { color: var(--agua); }
 
 /* Lista del descarte: qué ha jugado y perdido cada bando. */
 .desc-lista { display: flex; flex-direction: column; gap: 5px; }
 .desc-fila {
   display: flex; align-items: center; gap: 9px;
-  padding: 6px 8px; border-radius: 6px;
-  background: var(--panel-alto); border: 1px solid var(--borde);
+  padding: 7px 9px; border-radius: 6px;
+  background: rgba(244,236,224,.04); border: 1px solid var(--linea);
   font-size: 13px;
 }
-.desc-fila .n { font-weight: 800; color: var(--bio); min-width: 20px; }
+.desc-fila .n { font-weight: 500; color: var(--acento-claro); min-width: 20px; }
 .desc-fila .nom { flex: 1; min-width: 0; }
 .desc-fila .nom i { font-style: italic; }
 .desc-fila .fam { font-size: 10px; color: var(--tenue); text-transform: uppercase; letter-spacing: .06em; }
 .desc-vacio { color: var(--tenue); font-size: 13px; }
-
-#turno { color: var(--tenue); font-size: 11px; letter-spacing: .06em; white-space: nowrap; }
-
-.estacion {
-  font-size: 10.5px; font-weight: 600; padding: 2px 8px;
-  border-radius: 20px; border: 1px solid currentColor; white-space: nowrap;
-}
-.estacion.sequia { color: #d9a441; }
-.estacion.crecida { color: var(--agua); }
 
 /* ----------------------------------------------------------------- campo */
 
 #campo {
   flex: 1; min-height: 0;
   display: flex; flex-direction: column; justify-content: center;
-  gap: 5px; padding: 6px;
+  gap: 8px; padding: 10px;
+  overflow: hidden;
 }
 
-.habitat { display: flex; align-items: center; gap: 7px; font-size: 10px; }
-.habitat-et { text-transform: uppercase; letter-spacing: .08em; font-size: 9px; flex: 0 0 auto; }
-.habitat.rival .habitat-et { color: var(--rival); }
-.habitat.propio .habitat-et { color: var(--propio); }
+/* Hábitat: canal fino con la cifra «actual/máximo» y, al final, la pila del
+   mazo. El contador de cartas vive aquí y no en el marcador porque es un objeto
+   de la mesa, no una estadística. */
+.habitat { display: flex; align-items: center; gap: 9px; font-size: 12px; }
+.habitat-et { display: none; }
 .habitat-barra {
-  flex: 1; height: 8px; border-radius: 4px; overflow: hidden;
-  background: #241d15; border: 1px solid var(--borde);
+  flex: 1; height: 6px; border-radius: 3px; overflow: hidden;
+  background: rgba(244,236,224,.07);
 }
-.habitat-barra i { display: block; height: 100%; width: 100%; transition: width .45s ease-out; }
-.habitat.rival .habitat-barra i { background: linear-gradient(90deg, #6d3222, var(--rival)); }
-.habitat.propio .habitat-barra i { background: linear-gradient(90deg, #46603a, var(--propio)); }
-.habitat-num { font-size: 13px; font-weight: 700; flex: 0 0 auto; min-width: 24px; text-align: right; }
-.habitat.rival .habitat-num { color: var(--rival); }
-.habitat.propio .habitat-num { color: var(--propio); }
+.habitat-barra i { display: block; height: 100%; width: 100%; border-radius: 3px; transition: width .45s ease-out; }
+.habitat.rival .habitat-barra i { background: linear-gradient(90deg, #8a3f2a, var(--rival)); }
+.habitat.propio .habitat-barra i { background: linear-gradient(90deg, var(--borde-fuerte), var(--bio)); }
+.habitat-num { flex: 0 0 auto; font-size: 12px; color: var(--texto); }
+.habitat-num .tope { color: var(--tenue-2); }
 .habitat.golpe .habitat-num { animation: latido .45s ease-out; }
-@keyframes latido { 0%,100% { transform: none; } 40% { transform: scale(1.5); } }
+@keyframes latido { 0%,100% { transform: none; } 40% { transform: scale(1.4); } }
 
-.fila-ranuras { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
+/* Pila de mazo: dos capas para que se lea como un montón de cartas. */
+.pila { position: relative; width: 36px; height: 26px; flex: 0 0 auto; }
+.pila::before {
+  content: ''; position: absolute; left: 3px; top: 2px; width: 30px; height: 22px;
+  border-radius: 4px; background: #241b11; box-shadow: 0 0 0 1px #45372a;
+}
+.pila b {
+  position: absolute; left: 0; top: 0; width: 30px; height: 22px; border-radius: 4px;
+  background: #1c1610; display: grid; place-items: center;
+  font-size: 10px; font-weight: 500; color: var(--texto-2);
+}
+.habitat.rival .pila b { box-shadow: 0 0 0 1px var(--borde-fuerte); }
+.habitat.propio .pila b { box-shadow: 0 0 0 1px var(--bio); color: var(--texto); }
+.pila.aviso b { color: var(--peligro); }
+
+/* Descarte: una ficha plana al lado del mazo, y se puede abrir. */
+.descarte-ficha {
+  flex: 0 0 auto; min-width: 30px; height: 22px; padding: 0 6px; border-radius: 4px;
+  background: rgba(244,236,224,.04); box-shadow: 0 0 0 1px var(--linea);
+  color: var(--tenue); font-size: 10px;
+  display: grid; place-items: center;
+}
+.descarte-ficha:active { box-shadow: 0 0 0 1px var(--borde-fuerte); color: var(--texto-2); }
+
+/* Las filas se reparten el hueco que queda: fijar su alto en vh desbordaba la
+   pantalla en 360×640, que es la más pequeña que el juego declara soportar. */
+.fila-ranuras {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;
+  flex: 1 1 0; min-height: 92px; max-height: 172px;
+}
 
 .ranura {
-  position: relative;
-  aspect-ratio: 0.715;
+  position: relative; height: 100%; min-height: 0;
   border-radius: 7px;
-  border: 1px dashed var(--borde);
+  border: 1px dashed #3a2f22;
+  background: rgba(244,236,224,.015);
   display: flex; align-items: center; justify-content: center;
-  color: var(--borde); font-size: 11px;
+  color: #3a2f22; font-size: 11px;
   transition: border-color .18s, background .18s;
 }
-.ranura.destino { border-style: solid; border-color: var(--propio); background: var(--propio-tenue); }
-.ranura.ocupada { border-style: solid; border-color: transparent; }
+/* Ranura destino: lo único encendido mientras arrastras. */
+.ranura.destino {
+  border-color: var(--bio); background: rgba(217,164,65,.06); color: var(--acento-claro);
+}
+.ranura.destino::after {
+  content: '+'; position: absolute; font-size: 16px; color: var(--acento-claro);
+}
+.ranura.ocupada { border-color: transparent; background: none; }
 
+/* Franja de campo activo. */
 .franja {
   display: flex; align-items: center; gap: 8px;
-  padding: 4px 8px; border-radius: 6px;
-  background: rgba(0,0,0,.3); border: 1px solid var(--borde);
-  font-size: 11px; min-height: 30px;
+  padding: 7px 10px; border-radius: 8px;
+  border: 1px solid var(--linea);
+  background: linear-gradient(90deg, rgba(217,164,65,.07), rgba(217,164,65,.02));
+  font-size: 12px; min-height: 32px;
+}
+.franja::before {
+  content: 'Campo'; flex: 0 0 auto;
+  font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--tenue);
 }
 .franja-campo {
-  flex: 1; text-align: left; color: var(--tenue);
+  flex: 1; text-align: left; color: var(--tenue-2);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.franja-campo.puesto { color: var(--bio); font-weight: 600; }
-.franja.destino { border-color: var(--bio); background: rgba(208,165,58,.12); }
-.franja-nota { color: var(--tenue); font-size: 10px; flex: 0 0 auto; }
+.franja-campo.puesto { color: var(--texto); }
+.franja.destino { border-color: var(--bio); background: rgba(217,164,65,.12); }
+.franja-nota { color: var(--tenue-2); font-size: 10px; flex: 0 0 auto; }
 /* Lo tuyo comprometido: se puede tocar, así que tiene que parecer un botón. */
 .franja-mias {
-  flex: 0 0 auto; font-size: 10px; font-weight: 600; color: var(--propio);
-  border: 1px solid var(--propio-tenue); border-radius: 20px; padding: 3px 8px;
+  flex: 0 0 auto; font-size: 10px; color: var(--acento-claro);
+  border: 1px solid var(--borde-fuerte); border-radius: 20px; padding: 3px 9px;
   white-space: nowrap;
 }
-.franja-mias:active { border-color: var(--propio); }
+.franja-mias:active { background: rgba(217,164,65,.12); }
 
 .comp-fila {
   display: flex; align-items: center; gap: 9px;
-  padding: 7px 9px; margin-bottom: 6px; border-radius: 6px;
-  background: var(--panel-alto); border: 1px solid var(--borde); font-size: 13px;
+  padding: 8px 10px; margin-bottom: 6px; border-radius: 6px;
+  background: rgba(244,236,224,.04); border: 1px solid var(--linea); font-size: 13px;
 }
 .comp-fila .nom { flex: 1; min-width: 0; }
 .comp-fila .nom i { font-style: italic; }
 .comp-fila .que { display: block; font-size: 11px; color: var(--tenue); margin-top: 2px; }
 .comp-fila .retirar {
   flex: 0 0 auto; min-height: 34px; padding: 0 12px; font-size: 12px;
-  border: 1px solid var(--borde); border-radius: var(--radio); color: var(--bio);
+  border: 1px solid var(--borde); border-radius: var(--radio); color: var(--acento-claro);
 }
 .comp-fila .retirar:active { border-color: var(--bio); }
 .comp-fila .fijo { flex: 0 0 auto; font-size: 11px; color: var(--tenue); }
 
 /* ----------------------------------------------------------------- carta */
 
+/* Una sola composición para las tres escalas: ventana de arte arriba, coste en
+   círculo sobre ella, nombre y las tres cifras debajo. Lo que cambia entre la
+   ranura, la mano y el visor es el tamaño, nunca el orden. */
 .carta {
+  position: relative;
   border-radius: 7px;
-  background: linear-gradient(168deg, #2c2519, #17130e);
-  border: 1px solid var(--borde);
-  padding: 3px;
-  display: flex; flex-direction: column; gap: 2px;
+  background: linear-gradient(180deg, var(--superficie-2), var(--panel-alto) 40%, var(--panel));
+  box-shadow: 0 0 0 1px var(--borde);
+  display: flex; flex-direction: column;
   overflow: hidden;
   will-change: transform;
 }
+
+.c-arte {
+  flex: 0 0 auto; height: 52px; position: relative;
+  background: radial-gradient(120% 90% at 50% 15%, rgba(217,164,65,.07), transparent 70%), #14100c;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.c-arte svg { width: 100%; height: 100%; padding: 3px; }
+/* La foto recorta y llena, y baja al valor de la interfaz: a este tamaño lo que
+   se reconoce de un vistazo es el clado, no el detalle. */
+.c-arte .foto {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  filter: saturate(.85) brightness(.8);
+}
+/* Un velo abajo para que el nombre se lea sobre cualquier ilustración. */
+.c-arte::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(25,20,16,.45) 0%, transparent 40%, rgba(29,22,16,.75) 100%);
+}
+
+.c-coste {
+  position: absolute; top: 3px; left: 3px; z-index: 2;
+  width: 17px; height: 17px; border-radius: 50%;
+  background: rgba(20,15,11,.9); border: 1px solid var(--borde);
+  color: var(--texto); font-size: 9px; font-weight: 500;
+  display: grid; place-items: center;
+}
+.carta--ranura.propio .c-coste, .carta--mano .c-coste { border-color: var(--bio); }
+.carta--ranura.rival .c-coste { border-color: var(--rival); }
+
+.c-cuerpo { flex: 1; min-height: 0; padding: 4px; display: flex; flex-direction: column; gap: 4px; }
+.c-nombre {
+  font-size: 9px; line-height: 1.15; font-style: italic; color: var(--texto);
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.carta.no-dino .c-nombre { font-style: normal; }
+.c-tipo {
+  margin-top: auto; font-size: 8px; letter-spacing: .12em; text-transform: uppercase; color: var(--tenue);
+}
+
+/* La clave de estadísticas: glifo y color fijos en todas las pantallas. */
+.c-stats { display: flex; flex-direction: column; gap: 2px; font-size: 9px; }
+.st { display: flex; justify-content: space-between; align-items: baseline; gap: 3px; }
+.st i { font-style: normal; }
+.st b { font-weight: 500; }
+.st b em { font-style: normal; color: var(--tenue-2); }
+.st-a i { color: var(--acento-claro); }
+.st-d i { color: var(--agua); }
+.st-v i { color: var(--vida); }
+.st-a.mejorado b { color: var(--bio); }
+.st-a.mermado b { color: var(--peligro); }
+.st-v.herido b { color: var(--vida); }
+
+/* Las cartas que no son dinosaurio no compiten con las que sí: fondo frío. */
+.carta.no-dino { background: linear-gradient(180deg, #221d2c, #191320); }
+.carta.no-dino .c-arte { background: #171320; }
 
 .carta--ranura {
   position: absolute; inset: 0;
   transition: opacity .3s, transform .3s;
 }
-.carta--ranura.propio { border-color: var(--propio-tenue); }
-.carta--ranura.rival { border-color: var(--rival-tenue); }
+.carta--ranura.propio { box-shadow: 0 0 0 1px var(--propio-tenue); }
+.carta--ranura.rival { box-shadow: 0 0 0 1px var(--rival-tenue); }
 /* El retardo lo pone animarRevelacion() para que las cartas se abran en
    cadena y no las diez a la vez. Sin variable, vale 0 y entra al instante. */
 .carta--ranura.entra { animation: voltear .4s ease-out var(--retardo, 0ms) both; }
 .carta--ranura.muere { opacity: 0; transform: scale(.8) rotate(-7deg); }
 .carta--ranura.golpeada { animation: sacudida .35s ease-out; }
-.carta--ranura.pendiente { border-style: dashed; opacity: .9; }
+.carta--ranura.pendiente { box-shadow: 0 0 0 1px var(--bio); opacity: .92; }
 
+/* La mano es una fila, no un abanico: a 360 px el abanico solapaba las cartas
+   y había que adivinar dónde empezaba cada una. */
 .carta--mano {
-  position: absolute; bottom: 10px; left: 50%; margin-left: -31px;
-  width: 62px; height: 88px;
-  transform-origin: 50% 130%;
+  flex: 0 0 auto; height: 100%; width: auto; aspect-ratio: 82 / 112;
   transition: transform .18s ease-out, box-shadow .18s;
 }
-.carta--mano.impagable { opacity: .4; }
-.carta--mano.alzada { box-shadow: 0 0 0 1px var(--bio), 0 6px 16px rgba(0,0,0,.6); }
+.carta--mano .c-nombre { font-size: 10px; }
+.carta--mano .c-stats { flex-direction: row; gap: 6px; margin-top: auto; }
+.carta--mano .st { justify-content: flex-start; gap: 2px; }
+.carta--mano.impagable { opacity: .45; }
+.carta--mano.impagable .c-coste { border-color: var(--peligro); color: var(--peligro); }
+.carta--mano.alzada { box-shadow: 0 0 0 1px var(--bio), 0 10px 26px rgba(0,0,0,.6); transform: translateY(-6px); }
 .carta--mano.arrastrando { opacity: .25; }
 
-.c-top { display: flex; align-items: center; gap: 3px; font-size: 9px; flex: 0 0 auto; }
-.c-coste {
-  background: var(--bio); color: #171206; font-weight: 800;
-  min-width: 14px; height: 14px; padding: 0 2px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-}
-.c-def {
-  margin-left: auto; font-weight: 700; font-size: 11px; color: var(--agua);
-  display: inline-flex; align-items: center; gap: 2px;
-}
-.c-def::before {
-  content: ''; width: 6px; height: 7px; background: var(--agua);
-  border-radius: 2px 2px 50% 50%;
-}
-.c-poder { margin-left: 4px; font-weight: 800; font-size: 12px; color: var(--trof); }
-.carta--ranura .c-poder { font-size: 13px; }
-.c-poder.mejorado { color: var(--bio); }
-.c-poder.mermado { color: var(--vida); }
-
-.c-arte {
-  flex: 1; min-height: 0; border-radius: 4px;
-  background: radial-gradient(120% 90% at 50% 15%, rgba(255,255,255,.06), transparent 70%), #191510;
-  display: flex; align-items: center; justify-content: center; overflow: hidden;
-}
-.c-arte svg { width: 100%; height: 100%; padding: 2px; }
-/* La foto recorta y llena: en una carta de 56px la silueta pierde y la
-   ilustración gana, porque el clado se reconoce de un vistazo. */
-.c-arte .foto { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-.c-nombre {
-  font-size: 7px; line-height: 1.1; text-align: center; font-style: italic; flex: 0 0 auto;
-  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-}
-.carta.no-dino .c-nombre { font-style: normal; color: var(--bio); }
-.carta.evento { border-color: #5a4a22; }
-.carta.clima { border-color: #2f5560; }
-.carta.recurso { border-color: #4a6b32; }
-
-/* Barra de Vida: el dato nuevo de la v2, tiene que verse siempre. */
-.c-vida { flex: 0 0 auto; display: flex; align-items: center; gap: 3px; font-size: 8px; }
-.c-vida-barra { flex: 1; height: 4px; border-radius: 2px; background: #3a1f18; overflow: hidden; }
-.c-vida-barra i { display: block; height: 100%; background: var(--propio); transition: width .3s; }
-.carta--ranura.rival .c-vida-barra i { background: var(--rival); }
-.c-vida-num { font-weight: 700; color: var(--texto); }
-.c-vida.herido .c-vida-num { color: var(--vida); }
-
-.c-adap { position: absolute; right: 3px; top: 17px; width: 7px; height: 7px; border-radius: 50%;
+.c-adap { position: absolute; right: 3px; top: 3px; width: 7px; height: 7px; border-radius: 50%;
           background: var(--bio); box-shadow: 0 0 0 1px #17120e; }
 /* Presión rival encima: cuadrado y rojo, distinto de la adaptación a propósito
    —a 67 px de ancho el color solo no basta para decir qué le pasa a la carta. */
-.c-merma { position: absolute; right: 3px; top: 27px; width: 7px; height: 7px;
-           background: var(--vida); box-shadow: 0 0 0 1px #17120e; }
+.c-merma { position: absolute; right: 3px; top: 13px; width: 7px; height: 7px;
+           background: var(--peligro); box-shadow: 0 0 0 1px #17120e; }
 
+/* Reverso: el motivo de escamas y el emblema. Lo comparten la ranura oculta,
+   la pila de mazo y el sobre sin abrir, que es lo que hace que se lean como el
+   mismo objeto. */
 .carta-dorso {
   position: absolute; inset: 0; border-radius: 6px;
-  background: repeating-linear-gradient(45deg, #2a2318 0 5px, #211b13 5px 10px);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--tenue); font-size: 18px; font-weight: 700;
+  background-color: #1c1610;
+  background-image: var(--escamas);
+  background-size: 16px 11px, 16px 11px;
+  background-position: 0 0, 8px 5.5px;
+  display: grid; place-items: center;
+}
+.carta-dorso::after {
+  content: '◆';
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 1px solid var(--borde-fuerte); background: rgba(23,17,12,.7);
+  color: var(--acento-claro); font-size: 11px;
+  display: grid; place-items: center;
 }
 
 @keyframes voltear {
@@ -620,38 +817,58 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* ------------------------------------------------------------------- pie */
 
-#pie { background: var(--panel); border-top: 1px solid var(--borde); padding: 4px 8px 6px; }
+#pie {
+  background: rgba(15,11,8,.6); border-top: 1px solid var(--linea);
+  padding: 9px 14px calc(10px + var(--seguro-abajo));
+  display: flex; flex-direction: column; gap: 8px;
+}
 
 .mensaje {
-  text-align: center; font-size: 11.5px; line-height: 1.25; color: var(--tenue);
-  height: 29px; padding: 1px 6px;
-  display: flex; align-items: center; justify-content: center; overflow: hidden;
+  font-size: 11px; line-height: 1.4; color: var(--acento-claro);
+  min-height: 28px;
+  display: flex; align-items: center; overflow: hidden;
 }
-.mensaje.aviso { color: var(--trof); }
+.mensaje.aviso { color: var(--peligro); }
 
+/* La mano es una fila con desbordamiento lateral. Era un abanico: bonito de
+   lejos y ilegible a 360 px, con las cartas tapándose unas a otras y el borde
+   metiéndose debajo del botón Listo. */
 #mano {
-  display: flex; justify-content: center; align-items: flex-end;
-  height: 104px; margin: 2px 0 8px; position: relative;
+  display: flex; align-items: flex-end; gap: 6px;
+  height: clamp(94px, 16vh, 112px); flex: 0 0 auto;
+  overflow-x: auto; overflow-y: hidden;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+}
+#mano::-webkit-scrollbar { display: none; }
+/* Un velo al borde derecho dice que hay más mano de la que se ve. */
+#pie { position: relative; }
+#pie::after {
+  content: ''; position: absolute; right: 0; bottom: 62px; width: 22px; height: clamp(94px, 16vh, 112px);
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(15,11,8,.85));
 }
 
-.barra { display: flex; align-items: center; gap: 6px; }
+.barra { display: flex; align-items: center; gap: 7px; }
 .boton-listo {
-  flex: 1; min-height: 46px; background: var(--propio); color: #14180f;
-  font-weight: 700; border-radius: var(--radio);
+  flex: 1; min-height: 44px; border-radius: var(--radio);
+  background: rgba(217,164,65,.12); border: 1px solid var(--bio); color: var(--texto);
+  font-size: 15px; box-shadow: 0 0 20px rgba(217,164,65,.2);
 }
-.boton-listo:disabled { background: var(--borde); color: var(--tenue); }
-.boton-listo:active:not(:disabled) { filter: brightness(.9); }
+.boton-listo:disabled { background: none; border-color: var(--borde); color: var(--tenue-2); box-shadow: none; }
+.boton-listo:active:not(:disabled) { background: rgba(217,164,65,.22); }
 
 .boton-icono {
-  width: 42px; height: 46px; border: 1px solid var(--borde); border-radius: var(--radio);
-  color: var(--tenue); font-size: 16px; display: flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border: 1px solid var(--borde); border-radius: var(--radio);
+  color: var(--texto-2); font-size: 14px; display: grid; place-items: center;
 }
-.boton-icono.off { color: var(--borde); }
+.boton-icono:active { border-color: var(--borde-fuerte); }
+.boton-icono.off { color: var(--tenue-2); }
 
 .arrastre {
-  position: fixed; z-index: 60; width: 62px; height: 88px; pointer-events: none;
+  position: fixed; z-index: 60; width: 82px; height: 112px; pointer-events: none;
   transform: translate(-50%, -60%) scale(1.06);
-  filter: drop-shadow(0 8px 18px rgba(0,0,0,.7));
+  filter: drop-shadow(0 10px 26px rgba(0,0,0,.7));
 }
 
 /* -------------------------------------------------------------- tutorial */
@@ -664,15 +881,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   padding: 11px 12px; box-shadow: 0 8px 26px rgba(0,0,0,.6);
   animation: subir .2s ease-out;
 }
-.tutorial p { font-size: 13px; line-height: 1.45; color: var(--texto); }
-.tutorial b { color: var(--bio); }
+.tutorial p { font-size: 13px; line-height: 1.45; color: var(--texto-2); }
+.tutorial b { color: var(--acento-claro); font-weight: 500; }
 .tutorial-pie { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
 .tutorial-saltar {
   flex: 1; text-align: left; font-size: 11.5px; color: var(--tenue); min-height: 34px;
 }
 .tutorial-siguiente {
   flex: 0 0 auto; min-height: 38px; padding: 0 18px; border-radius: var(--radio);
-  background: var(--bio); color: #191308; font-weight: 700; font-size: 13px;
+  background: var(--bio); color: #191410; font-weight: 500; font-size: 13px;
 }
 
 /* ----------------------------------------------------------------- hojas */
@@ -680,17 +897,23 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hoja {
   position: absolute; z-index: 70; left: 0; right: 0; bottom: 0; max-height: 84%;
   display: flex; flex-direction: column;
-  background: var(--panel); border-top: 1px solid var(--borde);
-  border-radius: 14px 14px 0 0; padding: 14px 16px calc(14px + var(--seguro-abajo));
-  box-shadow: 0 -12px 40px rgba(0,0,0,.65);
+  background: var(--panel-alto); border-top: 1px solid var(--borde);
+  border-radius: 14px 14px 0 0; padding: 16px 18px calc(16px + var(--seguro-abajo));
+  box-shadow: 0 -16px 40px rgba(0,0,0,.65);
   animation: subir .22s ease-out;
 }
 @keyframes subir { from { transform: translateY(100%); } to { transform: none; } }
 
-.hoja-titulo { font-size: 15px; margin-bottom: 4px; }
+.hoja-titulo { font-size: 19px; font-weight: 500; letter-spacing: -.01em; margin-bottom: 5px; }
 .hoja-texto { font-size: 13px; color: var(--tenue); margin-bottom: 10px; }
 .hoja-cuerpo { overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; }
-.hoja-cerrar { margin-top: 12px; min-height: 46px; border: 1px solid var(--borde); border-radius: var(--radio); color: var(--tenue); }
+/* Cerrar es la acción de acento de la hoja: si no, la hoja no tiene salida
+   evidente y se toca fuera a ciegas. */
+.hoja-cerrar {
+  margin-top: 14px; min-height: 46px; border-radius: var(--radio);
+  border: 1px solid var(--bio); background: rgba(217,164,65,.12); color: var(--texto);
+}
+.hoja-cerrar:active { background: rgba(217,164,65,.22); }
 /* Rendirse vive en la hoja de registro, no en la barra: es una salida, no una
    jugada, y en la barra competiría con Listo. En rojo porque termina la partida. */
 .hoja-accion {
@@ -716,28 +939,50 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .ficha-arte:active { border: 1px solid var(--bio); }
 .ficha-ampliar {
-  margin-top: 8px; font-size: 11.5px; color: var(--bio);
-  border: 1px solid var(--borde); border-radius: 20px; padding: 4px 10px;
+  margin-top: 10px; font-size: 11.5px; color: var(--acento-claro);
+  border: 1px solid var(--borde); border-radius: 20px; padding: 5px 12px;
 }
-.ficha-binomial { font-style: italic; font-size: 17px; line-height: 1.15; }
-.ficha-binomial.recto { font-style: normal; color: var(--bio); }
-.ficha-clado { font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: var(--tenue); margin-top: 3px; }
-.ficha-cifras { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 7px; font-size: 12px; color: var(--tenue); }
-.ficha-cifras b { color: var(--texto); font-size: 14px; }
+.ficha-ampliar:active { border-color: var(--borde-fuerte); }
+.ficha-binomial { font-style: italic; font-size: 22px; line-height: 1.1; font-weight: 500; letter-spacing: -.02em; }
+.ficha-binomial.recto { font-style: normal; }
+.ficha-clado {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: var(--tenue); margin-top: 4px;
+}
+.ficha-rareza { padding: 2px 7px; border-radius: 3px; box-shadow: 0 0 0 1px currentColor; }
 
-.ficha-rasgo { background: var(--panel-alto); border-radius: var(--radio); padding: 9px 11px; margin-bottom: 10px; }
-.ficha-rasgo h3 { font-size: 13px; margin-bottom: 3px; }
-.ficha-rasgo p { font-size: 13px; }
+/* La clave de estadísticas también aquí: el cuadro de color es lo que une la
+   ficha con lo que se ve en el tablero. */
+.ficha-cifras { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 9px; font-size: 12px; }
+.cifra { display: inline-flex; align-items: center; gap: 5px; color: var(--tenue); }
+.cifra b { color: var(--texto); font-size: 14px; font-weight: 500; }
+.cifra i { font-style: normal; display: inline-flex; align-items: center; gap: 5px; }
+.cifra.ca i::before, .cifra.cd i::before, .cifra.cv i::before {
+  content: ''; width: 5px; height: 5px; border-radius: 1px;
+}
+.cifra.ca i::before { background: var(--acento-claro); }
+.cifra.cd i::before { background: var(--agua); }
+.cifra.cv i::before { background: var(--vida); }
+
+.ficha-rasgo {
+  border-radius: var(--radio); padding: 10px 12px; margin-bottom: 12px;
+  background: rgba(217,164,65,.06); border-left: 2px solid var(--bio);
+}
+.ficha-rasgo h3 {
+  font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--acento-claro); margin-bottom: 5px;
+}
+.ficha-rasgo p { font-size: 13px; color: var(--texto-2); }
 
 .evidencia {
   display: inline-block; font-size: 9.5px; letter-spacing: .09em;
-  padding: 2px 7px; border-radius: 20px; margin-top: 7px; border: 1px solid currentColor;
+  padding: 3px 8px; border-radius: 20px; margin-top: 9px; border: 1px solid currentColor;
 }
-.evidencia.ESTABLECIDO { color: #7fb069; }
-.evidencia.INFERIDO { color: #d9a441; }
-.evidencia.DEBATIDO { color: #c98a5e; }
+.evidencia.ESTABLECIDO { color: #86a86b; }
+.evidencia.INFERIDO { color: var(--acento-claro); }
+.evidencia.DEBATIDO { color: var(--vida); }
 
-.ficha-nota { font-size: 12.5px; line-height: 1.5; color: var(--tenue); }
+.ficha-nota { font-size: 12.5px; line-height: 1.6; color: var(--tenue); }
 
 .log-linea { font-size: 12.5px; padding: 5px 0; border-bottom: 1px solid var(--borde); line-height: 1.4; }
 .log-linea:last-child { border-bottom: 0; }
@@ -747,12 +992,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .log-turno { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--tenue); margin: 10px 0 2px; }
 
 .opcion {
-  display: block; width: 100%; text-align: left; padding: 11px 12px; margin-bottom: 7px;
-  background: var(--panel-alto); border: 1px solid var(--borde);
-  border-radius: var(--radio); min-height: 46px; font-size: 13px;
+  display: block; width: 100%; text-align: left; padding: 12px 13px; margin-bottom: 7px;
+  background: rgba(244,236,224,.04); border: 1px solid var(--borde);
+  border-radius: var(--radio); min-height: 46px; font-size: 13px; color: var(--texto);
 }
-.opcion:active { border-color: var(--bio); }
-.opcion small { display: block; color: var(--tenue); font-size: 11.5px; margin-top: 2px; }
+.opcion:active { border-color: var(--borde-fuerte); }
+.opcion small { display: block; color: var(--tenue); font-size: 11.5px; margin-top: 3px; }
 
 /* ----------------------------------------------------------------- visor */
 
@@ -771,12 +1016,38 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   flex: 1; min-height: 0; width: 100%;
   display: flex; align-items: center; justify-content: center;
 }
-.visor-marco { width: 208px; height: 291px; position: relative; }
-.visor-marco .carta {
-  position: absolute; top: 0; left: 0; width: 67px; height: 94px;
-  transform: scale(3.1); transform-origin: 0 0;
-  border-radius: 2.5px; border-width: .4px;
+/* La carta a tamaño de lectura no es la pequeña ampliada: es la misma
+   composición con sus propias medidas, porque escalar deja las cifras
+   gigantes y el texto ilegible por recorte. */
+.visor-marco { width: min(268px, 78vw); }
+.carta--visor { width: 100%; border-radius: 12px; }
+.carta--visor .c-arte { height: 168px; }
+.carta--visor .c-coste {
+  top: 10px; left: 10px; width: 36px; height: 36px; font-size: 15px;
+  border-color: var(--bio);
 }
+.c-rareza {
+  position: absolute; top: 12px; right: 12px; z-index: 2;
+  padding: 3px 8px; border-radius: 3px; font-size: 9.5px;
+  letter-spacing: .08em; text-transform: uppercase;
+  background: rgba(20,15,11,.85); box-shadow: 0 0 0 1px currentColor;
+}
+.carta--visor .c-cuerpo { padding: 11px 12px 13px; gap: 7px; }
+.carta--visor .c-nombre { font-size: 19px; line-height: 1.15; -webkit-line-clamp: 2; }
+.carta--visor .c-clado {
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--tenue);
+}
+.carta--visor .c-stats { font-size: 13px; gap: 5px; margin-top: 4px; }
+.carta--visor .c-rasgo {
+  margin-top: 4px; padding: 8px 10px; border-left: 2px solid var(--bio);
+  background: rgba(217,164,65,.06); border-radius: 0 6px 6px 0;
+}
+.carta--visor .c-rasgo b {
+  display: block; font-size: 10px; font-weight: 500; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--acento-claro); margin-bottom: 3px;
+}
+.carta--visor .c-rasgo p { font-size: 12.5px; line-height: 1.45; color: var(--texto-2); }
+.carta--visor.no-dino .c-tipo { margin-top: 0; }
 .visor-foto {
   max-width: 100%; max-height: 100%; object-fit: contain;
   border-radius: var(--radio); border: 1px solid var(--borde);
@@ -790,15 +1061,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* ----------------------------------------------------------------- ayuda */
 
-.ayuda-h { font-size: 12px; letter-spacing: .09em; text-transform: uppercase; color: var(--bio); margin: 16px 0 6px; }
+.ayuda-h { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--acento-claro); margin: 18px 0 8px; }
 .ayuda-h:first-child { margin-top: 0; }
 .ayuda-p { font-size: 13px; line-height: 1.5; margin-bottom: 8px; }
-.ayuda-p b { color: var(--bio); }
+.ayuda-p b { color: var(--texto); font-weight: 500; }
 
 .ayuda-lista { list-style: none; font-size: 13px; line-height: 1.45; }
 .ayuda-lista li { display: flex; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--borde); }
 .ayuda-lista li:last-child { border-bottom: 0; }
-.ayuda-lista .k { flex: 0 0 84px; font-weight: 600; color: var(--bio); }
+.ayuda-lista .k { flex: 0 0 84px; font-weight: 500; color: var(--acento-claro); }
 .ayuda-lista .v { color: var(--tenue); min-width: 0; }
 
 .ayuda-pasos { counter-reset: paso; list-style: none; font-size: 13px; }
@@ -812,30 +1083,32 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .ayuda-pasos b { color: var(--texto); font-weight: 600; }
 
-.anatomia { display: flex; gap: 14px; align-items: center; margin: 4px 0 10px; }
-.anatomia-carta { position: relative; width: 104px; height: 145px; flex: 0 0 auto; }
+/* La clave, no una carta con globos numerados: los glifos del cartel son los
+   mismos que están en la carta, así que la explicación es la propia carta. */
+.anatomia { display: flex; gap: 14px; align-items: flex-start; margin: 4px 0 10px; }
+.anatomia-carta { position: relative; width: 96px; height: 134px; flex: 0 0 auto; }
 .anatomia-carta .carta { position: absolute; inset: 0; }
-.llamada {
-  position: absolute; z-index: 5; width: 16px; height: 16px; border-radius: 50%;
-  background: var(--bio); color: #171206; font-size: 10px; font-weight: 800;
-  display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2px #17120e;
-}
 .anatomia-notas { flex: 1; min-width: 0; font-size: 12px; line-height: 1.4; }
-.anatomia-notas div { display: flex; gap: 6px; padding: 3px 0; }
+.anatomia-notas div { display: flex; gap: 8px; padding: 4px 0; }
 .anatomia-notas .n {
-  flex: 0 0 auto; width: 15px; height: 15px; border-radius: 50%;
-  background: var(--bio); color: #171206; font-size: 9px; font-weight: 800;
-  display: flex; align-items: center; justify-content: center;
+  flex: 0 0 auto; width: 17px; height: 17px; border-radius: 4px;
+  background: rgba(244,236,224,.05); box-shadow: 0 0 0 1px var(--borde);
+  font-size: 10px; font-weight: 500;
+  display: grid; place-items: center;
 }
+.anatomia-notas .n.c { border-radius: 50%; color: var(--texto); }
+.anatomia-notas .n.st-a { color: var(--acento-claro); }
+.anatomia-notas .n.st-d { color: var(--agua); }
+.anatomia-notas .n.st-v { color: var(--vida); }
 .anatomia-notas span { color: var(--tenue); }
-.anatomia-notas b { color: var(--texto); font-weight: 600; }
+.anatomia-notas b { color: var(--texto-2); font-weight: 500; }
 
 .leyenda-ev { display: flex; flex-wrap: wrap; gap: 10px; font-size: 11.5px; color: var(--tenue); margin-top: 6px; }
 .leyenda-ev span { display: inline-flex; align-items: center; gap: 5px; }
 .leyenda-ev .ev { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-.ev.ESTABLECIDO { background: #7fb069; }
-.ev.INFERIDO { background: #d9a441; }
-.ev.DEBATIDO { background: #c98a5e; }
+.ev.ESTABLECIDO { background: #86a86b; }
+.ev.INFERIDO { background: var(--acento-claro); }
+.ev.DEBATIDO { background: var(--vida); }
 
 .ayuda-tabla { width: 100%; border-collapse: collapse; font-size: 12px; }
 .ayuda-tabla th, .ayuda-tabla td { padding: 5px 4px; text-align: left; border-bottom: 1px solid var(--borde); }
@@ -854,5 +1127,5 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
-.fin-premio { color: var(--bio); }
+
 .mazo-nombre { touch-action: auto; }

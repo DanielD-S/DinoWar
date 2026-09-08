@@ -376,17 +376,33 @@ function rendirse() {
   soltarEntrada();
   cancelarAnimaciones();
 
-  const [p, r] = estado.jugadores;
-  el.finTitulo.textContent = 'Te has retirado';
-  el.finTitulo.style.color = 'var(--rival)';
-  el.finDetalle.innerHTML = 'abandonas el campo en el turno '
-    + `<b>${estado.turno}</b><br>Trofeos <b>${p.trofeos}</b> – <b>${r.trofeos}</b>`
-    + ` · Hábitat <b>${Math.max(0, p.habitat)}</b> – <b>${Math.max(0, r.habitat)}</b>`;
-
+  pintarFin({
+    via: 'Retirada',
+    gane: false,
+    titular: 'Derrota',
+    frase: 'Abandonas el campo antes de que se decida.',
+  });
   anotarResultado(false, estado.turno);
-  const premio = recompensar(false);
-  el.finDetalle.innerHTML += `<br><span class="fin-premio">+${premio} dinomonedas</span>`;
+  el.finPremio.textContent = `+${recompensar(false)} dinomonedas`;
   sonido('pierde');
+}
+
+/**
+ * Pantalla de fin: la vía de victoria arriba en versales, el titular, la frase
+ * que lo explica y el resumen en tres cajas. Antes era un párrafo con todo
+ * dentro y todo pesaba lo mismo.
+ */
+function pintarFin({ via, gane, titular, frase }) {
+  const [p, r] = estado.jugadores;
+  el.finVia.textContent = via;
+  el.finTitulo.textContent = titular;
+  el.finTitulo.style.color = gane ? 'var(--acento-claro)' : 'var(--rival)';
+  el.finDetalle.textContent = frase;
+  el.finResumen.innerHTML = [
+    ['Turnos', estado.turno],
+    ['Trofeos', `${p.trofeos}<span class="sep">–</span>${r.trofeos}`],
+    ['Hábitat', `${Math.max(0, p.habitat)}<span class="sep">–</span>${Math.max(0, r.habitat)}`],
+  ].map(([et, v]) => `<div class="fin-caja"><b>${v}</b><i>${et}</i></div>`).join('');
 }
 
 function preguntarRendicion() {
@@ -412,23 +428,28 @@ function finPartida() {
   if (tutorialActivo()) terminarTutorial();
 
   const gane = estado.ganador === JUGADOR;
-  const [p, r] = estado.jugadores;
-  el.finTitulo.textContent = gane ? 'Tu población domina' : 'Tu población se extingue';
-  el.finTitulo.style.color = gane ? 'var(--propio)' : 'var(--rival)';
-
-  const motivo = {
-    [MOTIVO_FIN.TROFEOS]: 'por registro fósil',
-    [MOTIVO_FIN.HABITAT]: 'por colapso del hábitat',
-    [MOTIVO_FIN.EXTINCION]: 'por extinción: alguien se quedó sin cartas',
-    [MOTIVO_FIN.LIMITE_TURNOS]: 'por límite de turnos',
+  const via = {
+    [MOTIVO_FIN.TROFEOS]: 'Registro fósil completo',
+    [MOTIVO_FIN.HABITAT]: 'Colapso del hábitat',
+    [MOTIVO_FIN.EXTINCION]: 'Extinción',
+    [MOTIVO_FIN.LIMITE_TURNOS]: 'Límite de turnos',
+  }[estado.motivoFin] ?? '';
+  const frase = {
+    [MOTIVO_FIN.TROFEOS]: gane
+      ? 'Tu población dejó más fósiles que la rival.'
+      : 'El registro fósil se llenó de los tuyos.',
+    [MOTIVO_FIN.HABITAT]: gane
+      ? 'El hábitat rival cedió antes que el tuyo.'
+      : 'Tu hábitat cedió antes que el suyo.',
+    [MOTIVO_FIN.EXTINCION]: gane
+      ? 'Al rival no le quedaban cartas que robar.'
+      : 'Te quedaste sin cartas que robar.',
+    [MOTIVO_FIN.LIMITE_TURNOS]: 'Se acabaron los turnos sin decidirse.',
   }[estado.motivoFin] ?? '';
 
-  el.finDetalle.innerHTML = `${motivo}<br>Trofeos <b>${p.trofeos}</b> – <b>${r.trofeos}</b>`
-    + ` · Hábitat <b>${Math.max(0, p.habitat)}</b> – <b>${Math.max(0, r.habitat)}</b><br>${estado.turno} turnos`;
-
+  pintarFin({ via, gane, titular: gane ? 'Victoria' : 'Derrota', frase });
   anotarResultado(gane, estado.turno);
-  const premio = recompensar(gane);
-  el.finDetalle.innerHTML += `<br><span class="fin-premio">+${premio} dinomonedas</span>`;
+  el.finPremio.textContent = `+${recompensar(gane)} dinomonedas`;
   sonido(gane ? 'gana' : 'pierde');
 }
 
