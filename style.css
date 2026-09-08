@@ -140,6 +140,23 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .rec.mano b { color: var(--texto); }
 .rec.mazo b { color: var(--tenue); }
 .rec.mazo.aviso b, .rec.mazo.aviso i { color: var(--vida); }
+.rec.desc b { color: var(--tenue); }
+.rec.desc { cursor: pointer; }
+.rec.desc:active b { color: var(--bio); }
+
+/* Lista del descarte: qué ha jugado y perdido cada bando. */
+.desc-lista { display: flex; flex-direction: column; gap: 5px; }
+.desc-fila {
+  display: flex; align-items: center; gap: 9px;
+  padding: 6px 8px; border-radius: 6px;
+  background: var(--panel-alto); border: 1px solid var(--borde);
+  font-size: 13px;
+}
+.desc-fila .n { font-weight: 800; color: var(--bio); min-width: 20px; }
+.desc-fila .nom { flex: 1; min-width: 0; }
+.desc-fila .nom i { font-style: italic; }
+.desc-fila .fam { font-size: 10px; color: var(--tenue); text-transform: uppercase; letter-spacing: .06em; }
+.desc-vacio { color: var(--tenue); font-size: 13px; }
 
 .hud-centro { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 3px; }
 #turno { color: var(--tenue); font-size: 11px; letter-spacing: .06em; }

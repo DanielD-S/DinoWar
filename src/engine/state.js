@@ -1,7 +1,7 @@
 // DinoWar — creación del estado y selectores de sólo lectura.
 // Ninguna función de este módulo muta su argumento.
 
-import { BALANCE } from '../data/balance.js';
+import { BALANCE, MAZO } from '../data/balance.js';
 import { CARTAS, TIPO, CLADO, RASGO, INMUNE_SEQUIA, carta } from '../data/cards.js';
 import { barajar, semilla } from './rng.js';
 
@@ -56,7 +56,7 @@ export function crearPartida(seedEntrada = 1) {
 
   for (let j = 0; j < 2; j++) {
     const mazo = [];
-    for (const [cardId, copias] of BALANCE.mazo) {
+    for (const [cardId, copias] of MAZO) {
       for (let k = 0; k < copias; k++) {
         const iid = siguienteInstId++;
         instancias[iid] = nuevaInstancia(iid, cardId, j);

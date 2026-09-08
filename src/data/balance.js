@@ -1,12 +1,12 @@
 // DinoWar — todos los números de balance viven aquí y en ningún otro sitio.
 // Si una constante numérica aparece en engine/ o ui/, es un bug.
 
-import { CLADO } from './cards.js';
+import { CARTAS, CLADO, RAREZA } from './cards.js';
 
 export const BALANCE = Object.freeze({
   // ------------------------------------------------------------- victorias
-  trofeosParaGanar: 12,      // registro fósil
-  vidaHabitat: 26,            // colapso del habitat
+  trofeosParaGanar: 6,      // registro fósil
+  vidaHabitat: 34,            // colapso del habitat
   // la tercera, extinción, no tiene número: es quedarse sin cartas al robar
 
   // ---------------------------------------------------------------- campo
@@ -20,9 +20,9 @@ export const BALANCE = Object.freeze({
   rentaTope: 8,
   rentaAcumula: false,      // lo que no gastas se pierde
 
-  manoInicial: 4,
+  manoInicial: 6,
   manoMaxima: 7,
-  robo: Object.freeze({ normal: 2 }),
+  robo: Object.freeze({ normal: 1 }),
   // Sin rebarajado, el mazo es finito y agotarlo es un reloj real, como en
   // Pokémon. Con robo de 2 y mazo de 30, se acaba justo en la franja de turnos
   // objetivo: la extinción muerde en las partidas que se alargan.
@@ -88,36 +88,16 @@ export const BALANCE = Object.freeze({
   }),
 
   // ------------------------------------------------------------------- mazo
-  // 30 cartas: 17 dinosaurios, 5 adaptaciones, 4 presiones, 4 de campo.
-  mazo: Object.freeze([
-    Object.freeze(['dryosaurus', 3]),
-    Object.freeze(['ornitholestes', 2]),
-    Object.freeze(['ceratosaurus', 2]),
-    Object.freeze(['stegosaurus', 2]),
-    Object.freeze(['allosaurus', 2]),
-    Object.freeze(['camarasaurus', 2]),
-    Object.freeze(['diplodocus', 2]),
-    Object.freeze(['apatosaurus', 1]),
-    Object.freeze(['torvosaurus', 1]),
-
-    Object.freeze(['gregarismo', 2]),
-    Object.freeze(['gastrolitos', 1]),
-    Object.freeze(['crecimiento_acelerado', 1]),
-    Object.freeze(['neumaticidad', 1]),
-
-    Object.freeze(['fractura', 2]),
-    Object.freeze(['competencia', 1]),
-    Object.freeze(['mortandad', 1]),
-
-    Object.freeze(['rebrote', 1]),
-    Object.freeze(['carrona', 1]),
-    Object.freeze(['lago', 1]),
-
-    Object.freeze(['llanura', 1]),
-    Object.freeze(['canal', 1]),
-    Object.freeze(['bosque', 1]),
-    Object.freeze(['sabana', 1]),
-  ]),
+  // Copias por rareza. Con 23 cartas distintas, 3/3/3/1 daría 49 o 51 según
+  // dónde se redondee y exigiría 9 legendarias de 23 para llegar a 50, que es
+  // demasiadas para que la palabra signifique algo. Bajando la épica a 2 el
+  // mazo cuadra en 50 exactos y las 23 cartas siguen siendo jugables.
+  copiasPorRareza: Object.freeze({
+    [RAREZA.COMUN]: 3,
+    [RAREZA.RARO]: 3,
+    [RAREZA.EPICO]: 2,
+    [RAREZA.LEGENDARIO]: 1,
+  }),
 
   mazoEstacional: Object.freeze([
     Object.freeze(['SEQUIA', 3]),
@@ -139,4 +119,12 @@ export const BALANCE = Object.freeze({
   }),
 });
 
-export const TOTAL_MAZO = BALANCE.mazo.reduce((n, [, copias]) => n + copias, 0);
+/**
+ * El mazo se DERIVA de la rareza de cada carta, no se escribe a mano: así no
+ * puede desviarse de la regla de copias por mucho que crezca el set.
+ */
+export const MAZO = Object.freeze(
+  Object.values(CARTAS).map((c) => Object.freeze([c.id, BALANCE.copiasPorRareza[c.rareza]])),
+);
+
+export const TOTAL_MAZO = MAZO.reduce((n, [, copias]) => n + copias, 0);

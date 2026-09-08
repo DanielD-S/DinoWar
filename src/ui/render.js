@@ -18,6 +18,11 @@ export function montar() {
     menu: id('menu'), partida: id('partida'), fin: id('fin'),
     rTrof: id('r-trof'), rBio: id('r-bio'), rMano: id('r-mano'), rMazo: id('r-mazo'),
     pTrof: id('p-trof'), pBio: id('p-bio'), pMano: id('p-mano'), pMazo: id('p-mazo'),
+    rDesc: id('r-desc'), pDesc: id('p-desc'),
+    rDescBtn: id('r-desc-btn'), pDescBtn: id('p-desc-btn'),
+    descarte: id('descarte'), descarteCuerpo: id('descarte-cuerpo'),
+    descarteTitulo: id('descarte-titulo'), descarteTexto: id('descarte-texto'),
+    descarteCerrar: id('descarte-cerrar'),
     rHabitat: id('r-habitat'), pHabitat: id('p-habitat'), rBarra: id('r-barra'), pBarra: id('p-barra'),
     turno: id('turno'), estacion: id('btn-estacion'),
     campo: id('campo'), franjaCampo: id('btn-campo'), franjaNota: id('franja-nota'),
@@ -237,6 +242,8 @@ export function render(estado) {
   el.pBio.textContent = p.biomasa;
   el.pMano.textContent = p.mano.length;
   el.pMazo.textContent = p.mazo.length;
+  el.pDesc.textContent = p.descarte.length;
+  el.rDesc.textContent = r.descarte.length;
   el.rTrof.textContent = r.trofeos;
   el.rBio.textContent = r.biomasa;
   el.rMano.textContent = r.mano.length;
@@ -312,7 +319,43 @@ export function abrirFicha(html) {
 }
 
 export function cerrarHojas() {
-  for (const h of [el.ficha, el.log, el.eleccion, el.ayuda]) h.classList.add('oculta');
+  for (const h of [el.ficha, el.log, el.eleccion, el.ayuda, el.descarte]) h.classList.add('oculta');
+}
+
+/**
+ * Descarte de un bando, agrupado por carta. Es información pública en el motor
+ * —`vistaDe` la respeta— pero hasta ahora no se enseñaba, y sin ella adivinar
+ * dónde despliega el rival era una moneda al aire en vez de una deducción.
+ */
+export function abrirDescarte(estado, bando) {
+  const jug = estado.jugadores[bando];
+  const cuenta = new Map();
+  for (const iid of jug.descarte) {
+    const cardId = estado.instancias[iid].cardId;
+    cuenta.set(cardId, (cuenta.get(cardId) ?? 0) + 1);
+  }
+
+  el.descarteTitulo.textContent = bando === JUGADOR ? 'Tu descarte' : 'Descarte del rival';
+  el.descarteTexto.textContent = bando === JUGADOR
+    ? 'Lo que has jugado y perdido. No vuelve al mazo.'
+    : 'Lo que el rival ya ha gastado y perdido. Lo que no está aquí, aún lo tiene.';
+
+  const filas = [...cuenta.entries()]
+    .sort((a, b) => b[1] - a[1] || carta(a[0]).binomial.localeCompare(carta(b[0]).binomial))
+    .map(([cardId, n]) => {
+      const c = carta(cardId);
+      const dino = c.tipo === TIPO.DINOSAURIO;
+      return `<div class="desc-fila" data-card="${cardId}">
+        <span class="n">${n}×</span>
+        <span class="nom">${dino ? `<i>${c.binomial}</i>` : c.binomial}
+          <span class="fam">${dino ? CLADO_NOMBRE[c.clado] : TIPO_NOMBRE[c.tipo]}</span></span>
+      </div>`;
+    });
+
+  el.descarteCuerpo.innerHTML = filas.length
+    ? `<div class="desc-lista">${filas.join('')}</div>`
+    : '<p class="desc-vacio">Todavía no ha ido nada al descarte.</p>';
+  el.descarte.classList.remove('oculta');
 }
 
 // ------------------------------------------------------------------ ayuda

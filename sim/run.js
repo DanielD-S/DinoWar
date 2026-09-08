@@ -7,7 +7,7 @@
 //   node sim/run.js --json              métricas crudas por stdout
 
 import { writeFileSync } from 'node:fs';
-import { BALANCE, TOTAL_MAZO } from '../src/data/balance.js';
+import { BALANCE, MAZO, TOTAL_MAZO } from '../src/data/balance.js';
 import { CARTAS, TIPO, CLADO_NOMBRE } from '../src/data/cards.js';
 import { MOTIVO_FIN } from '../src/engine/state.js';
 import { PERFIL } from '../src/engine/ai.js';
@@ -98,7 +98,7 @@ export function correr({ n, seed, perfiles }) {
 
 export function resumir(m) {
   const cardIds = Object.keys(CARTAS);
-  const copias = Object.fromEntries(BALANCE.mazo);
+  const copias = Object.fromEntries(MAZO);
   const frecuencias = cardIds.map((c) => {
     const cuota = pct(m.jugadasPorCarta[c], m.jugadasTotales);
     const esperado = pct(copias[c] ?? 0, TOTAL_MAZO);

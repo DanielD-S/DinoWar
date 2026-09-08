@@ -320,6 +320,15 @@ export function descartarDeMano(s, j, iid) {
 export function faseChequeo(s) {
   const [a, b] = s.jugadores;
 
+  // El mazo a cero es la derrota, sin esperar a que toque robar: es un reloj
+  // que el jugador puede ver bajar en el marcador.
+  if (a.mazo.length === 0 || b.mazo.length === 0) {
+    if (a.mazo.length === 0) a.sinCartas = true;
+    if (b.mazo.length === 0) b.sinCartas = true;
+    finalizar(s, MOTIVO_FIN.EXTINCION);
+    return;
+  }
+
   if (a.trofeos >= BALANCE.trofeosParaGanar || b.trofeos >= BALANCE.trofeosParaGanar) {
     finalizar(s, MOTIVO_FIN.TROFEOS);
     return;

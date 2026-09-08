@@ -9,7 +9,7 @@ import { decidir, PERFIL } from './engine/ai.js';
 import { semilla } from './engine/rng.js';
 import {
   montar, render, mensaje, el, JUGADOR, RIVAL,
-  fichaHTML, fichaEstacionHTML, ayudaHTML, abrirFicha, cerrarHojas,
+  fichaHTML, fichaEstacionHTML, ayudaHTML, abrirFicha, abrirDescarte, cerrarHojas,
 } from './ui/render.js';
 import { tomarEntrada, soltarEntrada } from './ui/input.js';
 import { animarCombate, cancelarAnimaciones, esperar, lineasDeLog } from './ui/animate.js';
@@ -348,6 +348,13 @@ function iniciar() {
   el.btnListo.addEventListener('click', alPulsarListo);
   el.btnLog.addEventListener('click', abrirLog);
   el.logCerrar.addEventListener('click', cerrarHojas);
+  el.descarteCerrar.addEventListener('click', cerrarHojas);
+  el.rDescBtn.addEventListener('click', () => { if (estado) abrirDescarte(estado, RIVAL); });
+  el.pDescBtn.addEventListener('click', () => { if (estado) abrirDescarte(estado, JUGADOR); });
+  el.descarteCuerpo.addEventListener('click', (e) => {
+    const f = e.target.closest('[data-card]');
+    if (f) abrirFicha(fichaHTML(f.dataset.card));
+  });
   el.fichaCerrar.addEventListener('click', cerrarHojas);
   el.ayudaCerrar.addEventListener('click', cerrarHojas);
   el.eleccionCerrar.addEventListener('click', () => {

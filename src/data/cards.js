@@ -30,6 +30,20 @@ export const OBJETIVO = Object.freeze({
   CAMPO: 'CAMPO',     // el campo entero
 });
 
+/**
+ * Rareza. Gobierna cuántas copias caben en el mazo y —cuando existan los
+ * sobres— con qué frecuencia aparece. Sigue la abundancia fósil real: los
+ * taxones corrientes de la Morrison son comunes, y *Torvosaurus*, genuinamente
+ * raro en el registro, es legendario.
+ */
+export const RAREZA = Object.freeze({
+  COMUN: 'COMUN', RARO: 'RARO', EPICO: 'EPICO', LEGENDARIO: 'LEGENDARIO',
+});
+
+export const RAREZA_NOMBRE = Object.freeze({
+  COMUN: 'Común', RARO: 'Rara', EPICO: 'Épica', LEGENDARIO: 'Legendaria',
+});
+
 export const TIPO_NOMBRE = Object.freeze({
   DINOSAURIO: 'Dinosaurio', EVENTO: 'Evento', CLIMA: 'Clima', RECURSO: 'Recurso',
 });
@@ -92,7 +106,7 @@ export const CARTAS = Object.freeze({
   // ------------------------------------------------------------ dinosaurios
 
   dryosaurus: dino({
-    id: 'dryosaurus', clado: CLADO.ORNITOPODO,
+    id: 'dryosaurus', rareza: RAREZA.COMUN, clado: CLADO.ORNITOPODO,
     binomial: 'Dryosaurus altus',
     coste: 1, ataque: 1, defensa: 0, vida: 2, consumoHidrico: 0,
     rasgo: RASGO.GREGARIO, rasgoNombre: 'Gregario',
@@ -102,7 +116,7 @@ export const CARTAS = Object.freeze({
   }),
 
   ornitholestes: dino({
-    id: 'ornitholestes', clado: CLADO.TEROPODO,
+    id: 'ornitholestes', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,
     binomial: 'Ornitholestes hermanni',
     coste: 2, ataque: 2, defensa: 0, vida: 2, consumoHidrico: 0,
     rasgo: RASGO.OPORTUNISTA, rasgoNombre: 'Oportunista',
@@ -112,7 +126,7 @@ export const CARTAS = Object.freeze({
   }),
 
   ceratosaurus: dino({
-    id: 'ceratosaurus', clado: CLADO.TEROPODO,
+    id: 'ceratosaurus', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,
     binomial: 'Ceratosaurus nasicornis',
     coste: 3, ataque: 4, defensa: 1, vida: 3, consumoHidrico: 2,
     rasgo: RASGO.RIBERENO, rasgoNombre: 'Ribereño',
@@ -122,7 +136,7 @@ export const CARTAS = Object.freeze({
   }),
 
   stegosaurus: dino({
-    id: 'stegosaurus', clado: CLADO.TIREOFORO,
+    id: 'stegosaurus', rareza: RAREZA.EPICO, clado: CLADO.TIREOFORO,
     binomial: 'Stegosaurus stenops',
     coste: 4, ataque: 3, defensa: 3, vida: 6, consumoHidrico: 1,
     rasgo: RASGO.TAGOMIZADOR, rasgoNombre: 'Tagomizador',
@@ -132,7 +146,7 @@ export const CARTAS = Object.freeze({
   }),
 
   allosaurus: dino({
-    id: 'allosaurus', clado: CLADO.TEROPODO,
+    id: 'allosaurus', rareza: RAREZA.EPICO, clado: CLADO.TEROPODO,
     binomial: 'Allosaurus fragilis',
     coste: 5, ataque: 6, defensa: 1, vida: 5, consumoHidrico: 1,
     rasgo: RASGO.DEPREDADOR_DOMINANTE, rasgoNombre: 'Depredador dominante',
@@ -142,7 +156,7 @@ export const CARTAS = Object.freeze({
   }),
 
   camarasaurus: dino({
-    id: 'camarasaurus', clado: CLADO.SAUROPODO,
+    id: 'camarasaurus', rareza: RAREZA.EPICO, clado: CLADO.SAUROPODO,
     binomial: 'Camarasaurus grandis',
     coste: 5, ataque: 3, defensa: 2, vida: 7, consumoHidrico: 2,
     rasgo: RASGO.MIGRADOR, rasgoNombre: 'Migrador',
@@ -152,7 +166,7 @@ export const CARTAS = Object.freeze({
   }),
 
   diplodocus: dino({
-    id: 'diplodocus', clado: CLADO.SAUROPODO,
+    id: 'diplodocus', rareza: RAREZA.EPICO, clado: CLADO.SAUROPODO,
     binomial: 'Diplodocus carnegii',
     coste: 5, ataque: 3, defensa: 2, vida: 10, consumoHidrico: 3,
     rasgo: RASGO.RAMONEO_BAJO, rasgoNombre: 'Ramoneo bajo',
@@ -162,7 +176,7 @@ export const CARTAS = Object.freeze({
   }),
 
   apatosaurus: dino({
-    id: 'apatosaurus', clado: CLADO.SAUROPODO,
+    id: 'apatosaurus', rareza: RAREZA.LEGENDARIO, clado: CLADO.SAUROPODO,
     binomial: 'Apatosaurus louisae',
     coste: 7, ataque: 4, defensa: 3, vida: 12, consumoHidrico: 3,
     rasgo: RASGO.MASA_COLOSAL, rasgoNombre: 'Masa colosal',
@@ -172,7 +186,7 @@ export const CARTAS = Object.freeze({
   }),
 
   torvosaurus: dino({
-    id: 'torvosaurus', clado: CLADO.TEROPODO,
+    id: 'torvosaurus', rareza: RAREZA.LEGENDARIO, clado: CLADO.TEROPODO,
     binomial: 'Torvosaurus tanneri',
     coste: 7, ataque: 8, defensa: 1, vida: 6, consumoHidrico: 2,
     rasgo: RASGO.ESCASO, rasgoNombre: 'Escaso',
@@ -184,7 +198,7 @@ export const CARTAS = Object.freeze({
   // ---------------------------------------------- eventos: mejoran a los tuyos
 
   gregarismo: evento({
-    id: 'gregarismo', binomial: 'Gregarismo', coste: 2,
+    id: 'gregarismo', rareza: RAREZA.RARO, binomial: 'Gregarismo', coste: 2,
     objetivo: OBJETIVO.PROPIO,
     rasgo: RASGO.GREGARISMO, rasgoNombre: 'Gregarismo',
     rasgoTexto: '+2 Poder a todos tus dinosaurios de la misma especie que el objetivo.',
@@ -193,7 +207,7 @@ export const CARTAS = Object.freeze({
   }),
 
   gastrolitos: evento({
-    id: 'gastrolitos', binomial: 'Gastrolitos', coste: 2,
+    id: 'gastrolitos', rareza: RAREZA.EPICO, binomial: 'Gastrolitos', coste: 2,
     objetivo: OBJETIVO.PROPIO,
     rasgo: RASGO.GASTROLITOS, rasgoNombre: 'Gastrolitos',
     rasgoTexto: 'El objetivo cura 1 herida al final de cada turno.',
@@ -202,7 +216,7 @@ export const CARTAS = Object.freeze({
   }),
 
   crecimiento_acelerado: evento({
-    id: 'crecimiento_acelerado', binomial: 'Crecimiento acelerado', coste: 3,
+    id: 'crecimiento_acelerado', rareza: RAREZA.LEGENDARIO, binomial: 'Crecimiento acelerado', coste: 3,
     objetivo: OBJETIVO.PROPIO,
     rasgo: RASGO.CRECIMIENTO_ACELERADO, rasgoNombre: 'Crecimiento acelerado',
     rasgoTexto: '+2 Poder y +2 Vida permanentes.',
@@ -211,7 +225,7 @@ export const CARTAS = Object.freeze({
   }),
 
   neumaticidad: evento({
-    id: 'neumaticidad', binomial: 'Neumaticidad ósea', coste: 2,
+    id: 'neumaticidad', rareza: RAREZA.EPICO, binomial: 'Neumaticidad ósea', coste: 2,
     objetivo: OBJETIVO.PROPIO,
     rasgo: RASGO.NEUMATICIDAD, rasgoNombre: 'Neumaticidad ósea',
     rasgoTexto: '+2 Poder. Sólo sobre terópodos y saurópodos.',
@@ -222,7 +236,7 @@ export const CARTAS = Object.freeze({
   // ------------------------------------- eventos: presiones sobre el rival
 
   fractura: evento({
-    id: 'fractura', binomial: 'Fractura consolidada', coste: 2,
+    id: 'fractura', rareza: RAREZA.EPICO, binomial: 'Fractura consolidada', coste: 2,
     objetivo: OBJETIVO.RIVAL,
     rasgo: RASGO.FRACTURA, rasgoNombre: 'Fractura consolidada',
     rasgoTexto: '−2 Poder permanente a un dinosaurio rival.',
@@ -231,7 +245,7 @@ export const CARTAS = Object.freeze({
   }),
 
   competencia: evento({
-    id: 'competencia', binomial: 'Competencia trófica', coste: 2,
+    id: 'competencia', rareza: RAREZA.EPICO, binomial: 'Competencia trófica', coste: 2,
     objetivo: OBJETIVO.CLADO,
     rasgo: RASGO.COMPETENCIA, rasgoNombre: 'Competencia trófica',
     rasgoTexto: '−2 Poder a todos los dinosaurios rivales del clado que elijas.',
@@ -240,7 +254,7 @@ export const CARTAS = Object.freeze({
   }),
 
   mortandad: evento({
-    id: 'mortandad', binomial: 'Mortandad estacional', coste: 3,
+    id: 'mortandad', rareza: RAREZA.LEGENDARIO, binomial: 'Mortandad estacional', coste: 3,
     objetivo: OBJETIVO.CAMPO,
     rasgo: RASGO.MORTANDAD, rasgoNombre: 'Mortandad estacional',
     rasgoTexto: '2 de daño a TODOS los dinosaurios del campo, incluidos los tuyos.',
@@ -251,7 +265,7 @@ export const CARTAS = Object.freeze({
   // ------------------------------------------------------------- recursos
 
   rebrote: recurso({
-    id: 'rebrote', binomial: 'Rebrote tras incendio',
+    id: 'rebrote', rareza: RAREZA.COMUN, binomial: 'Rebrote tras incendio',
     rasgo: RASGO.REBROTE, rasgoNombre: 'Rebrote tras incendio',
     rasgoTexto: '+3 Biomasa ahora mismo. Todos tus dinosaurios reciben 1 herida.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -259,7 +273,7 @@ export const CARTAS = Object.freeze({
   }),
 
   carrona: recurso({
-    id: 'carrona', binomial: 'Carroña abundante',
+    id: 'carrona', rareza: RAREZA.RARO, binomial: 'Carroña abundante',
     rasgo: RASGO.CARRONA, rasgoNombre: 'Carroña abundante',
     rasgoTexto: '+3 Biomasa ahora mismo. El rival gana 1 Biomasa.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -267,7 +281,7 @@ export const CARTAS = Object.freeze({
   }),
 
   lago: recurso({
-    id: 'lago', binomial: 'Lago efímero',
+    id: 'lago', rareza: RAREZA.RARO, binomial: 'Lago efímero',
     rasgo: RASGO.LAGO, rasgoNombre: 'Lago efímero',
     rasgoTexto: '+2 Biomasa ahora mismo. Tu habitat pierde 1.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -277,7 +291,7 @@ export const CARTAS = Object.freeze({
   // --------------------------------------------------------------- clima
 
   llanura: clima({
-    id: 'llanura', binomial: 'Llanura de inundación',
+    id: 'llanura', rareza: RAREZA.EPICO, binomial: 'Llanura de inundación',
     rasgo: RASGO.CAMPO_LLANURA, rasgoNombre: 'Llanura de inundación',
     rasgoTexto: '+1 Biomasa por turno a los dos bandos.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -285,7 +299,7 @@ export const CARTAS = Object.freeze({
   }),
 
   canal: clima({
-    id: 'canal', binomial: 'Canal fluvial trenzado',
+    id: 'canal', rareza: RAREZA.EPICO, binomial: 'Canal fluvial trenzado',
     rasgo: RASGO.CAMPO_CANAL, rasgoNombre: 'Canal fluvial trenzado',
     rasgoTexto: 'Agua permanente: la Sequía estacional no mata a nadie.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -293,7 +307,7 @@ export const CARTAS = Object.freeze({
   }),
 
   bosque: clima({
-    id: 'bosque', binomial: 'Bosque de coníferas ribereño',
+    id: 'bosque', rareza: RAREZA.EPICO, binomial: 'Bosque de coníferas ribereño',
     rasgo: RASGO.CAMPO_BOSQUE, rasgoNombre: 'Bosque de coníferas ribereño',
     rasgoTexto: 'Los saurópodos curan 1 herida al final de cada turno.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -301,7 +315,7 @@ export const CARTAS = Object.freeze({
   }),
 
   sabana: clima({
-    id: 'sabana', binomial: 'Sabana de helechos',
+    id: 'sabana', rareza: RAREZA.COMUN, binomial: 'Sabana de helechos',
     rasgo: RASGO.CAMPO_SABANA, rasgoNombre: 'Sabana de helechos',
     rasgoTexto: 'Terreno abierto, sin cobertura: +1 al daño contra los biomas.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
