@@ -48,7 +48,7 @@ revisión viene a arreglar.
 | ceratosaurus | Ceratosaurus nasicornis | Terópodo | Común | 1 | 1 | 4 | 1 | 3 | Ribereño | +2 Poder mientras el campo activo sea Canal fluvial trenzado. |
 | stegosaurus | Stegosaurus stenops | Tireóforo | Épica | 2 | 2 | 3 | 3 | 6 | Tagomizador | Devuelve 2 de daño adicional a quien lo ataque, además del que ya devuelve su clado. |
 | allosaurus | Allosaurus fragilis | Terópodo | Épica | 2 | 2 | 6 | 1 | 5 | Depredador dominante | Si mata a su rival, el daño sobrante pasa al hábitat enemigo. |
-| camarasaurus | Camarasaurus grandis | Saurópodo | Épica | 2 | 2 | 3 | 2 | 7 | Migrador | Puede cambiar de ranura en vez de desplegar. Inmune a Sequía estacional. |
+| camarasaurus | Camarasaurus grandis | Saurópodo | Épica | 2 | 2 | 3 | 2 | 7 | Migrador | Puede cambiar de ranura en vez de desplegar. |
 | diplodocus | Diplodocus carnegii | Saurópodo | Legendaria | 2 | 2 | 3 | 2 | 10 | Ramoneo bajo | Cura 1 herida al final de cada turno. |
 | apatosaurus | Apatosaurus louisae | Saurópodo | Legendaria | 3 | 3 | 4 | 3 | 12 | Masa colosal | +1 de Defensa adicional: es la mayor masa del set. |
 | torvosaurus | Torvosaurus tanneri | Terópodo | Legendaria | 3 | 3 | 8 | 1 | 6 | Escaso | Sólo 1 copia en el mazo. No admite adaptaciones. |
@@ -70,7 +70,7 @@ revisión viene a arreglar.
 | carrona | Carroña abundante | Recurso | Épica | 0 | 0 |  |  |  | Carroña abundante | +3 Biomasa ahora mismo. El rival gana 1 Biomasa. |
 | lago | Lago efímero | Recurso | Épica | 0 | 0 |  |  |  | Lago efímero | +2 Biomasa ahora mismo. Tu hábitat pierde 1. |
 | llanura | Llanura de inundación | Clima | Épica | 1 | 1 |  |  |  | Llanura de inundación | +1 Biomasa por turno a los dos bandos. |
-| canal | Canal fluvial trenzado | Clima | Legendaria | 1 | 1 |  |  |  | Canal fluvial trenzado | Agua permanente: la Sequía estacional no mata a nadie. |
+| canal | Canal fluvial trenzado | Clima | Legendaria | 1 | 1 |  |  |  | Canal fluvial trenzado | Agua permanente en el campo: los ribereños pelean a gusto. |
 | bosque | Bosque de coníferas ribereño | Clima | Legendaria | 1 | 1 |  |  |  | Bosque de coníferas ribereño | Los saurópodos curan 1 herida al final de cada turno. |
 | aridez | Deriva árida | Clima | Épica | 1 | 1 |  |  |  | Deriva árida | Cada turno, los dos bandos pierden 5 cartas del mazo. |
 | sabana | Sabana de helechos | Clima | Común | 1 | 1 |  |  |  | Sabana de helechos | Terreno abierto, sin cobertura: +1 al daño contra los biomas. |

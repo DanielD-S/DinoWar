@@ -2,7 +2,7 @@
 
 import { BALANCE } from '../data/balance.js';
 import {
-  CARTAS, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, RAREZA_NOMBRE, ESTACIONES, carta,
+  CARTAS, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, RAREZA_NOMBRE, carta,
 } from '../data/cards.js';
 import {
   unidadEn, unidadesDe, ataqueEfectivo, reduccionDe, vidaMaxima, vidaActual,
@@ -29,7 +29,7 @@ export function montar() {
     btnColeccion: id('btn-coleccion'), btnSobres: id('btn-sobres'), btnMazos: id('btn-mazos'),
     rHabitat: id('r-habitat'), pHabitat: id('p-habitat'), rBarra: id('r-barra'), pBarra: id('p-barra'),
     rPila: id('r-pila'), pPila: id('p-pila'),
-    turno: id('turno'), estacion: id('btn-estacion'),
+    turno: id('turno'),
     campo: id('campo'), franjaCampo: id('btn-campo'), franjaNota: id('franja-nota'),
     franjaMias: id('btn-mias'),
     comprometidas: id('comprometidas'), comprometidasCuerpo: id('comprometidas-cuerpo'),
@@ -374,13 +374,6 @@ export function render(estado) {
   el.pPila.classList.toggle('aviso', p.mazo.length <= 4);
   el.rPila.classList.toggle('aviso', r.mazo.length <= 4);
 
-  const est = estado.estacion.actual;
-  el.estacion.hidden = !est;
-  if (est) {
-    el.estacion.textContent = est === 'SEQUIA' ? 'Sequía' : 'Crecida';
-    el.estacion.className = `estacion ${est === 'SEQUIA' ? 'sequia' : 'crecida'}`;
-  }
-
   pintarHabitat(estado);
   pintarRanuras(estado);
   pintarFranja(estado);
@@ -424,17 +417,6 @@ export function fichaHTML(cardId) {
       <span class="evidencia ${c.nivel_evidencia}">Evidencia del rasgo: ${c.nivel_evidencia}</span>
     </div>
     <p class="ficha-nota">${c.nota_cientifica}</p>`;
-}
-
-export function fichaEstacionHTML(id) {
-  const e = ESTACIONES[id];
-  return `
-    <div class="ficha-cab"><div><div class="ficha-binomial recto">${e.nombre}</div></div></div>
-    <div class="ficha-rasgo">
-      <p>${e.texto}</p>
-      <span class="evidencia ${e.nivel_evidencia}">Evidencia: ${e.nivel_evidencia}</span>
-    </div>
-    <p class="ficha-nota">${e.nota_cientifica}</p>`;
 }
 
 export function abrirFicha(html) {
@@ -646,9 +628,8 @@ export function ayudaHTML() {
 
     <div class="ayuda-h">Cómo va un turno</div>
     <ol class="ayuda-pasos">
-      <li><b>Estación.</b> Desde el turno ${BALANCE.turnoPrimeraEstacion}, una carta de clima que nadie controla.</li>
       <li><b>Biomasa.</b> Los dos cobráis lo mismo.</li>
-      <li><b>Robo.</b> ${BALANCE.robo.normal} cartas.</li>
+      <li><b>Robo.</b> ${BALANCE.robo.normal} ${BALANCE.robo.normal === 1 ? 'carta' : 'cartas'}.</li>
       <li><b>Despliegue.</b> Sueltas cartas <b>boca abajo</b>. El rival no ve qué pones ni dónde.</li>
       <li><b>Combate.</b> Se revela todo a la vez y chocan las ranuras, de la 1 a la ${BALANCE.ranuras}.</li>
     </ol>

@@ -157,26 +157,9 @@ export async function animarCombate(estadoPrevio, estadoPosterior, eventos, alTe
 const bando = (j) => (j === JUGADOR ? 'Tu bando' : 'El rival');
 const clase = (j) => (j === JUGADOR ? 'propio' : 'rival');
 
-/**
- * La estación pasaba en silencio: aparecían heridas en media docena de cartas y
- * nada decía de dónde salían. Se marcan una a una, como en el combate.
- * @returns {Promise<number>} cuántas unidades han acusado el golpe
- */
-export async function animarEstacion(eventos) {
-  const golpes = eventos.filter((e) => e.tipo === 'DANO' && e.causa === CAUSA.SEQUIA);
-  const mia = generacion;
-  for (const g of golpes) {
-    if (mia !== generacion) return golpes.length;
-    golpear(g.iid, g.cantidad);
-  }
-  if (golpes.length > 0) await pausa(760);
-  return golpes.length;
-}
-
 const CAUSA_TEXTO = {
   [CAUSA.COMBATE]: 'en combate',
   [CAUSA.ESPINAS]: 'por las púas caudales',
-  [CAUSA.SEQUIA]: 'de sed',
   [CAUSA.MORTANDAD]: 'en la mortandad',
 };
 
@@ -186,9 +169,6 @@ export function lineasDeLog(eventos) {
 
   for (const e of eventos) {
     switch (e.tipo) {
-      case 'ESTACION':
-        push(`<b>Estación:</b> ${e.estacion === 'SEQUIA' ? 'Sequía estacional' : 'Crecida monzónica'}`);
-        break;
       case 'RENTA':
         push(`Ambos cobráis <b>${e.biomasa}</b> de Biomasa`);
         break;

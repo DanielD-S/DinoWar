@@ -170,7 +170,7 @@ export const CARTAS = Object.freeze({
     binomial: 'Camarasaurus grandis',
     coste: 2, ataque: 3, defensa: 2, vida: 7,
     rasgo: RASGO.MIGRADOR, rasgoNombre: 'Migrador',
-    rasgoTexto: 'Puede cambiar de ranura en vez de desplegar. Inmune a Sequía estacional.',
+    rasgoTexto: 'Puede cambiar de ranura en vez de desplegar.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Análisis isotópicos de esmalte dental sugieren desplazamientos estacionales hacia tierras altas durante la estación seca, a diferencia de otros saurópodos de la misma formación. El rasgo Migrador refleja ese resultado.',
   }),
@@ -382,7 +382,7 @@ export const CARTAS = Object.freeze({
   canal: clima({
     id: 'canal', coste: 1, rareza: RAREZA.LEGENDARIO, binomial: 'Canal fluvial trenzado',
     rasgo: RASGO.CAMPO_CANAL, rasgoNombre: 'Canal fluvial trenzado',
-    rasgoTexto: 'Agua permanente: la Sequía estacional no mata a nadie.',
+    rasgoTexto: 'Agua permanente en el campo: los ribereños pelean a gusto.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Los sistemas fluviales trenzados de la formación mantienen agua durante la estación seca, con vegetación ribereña estrecha a ambos lados.',
   }),
@@ -412,22 +412,6 @@ export const CARTAS = Object.freeze({
   }),
 });
 
-export const ESTACIONES = Object.freeze({
-  SEQUIA: Object.freeze({
-    id: 'SEQUIA', nombre: 'Sequía estacional',
-    texto: 'Cada dinosaurio recibe 1 herida, y 2 si tiene 7 o más de Vida: el cuerpo grande necesita más agua. Camarasaurus es inmune; el Canal fluvial protege a todos.',
-    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
-    nota_cientifica: 'Los paleosuelos, los depósitos evaporíticos y la estructura de los yacimientos de la Morrison indican un clima marcadamente estacional, semiárido, con precipitación concentrada.',
-  }),
-  CRECIDA: Object.freeze({
-    id: 'CRECIDA', nombre: 'Crecida monzónica',
-    texto: 'Todos los dinosaurios curan 1 herida. Este turno los biomas no reciben daño.',
-    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
-    nota_cientifica: 'La precipitación concentrada de la estación húmeda reverdece la llanura y desborda los canales; el agua rehace el paisaje y frena cualquier avance.',
-  }),
-});
-
-export const INMUNE_SEQUIA = Object.freeze(['camarasaurus']);
 
 export function carta(cardId) {
   const c = CARTAS[cardId];

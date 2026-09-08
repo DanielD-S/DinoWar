@@ -38,27 +38,27 @@ es legendario.
 
 | Taxón | Clado | Rareza | Copias | Coste | Ataque | Defensa | Vida | Sed |
 |---|---|---|---|---|---|---|---|---|
-| *Dryosaurus altus* | Ornitópodo | Común | 3 | 1 | 1 | 0 | 2 | undefined |
-| *Ornitholestes hermanni* | Terópodo | Común | 3 | 2 | 2 | 0 | 2 | undefined |
-| *Ceratosaurus nasicornis* | Terópodo | Común | 3 | 3 | 4 | 1 | 3 | undefined |
-| *Stegosaurus stenops* | Tireóforo | Épica | 2 | 4 | 3 | 3 | 6 | undefined |
-| *Allosaurus fragilis* | Terópodo | Épica | 2 | 5 | 6 | 1 | 5 | undefined |
-| *Camarasaurus grandis* | Saurópodo | Épica | 2 | 5 | 3 | 2 | 7 | undefined |
-| *Diplodocus carnegii* | Saurópodo | Legendaria | 1 | 5 | 3 | 2 | 10 | undefined |
-| *Apatosaurus louisae* | Saurópodo | Legendaria | 1 | 7 | 4 | 3 | 12 | undefined |
-| *Torvosaurus tanneri* | Terópodo | Legendaria | 1 | 7 | 8 | 1 | 6 | undefined |
-| *Nodosaurus textilis* | Tireóforo | Rara | 3 | 4 | 2 | 4 | 6 | undefined |
-| *Riparovenator milnerae* | Terópodo | Épica | 2 | 5 | 5 | 1 | 5 | undefined |
-| *Lokiceratops rangiformis* | Marginocéfalo | Épica | 2 | 5 | 4 | 2 | 7 | undefined |
-| *Brachylophosaurus canadensis* | Ornitópodo | Épica | 2 | 4 | 3 | 1 | 6 | undefined |
-| *Tyrannotitan chubutensis* | Terópodo | Legendaria | 1 | 8 | 9 | 1 | 7 | undefined |
-| *Huaxiadraco corollatus* | Pterosaurio | Épica | 2 | 4 | 3 | 0 | 3 | undefined |
+| *Dryosaurus altus* | Ornitópodo | Común | 3 | 0 | 1 | 0 | 2 | undefined |
+| *Ornitholestes hermanni* | Terópodo | Común | 3 | 1 | 2 | 0 | 2 | undefined |
+| *Ceratosaurus nasicornis* | Terópodo | Común | 3 | 1 | 4 | 1 | 3 | undefined |
+| *Stegosaurus stenops* | Tireóforo | Épica | 2 | 2 | 3 | 3 | 6 | undefined |
+| *Allosaurus fragilis* | Terópodo | Épica | 2 | 2 | 6 | 1 | 5 | undefined |
+| *Camarasaurus grandis* | Saurópodo | Épica | 2 | 2 | 3 | 2 | 7 | undefined |
+| *Diplodocus carnegii* | Saurópodo | Legendaria | 1 | 2 | 3 | 2 | 10 | undefined |
+| *Apatosaurus louisae* | Saurópodo | Legendaria | 1 | 3 | 4 | 3 | 12 | undefined |
+| *Torvosaurus tanneri* | Terópodo | Legendaria | 1 | 3 | 8 | 1 | 6 | undefined |
+| *Nodosaurus textilis* | Tireóforo | Rara | 3 | 2 | 2 | 4 | 6 | undefined |
+| *Riparovenator milnerae* | Terópodo | Épica | 2 | 2 | 5 | 1 | 5 | undefined |
+| *Lokiceratops rangiformis* | Marginocéfalo | Épica | 2 | 2 | 4 | 2 | 7 | undefined |
+| *Brachylophosaurus canadensis* | Ornitópodo | Épica | 2 | 2 | 3 | 1 | 6 | undefined |
+| *Tyrannotitan chubutensis* | Terópodo | Legendaria | 1 | 3 | 9 | 1 | 7 | undefined |
+| *Huaxiadraco corollatus* | Pterosaurio | Épica | 2 | 2 | 3 | 0 | 3 | undefined |
 
 *Camarasaurus* es inmune a la Sed: sus isótopos indican que migraba.
 
 ### *Dryosaurus altus* · Ornitópodo · Común · 3 copias
 
-**1 de coste · 1 de Ataque · 2 de Vida** · Defensa propuesta: *0*
+**0 de coste · 1 de Ataque · 2 de Vida** · Defensa propuesta: *0*
 
 **Gregario** — +1 Poder por cada otro Dryosaurus propio en el campo.
 
@@ -68,7 +68,7 @@ es legendario.
 
 ### *Ornitholestes hermanni* · Terópodo · Común · 3 copias
 
-**2 de coste · 2 de Ataque · 2 de Vida** · Defensa propuesta: *0*
+**1 de coste · 2 de Ataque · 2 de Vida** · Defensa propuesta: *0*
 
 **Oportunista** — +1 Vida permanente cada vez que muere un dinosaurio en el campo.
 
@@ -78,7 +78,7 @@ es legendario.
 
 ### *Ceratosaurus nasicornis* · Terópodo · Común · 3 copias
 
-**3 de coste · 4 de Ataque · 3 de Vida** · Defensa propuesta: *1*
+**1 de coste · 4 de Ataque · 3 de Vida** · Defensa propuesta: *1*
 
 **Ribereño** — +2 Poder mientras el campo activo sea Canal fluvial trenzado.
 
@@ -88,7 +88,7 @@ es legendario.
 
 ### *Stegosaurus stenops* · Tireóforo · Épica · 2 copias
 
-**4 de coste · 3 de Ataque · 6 de Vida** · Defensa propuesta: *3*
+**2 de coste · 3 de Ataque · 6 de Vida** · Defensa propuesta: *3*
 
 **Tagomizador** — Devuelve 2 de daño adicional a quien lo ataque, además del que ya devuelve su clado.
 
@@ -98,7 +98,7 @@ es legendario.
 
 ### *Allosaurus fragilis* · Terópodo · Épica · 2 copias
 
-**5 de coste · 6 de Ataque · 5 de Vida** · Defensa propuesta: *1*
+**2 de coste · 6 de Ataque · 5 de Vida** · Defensa propuesta: *1*
 
 **Depredador dominante** — Si mata a su rival, el daño sobrante pasa al hábitat enemigo.
 
@@ -108,9 +108,9 @@ es legendario.
 
 ### *Camarasaurus grandis* · Saurópodo · Épica · 2 copias
 
-**5 de coste · 3 de Ataque · 7 de Vida** · Defensa propuesta: *2*
+**2 de coste · 3 de Ataque · 7 de Vida** · Defensa propuesta: *2*
 
-**Migrador** — Puede cambiar de ranura en vez de desplegar. Inmune a Sequía estacional.
+**Migrador** — Puede cambiar de ranura en vez de desplegar.
 
 `ESTABLECIDO` · Análisis isotópicos de esmalte dental sugieren desplazamientos estacionales hacia tierras altas durante la estación seca, a diferencia de otros saurópodos de la misma formación. El rasgo Migrador refleja ese resultado.
 
@@ -118,7 +118,7 @@ es legendario.
 
 ### *Diplodocus carnegii* · Saurópodo · Legendaria · 1 copia
 
-**5 de coste · 3 de Ataque · 10 de Vida** · Defensa propuesta: *2*
+**2 de coste · 3 de Ataque · 10 de Vida** · Defensa propuesta: *2*
 
 **Ramoneo bajo** — Cura 1 herida al final de cada turno.
 
@@ -128,7 +128,7 @@ es legendario.
 
 ### *Apatosaurus louisae* · Saurópodo · Legendaria · 1 copia
 
-**7 de coste · 4 de Ataque · 12 de Vida** · Defensa propuesta: *3*
+**3 de coste · 4 de Ataque · 12 de Vida** · Defensa propuesta: *3*
 
 **Masa colosal** — +1 de Defensa adicional: es la mayor masa del set.
 
@@ -138,7 +138,7 @@ es legendario.
 
 ### *Torvosaurus tanneri* · Terópodo · Legendaria · 1 copia
 
-**7 de coste · 8 de Ataque · 6 de Vida** · Defensa propuesta: *1*
+**3 de coste · 8 de Ataque · 6 de Vida** · Defensa propuesta: *1*
 
 **Escaso** — Sólo 1 copia en el mazo. No admite adaptaciones.
 
@@ -148,7 +148,7 @@ es legendario.
 
 ### *Nodosaurus textilis* · Tireóforo · Rara · 3 copias
 
-**4 de coste · 2 de Ataque · 6 de Vida** · Defensa propuesta: *4*
+**2 de coste · 2 de Ataque · 6 de Vida** · Defensa propuesta: *4*
 
 **Coraza dorsal** — +2 de Defensa. La coraza protege; no es un arma, a diferencia de la cola del estegosaurio.
 
@@ -158,7 +158,7 @@ es legendario.
 
 ### *Riparovenator milnerae* · Terópodo · Épica · 2 copias
 
-**5 de coste · 5 de Ataque · 5 de Vida** · Defensa propuesta: *1*
+**2 de coste · 5 de Ataque · 5 de Vida** · Defensa propuesta: *1*
 
 **Ribereño** — +2 Poder mientras el Canal fluvial esté en el campo.
 
@@ -168,7 +168,7 @@ es legendario.
 
 ### *Lokiceratops rangiformis* · Marginocéfalo · Épica · 2 copias
 
-**5 de coste · 4 de Ataque · 7 de Vida** · Defensa propuesta: *2*
+**2 de coste · 4 de Ataque · 7 de Vida** · Defensa propuesta: *2*
 
 **Gola ornamentada** — +2 de Defensa.
 
@@ -178,7 +178,7 @@ es legendario.
 
 ### *Brachylophosaurus canadensis* · Ornitópodo · Épica · 2 copias
 
-**4 de coste · 3 de Ataque · 6 de Vida** · Defensa propuesta: *1*
+**2 de coste · 3 de Ataque · 6 de Vida** · Defensa propuesta: *1*
 
 **Gregario** — +1 Poder por cada copia suya que tengas en el campo.
 
@@ -188,7 +188,7 @@ es legendario.
 
 ### *Tyrannotitan chubutensis* · Terópodo · Legendaria · 1 copia
 
-**8 de coste · 9 de Ataque · 7 de Vida** · Defensa propuesta: *1*
+**3 de coste · 9 de Ataque · 7 de Vida** · Defensa propuesta: *1*
 
 **Desgarro** — A quien hiere no se le cura ninguna herida ese turno.
 
@@ -198,7 +198,7 @@ es legendario.
 
 ### *Huaxiadraco corollatus* · Pterosaurio · Épica · 2 copias
 
-**4 de coste · 3 de Ataque · 3 de Vida** · Defensa propuesta: *0*
+**2 de coste · 3 de Ataque · 3 de Vida** · Defensa propuesta: *0*
 
 **Vuelo** — Sobrevuela la ranura: golpea siempre al hábitat rival y no recibe daño de combate.
 
@@ -216,97 +216,97 @@ biológicos reales, no mutaciones; los de presión son patologías y presiones
 ecológicas documentadas, no hechizos: aquí no hay magia, y esa es la parte
 del set con más riesgo de romper la restricción paleontológica.
 
-### Gregarismo · Rara · coste 2 · 3 copias
+### Gregarismo · Rara · coste 1 · 3 copias
 
 Se juega **sobre un dinosaurio tuyo**. +2 Poder a todos tus dinosaurios de la misma especie que el objetivo.
 
 `INFERIDO` · Acumulaciones monoespecíficas en la Morrison sugieren agregación en varios taxones. La interpretación de estos yacimientos es discutida (¿manada viva o concentración tafonómica?).
 
-### Gastrolitos · Épica · coste 2 · 2 copias
+### Gastrolitos · Épica · coste 1 · 2 copias
 
 Se juega **sobre un dinosaurio tuyo**. El objetivo cura 1 herida al final de cada turno.
 
 `ESTABLECIDO` · Piedras de molleja asociadas a esqueletos de saurópodos jurásicos. Su función exacta en la digestión sigue en debate.
 
-### Crecimiento acelerado · Legendaria · coste 3 · 1 copia
+### Crecimiento acelerado · Legendaria · coste 1 · 1 copia
 
 Se juega **sobre un dinosaurio tuyo**. +2 Poder y +2 Vida permanentes.
 
 `ESTABLECIDO` · La osteohistología muestra tasas de crecimiento altas y sostenidas en saurópodos y en Allosaurus, alcanzando talla adulta en pocas décadas o menos.
 
-### Neumaticidad ósea · Épica · coste 2 · 1 copia
+### Neumaticidad ósea · Épica · coste 1 · 1 copia
 
 Se juega **sobre un dinosaurio tuyo**. +2 Poder. Sólo sobre terópodos y saurópodos.
 
 `ESTABLECIDO` · Los saurisquios de la Morrison presentan neumatización postcraneal: vértebras invadidas por divertículos de sacos aéreos. Aligera el esqueleto sin perder resistencia. No aparece en tireóforos ni en ornitópodos.
 
-### Fractura consolidada · Épica · coste 2 · 2 copias
+### Fractura consolidada · Épica · coste 1 · 2 copias
 
 Se juega **sobre un dinosaurio del rival**. −2 Poder permanente a un dinosaurio rival.
 
 `ESTABLECIDO` · El registro patológico de la Morrison es abundante: costillas fracturadas y consolidadas, infecciones óseas y lesiones por estrés, especialmente documentadas en ejemplares de Allosaurus. Un animal cojo caza peor, pero sigue vivo.
 
-### Competencia trófica · Épica · coste 2 · 1 copia
+### Competencia trófica · Épica · coste 1 · 1 copia
 
 Se juega **sobre un clado rival que eliges**. −2 Poder a todos los dinosaurios rivales del clado que elijas.
 
 `INFERIDO` · La coexistencia de varios saurópodos y de varios terópodos grandes en la misma formación implica reparto de recursos. La partición de nicho está sustentada por el desgaste dental; su intensidad como presión competitiva es una inferencia.
 
-### Trampa de depredadores · Rara · coste 3 · 3 copias
+### Trampa de depredadores · Rara · coste 1 · 3 copias
 
 Se juega **sobre el campo entero**. El rival pierde 12 cartas de su mazo. Tú pierdes 3: el fango no distingue.
 
 `DEBATIDO` · La cantera Cleveland-Lloyd, en la Morrison de Utah, acumula decenas de individuos de Allosaurus en una proporción de depredadores frente a presas que no se da en un ecosistema vivo. La trampa de depredadores es una de las explicaciones; también se ha propuesto sequía o agua envenenada. El yacimiento es un hecho, su mecanismo no.
 
-### Mortandad estacional · Legendaria · coste 3 · 1 copia
+### Mortandad estacional · Legendaria · coste 1 · 1 copia
 
 Se juega **sobre el campo entero**. 2 de daño a TODOS los dinosaurios del campo, incluidos los tuyos.
 
 `DEBATIDO` · Algunas acumulaciones óseas de la Morrison se han interpretado como mortandades masivas asociadas a sequía o a eventos de crecida. La causa concreta de cada yacimiento sigue discutiéndose.
 
-### Gregarismo · Rara · coste 2 · 3 copias
+### Gregarismo · Rara · coste 1 · 3 copias
 
 +2 Poder a todos tus dinosaurios de la misma especie que el objetivo.
 
 `INFERIDO` · Acumulaciones monoespecíficas en la Morrison sugieren agregación en varios taxones. La interpretación de estos yacimientos es discutida (¿manada viva o concentración tafonómica?).
 
-### Gastrolitos · Épica · coste 2 · 2 copias
+### Gastrolitos · Épica · coste 1 · 2 copias
 
 El objetivo cura 1 herida al final de cada turno.
 
 `ESTABLECIDO` · Piedras de molleja asociadas a esqueletos de saurópodos jurásicos. Su función exacta en la digestión sigue en debate.
 
-### Crecimiento acelerado · Legendaria · coste 3 · 1 copia
+### Crecimiento acelerado · Legendaria · coste 1 · 1 copia
 
 +2 Poder y +2 Vida permanentes.
 
 `ESTABLECIDO` · La osteohistología muestra tasas de crecimiento altas y sostenidas en saurópodos y en Allosaurus, alcanzando talla adulta en pocas décadas o menos.
 
-### Neumaticidad ósea · Épica · coste 2 · 1 copia
+### Neumaticidad ósea · Épica · coste 1 · 1 copia
 
 +2 Poder. Sólo sobre terópodos y saurópodos.
 
 `ESTABLECIDO` · Los saurisquios de la Morrison presentan neumatización postcraneal: vértebras invadidas por divertículos de sacos aéreos. Aligera el esqueleto sin perder resistencia. No aparece en tireóforos ni en ornitópodos.
 
-### Fractura consolidada · Épica · coste 2 · 2 copias
+### Fractura consolidada · Épica · coste 1 · 2 copias
 
 −2 Poder permanente a un dinosaurio rival.
 
 `ESTABLECIDO` · El registro patológico de la Morrison es abundante: costillas fracturadas y consolidadas, infecciones óseas y lesiones por estrés, especialmente documentadas en ejemplares de Allosaurus. Un animal cojo caza peor, pero sigue vivo.
 
-### Competencia trófica · Épica · coste 2 · 1 copia
+### Competencia trófica · Épica · coste 1 · 1 copia
 
 −2 Poder a todos los dinosaurios rivales del clado que elijas.
 
 `INFERIDO` · La coexistencia de varios saurópodos y de varios terópodos grandes en la misma formación implica reparto de recursos. La partición de nicho está sustentada por el desgaste dental; su intensidad como presión competitiva es una inferencia.
 
-### Trampa de depredadores · Rara · coste 3 · 3 copias
+### Trampa de depredadores · Rara · coste 1 · 3 copias
 
 El rival pierde 12 cartas de su mazo. Tú pierdes 3: el fango no distingue.
 
 `DEBATIDO` · La cantera Cleveland-Lloyd, en la Morrison de Utah, acumula decenas de individuos de Allosaurus en una proporción de depredadores frente a presas que no se da en un ecosistema vivo. La trampa de depredadores es una de las explicaciones; también se ha propuesto sequía o agua envenenada. El yacimiento es un hecho, su mecanismo no.
 
-### Mortandad estacional · Legendaria · coste 3 · 1 copia
+### Mortandad estacional · Legendaria · coste 1 · 1 copia
 
 2 de daño a TODOS los dinosaurios del campo, incluidos los tuyos.
 
@@ -345,31 +345,31 @@ ve venir, y eso es parte de su precio. Cuestan 0 y todos traen inconveniente.
 Los cuatro paleoambientes de la Formación Morrison. **Una activa a la vez**;
 cualquiera de los dos bandos puede reemplazarla, y su efecto alcanza a los dos.
 
-### Llanura de inundación · Épica · coste 2
+### Llanura de inundación · Épica · coste 1
 
 +1 Biomasa por turno a los dos bandos.
 
 `ESTABLECIDO` · Las llanuras de inundación de la Morrison concentran la mayor productividad vegetal estacional de la formación.
 
-### Canal fluvial trenzado · Legendaria · coste 2
+### Canal fluvial trenzado · Legendaria · coste 1
 
-Agua permanente: la Sequía estacional no mata a nadie.
+Agua permanente en el campo: los ribereños pelean a gusto.
 
 `ESTABLECIDO` · Los sistemas fluviales trenzados de la formación mantienen agua durante la estación seca, con vegetación ribereña estrecha a ambos lados.
 
-### Bosque de coníferas ribereño · Legendaria · coste 2
+### Bosque de coníferas ribereño · Legendaria · coste 1
 
 Los saurópodos curan 1 herida al final de cada turno.
 
 `ESTABLECIDO` · Los bosques de coníferas ribereños ofrecen ramoneo alto sostenido, el estrato del que dependen los saurópodos de cuello elevado.
 
-### Deriva árida · Épica · coste 2
+### Deriva árida · Épica · coste 1
 
 Cada turno, los dos bandos pierden 5 cartas del mazo.
 
 `INFERIDO` · Los paleosuelos calcáreos, las evaporitas y los depósitos eólicos de la Morrison documentan un clima semiárido y muy estacional que se acentúa hacia el techo de la formación. Que esa deriva mermara las poblaciones es una inferencia razonable, no una medida.
 
-### Sabana de helechos · Común · coste 2
+### Sabana de helechos · Común · coste 1
 
 Terreno abierto, sin cobertura: +1 al daño contra los biomas.
 
@@ -377,25 +377,7 @@ Terreno abierto, sin cobertura: +1 al daño contra los biomas.
 
 ---
 
-## 5. Clima estacional
-
-Baraja neutral y compartida, aparte del mazo. Se voltea una carta por turno desde el turno 3. Nadie la controla.
-
-### Sequía estacional
-
-Cada dinosaurio recibe 1 herida, y 2 si tiene 7 o más de Vida: el cuerpo grande necesita más agua. Camarasaurus es inmune; el Canal fluvial protege a todos.
-
-`ESTABLECIDO` · Los paleosuelos, los depósitos evaporíticos y la estructura de los yacimientos de la Morrison indican un clima marcadamente estacional, semiárido, con precipitación concentrada.
-
-### Crecida monzónica
-
-Todos los dinosaurios curan 1 herida. Este turno los biomas no reciben daño.
-
-`ESTABLECIDO` · La precipitación concentrada de la estación húmeda reverdece la llanura y desborda los canales; el agua rehace el paisaje y frena cualquier avance.
-
----
-
-## 6. La red trófica actual
+## 5. La red trófica actual
 
 El clado no es piedra-papel-tijera: cada relación se apoya en la misma evidencia que cita su carta.
 

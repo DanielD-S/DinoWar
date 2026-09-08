@@ -2,14 +2,14 @@
 // La interfaz sólo LEE el estado; toda mutación pasa por reduce().
 
 import { BALANCE } from './data/balance.js';
-import { TIPO, OBJETIVO, CLADO, CLADO_NOMBRE, ESTACIONES, carta } from './data/cards.js';
+import { TIPO, OBJETIVO, CLADO, CLADO_NOMBRE, carta } from './data/cards.js';
 import { crearPartida, vistaDe, FASE, MOTIVO_FIN, unidadesDe } from './engine/state.js';
 import { reduce, ACCION, legales, validar, cartasTrasMulligan } from './engine/actions.js';
 import { decidir, PERFIL } from './engine/ai.js';
 import { semilla } from './engine/rng.js';
 import {
   montar, render, mensaje, el, JUGADOR, RIVAL,
-  fichaHTML, fichaEstacionHTML, ayudaHTML, abrirFicha, abrirDescarte, cerrarHojas,
+  fichaHTML, ayudaHTML, abrirFicha, abrirDescarte, cerrarHojas,
   abrirVisor, cambiarModoVisor, cerrarVisor, abrirComprometidas,
 } from './ui/render.js';
 import { tomarEntrada, soltarEntrada } from './ui/input.js';
@@ -22,7 +22,7 @@ import { montarMeta, abrirColeccion, abrirSobres, abrirMazos, pintarMenu, recomp
 import { mazoActivo, cargarPerfil, actualizarPerfil } from './ui/almacen.js';
 import { aListaDeMazo } from './data/coleccion.js';
 import {
-  animarCombate, animarRevelacion, animarEstacion, cancelarAnimaciones, esperar, lineasDeLog,
+  animarCombate, animarRevelacion, cancelarAnimaciones, esperar, lineasDeLog,
 } from './ui/animate.js';
 import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio } from './ui/audio.js';
 
@@ -233,13 +233,6 @@ async function alPulsarListo() {
   await bucle();
 }
 
-/** Qué ha hecho la estación, en una línea. */
-function resumenEstacion(heridos, bajas) {
-  if (heridos === 0) return 'Los dinosaurios curan 1 herida y los hábitats no reciben daño este turno.';
-  const h = heridos === 1 ? '1 dinosaurio pasa sed' : `${heridos} dinosaurios pasan sed`;
-  return bajas === 0 ? `${h}.` : `${h} y ${bajas === 1 ? 'cae 1' : `caen ${bajas}`}.`;
-}
-
 /**
  * Resumen de lo que el rival ha jugado SOBRE lo tuyo en esta revelación.
  * Devuelve null si no ha jugado nada de eso.
@@ -316,26 +309,6 @@ async function bucle() {
       continue;
     }
 
-    // La estación se resolvía dentro del avance genérico, sin decir nada: todos
-    // los dinosaurios amanecían heridos y el jugador no sabía por qué.
-    if (estado.fase === FASE.ESTACION) {
-      const desde = estado.eventos.length;
-      estado = reduce(estado, { tipo: ACCION.AVANZAR });
-      render(estado);
-      const nuevos = estado.eventos.slice(desde);
-      const cambio = nuevos.find((e) => e.tipo === 'ESTACION');
-      if (cambio) {
-        irA(APP.RESOLVING);
-        const e = ESTACIONES[cambio.estacion];
-        const bajas = nuevos.filter((x) => x.tipo === 'MUERTE').length;
-        const heridos = nuevos.filter((x) => x.tipo === 'DANO').length;
-        mensaje(`${e.nombre}. ${resumenEstacion(heridos, bajas)}`);
-        sonido(heridos > 0 ? 'muerte' : 'revelar');
-        await animarEstacion(nuevos);
-      }
-      continue;
-    }
-
     if (estado.fase === FASE.CHEQUEO) archivarLog();
 
     estado = reduce(estado, { tipo: ACCION.AVANZAR });
@@ -358,7 +331,7 @@ function pedirDescarte() {
     const c = carta(estado.instancias[iid].cardId);
     const dino = c.tipo === TIPO.DINOSAURIO;
     return `<button class="opcion" data-iid="${iid}">${dino ? `<i>${c.binomial}</i>` : c.binomial}
-      <small>coste ${c.coste}${dino ? ` · ${c.poder} de Poder · ${c.vida} de Vida` : ''}</small></button>`;
+      <small>coste ${c.coste}${dino ? ` · ${c.ataque} de Ataque · ${c.vida} de Vida` : ''}</small></button>`;
   }).join('');
   el.eleccion.classList.remove('oculta');
 
@@ -638,10 +611,6 @@ function iniciar() {
     desbloquear();
     empezarTutorial();
     nuevaPartida();
-  });
-
-  el.estacion.addEventListener('click', () => {
-    if (estado?.estacion.actual) abrirFicha(fichaEstacionHTML(estado.estacion.actual));
   });
 
   el.btnMute.classList.toggle('off', estaSilenciado());

@@ -9,7 +9,7 @@ import {
   FASE, MOTIVO_FIN, CAUSA, rival,
   unidadEn, unidadesDe, todasLasUnidades,
   ataqueEfectivo, vidaActual, danoEntre, danoAlHabitat, espinasDe,
-  curacionDe, rentaDe, inmuneSequia, sedDe, haySequia, hayCrecida, hayAridez, campoEs, vuela,
+  curacionDe, rentaDe, hayAridez, campoEs, vuela,
 } from './state.js';
 
 export function ev(s, tipo, datos = {}) {
@@ -113,36 +113,6 @@ export function robar(s, j, n) {
 }
 
 // ------------------------------------------------------------------- fases
-
-export function faseEstacion(s) {
-  s.estacion.actual = null;
-
-  if (s.turno >= BALANCE.turnoPrimeraEstacion) {
-    if (s.estacion.mazo.length === 0) {
-      const b = barajar(s.estacion.descarte, s.rng);
-      s.rng = b.rng;
-      s.estacion.mazo = b.lista;
-      s.estacion.descarte = [];
-    }
-    s.estacion.actual = s.estacion.mazo.shift();
-    s.estacion.descarte.push(s.estacion.actual);
-    ev(s, 'ESTACION', { estacion: s.estacion.actual });
-  }
-
-  // La sequía cobra heridas, y las cobra según la Vida: el cuerpo grande
-  // necesita más agua. Antes salían de un «Consumo hídrico» propio de cada
-  // carta, un número que sólo existía para este momento. El Canal fluvial, con
-  // agua permanente, la anula por completo.
-  if (haySequia(s) && !campoEs(s, RASGO.CAMPO_CANAL)) {
-    for (const inst of todasLasUnidades(s)) {
-      if (inmuneSequia(inst)) continue;
-      herir(s, inst.iid, sedDe(s, inst.iid), CAUSA.SEQUIA, null);
-    }
-    recogerBajas(s, CAUSA.SEQUIA);
-  }
-
-  s.fase = FASE.RENTA;
-}
 
 export function faseRenta(s) {
   const renta = rentaDe(s);
@@ -291,7 +261,7 @@ export function faseCombate(s) {
     const b = unidadEn(s, 1, r);
 
     // Lo que vuela no choca: pasa por encima de la ranura, va al habitat y no
-    // recibe nada a cambio. Sigue muriendo por Mortandad o por Sequía, que no
+    // recibe nada a cambio. Sigue muriendo por Mortandad, que no
     // se esquivan volando.
     const volA = a && vuela(s, a.iid);
     const volB = b && vuela(s, b.iid);
@@ -357,11 +327,8 @@ export function faseCombate(s) {
   for (const g of golpes) herir(s, g.iid, g.cantidad, g.causa, g.por);
   recogerBajas(s, CAUSA.COMBATE);
 
-  // La Crecida rehace el paisaje: este turno ningún habitat recibe daño.
-  if (!hayCrecida(s)) {
-    golpearHabitat(s, 0, alHabitat[0]);
-    golpearHabitat(s, 1, alHabitat[1]);
-  }
+  golpearHabitat(s, 0, alHabitat[0]);
+  golpearHabitat(s, 1, alHabitat[1]);
 
   for (const inst of todasLasUnidades(s)) {
     if (inst.sinCuracion) { inst.sinCuracion = false; continue; }
@@ -409,12 +376,11 @@ export function faseChequeo(s) {
 
   s.turno += 1;
   s.eventos = [];
-  s.estacion.actual = null;
   for (const jug of s.jugadores) {
     jug.listo = false;
     jug.pendientes = [];
   }
-  s.fase = FASE.ESTACION;
+  s.fase = FASE.RENTA;
 }
 
 /**

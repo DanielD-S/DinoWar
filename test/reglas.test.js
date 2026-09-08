@@ -445,40 +445,13 @@ test('Retirar un movimiento no toca la Biomasa: no costó nada', () => {
   assert.ok(!r.jugadores[0].mano.includes(iid), 'sigue en el campo, no vuelve a la mano');
 });
 
-// -------------------------------------------------------------- estaciones
-
-test('Sequía: cobra heridas según la Vida, y Camarasaurus es inmune', () => {
+test('Sin nadie enfrente, el daño llega al hábitat rival', () => {
   const s = tablero();
-  s.turno = BALANCE.turnoPrimeraEstacion;
-  s.estacion.mazo = ['SEQUIA'];
-  const diplo = poner(s, 'diplodocus', 0, 0);     // 10 de Vida: cuerpo grande
-  const dryo = poner(s, 'dryosaurus', 0, 2);      // 2 de Vida
-  const cama = poner(s, 'camarasaurus', 0, 1);    // inmune
-
-  const r = ejecutar(s, FASE.ESTACION);
-  assert.equal(r.instancias[diplo].heridas, BALANCE.estacion.sequiaHeridaGrande);
-  assert.equal(r.instancias[dryo].heridas, BALANCE.estacion.sequiaHerida);
-  assert.equal(r.instancias[cama].heridas, 0);
-});
-
-test('El Canal fluvial anula la Sequía por completo', () => {
-  const s = tablero();
-  s.turno = BALANCE.turnoPrimeraEstacion;
-  s.estacion.mazo = ['SEQUIA'];
-  s.campo = 'canal';
-  const diplo = poner(s, 'diplodocus', 0, 0);
-
-  const r = ejecutar(s, FASE.ESTACION);
-  assert.equal(r.instancias[diplo].heridas, 0);
-});
-
-test('La Crecida cura y frena el daño a los biomas', () => {
-  const s = tablero();
-  s.estacion.actual = 'CRECIDA';
-  poner(s, 'allosaurus', 0, 0);   // sin rival enfrente
+  poner(s, 'allosaurus', 0, 0);
 
   const r = ejecutar(s, FASE.COMBATE);
-  assert.equal(r.jugadores[1].habitat, BALANCE.vidaHabitat, 'el agua frena el avance');
+  assert.ok(r.jugadores[1].habitat < BALANCE.vidaHabitat,
+    'una ranura vacía enfrente deja pasar el golpe');
 });
 
 // ---------------------------------------------------------------- despliegue

@@ -11,7 +11,7 @@ import {
 import { barajar } from './rng.js';
 import {
   ev, descartarDeMano,
-  faseEstacion, faseRenta, faseRobo, faseRevelacion, faseCombate, faseChequeo,
+  faseRenta, faseRobo, faseRevelacion, faseCombate, faseChequeo,
 } from './resolve.js';
 
 export const ACCION = Object.freeze({
@@ -185,7 +185,6 @@ function aplicarRecurso(s, j, iid) {
 
 function aplicarFaseAutomatica(s) {
   switch (s.fase) {
-    case FASE.ESTACION: return faseEstacion(s);
     case FASE.RENTA: return faseRenta(s);
     case FASE.ROBO: return faseRobo(s);
     case FASE.REVELACION: return faseRevelacion(s);

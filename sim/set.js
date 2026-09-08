@@ -2,7 +2,7 @@
 // las de verdad y no una transcripción a mano que se desfase.
 
 import { writeFileSync } from 'node:fs';
-import { CARTAS, TIPO, TIPO_NOMBRE, OBJETIVO, CLADO_NOMBRE, RAREZA_NOMBRE, ESTACIONES } from '../src/data/cards.js';
+import { CARTAS, TIPO, TIPO_NOMBRE, OBJETIVO, CLADO_NOMBRE, RAREZA_NOMBRE } from '../src/data/cards.js';
 import { BALANCE, MAZO, TOTAL_MAZO } from '../src/data/balance.js';
 
 // Por qué cada carta tiene la Defensa que tiene. La cifra vive en cards.js;
@@ -184,22 +184,7 @@ for (const [id, c] of Object.entries(CARTAS)) {
 
 p('---');
 p('');
-p('## 5. Clima estacional');
-p('');
-p(`Baraja neutral y compartida, aparte del mazo. Se voltea una carta por turno desde el turno ${BALANCE.turnoPrimeraEstacion}. Nadie la controla.`);
-p('');
-for (const e of Object.values(ESTACIONES)) {
-  p(`### ${e.nombre}`);
-  p('');
-  p(`${e.texto}`);
-  p('');
-  p(`\`${e.nivel_evidencia}\` · ${e.nota_cientifica}`);
-  p('');
-}
-
-p('---');
-p('');
-p('## 6. La red trófica actual');
+p('## 5. La red trófica actual');
 p('');
 p('El clado no es piedra-papel-tijera: cada relación se apoya en la misma evidencia que cita su carta.');
 p('');

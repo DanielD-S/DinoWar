@@ -627,3 +627,64 @@ registro fósil desaparece como vía de victoria.
 Para que esa regla funcione habría que **recostar las 31 cartas** a una escala
 de 0 a 2, que es tanto como rehacer el juego. Queda medido y escrito; la
 decisión es del autor.
+
+---
+
+## 17. V2-8 — la renta acumulativa, y fuera las estaciones
+
+Las dos decisiones son del autor y van juntas porque la segunda obliga a
+recalibrar lo que dejó la primera.
+
+### 17.1 La renta pasa a ser una hucha
+
+`rentaPorTurno: 1` **acumulativo**, con tope de 12 de ahorro. Antes la Biomasa
+se ponía al número de turno y lo no gastado se perdía: gastar 2 en el turno 2
+dejaba 3 en el turno 3, que es lo que el jugador leía como «+3». Ahora entra 1
+fijo y lo que sobra se queda, así que aguantar un turno es la forma de pagar
+algo caro.
+
+Sola, esa regla rompe la partida: el presupuesto de una partida entera baja de
+47 de Biomasa a 12 y la escala de costes seguía siendo 0-8. Medido: 14,6 turnos,
+0 % de victorias por trofeos, 24 de 25 cartas descalibradas. Por eso va con el
+recoste 0-3 que §16 dejaba propuesto, aplicado de forma mecánica y **provisional
+hasta la revisión a mano** de `RECOSTE.md`.
+
+### 17.2 Fuera la Sequía y la Crecida
+
+El clima estacional —la baraja neutral de 3 Sequías y 3 Crecidas que §5 del set
+documentaba— se retira entera: baraja, fase, efectos, ficha, marcador del HUD y
+paso del tutorial.
+
+Lo que se lleva por delante:
+
+- `sedDe`, `haySequia`, `hayCrecida`, `inmuneSequia`, `CAUSA.SEQUIA`,
+  `FASE.ESTACION` y `faseEstacion`. El turno pasa de cinco pasos a cuatro.
+- *Camarasaurus* pierde la cláusula «Inmune a Sequía estacional» y se queda con
+  Migrador a secas.
+- *Canal fluvial trenzado* pierde su efecto propio. Sobrevive como campo porque
+  es lo que dispara el rasgo Ribereño de *Ceratosaurus* y *Riparovenator*, pero
+  **es la carta que queda coja** y merece un efecto nuevo cuando haya ocasión.
+
+### 17.3 Lo que costó en balance
+
+La Crecida frenaba el daño a los biomas en la mitad de los turnos en que salía.
+Sin ella el hábitat cae mucho antes: 8,7 turnos y un reparto de 14/69/17. La
+recalibración, sobre un barrido de 9 combinaciones a 700 partidas cada una:
+
+| | V2-7 | V2-8 |
+|---|---|---|
+| `trofeosParaGanar` | 6 | 6 |
+| `vidaHabitat` | 54 | **90** |
+
+Cinco de los seis objetivos de §8 pasan: 10,72 turnos, inicial 48,1 %, bola de
+nieve 66,4 %, sin decisión 0 %, reparto 35/36/29. Sigue fallando **cartas
+descalibradas (12 de 25)**, que es justo lo que la revisión a mano del recoste
+viene a arreglar.
+
+### 17.4 Lo que queda pendiente de esto
+
+- La mano llega al tope de 7 en la mitad de las partidas: con renta de +1 se
+  juegan menos cartas de las que se roban. Las **cartas de Biomasa** que el
+  autor propone (estilo energías o tierras) son la pieza que lo descomprime y
+  la que permitiría subir otra vez la escala de costes.
+- *Canal fluvial trenzado* necesita un efecto propio.

@@ -49,10 +49,9 @@ const PASOS = [
   },
   {
     evento: 'turno',
-    turno: BALANCE.turnoPrimeraEstacion,
-    texto: `Desde el turno ${BALANCE.turnoPrimeraEstacion} entra una <b>estación</b> que no controla nadie. `
-      + `Ya sabes jugar: gana quien reúna <b>${BALANCE.trofeosParaGanar} trofeos</b>, tumbe el <b>hábitat</b> `
-      + 'rival o deje al otro <b>sin mazo</b>. Suerte.',
+    turno: 3,
+    texto: `Ya sabes jugar: gana quien reúna <b>${BALANCE.trofeosParaGanar} trofeos</b>, `
+      + 'tumbe el <b>hábitat</b> rival o deje al otro <b>sin mazo</b>. Suerte.',
     ultimo: true,
   },
 ];

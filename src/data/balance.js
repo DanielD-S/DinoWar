@@ -6,7 +6,7 @@ import { CARTAS, CLADO, RAREZA } from './cards.js';
 export const BALANCE = Object.freeze({
   // ------------------------------------------------------------- victorias
   trofeosParaGanar: 6,      // registro fósil
-  vidaHabitat: 54,            // colapso del habitat
+  vidaHabitat: 90,            // colapso del habitat
   // la tercera, extinción, no tiene número: es quedarse sin cartas al robar
 
   // ---------------------------------------------------------------- campo
@@ -35,7 +35,6 @@ export const BALANCE = Object.freeze({
   // Con despliegue simultáneo no hay ventaja de iniciativa que compensar.
   compensacionSegundoJugador: Object.freeze({ cartas: 0 }),
 
-  turnoPrimeraEstacion: 3,
   // Como en Pokémon: en el primer turno no se ataca. Con 1 sola Biomasa era
   // normal que sólo un bando llegase a desplegar, y ese golpeaba un habitat
   // vacío gratis. La apertura pasa a ser de montar, no de arañar daño.
@@ -93,17 +92,6 @@ export const BALANCE = Object.freeze({
     sabanaDanoHabitat: 1,
   }),
 
-  estacion: Object.freeze({
-    crecidaCura: 1,
-    // La sequía cobraba un «Consumo hídrico» que cada carta llevaba escrito: un
-    // cuarto número que sólo servía para esto y que el jugador tenía que
-    // recordar. Ahora sale de la Vida, que ya está en la carta y en el tablero:
-    // el cuerpo grande necesita más agua.
-    sequiaHerida: 1,
-    sequiaHeridaGrande: 2,
-    sequiaVidaGrande: 7,
-  }),
-
   // ------------------------------------------------------------------- mazo
   tamanoMazo: 50,
 
@@ -118,10 +106,6 @@ export const BALANCE = Object.freeze({
     [RAREZA.LEGENDARIO]: 1,
   }),
 
-  mazoEstacional: Object.freeze([
-    Object.freeze(['SEQUIA', 3]),
-    Object.freeze(['CRECIDA', 3]),
-  ]),
 
   // --------------------------------------------------------------------- IA
   ia: Object.freeze({

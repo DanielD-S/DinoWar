@@ -2,11 +2,10 @@
 // Ninguna función de este módulo muta su argumento.
 
 import { BALANCE, MAZO } from '../data/balance.js';
-import { CARTAS, TIPO, CLADO, RASGO, INMUNE_SEQUIA, carta } from '../data/cards.js';
+import { CARTAS, TIPO, CLADO, RASGO, carta } from '../data/cards.js';
 import { barajar, semilla } from './rng.js';
 
 export const FASE = Object.freeze({
-  ESTACION: 'ESTACION',
   RENTA: 'RENTA',
   ROBO: 'ROBO',
   DESPLIEGUE: 'DESPLIEGUE',
@@ -29,7 +28,6 @@ export const MOTIVO_FIN = Object.freeze({
 export const CAUSA = Object.freeze({
   COMBATE: 'COMBATE',
   ESPINAS: 'ESPINAS',
-  SEQUIA: 'SEQUIA',
   MORTANDAD: 'MORTANDAD',
 });
 
@@ -93,20 +91,12 @@ export function crearPartida(seedEntrada = 1, mazos = null) {
     for (let k = 0; k < BALANCE.manoInicial + extra; k++) jug.mano.push(jug.mazo.shift());
   }
 
-  const estacional = [];
-  for (const [id, copias] of BALANCE.mazoEstacional) {
-    for (let k = 0; k < copias; k++) estacional.push(id);
-  }
-  const be = barajar(estacional, rng);
-  rng = be.rng;
-
   return {
     seed: semilla(seedEntrada),
     rng,
     turno: 1,
-    fase: FASE.ESTACION,
+    fase: FASE.RENTA,
     campo: null,
-    estacion: { mazo: be.lista, actual: null, descarte: [] },
     siguienteInstId,
     instancias,
     ranuras: [
@@ -138,12 +128,9 @@ export function todasLasUnidades(state) {
 }
 
 export const cladoDe = (inst) => carta(inst.cardId).clado;
-export const inmuneSequia = (inst) => INMUNE_SEQUIA.includes(inst.cardId);
 export const sinSinergias = (inst) => carta(inst.cardId).rasgo === RASGO.ESCASO;
 
 export const campoEs = (state, rasgo) => state.campo !== null && carta(state.campo).rasgo === rasgo;
-export const hayCrecida = (state) => state.estacion.actual === 'CRECIDA';
-export const haySequia = (state) => state.estacion.actual === 'SEQUIA';
 
 function adherenciasCon(state, inst, rasgo) {
   let n = 0;
@@ -191,16 +178,6 @@ export function vidaMaxima(state, iid) {
 export const vidaActual = (state, iid) => vidaMaxima(state, iid) - state.instancias[iid].heridas;
 
 /**
- * Heridas que le cuesta la Sequía. Sale de la Vida —el cuerpo grande necesita
- * más agua— y no de un número aparte en la carta: el jugador ve el dato que
- * decide, y no hay una cuarta cifra que memorizar.
- */
-export function sedDe(state, iid) {
-  const { sequiaHerida, sequiaHeridaGrande, sequiaVidaGrande } = BALANCE.estacion;
-  return vidaMaxima(state, iid) >= sequiaVidaGrande ? sequiaHeridaGrande : sequiaHerida;
-}
-
-/**
  * Defensa: reducción plana del daño recibido. Sale de la propia carta —masa,
  * osteodermos, placas—, no del clado.
  */
@@ -232,7 +209,6 @@ export function danoEntre(state, atacanteIid, defensorIid) {
 
 /** Daño que una unidad sin rival enfrente inflige al habitat contrario. */
 export function danoAlHabitat(state, iid) {
-  if (hayCrecida(state)) return 0;   // el agua rehace el paisaje y frena el avance
   const extra = campoEs(state, RASGO.CAMPO_SABANA) ? BALANCE.efectosCampo.sabanaDanoHabitat : 0;
   return ataqueEfectivo(state, iid) + extra;
 }
@@ -259,7 +235,6 @@ export function curacionDe(state, iid) {
   if (campoEs(state, RASGO.CAMPO_BOSQUE) && c.clado === CLADO.SAUROPODO) {
     cura += BALANCE.efectosCampo.bosqueCura;
   }
-  if (hayCrecida(state)) cura += BALANCE.estacion.crecidaCura;
   return cura;
 }
 
