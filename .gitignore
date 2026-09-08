@@ -13,6 +13,6 @@ desktop.ini
 .idea/
 *.swp
 
-# Ilustraciones de referencia (material de terceros, ver assets/LEEME.md)
-assets/dinos/
+# Originales de las ilustraciones: pesan 29 MB y no hacen falta para jugar.
+# Lo que se sirve es assets/dinos/, que sí va en el repositorio.
 src/dinos/

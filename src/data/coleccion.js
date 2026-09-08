@@ -7,8 +7,8 @@
 import { BALANCE, MAZO, TOTAL_MAZO } from './balance.js';
 import { CARTAS, RAREZA, carta } from './cards.js';
 
-/** Tamaño exacto de un mazo legal. Es el mismo 50 del mazo por defecto. */
-export const TAM_MAZO = TOTAL_MAZO;
+/** Tamaño exacto de un mazo legal. */
+export const TAM_MAZO = BALANCE.tamanoMazo;
 
 /**
  * Copias de una carta que caben en un mazo. Es su rareza, no un número aparte:
@@ -126,7 +126,11 @@ export function valorFusion(cartas) {
 /** Mazo por defecto: el que el simulador mide y el que arranca la colección. */
 export const mazoPorDefecto = () => Object.fromEntries(MAZO);
 
-/** Colección de partida: justo lo necesario para montar el mazo por defecto. */
+/**
+ * Colección de partida: justo lo necesario para montar el mazo por defecto, ni
+ * una carta más. Las seis que no entran en él salen de los sobres, que es para
+ * lo que están.
+ */
 export const coleccionInicial = () => mazoPorDefecto();
 
 /**

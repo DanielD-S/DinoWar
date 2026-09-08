@@ -54,6 +54,8 @@ export const CLADO = Object.freeze({
   SAUROPODO: 'SAUROPODO',
   TIREOFORO: 'TIREOFORO',
   ORNITOPODO: 'ORNITOPODO',
+  MARGINOCEFALO: 'MARGINOCEFALO',
+  PTEROSAURIO: 'PTEROSAURIO',
 });
 
 export const CLADO_NOMBRE = Object.freeze({
@@ -61,6 +63,8 @@ export const CLADO_NOMBRE = Object.freeze({
   SAUROPODO: 'Saurópodo',
   TIREOFORO: 'Tireóforo',
   ORNITOPODO: 'Ornitópodo',
+  MARGINOCEFALO: 'Marginocéfalo',
+  PTEROSAURIO: 'Pterosaurio',
 });
 
 export const RASGO = Object.freeze({
@@ -73,6 +77,10 @@ export const RASGO = Object.freeze({
   MIGRADOR: 'MIGRADOR',
   TAGOMIZADOR: 'TAGOMIZADOR',
   GREGARIO: 'GREGARIO',
+  DESGARRO: 'DESGARRO',
+  CORAZA: 'CORAZA',
+  GOLA: 'GOLA',
+  VUELO: 'VUELO',
   // adaptaciones
   GREGARISMO: 'GREGARISMO',
   GASTROLITOS: 'GASTROLITOS',
@@ -195,6 +203,68 @@ export const CARTAS = Object.freeze({
     rasgoTexto: 'Sólo 1 copia en el mazo. No admite adaptaciones.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'El terópodo de mayor tamaño de la formación, pero genuinamente raro en el registro. Su escasez en el mazo replica su escasez fósil.',
+  }),
+
+  // --------------------------------- fuera de la Morrison (ver README, §fauna)
+
+  nodosaurus: dino({
+    id: 'nodosaurus', rareza: RAREZA.RARO, clado: CLADO.TIREOFORO,
+    binomial: 'Nodosaurus textilis',
+    coste: 4, ataque: 2, defensa: 4, vida: 6, consumoHidrico: 1,
+    rasgo: RASGO.CORAZA, rasgoNombre: 'Coraza dorsal',
+    rasgoTexto: '+2 de Defensa. La coraza protege; no es un arma, a diferencia de la cola del estegosaurio.',
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Formación Frontier, Wyoming, Cenomaniense (~100 Ma). Los osteodermos en bandas sobre el dorso están documentados directamente. El taxón en sí es material fragmentario y varios autores lo tratan como nomen dubium: la coraza es firme, la especie lo es menos.',
+  }),
+
+  riparovenator: dino({
+    id: 'riparovenator', rareza: RAREZA.EPICO, clado: CLADO.TEROPODO,
+    binomial: 'Riparovenator milnerae',
+    coste: 5, ataque: 5, defensa: 1, vida: 5, consumoHidrico: 1,
+    rasgo: RASGO.RIBERENO, rasgoNombre: 'Ribereño',
+    rasgoTexto: '+2 Poder mientras el Canal fluvial esté en el campo.',
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: 'Formación Wessex, isla de Wight, Barremiense (~125 Ma), descrito en 2021. Espinosáurido de hocico alargado y dientes cónicos, morfología asociada a capturar peces. En su pariente Baryonyx se conservaron escamas de pez en la cavidad abdominal; para este género es inferencia por morfología.',
+  }),
+
+  lokiceratops: dino({
+    id: 'lokiceratops', rareza: RAREZA.EPICO, clado: CLADO.MARGINOCEFALO,
+    binomial: 'Lokiceratops rangiformis',
+    coste: 5, ataque: 4, defensa: 2, vida: 7, consumoHidrico: 1,
+    rasgo: RASGO.GOLA, rasgoNombre: 'Gola ornamentada',
+    rasgoTexto: '+2 de Defensa.',
+    nivel_evidencia: EVIDENCIA.DEBATIDO,
+    nota_cientifica: 'Formación Judith River, Montana, Campaniense (~78 Ma), descrito en 2024. La gola lleva las mayores hojas óseas conocidas en un ceratópsido, asimétricas entre lados. Si servían para defensa, para exhibición o para reconocerse entre especies es justamente lo que se discute.',
+  }),
+
+  brachylophosaurus: dino({
+    id: 'brachylophosaurus', rareza: RAREZA.EPICO, clado: CLADO.ORNITOPODO,
+    binomial: 'Brachylophosaurus canadensis',
+    coste: 4, ataque: 3, defensa: 1, vida: 6, consumoHidrico: 1,
+    rasgo: RASGO.GREGARIO, rasgoNombre: 'Gregario',
+    rasgoTexto: '+1 Poder por cada copia suya que tengas en el campo.',
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Formaciones Judith River y Oldman, Montana y Alberta, Campaniense (~78 Ma). Los lechos de huesos monoespecíficos de hadrosaurios son la mejor evidencia de vida en manada de todo el registro. De este taxón se conocen además ejemplares con tejido blando conservado.',
+  }),
+
+  tyrannotitan: dino({
+    id: 'tyrannotitan', rareza: RAREZA.LEGENDARIO, clado: CLADO.TEROPODO,
+    binomial: 'Tyrannotitan chubutensis',
+    coste: 8, ataque: 9, defensa: 1, vida: 7, consumoHidrico: 2,
+    rasgo: RASGO.DESGARRO, rasgoNombre: 'Desgarro',
+    rasgoTexto: 'A quien hiere no se le cura ninguna herida ese turno.',
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: 'Formación Cerro Barcino, Chubut, Argentina, Aptiense (~113 Ma). Carcarodontosáurido de unos 12 metros con dientes comprimidos y aserrados, de filo cortante en vez de aplastante. Que eso implique cortar carne y provocar hemorragias se infiere de la forma del diente, no de una herida fósil.',
+  }),
+
+  huaxiadraco: dino({
+    id: 'huaxiadraco', rareza: RAREZA.EPICO, clado: CLADO.PTEROSAURIO,
+    binomial: 'Huaxiadraco corollatus',
+    coste: 4, ataque: 3, defensa: 0, vida: 3, consumoHidrico: 0,
+    rasgo: RASGO.VUELO, rasgoNombre: 'Vuelo',
+    rasgoTexto: 'Sobrevuela la ranura: golpea siempre al habitat rival y no recibe daño de combate.',
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Formación Jiufotang, Liaoning, China, Aptiense (~120 Ma). No es un dinosaurio: es un pterosaurio tapejárido, sin dientes y con cresta craneal. Los tapejáridos conservan picnofibras, filamentos tegumentarios reales — la razón por la que este juego no pone plumas a los dinosaurios es que ellos no las tienen, no una regla estética.',
   }),
 
   // ---------------------------------------------- eventos: mejoran a los tuyos

@@ -3,14 +3,16 @@
 > Generado por `node sim/set.js` desde `src/data/cards.js` y `src/data/balance.js`.
 > Todas las cifras son las que ejecuta el motor, calibradas sobre 2.000 partidas.
 >
-> **Copias**: cuántos ejemplares de esa carta hay en el mazo.
+> **Copias**: ejemplares de esa carta en el mazo de referencia, que es el
+> que lleva la IA y el que mide BALANCE.md. Tu mazo lo montas tú.
 > **Sed**: heridas que recibe cuando sale *Sequía estacional*. **No es un
 > segundo coste**: no se paga al jugarla, sólo cuando el clima lo cobra.
 
-Mazo fijo de **50 cartas**: 18 dinosaurios, 16 eventos, 7 de recurso y 9 de clima.
+El set tiene **31 cartas distintas**. Un mazo son **50 cartas exactas**, así que no caben todas: el de referencia lleva 30 dinosaurios, 12 eventos, 2 de recurso y 6 de clima.
 
-**Qué revisar sobre todo:** los eventos de presión —Fractura consolidada,
-Competencia trófica y Mortandad estacional— y las tres cartas de recurso.
+Fuera del mazo de referencia, y por tanto sin medir aquí: Neumaticidad ósea, Competencia trófica, Carroña abundante, Lago efímero, Llanura de inundación, Bosque de coníferas ribereño. Se juegan igual, pero su calibración no está comprobada.
+
+**Qué revisar sobre todo:** los eventos de presión y las cartas de recurso.
 Son lo único del set que no describe un animal sino una presión sobre él, y
 es donde más fácil sería que se me hubiera colado algo sin respaldo.
 
@@ -18,17 +20,17 @@ es donde más fácil sería que se me hubiera colado algo sin respaldo.
 
 ## 0. Rarezas
 
-La rareza gobierna cuántas copias caben en el mazo y —cuando existan los
-sobres— con qué frecuencia sale. Sigue la abundancia fósil real: los taxones
-corrientes de la Morrison son comunes y *Torvosaurus*, genuinamente raro en
-el registro, es legendario.
+La rareza gobierna cuántas copias de una carta caben en un mazo y con qué
+frecuencia sale de un sobre. Sigue la abundancia fósil real: los taxones
+corrientes son comunes y *Torvosaurus*, genuinamente raro en el registro,
+es legendario.
 
-| Rareza | Copias por carta | Cartas distintas | Copias en el mazo |
+| Rareza | Copias máximas | Cartas distintas | En el mazo de referencia |
 |---|---|---|---|
 | Común | 3 | 4 | 12 |
-| Rara | 3 | 3 | 9 |
-| Épica | 2 | 11 | 22 |
-| Legendaria | 1 | 7 | 7 |
+| Rara | 3 | 4 | 11 |
+| Épica | 2 | 15 | 20 |
+| Legendaria | 1 | 8 | 7 |
 
 ---
 
@@ -45,6 +47,12 @@ el registro, es legendario.
 | *Diplodocus carnegii* | Saurópodo | Legendaria | 1 | 5 | 3 | 2 | 10 | 3 |
 | *Apatosaurus louisae* | Saurópodo | Legendaria | 1 | 7 | 4 | 3 | 12 | 3 |
 | *Torvosaurus tanneri* | Terópodo | Legendaria | 1 | 7 | 8 | 1 | 6 | 2 |
+| *Nodosaurus textilis* | Tireóforo | Rara | 3 | 4 | 2 | 4 | 6 | 1 |
+| *Riparovenator milnerae* | Terópodo | Épica | 2 | 5 | 5 | 1 | 5 | 1 |
+| *Lokiceratops rangiformis* | Marginocéfalo | Épica | 2 | 5 | 4 | 2 | 7 | 1 |
+| *Brachylophosaurus canadensis* | Ornitópodo | Épica | 2 | 4 | 3 | 1 | 6 | 1 |
+| *Tyrannotitan chubutensis* | Terópodo | Legendaria | 1 | 8 | 9 | 1 | 7 | 2 |
+| *Huaxiadraco corollatus* | Pterosaurio | Épica | 2 | 4 | 3 | 0 | 3 | 0 |
 
 *Camarasaurus* es inmune a la Sed: sus isótopos indican que migraba.
 
@@ -138,6 +146,66 @@ el registro, es legendario.
 
 *Por qué 1 de Defensa:* El mayor terópodo, pero sin blindaje.
 
+### *Nodosaurus textilis* · Tireóforo · Rara · 3 copias
+
+**4 de coste · 2 de Ataque · 6 de Vida** · Defensa propuesta: *4*
+
+**Coraza dorsal** — +2 de Defensa. La coraza protege; no es un arma, a diferencia de la cola del estegosaurio.
+
+`ESTABLECIDO` · Formación Frontier, Wyoming, Cenomaniense (~100 Ma). Los osteodermos en bandas sobre el dorso están documentados directamente. El taxón en sí es material fragmentario y varios autores lo tratan como nomen dubium: la coraza es firme, la especie lo es menos.
+
+*Por qué 4 de Defensa:* Osteodermos en bandas sobre todo el dorso: coraza en el sentido literal.
+
+### *Riparovenator milnerae* · Terópodo · Épica · 2 copias
+
+**5 de coste · 5 de Ataque · 5 de Vida** · Defensa propuesta: *1*
+
+**Ribereño** — +2 Poder mientras el Canal fluvial esté en el campo.
+
+`INFERIDO` · Formación Wessex, isla de Wight, Barremiense (~125 Ma), descrito en 2021. Espinosáurido de hocico alargado y dientes cónicos, morfología asociada a capturar peces. En su pariente Baryonyx se conservaron escamas de pez en la cavidad abdominal; para este género es inferencia por morfología.
+
+*Por qué 1 de Defensa:* Espinosáurido grácil, construido para pescar y no para encajar.
+
+### *Lokiceratops rangiformis* · Marginocéfalo · Épica · 2 copias
+
+**5 de coste · 4 de Ataque · 7 de Vida** · Defensa propuesta: *2*
+
+**Gola ornamentada** — +2 de Defensa.
+
+`DEBATIDO` · Formación Judith River, Montana, Campaniense (~78 Ma), descrito en 2024. La gola lleva las mayores hojas óseas conocidas en un ceratópsido, asimétricas entre lados. Si servían para defensa, para exhibición o para reconocerse entre especies es justamente lo que se discute.
+
+*Por qué 2 de Defensa:* La gola es hueso, pero está calada y orientada hacia arriba, no hacia el atacante.
+
+### *Brachylophosaurus canadensis* · Ornitópodo · Épica · 2 copias
+
+**4 de coste · 3 de Ataque · 6 de Vida** · Defensa propuesta: *1*
+
+**Gregario** — +1 Poder por cada copia suya que tengas en el campo.
+
+`ESTABLECIDO` · Formaciones Judith River y Oldman, Montana y Alberta, Campaniense (~78 Ma). Los lechos de huesos monoespecíficos de hadrosaurios son la mejor evidencia de vida en manada de todo el registro. De este taxón se conocen además ejemplares con tejido blando conservado.
+
+*Por qué 1 de Defensa:* Hadrosaurio sin armadura: la manada es la defensa, no el cuerpo.
+
+### *Tyrannotitan chubutensis* · Terópodo · Legendaria · 1 copia
+
+**8 de coste · 9 de Ataque · 7 de Vida** · Defensa propuesta: *1*
+
+**Desgarro** — A quien hiere no se le cura ninguna herida ese turno.
+
+`INFERIDO` · Formación Cerro Barcino, Chubut, Argentina, Aptiense (~113 Ma). Carcarodontosáurido de unos 12 metros con dientes comprimidos y aserrados, de filo cortante en vez de aplastante. Que eso implique cortar carne y provocar hemorragias se infiere de la forma del diente, no de una herida fósil.
+
+*Por qué 1 de Defensa:* Doce metros de depredador sin una sola placa dérmica.
+
+### *Huaxiadraco corollatus* · Pterosaurio · Épica · 2 copias
+
+**4 de coste · 3 de Ataque · 3 de Vida** · Defensa propuesta: *0*
+
+**Vuelo** — Sobrevuela la ranura: golpea siempre al habitat rival y no recibe daño de combate.
+
+`ESTABLECIDO` · Formación Jiufotang, Liaoning, China, Aptiense (~120 Ma). No es un dinosaurio: es un pterosaurio tapejárido, sin dientes y con cresta craneal. Los tapejáridos conservan picnofibras, filamentos tegumentarios reales — la razón por la que este juego no pone plumas a los dinosaurios es que ellos no las tienen, no una regla estética.
+
+*Por qué 0 de Defensa:* Esqueleto neumatizado de pared finísima; lo que no puede encajar, lo esquiva volando.
+
 ---
 
 ## 2. Eventos
@@ -166,7 +234,7 @@ Se juega **sobre un dinosaurio tuyo**. +2 Poder y +2 Vida permanentes.
 
 `ESTABLECIDO` · La osteohistología muestra tasas de crecimiento altas y sostenidas en saurópodos y en Allosaurus, alcanzando talla adulta en pocas décadas o menos.
 
-### Neumaticidad ósea · Épica · coste 2 · 2 copias
+### Neumaticidad ósea · Épica · coste 2 · fuera del mazo de referencia
 
 Se juega **sobre un dinosaurio tuyo**. +2 Poder. Sólo sobre terópodos y saurópodos.
 
@@ -178,7 +246,7 @@ Se juega **sobre un dinosaurio del rival**. −2 Poder permanente a un dinosauri
 
 `ESTABLECIDO` · El registro patológico de la Morrison es abundante: costillas fracturadas y consolidadas, infecciones óseas y lesiones por estrés, especialmente documentadas en ejemplares de Allosaurus. Un animal cojo caza peor, pero sigue vivo.
 
-### Competencia trófica · Épica · coste 2 · 2 copias
+### Competencia trófica · Épica · coste 2 · fuera del mazo de referencia
 
 Se juega **sobre un clado rival que eliges**. −2 Poder a todos los dinosaurios rivales del clado que elijas.
 
@@ -214,7 +282,7 @@ El objetivo cura 1 herida al final de cada turno.
 
 `ESTABLECIDO` · La osteohistología muestra tasas de crecimiento altas y sostenidas en saurópodos y en Allosaurus, alcanzando talla adulta en pocas décadas o menos.
 
-### Neumaticidad ósea · Épica · coste 2 · 2 copias
+### Neumaticidad ósea · Épica · coste 2 · fuera del mazo de referencia
 
 +2 Poder. Sólo sobre terópodos y saurópodos.
 
@@ -226,7 +294,7 @@ El objetivo cura 1 herida al final de cada turno.
 
 `ESTABLECIDO` · El registro patológico de la Morrison es abundante: costillas fracturadas y consolidadas, infecciones óseas y lesiones por estrés, especialmente documentadas en ejemplares de Allosaurus. Un animal cojo caza peor, pero sigue vivo.
 
-### Competencia trófica · Épica · coste 2 · 2 copias
+### Competencia trófica · Épica · coste 2 · fuera del mazo de referencia
 
 −2 Poder a todos los dinosaurios rivales del clado que elijas.
 
@@ -252,19 +320,19 @@ Se juegan **boca arriba y surten efecto al instante**: dar Biomasa «este
 turno» no serviría de nada si esperasen a la revelación. A cambio el rival los
 ve venir, y eso es parte de su precio. Cuestan 0 y todos traen inconveniente.
 
-### Rebrote tras incendio · Rara · 3 copias
+### Rebrote tras incendio · Rara · 2 copias
 
 +3 Biomasa ahora mismo. Todos tus dinosaurios reciben 1 herida.
 
 `INFERIDO` · Los sedimentos de la Morrison contienen fusaíta —carbón vegetal fósil—, prueba directa de incendios recurrentes. El rebrote nutritivo posterior se infiere por analogía con sabanas actuales, no está medido en el registro.
 
-### Carroña abundante · Épica · 2 copias
+### Carroña abundante · Épica · fuera del mazo de referencia
 
 +3 Biomasa ahora mismo. El rival gana 1 Biomasa.
 
 `INFERIDO` · Marcas de mordida y dientes desprendidos de terópodo asociados a esqueletos de saurópodo indican consumo de carroña. Un cadáver grande alimenta a más de un carroñero, y no sólo al que llegó primero.
 
-### Lago efímero · Épica · 2 copias
+### Lago efímero · Épica · fuera del mazo de referencia
 
 +2 Biomasa ahora mismo. Tu habitat pierde 1.
 

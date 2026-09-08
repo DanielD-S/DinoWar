@@ -5,7 +5,7 @@ import { CARTAS, CLADO, RAREZA } from './cards.js';
 
 export const BALANCE = Object.freeze({
   // ------------------------------------------------------------- victorias
-  trofeosParaGanar: 6,      // registro fósil
+  trofeosParaGanar: 8,      // registro fósil
   vidaHabitat: 34,            // colapso del habitat
   // la tercera, extinción, no tiene número: es quedarse sin cartas al robar
 
@@ -64,6 +64,8 @@ export const BALANCE = Object.freeze({
     fracturaAtaque: 2,
     competenciaAtaque: 2,
     mortandadDano: 2,
+    corazaDefensa: 2,
+    golaDefensa: 2,
     trampaMazoRival: 12,
     trampaMazoPropio: 3,
   }),
@@ -91,10 +93,12 @@ export const BALANCE = Object.freeze({
   }),
 
   // ------------------------------------------------------------------- mazo
-  // Copias por rareza. Con 23 cartas distintas, 3/3/3/1 daría 49 o 51 según
-  // dónde se redondee y exigiría 9 legendarias de 23 para llegar a 50, que es
-  // demasiadas para que la palabra signifique algo. Bajando la épica a 2 el
-  // mazo cuadra en 50 exactos y las 23 cartas siguen siendo jugables.
+  tamanoMazo: 50,
+
+  // Copias que caben de una misma carta. Es a la vez el límite de construcción
+  // del jugador y la escala de rareza: son la misma regla mirada desde dos
+  // sitios. La épica se queda en 2 y no en 3 porque con 3 el mazo se llenaría
+  // de repetidas y quedaría sitio para muy pocas cartas distintas.
   copiasPorRareza: Object.freeze({
     [RAREZA.COMUN]: 3,
     [RAREZA.RARO]: 3,
@@ -123,11 +127,40 @@ export const BALANCE = Object.freeze({
 });
 
 /**
- * El mazo se DERIVA de la rareza de cada carta, no se escribe a mano: así no
- * puede desviarse de la regla de copias por mucho que crezca el set.
+ * Mazo de referencia: el que lleva la IA y el que mide BALANCE.md.
+ *
+ * Hasta las 25 cartas se derivaba de la rareza, porque una copia de cada al
+ * máximo daba justo 50. Con 31 no cabe: sumarían 62. Que el mazo sea una
+ * SELECCIÓN y no el catálogo entero es lo normal en un juego de cartas, y es
+ * lo que hace que construir mazos signifique algo — pero obliga a escribirlo,
+ * así que la comprobación de más abajo vigila que no se descuadre.
+ *
+ * Fuera se quedan seis cartas, jugables por el jugador pero no medidas aquí:
+ * neumaticidad, competencia, bosque, llanura, carroña y lago.
  */
-export const MAZO = Object.freeze(
-  Object.values(CARTAS).map((c) => Object.freeze([c.id, BALANCE.copiasPorRareza[c.rareza]])),
-);
+export const MAZO = Object.freeze([
+  // dinosaurios — 30
+  ['dryosaurus', 3], ['ornitholestes', 3], ['ceratosaurus', 3],
+  ['nodosaurus', 3],
+  ['stegosaurus', 2], ['allosaurus', 2], ['camarasaurus', 2],
+  ['riparovenator', 2], ['lokiceratops', 2], ['brachylophosaurus', 2], ['huaxiadraco', 2],
+  ['diplodocus', 1], ['apatosaurus', 1], ['torvosaurus', 1], ['tyrannotitan', 1],
+  // soporte — 20
+  ['sabana', 3], ['gregarismo', 3], ['trampa', 3], ['rebrote', 2],
+  ['gastrolitos', 2], ['fractura', 2], ['aridez', 2],
+  ['mortandad', 1], ['crecimiento_acelerado', 1], ['canal', 1],
+].map((e) => Object.freeze(e)));
 
 export const TOTAL_MAZO = MAZO.reduce((n, [, copias]) => n + copias, 0);
+
+// Un mazo mal escrito no debe llegar a una partida: falla al importar, que es
+// el único momento en que el error todavía es barato.
+for (const [cardId, copias] of MAZO) {
+  const c = CARTAS[cardId];
+  if (!c) throw new Error(`MAZO: la carta "${cardId}" no existe`);
+  const tope = BALANCE.copiasPorRareza[c.rareza];
+  if (copias > tope) throw new Error(`MAZO: ${cardId} lleva ${copias} copias y su rareza permite ${tope}`);
+}
+if (TOTAL_MAZO !== BALANCE.tamanoMazo) {
+  throw new Error(`MAZO suma ${TOTAL_MAZO} cartas y deberían ser ${BALANCE.tamanoMazo}`);
+}

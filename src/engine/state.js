@@ -197,6 +197,8 @@ export function reduccionDe(state, iid) {
   const c = carta(state.instancias[iid].cardId);
   let d = c.defensa ?? 0;
   if (c.rasgo === RASGO.MASA_COLOSAL) d += BALANCE.rasgos.masaColosalDefensa;
+  if (c.rasgo === RASGO.CORAZA) d += BALANCE.rasgos.corazaDefensa;
+  if (c.rasgo === RASGO.GOLA) d += BALANCE.rasgos.golaDefensa;
   return d;
 }
 
@@ -223,6 +225,9 @@ export function danoAlHabitat(state, iid) {
   const extra = campoEs(state, RASGO.CAMPO_SABANA) ? BALANCE.efectosCampo.sabanaDanoHabitat : 0;
   return ataqueEfectivo(state, iid) + extra;
 }
+
+/** ¿Sobrevuela la ranura en vez de chocar con quien tiene enfrente? */
+export const vuela = (state, iid) => carta(state.instancias[iid].cardId).rasgo === RASGO.VUELO;
 
 /** La deriva árida muerde el mazo de los dos bandos mientras siga en el campo. */
 export const hayAridez = (state) => campoEs(state, RASGO.CAMPO_ARIDEZ);

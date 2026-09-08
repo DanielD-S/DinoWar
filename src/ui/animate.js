@@ -32,6 +32,30 @@ function pausa(ms) {
 
 export const esperar = (ms) => pausa(ms);
 
+/**
+ * Escalona el volteo de las cartas que acaban de salir del despliegue oculto.
+ * Ya se volteaban —render() les pone .entra— pero las diez a la vez, así que el
+ * momento que el juego declara como su tensión central pasaba desapercibido.
+ * Devuelve cuántas se van a abrir, para saber cuánto hay que esperar.
+ */
+export function animarRevelacion(previo, actual) {
+  const yaEstaba = new Set();
+  for (const fila of previo.ranuras) for (const iid of fila) if (iid !== null) yaEstaba.add(iid);
+
+  let n = 0;
+  for (const fila of actual.ranuras) {
+    for (const iid of fila) {
+      if (iid === null || yaEstaba.has(iid)) continue;
+      const nodo = cartaNodo(iid);
+      if (!nodo) continue;
+      // La clase .entra ya la pone render(); aquí sólo se escalona.
+      nodo.style.setProperty('--retardo', `${n * 90}ms`);
+      n += 1;
+    }
+  }
+  return n;
+}
+
 const ranuraNodo = (bando, r) => el.filas[bando]?.children[r] ?? null;
 const cartaNodo = (iid) => document.querySelector(`.carta--ranura[data-iid="${iid}"]`);
 

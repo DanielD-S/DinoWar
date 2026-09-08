@@ -8,7 +8,7 @@ import { BALANCE } from '../data/balance.js';
 import { TIPO, OBJETIVO, CLADO, RASGO, carta } from '../data/cards.js';
 import {
   FASE, rival, unidadEn, unidadesDe,
-  ataqueEfectivo, vidaActual, reduccionDe, espinasDe, danoAlHabitat, campoEs,
+  ataqueEfectivo, vidaActual, reduccionDe, espinasDe, danoAlHabitat, campoEs, vuela,
 } from './state.js';
 import { ACCION, legales } from './actions.js';
 import { elegir } from './rng.js';
@@ -78,6 +78,19 @@ function valorEnRanura(vista, j, ranura, mio) {
     return (mio.poder + extraSabana) * IA.pesoHabitat * turnos;
   }
 
+  // Lo que vuela no negocia con la ranura: pasa por encima. Vale su daño al
+  // habitat sin riesgo, pero no tapa nada, así que lo de enfrente también pasa.
+  if (mio.vuela) {
+    const turnos = 1 + (IA.horizonte - 1) * 0.5;
+    return (mio.poder + extraSabana) * IA.pesoHabitat * turnos;
+  }
+
+  // Si el de enfrente vuela, esta ranura está de hecho vacía para mí.
+  if (vuela(vista, b.iid)) {
+    const turnos = 1 + (IA.horizonte - 1) * 0.5;
+    return (mio.poder + extraSabana) * IA.pesoHabitat * turnos;
+  }
+
   // Lo que ese rival me haría al habitat si dejo la ranura vacía.
   const evitado = danoAlHabitat(vista, b.iid) * IA.pesoHabitat;
 
@@ -104,6 +117,7 @@ function statsDeCarta(vista, j, cardId, rivalIid) {
     poder: ataqueHipotetico(vista, j, cardId),
     vida: c.vida,
     clado: c.clado,
+    vuela: c.rasgo === RASGO.VUELO,
     reduccion: reduccionHipotetica(cardId),
     espinasPropias: espinasHipoteticas(cardId),
     espinasRecibidas: rivalIid === null ? 0 : espinasDe(vista, rivalIid),

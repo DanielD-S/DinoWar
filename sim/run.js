@@ -97,7 +97,10 @@ export function correr({ n, seed, perfiles }) {
 }
 
 export function resumir(m) {
-  const cardIds = Object.keys(CARTAS);
+  // Sólo se califican las cartas que el mazo de referencia lleva. Una carta que
+  // no está en el mazo no se puede jugar, así que su índice sería 0 por
+  // construcción: contarla como descalibrada es medir el mazo, no la carta.
+  const cardIds = MAZO.map(([c]) => c);
   const copias = Object.fromEntries(MAZO);
   const frecuencias = cardIds.map((c) => {
     const cuota = pct(m.jugadasPorCarta[c], m.jugadasTotales);

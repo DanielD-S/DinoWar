@@ -88,7 +88,7 @@ test('La colección inicial monta exactamente el mazo por defecto', () => {
 
   assert.equal(v.valido, true, v.problemas.join(' '));
   assert.equal(v.total, TAM_MAZO);
-  assert.equal(TAM_MAZO, TOTAL_MAZO);
+  assert.equal(TOTAL_MAZO, TAM_MAZO, 'el mazo de referencia debe sumar un mazo legal');
 });
 
 test('Un mazo ilegal dice POR QUÉ lo es', () => {
@@ -96,7 +96,7 @@ test('Un mazo ilegal dice POR QUÉ lo es', () => {
 
   const corto = validarMazo({ dryosaurus: 3 }, col);
   assert.equal(corto.valido, false);
-  assert.match(corto.problemas.join(' '), /47 cartas/);
+  assert.match(corto.problemas.join(' '), new RegExp(`${TAM_MAZO - 3} cartas`));
 
   const pasado = validarMazo({ ...mazoPorDefecto(), torvosaurus: 3 }, col);
   assert.equal(pasado.valido, false);
@@ -123,5 +123,4 @@ test('El mazo del jugador entra en la partida sin tocar el motor', () => {
 
   // El rival sigue con el mazo de referencia, que es el que mide el simulador.
   assert.equal(s.jugadores[1].mazo.length + s.jugadores[1].mano.length, TOTAL_MAZO);
-  assert.equal(MAZO.length, Object.keys(CARTAS).length);
 });

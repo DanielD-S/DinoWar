@@ -138,7 +138,7 @@ function pintarRanuras(estado) {
         // Sólo se ven las cartas propias comprometidas: sabes qué has jugado.
         const cardId = estado.instancias[pendiente.iid].cardId;
         nodo.appendChild(nodoCarta(estado, cardId, {
-          variante: 'ranura', dueno: bando, iid: pendiente.iid, clases: ['pendiente'],
+          variante: 'ranura', dueno: bando, iid: pendiente.iid, clases: ['pendiente', 'aterriza'],
         }));
       }
     }
@@ -449,9 +449,10 @@ export function ayudaHTML() {
       <span><i class="ev DEBATIDO"></i> Debatido</span>
     </div>
     <p class="ayuda-p" style="margin-top:10px">
-      Los ${Object.values(CARTAS).filter((x) => x.tipo === TIPO.DINOSAURIO).length} taxones existen, están descritos
-      formalmente y proceden todos de la Formación Morrison, así que pudieron coincidir en el tiempo y
-      en el espacio. Ninguno lleva plumas porque ninguno tiene evidencia que las respalde.
+      Los ${Object.values(CARTAS).filter((x) => x.tipo === TIPO.DINOSAURIO).length} taxones existen y están descritos
+      formalmente. El núcleo es la Formación Morrison, del Jurásico Superior; el resto llega de otras
+      formaciones y otras edades, y cada ficha dice de cuál y de cuándo. Ninguno lleva plumas porque
+      ninguno tiene evidencia que las respalde, salvo el pterosaurio, que sí la tiene y por eso se dice.
     </p>`;
 }
 

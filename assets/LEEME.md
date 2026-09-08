@@ -3,9 +3,9 @@
 `assets/dinos/` guarda las ilustraciones de las cartas en JPEG de 460 px de lado
 mayor, con un `indice.json` que dice cuáles hay.
 
-**Esa carpeta no está en el repositorio.** Las imágenes de referencia que hay
-ahora son paleoarte de terceros y publicarlas en GitHub Pages sería
-redistribuirlas sin licencia. Sirven de marcador de posición en local.
+Las ilustraciones sí viajan en el repositorio, por decisión del autor del
+proyecto. Los originales sin reducir (`src/dinos/`, 29 MB) no: no hacen falta
+para jugar y sólo sirven para regenerar esta carpeta.
 
 El juego no depende de ellas. `src/ui/art.js` pide `indice.json` una vez al
 arrancar: si no está —y en el sitio publicado no lo está— falla esa única

@@ -9,7 +9,7 @@ import {
   FASE, MOTIVO_FIN, CAUSA, rival,
   unidadEn, unidadesDe, todasLasUnidades,
   ataqueEfectivo, vidaActual, danoEntre, danoAlHabitat, espinasDe,
-  curacionDe, rentaDe, inmuneSequia, haySequia, hayCrecida, hayAridez, campoEs,
+  curacionDe, rentaDe, inmuneSequia, haySequia, hayCrecida, hayAridez, campoEs, vuela,
 } from './state.js';
 
 export function ev(s, tipo, datos = {}) {
@@ -284,6 +284,36 @@ export function faseCombate(s) {
     const a = unidadEn(s, 0, r);
     const b = unidadEn(s, 1, r);
 
+    // Lo que vuela no choca: pasa por encima de la ranura, va al habitat y no
+    // recibe nada a cambio. Sigue muriendo por Mortandad o por Sequía, que no
+    // se esquivan volando.
+    const volA = a && vuela(s, a.iid);
+    const volB = b && vuela(s, b.iid);
+    if (a && volA) {
+      const d = danoAlHabitat(s, a.iid);
+      alHabitat[1] += d;
+      ev(s, 'SOBREVUELO', { ranura: r, iid: a.iid, bando: 0, dano: d });
+    }
+    if (b && volB) {
+      const d = danoAlHabitat(s, b.iid);
+      alHabitat[0] += d;
+      ev(s, 'SOBREVUELO', { ranura: r, iid: b.iid, bando: 1, dano: d });
+    }
+    if (volA || volB) {
+      // El que se queda en tierra tiene la ranura libre delante.
+      if (a && !volA) {
+        const d = danoAlHabitat(s, a.iid);
+        alHabitat[1] += d;
+        ev(s, 'AVANCE', { ranura: r, iid: a.iid, bando: 0, dano: d });
+      }
+      if (b && !volB) {
+        const d = danoAlHabitat(s, b.iid);
+        alHabitat[0] += d;
+        ev(s, 'AVANCE', { ranura: r, iid: b.iid, bando: 1, dano: d });
+      }
+      continue;
+    }
+
     if (a && b) {
       const dA = danoEntre(s, a.iid, b.iid);
       const dB = danoEntre(s, b.iid, a.iid);
@@ -291,6 +321,10 @@ export function faseCombate(s) {
       golpes.push({ iid: a.iid, cantidad: dB, causa: CAUSA.COMBATE, por: 1 });
       golpes.push({ iid: a.iid, cantidad: espinasDe(s, b.iid), causa: CAUSA.ESPINAS, por: 1 });
       golpes.push({ iid: b.iid, cantidad: espinasDe(s, a.iid), causa: CAUSA.ESPINAS, por: 0 });
+
+      // Desgarro: la herida no cierra en el mismo turno en que se abre.
+      if (dA > 0 && carta(a.cardId).rasgo === RASGO.DESGARRO) s.instancias[b.iid].sinCuracion = true;
+      if (dB > 0 && carta(b.cardId).rasgo === RASGO.DESGARRO) s.instancias[a.iid].sinCuracion = true;
 
       // Depredador dominante: lo que sobra al matar sigue hacia el habitat.
       if (carta(a.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE) {
@@ -324,6 +358,7 @@ export function faseCombate(s) {
   }
 
   for (const inst of todasLasUnidades(s)) {
+    if (inst.sinCuracion) { inst.sinCuracion = false; continue; }
     const cura = curacionDe(s, inst.iid);
     if (cura > 0 && inst.heridas > 0) {
       inst.heridas = Math.max(0, inst.heridas - cura);

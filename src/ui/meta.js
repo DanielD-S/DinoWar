@@ -19,6 +19,14 @@ import { arte } from './art.js';
 import { fichaHTML, abrirFicha } from './render.js';
 
 const id = (s) => document.getElementById(s);
+
+/**
+ * Modo de pruebas: ?pruebas=1 en la URL da monedas infinitas para poder abrir
+ * sobres a discreción. No toca el perfil guardado — sólo deja de cobrar — así
+ * que salir del modo devuelve el saldo que tuvieras.
+ */
+const PRUEBAS = new URLSearchParams(location.search).get('pruebas') === '1';
+const MONEDAS = () => (PRUEBAS ? '∞' : cargarPerfil().monedas);
 const ORDEN = [RAREZA.LEGENDARIO, RAREZA.EPICO, RAREZA.RARO, RAREZA.COMUN];
 
 let dom = null;
@@ -81,15 +89,14 @@ function catalogo() {
 }
 
 function pintarMonedas() {
-  const p = cargarPerfil();
-  for (const m of document.querySelectorAll('.moneda')) m.textContent = p.monedas;
+  for (const m of document.querySelectorAll('.moneda')) m.textContent = MONEDAS();
 }
 
 export function pintarMenu() {
   const p = cargarPerfil();
   const m = p.mazos[p.activo] ?? p.mazos[0];
   const v = validarMazo(m?.cartas ?? {}, p.cartas);
-  dom.menuMoneda.textContent = p.monedas;
+  dom.menuMoneda.textContent = MONEDAS();
   dom.menuMazo.textContent = v.valido ? m.nombre : `${m?.nombre ?? '—'} (no válido)`;
 }
 
@@ -172,46 +179,72 @@ function pintarSobres(tirada = null, nuevas = new Set()) {
         <td>${Object.values(CARTAS).filter((c) => c.rareza === r).length}</td></tr>`).join('');
 
   if (!tirada) {
-    dom.tirada.innerHTML = '<p class="sobre-vacio">Cinco cartas al azar.<br>'
-      + `Al menos una ${RAREZA_NOMBRE[GARANTIA].toLowerCase()} o mejor, garantizada.</p>`;
+    dom.tirada.className = 'sobre-tirada cerrado';
+    dom.tirada.innerHTML = `<div class="sobre-paquete" id="sobre-paquete">
+        <div class="sobre-solapa"></div>
+        <div class="sobre-sello">DW</div>
+      </div>
+      <p class="sobre-vacio">Cinco cartas al azar.<br>
+        Al menos una ${RAREZA_NOMBRE[GARANTIA].toLowerCase()} o mejor, garantizada.</p>`;
   } else {
+    // Cada carta cae boca abajo y se voltea por turnos. El retardo va en una
+    // variable CSS para que la animación de reparto y la de volteo compartan
+    // el mismo reloj sin encadenar temporizadores en JS.
+    dom.tirada.className = 'sobre-tirada abierto';
     dom.tirada.innerHTML = tirada.map((cid, i) => {
       const c = carta(cid);
-      return `<div class="sobre-carta ${nuevas.has(cid) ? 'nueva' : ''}" data-card="${cid}"
-                   style="animation-delay:${i * 130}ms">
-        <div class="col-arte">${arte(cid)}</div>
-        <div class="col-pie">
-          <div class="col-nombre">${nombreHTML(c)}</div>
-          <div class="col-rar rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</div>
-          ${nuevas.has(cid) ? '<div class="sobre-nueva">NUEVA</div>' : ''}
+      const nueva = nuevas.has(cid);
+      return `<div class="sobre-carta rareza-${c.rareza} ${nueva ? 'nueva' : ''}"
+                   data-card="${cid}" style="--retardo:${i * 220}ms">
+        <div class="sobre-giro">
+          <div class="sobre-dorso"></div>
+          <div class="sobre-frente">
+            <div class="col-arte">${arte(cid)}</div>
+            <div class="col-pie">
+              <div class="col-nombre">${nombreHTML(c)}</div>
+              <div class="col-rar rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</div>
+              ${nueva ? '<div class="sobre-nueva">NUEVA</div>' : ''}
+            </div>
+          </div>
         </div>
       </div>`;
     }).join('');
   }
 
-  const puede = p.monedas >= ECONOMIA.precioSobre;
+  const puede = PRUEBAS || p.monedas >= ECONOMIA.precioSobre;
   dom.btnAbrir.disabled = !puede;
-  dom.btnAbrir.textContent = `Abrir sobre · ${ECONOMIA.precioSobre} ◈`;
+  dom.btnAbrir.textContent = PRUEBAS
+    ? 'Abrir sobre · modo pruebas'
+    : `Abrir sobre · ${ECONOMIA.precioSobre} ◈`;
   dom.aviso.className = puede ? 'meta-nota' : 'meta-nota mal';
-  dom.aviso.textContent = puede
-    ? `${p.sobresAbiertos === 1 ? 'Llevas 1 sobre abierto' : `Llevas ${p.sobresAbiertos} sobres abiertos`}. Las monedas se ganan jugando: ${ECONOMIA.monedasVictoria} por victoria, ${ECONOMIA.monedasDerrota} por derrota.`
-    : `Te faltan ${ECONOMIA.precioSobre - p.monedas} monedas. Se ganan jugando, o fundiendo copias sobrantes en la colección.`;
+  const abiertos = p.sobresAbiertos === 1 ? 'Llevas 1 sobre abierto' : `Llevas ${p.sobresAbiertos} sobres abiertos`;
+  dom.aviso.textContent = PRUEBAS
+    ? `${abiertos}. Modo pruebas: los sobres no cuestan monedas. Quita ?pruebas=1 de la dirección para volver a lo normal.`
+    : puede
+      ? `${abiertos}. Las monedas se ganan jugando: ${ECONOMIA.monedasVictoria} por victoria, ${ECONOMIA.monedasDerrota} por derrota.`
+      : `Te faltan ${ECONOMIA.precioSobre - p.monedas} monedas. Se ganan jugando, o fundiendo copias sobrantes en la colección.`;
 }
 
 function comprarSobre() {
   const p = cargarPerfil();
-  if (p.monedas < ECONOMIA.precioSobre) return;
+  if (!PRUEBAS && p.monedas < ECONOMIA.precioSobre) return;
 
   const tirada = abrirSobre(Math.random);
   const nuevas = new Set(tirada.filter((cid) => (p.cartas[cid] ?? 0) === 0));
 
   actualizarPerfil({
-    monedas: p.monedas - ECONOMIA.precioSobre,
+    monedas: PRUEBAS ? p.monedas : p.monedas - ECONOMIA.precioSobre,
     sobresAbiertos: p.sobresAbiertos + 1,
   });
   anadirCartas(tirada);
   pintarSobres(tirada, nuevas);
   pintarMenu();
+
+  // El volteo se dispara en el fotograma siguiente al pintado, para que el
+  // navegador tenga el estado inicial con el que interpolar.
+  requestAnimationFrame(() => {
+    for (const n of dom.tirada.querySelectorAll('.sobre-carta')) n.classList.add('gira');
+  });
 }
 
 // ------------------------------------------------------------------ mazos

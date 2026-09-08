@@ -5,8 +5,9 @@ import { writeFileSync } from 'node:fs';
 import { CARTAS, TIPO, TIPO_NOMBRE, OBJETIVO, CLADO_NOMBRE, RAREZA_NOMBRE, ESTACIONES } from '../src/data/cards.js';
 import { BALANCE, MAZO, TOTAL_MAZO } from '../src/data/balance.js';
 
-// Defensa PROPUESTA: reducción plana de daño, correlacionada con morfología
-// antipredatoria real (osteodermos, placas, talla). No está en el código.
+// Por qué cada carta tiene la Defensa que tiene. La cifra vive en cards.js;
+// esto es sólo el argumento, que no cabía en la carta. Si falta una entrada, la
+// línea se omite: añadir un taxón no debe romper el generador.
 const DEFENSA = {
   dryosaurus: [0, 'Cursorial y grácil: su defensa es correr, no aguantar.'],
   ornitholestes: [0, 'Terópodo de ~2 m, sin blindaje ni masa.'],
@@ -17,9 +18,19 @@ const DEFENSA = {
   diplodocus: [2, 'Talla equivalente, cuerpo más grácil.'],
   apatosaurus: [3, 'La mayor masa del set; la talla ES la defensa.'],
   torvosaurus: [1, 'El mayor terópodo, pero sin blindaje.'],
+  nodosaurus: [4, 'Osteodermos en bandas sobre todo el dorso: coraza en el sentido literal.'],
+  riparovenator: [1, 'Espinosáurido grácil, construido para pescar y no para encajar.'],
+  lokiceratops: [2, 'La gola es hueso, pero está calada y orientada hacia arriba, no hacia el atacante.'],
+  brachylophosaurus: [1, 'Hadrosaurio sin armadura: la manada es la defensa, no el cuerpo.'],
+  tyrannotitan: [1, 'Doce metros de depredador sin una sola placa dérmica.'],
+  huaxiadraco: [0, 'Esqueleto neumatizado de pared finísima; lo que no puede encajar, lo esquiva volando.'],
 };
 
-const copias = Object.fromEntries(MAZO);
+// El mazo de referencia ya no lleva una copia de cada carta: con 31 cartas
+// sumarían 62 y un mazo son 50. Las que no entran se marcan, no se ocultan.
+const copiasEnMazo = Object.fromEntries(MAZO);
+const copias = new Proxy({}, { get: (_, id) => copiasEnMazo[id] ?? 0 });
+const enMazo = (id) => (copiasEnMazo[id] ?? 0) > 0;
 const L = [];
 const p = (x = '') => L.push(x);
 
@@ -28,17 +39,26 @@ p('');
 p('> Generado por `node sim/set.js` desde `src/data/cards.js` y `src/data/balance.js`.');
 p('> Todas las cifras son las que ejecuta el motor, calibradas sobre 2.000 partidas.');
 p('>');
-p('> **Copias**: cuántos ejemplares de esa carta hay en el mazo.');
+p('> **Copias**: ejemplares de esa carta en el mazo de referencia, que es el');
+p('> que lleva la IA y el que mide BALANCE.md. Tu mazo lo montas tú.');
 p('> **Sed**: heridas que recibe cuando sale *Sequía estacional*. **No es un');
 p('> segundo coste**: no se paga al jugarla, sólo cuando el clima lo cobra.');
 p('');
-p(`Mazo fijo de **${TOTAL_MAZO} cartas**: ${MAZO.filter(([id]) => CARTAS[id].tipo === TIPO.DINOSAURIO).reduce((n, [, k]) => n + k, 0)} dinosaurios, ` +
+p(`El set tiene **${Object.keys(CARTAS).length} cartas distintas**. Un mazo son ` +
+  `**${BALANCE.tamanoMazo} cartas exactas**, así que no caben todas: el de referencia lleva ` +
+  `${MAZO.filter(([id]) => CARTAS[id].tipo === TIPO.DINOSAURIO).reduce((n, [, k]) => n + k, 0)} dinosaurios, ` +
   `${MAZO.filter(([id]) => CARTAS[id].tipo === TIPO.EVENTO).reduce((n, [, k]) => n + k, 0)} eventos, ` +
   `${MAZO.filter(([id]) => CARTAS[id].tipo === TIPO.RECURSO).reduce((n, [, k]) => n + k, 0)} de recurso y ` +
   `${MAZO.filter(([id]) => CARTAS[id].tipo === TIPO.CLIMA).reduce((n, [, k]) => n + k, 0)} de clima.`);
 p('');
-p('**Qué revisar sobre todo:** los eventos de presión —Fractura consolidada,');
-p('Competencia trófica y Mortandad estacional— y las tres cartas de recurso.');
+const fuera = Object.keys(CARTAS).filter((id) => !enMazo(id));
+if (fuera.length > 0) {
+  p(`Fuera del mazo de referencia, y por tanto sin medir aquí: ` +
+    `${fuera.map((id) => CARTAS[id].binomial).join(', ')}. Se juegan igual, ` +
+    `pero su calibración no está comprobada.`);
+}
+p('');
+p('**Qué revisar sobre todo:** los eventos de presión y las cartas de recurso.');
 p('Son lo único del set que no describe un animal sino una presión sobre él, y');
 p('es donde más fácil sería que se me hubiera colado algo sin respaldo.');
 p('');
@@ -48,16 +68,17 @@ p('');
 // ------------------------------------------------------------- dinosaurios
 p('## 0. Rarezas');
 p('');
-p('La rareza gobierna cuántas copias caben en el mazo y —cuando existan los');
-p('sobres— con qué frecuencia sale. Sigue la abundancia fósil real: los taxones');
-p('corrientes de la Morrison son comunes y *Torvosaurus*, genuinamente raro en');
-p('el registro, es legendario.');
+p('La rareza gobierna cuántas copias de una carta caben en un mazo y con qué');
+p('frecuencia sale de un sobre. Sigue la abundancia fósil real: los taxones');
+p('corrientes son comunes y *Torvosaurus*, genuinamente raro en el registro,');
+p('es legendario.');
 p('');
-p('| Rareza | Copias por carta | Cartas distintas | Copias en el mazo |');
+p('| Rareza | Copias máximas | Cartas distintas | En el mazo de referencia |');
 p('|---|---|---|---|');
 for (const r of ['COMUN', 'RARO', 'EPICO', 'LEGENDARIO']) {
   const l = Object.values(CARTAS).filter((c) => c.rareza === r);
-  p(`| ${RAREZA_NOMBRE[r]} | ${BALANCE.copiasPorRareza[r]} | ${l.length} | ${l.length * BALANCE.copiasPorRareza[r]} |`);
+  const enDeck = MAZO.filter(([id]) => CARTAS[id].rareza === r).reduce((n, [, k]) => n + k, 0);
+  p(`| ${RAREZA_NOMBRE[r]} | ${BALANCE.copiasPorRareza[r]} | ${l.length} | ${enDeck} |`);
 }
 p('');
 p('---');
@@ -76,7 +97,7 @@ p('');
 
 for (const [id, c] of Object.entries(CARTAS)) {
   if (c.tipo !== TIPO.DINOSAURIO) continue;
-  p(`### *${c.binomial}* · ${CLADO_NOMBRE[c.clado]} · ${RAREZA_NOMBRE[c.rareza]} · ${copias[id]} ${copias[id] === 1 ? 'copia' : 'copias'}`);
+  p(`### *${c.binomial}* · ${CLADO_NOMBRE[c.clado]} · ${RAREZA_NOMBRE[c.rareza]} · ${enMazo(id) ? `${copias[id]} ${copias[id] === 1 ? 'copia' : 'copias'}` : 'fuera del mazo de referencia'}`);
   p('');
   p(`**${c.coste} de coste · ${c.ataque} de Ataque · ${c.vida} de Vida** · Defensa propuesta: *${c.defensa}*`);
   p('');
@@ -84,8 +105,10 @@ for (const [id, c] of Object.entries(CARTAS)) {
   p('');
   p(`\`${c.nivel_evidencia}\` · ${c.nota_cientifica}`);
   p('');
-  p(`*Por qué ${c.defensa} de Defensa:* ${DEFENSA[id][1]}`);
-  p('');
+  if (DEFENSA[id]) {
+    p(`*Por qué ${c.defensa} de Defensa:* ${DEFENSA[id][1]}`);
+    p('');
+  }
 }
 
 p('---');
@@ -106,7 +129,7 @@ const DESTINO = {
 };
 for (const [id, c] of Object.entries(CARTAS)) {
   if (c.tipo !== TIPO.EVENTO) continue;
-  p(`### ${c.binomial} · ${RAREZA_NOMBRE[c.rareza]} · coste ${c.coste} · ${copias[id]} ${copias[id] === 1 ? 'copia' : 'copias'}`);
+  p(`### ${c.binomial} · ${RAREZA_NOMBRE[c.rareza]} · coste ${c.coste} · ${enMazo(id) ? `${copias[id]} ${copias[id] === 1 ? 'copia' : 'copias'}` : 'fuera del mazo de referencia'}`);
   p('');
   p(`Se juega **${DESTINO[c.objetivo]}**. ${c.rasgoTexto}`);
   p('');
@@ -117,7 +140,7 @@ for (const [id, c] of Object.entries(CARTAS)) {
 
 for (const [id, c] of Object.entries(CARTAS)) {
   if (c.tipo !== TIPO.EVENTO) continue;
-  p(`### ${c.binomial} · ${RAREZA_NOMBRE[c.rareza]} · coste ${c.coste} · ${copias[id]} ${copias[id] === 1 ? 'copia' : 'copias'}`);
+  p(`### ${c.binomial} · ${RAREZA_NOMBRE[c.rareza]} · coste ${c.coste} · ${enMazo(id) ? `${copias[id]} ${copias[id] === 1 ? 'copia' : 'copias'}` : 'fuera del mazo de referencia'}`);
   p('');
   p(`${c.rasgoTexto}`);
   p('');
@@ -135,7 +158,7 @@ p('ve venir, y eso es parte de su precio. Cuestan 0 y todos traen inconveniente.
 p('');
 for (const [id, c] of Object.entries(CARTAS)) {
   if (c.tipo !== TIPO.RECURSO) continue;
-  p(`### ${c.binomial} · ${RAREZA_NOMBRE[c.rareza]} · ${copias[id]} ${copias[id] === 1 ? 'copia' : 'copias'}`);
+  p(`### ${c.binomial} · ${RAREZA_NOMBRE[c.rareza]} · ${enMazo(id) ? `${copias[id]} ${copias[id] === 1 ? 'copia' : 'copias'}` : 'fuera del mazo de referencia'}`);
   p('');
   p(`${c.rasgoTexto}`);
   p('');

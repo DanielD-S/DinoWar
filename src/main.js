@@ -16,7 +16,9 @@ import { detectarFotos, vigilarFotos } from './ui/art.js';
 import { montarMeta, abrirColeccion, abrirSobres, abrirMazos, pintarMenu, recompensar } from './ui/meta.js';
 import { mazoActivo } from './ui/almacen.js';
 import { aListaDeMazo } from './data/coleccion.js';
-import { animarCombate, cancelarAnimaciones, esperar, lineasDeLog } from './ui/animate.js';
+import {
+  animarCombate, animarRevelacion, cancelarAnimaciones, esperar, lineasDeLog,
+} from './ui/animate.js';
 import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio } from './ui/audio.js';
 
 const APP = Object.freeze({
@@ -214,11 +216,15 @@ async function bucle() {
 
     if (estado.fase === FASE.REVELACION) {
       irA(APP.RESOLVING);
+      const antes = estado;
       estado = reduce(estado, { tipo: ACCION.AVANZAR });
       render(estado);
       mensaje('Revelación simultánea…');
       sonido('revelar');
-      await esperar(700);
+      // Se espera a que terminen los volteos, no un tiempo fijo: con el campo
+      // lleno son diez cartas y 700 ms las cortaba por la mitad.
+      const volteadas = animarRevelacion(antes, estado);
+      await esperar(volteadas > 0 ? 480 + volteadas * 90 : 500);
       continue;
     }
 
