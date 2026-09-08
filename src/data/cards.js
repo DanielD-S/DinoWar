@@ -27,6 +27,7 @@ export const OBJETIVO = Object.freeze({
   PROPIO: 'PROPIO',   // un dinosaurio tuyo
   RIVAL: 'RIVAL',     // un dinosaurio del rival
   CLADO: 'CLADO',     // todos los rivales de un clado que eliges
+  RIVALES: 'RIVALES', // varios dinosaurios del rival, elegidos uno a uno
   // No se elige nada: la carta cae sobre la mesa entera. Antes esto se llamaba
   // CAMPO y valía a la vez para «no tiene objetivo» y para «ocupa la ranura de
   // clima», que son cosas distintas: por eso una Mortandad se podía soltar
@@ -75,17 +76,23 @@ export const CLADO_NOMBRE = Object.freeze({
 export const RASGO = Object.freeze({
   DEPREDADOR_DOMINANTE: 'DEPREDADOR_DOMINANTE',
   RIBERENO: 'RIBERENO',
-  ESCASO: 'ESCASO',
   OPORTUNISTA: 'OPORTUNISTA',
-  MASA_COLOSAL: 'MASA_COLOSAL',
   RAMONEO_BAJO: 'RAMONEO_BAJO',
   MIGRADOR: 'MIGRADOR',
-  TAGOMIZADOR: 'TAGOMIZADOR',
   GREGARIO: 'GREGARIO',
   DESGARRO: 'DESGARRO',
   CORAZA: 'CORAZA',
-  GOLA: 'GOLA',
   VUELO: 'VUELO',
+  // Rasgos que sólo valen acompañados: piden que haya otro de los suyos —o de
+  // su clado— en el campo. Antes eran bonificaciones planas.
+  CAZA_EN_GRUPO: 'CAZA_EN_GRUPO',       // Ceratosaurus: hacen falta tres
+  MURO_DE_PLACAS: 'MURO_DE_PLACAS',     // Stegosaurus: con otro igual
+  GOLA: 'GOLA',                         // Lokiceratops: con otro igual
+  MANADA: 'MANADA',                     // Apatosaurus: con otro saurópodo
+  // Buscar en el propio mazo al jugar la carta.
+  BUSCA_EVENTO: 'BUSCA_EVENTO',
+  BUSCA_CLIMA: 'BUSCA_CLIMA',
+  BUSCA_GREGARISMO: 'BUSCA_GREGARISMO',
   // adaptaciones
   GREGARISMO: 'GREGARISMO',
   GASTROLITOS: 'GASTROLITOS',
@@ -145,8 +152,8 @@ export const CARTAS = Object.freeze({
     id: 'ceratosaurus', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,
     binomial: 'Ceratosaurus nasicornis',
     coste: 1, ataque: 3, defensa: 0, vida: 3,
-    rasgo: RASGO.RIBERENO, rasgoNombre: 'Ribereño',
-    rasgoTexto: '+2 Poder mientras el campo activo sea Canal fluvial trenzado.',
+    rasgo: RASGO.CAZA_EN_GRUPO, rasgoNombre: 'Caza en grupo',
+    rasgoTexto: '+2 de Ataque si hay tres Ceratosaurus tuyos en el campo.',
     nivel_evidencia: EVIDENCIA.DEBATIDO,
     nota_cientifica: 'Menos frecuente que Allosaurus. Se ha propuesto una dieta con mayor componente de presa acuática y un uso preferente de ambientes ribereños, a partir de morfología dental y contexto de hallazgos. Hipótesis discutida.',
   }),
@@ -155,8 +162,8 @@ export const CARTAS = Object.freeze({
     id: 'stegosaurus', rareza: RAREZA.COMUN, clado: CLADO.TIREOFORO,
     binomial: 'Stegosaurus stenops',
     coste: 2, ataque: 1, defensa: 4, vida: 5,
-    rasgo: RASGO.TAGOMIZADOR, rasgoNombre: 'Tagomizador',
-    rasgoTexto: 'Devuelve 2 de daño adicional a quien lo ataque, además del que ya devuelve su clado.',
+    rasgo: RASGO.MURO_DE_PLACAS, rasgoNombre: 'Muro de placas',
+    rasgoTexto: '+1 de Defensa si tienes otro Stegosaurus en el campo.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Una vértebra caudal de Allosaurus con una perforación compatible con una púa caudal de Stegosaurus es evidencia directa de uso defensivo del tagomizador.',
   }),
@@ -175,8 +182,8 @@ export const CARTAS = Object.freeze({
     id: 'camarasaurus', rareza: RAREZA.RARO, clado: CLADO.SAUROPODO,
     binomial: 'Camarasaurus grandis',
     coste: 3, ataque: 2, defensa: 3, vida: 4,
-    rasgo: RASGO.MIGRADOR, rasgoNombre: 'Migrador',
-    rasgoTexto: 'Puede cambiar de ranura en vez de desplegar.',
+    rasgo: RASGO.BUSCA_EVENTO, rasgoNombre: 'Migrador',
+    rasgoTexto: 'Al jugarla, busca un evento en tu mazo y llévatelo a la mano.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Análisis isotópicos de esmalte dental sugieren desplazamientos estacionales hacia tierras altas durante la estación seca, a diferencia de otros saurópodos de la misma formación. El rasgo Migrador refleja ese resultado.',
   }),
@@ -195,8 +202,8 @@ export const CARTAS = Object.freeze({
     id: 'apatosaurus', rareza: RAREZA.EPICO, clado: CLADO.SAUROPODO,
     binomial: 'Apatosaurus louisae',
     coste: 3, ataque: 2, defensa: 5, vida: 10,
-    rasgo: RASGO.MASA_COLOSAL, rasgoNombre: 'Masa colosal',
-    rasgoTexto: '+1 de Defensa adicional: es la mayor masa del set.',
+    rasgo: RASGO.MANADA, rasgoNombre: 'Manada',
+    rasgoTexto: '+1 de Defensa si tienes otro saurópodo en el campo.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'La talla adulta de los diplodócidos es en sí misma la principal defensa antipredatoria. Nota: la validez de Brontosaurus como género separado sigue en discusión; el juego usa Apatosaurus.',
   }),
@@ -205,8 +212,8 @@ export const CARTAS = Object.freeze({
     id: 'torvosaurus', rareza: RAREZA.LEGENDARIO, clado: CLADO.TEROPODO,
     binomial: 'Torvosaurus tanneri',
     coste: 4, ataque: 7, defensa: 1, vida: 5,
-    rasgo: RASGO.ESCASO, rasgoNombre: 'Escaso',
-    rasgoTexto: 'Sólo 1 copia en el mazo. No admite adaptaciones.',
+    rasgo: RASGO.BUSCA_CLIMA, rasgoNombre: 'Rastreador',
+    rasgoTexto: 'Al jugarla, busca un clima en tu mazo y llévatelo a la mano.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'El terópodo de mayor tamaño de la formación, pero genuinamente raro en el registro. Su escasez en el mazo replica su escasez fósil.',
   }),
@@ -217,8 +224,8 @@ export const CARTAS = Object.freeze({
     id: 'nodosaurus', rareza: RAREZA.RARO, clado: CLADO.TIREOFORO,
     binomial: 'Nodosaurus textilis',
     coste: 2, ataque: 2, defensa: 3, vida: 5,
-    rasgo: RASGO.CORAZA, rasgoNombre: 'Coraza dorsal',
-    rasgoTexto: '+2 de Defensa. La coraza protege; no es un arma, a diferencia de la cola del estegosaurio.',
+    rasgo: RASGO.BUSCA_GREGARISMO, rasgoNombre: 'Llamada de manada',
+    rasgoTexto: 'Al jugarla, busca un Gregarismo en tu mazo y llévatelo a la mano.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Formación Frontier, Wyoming, Cenomaniense (~100 Ma). Los osteodermos en bandas sobre el dorso están documentados directamente. El taxón en sí es material fragmentario y varios autores lo tratan como nomen dubium: la coraza es firme, la especie lo es menos.',
   }),
@@ -238,7 +245,7 @@ export const CARTAS = Object.freeze({
     binomial: 'Lokiceratops rangiformis',
     coste: 3, ataque: 4, defensa: 1, vida: 7,
     rasgo: RASGO.GOLA, rasgoNombre: 'Gola ornamentada',
-    rasgoTexto: '+2 de Defensa.',
+    rasgoTexto: '+2 de Defensa si tienes otro Lokiceratops en el campo.',
     nivel_evidencia: EVIDENCIA.DEBATIDO,
     nota_cientifica: 'Formación Judith River, Montana, Campaniense (~78 Ma), descrito en 2024. La gola lleva las mayores hojas óseas conocidas en un ceratópsido, asimétricas entre lados. Si servían para defensa, para exhibición o para reconocerse entre especies es justamente lo que se discute.',
   }),
@@ -268,7 +275,7 @@ export const CARTAS = Object.freeze({
     binomial: 'Huaxiadraco corollatus',
     coste: 2, ataque: 2, defensa: 2, vida: 2,
     rasgo: RASGO.VUELO, rasgoNombre: 'Vuelo',
-    rasgoTexto: 'Sobrevuela la ranura: golpea siempre al hábitat rival y no recibe daño de combate.',
+    rasgoTexto: 'Sobrevuela la ranura: golpea siempre al hábitat rival, pero quien tenga enfrente le alcanza igual.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Formación Jiufotang, Liaoning, China, Aptiense (~120 Ma). No es un dinosaurio: es un pterosaurio tapejárido, sin dientes y con cresta craneal. Los tapejáridos conservan picnofibras, filamentos tegumentarios reales — la razón por la que este juego no pone plumas a los dinosaurios es que ellos no las tienen, no una regla estética.',
   }),
@@ -303,10 +310,10 @@ export const CARTAS = Object.freeze({
   }),
 
   neumaticidad: evento({
-    id: 'neumaticidad', rareza: RAREZA.EPICO, binomial: 'Neumaticidad ósea', coste: 1,
+    id: 'neumaticidad', rareza: RAREZA.EPICO, binomial: 'Neumaticidad ósea', coste: 2,
     objetivo: OBJETIVO.PROPIO,
     rasgo: RASGO.NEUMATICIDAD, rasgoNombre: 'Neumaticidad ósea',
-    rasgoTexto: '+2 Poder. Sólo sobre terópodos y saurópodos.',
+    rasgoTexto: '+2 de Ataque permanentes. Sólo sobre terópodos y saurópodos.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Los saurisquios de la Morrison presentan neumatización postcraneal: vértebras invadidas por divertículos de sacos aéreos. Aligera el esqueleto sin perder resistencia. No aparece en tireóforos ni en ornitópodos.',
   }),
@@ -324,9 +331,9 @@ export const CARTAS = Object.freeze({
 
   competencia: evento({
     id: 'competencia', rareza: RAREZA.EPICO, binomial: 'Competencia trófica', coste: 3,
-    objetivo: OBJETIVO.CLADO,
+    objetivo: OBJETIVO.RIVALES,
     rasgo: RASGO.COMPETENCIA, rasgoNombre: 'Competencia trófica',
-    rasgoTexto: '−2 Poder a todos los dinosaurios rivales del clado que elijas.',
+    rasgoTexto: '−2 de Defensa a dos dinosaurios rivales que elijas.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: 'La coexistencia de varios saurópodos y de varios terópodos grandes en la misma formación implica reparto de recursos. La partición de nicho está sustentada por el desgaste dental; su intensidad como presión competitiva es una inferencia.',
   }),

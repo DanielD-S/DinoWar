@@ -21,7 +21,10 @@ export const BALANCE = Object.freeze({
   // resto, así que gastar 2 en el turno 2 te dejaba con 3 en el turno 3 —el
   // jugador leía «+3» y tenía razón—. Ahora un turno sin gastar es un turno
   // ahorrado, que es lo que hace que guardar sea una decisión.
-  rentaPorTurno: 1,         // se suma a lo que ya tenías
+  // El turno 1 se abre con tres, para que la primera jugada exista: con una
+  // sola Biomasa casi nada era pagable y el turno se iba en pulsar Listo.
+  biomasaInicial: 3,
+  rentaPorTurno: 1,         // a partir de ahí, se suma a lo que ya tenías
   rentaTope: 12,            // tope de lo ahorrado, no de la renta
   rentaAcumula: true,
 
@@ -62,8 +65,6 @@ export const BALANCE = Object.freeze({
   rasgos: Object.freeze({
     gregarioAtaquePorCompanero: 1,
     riberenoAtaque: 2,
-    tagomizadorExtra: 2,
-    masaColosalDefensa: 1,   // adicional a la Defensa de su carta
     oportunistaVidaPorMuerte: 1,
     ramoneoBajoCura: 1,
     gregarismoAtaque: 1,
@@ -72,10 +73,18 @@ export const BALANCE = Object.freeze({
     crecimientoVida: 2,
     neumaticidadAtaque: 2,
     fracturaAtaque: 2,
-    competenciaAtaque: 2,
+    competenciaDefensa: 2,
+    competenciaObjetivos: 2,
     mortandadDano: 3,
     corazaDefensa: 2,
+    // Bonificaciones que piden compañía. La de Ceratosaurus pide tres en el
+    // campo, que con cinco ranuras y tres copias por mazo es el techo: cuando
+    // sale, sale entera.
+    cazaEnGrupoAtaque: 2,
+    cazaEnGrupoMinimo: 3,
+    muroDePlacasDefensa: 1,
     golaDefensa: 2,
+    manadaDefensa: 1,
     trampaMazoRival: 5,
     trampaMazoPropio: 3,
   }),
@@ -95,7 +104,10 @@ export const BALANCE = Object.freeze({
     aridezMazo: 5,
     llanuraBiomasa: 1,
     bosqueCura: 1,
-    sabanaDanoHabitat: 1,
+    // El canal y la sabana ya no tocan sólo a los tuyos: como todo clima,
+    // valen para los dos bandos por igual.
+    canalVida: 1,
+    sabanaDefensa: 1,
   }),
 
   // ------------------------------------------------------------------- mazo
@@ -145,7 +157,10 @@ export const MAZO = Object.freeze([
   ['dryosaurus', 3], ['ornitholestes', 3], ['ceratosaurus', 3],
   ['nodosaurus', 3],
   ['stegosaurus', 2], ['allosaurus', 2], ['camarasaurus', 2],
-  ['riparovenator', 2], ['lokiceratops', 2], ['brachylophosaurus', 2], ['huaxiadraco', 2],
+  // Lokiceratops pasó a legendaria y sólo admite una copia. La plaza que deja
+  // va a Brachylophosaurus, que con la rareza nueva admite tres y es el otro
+  // gregario del mazo: la lista sigue siendo la misma clase de mazo.
+  ['riparovenator', 2], ['lokiceratops', 1], ['brachylophosaurus', 3], ['huaxiadraco', 2],
   ['diplodocus', 1], ['apatosaurus', 1], ['torvosaurus', 1], ['tyrannotitan', 1],
   // soporte — 20
   //

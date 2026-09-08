@@ -8,7 +8,7 @@ import { CARTAS, CLADO, RASGO, TIPO, carta } from '../src/data/cards.js';
 import {
   crearPartida, FASE, MOTIVO_FIN,
   unidadEn, unidadesDe, ataqueEfectivo, vidaActual, danoEntre,
-  espinasDe, reduccionDe, rentaDe, curacionDe, efectosDe, adheridasA,
+  espinasDe, reduccionDe, rentaDe, curacionDe, efectosDe, adheridasA, buscablesDe,
 } from '../src/engine/state.js';
 import { reduce, ACCION, avanzar, validar } from '../src/engine/actions.js';
 import { tablero, poner, enMano, ejecutar, vivo } from './helpers.js';
@@ -25,12 +25,14 @@ test('La renta es plana y es igual para los dos bandos', () => {
   }
 });
 
-test('Acumula: turno tras turno la Biomasa sube de una en una', () => {
+test('El turno 1 reparte el fondo inicial y a partir de ahí acumula de una en una', () => {
   let s = tablero();
   for (let turno = 1; turno <= 5; turno++) {
     s.turno = turno;
     s = ejecutar(s, FASE.RENTA);
-    assert.equal(s.jugadores[0].biomasa, turno, `en el turno ${turno} sin gastar debería haber ${turno}`);
+    const esperado = BALANCE.biomasaInicial + (turno - 1) * BALANCE.rentaPorTurno;
+    assert.equal(s.jugadores[0].biomasa, esperado,
+      `en el turno ${turno} sin gastar debería haber ${esperado}`);
   }
 });
 
@@ -138,8 +140,8 @@ test('La Defensa sale de la carta, no del clado', () => {
   assert.equal(reduccionDe(s, sauropodo), CARTAS.camarasaurus.defensa);
   assert.equal(reduccionDe(s, agil), 0, 'el que corre no para golpes');
   assert.equal(reduccionDe(s, colosal),
-    CARTAS.apatosaurus.defensa + BALANCE.rasgos.masaColosalDefensa,
-    'Masa colosal suma encima de la Defensa de su carta');
+    CARTAS.apatosaurus.defensa + BALANCE.rasgos.manadaDefensa,
+    'Manada suma encima de la Defensa de su carta cuando hay otro saurópodo');
 });
 
 test('El primer turno no hay combate', () => {
@@ -157,15 +159,17 @@ test('El primer turno no hay combate', () => {
   assert.ok(r.eventos.some((e) => e.tipo === 'SIN_COMBATE'));
 });
 
-test('Tireóforo: devuelve daño a quien lo ataca, y Stegosaurus devuelve más', () => {
+test('Tireóforo: devuelve daño a quien lo ataca', () => {
   const s = tablero();
   const stego = poner(s, 'stegosaurus', 1, 0);
-  assert.equal(espinasDe(s, stego),
-    BALANCE.clados.espinasTireoforo + BALANCE.rasgos.tagomizadorExtra);
+  assert.equal(espinasDe(s, stego), BALANCE.clados.espinasTireoforo,
+    'las púas del clado, sin extras: el Tagomizador ya no existe');
 
-  const atacante = poner(s, 'ceratosaurus', 0, 0);   // 4/3
+  const atacante = poner(s, 'ornitholestes', 0, 0);
+  const antes = vidaActual(s, atacante);
   const r = ejecutar(s, FASE.COMBATE);
-  assert.equal(vivo(r, atacante), false, 'las púas lo rematan');
+  assert.ok(!vivo(r, atacante) || vidaActual(r, atacante) < antes,
+    'atacar a un tireóforo cuesta caro');
 });
 
 // -------------------------------------------------------------- victorias
@@ -251,15 +255,16 @@ test('Diplodocus y Gastrolitos curan heridas al final del turno', () => {
   assert.equal(r.instancias[diplo].heridas, 4 - BALANCE.rasgos.ramoneoBajoCura);
 });
 
-test('Torvosaurus no admite eventos de mejora', () => {
+test('Cualquier dinosaurio propio admite una adaptación', () => {
   const s = tablero();
   s.fase = FASE.DESPLIEGUE;
   s.jugadores[0].biomasa = 10;
   const torvo = poner(s, 'torvosaurus', 0, 0);
   const adap = enMano(s, 'neumaticidad', 0);
 
-  const motivo = validar(s, { tipo: ACCION.EVENTO, jugador: 0, iid: adap, objetivo: torvo });
-  assert.match(motivo, /no admite eventos de mejora/);
+  // Torvosaurus tenía el rasgo Escaso, que se lo impedía. Se le quitó a
+  // propósito al pasar a Rastreador.
+  assert.equal(validar(s, { tipo: ACCION.EVENTO, jugador: 0, iid: adap, objetivo: torvo }), null);
 });
 
 test('Neumaticidad ósea sólo se da en terópodos y saurópodos', () => {
@@ -498,7 +503,8 @@ test('Reparto inicial y arranque del turno 1', () => {
 
   const tras = avanzar(s);
   assert.equal(tras.fase, FASE.DESPLIEGUE);
-  assert.equal(tras.jugadores[0].biomasa, 1, 'turno 1 → 1 de Biomasa');
+  assert.equal(tras.jugadores[0].biomasa, BALANCE.biomasaInicial,
+    `turno 1 → ${BALANCE.biomasaInicial} de Biomasa`);
 });
 
 // ------------------------------------------------------- lectura de efectos
@@ -545,11 +551,11 @@ test('efectosDe suma las copias de una misma carta en un solo apunte', () => {
 
 test('efectosDe recoge lo que depende del campo, no sólo lo permanente', () => {
   const s = tablero();
-  const cera = poner(s, 'ceratosaurus', 0, 0);
-  assert.deepEqual(efectosDe(s, cera), [], 'sin campo no hay nada que explicar');
+  const ripa = poner(s, 'riparovenator', 0, 0);
+  assert.deepEqual(efectosDe(s, ripa), [], 'sin campo no hay nada que explicar');
 
   s.campo = 'canal';
-  const efectos = efectosDe(s, cera);
+  const efectos = efectosDe(s, ripa);
   assert.equal(efectos.length, 1);
   assert.equal(efectos[0].ataque, BALANCE.rasgos.riberenoAtaque);
   assert.match(efectos[0].nota, /canal/);
@@ -604,4 +610,61 @@ test('Dos climas en el mismo turno, no', () => {
 
   const r = reduce(s, { tipo: ACCION.CLIMA, jugador: 0, iid: uno });
   assert.match(validar(r, { tipo: ACCION.CLIMA, jugador: 0, iid: dos }), /clima/);
+});
+
+// ------------------------------------------------------------- la búsqueda
+
+test('Al jugar un buscador, lo buscado pasa del mazo a la mano', () => {
+  const s = tablero();
+  s.fase = FASE.DESPLIEGUE;
+  s.jugadores[0].biomasa = 10;
+  const torvo = enMano(s, 'torvosaurus', 0);
+
+  const opciones = buscablesDe(s, 0, 'torvosaurus');
+  assert.ok(opciones.length > 0, 'el mazo de referencia lleva climas');
+  const elegida = opciones[0];
+  const cardId = s.instancias[elegida].cardId;
+  assert.equal(carta(cardId).tipo, TIPO.CLIMA, 'el Rastreador sólo saca climas');
+
+  const mazoAntes = s.jugadores[0].mazo.length;
+  const r = reduce(s, { tipo: ACCION.DESPLEGAR, jugador: 0, iid: torvo, ranura: 0, busca: elegida });
+
+  assert.ok(r.jugadores[0].mano.includes(elegida), 'lo buscado está en la mano');
+  assert.ok(!r.jugadores[0].mazo.includes(elegida), 'y ya no en el mazo');
+  assert.equal(r.jugadores[0].mazo.length, mazoAntes - 1, 'cuesta una carta de mazo');
+});
+
+test('Cada buscador saca lo suyo y nada más', () => {
+  const s = tablero();
+  const deTipo = (jug, cid) => buscablesDe(s, jug, cid)
+    .map((iid) => carta(s.instancias[iid].cardId));
+
+  assert.ok(deTipo(0, 'camarasaurus').every((c) => c.tipo === TIPO.EVENTO));
+  assert.ok(deTipo(0, 'torvosaurus').every((c) => c.tipo === TIPO.CLIMA));
+  assert.ok(deTipo(0, 'nodosaurus').every((c) => c.id === 'gregarismo'));
+  assert.deepEqual(buscablesDe(s, 0, 'allosaurus'), [], 'un dinosaurio normal no busca nada');
+});
+
+test('No se puede buscar una carta que no está en tu mazo', () => {
+  const s = tablero();
+  s.fase = FASE.DESPLIEGUE;
+  s.jugadores[0].biomasa = 10;
+  const torvo = enMano(s, 'torvosaurus', 0);
+  const ajena = s.jugadores[1].mazo[0];
+
+  assert.match(
+    validar(s, { tipo: ACCION.DESPLEGAR, jugador: 0, iid: torvo, ranura: 0, busca: ajena }),
+    /no está en tu mazo/,
+  );
+});
+
+test('Un buscador se puede jugar aunque no haya nada que buscar', () => {
+  const s = tablero();
+  s.fase = FASE.DESPLIEGUE;
+  s.jugadores[0].biomasa = 10;
+  s.jugadores[0].mazo = [];
+  const nodo = enMano(s, 'nodosaurus', 0);
+
+  assert.deepEqual(buscablesDe(s, 0, 'nodosaurus'), []);
+  assert.equal(validar(s, { tipo: ACCION.DESPLEGAR, jugador: 0, iid: nodo, ranura: 0 }), null);
 });

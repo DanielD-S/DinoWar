@@ -190,7 +190,9 @@ export function lineasDeLog(eventos) {
       case 'PRESION':
         push(`<b>${bando(e.jugador)}</b> aplica <b>${carta(e.cardId).rasgoNombre}</b>`
           + (e.objetivoCardId ? ` sobre <i>${carta(e.objetivoCardId).binomial}</i>` : '')
-          + (e.clado ? ` a los ${CLADO_NOMBRE[e.clado].toLowerCase()}s rivales` : ''), e.jugador);
+          + (e.clado ? ` a los ${CLADO_NOMBRE[e.clado].toLowerCase()}s rivales` : '')
+          + (e.afectados && !e.objetivoCardId && !e.clado
+            ? ` sobre ${e.afectados} rival${e.afectados === 1 ? '' : 'es'}` : ''), e.jugador);
         break;
       case 'CHOQUE':
         push(`Ranura ${e.ranura + 1}: chocan y se hacen <b>${e.danoA}</b> y <b>${e.danoB}</b> de daño`);

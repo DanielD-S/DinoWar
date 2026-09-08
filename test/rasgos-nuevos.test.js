@@ -5,21 +5,78 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { FASE, vidaActual, reduccionDe, vuela } from '../src/engine/state.js';
+import { FASE, vidaActual, vidaMaxima, reduccionDe, ataqueEfectivo, vuela } from '../src/engine/state.js';
 import { BALANCE } from '../src/data/balance.js';
 import { CARTAS } from '../src/data/cards.js';
 import { tablero, poner, ejecutar, vivo } from './helpers.js';
 
-test('Coraza y Gola suman Defensa a la que ya trae la carta', () => {
+test('La Gola necesita a otro Lokiceratops delante', () => {
   const s = tablero(101);
   const nodo = poner(s, 'nodosaurus', 0, 0);
   const loki = poner(s, 'lokiceratops', 0, 1);
 
-  assert.equal(reduccionDe(s, nodo), CARTAS.nodosaurus.defensa + BALANCE.rasgos.corazaDefensa);
-  assert.equal(reduccionDe(s, loki), CARTAS.lokiceratops.defensa + BALANCE.rasgos.golaDefensa);
+  assert.equal(reduccionDe(s, nodo), CARTAS.nodosaurus.defensa,
+    'Nodosaurus perdió la Coraza al pasar a buscador');
+  assert.equal(reduccionDe(s, loki), CARTAS.lokiceratops.defensa,
+    'solo, la gola no vale de nada');
+
+  poner(s, 'lokiceratops', 0, 2);
+  assert.equal(reduccionDe(s, loki), CARTAS.lokiceratops.defensa + BALANCE.rasgos.golaDefensa,
+    'con otro de los suyos delante, sí');
 });
 
-test('Lo que vuela pasa por encima: golpea el habitat y no recibe combate', () => {
+test('Los rasgos de compañía sólo cuentan a los tuyos', () => {
+  const s = tablero(111);
+  const mio = poner(s, 'stegosaurus', 0, 0);
+  const base = CARTAS.stegosaurus.defensa;
+
+  poner(s, 'stegosaurus', 1, 0);
+  assert.equal(reduccionDe(s, mio), base, 'un Stegosaurus del rival no te hace de muro');
+
+  poner(s, 'stegosaurus', 0, 1);
+  assert.equal(reduccionDe(s, mio), base + BALANCE.rasgos.muroDePlacasDefensa);
+});
+
+test('Caza en grupo: con dos Ceratosaurus no basta, con tres sí', () => {
+  const s = tablero(112);
+  const uno = poner(s, 'ceratosaurus', 0, 0);
+  const base = CARTAS.ceratosaurus.ataque;
+
+  assert.equal(ataqueEfectivo(s, uno), base, 'uno solo caza igual que siempre');
+  poner(s, 'ceratosaurus', 0, 1);
+  assert.equal(ataqueEfectivo(s, uno), base, 'dos tampoco');
+  poner(s, 'ceratosaurus', 0, 2);
+  assert.equal(ataqueEfectivo(s, uno), base + BALANCE.rasgos.cazaEnGrupoAtaque,
+    `hacen falta ${BALANCE.rasgos.cazaEnGrupoMinimo}`);
+});
+
+test('Manada: al Apatosaurus le vale cualquier otro saurópodo', () => {
+  const s = tablero(113);
+  const apato = poner(s, 'apatosaurus', 0, 0);
+  const base = CARTAS.apatosaurus.defensa + BALANCE.rasgos.manadaDefensa;
+
+  assert.equal(reduccionDe(s, apato), CARTAS.apatosaurus.defensa, 'solo, no');
+  poner(s, 'diplodocus', 0, 1);
+  assert.equal(reduccionDe(s, apato), base, 'con un Diplodocus al lado, sí');
+});
+
+test('Los climas nuevos alcanzan a los dos bandos', () => {
+  const s = tablero(114);
+  const mio = poner(s, 'allosaurus', 0, 0);
+  const suyo = poner(s, 'allosaurus', 1, 0);
+
+  const defensa = reduccionDe(s, mio);
+  s.campo = 'sabana';
+  assert.equal(reduccionDe(s, mio), defensa + BALANCE.efectosCampo.sabanaDefensa);
+  assert.equal(reduccionDe(s, suyo), defensa + BALANCE.efectosCampo.sabanaDefensa,
+    'la sabana no distingue de quién es el dinosaurio');
+
+  s.campo = 'canal';
+  assert.equal(vidaMaxima(s, mio), CARTAS.allosaurus.vida + BALANCE.efectosCampo.canalVida);
+  assert.equal(vidaMaxima(s, suyo), CARTAS.allosaurus.vida + BALANCE.efectosCampo.canalVida);
+});
+
+test('Lo que vuela golpea el habitat, pero el de tierra le pega igual', () => {
   const s = tablero(102);
   const pterosaurio = poner(s, 'huaxiadraco', 0, 0);
   const bloqueo = poner(s, 'allosaurus', 1, 0);
@@ -28,12 +85,13 @@ test('Lo que vuela pasa por encima: golpea el habitat y no recibe combate', () =
   const r = ejecutar(s, FASE.COMBATE);
 
   assert.ok(vuela(r, pterosaurio), 'el rasgo debería identificarse como vuelo');
-  assert.equal(vidaActual(r, pterosaurio), CARTAS.huaxiadraco.vida,
-    'un Allosaurus enfrente no debería poder tocarlo');
   assert.ok(r.jugadores[1].habitat < habitatAntes,
     'el daño tiene que haber ido al habitat rival');
   assert.ok(r.eventos.some((e) => e.tipo === 'SOBREVUELO'));
-  assert.ok(vivo(r, bloqueo), 'el que se queda en tierra no recibe nada del que vuela');
+  // Volar ya no es ser intocable: sobrevuela la ranura, no al que la ocupa.
+  assert.ok(vidaActual(r, pterosaurio) < vidaMaxima(r, pterosaurio) || !vivo(r, pterosaurio),
+    'el Allosaurus de debajo tiene que haberle alcanzado');
+  assert.ok(vivo(r, bloqueo), 'y el de tierra no recibe nada del que vuela');
 });
 
 test('Si el rival vuela, el de tierra tiene la ranura libre delante', () => {

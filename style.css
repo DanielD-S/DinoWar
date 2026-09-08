@@ -749,6 +749,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .franja-mias:active { background: rgba(217,164,65,.12); }
 
+/* Elegir varios: la opción marcada tiene que verse marcada. */
+.opcion.marcada { border-color: var(--bio); background: rgba(217, 164, 65, .14); }
+.opcion.aplicar { text-align: center; border-color: var(--bio); color: var(--acento-claro); }
+.opcion.aplicar[disabled] { opacity: .45; border-color: var(--linea); color: var(--tenue); }
+
 .comp-fila {
   display: flex; align-items: center; gap: 9px;
   padding: 8px 10px; margin-bottom: 6px; border-radius: 6px;

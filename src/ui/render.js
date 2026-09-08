@@ -303,6 +303,7 @@ function queHace(estado, p) {
     case 'PRESION':
       if (p.objetivo) return `cae sobre ${nombre(p.objetivo)}`;
       if (p.clado) return `aprieta a los ${CLADO_NOMBRE[p.clado].toLowerCase()}s rivales`;
+      if (p.objetivos?.length) return `aprieta a ${p.objetivos.map(nombre).join(' y ')}`;
       return c.rasgoNombre;
     default: return '';
   }
@@ -421,10 +422,11 @@ function estadoEnJuegoHTML(estado, iid) {
   const signo = (n) => (n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`);
   const cifra = (e) => [
     e.ataque ? `${signo(e.ataque)} de Ataque` : '',
+    e.defensa ? `${signo(e.defensa)} de Defensa` : '',
     e.vida ? `${signo(e.vida)} de Vida` : '',
   ].filter(Boolean).join(' y ');
 
-  const filas = efectos.map((e) => `<li class="${e.ataque + e.vida < 0 ? 'malo' : 'bueno'}">
+  const filas = efectos.map((e) => `<li class="${e.ataque + (e.defensa ?? 0) + e.vida < 0 ? 'malo' : 'bueno'}">
       <b>${e.fuente}${e.veces > 1 ? ` ×${e.veces}` : ''}</b>
       <span>${cifra(e)}${e.nota ? ` · ${e.nota}` : ''}</span></li>`);
 

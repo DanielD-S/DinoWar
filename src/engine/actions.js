@@ -6,7 +6,7 @@ import { BALANCE } from '../data/balance.js';
 import { TIPO, OBJETIVO, CLADO, RASGO, carta } from '../data/cards.js';
 import {
   FASE, FASES_INTERACTIVAS, rival,
-  ranuraValida, unidadesDe, ranurasLibres, sinSinergias,
+  ranuraValida, unidadesDe, ranurasLibres, buscablesDe, buscaEnElMazo, ataqueEfectivo,
 } from './state.js';
 import { barajar } from './rng.js';
 import {
@@ -112,12 +112,22 @@ export function validar(s, a) {
   if (jug.biomasa < c.coste) return 'Biomasa insuficiente';
 
   switch (a.tipo) {
-    case ACCION.DESPLEGAR:
+    case ACCION.DESPLEGAR: {
       if (c.tipo !== TIPO.DINOSAURIO) return 'esa carta no se despliega en una ranura';
       if (!ranuraValida(a.ranura)) return 'ranura inexistente';
       if (s.ranuras[a.jugador][a.ranura] !== null) return 'esa ranura está ocupada';
       if (ranuraReservada(s, a.jugador, a.ranura)) return 'ya has comprometido esa ranura';
+
+      // La búsqueda es opcional en el sentido de que puede no haber nada que
+      // buscar, pero si se nombra una carta tiene que valer.
+      if (a.busca !== undefined && a.busca !== null) {
+        if (!buscaEnElMazo(a.cardId ?? inst.cardId)) return 'esa carta no busca nada en el mazo';
+        if (!buscablesDe(s, a.jugador, inst.cardId).includes(a.busca)) {
+          return 'esa carta no está en tu mazo o no es de las que puede buscar';
+        }
+      }
       return null;
+    }
 
     case ACCION.RECURSO:
       if (c.tipo !== TIPO.RECURSO) return 'esa carta no es de recurso';
@@ -137,7 +147,6 @@ export function validar(s, a) {
         const objetivo = s.instancias[a.objetivo];
         if (!objetivo || objetivo.dueno !== a.jugador) return 'el objetivo no es tuyo';
         if (carta(objetivo.cardId).tipo !== TIPO.DINOSAURIO) return 'el objetivo no es un dinosaurio';
-        if (sinSinergias(objetivo)) return 'ese dinosaurio no admite eventos de mejora';
         if (ranuraProyectada(s, a.jugador, a.objetivo) === null) return 'el objetivo no está en el campo';
         if (c.rasgo === RASGO.NEUMATICIDAD) {
           const clado = carta(objetivo.cardId).clado;
@@ -151,6 +160,19 @@ export function validar(s, a) {
         if (objetivo.ranura === null) return 'el objetivo no está en el campo';
       } else if (c.objetivo === OBJETIVO.CLADO) {
         if (!CLADOS.includes(a.clado)) return 'clado inexistente';
+      } else if (c.objetivo === OBJETIVO.RIVALES) {
+        // Se permiten menos objetivos de los que admite la carta: si al rival
+        // sólo le queda uno en pie, la carta sigue jugándose.
+        const tope = BALANCE.rasgos.competenciaObjetivos;
+        const os = a.objetivos ?? [];
+        if (!Array.isArray(os) || os.length === 0) return 'elige al menos un dinosaurio rival';
+        if (os.length > tope) return `esta carta alcanza a ${tope} como mucho`;
+        if (new Set(os).size !== os.length) return 'no se puede señalar dos veces al mismo';
+        for (const oid of os) {
+          const o = s.instancias[oid];
+          if (!o || o.dueno !== rival(a.jugador)) return 'el objetivo no es del rival';
+          if (o.ranura === null) return 'el objetivo no está en el campo';
+        }
       }
       return null;
     }
@@ -215,6 +237,17 @@ export function reduce(state, action) {
       jug.biomasa -= carta(s.instancias[action.iid].cardId).coste;
       jug.mano = jug.mano.filter((x) => x !== action.iid);
       jug.pendientes.push({ tipo: 'DESPLIEGUE', iid: action.iid, ranura: action.ranura });
+      // Lo buscado pasa del mazo a la mano ahora mismo: cuesta una carta de
+      // mazo, igual que robar, y el mazo es el reloj de la extinción.
+      if (action.busca !== undefined && action.busca !== null) {
+        jug.mazo = jug.mazo.filter((x) => x !== action.busca);
+        jug.mano.push(action.busca);
+        ev(s, 'BUSQUEDA', {
+          jugador: action.jugador,
+          porCardId: s.instancias[action.iid].cardId,
+          cardId: s.instancias[action.busca].cardId,
+        });
+      }
       break;
 
     case ACCION.MOVER:
@@ -242,6 +275,7 @@ export function reduce(state, action) {
         iid: action.iid,
         objetivo: action.objetivo ?? null,
         clado: action.clado ?? null,
+        objetivos: action.objetivos ?? null,
       });
       break;
     }
@@ -301,6 +335,17 @@ export function avanzar(state, maxPasos = 64) {
 }
 
 /** Acciones legales para un bando en la fase actual. Base de la IA. */
+/** La carta que más conviene rescatar, o null si esta carta no busca nada. */
+function mejorBusqueda(s, j, cardId) {
+  const opciones = buscablesDe(s, j, cardId);
+  if (opciones.length === 0) return null;
+  let mejor = opciones[0];
+  for (const iid of opciones) {
+    if (carta(s.instancias[iid].cardId).coste > carta(s.instancias[mejor].cardId).coste) mejor = iid;
+  }
+  return mejor;
+}
+
 export function legales(state, j) {
   const s = state;
   const jug = s.jugadores[j];
@@ -329,7 +374,13 @@ export function legales(state, j) {
     if (c.coste > jug.biomasa) continue;
 
     if (c.tipo === TIPO.DINOSAURIO) {
-      for (const r of libres) salida.push({ tipo: ACCION.DESPLEGAR, jugador: j, iid, ranura: r });
+      // Si la carta busca, se ofrece ya elegido a quién: enumerar cada ranura
+      // por cada carta buscable multiplicaría las opciones sin enseñarle nada
+      // nuevo a la IA. Se coge la más cara, que es la que menos veces vas a
+      // poder pagar por tu cuenta, y a igualdad la primera del mazo, para que
+      // la misma semilla siga dando la misma partida.
+      const busca = mejorBusqueda(s, j, s.instancias[iid].cardId);
+      for (const r of libres) salida.push({ tipo: ACCION.DESPLEGAR, jugador: j, iid, ranura: r, busca });
     } else if (c.tipo === TIPO.RECURSO) {
       salida.push({ tipo: ACCION.RECURSO, jugador: j, iid });
     } else if (c.tipo === TIPO.CLIMA) {
@@ -345,6 +396,14 @@ export function legales(state, j) {
         for (const objetivo of ajenas) salida.push({ tipo: ACCION.EVENTO, jugador: j, iid, objetivo });
       } else if (c.objetivo === OBJETIVO.CLADO) {
         for (const clado of CLADOS) salida.push({ tipo: ACCION.EVENTO, jugador: j, iid, clado });
+      } else if (c.objetivo === OBJETIVO.RIVALES) {
+        // Se ofrece un solo par, el de los rivales que más pegan: enumerar
+        // todas las combinaciones de dos entre cinco multiplicaría por diez las
+        // opciones de la IA para elegir casi siempre lo mismo.
+        const duros = [...ajenas]
+          .sort((x, y) => ataqueEfectivo(s, y) - ataqueEfectivo(s, x))
+          .slice(0, BALANCE.rasgos.competenciaObjetivos);
+        if (duros.length) salida.push({ tipo: ACCION.EVENTO, jugador: j, iid, objetivos: duros });
       } else {
         salida.push({ tipo: ACCION.EVENTO, jugador: j, iid });
       }

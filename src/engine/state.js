@@ -44,6 +44,7 @@ export function nuevaInstancia(iid, cardId, dueno) {
     ranura: null,
     heridas: 0,
     modAtaque: 0,
+    modDefensa: 0,
     modVida: 0,
     // Qué le ha cambiado las cifras y quién se lo hizo. modAtaque y modVida son
     // dos números sin memoria: dicen «−2» pero no de dónde salió, y en la mesa
@@ -138,7 +139,6 @@ export function todasLasUnidades(state) {
 }
 
 export const cladoDe = (inst) => carta(inst.cardId).clado;
-export const sinSinergias = (inst) => carta(inst.cardId).rasgo === RASGO.ESCASO;
 
 export const campoEs = (state, rasgo) => state.campo !== null && carta(state.campo).rasgo === rasgo;
 
@@ -169,12 +169,16 @@ export function ataqueEfectivo(state, iid) {
     poder += BALANCE.rasgos.riberenoAtaque;
   }
 
+  // Caza en grupo: no basta con estar acompañado, hacen falta tres.
+  if (c.rasgo === RASGO.CAZA_EN_GRUPO
+      && conCompañía(state, inst, BALANCE.rasgos.cazaEnGrupoMinimo - 1)) {
+    poder += BALANCE.rasgos.cazaEnGrupoAtaque;
+  }
+
   // Gregarismo: una carta adherida a un congénere beneficia a toda la especie.
-  if (!sinSinergias(inst)) {
-    for (const otro of unidadesDe(state, inst.dueno)) {
-      if (otro.cardId !== inst.cardId) continue;
-      poder += adherenciasCon(state, otro, RASGO.GREGARISMO) * BALANCE.rasgos.gregarismoAtaque;
-    }
+  for (const otro of unidadesDe(state, inst.dueno)) {
+    if (otro.cardId !== inst.cardId) continue;
+    poder += adherenciasCon(state, otro, RASGO.GREGARISMO) * BALANCE.rasgos.gregarismoAtaque;
   }
 
   return Math.max(0, poder);
@@ -182,7 +186,8 @@ export function ataqueEfectivo(state, iid) {
 
 export function vidaMaxima(state, iid) {
   const inst = state.instancias[iid];
-  return carta(inst.cardId).vida + inst.modVida;
+  const extra = campoEs(state, RASGO.CAMPO_CANAL) ? BALANCE.efectosCampo.canalVida : 0;
+  return carta(inst.cardId).vida + inst.modVida + extra;
 }
 
 export const vidaActual = (state, iid) => vidaMaxima(state, iid) - state.instancias[iid].heridas;
@@ -192,19 +197,46 @@ export const vidaActual = (state, iid) => vidaMaxima(state, iid) - state.instanc
  * osteodermos, placas—, no del clado.
  */
 export function reduccionDe(state, iid) {
-  const c = carta(state.instancias[iid].cardId);
-  let d = c.defensa ?? 0;
-  if (c.rasgo === RASGO.MASA_COLOSAL) d += BALANCE.rasgos.masaColosalDefensa;
+  const inst = state.instancias[iid];
+  const c = carta(inst.cardId);
+  let d = (c.defensa ?? 0) + inst.modDefensa;
   if (c.rasgo === RASGO.CORAZA) d += BALANCE.rasgos.corazaDefensa;
-  if (c.rasgo === RASGO.GOLA) d += BALANCE.rasgos.golaDefensa;
-  return d;
+
+  // Las que piden compañía. Se cuentan sólo los propios: un Stegosaurus rival
+  // no le sirve de muro al tuyo.
+  if (c.rasgo === RASGO.MURO_DE_PLACAS && conCompañía(state, inst, 1)) {
+    d += BALANCE.rasgos.muroDePlacasDefensa;
+  }
+  if (c.rasgo === RASGO.GOLA && conCompañía(state, inst, 1)) {
+    d += BALANCE.rasgos.golaDefensa;
+  }
+  if (c.rasgo === RASGO.MANADA && delClado(state, inst, c.clado, 1)) {
+    d += BALANCE.rasgos.manadaDefensa;
+  }
+
+  // La sabana abierta obliga a apiñarse: los dos bandos ganan Defensa.
+  if (campoEs(state, RASGO.CAMPO_SABANA)) d += BALANCE.efectosCampo.sabanaDefensa;
+  return Math.max(0, d);
+}
+
+/** ¿Hay al menos `min` copias MÁS de esta misma carta entre las tuyas? */
+function conCompañía(state, inst, min) {
+  const n = unidadesDe(state, inst.dueno)
+    .filter((o) => o.iid !== inst.iid && o.cardId === inst.cardId).length;
+  return n >= min;
+}
+
+/** ¿Hay al menos `min` unidades propias MÁS de este clado? */
+function delClado(state, inst, clado, min) {
+  const n = unidadesDe(state, inst.dueno)
+    .filter((o) => o.iid !== inst.iid && carta(o.cardId).clado === clado).length;
+  return n >= min;
 }
 
 /** Daño devuelto a quien ataca: púas caudales. */
 export function espinasDe(state, iid) {
   const c = carta(state.instancias[iid].cardId);
   let e = c.clado === CLADO.TIREOFORO ? BALANCE.clados.espinasTireoforo : 0;
-  if (c.rasgo === RASGO.TAGOMIZADOR) e += BALANCE.rasgos.tagomizadorExtra;
   return e;
 }
 
@@ -219,8 +251,7 @@ export function danoEntre(state, atacanteIid, defensorIid) {
 
 /** Daño que una unidad sin rival enfrente inflige al habitat contrario. */
 export function danoAlHabitat(state, iid) {
-  const extra = campoEs(state, RASGO.CAMPO_SABANA) ? BALANCE.efectosCampo.sabanaDanoHabitat : 0;
-  return ataqueEfectivo(state, iid) + extra;
+  return ataqueEfectivo(state, iid);
 }
 
 /** ¿Sobrevuela la ranura en vez de chocar con quien tiene enfrente? */
@@ -266,10 +297,11 @@ export function efectosDe(state, iid) {
   const fuera = [];
 
   for (const m of inst.marcas) {
-    if (m.ataque === 0 && m.vida === 0) continue;
+    const def = m.defensa ?? 0;
+    if (m.ataque === 0 && m.vida === 0 && def === 0) continue;
     fuera.push({
       fuente: carta(m.cardId).binomial,
-      ataque: m.ataque, vida: m.vida, veces: m.veces,
+      ataque: m.ataque, defensa: def, vida: m.vida, veces: m.veces,
       nota: m.cardId === inst.cardId ? 'su propio rasgo' : '',
     });
   }
@@ -280,7 +312,7 @@ export function efectosDe(state, iid) {
     if (companeros > 0) {
       fuera.push({
         fuente: 'Gregario',
-        ataque: companeros * BALANCE.rasgos.gregarioAtaquePorCompanero, vida: 0, veces: 1,
+        ataque: companeros * BALANCE.rasgos.gregarioAtaquePorCompanero, defensa: 0, vida: 0, veces: 1,
         nota: `${companeros} de los suyos en el campo`,
       });
     }
@@ -288,19 +320,19 @@ export function efectosDe(state, iid) {
 
   if (c.rasgo === RASGO.RIBERENO && campoEs(state, RASGO.CAMPO_CANAL)) {
     fuera.push({
-      fuente: 'Ribereño', ataque: BALANCE.rasgos.riberenoAtaque, vida: 0, veces: 1,
+      fuente: 'Ribereño', ataque: BALANCE.rasgos.riberenoAtaque, defensa: 0, vida: 0, veces: 1,
       nota: 'el campo activo es el canal',
     });
   }
 
-  if (!sinSinergias(inst)) {
+  {
     let n = 0;
     for (const otro of unidadesDe(state, inst.dueno)) {
       if (otro.cardId === inst.cardId) n += adherenciasCon(state, otro, RASGO.GREGARISMO);
     }
     if (n > 0) {
       fuera.push({
-        fuente: 'Gregarismo', ataque: n * BALANCE.rasgos.gregarismoAtaque, vida: 0, veces: n,
+        fuente: 'Gregarismo', ataque: n * BALANCE.rasgos.gregarismoAtaque, defensa: 0, vida: 0, veces: n,
         nota: 'sobre un congénere',
       });
     }
@@ -316,6 +348,30 @@ export function adheridasA(state, iid) {
     .filter(Boolean)
     .map((a) => a.cardId);
 }
+
+/**
+ * Qué puede rescatar del mazo una carta con rasgo de búsqueda, y nada si no lo
+ * tiene. La búsqueda se resuelve AL JUGAR la carta, no al revelarla: el
+ * despliegue es simultáneo y a ciegas, así que parar la revelación para
+ * preguntar le enseñaría al rival que has buscado algo. Eligiendo antes, la
+ * jugada sigue siendo secreta.
+ *
+ * @returns {number[]} iids del mazo del jugador que valen como objetivo
+ */
+export function buscablesDe(state, jugador, cardId) {
+  const filtro = FILTRO_BUSQUEDA[carta(cardId).rasgo];
+  if (!filtro) return [];
+  return state.jugadores[jugador].mazo.filter((iid) => filtro(carta(state.instancias[iid].cardId)));
+}
+
+/** ¿Esta carta busca algo en el mazo al jugarse? */
+export const buscaEnElMazo = (cardId) => FILTRO_BUSQUEDA[carta(cardId).rasgo] !== undefined;
+
+const FILTRO_BUSQUEDA = Object.freeze({
+  [RASGO.BUSCA_EVENTO]: (c) => c.tipo === TIPO.EVENTO,
+  [RASGO.BUSCA_CLIMA]: (c) => c.tipo === TIPO.CLIMA,
+  [RASGO.BUSCA_GREGARISMO]: (c) => c.rasgo === RASGO.GREGARISMO,
+});
 
 /** Ranuras propias libres. */
 export const ranurasLibres = (state, bando) =>

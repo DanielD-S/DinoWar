@@ -47,6 +47,7 @@ function recogerBajas(s, causa) {
       inst.ranura = null;
       inst.heridas = 0;
       inst.modAtaque = 0;
+      inst.modDefensa = 0;
       inst.modVida = 0;
       inst.marcas = [];
       inst.desplegadoEnTurno = null;
@@ -77,10 +78,13 @@ function recogerBajas(s, causa) {
  * copias de la misma carta se acumulan en un solo apunte: «Competencia trófica
  * ×2, −4 de Ataque» se lee mejor que dos renglones iguales.
  */
-export function marcar(inst, cardId, ataque, vida) {
+export function marcar(inst, cardId, ataque, vida, defensa = 0) {
   const previo = inst.marcas.find((m) => m.cardId === cardId);
-  if (previo) { previo.ataque += ataque; previo.vida += vida; previo.veces += 1; return; }
-  inst.marcas.push({ cardId, ataque, vida, veces: 1 });
+  if (previo) {
+    previo.ataque += ataque; previo.vida += vida; previo.defensa += defensa; previo.veces += 1;
+    return;
+  }
+  inst.marcas.push({ cardId, ataque, vida, defensa, veces: 1 });
 }
 
 export function golpearHabitat(s, bando, cantidad) {
@@ -128,11 +132,12 @@ export function robar(s, j, n) {
 // ------------------------------------------------------------------- fases
 
 export function faseRenta(s) {
-  const renta = rentaDe(s);
+  // El primer turno no cobra renta: reparte el fondo inicial.
+  const renta = s.turno === 1 ? BALANCE.biomasaInicial : rentaDe(s);
   for (const jug of s.jugadores) {
     // El tope es de lo ahorrado, no de la renta: nadie puede sentarse veinte
     // turnos a acumular, pero guardar dos o tres turnos sí tiene que valer.
-    jug.biomasa = BALANCE.rentaAcumula
+    jug.biomasa = BALANCE.rentaAcumula && s.turno > 1
       ? Math.min(jug.biomasa + renta, BALANCE.rentaTope)
       : Math.min(renta, BALANCE.rentaTope);
   }
@@ -237,14 +242,17 @@ function aplicarPresion(s, p) {
     ev(s, 'PRESION', { jugador: p.jugador, cardId, objetivo: objetivo.iid, objetivoCardId: objetivo.cardId });
 
   } else if (r === RASGO.COMPETENCIA) {
+    // Dos rivales señalados uno a uno, y le muerde a la Defensa: antes era todo
+    // un clado y le quitaba Ataque.
     let n = 0;
-    for (const inst of unidadesDe(s, contrario)) {
-      if (carta(inst.cardId).clado !== p.clado) continue;
-      inst.modAtaque -= BALANCE.rasgos.competenciaAtaque;
-      marcar(inst, cardId, -BALANCE.rasgos.competenciaAtaque, 0);
+    for (const oid of p.objetivos ?? []) {
+      const inst = s.instancias[oid];
+      if (!inst || inst.ranura === null || inst.dueno !== contrario) continue;
+      inst.modDefensa -= BALANCE.rasgos.competenciaDefensa;
+      marcar(inst, cardId, 0, 0, -BALANCE.rasgos.competenciaDefensa);
       n += 1;
     }
-    ev(s, 'PRESION', { jugador: p.jugador, cardId, clado: p.clado, afectados: n });
+    ev(s, 'PRESION', { jugador: p.jugador, cardId, objetivos: p.objetivos ?? [], afectados: n });
 
   } else if (r === RASGO.TRAMPA) {
     perderDelMazo(s, contrario, BALANCE.rasgos.trampaMazoRival);
@@ -279,32 +287,23 @@ export function faseCombate(s) {
     const a = unidadEn(s, 0, r);
     const b = unidadEn(s, 1, r);
 
-    // Lo que vuela no choca: pasa por encima de la ranura, va al habitat y no
-    // recibe nada a cambio. Sigue muriendo por Mortandad, que no
-    // se esquivan volando.
+    // Lo que vuela pasa por encima de la ranura y va al habitat en vez de
+    // chocar, pero NO es intocable: quien tenga enfrente le pega igual. Antes
+    // esquivaba también el golpe, y un volador barato salía gratis.
     const volA = a && vuela(s, a.iid);
     const volB = b && vuela(s, b.iid);
-    if (a && volA) {
-      const d = danoAlHabitat(s, a.iid);
-      alHabitat[1] += d;
-      ev(s, 'SOBREVUELO', { ranura: r, iid: a.iid, bando: 0, dano: d });
-    }
-    if (b && volB) {
-      const d = danoAlHabitat(s, b.iid);
-      alHabitat[0] += d;
-      ev(s, 'SOBREVUELO', { ranura: r, iid: b.iid, bando: 1, dano: d });
-    }
     if (volA || volB) {
-      // El que se queda en tierra tiene la ranura libre delante.
-      if (a && !volA) {
-        const d = danoAlHabitat(s, a.iid);
-        alHabitat[1] += d;
-        ev(s, 'AVANCE', { ranura: r, iid: a.iid, bando: 0, dano: d });
+      for (const [uno, bando, vuela1] of [[a, 0, volA], [b, 1, volB]]) {
+        if (!uno) continue;
+        const d = danoAlHabitat(s, uno.iid);
+        alHabitat[rival(bando)] += d;
+        ev(s, vuela1 ? 'SOBREVUELO' : 'AVANCE', { ranura: r, iid: uno.iid, bando, dano: d });
       }
-      if (b && !volB) {
-        const d = danoAlHabitat(s, b.iid);
-        alHabitat[0] += d;
-        ev(s, 'AVANCE', { ranura: r, iid: b.iid, bando: 1, dano: d });
+      // El de tierra golpea al volador que le pasa por encima; el volador no
+      // devuelve nada, que para eso ha volado.
+      if (a && b) {
+        if (!volA) golpes.push({ iid: b.iid, cantidad: danoEntre(s, a.iid, b.iid), causa: CAUSA.COMBATE, por: 0 });
+        if (!volB) golpes.push({ iid: a.iid, cantidad: danoEntre(s, b.iid, a.iid), causa: CAUSA.COMBATE, por: 1 });
       }
       continue;
     }

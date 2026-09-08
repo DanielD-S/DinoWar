@@ -3,7 +3,10 @@
 
 import { BALANCE } from './data/balance.js';
 import { TIPO, OBJETIVO, CLADO, CLADO_NOMBRE, carta } from './data/cards.js';
-import { crearPartida, vistaDe, FASE, MOTIVO_FIN, unidadesDe } from './engine/state.js';
+import {
+  crearPartida, vistaDe, FASE, MOTIVO_FIN, unidadesDe, buscablesDe, buscaEnElMazo,
+  reduccionDe,
+} from './engine/state.js';
 import { reduce, ACCION, legales, validar, cartasTrasMulligan } from './engine/actions.js';
 import { decidir, PERFIL } from './engine/ai.js';
 import { semilla } from './engine/rng.js';
@@ -137,10 +140,8 @@ function soltar(iid, cardId, destino) {
   }
 
   if (c.tipo === TIPO.DINOSAURIO) {
-    if (aplicar({ tipo: ACCION.DESPLEGAR, jugador: JUGADOR, iid, ranura: destino.ranura })) {
-      mensaje(`${c.binomial} queda boca abajo en la ranura ${destino.ranura + 1}.`);
-      pasoTutorial('desplegada');
-    }
+    if (buscaEnElMazo(cardId)) { pedirBusqueda(iid, c, destino.ranura); return; }
+    desplegar(iid, c, destino.ranura);
     return;
   }
   if (c.tipo === TIPO.RECURSO) {
@@ -155,11 +156,108 @@ function soltar(iid, cardId, destino) {
     return;
   }
   if (c.objetivo === OBJETIVO.CLADO) { pedirClado(iid, c); return; }
+  if (c.objetivo === OBJETIVO.RIVALES) { pedirRivales(iid, c); return; }
 
   const objetivo = c.objetivo === OBJETIVO.NINGUNO ? undefined : destino.iid;
   if (aplicar({ tipo: ACCION.EVENTO, jugador: JUGADOR, iid, objetivo })) {
     mensaje(`${c.rasgoNombre} preparado.`);
   }
+}
+
+function desplegar(iid, c, ranura, busca = null) {
+  if (!aplicar({ tipo: ACCION.DESPLEGAR, jugador: JUGADOR, iid, ranura, busca })) return;
+  const traido = busca === null ? '' : ` Te llevas ${carta(estado.instancias[busca].cardId).binomial} a la mano.`;
+  mensaje(`${c.binomial} queda boca abajo en la ranura ${ranura + 1}.${traido}`);
+  pasoTutorial('desplegada');
+}
+
+/**
+ * Los buscadores eligen AL JUGARSE, no al revelarse: el despliegue va a ciegas
+ * y parar la revelación para preguntar le diría al rival que has buscado algo.
+ * Como se elige del propio mazo, enseñarlo entero no filtra nada.
+ */
+function pedirBusqueda(iid, c, ranura) {
+  const opciones = buscablesDe(estado, JUGADOR, c.id);
+  if (opciones.length === 0) {
+    desplegar(iid, c, ranura);
+    mensaje(`${c.binomial} no encuentra nada que buscar en tu mazo.`, true);
+    return;
+  }
+
+  el.eleccionTitulo.textContent = c.rasgoNombre;
+  el.eleccionTexto.textContent = `${c.binomial} se despliega y te lleva una carta del mazo a la mano.`;
+  // Las copias de la misma carta se agrupan: da igual cuál de los tres
+  // Gregarismos del mazo te lleves, y tres renglones idénticos sólo estorban.
+  // Y se ordena por nombre, no por posición: enseñar el orden del mazo sería
+  // decirle al jugador qué va a robar después.
+  const porCarta = new Map();
+  for (const bid of opciones) {
+    const cid = estado.instancias[bid].cardId;
+    if (porCarta.has(cid)) porCarta.get(cid).copias += 1;
+    else porCarta.set(cid, { bid, copias: 1, c: carta(cid) });
+  }
+  const vistas = [...porCarta.values()].sort((a, b) => a.c.binomial.localeCompare(b.c.binomial, 'es'));
+  el.eleccionCuerpo.innerHTML = vistas.map(({ bid, copias, c: bc }) => `
+    <button class="opcion" data-busca="${bid}">${bc.binomial}${copias > 1 ? ` ×${copias}` : ''}
+      <small>coste ${bc.coste} · ${bc.rasgoTexto}</small></button>`).join('');
+  el.eleccion.classList.remove('oculta');
+
+  el.eleccionCuerpo.onclick = (e) => {
+    const b = e.target.closest('[data-busca]');
+    if (!b) return;
+    el.eleccion.classList.add('oculta');
+    el.eleccionCuerpo.onclick = null;
+    desplegar(iid, c, ranura, Number(b.dataset.busca));
+  };
+}
+
+/**
+ * Competencia trófica señala a dos rivales, uno a uno. Se marcan en la lista y
+ * el botón sólo se enciende cuando hay al menos uno: si al rival le queda un
+ * solo dinosaurio en pie, la carta se juega igual sobre ése.
+ */
+function pedirRivales(iid, c) {
+  const tope = BALANCE.rasgos.competenciaObjetivos;
+  const enPie = unidadesDe(estado, RIVAL);
+  if (enPie.length === 0) {
+    mensaje('El rival no tiene dinosaurios en el campo a los que apretar.', true);
+    sonido('error');
+    return;
+  }
+
+  const elegidos = new Set();
+  el.eleccionTitulo.textContent = c.binomial;
+  const pintar = () => {
+    el.eleccionTexto.textContent = elegidos.size === 0
+      ? `Señala hasta ${tope} dinosaurios del rival.`
+      : `${elegidos.size} de ${tope} señalados. Pulsa Aplicar cuando quieras.`;
+    el.eleccionCuerpo.innerHTML = enPie.map((u) => {
+      const uc = carta(u.cardId);
+      const puesto = elegidos.has(u.iid);
+      return `<button class="opcion${puesto ? ' marcada' : ''}" data-rival="${u.iid}">
+        ${uc.binomial}<small>ranura ${u.ranura + 1} · Defensa ${reduccionDe(estado, u.iid)}</small></button>`;
+    }).join('')
+      + `<button class="opcion aplicar" data-aplicar="1"${elegidos.size ? '' : ' disabled'}>Aplicar</button>`;
+  };
+  pintar();
+  el.eleccion.classList.remove('oculta');
+
+  el.eleccionCuerpo.onclick = (e) => {
+    const b = e.target.closest('[data-rival]');
+    if (b) {
+      const id = Number(b.dataset.rival);
+      if (elegidos.has(id)) elegidos.delete(id);
+      else if (elegidos.size < tope) elegidos.add(id);
+      pintar();
+      return;
+    }
+    if (!e.target.closest('[data-aplicar]') || elegidos.size === 0) return;
+    el.eleccion.classList.add('oculta');
+    el.eleccionCuerpo.onclick = null;
+    if (aplicar({ tipo: ACCION.EVENTO, jugador: JUGADOR, iid, objetivos: [...elegidos] })) {
+      mensaje(`Competencia trófica sobre ${elegidos.size} rival${elegidos.size === 1 ? '' : 'es'}.`);
+    }
+  };
 }
 
 function pedirClado(iid, c) {

@@ -56,25 +56,25 @@ revisión viene a arreglar.
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | dryosaurus | Dryosaurus altus | Ornitópodo | Común | 0 | 0 | 1 | 0 | 2 | Gregario | +1 de Ataque por cada otro Dryosaurus propio en el campo. |  |
 | ornitholestes | Ornitholestes hermanni | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Oportunista | +1 Vida permanente cada vez que muere un dinosaurio en el campo. |  |
-| ceratosaurus | Ceratosaurus nasicornis | Terópodo | Común | 1 | 1 | 3 | 0 | 3 | Ribereño | +2 Poder mientras el campo activo sea Canal fluvial trenzado. |  |
-| stegosaurus | Stegosaurus stenops | Tireóforo | Común | 2 | 2 | 1 | 4 | 5 | Tagomizador | Devuelve 2 de daño adicional a quien lo ataque, además del que ya devuelve su clado. |  |
+| ceratosaurus | Ceratosaurus nasicornis | Terópodo | Común | 1 | 1 | 3 | 0 | 3 | Caza en grupo | +2 de Ataque si hay tres Ceratosaurus tuyos en el campo. |  |
+| stegosaurus | Stegosaurus stenops | Tireóforo | Común | 2 | 2 | 1 | 4 | 5 | Muro de placas | +1 de Defensa si tienes otro Stegosaurus en el campo. |  |
 | allosaurus | Allosaurus fragilis | Terópodo | Rara | 3 | 3 | 5 | 2 | 3 | Depredador dominante | Si mata a su rival, el daño sobrante pasa al hábitat enemigo. |  |
-| camarasaurus | Camarasaurus grandis | Saurópodo | Rara | 3 | 3 | 2 | 3 | 4 | Migrador | Puede cambiar de ranura en vez de desplegar. |  |
+| camarasaurus | Camarasaurus grandis | Saurópodo | Rara | 3 | 3 | 2 | 3 | 4 | Migrador | Al jugarla, busca un evento en tu mazo y llévatelo a la mano. |  |
 | diplodocus | Diplodocus carnegii | Saurópodo | Épica | 2 | 2 | 3 | 3 | 10 | Ramoneo bajo | Recupera +1 de vida al final de cada uno de tus turnos |  |
-| apatosaurus | Apatosaurus louisae | Saurópodo | Épica | 3 | 3 | 2 | 5 | 10 | Masa colosal | +1 de Defensa adicional: es la mayor masa del set. |  |
-| torvosaurus | Torvosaurus tanneri | Terópodo | Legendaria | 4 | 4 | 7 | 1 | 5 | Escaso | Sólo 1 copia en el mazo. No admite adaptaciones. |  |
-| nodosaurus | Nodosaurus textilis | Tireóforo | Rara | 2 | 2 | 2 | 3 | 5 | Coraza dorsal | +2 de Defensa. La coraza protege; no es un arma, a diferencia de la cola del estegosaurio. |  |
+| apatosaurus | Apatosaurus louisae | Saurópodo | Épica | 3 | 3 | 2 | 5 | 10 | Manada | +1 de Defensa si tienes otro saurópodo en el campo. |  |
+| torvosaurus | Torvosaurus tanneri | Terópodo | Legendaria | 4 | 4 | 7 | 1 | 5 | Rastreador | Al jugarla, busca un clima en tu mazo y llévatelo a la mano. |  |
+| nodosaurus | Nodosaurus textilis | Tireóforo | Rara | 2 | 2 | 2 | 3 | 5 | Llamada de manada | Al jugarla, busca un Gregarismo en tu mazo y llévatelo a la mano. |  |
 | riparovenator | Riparovenator milnerae | Terópodo | Épica | 2 | 2 | 4 | 1 | 4 | Ribereño | +2 de ataque mientras el Canal fluvial esté en el campo. |  |
-| lokiceratops | Lokiceratops rangiformis | Marginocéfalo | Épica | 3 | 3 | 4 | 1 | 7 | Gola ornamentada | +2 de Defensa. |  |
+| lokiceratops | Lokiceratops rangiformis | Marginocéfalo | Épica | 3 | 3 | 4 | 1 | 7 | Gola ornamentada | +2 de Defensa si tienes otro Lokiceratops en el campo. |  |
 | brachylophosaurus | Brachylophosaurus canadensis | Ornitópodo | Rara | 2 | 2 | 2 | 1 | 6 | Gregario | +1 Poder por cada copia suya que tengas en el campo. |  |
 | tyrannotitan | Tyrannotitan chubutensis | Terópodo | Legendaria | 4 | 4 | 10 | 1 | 5 | Desgarro | A quien hiere no se le cura ninguna herida ese turno. |  |
-| huaxiadraco | Huaxiadraco corollatus | Pterosaurio | Rara | 2 | 2 | 2 | 2 | 2 | Vuelo | Sobrevuela la ranura: golpea siempre al hábitat rival y no recibe daño de combate. |  |
+| huaxiadraco | Huaxiadraco corollatus | Pterosaurio | Rara | 2 | 2 | 2 | 2 | 2 | Vuelo | Sobrevuela la ranura: golpea siempre al hábitat rival, pero quien tenga enfrente le alcanza igual. |  |
 | gregarismo | Gregarismo | Evento | Rara | 1 | 1 |  |  |  | Gregarismo | +1 de Ataque a todos tus dinosaurios de la misma especie que el objetivo. |  |
 | gastrolitos | Gastrolitos | Evento | Épica | 1 | 1 |  |  |  | Gastrolitos | Cura +1 de vida a un dinosaurio al final del turno |  |
 | crecimiento_acelerado | Crecimiento acelerado | Evento | Legendaria | 1 | 1 |  |  |  | Crecimiento acelerado | +2 Poder y +2 Vida permanentes a un dinosaurio que elijas. |  |
-| neumaticidad | Neumaticidad ósea | Evento | Épica | 1 | 1 |  |  |  | Neumaticidad ósea | +2 Poder. Sólo sobre terópodos y saurópodos. |  |
+| neumaticidad | Neumaticidad ósea | Evento | Épica | 2 | 2 |  |  |  | Neumaticidad ósea | +2 de Ataque permanentes. Sólo sobre terópodos y saurópodos. |  |
 | fractura | Fractura consolidada | Evento | Épica | 2 | 2 |  |  |  | Fractura consolidada | −2 Poder permanente a un dinosaurio rival. |  |
-| competencia | Competencia trófica | Evento | Épica | 3 | 3 |  |  |  | Competencia trófica | −2 Poder a todos los dinosaurios rivales del clado que elijas. |  |
+| competencia | Competencia trófica | Evento | Épica | 3 | 3 |  |  |  | Competencia trófica | −2 de Defensa a dos dinosaurios rivales que elijas. |  |
 | trampa | Trampa de depredadores | Evento | Rara | 1 | 1 |  |  |  | Trampa de depredadores | El rival pierde 5 cartas de su mazo. Tú pierdes 3: el fango no distingue. |  |
 | mortandad | Mortandad estacional | Evento | Legendaria | 1 | 1 |  |  |  | Mortandad estacional | 3 de daño a TODOS los dinosaurios del campo, incluidos los tuyos. |  |
 | rebrote | Rebrote tras incendio | Recurso | Rara | 0 | 0 |  |  |  | Rebrote tras incendio | +2 Biomasa ahora mismo. Todos tus dinosaurios reciben 1 herida. |  |

@@ -28,8 +28,8 @@ es legendario.
 | Rareza | Copias máximas | Cartas distintas | En el mazo de referencia |
 |---|---|---|---|
 | Común | 3 | 5 | 12 |
-| Rara | 3 | 8 | 20 |
-| Épica | 2 | 10 | 12 |
+| Rara | 3 | 8 | 21 |
+| Épica | 2 | 10 | 11 |
 | Legendaria | 1 | 8 | 6 |
 
 ---
@@ -49,8 +49,8 @@ es legendario.
 | *Torvosaurus tanneri* | Terópodo | Legendaria | 1 | 4 | 7 | 1 | 5 | undefined |
 | *Nodosaurus textilis* | Tireóforo | Rara | 3 | 2 | 2 | 3 | 5 | undefined |
 | *Riparovenator milnerae* | Terópodo | Épica | 2 | 2 | 4 | 1 | 4 | undefined |
-| *Lokiceratops rangiformis* | Marginocéfalo | Épica | 2 | 3 | 4 | 1 | 7 | undefined |
-| *Brachylophosaurus canadensis* | Ornitópodo | Rara | 2 | 2 | 2 | 1 | 6 | undefined |
+| *Lokiceratops rangiformis* | Marginocéfalo | Épica | 1 | 3 | 4 | 1 | 7 | undefined |
+| *Brachylophosaurus canadensis* | Ornitópodo | Rara | 3 | 2 | 2 | 1 | 6 | undefined |
 | *Tyrannotitan chubutensis* | Terópodo | Legendaria | 1 | 4 | 10 | 1 | 5 | undefined |
 | *Huaxiadraco corollatus* | Pterosaurio | Rara | 2 | 2 | 2 | 2 | 2 | undefined |
 
@@ -80,7 +80,7 @@ es legendario.
 
 **1 de coste · 3 de Ataque · 3 de Vida** · Defensa propuesta: *0*
 
-**Ribereño** — +2 Poder mientras el campo activo sea Canal fluvial trenzado.
+**Caza en grupo** — +2 de Ataque si hay tres Ceratosaurus tuyos en el campo.
 
 `DEBATIDO` · Menos frecuente que Allosaurus. Se ha propuesto una dieta con mayor componente de presa acuática y un uso preferente de ambientes ribereños, a partir de morfología dental y contexto de hallazgos. Hipótesis discutida.
 
@@ -90,7 +90,7 @@ es legendario.
 
 **2 de coste · 1 de Ataque · 5 de Vida** · Defensa propuesta: *4*
 
-**Tagomizador** — Devuelve 2 de daño adicional a quien lo ataque, además del que ya devuelve su clado.
+**Muro de placas** — +1 de Defensa si tienes otro Stegosaurus en el campo.
 
 `ESTABLECIDO` · Una vértebra caudal de Allosaurus con una perforación compatible con una púa caudal de Stegosaurus es evidencia directa de uso defensivo del tagomizador.
 
@@ -110,7 +110,7 @@ es legendario.
 
 **3 de coste · 2 de Ataque · 4 de Vida** · Defensa propuesta: *3*
 
-**Migrador** — Puede cambiar de ranura en vez de desplegar.
+**Migrador** — Al jugarla, busca un evento en tu mazo y llévatelo a la mano.
 
 `ESTABLECIDO` · Análisis isotópicos de esmalte dental sugieren desplazamientos estacionales hacia tierras altas durante la estación seca, a diferencia de otros saurópodos de la misma formación. El rasgo Migrador refleja ese resultado.
 
@@ -130,7 +130,7 @@ es legendario.
 
 **3 de coste · 2 de Ataque · 10 de Vida** · Defensa propuesta: *5*
 
-**Masa colosal** — +1 de Defensa adicional: es la mayor masa del set.
+**Manada** — +1 de Defensa si tienes otro saurópodo en el campo.
 
 `ESTABLECIDO` · La talla adulta de los diplodócidos es en sí misma la principal defensa antipredatoria. Nota: la validez de Brontosaurus como género separado sigue en discusión; el juego usa Apatosaurus.
 
@@ -140,7 +140,7 @@ es legendario.
 
 **4 de coste · 7 de Ataque · 5 de Vida** · Defensa propuesta: *1*
 
-**Escaso** — Sólo 1 copia en el mazo. No admite adaptaciones.
+**Rastreador** — Al jugarla, busca un clima en tu mazo y llévatelo a la mano.
 
 `ESTABLECIDO` · El terópodo de mayor tamaño de la formación, pero genuinamente raro en el registro. Su escasez en el mazo replica su escasez fósil.
 
@@ -150,7 +150,7 @@ es legendario.
 
 **2 de coste · 2 de Ataque · 5 de Vida** · Defensa propuesta: *3*
 
-**Coraza dorsal** — +2 de Defensa. La coraza protege; no es un arma, a diferencia de la cola del estegosaurio.
+**Llamada de manada** — Al jugarla, busca un Gregarismo en tu mazo y llévatelo a la mano.
 
 `ESTABLECIDO` · Formación Frontier, Wyoming, Cenomaniense (~100 Ma). Los osteodermos en bandas sobre el dorso están documentados directamente. El taxón en sí es material fragmentario y varios autores lo tratan como nomen dubium: la coraza es firme, la especie lo es menos.
 
@@ -166,17 +166,17 @@ es legendario.
 
 *Por qué 1 de Defensa:* Espinosáurido grácil, construido para pescar y no para encajar.
 
-### *Lokiceratops rangiformis* · Marginocéfalo · Épica · 2 copias
+### *Lokiceratops rangiformis* · Marginocéfalo · Épica · 1 copia
 
 **3 de coste · 4 de Ataque · 7 de Vida** · Defensa propuesta: *1*
 
-**Gola ornamentada** — +2 de Defensa.
+**Gola ornamentada** — +2 de Defensa si tienes otro Lokiceratops en el campo.
 
 `DEBATIDO` · Formación Judith River, Montana, Campaniense (~78 Ma), descrito en 2024. La gola lleva las mayores hojas óseas conocidas en un ceratópsido, asimétricas entre lados. Si servían para defensa, para exhibición o para reconocerse entre especies es justamente lo que se discute.
 
 *Por qué 1 de Defensa:* La gola es hueso, pero está calada y orientada hacia arriba, no hacia el atacante.
 
-### *Brachylophosaurus canadensis* · Ornitópodo · Rara · 2 copias
+### *Brachylophosaurus canadensis* · Ornitópodo · Rara · 3 copias
 
 **2 de coste · 2 de Ataque · 6 de Vida** · Defensa propuesta: *1*
 
@@ -200,7 +200,7 @@ es legendario.
 
 **2 de coste · 2 de Ataque · 2 de Vida** · Defensa propuesta: *2*
 
-**Vuelo** — Sobrevuela la ranura: golpea siempre al hábitat rival y no recibe daño de combate.
+**Vuelo** — Sobrevuela la ranura: golpea siempre al hábitat rival, pero quien tenga enfrente le alcanza igual.
 
 `ESTABLECIDO` · Formación Jiufotang, Liaoning, China, Aptiense (~120 Ma). No es un dinosaurio: es un pterosaurio tapejárido, sin dientes y con cresta craneal. Los tapejáridos conservan picnofibras, filamentos tegumentarios reales — la razón por la que este juego no pone plumas a los dinosaurios es que ellos no las tienen, no una regla estética.
 
@@ -234,9 +234,9 @@ Se juega **sobre un dinosaurio tuyo**. +2 Poder y +2 Vida permanentes a un dinos
 
 `ESTABLECIDO` · La osteohistología muestra tasas de crecimiento altas y sostenidas en saurópodos y en Allosaurus, alcanzando talla adulta en pocas décadas o menos.
 
-### Neumaticidad ósea · Épica · coste 1 · 1 copia
+### Neumaticidad ósea · Épica · coste 2 · 1 copia
 
-Se juega **sobre un dinosaurio tuyo**. +2 Poder. Sólo sobre terópodos y saurópodos.
+Se juega **sobre un dinosaurio tuyo**. +2 de Ataque permanentes. Sólo sobre terópodos y saurópodos.
 
 `ESTABLECIDO` · Los saurisquios de la Morrison presentan neumatización postcraneal: vértebras invadidas por divertículos de sacos aéreos. Aligera el esqueleto sin perder resistencia. No aparece en tireóforos ni en ornitópodos.
 
@@ -248,7 +248,7 @@ Se juega **sobre un dinosaurio del rival**. −2 Poder permanente a un dinosauri
 
 ### Competencia trófica · Épica · coste 3 · 1 copia
 
-Se juega **sobre un clado rival que eliges**. −2 Poder a todos los dinosaurios rivales del clado que elijas.
+Se juega **undefined**. −2 de Defensa a dos dinosaurios rivales que elijas.
 
 `INFERIDO` · La coexistencia de varios saurópodos y de varios terópodos grandes en la misma formación implica reparto de recursos. La partición de nicho está sustentada por el desgaste dental; su intensidad como presión competitiva es una inferencia.
 
@@ -282,9 +282,9 @@ Cura +1 de vida a un dinosaurio al final del turno
 
 `ESTABLECIDO` · La osteohistología muestra tasas de crecimiento altas y sostenidas en saurópodos y en Allosaurus, alcanzando talla adulta en pocas décadas o menos.
 
-### Neumaticidad ósea · Épica · coste 1 · 1 copia
+### Neumaticidad ósea · Épica · coste 2 · 1 copia
 
-+2 Poder. Sólo sobre terópodos y saurópodos.
++2 de Ataque permanentes. Sólo sobre terópodos y saurópodos.
 
 `ESTABLECIDO` · Los saurisquios de la Morrison presentan neumatización postcraneal: vértebras invadidas por divertículos de sacos aéreos. Aligera el esqueleto sin perder resistencia. No aparece en tireóforos ni en ornitópodos.
 
@@ -296,7 +296,7 @@ Cura +1 de vida a un dinosaurio al final del turno
 
 ### Competencia trófica · Épica · coste 3 · 1 copia
 
-−2 Poder a todos los dinosaurios rivales del clado que elijas.
+−2 de Defensa a dos dinosaurios rivales que elijas.
 
 `INFERIDO` · La coexistencia de varios saurópodos y de varios terópodos grandes en la misma formación implica reparto de recursos. La partición de nicho está sustentada por el desgaste dental; su intensidad como presión competitiva es una inferencia.
 

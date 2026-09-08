@@ -39,14 +39,12 @@ function ataqueHipotetico(vista, j, cardId) {
 function reduccionHipotetica(cardId) {
   const c = carta(cardId);
   let d = c.defensa ?? 0;
-  if (c.rasgo === RASGO.MASA_COLOSAL) d += BALANCE.rasgos.masaColosalDefensa;
   return d;
 }
 
 function espinasHipoteticas(cardId) {
   const c = carta(cardId);
   let e = c.clado === CLADO.TIREOFORO ? BALANCE.clados.espinasTireoforo : 0;
-  if (c.rasgo === RASGO.TAGOMIZADOR) e += BALANCE.rasgos.tagomizadorExtra;
   return e;
 }
 
@@ -163,8 +161,9 @@ function valorDeAccion(vista, j, a) {
       } else if (r === RASGO.FRACTURA) {
         delta = BALANCE.rasgos.fracturaAtaque;
       } else if (r === RASGO.COMPETENCIA) {
-        delta = unidadesDe(vista, contrario).filter((u) => carta(u.cardId).clado === a.clado).length
-          * BALANCE.rasgos.competenciaAtaque;
+        // Ya no muerde el Ataque de un clado entero, sino la Defensa de dos
+        // señalados: vale por lo que dejan de parar, no por lo que dejan de pegar.
+        delta = (a.objetivos ?? []).length * BALANCE.rasgos.competenciaDefensa;
       } else if (r === RASGO.TRAMPA) {
         // Vale por lo que acerca al rival al mazo vacío, menos lo que te acerca
         // a ti. Con los dos mazos llenos casi no vale nada; al final, decide.
