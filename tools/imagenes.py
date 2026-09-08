@@ -41,10 +41,14 @@ DESTINO = RAIZ / 'assets' / 'dinos'
 # Lado mayor en píxeles. Las cartas del tablero miden 56 px y la ficha 74, así
 # que 460 da margen de sobra para pantallas de densidad 3x sin que una partida
 # se coma varios megabytes.
-# 900 px de lado mayor: la ventana más grande es la carta a tamaño de lectura,
-# 268x168 css, que a DPR 3 son 804x504 px reales. Con 460 se veían blandas.
-LADO = 900
-CALIDAD = 82
+# 1200 px de lado mayor: la ventana más grande es la ilustración de la ficha,
+# 394x222 css en un movil de 430 px, que a DPR 3 son 1182x665 px reales. Con
+# 460 se veian blandas y con 900 la ficha las ampliaba un 30 %.
+# Son unos 2 MB para las quince, que el service worker cachea en tiempo muerto.
+# Si eso pesa demasiado, bajar a 1000 deja la ficha con un 18 % de ampliacion,
+# que a esta densidad ya no se distingue.
+LADO = 1200
+CALIDAD = 80
 
 
 def ids_de_cartas():

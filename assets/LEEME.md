@@ -9,29 +9,35 @@ jugar y sólo sirven para regenerar esta carpeta.
 
 ## Qué tamaño hace falta
 
-La ventana más grande del juego es la carta a tamaño de lectura: **268×168 css**,
-que en un móvil a DPR 3 son **804×504 píxeles reales**. Todo lo demás es más
-pequeño:
+La ventana más grande del juego es la ilustración de la ficha, que ocupa el
+ancho del panel: **394×222 css** en un móvil de 430 px, que a DPR 3 son
+**1182×665 píxeles reales**. Todo lo demás es más pequeño:
 
 | Dónde | css | píxeles a DPR 3 | proporción |
 |---|---|---|---|
-| Carta a tamaño de lectura (visor) | 268×168 | **804×504** | 1,60 |
-| Rejilla de la colección | 129×96 | 386×288 | 1,34 |
+| Ilustración de la ficha | 394×222 | **1182×665** | 1,78 |
+| Carta a tamaño de lectura (visor) | 268×168 | 804×504 | 1,60 |
+| Rejilla de la colección | 129×96 | 386×288 | **1,34** |
 | Carta en la mano | 82×52 | 246×156 | 1,58 |
 | Carta en la ranura | 76×52 | 228×156 | 1,46 |
-| Miniatura de la ficha | 74×74 | 222×222 | **1,00** |
-| Héroe del menú | 430×652 | 1290×1957 | 0,66 (vertical) |
 
 De ahí salen dos reglas:
 
-1. **900×600 px, JPEG de calidad 82** (unos 90–120 KB). Cubre el visor con
-   margen y sirve para todas las demás ventanas. `tools/imagenes.py` ya reduce a
-   eso. Con los 460 px de antes, el visor ampliaba la imagen casi al doble y se
-   veía blanda.
-2. **El animal tiene que caber en el cuadrado central.** Las ventanas van de
-   proporción 1,00 (la miniatura de la ficha) a 1,60 (el visor), y `object-fit:
-   cover` recorta lo que sobra por los lados o por arriba y abajo. Lo que esté
-   fuera del 67 % central del ancho no se ve en la miniatura.
+1. **1200×750 px, JPEG de calidad 80.** Cubre la ficha sin ampliar y sirve para
+   todas las demás ventanas. `tools/imagenes.py` ya reduce a eso. Son unos 2 MB
+   entre las quince, que el service worker cachea en tiempo muerto; si eso pesa
+   demasiado, bajar `LADO` a 1000 deja la ficha con un 18 % de ampliación, que a
+   esa densidad no se nota.
+2. **Exporta todas con la misma proporción, 3:2 (1,5).** Es el punto medio entre
+   la ventana más estrecha (1,34, la colección) y la más ancha (1,78, la ficha),
+   así que ninguna recorta mucho. Las de ahora van de **0,97 a 1,93** y por eso
+   unas se ven completas y otras cortadas: no es el recorte, es que cada
+   original tiene una forma distinta.
+
+Con `object-fit: cover`, una ventana más ancha que la imagen recorta por arriba
+y por abajo, y una más estrecha recorta por los lados. Con 3:2 de origen lo
+peor que pasa es perder un 11 % de alto en la ficha o un 11 % de ancho en la
+colección: el animal cabe siempre si no toca los bordes.
 
 El héroe del menú es aparte: es vertical y grande. Si se quiere una imagen
 propia en vez de reutilizar una carta, hace falta **1290×1960** como mínimo.

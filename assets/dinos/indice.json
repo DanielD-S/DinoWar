@@ -16,5 +16,8 @@
     "torvosaurus",
     "tyrannotitan"
   ],
-  "foco": {}
+  "foco": {
+    "ornitholestes": "50% 40%",
+    "huaxiadraco": "50% 44%"
+  }
 }

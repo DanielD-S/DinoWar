@@ -16,7 +16,7 @@ import {
   cargarPerfil, actualizarPerfil, anadirCartas, perfilInicial,
 } from './almacen.js';
 import { arte } from './art.js';
-import { fichaHTML, abrirFicha } from './render.js';
+import { fichaHTML, abrirFicha, statHTML } from './render.js';
 
 const id = (s) => document.getElementById(s);
 
@@ -138,10 +138,10 @@ function pintarColeccion() {
       <div class="col-pie">
         <div class="col-nombre">${nombreHTML(c)}</div>
         <div class="col-meta"><span class="col-rar rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span> · ${familia(c)}</div>
-        ${esDino(c) ? `<div class="c-stats fila">
-          <span class="st st-a"><i>A</i><b>${c.ataque}</b></span>
-          <span class="st st-d"><i>D</i><b>${c.defensa}</b></span>
-          <span class="st st-v"><i>V</i><b>${c.vida}</b></span>
+        ${esDino(c) ? `<div class="c-stats">
+          ${statHTML('a', 'Ataque', c.ataque)}
+          ${statHTML('d', 'Defensa', c.defensa)}
+          ${statHTML('v', 'Vida', c.vida)}
         </div>` : ''}
       </div>
     </div>`;

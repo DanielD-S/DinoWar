@@ -325,8 +325,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .col-carta.dino .col-nombre { font-style: italic; }
 .col-meta { font-size: 9px; color: var(--tenue); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.c-stats.fila { flex-direction: row; gap: 8px; margin-top: auto; }
-.c-stats.fila .st { justify-content: flex-start; gap: 2px; }
 
 /* Una especie que no tienes es un hueco, no una carta apagada. */
 .col-carta.ninguna { background: #1a1410; box-shadow: 0 0 0 1px #2e2519; }
@@ -787,15 +785,33 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   margin-top: auto; font-size: 8px; letter-spacing: .12em; text-transform: uppercase; color: var(--tenue);
 }
 
-/* La clave de estadísticas: glifo y color fijos en todas las pantallas. */
-.c-stats { display: flex; flex-direction: column; gap: 2px; font-size: 9px; }
-.st { display: flex; justify-content: space-between; align-items: baseline; gap: 3px; }
-.st i { font-style: normal; }
-.st b { font-weight: 500; }
+/* La clave de estadísticas: glifo y color fijos en todas las pantallas.
+   Van en fila y pegados a su cifra; en columna y con la cifra empujada al otro
+   extremo eran tres renglones sueltos que no se leían como un grupo. */
+.c-stats { display: flex; gap: 5px; font-size: 9px; margin-top: auto; }
+/* Sin recuadro a tamaño de juego: en una carta de la mano, 67 px de ancho, las
+   tres fichas con fondo y relleno no caben en una línea y la Vida se caía
+   sola abajo. El color del glifo ya distingue las tres. */
+.st { display: inline-flex; align-items: center; gap: 2px; }
+.st i {
+  width: 1.05em; height: 1.05em; flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.st i svg { width: 100%; height: 100%; display: block; }
+/* El nombre viaja siempre en el DOM y sólo asoma donde hay sitio. */
+.st u { display: none; text-decoration: none; }
+.st b { font-weight: 500; color: var(--texto); }
 .st b em { font-style: normal; color: var(--tenue-2); }
 .st-a i { color: var(--acento-claro); }
 .st-d i { color: var(--agua); }
 .st-v i { color: var(--vida); }
+/* El recuadro sólo donde hay sitio para él. */
+.col-carta .st, .ficha-cifras .st, .carta--visor .st {
+  padding: 1px 4px 1px 3px; border-radius: 3px; background: rgba(255, 255, 255, .045);
+}
+.col-carta .st-a, .ficha-cifras .st-a, .carta--visor .st-a { background: rgba(217, 164, 65, .1); }
+.col-carta .st-d, .ficha-cifras .st-d, .carta--visor .st-d { background: rgba(126, 158, 176, .1); }
+.col-carta .st-v, .ficha-cifras .st-v, .carta--visor .st-v { background: rgba(214, 122, 90, .1); }
 .st-a.mejorado b { color: var(--bio); }
 .st-a.mermado b { color: var(--peligro); }
 .st-v.herido b { color: var(--vida); }
@@ -1024,7 +1040,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .hoja-titulo { font-size: 19px; font-weight: 500; letter-spacing: -.01em; margin-bottom: 5px; }
 .hoja-texto { font-size: 13px; color: var(--tenue); margin-bottom: 10px; }
-.hoja-cuerpo { overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; }
+/* `min-height: 0` con la base en el contenido: la hoja no tiene altura fija
+   —crece con lo que lleva hasta el tope del 84 %—, así que la base ha de ser
+   `auto` para que no se colapse, y el mínimo cero para que sí pueda encogerse
+   cuando el tope muerde. Sin esto recortaba el final en vez de scrollear. */
+.hoja-cuerpo {
+  flex: 0 1 auto; min-height: 0;
+  overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
 /* Cerrar es la acción de acento de la hoja: si no, la hoja no tiene salida
    evidente y se toca fuera a ciegas. */
 .hoja-cerrar {
@@ -1040,18 +1064,21 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .hoja-accion:active { border-color: var(--vida); }
 
-.ficha-cab { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px; }
+.ficha-cab { margin-bottom: 10px; }
+/* Apaisada y de ancho completo: las ilustraciones tienen proporción 1,5 a 1,8
+   y en el cuadrado de antes se les recortaba medio animal. La silueta SVG, que
+   no se recorta, va en una franja más baja porque no gana nada con la altura. */
 .ficha-arte {
-  position: relative; width: 74px; height: 74px; flex: 0 0 auto;
+  position: relative; width: 100%; aspect-ratio: 21 / 9;
   background: var(--panel-alto); border-radius: var(--radio); padding: 6px;
-  overflow: hidden; display: block; cursor: pointer;
+  overflow: hidden; display: block; cursor: pointer; margin-bottom: 11px;
 }
 .ficha-arte svg { width: 100%; height: 100%; }
 .ficha-arte .foto { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; display: block; }
-.ficha-arte:has(.foto) { padding: 0; }
+.ficha-arte:has(.foto) { padding: 0; aspect-ratio: 16 / 9; }
 /* La miniatura no se lee: hay que decir que se puede abrir. */
 .ficha-lupa {
-  position: absolute; right: 3px; bottom: 3px; width: 18px; height: 18px;
+  position: absolute; right: 6px; bottom: 6px; width: 18px; height: 18px;
   border-radius: 5px; background: rgba(12,10,7,.78); border: 1px solid var(--borde);
   color: var(--texto); font-size: 11px; line-height: 16px; text-align: center;
 }
@@ -1071,7 +1098,19 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* La clave de estadísticas también aquí: el cuadro de color es lo que une la
    ficha con lo que se ve en el tablero. */
-.ficha-cifras { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 9px; font-size: 12px; }
+/* Las mismas fichas de estadística que la carta, para que el jugador no tenga
+   que traducir entre dos claves distintas. */
+.ficha-cifras {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 10px;
+}
+.ficha-cifras .st { flex-direction: column; gap: 1px; padding: 6px 2px 5px; border-radius: 5px; }
+.ficha-cifras .st u {
+  display: flex; align-items: center; gap: 3px;
+  font-size: 9px; letter-spacing: .05em; text-transform: uppercase; color: var(--tenue);
+}
+.ficha-cifras .st i { width: 11px; height: 11px; }
+.ficha-cifras .st b { font-size: 17px; line-height: 1.1; }
+.st-c i { color: var(--tenue-2); font-size: .8em; }
 .cifra { display: inline-flex; align-items: center; gap: 5px; color: var(--tenue); }
 .cifra b { color: var(--texto); font-size: 14px; font-weight: 500; }
 .cifra i { font-style: normal; display: inline-flex; align-items: center; gap: 5px; }
@@ -1140,12 +1179,19 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .visor-marco { width: min(268px, 78vw); }
 .carta--visor { width: 100%; border-radius: 12px; }
 .carta--visor .c-arte { height: 168px; }
-.carta--visor .c-coste {
-  top: 10px; left: 10px; width: 36px; height: 36px; font-size: 15px;
+/* Coste y rareza en su propia cinta: encima del arte, no sobre él. A este
+   tamaño la ilustración es el contenido de la carta y taparle la cabeza al
+   animal con el círculo del coste era el defecto más visible del visor. */
+.c-cab {
+  flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; padding: 9px 11px 8px; background: var(--panel-alto);
+  box-shadow: inset 0 -1px 0 var(--borde);
+}
+.carta--visor .c-cab .c-coste {
+  position: static; width: 30px; height: 30px; font-size: 14px;
   border-color: var(--bio);
 }
 .c-rareza {
-  position: absolute; top: 12px; right: 12px; z-index: 2;
   padding: 3px 8px; border-radius: 3px; font-size: 9.5px;
   letter-spacing: .08em; text-transform: uppercase;
   background: rgba(20,15,11,.85); box-shadow: 0 0 0 1px currentColor;
@@ -1155,7 +1201,21 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .carta--visor .c-clado {
   font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--tenue);
 }
-.carta--visor .c-stats { font-size: 13px; gap: 5px; margin-top: 4px; }
+/* Tres columnas iguales con el nombre encima de la cifra: en una sola fila
+   «ATAQUE 4 DEFENSA 1 VIDA 3» no cabe en 268 px y la Vida se caía sola abajo. */
+.carta--visor .c-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 6px;
+}
+.carta--visor .st {
+  flex-direction: column; gap: 1px; padding: 6px 2px 5px; border-radius: 5px;
+}
+.carta--visor .st u {
+  display: flex; align-items: center; gap: 3px;
+  font-size: 9px; letter-spacing: .06em; text-transform: uppercase; color: var(--tenue);
+}
+.carta--visor .st i { width: 11px; height: 11px; }
+.carta--visor .st b { font-size: 17px; line-height: 1.1; }
+.carta--visor .st b em { font-size: 12px; }
 .carta--visor .c-rasgo {
   margin-top: 4px; padding: 8px 10px; border-left: 2px solid var(--bio);
   background: rgba(217,164,65,.06); border-radius: 0 6px 6px 0;
@@ -1215,6 +1275,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   display: grid; place-items: center;
 }
 .anatomia-notas .n.c { border-radius: 50%; color: var(--texto); }
+.anatomia-notas .n i { width: 11px; height: 11px; display: block; }
+.anatomia-notas .n i svg { width: 100%; height: 100%; display: block; }
 .anatomia-notas .n.st-a { color: var(--acento-claro); }
 .anatomia-notas .n.st-d { color: var(--agua); }
 .anatomia-notas .n.st-v { color: var(--vida); }

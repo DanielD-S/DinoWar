@@ -76,12 +76,40 @@ export function montar() {
 // ----------------------------------------------------------------- cartas
 
 /**
+ * Los tres glifos de las estadísticas. Un diente, un escudo y un corazón: la
+ * letra sola («A», «D», «V») no significaba nada para quien no se hubiera
+ * leído la ayuda, y en la carta grande quedaban tres renglones de texto plano.
+ * Van con `currentColor` para heredar el color de cada estadística.
+ */
+const GLIFO = {
+  a: '<path d="M2.6 1h6.8c-.35 4-1.4 7.4-3.4 10.6C4 8.4 2.95 5 2.6 1Z"/>',
+  d: '<path d="M6 .9 10.7 2.6c0 4.4-1.7 7.5-4.7 9-3-1.5-4.7-4.6-4.7-9Z"/>',
+  v: '<path d="M6 11.2C2.1 8.5.9 6.5.9 4.7.9 3 2.1 1.8 3.6 1.8c1 0 1.9.5 2.4 1.3.5-.8 1.4-1.3 2.4-1.3C9.9 1.8 11.1 3 11.1 4.7c0 1.8-1.2 3.8-5.1 6.5Z"/>',
+};
+
+const glifo = (k) => `<i aria-hidden="true"><svg viewBox="0 0 12 12" fill="currentColor">${GLIFO[k]}</svg></i>`;
+
+/**
+ * Una estadística: glifo, nombre y cifra. El nombre viaja siempre en el DOM y
+ * sólo se enseña en la carta a tamaño de lectura, donde hay sitio; en la mano
+ * y en la ranura basta con el glifo, que es lo que se reconoce de un vistazo.
+ */
+export function statHTML(k, nombre, valor, clase = '') {
+  return `<span class="st st-${k}${clase}">${glifo(k)}`
+    + `<u>${nombre}</u><b>${valor}</b></span>`;
+}
+
+/**
  * La cara de una carta. Misma estructura en la ranura, en la mano y en el
  * visor: cambia el tamaño, no la composición.
  *
  * Las tres cifras llevan glifo y color fijos —A ámbar, D acero, V arcilla—
  * porque sin eso eran tres números iguales en fila y nadie sabía cuál era cuál.
  * La Vida sólo enseña el máximo cuando hay heridas: «5» de sano, «2/6» herido.
+ *
+ * El coste y la rareza sólo se superponen al arte en las cartas de jugar, donde
+ * no cabe otra cosa. En la carta a tamaño de lectura la ilustración es el
+ * contenido, así que los dos se van a una cinta encima y no tapan nada.
  */
 function marcoCarta(estado, cardId, {
   poder = null, defensa = null, vidaAct = null, vidaMax = null,
@@ -99,18 +127,22 @@ function marcoCarta(estado, cardId, {
   if (dino && atq > c.ataque) clasePoder = ' mejorado';
   if (dino && atq < c.ataque) clasePoder = ' mermado';
 
+  const coste = `<span class="c-coste">${c.coste}</span>`;
+  const rareza = `<span class="c-rareza rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span>`;
+
   return `
+    ${grande ? `<div class="c-cab">${coste}${rareza}</div>` : ''}
     <div class="c-arte">${arte(cardId)}</div>
-    <span class="c-coste">${c.coste}</span>
-    ${grande ? `<span class="c-rareza rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span>` : ''}
+    ${grande ? '' : coste}
     <div class="c-cuerpo">
       <div class="c-nombre">${c.binomial}</div>
       ${grande ? `<div class="c-clado">${dino ? CLADO_NOMBRE[c.clado] : TIPO_NOMBRE[c.tipo]}</div>` : ''}
       ${dino ? `<div class="c-stats">
-        <span class="st st-a${clasePoder}"><i>A</i><b>${atq}</b></span>
-        <span class="st st-d"><i>D</i><b>${def}</b></span>
-        <span class="st st-v${herido ? ' herido' : ''}"><i>V</i><b>${va}${herido ? `<em>/${vm}</em>` : ''}</b></span>
-      </div>` : `<div class="c-tipo">${TIPO_NOMBRE[c.tipo]}</div>`}
+        ${statHTML('a', 'Ataque', atq, clasePoder)}
+        ${statHTML('d', 'Defensa', def)}
+        ${statHTML('v', 'Vida', `${va}${herido ? `<em>/${vm}</em>` : ''}`, herido ? ' herido' : '')}
+      </div>` : ''}
+      ${!dino && !grande ? `<div class="c-tipo">${TIPO_NOMBRE[c.tipo]}</div>` : ''}
       ${grande ? `<div class="c-rasgo"><b>${c.rasgoNombre}</b><p>${c.rasgoTexto}</p></div>` : ''}
     </div>
     ${adaptada ? '<span class="c-adap"></span>' : ''}
@@ -367,23 +399,24 @@ export function fichaHTML(cardId) {
   const dino = c.tipo === TIPO.DINOSAURIO;
   const familia = dino ? `Dinosaurio · ${CLADO_NOMBRE[c.clado]}` : TIPO_NOMBRE[c.tipo];
 
+  // La ilustración va de ancho completo y no en un cuadrado al lado del texto:
+  // las fotos son apaisadas (proporción 1,5 a 1,8) y en un cuadro 1:1 se les
+  // recortaba medio animal, que es justo lo que esta pantalla viene a enseñar.
   return `
     <div class="ficha-cab">
       <button class="ficha-arte" data-zoom="${cardId}" data-modo="${hayFoto(cardId) ? 'foto' : 'carta'}"
               aria-label="${hayFoto(cardId) ? 'Ver la ilustración en grande' : 'Ver la carta en grande'}">
         ${arte(cardId)}<span class="ficha-lupa" aria-hidden="true">⤢</span>
       </button>
-      <div>
-        <div class="ficha-binomial${dino ? '' : ' recto'}">${c.binomial}</div>
-        <div class="ficha-clado">${familia} <span class="ficha-rareza rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span></div>
-        <div class="ficha-cifras">
-          <span class="cifra"><i>Coste</i><b>${c.coste}</b></span>
-          ${dino ? `<span class="cifra ca"><i>Ataque</i><b>${c.ataque}</b></span>` : ''}
-          ${dino ? `<span class="cifra cd"><i>Defensa</i><b>${c.defensa}</b></span>` : ''}
-          ${dino ? `<span class="cifra cv"><i>Vida</i><b>${c.vida}</b></span>` : ''}
-        </div>
-        <button class="ficha-ampliar" data-zoom="${cardId}" data-modo="carta">Ver la carta en grande</button>
+      <div class="ficha-binomial${dino ? '' : ' recto'}">${c.binomial}</div>
+      <div class="ficha-clado">${familia} <span class="ficha-rareza rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span></div>
+      <div class="ficha-cifras">
+        <span class="st st-c"><i aria-hidden="true">◆</i><u>Coste</u><b>${c.coste}</b></span>
+        ${dino ? statHTML('a', 'Ataque', c.ataque) : ''}
+        ${dino ? statHTML('d', 'Defensa', c.defensa) : ''}
+        ${dino ? statHTML('v', 'Vida', c.vida) : ''}
       </div>
+      <button class="ficha-ampliar" data-zoom="${cardId}" data-modo="carta">Ver la carta en grande</button>
     </div>
     <div class="ficha-rasgo">
       <h3>${c.rasgoNombre}</h3>
@@ -531,7 +564,7 @@ export function ayudaHTML() {
     <div class="ayuda-h">El campo</div>
     <p class="ayuda-p">
       Cada bando tiene <b>${BALANCE.ranuras} ranuras</b>, enfrentadas una a una. Si en la ranura 3 tenéis
-      dinosaurio los dos, combaten. Si el rival la tiene <b>vacía</b>, el tuyo golpea su habitat.
+      dinosaurio los dos, combaten. Si el rival la tiene <b>vacía</b>, el tuyo golpea su hábitat.
     </p>
     <p class="ayuda-p">
       De ahí sale la decisión de cada turno: <b>una fila llena tapa tu hábitat pero regala trofeos;
@@ -554,9 +587,9 @@ export function ayudaHTML() {
       <div class="anatomia-carta">${n.outerHTML}</div>
       <div class="anatomia-notas">
         <div><span class="n c">${c.coste}</span><span><b>Coste</b> en Biomasa. Va en el círculo, sobre el arte.</span></div>
-        <div><span class="n st-a">A</span><span><b>Ataque</b>: daño que reparte, una vez por turno.</span></div>
-        <div><span class="n st-d">D</span><span><b>Defensa</b>: se resta de <b>cada</b> golpe que recibe, no de la Vida.</span></div>
-        <div><span class="n st-v">V</span><span><b>Vida</b>: heridas que aguanta antes de morir. Herida enseña <b>actual/máximo</b>, y <b>no se cura</b> salvo carta que lo diga.</span></div>
+        <div><span class="n st-a">${glifo('a')}</span><span><b>Ataque</b>: daño que reparte, una vez por turno.</span></div>
+        <div><span class="n st-d">${glifo('d')}</span><span><b>Defensa</b>: se resta de <b>cada</b> golpe que recibe, no de la Vida.</span></div>
+        <div><span class="n st-v">${glifo('v')}</span><span><b>Vida</b>: heridas que aguanta antes de morir. Herida enseña <b>actual/máximo</b>, y <b>no se cura</b> salvo carta que lo diga.</span></div>
       </div>
     </div>
 
