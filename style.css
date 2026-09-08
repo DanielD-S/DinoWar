@@ -740,6 +740,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   position: absolute; inset: 0;
   transition: opacity .3s, transform .3s;
 }
+/* Las cifras al pie de la carta: la ranura es más alta que su contenido y
+   dejarlas pegadas al nombre abría un hueco muerto debajo. */
+.carta--ranura .c-stats { margin-top: auto; }
 .carta--ranura.propio { box-shadow: 0 0 0 1px var(--propio-tenue); }
 .carta--ranura.rival { box-shadow: 0 0 0 1px var(--rival-tenue); }
 /* El retardo lo pone animarRevelacion() para que las cartas se abran en
