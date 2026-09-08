@@ -19,6 +19,7 @@ export const ACCION = Object.freeze({
   EVENTO: 'EVENTO',
   CLIMA: 'CLIMA',
   RECURSO: 'RECURSO',
+  RETIRAR: 'RETIRAR',
   PASAR: 'PASAR',
   DESCARTAR: 'DESCARTAR',
   AVANZAR: 'AVANZAR',
@@ -60,6 +61,20 @@ export function validar(s, a) {
 
   const inst = s.instancias[a.iid];
   if (!inst) return 'carta inexistente';
+
+  // Retirar lo comprometido antes de pasar. Nada de esto ha ocurrido todavía
+  // —se resuelve en la revelación y el rival no ve qué es— así que devolverlo
+  // no filtra nada. Lo que ya está boca arriba, un recurso, no se puede
+  // deshacer: el rival lo ha visto y la Biomasa ya se ha podido gastar.
+  if (a.tipo === ACCION.RETIRAR) {
+    const p = jug.pendientes.find((x) => x.iid === a.iid);
+    if (!p) return 'esa carta no está comprometida este turno';
+    if (p.tipo === 'DESPLIEGUE'
+      && jug.pendientes.some((x) => x.tipo === 'ADAPTACION' && x.objetivo === a.iid)) {
+      return 'retira antes el evento que le has puesto encima';
+    }
+    return null;
+  }
 
   if (a.tipo === ACCION.MOVER) {
     if (inst.dueno !== a.jugador) return 'esa unidad no es tuya';
@@ -209,6 +224,19 @@ export function reduce(state, action) {
         objetivo: action.objetivo ?? null,
         clado: action.clado ?? null,
       });
+      break;
+    }
+
+    case ACCION.RETIRAR: {
+      const p = jug.pendientes.find((x) => x.iid === action.iid);
+      jug.pendientes = jug.pendientes.filter((x) => x !== p);
+      // Un movimiento no costó Biomasa y la unidad nunca salió del campo:
+      // retirarlo es sólo cancelar la orden.
+      if (p.tipo !== 'MOVIMIENTO') {
+        jug.biomasa += carta(s.instancias[action.iid].cardId).coste;
+        jug.mano.push(action.iid);
+      }
+      ev(s, 'RETIRADA', { jugador: action.jugador, iid: action.iid, tipo: p.tipo });
       break;
     }
 

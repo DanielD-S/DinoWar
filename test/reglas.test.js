@@ -314,6 +314,75 @@ test('Ranuras cruzadas: cada uno pega al hábitat contrario, y con el Ataque a 0
   assert.equal(avance.dano, 0, 'el evento se emite igual, con 0: el registro lo cuenta');
 });
 
+// ---------------------------------------------------------------- retirar
+
+test('Retirar devuelve la carta a la mano y la Biomasa, y libera la ranura', () => {
+  const s = tablero();
+  s.fase = FASE.DESPLIEGUE;
+  s.jugadores[0].biomasa = 6;
+  const iid = enMano(s, 'allosaurus', 0);
+  const coste = CARTAS.allosaurus.coste;
+
+  const puesto = reduce(s, { tipo: ACCION.DESPLEGAR, jugador: 0, iid, ranura: 2 });
+  assert.equal(puesto.jugadores[0].biomasa, 6 - coste);
+  assert.equal(puesto.jugadores[0].pendientes.length, 1);
+  assert.ok(!puesto.jugadores[0].mano.includes(iid));
+
+  const r = reduce(puesto, { tipo: ACCION.RETIRAR, jugador: 0, iid });
+  assert.equal(r.jugadores[0].biomasa, 6, 'devuelve la Biomasa entera');
+  assert.deepEqual(r.jugadores[0].pendientes, []);
+  assert.ok(r.jugadores[0].mano.includes(iid), 'la carta vuelve a la mano');
+  assert.equal(validar(r, { tipo: ACCION.DESPLEGAR, jugador: 0, iid, ranura: 2 }), null,
+    'la ranura queda libre otra vez');
+});
+
+test('No se retira lo que ya está boca arriba ni lo que no se ha comprometido', () => {
+  const s = tablero();
+  s.fase = FASE.DESPLIEGUE;
+  s.jugadores[0].biomasa = 6;
+  const recurso = enMano(s, 'rebrote', 0);
+  const enLaMano = enMano(s, 'allosaurus', 0);
+
+  const tras = reduce(s, { tipo: ACCION.RECURSO, jugador: 0, iid: recurso });
+  assert.ok(validar(tras, { tipo: ACCION.RETIRAR, jugador: 0, iid: recurso }),
+    'un recurso ya jugado no se deshace: el rival lo ha visto');
+  assert.ok(validar(s, { tipo: ACCION.RETIRAR, jugador: 0, iid: enLaMano }));
+});
+
+test('Retirar un despliegue con un evento encima pide retirar antes el evento', () => {
+  const s = tablero();
+  s.fase = FASE.DESPLIEGUE;
+  s.jugadores[0].biomasa = 12;
+  const dino = enMano(s, 'allosaurus', 0);
+  const adap = enMano(s, 'gastrolitos', 0);
+
+  let r = reduce(s, { tipo: ACCION.DESPLEGAR, jugador: 0, iid: dino, ranura: 0 });
+  r = reduce(r, { tipo: ACCION.EVENTO, jugador: 0, iid: adap, objetivo: dino });
+  assert.equal(r.jugadores[0].pendientes.length, 2);
+
+  assert.ok(validar(r, { tipo: ACCION.RETIRAR, jugador: 0, iid: dino }),
+    'primero el evento, para que no se quede apuntando a una carta en la mano');
+
+  const sinEvento = reduce(r, { tipo: ACCION.RETIRAR, jugador: 0, iid: adap });
+  assert.equal(validar(sinEvento, { tipo: ACCION.RETIRAR, jugador: 0, iid: dino }), null);
+});
+
+test('Retirar un movimiento no toca la Biomasa: no costó nada', () => {
+  const s = tablero();
+  s.fase = FASE.DESPLIEGUE;
+  s.jugadores[0].biomasa = 4;
+  const migrador = Object.values(CARTAS).find((c) => c.rasgo === RASGO.MIGRADOR);
+  if (!migrador) return;                          // el set puede no tener migradores
+  const iid = poner(s, migrador.id, 0, 0);
+
+  const movido = reduce(s, { tipo: ACCION.MOVER, jugador: 0, iid, ranura: 3 });
+  assert.equal(movido.jugadores[0].pendientes.length, 1);
+  const r = reduce(movido, { tipo: ACCION.RETIRAR, jugador: 0, iid });
+  assert.deepEqual(r.jugadores[0].pendientes, []);
+  assert.equal(r.jugadores[0].biomasa, 4);
+  assert.ok(!r.jugadores[0].mano.includes(iid), 'sigue en el campo, no vuelve a la mano');
+});
+
 // -------------------------------------------------------------- estaciones
 
 test('Sequía: cobra heridas según la Vida, y Camarasaurus es inmune', () => {

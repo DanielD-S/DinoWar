@@ -10,7 +10,7 @@ import { semilla } from './engine/rng.js';
 import {
   montar, render, mensaje, el, JUGADOR, RIVAL,
   fichaHTML, fichaEstacionHTML, ayudaHTML, abrirFicha, abrirDescarte, cerrarHojas,
-  abrirVisor, cambiarModoVisor, cerrarVisor,
+  abrirVisor, cambiarModoVisor, cerrarVisor, abrirComprometidas,
 } from './ui/render.js';
 import { tomarEntrada, soltarEntrada } from './ui/input.js';
 import { detectarFotos, vigilarFotos, calentarFotos } from './ui/art.js';
@@ -447,6 +447,22 @@ function iniciar() {
     irA(APP.MENU);
   });
   el.btnRendirse.addEventListener('click', preguntarRendicion);
+
+  // Marcha atrás del despliegue. Sin esto, soltar una carta en la ranura
+  // equivocada costaba el turno entero y la Biomasa.
+  el.franjaMias.addEventListener('click', () => { if (estado) abrirComprometidas(estado); });
+  el.comprometidasCerrar.addEventListener('click', cerrarHojas);
+  el.comprometidasCuerpo.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-retirar]');
+    if (!b || !interactivo()) return;
+    const iid = Number(b.dataset.retirar);
+    const c = carta(estado.instancias[iid].cardId);
+    if (aplicar({ tipo: ACCION.RETIRAR, jugador: JUGADOR, iid })) {
+      mensaje(`${c.binomial} vuelve a tu mano.`);
+      if (estado.jugadores[JUGADOR].pendientes.length === 0) cerrarHojas();
+      else abrirComprometidas(estado);
+    }
+  });
   el.btnListo.addEventListener('click', alPulsarListo);
   el.btnLog.addEventListener('click', abrirLog);
   el.logCerrar.addEventListener('click', cerrarHojas);

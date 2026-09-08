@@ -28,6 +28,9 @@ export function montar() {
     rHabitat: id('r-habitat'), pHabitat: id('p-habitat'), rBarra: id('r-barra'), pBarra: id('p-barra'),
     turno: id('turno'), estacion: id('btn-estacion'),
     campo: id('campo'), franjaCampo: id('btn-campo'), franjaNota: id('franja-nota'),
+    franjaMias: id('btn-mias'),
+    comprometidas: id('comprometidas'), comprometidasCuerpo: id('comprometidas-cuerpo'),
+    comprometidasCerrar: id('comprometidas-cerrar'),
     mano: id('mano'), mensaje: id('mensaje'),
     btnListo: id('btn-listo'), btnLog: id('btn-log'), btnMute: id('btn-mute'),
     btnAyuda: id('btn-ayuda'), btnAyudaMenu: id('btn-ayuda-menu'),
@@ -217,6 +220,50 @@ function pintarFranja(estado) {
   // arruinaría la información oculta, que es de lo que va el despliegue.
   const n = estado.jugadores[RIVAL].pendientes.length;
   el.franjaNota.textContent = n === 0 ? '' : `rival: ${n} oculta${n === 1 ? '' : 's'}`;
+
+  // Y lo tuyo, que sí puedes deshacer mientras no pulses Listo.
+  const mias = estado.jugadores[JUGADOR].pendientes.length;
+  el.franjaMias.hidden = mias === 0;
+  el.franjaMias.textContent = mias === 1 ? 'tú: 1 comprometida' : `tú: ${mias} comprometidas`;
+}
+
+/** Qué hace cada carta comprometida, dicho como lo diría el jugador. */
+function queHace(estado, p) {
+  const c = carta(estado.instancias[p.iid].cardId);
+  const nombre = (id) => carta(estado.instancias[id].cardId).binomial;
+  switch (p.tipo) {
+    case 'DESPLIEGUE': return `se despliega en la ranura ${p.ranura + 1}`;
+    case 'MOVIMIENTO': return `se mueve a la ranura ${p.ranura + 1}`;
+    case 'CAMPO': return 'se impone como clima';
+    case 'ADAPTACION': return `mejora a ${nombre(p.objetivo)}`;
+    case 'PRESION':
+      if (p.objetivo) return `cae sobre ${nombre(p.objetivo)}`;
+      if (p.clado) return `aprieta a los ${CLADO_NOMBRE[p.clado].toLowerCase()}s rivales`;
+      return c.rasgoNombre;
+    default: return '';
+  }
+}
+
+/**
+ * Lo comprometido este turno, con su marcha atrás. Hasta pulsar Listo nada ha
+ * ocurrido y el rival no ve qué es, así que devolverlo no filtra nada — y sin
+ * esto, soltar una carta en la ranura equivocada costaba el turno entero.
+ */
+export function abrirComprometidas(estado) {
+  const jug = estado.jugadores[JUGADOR];
+  el.comprometidasCuerpo.innerHTML = jug.pendientes.length === 0
+    ? '<p class="desc-vacio">No llevas nada comprometido este turno.</p>'
+    : jug.pendientes.map((p) => {
+      const c = carta(estado.instancias[p.iid].cardId);
+      const dino = c.tipo === TIPO.DINOSAURIO;
+      const gratis = p.tipo === 'MOVIMIENTO';
+      return `<div class="comp-fila">
+        <span class="nom">${dino ? `<i>${c.binomial}</i>` : c.binomial}
+          <span class="que">${queHace(estado, p)}</span></span>
+        <button class="retirar" data-retirar="${p.iid}">Retirar${gratis ? '' : ` · +${c.coste}`}</button>
+      </div>`;
+    }).join('');
+  el.comprometidas.classList.remove('oculta');
 }
 
 // -------------------------------------------------------------------- mano
@@ -398,7 +445,9 @@ export function visorAbierto() {
 
 export function cerrarHojas() {
   cerrarVisor();
-  for (const h of [el.ficha, el.log, el.eleccion, el.ayuda, el.descarte]) h.classList.add('oculta');
+  for (const h of [el.ficha, el.log, el.eleccion, el.ayuda, el.descarte, el.comprometidas]) {
+    h.classList.add('oculta');
+  }
 }
 
 /**

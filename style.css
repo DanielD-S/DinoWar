@@ -467,6 +467,28 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .franja-campo.puesto { color: var(--bio); font-weight: 600; }
 .franja.destino { border-color: var(--bio); background: rgba(208,165,58,.12); }
 .franja-nota { color: var(--tenue); font-size: 10px; flex: 0 0 auto; }
+/* Lo tuyo comprometido: se puede tocar, así que tiene que parecer un botón. */
+.franja-mias {
+  flex: 0 0 auto; font-size: 10px; font-weight: 600; color: var(--propio);
+  border: 1px solid var(--propio-tenue); border-radius: 20px; padding: 3px 8px;
+  white-space: nowrap;
+}
+.franja-mias:active { border-color: var(--propio); }
+
+.comp-fila {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 9px; margin-bottom: 6px; border-radius: 6px;
+  background: var(--panel-alto); border: 1px solid var(--borde); font-size: 13px;
+}
+.comp-fila .nom { flex: 1; min-width: 0; }
+.comp-fila .nom i { font-style: italic; }
+.comp-fila .que { display: block; font-size: 11px; color: var(--tenue); margin-top: 2px; }
+.comp-fila .retirar {
+  flex: 0 0 auto; min-height: 34px; padding: 0 12px; font-size: 12px;
+  border: 1px solid var(--borde); border-radius: var(--radio); color: var(--bio);
+}
+.comp-fila .retirar:active { border-color: var(--bio); }
+.comp-fila .fijo { flex: 0 0 auto; font-size: 11px; color: var(--tenue); }
 
 /* ----------------------------------------------------------------- carta */
 

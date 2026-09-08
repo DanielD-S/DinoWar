@@ -77,6 +77,7 @@
 
       <div class="franja">
         <button id="btn-campo" class="franja-campo">Sin carta de campo</button>
+        <button id="btn-mias" class="franja-mias" hidden></button>
         <span class="franja-nota" id="franja-nota"></span>
       </div>
 
@@ -127,6 +128,14 @@
     <div class="hoja-cuerpo" id="log-cuerpo"></div>
     <button class="hoja-accion" id="btn-rendirse">Rendirse</button>
     <button class="hoja-cerrar" id="log-cerrar">Cerrar</button>
+  </div>
+
+  <div id="comprometidas" class="hoja oculta" role="dialog" aria-modal="true">
+    <h2 class="hoja-titulo">Lo que llevas comprometido</h2>
+    <p class="hoja-texto">Nada de esto ha ocurrido todavía y el rival no ve qué es. Puedes retirarlo
+      hasta que pulses Listo.</p>
+    <div class="hoja-cuerpo" id="comprometidas-cuerpo"></div>
+    <button class="hoja-cerrar" id="comprometidas-cerrar">Cerrar</button>
   </div>
 
   <div id="eleccion" class="hoja oculta" role="dialog" aria-modal="true">
