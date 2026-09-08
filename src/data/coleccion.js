@@ -57,38 +57,38 @@ export const CUOTA = Object.freeze(Object.fromEntries(
 export const COLECCION_COMPLETA = ESCALA.reduce((n, r) => n + CUOTA[r], 0);
 
 /**
- * Cuánto se estrecha cada rareza respecto a lo que pesa en el set. Es el único
- * número a mano de todo esto: lo demás sale de la forma del set.
+ * Cada cuánto sale UNA carta de esta rareza comparada con una legendaria. Es
+ * el único número a mano de todo esto: una común concreta sale ocho veces más
+ * que una legendaria concreta, pase lo que pase con el tamaño del set.
  *
- * Con peso 1 en todas, cada carta saldría con la misma frecuencia y la rareza
- * no significaría nada. Los pesos la inclinan: una común concreta sale unas
- * veinte veces más que una legendaria concreta.
+ * Antes el peso se aplicaba a las COPIAS que cada rareza aporta a la colección,
+ * y eso sólo aguanta mientras los grupos sean parecidos: al entrar treinta y
+ * seis comunes de golpe, las comunes sumaban 123 copias contra 8 de las
+ * legendarias y el reparto por rareza dejaba a éstas en el 0,8 % del sobre, por
+ * debajo de lo que aportan al set. Contando por carta el orden no depende del
+ * tamaño de cada grupo y no se puede romper añadiendo cartas.
  */
 const PESO = Object.freeze({
-  [RAREZA.COMUN]: 3,
-  [RAREZA.RARO]: 2,
-  [RAREZA.EPICO]: 1,
-  [RAREZA.LEGENDARIO]: 0.45,
+  [RAREZA.COMUN]: 8,
+  [RAREZA.RARO]: 4,
+  [RAREZA.EPICO]: 2,
+  [RAREZA.LEGENDARIO]: 1,
 });
 
 /**
  * Probabilidad de que una carta del sobre salga de cada rareza. Suma 1.
  *
- * Sale de la forma del set, no de una tabla escrita a mano, porque escrita a
- * mano estaba al revés: el set son 15 épicas y 8 legendarias frente a 4 comunes
- * y 4 raras, pero los sobres repartían el 88 % entre esas ocho cartas. Es
- * decir, el 88 % de lo que abrías caía sobre el 19 % del set, y las épicas
- * —que son la mitad de la colección— salían el 10 % de las veces.
- *
- * Ahora cada rareza recibe lo que pesa en el set multiplicado por su PESO, así
- * que añadir cartas al set reajusta la tabla sola. Lo que hay que mirar no es
- * este número sino el de por carta, que es el que nota quien abre el sobre.
+ * Sale de cuántas cartas tiene cada rareza por lo que pesa una de ellas, así
+ * que añadir cartas al set reajusta la tabla sola y sin invertir el orden. Lo
+ * que hay que mirar no es este número sino el de por carta, que es el que nota
+ * quien abre el sobre.
  */
 export const PROBABILIDAD = Object.freeze((() => {
-  const bruto = ESCALA.map((r) => CUOTA[r] * PESO[r]);
+  const bruto = ESCALA.map((r) => POR_RAREZA[r].length * PESO[r]);
   const total = bruto.reduce((a, b) => a + b, 0);
   return Object.fromEntries(ESCALA.map((r, i) => [r, bruto[i] / total]));
 })());
+
 
 
 // ------------------------------------------------------------------- sobres

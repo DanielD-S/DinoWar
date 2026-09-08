@@ -85,3 +85,39 @@ revisión viene a arreglar.
 | bosque | Bosque de coníferas ribereño | Clima | Legendaria | 1 | 1 |  |  |  | Bosque de coníferas ribereño | Los saurópodos curan 1 herida al final de cada turno. |  |
 | aridez | Deriva árida | Clima | Legendaria | 1 | 1 |  |  |  | Deriva árida | Ambos jugadores pierden 5 cartas del mazo |  |
 | sabana | Sabana de helechos | Clima | Común | 1 | 1 |  |  |  | Sabana de helechos | Terreno abierto, sin cobertura: +1 al daño contra los biomas. |  |
+| plesiopleurodon | Plesiopleurodon wellesi | Reptil marino | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| ojoraptorsaurus | Ojoraptorsaurus boerei | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| dromaeosaurus | Dromaeosaurus albertensis | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| athenar | Athenar | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| sanjuansaurus | Sanjuansaurus gordilloi | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| suchomimus | Suchomimus tenerensis | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| eosinopteryx | Eosinopteryx brevipenna | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| troodon | Troodon formosus | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| carnotaurus | Carnotaurus sastrei | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| spinosaurus | Spinosaurus aegyptiacus | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| mosasaurus | Mosasaurus hoffmannii | Reptil marino | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| halszkaraptor | Halszkaraptor escuilliei | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| tongtianlong | Tongtianlong limosus | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| scanisaurus | Scanisaurus nazarowi | Reptil marino | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| monolophosaurus | Monolophosaurus jiangi | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| invictarx | Invictarx zephyri | Tireóforo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| medusaceratops | Medusaceratops lokii | Marginocéfalo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| platyceratops | Platyceratops tatarinovi | Marginocéfalo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| loricatosaurus | Loricatosaurus priscus | Tireóforo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| therizinosaurus | Therizinosaurus cheloniformis | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| alaskacephale | Alaskacephale gangloffi | Marginocéfalo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| titanoceratops | Titanoceratops ouranos | Marginocéfalo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| atlasaurus | Atlasaurus imelakei | Saurópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| stegoceras | Stegoceras validum | Marginocéfalo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| maiasaura | Maiasaura peeblesorum | Ornitópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| edmontosaurus | Edmontosaurus annectens | Ornitópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| plateosauravus | Plateosauravus cullingworthi | Saurópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| gargoyleosaurus | Gargoyleosaurus parkpinorum | Tireóforo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| wendiceratops | Wendiceratops pinhornensis | Marginocéfalo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| domeykosaurus | Domeykosaurus chilensis | Saurópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| antarctosaurus | Antarctosaurus wichmannianus | Saurópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| liaoceratops | Liaoceratops yanzigouensis | Marginocéfalo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| rhinorex | Rhinorex condrupus | Ornitópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| bienosaurus | Bienosaurus lufengensis | Tireóforo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| shuangmiaosaurus | Shuangmiaosaurus gilmorei | Ornitópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| chasmosaurus | Chasmosaurus belli | Marginocéfalo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |

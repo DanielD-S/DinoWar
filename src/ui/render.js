@@ -2,7 +2,7 @@
 
 import { BALANCE } from '../data/balance.js';
 import {
-  CARTAS, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, RAREZA_NOMBRE, carta,
+  CARTAS, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, RAREZA_NOMBRE, RASGO, ES_DINOSAURIO, carta,
 } from '../data/cards.js';
 import {
   unidadEn, unidadesDe, ataqueEfectivo, reduccionDe, vidaMaxima, vidaActual,
@@ -453,7 +453,11 @@ function estadoEnJuegoHTML(estado, iid) {
 export function fichaHTML(cardId, iid = null, estado = null) {
   const c = carta(cardId);
   const dino = c.tipo === TIPO.DINOSAURIO;
-  const familia = dino ? `Dinosaurio · ${CLADO_NOMBRE[c.clado]}` : TIPO_NOMBRE[c.tipo];
+  // «Dinosaurio · Reptil marino» no es una familia, es una contradicción: el
+  // tipo de carta y el clado real no siempre coinciden.
+  const familia = !dino ? TIPO_NOMBRE[c.tipo]
+    : ES_DINOSAURIO[c.clado] ? `Dinosaurio · ${CLADO_NOMBRE[c.clado]}`
+      : CLADO_NOMBRE[c.clado];
 
   // La ilustración va de ancho completo y no en un cuadrado al lado del texto:
   // las fotos son apaisadas (proporción 1,5 a 1,8) y en un cuadro 1:1 se les
@@ -478,7 +482,8 @@ export function fichaHTML(cardId, iid = null, estado = null) {
     <div class="ficha-rasgo">
       <h3>${c.rasgoNombre}</h3>
       <p>${c.rasgoTexto}</p>
-      <span class="evidencia ${c.nivel_evidencia}">Evidencia del rasgo: ${c.nivel_evidencia}</span>
+      ${c.rasgo === RASGO.NINGUNO ? ''
+    : `<span class="evidencia ${c.nivel_evidencia}">Evidencia del rasgo: ${c.nivel_evidencia}</span>`}
     </div>
     <p class="ficha-nota">${c.nota_cientifica}</p>`;
 }

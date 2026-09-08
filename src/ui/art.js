@@ -4,6 +4,8 @@
 // más información honesta que la silueta. Ninguna lleva plumas — ningún taxón de
 // este set tiene evidencia tegumentaria que las respalde (§2 de la spec).
 
+import { carta } from '../data/cards.js';
+
 const SILUETAS = {
   // Terópodo grande: cuerpo horizontal, cráneo profundo, cola contrapesada.
   teropodo: `
@@ -140,6 +142,17 @@ const SILUETAS = {
     <path d="M18 46 L22 58 L18 70 L14 58 Z M44 46 L48 62 L44 70 L40 62 Z
              M70 46 L74 56 L70 70 L66 56 Z" opacity=".5"/>
     <path d="M22 58 L40 62 L40 65 L22 61 Z M48 62 L66 56 L66 59 L48 65 Z" opacity=".35"/>`,
+};
+
+/** Silueta por clado, para las cartas que no tienen una propia. */
+const POR_CLADO = {
+  TEROPODO: 'teropodo',
+  SAUROPODO: 'sauropodo',
+  TIREOFORO: 'estegosaurio',
+  ORNITOPODO: 'ornitopodo',
+  MARGINOCEFALO: 'ornitopodo',
+  PTEROSAURIO: 'teropodito',
+  MARINO: 'lago',
 };
 
 const PLAN = {
@@ -301,7 +314,10 @@ export function arte(cardId, color = null) {
     return `<img class="foto" data-carta="${cardId}" src="${rutaFoto(cardId)}" alt=""`
       + `${foco ? ` style="object-position:${foco}"` : ''}>`;
   }
-  const plan = PLAN[cardId] ?? 'teropodo';
+  // Sin entrada propia, la silueta sale del clado: es lo que el plan corporal
+  // dice de verdad. Con «terópodo» de reserva, cualquier carta nueva sin mapear
+  // salía dibujada como un carnívoro bípedo aunque fuese un ceratopsio.
+  const plan = PLAN[cardId] ?? POR_CLADO[carta(cardId)?.clado] ?? 'teropodo';
   const [tono, escala] = TONO[cardId] ?? ['#a89170', 1];
   const relleno = color ?? tono;
   const y = (1 - escala) * 35;

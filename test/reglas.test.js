@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { BALANCE, TOTAL_MAZO } from '../src/data/balance.js';
-import { CARTAS, CLADO, RASGO, TIPO, carta } from '../src/data/cards.js';
+import { CARTAS, CLADO, RASGO, TIPO, ES_DINOSAURIO, carta } from '../src/data/cards.js';
 import {
   crearPartida, FASE, MOTIVO_FIN,
   unidadEn, unidadesDe, ataqueEfectivo, vidaActual, danoEntre,
@@ -667,4 +667,21 @@ test('Un buscador se puede jugar aunque no haya nada que buscar', () => {
 
   assert.deepEqual(buscablesDe(s, 0, 'nodosaurus'), []);
   assert.equal(validar(s, { tipo: ACCION.DESPLEGAR, jugador: 0, iid: nodo, ranura: 0 }), null);
+});
+
+test('Ninguna carta se queda con un rasgo que el motor no conoce', () => {
+  for (const c of Object.values(CARTAS)) {
+    assert.ok(Object.values(RASGO).includes(c.rasgo), `${c.id}: rasgo «${c.rasgo}» no está en RASGO`);
+    assert.ok(c.rasgoNombre && c.rasgoTexto, `${c.id}: le falta nombre o texto de rasgo`);
+  }
+});
+
+test('Todo clado dice si es de dinosaurio, y las cifras nunca son negativas', () => {
+  for (const c of Object.values(CARTAS)) {
+    if (c.tipo !== TIPO.DINOSAURIO) continue;
+    assert.equal(typeof ES_DINOSAURIO[c.clado], 'boolean', `${c.id}: clado «${c.clado}» sin clasificar`);
+    for (const k of ['coste', 'ataque', 'defensa', 'vida']) {
+      assert.ok(Number.isInteger(c[k]) && c[k] >= 0, `${c.id}: ${k} debería ser un entero no negativo`);
+    }
+  }
 });
