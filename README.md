@@ -79,6 +79,12 @@ HTML, CSS y JavaScript vanilla con módulos ES. Sin frameworks, sin dependencias
 CDNs. El arte son siluetas SVG generadas por código y el audio está sintetizado: no hay
 un solo binario en el repositorio.
 
+El arte de las cartas admite ilustración: deja los originales en `src/dinos/`,
+corre `python tools/imagenes.py` y aparecen. Sin ellas se dibujan las siluetas
+generadas por código, que es lo que ve el sitio publicado — las imágenes de
+referencia son de terceros y no viajan en el repositorio (ver
+[assets/LEEME.md](assets/LEEME.md)).
+
 ```
 src/data/      cartas y números de balance — ninguna constante suelta fuera de aquí
 src/engine/    motor de reglas: (estado, acción) → estado. Puro, sin DOM, corre en Node
@@ -86,6 +92,7 @@ src/ui/        interfaz: sólo lee el estado, nunca lo muta. almacen.js es el
                único fichero que toca localStorage
 sim/           simulador de balance y generador del set
 test/          47 tests
+tools/         utilidades de desarrollo, fuera del juego servido
 v1/            versión anterior, jugable y congelada (ver v1/LEEME.md)
 ```
 

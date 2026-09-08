@@ -12,7 +12,7 @@ import {
   fichaHTML, fichaEstacionHTML, ayudaHTML, abrirFicha, abrirDescarte, cerrarHojas,
 } from './ui/render.js';
 import { tomarEntrada, soltarEntrada } from './ui/input.js';
-import { detectarFotos } from './ui/art.js';
+import { detectarFotos, vigilarFotos } from './ui/art.js';
 import { montarMeta, abrirColeccion, abrirSobres, abrirMazos, pintarMenu, recompensar } from './ui/meta.js';
 import { mazoActivo } from './ui/almacen.js';
 import { aListaDeMazo } from './data/coleccion.js';
@@ -354,6 +354,7 @@ function iniciar() {
   montar();
   // Las ilustraciones son opcionales: si están servidas se repinta con ellas,
   // si no, se juega con las siluetas y nadie ve un hueco.
+  vigilarFotos();
   detectarFotos(() => { if (estado) render(estado); });
   pintarRecord();
   irA(APP.MENU);

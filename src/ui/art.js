@@ -206,37 +206,59 @@ const TONO = {
  * @param {string} [color] fuerza el color de relleno (p. ej. el del bando)
  */
 /**
- * Taxones con ilustración de referencia en assets/dinos/. Es material de
- * terceros, así que no viaja en el repositorio (ver assets/LEEME.md): si la
- * carpeta no está, cada carta cae en su silueta SVG y el juego no se entera.
+ * Ilustraciones opcionales. `assets/dinos/indice.json` dice cuáles hay; lo
+ * genera `tools/imagenes.py` a partir de lo que dejes en `src/dinos/`. Esa
+ * carpeta no viaja en el repositorio por licencia (ver assets/LEEME.md), así
+ * que en el sitio publicado el índice no está, la petición falla una vez y
+ * todo se dibuja con las siluetas SVG, que siempre están.
+ *
+ * Vale para CUALQUIER carta, no sólo para los dinosaurios: si algún día hay
+ * arte de un clima, basta con dejarlo en src/dinos/ con el id de la carta.
  */
-const FOTOS = new Set([
-  'allosaurus', 'apatosaurus', 'camarasaurus', 'ceratosaurus', 'diplodocus',
-  'dryosaurus', 'ornitholestes', 'stegosaurus', 'torvosaurus',
-]);
-
-// Empieza en falso: sin comprobar, se dibuja la silueta, que siempre está.
-let fotosOk = false;
+const conFoto = new Set();
 
 export const rutaFoto = (cardId) => `assets/dinos/${cardId}.jpg`;
+export const hayFoto = (cardId) => conFoto.has(cardId);
 
 /**
- * Comprueba UNA vez si las ilustraciones están servidas. Se resuelve siempre,
- * nunca rechaza: no tener fotos no es un error, es el estado por defecto.
- * @param {() => void} [alCambiar] se llama sólo si hay que repintar.
+ * Mira una sola vez qué ilustraciones hay servidas. No rechaza nunca: no tener
+ * ninguna es el estado normal, no un error.
+ * @param {() => void} [alCambiar] se llama sólo si hay algo que repintar.
  */
-export function detectarFotos(alCambiar) {
-  const img = new Image();
-  img.onload = () => { fotosOk = true; if (alCambiar) alCambiar(); };
-  img.onerror = () => { fotosOk = false; };
-  img.src = rutaFoto('allosaurus');
+export async function detectarFotos(alCambiar) {
+  let ids = [];
+  try {
+    const r = await fetch('assets/dinos/indice.json', { cache: 'no-cache' });
+    if (r.ok) ids = await r.json();
+  } catch {
+    ids = [];
+  }
+  if (!Array.isArray(ids) || ids.length === 0) return;
+  for (const id of ids) if (typeof id === 'string') conFoto.add(id);
+  if (alCambiar) alCambiar();
 }
 
-export const hayFoto = (cardId) => fotosOk && FOTOS.has(cardId);
+/**
+ * Una imagen que no carga vuelve a su silueta. Los eventos `error` de <img> no
+ * burbujean, así que se escuchan en captura, y con uno basta para toda la
+ * página: el índice puede quedarse desfasado y ninguna carta se queda en blanco.
+ */
+export function vigilarFotos() {
+  document.addEventListener('error', (e) => {
+    const img = e.target;
+    if (!(img instanceof HTMLImageElement) || !img.dataset.carta) return;
+    const cardId = img.dataset.carta;
+    conFoto.delete(cardId);
+    img.replaceWith(document.createRange().createContextualFragment(arte(cardId)));
+  }, true);
+}
 
 export function arte(cardId, color = null) {
   if (hayFoto(cardId)) {
-    return `<img class="foto" src="${rutaFoto(cardId)}" alt="" loading="lazy">`;
+    // Sin loading="lazy": el juego entero pesa unos 200 KB de ilustración y,
+    // diferida, una imagen que falta no se sustituye por su silueta hasta que
+    // aparece en pantalla, que es justo cuando se nota el hueco.
+    return `<img class="foto" data-carta="${cardId}" src="${rutaFoto(cardId)}" alt="">`;
   }
   const plan = PLAN[cardId] ?? 'teropodo';
   const [tono, escala] = TONO[cardId] ?? ['#a89170', 1];
