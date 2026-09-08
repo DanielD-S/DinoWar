@@ -492,3 +492,58 @@ día interesa un formato corto.
 | V2-3 tablero jugable | ✅ |
 | V2-4 pulido y publicación | ✅ publicado, con la meta encima |
 | V2-5 calibración | 🟡 1 de 25 fuera de banda, documentada en §14.3 |
+
+---
+
+## 15. V2-6 — el rediseño visual
+
+Encargo del autor, resuelto fuera con Claude Design y entregado como paquete de
+referencia (prototipo HTML + memoria de tokens). El motivo declarado: el juego
+«parecía tosco, no parecía un videojuego». No cambia ninguna regla ni ningún
+número: reordena la jerarquía, unifica la paleta y le da presencia física a lo
+que en una mesa es un objeto.
+
+### 15.1 Lo que trae
+
+- Paleta **resina**: un solo acento cálido sobre tierra oscura, en vez de los
+  cuatro colores sueltos (verde propio, naranja trofeo, azul agua, rojo vida)
+  que competían entre sí.
+- **Inter vendorizada**: 48 KB, variable, pesos 300–600. No se trae de un CDN
+  porque el juego no pide nada a terceros; es la misma regla que ya cumplían las
+  ilustraciones y el audio.
+- Una **composición de carta única** para las tres escalas —ranura, mano y
+  lectura—: ventana de arte arriba, coste en círculo sobre ella, nombre y
+  cifras debajo. Lo que cambia entre ellas es el tamaño, nunca el orden.
+
+### 15.2 La clave de estadísticas
+
+Es el cambio funcional del rediseño, no sólo cosmético. Ataque, Defensa y Vida
+eran tres números iguales en fila y no había manera de saber cuál era cuál sin
+abrir la ficha. Ahora llevan **glifo y color fijos en todas las pantallas**: A
+ámbar, D acero, V arcilla. La Vida enseña el máximo sólo cuando hay heridas
+—«5» de sano, «2/6» herido— y la barra de vida desaparece: decía menos que la
+cifra y ocupaba más.
+
+### 15.3 Dos cosas del paquete que no se han portado
+
+- **Las ranuras ocultas del rival.** El prototipo las dibuja con el emblema
+  sobre el motivo de escamas. Enseñar en qué ranura ha desplegado el rival es
+  exactamente la información que el juego oculta a propósito (§13.3): sería
+  regalar la lectura del despliegue. El motivo sí se reutiliza donde no filtra
+  nada — reverso, sobre y pila de mazo.
+- **Las pilas de escritorio de 88×124 px.** El juego es vertical y a 360 px no
+  caben; se usa la ficha reducida de dos capas que el propio paquete describe
+  para móvil.
+
+### 15.4 Fallos que salieron al aplicarlo
+
+- La mano en fila trajo desbordamiento lateral, y con él un fallo nuevo: al
+  desplazarla, el navegador se queda el gesto y manda `pointercancel`, que caía
+  en el mismo camino que un toque y abría una ficha por cada arrastre. Ahora se
+  limpia sin abrir nada.
+- Medir el alto de las ranuras en `vh` desbordaba la pantalla en 360×640, que es
+  la más pequeña que el juego declara soportar. Las filas se reparten el hueco
+  que queda.
+- El tutorial era una cola estricta: un turno 1 sin Biomasa para desplegar lo
+  dejaba parado para siempre en el paso del despliegue. Pasa a ser una lista de
+  pasos pendientes y se enseña el primero que encaje con lo que acaba de pasar.

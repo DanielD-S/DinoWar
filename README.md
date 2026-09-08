@@ -100,8 +100,12 @@ de seguridad para cuando no hay red, nunca una versión vieja servida de tapadil
 ## Cómo está hecho
 
 HTML, CSS y JavaScript vanilla con módulos ES. Sin frameworks, sin dependencias, sin
-CDNs. El arte son siluetas SVG generadas por código y el audio está sintetizado: no hay
-un solo binario en el repositorio.
+CDNs: la tipografía (Inter variable, 48 KB) viaja en el repositorio igual que las
+ilustraciones, y el audio está sintetizado por código.
+
+Las cartas usan una **clave de estadísticas** constante en todas las pantallas —**A**
+Ataque en ámbar, **D** Defensa en acero, **V** Vida en arcilla— y la Vida enseña el
+máximo sólo cuando hay heridas: `5` de sano, `2/6` herido.
 
 El arte de las cartas admite ilustración: deja los originales en `src/dinos/`,
 corre `python tools/imagenes.py` y aparecen en `assets/dinos/`. Las cartas sin

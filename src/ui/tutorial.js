@@ -58,7 +58,7 @@ const PASOS = [
 
 let dom = null;
 let activo = false;
-let indice = 0;
+let pendientes = new Set();
 let esperandoConfirmacion = false;
 // Lo que ha pasado mientras el jugador leía el cartel anterior. Sin esto, un
 // paso que llega tarde se pierde para siempre: el turno 2 sólo ocurre una vez.
@@ -81,7 +81,7 @@ export function tutorialHecho() {
 
 export function empezarTutorial() {
   activo = true;
-  indice = 0;
+  pendientes = new Set(PASOS.map((_, i) => i));
   esperandoConfirmacion = false;
   enEspera = null;
 }
@@ -108,24 +108,33 @@ export const tutorialEspera = () => activo && esperandoConfirmacion;
 export function pasoTutorial(evento, datos = {}) {
   if (!activo) return;
   if (esperandoConfirmacion) { enEspera = { evento, datos }; return; }
-  const paso = PASOS[indice];
-  if (!paso || paso.evento !== evento) return;
-  // El turno es un mínimo, no una igualdad: si el paso del turno 2 se perdió
-  // porque el jugador seguía leyendo, se enseña en el 3 en vez de nunca.
-  if (paso.turno !== undefined && datos.turno < paso.turno) return;
+
+  // No es una cola estricta: es una lista de pasos pendientes y se enseña el
+  // primero que encaje con lo que acaba de pasar. Con una cola, un turno 1 sin
+  // Biomasa para desplegar dejaba el tutorial parado en el paso del despliegue
+  // para siempre; y saltándolo sin más, el paso se perdía aunque el jugador
+  // desplegara en el turno 2. Así ni se atasca ni se pierde.
+  const encaja = (i) => {
+    const x = PASOS[i];
+    return pendientes.has(i) && x.evento === evento
+      && (x.turno === undefined || datos.turno >= x.turno);
+  };
+  const salto = PASOS.findIndex((_, i) => encaja(i));
+  if (salto === -1) return;
+  pendientes.delete(salto);
+  const paso = PASOS[salto];
 
   dom.texto.innerHTML = paso.texto;
   dom.siguiente.textContent = paso.ultimo ? 'Entendido' : 'Siguiente';
   dom.saltar.hidden = !!paso.ultimo;
   dom.panel.classList.remove('oculta');
   esperandoConfirmacion = true;
-  indice += 1;
 }
 
 function ocultar() {
   esperandoConfirmacion = false;
   dom.panel.classList.add('oculta');
-  if (indice >= PASOS.length) { terminarTutorial(); return; }
+  if (pendientes.size === 0) { terminarTutorial(); return; }
   const pendiente = enEspera;
   enEspera = null;
   if (pendiente) pasoTutorial(pendiente.evento, pendiente.datos);
