@@ -55,6 +55,13 @@ const bonusTrofico = (cladoA, cladoB) =>
 
 // ------------------------------------------------------------------- valor
 
+/** Cartas que le quedan a un bando. La vista redacta el mazo rival a un número. */
+function mazoDe(vista, j) {
+  const m = vista.jugadores[j].mazo;
+  return typeof m === 'number' ? m : m.length;
+}
+
+
 /**
  * Qué pasa en una ranura si pongo ahí una carta con estas estadísticas.
  * Incluye el valor DEFENSIVO: tapar una ranura evita que el rival de enfrente
@@ -144,6 +151,14 @@ function valorDeAccion(vista, j, a) {
       } else if (r === RASGO.COMPETENCIA) {
         delta = unidadesDe(vista, contrario).filter((u) => carta(u.cardId).clado === a.clado).length
           * BALANCE.rasgos.competenciaAtaque;
+      } else if (r === RASGO.TRAMPA) {
+        // Vale por lo que acerca al rival al mazo vacío, menos lo que te acerca
+        // a ti. Con los dos mazos llenos casi no vale nada; al final, decide.
+        const restante = mazoDe(vista, contrario);
+        const acerca = BALANCE.rasgos.trampaMazoRival / Math.max(1, restante);
+        const arriesga = BALANCE.rasgos.trampaMazoPropio / Math.max(1, mazoDe(vista, j));
+        delta = (acerca - arriesga) * IA.pesoTrofeo / IA.pesoDano * 3;
+
       } else if (r === RASGO.MORTANDAD) {
         // Sólo interesa si mata a más rivales que propios.
         const mueren = (bando) => unidadesDe(vista, bando)
@@ -183,6 +198,10 @@ function valorDeAccion(vista, j, a) {
       }
       if (r === RASGO.CAMPO_BOSQUE) {
         valor = unidadesDe(vista, j).filter((u) => carta(u.cardId).clado === CLADO.SAUROPODO).length * 0.8;
+      }
+      if (r === RASGO.CAMPO_ARIDEZ) {
+        // Es una carrera: sólo la pone quien va por delante en cartas.
+        valor = (mazoDe(vista, contrario) - mazoDe(vista, j)) * 0.4;
       }
       if (r === RASGO.CAMPO_CANAL) {
         // Lo que de verdad hace: anular la Sequía. Se valora por las heridas

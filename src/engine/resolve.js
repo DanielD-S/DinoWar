@@ -9,7 +9,7 @@ import {
   FASE, MOTIVO_FIN, CAUSA, rival,
   unidadEn, unidadesDe, todasLasUnidades,
   ataqueEfectivo, vidaActual, danoEntre, danoAlHabitat, espinasDe,
-  curacionDe, rentaDe, inmuneSequia, haySequia, hayCrecida, campoEs,
+  curacionDe, rentaDe, inmuneSequia, haySequia, hayCrecida, hayAridez, campoEs,
 } from './state.js';
 
 export function ev(s, tipo, datos = {}) {
@@ -78,6 +78,21 @@ export function golpearHabitat(s, bando, cantidad) {
 
 // -------------------------------------------------------------------- robo
 
+/**
+ * Saca cartas del mazo directas al descarte, sin pasar por la mano. Es lo que
+ * convierte la extinción en una vía que se puede buscar: con 50 cartas y robo
+ * de 1, el mazo por sí solo no se vacía antes del turno 44 y las partidas duran
+ * once. Van al descarte, que es público, así que el rival ve lo que ha perdido.
+ */
+export function perderDelMazo(s, j, n) {
+  const jug = s.jugadores[j];
+  const perdidas = Math.min(n, jug.mazo.length);
+  for (let k = 0; k < perdidas; k++) jug.descarte.push(jug.mazo.shift());
+  if (perdidas > 0) {
+    ev(s, 'MAZO_PERDIDO', { jugador: j, cartas: perdidas, restante: jug.mazo.length });
+  }
+}
+
 export function robar(s, j, n) {
   const jug = s.jugadores[j];
   for (let k = 0; k < n; k++) {
@@ -137,6 +152,10 @@ export function faseRenta(s) {
 }
 
 export function faseRobo(s) {
+  // La aridez muerde antes del robo: lo que se lleva no llega a la mano.
+  if (hayAridez(s)) {
+    for (let j = 0; j < 2; j++) perderDelMazo(s, j, BALANCE.efectosCampo.aridezMazo);
+  }
   for (let j = 0; j < 2; j++) robar(s, j, BALANCE.robo.normal);
   if (s.jugadores.some((j) => j.sinCartas)) {
     finalizar(s, MOTIVO_FIN.EXTINCION);
@@ -231,6 +250,11 @@ function aplicarPresion(s, p) {
       n += 1;
     }
     ev(s, 'PRESION', { jugador: p.jugador, cardId, clado: p.clado, afectados: n });
+
+  } else if (r === RASGO.TRAMPA) {
+    perderDelMazo(s, contrario, BALANCE.rasgos.trampaMazoRival);
+    perderDelMazo(s, p.jugador, BALANCE.rasgos.trampaMazoPropio);
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
 
   } else if (r === RASGO.MORTANDAD) {
     for (const inst of todasLasUnidades(s)) {

@@ -79,6 +79,7 @@ export const RASGO = Object.freeze({
   CRECIMIENTO_ACELERADO: 'CRECIMIENTO_ACELERADO',
   NEUMATICIDAD: 'NEUMATICIDAD',
   // presiones
+  TRAMPA: 'TRAMPA',
   FRACTURA: 'FRACTURA',
   COMPETENCIA: 'COMPETENCIA',
   MORTANDAD: 'MORTANDAD',
@@ -91,6 +92,7 @@ export const RASGO = Object.freeze({
   CAMPO_CANAL: 'CAMPO_CANAL',
   CAMPO_BOSQUE: 'CAMPO_BOSQUE',
   CAMPO_SABANA: 'CAMPO_SABANA',
+  CAMPO_ARIDEZ: 'CAMPO_ARIDEZ',
 });
 
 const dino = (o) => Object.freeze({ tipo: TIPO.DINOSAURIO, ...o });
@@ -166,7 +168,7 @@ export const CARTAS = Object.freeze({
   }),
 
   diplodocus: dino({
-    id: 'diplodocus', rareza: RAREZA.EPICO, clado: CLADO.SAUROPODO,
+    id: 'diplodocus', rareza: RAREZA.LEGENDARIO, clado: CLADO.SAUROPODO,
     binomial: 'Diplodocus carnegii',
     coste: 5, ataque: 3, defensa: 2, vida: 10, consumoHidrico: 3,
     rasgo: RASGO.RAMONEO_BAJO, rasgoNombre: 'Ramoneo bajo',
@@ -253,6 +255,15 @@ export const CARTAS = Object.freeze({
     nota_cientifica: 'La coexistencia de varios saurópodos y de varios terópodos grandes en la misma formación implica reparto de recursos. La partición de nicho está sustentada por el desgaste dental; su intensidad como presión competitiva es una inferencia.',
   }),
 
+  trampa: evento({
+    id: 'trampa', rareza: RAREZA.RARO, binomial: 'Trampa de depredadores', coste: 3,
+    objetivo: OBJETIVO.CAMPO,
+    rasgo: RASGO.TRAMPA, rasgoNombre: 'Trampa de depredadores',
+    rasgoTexto: 'El rival pierde 12 cartas de su mazo. Tú pierdes 3: el fango no distingue.',
+    nivel_evidencia: EVIDENCIA.DEBATIDO,
+    nota_cientifica: 'La cantera Cleveland-Lloyd, en la Morrison de Utah, acumula decenas de individuos de Allosaurus en una proporción de depredadores frente a presas que no se da en un ecosistema vivo. La trampa de depredadores es una de las explicaciones; también se ha propuesto sequía o agua envenenada. El yacimiento es un hecho, su mecanismo no.',
+  }),
+
   mortandad: evento({
     id: 'mortandad', rareza: RAREZA.LEGENDARIO, binomial: 'Mortandad estacional', coste: 3,
     objetivo: OBJETIVO.CAMPO,
@@ -265,7 +276,7 @@ export const CARTAS = Object.freeze({
   // ------------------------------------------------------------- recursos
 
   rebrote: recurso({
-    id: 'rebrote', rareza: RAREZA.COMUN, binomial: 'Rebrote tras incendio',
+    id: 'rebrote', rareza: RAREZA.RARO, binomial: 'Rebrote tras incendio',
     rasgo: RASGO.REBROTE, rasgoNombre: 'Rebrote tras incendio',
     rasgoTexto: '+3 Biomasa ahora mismo. Todos tus dinosaurios reciben 1 herida.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -273,7 +284,7 @@ export const CARTAS = Object.freeze({
   }),
 
   carrona: recurso({
-    id: 'carrona', rareza: RAREZA.RARO, binomial: 'Carroña abundante',
+    id: 'carrona', rareza: RAREZA.EPICO, binomial: 'Carroña abundante',
     rasgo: RASGO.CARRONA, rasgoNombre: 'Carroña abundante',
     rasgoTexto: '+3 Biomasa ahora mismo. El rival gana 1 Biomasa.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -281,7 +292,7 @@ export const CARTAS = Object.freeze({
   }),
 
   lago: recurso({
-    id: 'lago', rareza: RAREZA.RARO, binomial: 'Lago efímero',
+    id: 'lago', rareza: RAREZA.EPICO, binomial: 'Lago efímero',
     rasgo: RASGO.LAGO, rasgoNombre: 'Lago efímero',
     rasgoTexto: '+2 Biomasa ahora mismo. Tu habitat pierde 1.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -299,7 +310,7 @@ export const CARTAS = Object.freeze({
   }),
 
   canal: clima({
-    id: 'canal', rareza: RAREZA.EPICO, binomial: 'Canal fluvial trenzado',
+    id: 'canal', rareza: RAREZA.LEGENDARIO, binomial: 'Canal fluvial trenzado',
     rasgo: RASGO.CAMPO_CANAL, rasgoNombre: 'Canal fluvial trenzado',
     rasgoTexto: 'Agua permanente: la Sequía estacional no mata a nadie.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -307,11 +318,19 @@ export const CARTAS = Object.freeze({
   }),
 
   bosque: clima({
-    id: 'bosque', rareza: RAREZA.EPICO, binomial: 'Bosque de coníferas ribereño',
+    id: 'bosque', rareza: RAREZA.LEGENDARIO, binomial: 'Bosque de coníferas ribereño',
     rasgo: RASGO.CAMPO_BOSQUE, rasgoNombre: 'Bosque de coníferas ribereño',
     rasgoTexto: 'Los saurópodos curan 1 herida al final de cada turno.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Los bosques de coníferas ribereños ofrecen ramoneo alto sostenido, el estrato del que dependen los saurópodos de cuello elevado.',
+  }),
+
+  aridez: clima({
+    id: 'aridez', rareza: RAREZA.EPICO, binomial: 'Deriva árida',
+    rasgo: RASGO.CAMPO_ARIDEZ, rasgoNombre: 'Deriva árida',
+    rasgoTexto: 'Cada turno, los dos bandos pierden 5 cartas del mazo.',
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: 'Los paleosuelos calcáreos, las evaporitas y los depósitos eólicos de la Morrison documentan un clima semiárido y muy estacional que se acentúa hacia el techo de la formación. Que esa deriva mermara las poblaciones es una inferencia razonable, no una medida.',
   }),
 
   sabana: clima({

@@ -218,6 +218,9 @@ export function danoAlHabitat(state, iid) {
   return ataqueEfectivo(state, iid) + extra;
 }
 
+/** La deriva árida muerde el mazo de los dos bandos mientras siga en el campo. */
+export const hayAridez = (state) => campoEs(state, RASGO.CAMPO_ARIDEZ);
+
 /** Biomasa que le toca a cada bando este turno. */
 export function rentaDe(state) {
   const base = Math.min(state.turno * BALANCE.rentaPorTurno, BALANCE.rentaTope);

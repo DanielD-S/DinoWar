@@ -12,6 +12,7 @@ import {
   fichaHTML, fichaEstacionHTML, ayudaHTML, abrirFicha, abrirDescarte, cerrarHojas,
 } from './ui/render.js';
 import { tomarEntrada, soltarEntrada } from './ui/input.js';
+import { detectarFotos } from './ui/art.js';
 import { animarCombate, cancelarAnimaciones, esperar, lineasDeLog } from './ui/animate.js';
 import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio } from './ui/audio.js';
 
@@ -340,6 +341,9 @@ function bucleDebug() {
 
 function iniciar() {
   montar();
+  // Las ilustraciones son opcionales: si están servidas se repinta con ellas,
+  // si no, se juega con las siluetas y nadie ve un hueco.
+  detectarFotos(() => { if (estado) render(estado); });
   pintarRecord();
   irA(APP.MENU);
 

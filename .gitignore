@@ -12,3 +12,7 @@ desktop.ini
 .vscode/
 .idea/
 *.swp
+
+# Ilustraciones de referencia (material de terceros, ver assets/LEEME.md)
+assets/dinos/
+src/dinos/

@@ -279,6 +279,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
 .c-arte svg { width: 100%; height: 100%; padding: 2px; }
+/* La foto recorta y llena: en una carta de 56px la silueta pierde y la
+   ilustración gana, porque el clado se reconoce de un vistazo. */
+.c-arte .foto { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 .c-nombre {
   font-size: 7px; line-height: 1.1; text-align: center; font-style: italic; flex: 0 0 auto;
@@ -386,6 +389,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .ficha-cab { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px; }
 .ficha-arte { width: 74px; height: 74px; flex: 0 0 auto; background: var(--panel-alto); border-radius: var(--radio); padding: 6px; }
 .ficha-arte svg { width: 100%; height: 100%; }
+.ficha-arte { overflow: hidden; }
+.ficha-arte .foto { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; display: block; }
+.ficha-arte:has(.foto) { padding: 0; }
 .ficha-binomial { font-style: italic; font-size: 17px; line-height: 1.15; }
 .ficha-binomial.recto { font-style: normal; color: var(--bio); }
 .ficha-clado { font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: var(--tenue); margin-top: 3px; }

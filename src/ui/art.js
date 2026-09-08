@@ -103,6 +103,43 @@ const SILUETAS = {
              C76 44 80 40 80 35 C80 30 76 26 70 26 C66 26 63 28 61 31 L33 31
              C31 28 28 26 24 26 Z"/>
     <path d="M84 14 L90 22 L84 30 L88 22 Z M84 40 L92 48 L84 56 L89 48 Z"/>`,
+  // Rebrote tras incendio: la llama y el brote que la sigue.
+  rebrote: `
+    <path d="M32 12 C38 24 46 30 46 40 C46 50 40 57 32 57 C24 57 18 50 18 40
+             C18 33 23 28 27 21 C28 29 31 32 32 37 C36 30 34 20 32 12 Z" opacity=".75"/>
+    <path d="M70 66 L70 38 L74 38 L74 66 Z"/>
+    <path d="M72 42 C66 42 60 38 58 31 C66 31 71 35 72 42 Z" opacity=".85"/>
+    <path d="M72 50 C78 50 84 46 86 39 C78 39 73 43 72 50 Z" opacity=".6"/>`,
+  // Carroña: costillar expuesto y un hueso ya desprendido.
+  carrona: `
+    <path d="M22 16 C18 16 16 20 18 23 L22 27 L22 58 C22 62 26 64 29 62
+             C31 60 31 57 29 55 L27 53 L27 24 C29 22 29 18 26 16 Z"/>
+    <path d="M30 26 C40 28 50 33 58 40 L55 44 C47 38 38 33 29 31 Z" opacity=".8"/>
+    <path d="M30 38 C40 40 50 45 58 52 L55 56 C47 50 38 45 29 43 Z" opacity=".6"/>
+    <path d="M66 18 C62 18 60 22 63 25 L78 33 C81 35 85 32 83 28 C86 25 82 20 78 22 Z" opacity=".5"/>`,
+  // Lago efímero: lámina de agua y la costra salina que deja al secarse.
+  lago: `
+    <path d="M14 32 C24 24 40 22 52 26 C64 30 78 30 88 26 L88 38
+             C78 44 64 44 52 40 C40 36 24 38 14 44 Z"/>
+    <path d="M12 54 L34 54 L34 57 L12 57 Z M40 54 L62 54 L62 57 L40 57 Z
+             M68 54 L90 54 L90 57 L68 57 Z" opacity=".45"/>
+    <path d="M12 62 L28 62 L28 65 L12 65 Z M34 62 L56 62 L56 65 L34 65 Z
+             M62 62 L88 62 L88 65 L62 65 Z" opacity=".3"/>`,
+  // Trampa de depredadores: el fango se traga a lo que entró a comer.
+  trampa: `
+    <path d="M4 46 C20 41 32 48 50 46 C68 44 80 51 96 46 L96 70 L4 70 Z" opacity=".85"/>
+    <path d="M28 48 L28 22 L33 22 L33 48 Z M41 48 L41 15 L46 15 L46 48 Z" opacity=".55"/>
+    <path d="M58 48 L58 27 L63 27 L63 48 Z" opacity=".4"/>
+    <path d="M38 8 C34 8 32 12 35 15 L50 22 C53 24 57 21 55 17 C58 14 54 9 50 11 Z" opacity=".5"/>`,
+  // Deriva árida: el suelo que se agrieta y el sol que no afloja.
+  aridez: `
+    <circle cx="76" cy="18" r="10" opacity=".8"/>
+    <path d="M76 2 L79 9 L73 9 Z M76 34 L79 27 L73 27 Z M59 18 L66 15 L66 21 Z
+             M93 18 L86 15 L86 21 Z" opacity=".55"/>
+    <path d="M4 42 L96 42 L96 46 L4 46 Z" opacity=".9"/>
+    <path d="M18 46 L22 58 L18 70 L14 58 Z M44 46 L48 62 L44 70 L40 62 Z
+             M70 46 L74 56 L70 70 L66 56 Z" opacity=".5"/>
+    <path d="M22 58 L40 62 L40 65 L22 61 Z M48 62 L66 56 L66 59 L48 65 Z" opacity=".35"/>`,
 };
 
 const PLAN = {
@@ -126,6 +163,11 @@ const PLAN = {
   canal: 'canal',
   bosque: 'bosque',
   sabana: 'sabana',
+  rebrote: 'rebrote',
+  carrona: 'carrona',
+  lago: 'lago',
+  trampa: 'trampa',
+  aridez: 'aridez',
 };
 
 // Tono por carta: distingue especies del mismo plan corporal sin inventar
@@ -151,6 +193,11 @@ const TONO = {
   canal: ['#3f7d8c', 1],
   bosque: ['#4e7a4a', 1],
   sabana: ['#a08243', 1],
+  rebrote: ['#c9793a', 1],
+  carrona: ['#b09a76', 1],
+  lago: ['#4d8a9c', 1],
+  trampa: ['#7a5f42', 1],
+  aridez: ['#c2a04e', 1],
 };
 
 /**
@@ -158,7 +205,39 @@ const TONO = {
  * @param {string} cardId
  * @param {string} [color] fuerza el color de relleno (p. ej. el del bando)
  */
+/**
+ * Taxones con ilustración de referencia en assets/dinos/. Es material de
+ * terceros, así que no viaja en el repositorio (ver assets/LEEME.md): si la
+ * carpeta no está, cada carta cae en su silueta SVG y el juego no se entera.
+ */
+const FOTOS = new Set([
+  'allosaurus', 'apatosaurus', 'camarasaurus', 'ceratosaurus', 'diplodocus',
+  'dryosaurus', 'ornitholestes', 'stegosaurus', 'torvosaurus',
+]);
+
+// Empieza en falso: sin comprobar, se dibuja la silueta, que siempre está.
+let fotosOk = false;
+
+export const rutaFoto = (cardId) => `assets/dinos/${cardId}.jpg`;
+
+/**
+ * Comprueba UNA vez si las ilustraciones están servidas. Se resuelve siempre,
+ * nunca rechaza: no tener fotos no es un error, es el estado por defecto.
+ * @param {() => void} [alCambiar] se llama sólo si hay que repintar.
+ */
+export function detectarFotos(alCambiar) {
+  const img = new Image();
+  img.onload = () => { fotosOk = true; if (alCambiar) alCambiar(); };
+  img.onerror = () => { fotosOk = false; };
+  img.src = rutaFoto('allosaurus');
+}
+
+export const hayFoto = (cardId) => fotosOk && FOTOS.has(cardId);
+
 export function arte(cardId, color = null) {
+  if (hayFoto(cardId)) {
+    return `<img class="foto" src="${rutaFoto(cardId)}" alt="" loading="lazy">`;
+  }
   const plan = PLAN[cardId] ?? 'teropodo';
   const [tono, escala] = TONO[cardId] ?? ['#a89170', 1];
   const relleno = color ?? tono;

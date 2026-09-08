@@ -7,7 +7,7 @@
 > **Sed**: heridas que recibe cuando sale *Sequía estacional*. **No es un
 > segundo coste**: no se paga al jugarla, sólo cuando el clima lo cobra.
 
-Mazo fijo de **50 cartas**: 19 dinosaurios, 13 eventos, 9 de recurso y 9 de clima.
+Mazo fijo de **50 cartas**: 18 dinosaurios, 16 eventos, 7 de recurso y 9 de clima.
 
 **Qué revisar sobre todo:** los eventos de presión —Fractura consolidada,
 Competencia trófica y Mortandad estacional— y las tres cartas de recurso.
@@ -25,10 +25,10 @@ el registro, es legendario.
 
 | Rareza | Copias por carta | Cartas distintas | Copias en el mazo |
 |---|---|---|---|
-| Común | 3 | 5 | 15 |
+| Común | 3 | 4 | 12 |
 | Rara | 3 | 3 | 9 |
 | Épica | 2 | 11 | 22 |
-| Legendaria | 1 | 4 | 4 |
+| Legendaria | 1 | 7 | 7 |
 
 ---
 
@@ -42,7 +42,7 @@ el registro, es legendario.
 | *Stegosaurus stenops* | Tireóforo | Épica | 2 | 4 | 3 | 3 | 6 | 1 |
 | *Allosaurus fragilis* | Terópodo | Épica | 2 | 5 | 6 | 1 | 5 | 1 |
 | *Camarasaurus grandis* | Saurópodo | Épica | 2 | 5 | 3 | 2 | 7 | 2 |
-| *Diplodocus carnegii* | Saurópodo | Épica | 2 | 5 | 3 | 2 | 10 | 3 |
+| *Diplodocus carnegii* | Saurópodo | Legendaria | 1 | 5 | 3 | 2 | 10 | 3 |
 | *Apatosaurus louisae* | Saurópodo | Legendaria | 1 | 7 | 4 | 3 | 12 | 3 |
 | *Torvosaurus tanneri* | Terópodo | Legendaria | 1 | 7 | 8 | 1 | 6 | 2 |
 
@@ -108,7 +108,7 @@ el registro, es legendario.
 
 *Por qué 2 de Defensa:* Talla adulta de ~15 t como defensa antipredatoria.
 
-### *Diplodocus carnegii* · Saurópodo · Épica · 2 copias
+### *Diplodocus carnegii* · Saurópodo · Legendaria · 1 copia
 
 **5 de coste · 3 de Ataque · 10 de Vida** · Defensa propuesta: *2*
 
@@ -184,6 +184,12 @@ Se juega **sobre un clado rival que eliges**. −2 Poder a todos los dinosaurios
 
 `INFERIDO` · La coexistencia de varios saurópodos y de varios terópodos grandes en la misma formación implica reparto de recursos. La partición de nicho está sustentada por el desgaste dental; su intensidad como presión competitiva es una inferencia.
 
+### Trampa de depredadores · Rara · coste 3 · 3 copias
+
+Se juega **sobre el campo entero**. El rival pierde 12 cartas de su mazo. Tú pierdes 3: el fango no distingue.
+
+`DEBATIDO` · La cantera Cleveland-Lloyd, en la Morrison de Utah, acumula decenas de individuos de Allosaurus en una proporción de depredadores frente a presas que no se da en un ecosistema vivo. La trampa de depredadores es una de las explicaciones; también se ha propuesto sequía o agua envenenada. El yacimiento es un hecho, su mecanismo no.
+
 ### Mortandad estacional · Legendaria · coste 3 · 1 copia
 
 Se juega **sobre el campo entero**. 2 de daño a TODOS los dinosaurios del campo, incluidos los tuyos.
@@ -226,6 +232,12 @@ El objetivo cura 1 herida al final de cada turno.
 
 `INFERIDO` · La coexistencia de varios saurópodos y de varios terópodos grandes en la misma formación implica reparto de recursos. La partición de nicho está sustentada por el desgaste dental; su intensidad como presión competitiva es una inferencia.
 
+### Trampa de depredadores · Rara · coste 3 · 3 copias
+
+El rival pierde 12 cartas de su mazo. Tú pierdes 3: el fango no distingue.
+
+`DEBATIDO` · La cantera Cleveland-Lloyd, en la Morrison de Utah, acumula decenas de individuos de Allosaurus en una proporción de depredadores frente a presas que no se da en un ecosistema vivo. La trampa de depredadores es una de las explicaciones; también se ha propuesto sequía o agua envenenada. El yacimiento es un hecho, su mecanismo no.
+
 ### Mortandad estacional · Legendaria · coste 3 · 1 copia
 
 2 de daño a TODOS los dinosaurios del campo, incluidos los tuyos.
@@ -240,19 +252,19 @@ Se juegan **boca arriba y surten efecto al instante**: dar Biomasa «este
 turno» no serviría de nada si esperasen a la revelación. A cambio el rival los
 ve venir, y eso es parte de su precio. Cuestan 0 y todos traen inconveniente.
 
-### Rebrote tras incendio · Común · 3 copias
+### Rebrote tras incendio · Rara · 3 copias
 
 +3 Biomasa ahora mismo. Todos tus dinosaurios reciben 1 herida.
 
 `INFERIDO` · Los sedimentos de la Morrison contienen fusaíta —carbón vegetal fósil—, prueba directa de incendios recurrentes. El rebrote nutritivo posterior se infiere por analogía con sabanas actuales, no está medido en el registro.
 
-### Carroña abundante · Rara · 3 copias
+### Carroña abundante · Épica · 2 copias
 
 +3 Biomasa ahora mismo. El rival gana 1 Biomasa.
 
 `INFERIDO` · Marcas de mordida y dientes desprendidos de terópodo asociados a esqueletos de saurópodo indican consumo de carroña. Un cadáver grande alimenta a más de un carroñero, y no sólo al que llegó primero.
 
-### Lago efímero · Rara · 3 copias
+### Lago efímero · Épica · 2 copias
 
 +2 Biomasa ahora mismo. Tu habitat pierde 1.
 
@@ -271,17 +283,23 @@ cualquiera de los dos bandos puede reemplazarla, y su efecto alcanza a los dos.
 
 `ESTABLECIDO` · Las llanuras de inundación de la Morrison concentran la mayor productividad vegetal estacional de la formación.
 
-### Canal fluvial trenzado · Épica · coste 2
+### Canal fluvial trenzado · Legendaria · coste 2
 
 Agua permanente: la Sequía estacional no mata a nadie.
 
 `ESTABLECIDO` · Los sistemas fluviales trenzados de la formación mantienen agua durante la estación seca, con vegetación ribereña estrecha a ambos lados.
 
-### Bosque de coníferas ribereño · Épica · coste 2
+### Bosque de coníferas ribereño · Legendaria · coste 2
 
 Los saurópodos curan 1 herida al final de cada turno.
 
 `ESTABLECIDO` · Los bosques de coníferas ribereños ofrecen ramoneo alto sostenido, el estrato del que dependen los saurópodos de cuello elevado.
+
+### Deriva árida · Épica · coste 2
+
+Cada turno, los dos bandos pierden 5 cartas del mazo.
+
+`INFERIDO` · Los paleosuelos calcáreos, las evaporitas y los depósitos eólicos de la Morrison documentan un clima semiárido y muy estacional que se acentúa hacia el techo de la formación. Que esa deriva mermara las poblaciones es una inferencia razonable, no una medida.
 
 ### Sabana de helechos · Común · coste 2
 

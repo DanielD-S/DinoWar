@@ -64,6 +64,8 @@ export const BALANCE = Object.freeze({
     fracturaAtaque: 2,
     competenciaAtaque: 2,
     mortandadDano: 2,
+    trampaMazoRival: 12,
+    trampaMazoPropio: 3,
   }),
 
   // Cartas de recurso: Biomasa inmediata con inconveniente. Atacan el atasco de mano,
@@ -78,6 +80,7 @@ export const BALANCE = Object.freeze({
   }),
 
   efectosCampo: Object.freeze({
+    aridezMazo: 5,
     llanuraBiomasa: 1,
     bosqueCura: 1,
     sabanaDanoHabitat: 1,
