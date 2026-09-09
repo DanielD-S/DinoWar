@@ -31,6 +31,26 @@
       "sentido": "Vida con otro del mismo clado"
     },
     {
+      "rasgo": "ENTRADA_ALERTA",
+      "nombre": "Alerta",
+      "cartas": 1,
+      "quienes": "Troodon formosus",
+      "texto": "Al entrar en juego, robas 1 carta.",
+      "constante": "entradas.alertaRoba",
+      "valor": 1,
+      "sentido": "cartas que robas al entrar"
+    },
+    {
+      "rasgo": "ENTRADA_ARRASA",
+      "nombre": "Arrasa la ribera",
+      "cartas": 1,
+      "quienes": "Spinosaurus aegyptiacus",
+      "texto": "Al entrar en juego, 3 de daño al hábitat rival.",
+      "constante": "entradas.arrasaHabitat",
+      "valor": 3,
+      "sentido": "de daño al hábitat rival, al entrar"
+    },
+    {
       "rasgo": "CAMPO_BOSQUE",
       "nombre": "Bosque de coníferas ribereño",
       "cartas": 1,
@@ -71,6 +91,16 @@
       "sentido": "Ataque si hay bastantes copias en el campo"
     },
     {
+      "rasgo": "ENTRADA_MANADA_SANA",
+      "nombre": "Cierra la formación",
+      "cartas": 1,
+      "quienes": "Gargoyleosaurus parkpinorum",
+      "texto": "Al entrar en juego, tus otros dinosaurios curan 2 heridas.",
+      "constante": "entradas.manadaSanaCura",
+      "valor": 2,
+      "sentido": "heridas que curan tus OTROS dinosaurios"
+    },
+    {
       "rasgo": "COMPETENCIA",
       "nombre": "Competencia trófica",
       "cartas": 1,
@@ -109,6 +139,26 @@
       "constante": "",
       "valor": "",
       "sentido": "no lleva número: es una regla, no una cifra"
+    },
+    {
+      "rasgo": "ENTRADA_DEVORA_MAZO",
+      "nombre": "Devora el registro",
+      "cartas": 1,
+      "quienes": "Mosasaurus hoffmannii",
+      "texto": "Al entrar en juego, el rival pierde 3 cartas de su mazo.",
+      "constante": "entradas.devoraMazo",
+      "valor": 3,
+      "sentido": "cartas de mazo que pierde el rival"
+    },
+    {
+      "rasgo": "ENTRADA_EMBOSCADA",
+      "nombre": "Emboscada",
+      "cartas": 1,
+      "quienes": "Dromaeosaurus albertensis",
+      "texto": "Al entrar en juego, hace 3 de daño al dinosaurio que tenga enfrente.",
+      "constante": "entradas.emboscadaDano",
+      "valor": 3,
+      "sentido": "de daño al que tenga enfrente, al entrar"
     },
     {
       "rasgo": "FRACTURA",
@@ -229,6 +279,16 @@
       "constante": "rasgos.oportunistaVidaPorMuerte",
       "valor": 1,
       "sentido": "Vida permanente por cada muerte"
+    },
+    {
+      "rasgo": "ENTRADA_RAMONEO",
+      "nombre": "Ramoneo alto",
+      "cartas": 1,
+      "quienes": "Atlasaurus imelakei",
+      "texto": "Al entrar en juego, ganas 2 de Biomasa.",
+      "constante": "entradas.ramoneoBiomasa",
+      "valor": 2,
+      "sentido": "Biomasa que ganas al entrar"
     },
     {
       "rasgo": "RAMONEO_BAJO",

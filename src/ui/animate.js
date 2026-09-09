@@ -213,6 +213,18 @@ export function lineasDeLog(eventos) {
       case 'AVANCE':
         push(`Ranura ${e.ranura + 1} sin defensa: <b>${e.dano}</b> al hábitat`, e.bando);
         break;
+      case 'ENTRADA': {
+        const q = {
+          roba: `roba ${e.n} carta${e.n === 1 ? '' : 's'}`,
+          emboscada: e.n > 0 ? `embosca: <b>${e.n}</b> de daño al de enfrente` : 'embosca, pero no hay nadie enfrente',
+          cura: e.n > 0 ? `cura ${e.n} de los tuyos` : 'cura, pero nadie estaba herido',
+          muele: `el rival pierde <b>${e.n}</b> del mazo`,
+          biomasa: `+${e.n} de Biomasa`,
+          habitat: `<b>${e.n}</b> al hábitat rival`,
+        }[e.efecto] ?? 'hace su efecto';
+        push(`<i>${carta(e.cardId).binomial}</i> entra en juego: ${q}`, e.dueno);
+        break;
+      }
       case 'MUERTE':
         push(`Muere <i>${carta(e.cardId).binomial}</i> de <b>${e.dueno === JUGADOR ? 'los tuyos' : 'el rival'}</b> ${CAUSA_TEXTO[e.causa] ?? ''}`, e.dueno);
         break;

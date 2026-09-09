@@ -40,6 +40,13 @@ const NUMERO_DE = {
   [RASGO.MORTANDAD]: ['rasgos.mortandadDano', 'de daño a TODOS, incluidos los tuyos'],
   [RASGO.TRAMPA]: ['rasgos.trampaMazoRival', 'cartas que pierde el rival'],
   [RASGO.GREGARISMO]: ['rasgos.gregarismoAtaque', 'Ataque a toda la especie'],
+  // Habilidades al entrar en juego. Se disparan una vez y se acabó.
+  [RASGO.ENTRADA_ALERTA]: ['entradas.alertaRoba', 'cartas que robas al entrar'],
+  [RASGO.ENTRADA_EMBOSCADA]: ['entradas.emboscadaDano', 'de daño al que tenga enfrente, al entrar'],
+  [RASGO.ENTRADA_MANADA_SANA]: ['entradas.manadaSanaCura', 'heridas que curan tus OTROS dinosaurios'],
+  [RASGO.ENTRADA_DEVORA_MAZO]: ['entradas.devoraMazo', 'cartas de mazo que pierde el rival'],
+  [RASGO.ENTRADA_RAMONEO]: ['entradas.ramoneoBiomasa', 'Biomasa que ganas al entrar'],
+  [RASGO.ENTRADA_ARRASA]: ['entradas.arrasaHabitat', 'de daño al hábitat rival, al entrar'],
   [RASGO.CAMPO_LLANURA]: ['efectosCampo.llanuraReciclaPorTurno', 'cambio de carta por turno y jugador'],
   [RASGO.CAMPO_CANAL]: ['efectosCampo.canalVida', 'Vida a todos los del campo'],
   [RASGO.CAMPO_BOSQUE]: ['efectosCampo.bosqueCura', 'heridas que curan los saurópodos'],

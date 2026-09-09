@@ -100,15 +100,15 @@ revisión viene a arreglar.
 | sabana | Sabana de helechos | Clima | Común | 1 | 1 |  |  | Sabana de helechos | +1 de Biomasa cada turno para los dos jugadores, mientras siga en el campo. |  |
 | plesiopleurodon | Plesiopleurodon wellesi | Reptil marino | Épica | 3 | 3 | 9 | 6 | Sin rasgo | Todavía no hace nada especial. |  |
 | ojoraptorsaurus | Ojoraptorsaurus boerei | Terópodo | Rara | 2 | 2 | 4 | 5 | Sin rasgo | Todavía no hace nada especial. |  |
-| dromaeosaurus | Dromaeosaurus albertensis | Terópodo | Común | 2 | 2 | 5 | 4 | Sin rasgo | Todavía no hace nada especial. |  |
+| dromaeosaurus | Dromaeosaurus albertensis | Terópodo | Común | 2 | 2 | 5 | 4 | Emboscada | Al entrar en juego, hace 3 de daño al dinosaurio que tenga enfrente. |  |
 | athenar | Athenar bermani | Saurópodo | Común | 2 | 2 | 2 | 7 | Sin rasgo | Todavía no hace nada especial. |  |
 | sanjuansaurus | Sanjuansaurus gordilloi | Terópodo | Rara | 2 | 2 | 5 | 4 | Sin rasgo | Todavía no hace nada especial. |  |
 | suchomimus | Suchomimus tenerensis | Terópodo | Épica | 3 | 3 | 8 | 7 | Sin rasgo | Todavía no hace nada especial. |  |
 | eosinopteryx | Eosinopteryx brevipenna | Terópodo | Común | 1 | 1 | 2 | 2 | Sin rasgo | Todavía no hace nada especial. |  |
-| troodon | Troodon formosus | Terópodo | Común | 2 | 2 | 4 | 5 | Sin rasgo | Todavía no hace nada especial. |  |
+| troodon | Troodon formosus | Terópodo | Común | 2 | 2 | 4 | 5 | Alerta | Al entrar en juego, robas 1 carta. |  |
 | carnotaurus | Carnotaurus sastrei | Terópodo | Épica | 3 | 3 | 9 | 6 | Sin rasgo | Todavía no hace nada especial. |  |
-| spinosaurus | Spinosaurus aegyptiacus | Terópodo | Legendaria | 4 | 4 | 11 | 11 | Sin rasgo | Todavía no hace nada especial. |  |
-| mosasaurus | Mosasaurus hoffmannii | Reptil marino | Legendaria | 4 | 4 | 12 | 10 | Sin rasgo | Todavía no hace nada especial. |  |
+| spinosaurus | Spinosaurus aegyptiacus | Terópodo | Legendaria | 4 | 4 | 11 | 11 | Arrasa la ribera | Al entrar en juego, 3 de daño al hábitat rival. |  |
+| mosasaurus | Mosasaurus hoffmannii | Reptil marino | Legendaria | 4 | 4 | 12 | 10 | Devora el registro | Al entrar en juego, el rival pierde 3 cartas de su mazo. |  |
 | halszkaraptor | Halszkaraptor escuilliei | Terópodo | Común | 1 | 1 | 2 | 2 | Sin rasgo | Todavía no hace nada especial. |  |
 | tongtianlong | Tongtianlong limosus | Terópodo | Común | 1 | 1 | 1 | 3 | Sin rasgo | Todavía no hace nada especial. |  |
 | scanisaurus | Scanisaurus nazarowi | Reptil marino | Rara | 2 | 2 | 4 | 5 | Sin rasgo | Todavía no hace nada especial. |  |
@@ -120,12 +120,12 @@ revisión viene a arreglar.
 | therizinosaurus | Therizinosaurus cheloniformis | Terópodo | Épica | 3 | 3 | 6 | 9 | Sin rasgo | Todavía no hace nada especial. |  |
 | alaskacephale | Alaskacephale gangloffi | Marginocéfalo | Rara | 2 | 2 | 3 | 6 | Sin rasgo | Todavía no hace nada especial. |  |
 | titanoceratops | Titanoceratops ouranos | Marginocéfalo | Épica | 3 | 3 | 6 | 9 | Sin rasgo | Todavía no hace nada especial. |  |
-| atlasaurus | Atlasaurus imelakei | Saurópodo | Épica | 3 | 3 | 3 | 12 | Sin rasgo | Todavía no hace nada especial. |  |
+| atlasaurus | Atlasaurus imelakei | Saurópodo | Épica | 3 | 3 | 3 | 12 | Ramoneo alto | Al entrar en juego, ganas 2 de Biomasa. |  |
 | stegoceras | Stegoceras validum | Marginocéfalo | Común | 2 | 2 | 3 | 6 | Sin rasgo | Todavía no hace nada especial. |  |
 | maiasaura | Maiasaura peeblesorum | Ornitópodo | Épica | 3 | 3 | 4 | 11 | Sin rasgo | Todavía no hace nada especial. |  |
 | edmontosaurus | Edmontosaurus annectens | Ornitópodo | Legendaria | 4 | 4 | 5 | 17 | Sin rasgo | Todavía no hace nada especial. |  |
 | plateosauravus | Plateosauravus cullingworthi | Saurópodo | Común | 2 | 2 | 2 | 7 | Sin rasgo | Todavía no hace nada especial. |  |
-| gargoyleosaurus | Gargoyleosaurus parkpinorum | Tireóforo | Rara | 2 | 2 | 2 | 7 | Sin rasgo | Todavía no hace nada especial. |  |
+| gargoyleosaurus | Gargoyleosaurus parkpinorum | Tireóforo | Rara | 2 | 2 | 2 | 7 | Cierra la formación | Al entrar en juego, tus otros dinosaurios curan 2 heridas. |  |
 | wendiceratops | Wendiceratops pinhornensis | Marginocéfalo | Épica | 3 | 3 | 5 | 10 | Sin rasgo | Todavía no hace nada especial. |  |
 | antarctosaurus | Antarctosaurus wichmannianus | Saurópodo | Legendaria | 4 | 4 | 4 | 18 | Sin rasgo | Todavía no hace nada especial. |  |
 | liaoceratops | Liaoceratops yanzigouensis | Marginocéfalo | Común | 1 | 1 | 1 | 3 | Sin rasgo | Todavía no hace nada especial. |  |
