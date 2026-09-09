@@ -23,6 +23,7 @@ RAIZ = Path(__file__).resolve().parent.parent
 MD = RAIZ / 'RECOSTE.md'
 XLSX = RAIZ / 'RECOSTE.xlsx'
 MECANICAS = RAIZ / 'tools' / 'mecanicas.json'
+BALANCE = RAIZ / 'BALANCE.md'
 
 CABECERA = ['id', 'Carta', 'Familia', 'Rareza', 'Coste actual', 'Coste nuevo',
             'Δ', 'A', 'V', 'Rasgo', 'Texto del rasgo', 'Mecánica nueva']
@@ -156,6 +157,7 @@ def escribir():
     # Desproteger para tocar cualquier otra celda y Excel avisaba de una
     # contraseña que no existía. El color ya dice qué se edita y qué no.
 
+    hoja_de_estado(wb)
     hojas_de_mecanicas(wb)
 
     notas = wb.create_sheet('Notas')
@@ -169,6 +171,61 @@ def escribir():
 
     wb.save(XLSX)
     print(f'RECOSTE.xlsx escrito: {len(filas)} cartas')
+
+
+def hoja_de_estado(wb):
+    """Contra qué se está recosteando: los seis objetivos y qué falla hoy.
+
+    Sale de BALANCE.md, que lo escribe `npm run sim`. Si esa hoja se copiara a
+    mano envejecería en dos horas, que es el ritmo al que se han movido los
+    números — y una hoja de estado obsoleta es peor que no tenerla, porque se
+    recostea contra un juego que ya no existe.
+    """
+    if not BALANCE.exists():
+        return
+    texto = BALANCE.read_text(encoding='utf8')
+
+    objetivos = []
+    for linea in texto.split(chr(10)):
+        if not linea.startswith('|') or linea.startswith('|---') or 'Métrica' in linea:
+            continue
+        celdas = [c.strip() for c in linea.split('|')[1:-1]]
+        # Se lee por la DERECHA: el nombre de una métrica puede llevar barras
+        # dentro —«P(ganar | ventaja en el turno 5)»— y partir por «|» la trocea
+        # en cinco. La primera versión de esto se comía justo esa fila, que es la
+        # bola de nieve, o sea la métrica que más ha costado meter en rango.
+        if len(celdas) >= 4 and celdas[-1] in ('✅', '❌'):
+            nombre = ' | '.join(celdas[:-3]).strip()
+            objetivos.append([nombre, celdas[-3], celdas[-2],
+                              'cumple' if celdas[-1] == '✅' else 'FALLA'])
+        if len(objetivos) >= 6:
+            break
+
+    # Las descalibradas van en el diagnóstico, con guion y raya.
+    descalibradas = []
+    for linea in texto.split(chr(10)):
+        l = linea.strip()
+        if l.startswith('- ') and '—' in l and 'índice' in l:
+            nombre, resto = l[2:].split('—', 1)
+            descalibradas.append([nombre.strip(), resto.strip()])
+
+    filas = ([['OBJETIVO', 'Resultado hoy', 'Objetivo', '']] if False else []) + objetivos
+    if descalibradas:
+        filas.append(['', '', '', ''])
+        filas.append(['Cartas fuera de banda', '', '', 'índice 1,00 es la diana; fuera de 0,70–1,30 está mal'])
+        for nombre, detalle in descalibradas:
+            filas.append(['', nombre, detalle, ''])
+
+    _tabla(
+        wb.create_sheet('Estado', 0),
+        'Contra qué estás recosteando',
+        'Sale de BALANCE.md, que escribe `npm run sim` sobre 2.000 partidas. Vuelve a '
+        'correrlo después de aplicar cambios: `python tools/excel.py leer`, '
+        '`node tools/tabla.mjs aplicar`, `npm test` y `npm run sim`.',
+        ['Métrica', 'Resultado', 'Objetivo', 'Estado'],
+        filas,
+        [34, 30, 26, 54],
+    )
 
 
 def datos_de_mecanicas():
