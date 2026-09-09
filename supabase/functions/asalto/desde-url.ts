@@ -24,17 +24,17 @@
 // la función arranca y muere con «Module not found» AUNQUE LA URL CONTESTE 200.
 // Costó verlo porque todo lo demás —el commit, la URL, el contenido— estaba bien.
 //
-// Motor anclado en: 2c91e1bea17de37a174651ea2f15806f7f5e21a7
+// Motor anclado en: c97e994e20a452f51f138baec9bee601a4095389
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import {
   validarAsalto, jefeDelEvento, AsaltoInvalido,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@2c91e1bea17de37a174651ea2f15806f7f5e21a7/supabase/functions/_compartido/validarAsalto.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@c97e994e20a452f51f138baec9bee601a4095389/supabase/functions/_compartido/validarAsalto.js';
 import {
   validarSolitario,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@2c91e1bea17de37a174651ea2f15806f7f5e21a7/supabase/functions/_compartido/validarSolitario.js';
-import { CUENCA } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@2c91e1bea17de37a174651ea2f15806f7f5e21a7/src/data/tribu.js';
-import { ECONOMIA, abrirSobre } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@2c91e1bea17de37a174651ea2f15806f7f5e21a7/src/data/coleccion.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@c97e994e20a452f51f138baec9bee601a4095389/supabase/functions/_compartido/validarSolitario.js';
+import { CUENCA } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@c97e994e20a452f51f138baec9bee601a4095389/src/data/tribu.js';
+import { ECONOMIA, abrirSobre } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@c97e994e20a452f51f138baec9bee601a4095389/src/data/coleccion.js';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',

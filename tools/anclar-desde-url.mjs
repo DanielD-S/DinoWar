@@ -17,22 +17,31 @@
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { readFileSync, writeFileSync } from 'node:fs';
+import { fuentesDelPaquete } from './huellaAsalto.mjs';
 
 export const SALIDA = 'supabase/functions/asalto/desde-url.ts';
 export const MARCA = 'Motor anclado en: ';
 
-/** Los ficheros que la función se trae por URL y que, por tanto, hay que vigilar. */
-// No es el cierre transitivo —detrás de estos viene el motor entero— sino los
-// que la función nombra o los que arrastran una regla que decide algo. Las
-// rutas relativas desde una URL del CDN siguen siendo esa URL, así que
-// validarPartida.js viaja aunque no aparezca en ningún import de la función.
-export const VIGILADOS = [
-  'supabase/functions/_compartido/validarAsalto.js',
-  'supabase/functions/_compartido/validarPartida.js',
-  'supabase/functions/_compartido/validarSolitario.js',
-  'src/data/tribu.js',
-  'src/data/coleccion.js',
-];
+/**
+ * Los ficheros que la función se trae por URL y que, por tanto, hay que vigilar.
+ *
+ * NO es una lista a mano. Lo fue, con cinco entradas escogidas a ojo, y por eso
+ * pasó lo siguiente: al quitar la Defensa cambiaron `cards.js`, `state.js` y
+ * `balance.js` —ninguno estaba en la lista—, el anclaje se quedó apuntando al
+ * motor de tres cifras y la función siguió re-jugando con él. Cuatro de cada
+ * cuatro partidas se rechazaban con «jugada ilegal», ninguna victoria pagaba, y
+ * `npm test` estaba en verde. El comentario de la lista incluso avisaba de que
+ * no era el cierre transitivo.
+ *
+ * Ahora sale de lo que esbuild dice que entra de verdad en el paquete, que es
+ * el mismo conjunto de módulos que la versión por URL arrastra. Añadir un import
+ * a la función extiende la vigilancia sola, que es la única forma de que esto no
+ * dependa de que alguien se acuerde.
+ *
+ * Encadena con `test/paquete.test.js`: si el paquete se ha quedado atrás, esa
+ * lista no vale y ese test falla primero.
+ */
+export const VIGILADOS = fuentesDelPaquete();
 
 export const shaAnclado = () => (readFileSync(SALIDA, 'utf8').match(/@([0-9a-f]{40})/) ?? [])[1] ?? null;
 
