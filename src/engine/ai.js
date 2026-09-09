@@ -63,26 +63,24 @@ function mazoDe(vista, j) {
  */
 function valorEnRanura(vista, j, ranura, mio) {
   const b = unidadEn(vista, rival(j), ranura);
-  const extraSabana = campoEs(vista, RASGO.CAMPO_SABANA) ? BALANCE.efectosCampo.sabanaDanoHabitat : 0;
-
   if (!b) {
     // Sin nadie enfrente golpea el habitat, y seguirá haciéndolo mientras aguante.
     // Se descuenta porque el rival puede taparlo el turno que viene.
     const turnos = 1 + (IA.horizonte - 1) * 0.5;
-    return (mio.poder + extraSabana) * IA.pesoHabitat * turnos;
+    return mio.poder * IA.pesoHabitat * turnos;
   }
 
   // Lo que vuela no negocia con la ranura: pasa por encima. Vale su daño al
   // habitat sin riesgo, pero no tapa nada, así que lo de enfrente también pasa.
   if (mio.vuela) {
     const turnos = 1 + (IA.horizonte - 1) * 0.5;
-    return (mio.poder + extraSabana) * IA.pesoHabitat * turnos;
+    return mio.poder * IA.pesoHabitat * turnos;
   }
 
   // Si el de enfrente vuela, esta ranura está de hecho vacía para mí.
   if (vuela(vista, b.iid)) {
     const turnos = 1 + (IA.horizonte - 1) * 0.5;
-    return (mio.poder + extraSabana) * IA.pesoHabitat * turnos;
+    return mio.poder * IA.pesoHabitat * turnos;
   }
 
   // Lo que ese rival me haría al habitat si dejo la ranura vacía.
@@ -226,9 +224,8 @@ function valorDeAccion(vista, j, a) {
       const r = carta(cardId).rasgo;
       let valor = 0;
       if (r === RASGO.CAMPO_LLANURA) valor = BALANCE.efectosCampo.llanuraBiomasa * 1.2;
-      if (r === RASGO.CAMPO_SABANA) {
-        valor = (unidadesDe(vista, j).length - unidadesDe(vista, contrario).length) * IA.pesoHabitat;
-      }
+      // La sabana hace lo mismo que la llanura: Biomasa para los dos.
+      if (r === RASGO.CAMPO_SABANA) valor = BALANCE.efectosCampo.sabanaBiomasa * 1.2;
       if (r === RASGO.CAMPO_BOSQUE) {
         valor = unidadesDe(vista, j).filter((u) => carta(u.cardId).clado === CLADO.SAUROPODO).length * 0.8;
       }

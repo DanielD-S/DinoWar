@@ -135,7 +135,7 @@ es legendario.
 
 **3 de coste · 5 de Ataque · 5 de Vida**
 
-**Depredador dominante** — Si mata a su rival, el daño sobrante pasa al hábitat enemigo.
+**Depredador dominante** — Si mata a su rival, el daño sobrante que pasa al hábitat enemigo se duplica.
 
 `ESTABLECIDO` · Taxón de terópodo más abundante de la Morrison. Marcas de mordida atribuidas a Allosaurus aparecen en huesos de saurópodos y de Stegosaurus.
 
@@ -686,7 +686,7 @@ Ambos jugadores pierden 5 cartas del mazo
 
 ### Sabana de helechos · Común · coste 1
 
-Terreno abierto, sin cobertura: +1 al daño contra los biomas.
++1 de Biomasa cada turno para los dos jugadores, mientras siga en el campo.
 
 `ESTABLECIDO` · Extensiones abiertas de helechos sobre suelos semiáridos, sin dosel que rompa la línea de visión ni frene un avance.
 

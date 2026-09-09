@@ -154,7 +154,11 @@ export const BALANCE = Object.freeze({
     // El canal y la sabana ya no tocan sólo a los tuyos: como todo clima,
     // valen para los dos bandos por igual.
     canalVida: 1,
-    sabanaVida: 1,
+    // La sabana da Biomasa a los dos, cada turno, mientras siga en el campo.
+    // Fue «+1 al daño contra los biomas» —una constante que se borró y a la que
+    // la IA siguió llamando durante un día entero, calculando NaN— y luego +1 de
+    // Defensa, que dejó de existir con la Defensa.
+    sabanaBiomasa: 1,
   }),
 
   // ------------------------------------------------------------------- mazo
