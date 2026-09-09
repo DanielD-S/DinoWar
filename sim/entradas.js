@@ -17,10 +17,16 @@ import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { MAZO, BALANCE } from '../src/data/balance.js';
 import { CARTAS } from '../src/data/cards.js';
+import { esEntrada } from '../src/engine/entradas.js';
 
-/** Las seis con habilidad de entrada, y cuántas copias caben de cada una. */
-export const CON_ENTRADA = ['troodon', 'dromaeosaurus', 'gargoyleosaurus',
-  'mosasaurus', 'atlasaurus', 'spinosaurus'];
+/**
+ * Las criaturas con habilidad de entrada. Se DESCUBREN del set en vez de ir
+ * escritas: hoy no hay ninguna —las 52 son planas por decisión del autor— y en
+ * cuanto se le ponga una a una carta, esta herramienta la mide sin tocarla.
+ */
+export const CON_ENTRADA = Object.values(CARTAS)
+  .filter((c) => esEntrada(c.id))
+  .map((c) => c.id);
 
 /**
  * Un mazo legal de 50 que lleva las seis. Se parte del de referencia, se meten
@@ -130,6 +136,13 @@ export async function medir(n, mazo) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const N = Number(process.argv[2] ?? 400);
+  if (CON_ENTRADA.length === 0) {
+    process.stdout.write('Ninguna carta tiene habilidad de entrada todavia: nada que medir.'
+      + String.fromCharCode(10)
+      + 'El armazon esta en src/engine/entradas.js, esperando cartas.'
+      + String.fromCharCode(10));
+    process.exit(0);
+  }
   const mazo = mazoConEntradas();
 
   if (process.env.DINOWAR_ENTRADAS_HIJO) {

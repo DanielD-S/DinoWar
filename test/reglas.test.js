@@ -117,18 +117,6 @@ test('Las heridas persisten entre turnos', () => {
 
 // ------------------------------------------------------------ red trófica
 
-test('Terópodo contra ornitópodo: bonificación de depredación', () => {
-  const s = tablero();
-  const teropodo = poner(s, 'ceratosaurus', 0, 0);
-  const presa = poner(s, 'dryosaurus', 1, 0);
-  const otro = poner(s, 'stegosaurus', 1, 1);
-
-  const atq = carta('ceratosaurus').ataque;
-  assert.equal(danoEntre(s, teropodo, presa), atq + BALANCE.clados.bonusDepredacion);
-  // Contra quien no es su presa, su Ataque pelado.
-  assert.equal(danoEntre(s, teropodo, otro), atq, 'sólo aplica sobre su presa');
-});
-
 test('El daño es el Ataque y nada más: no hay resta que adivinar', () => {
   const s = tablero();
   // Es la razón de haber quitado la Defensa. Antes esto daba 1 —el suelo— y no
@@ -142,19 +130,23 @@ test('El daño es el Ataque y nada más: no hay resta que adivinar', () => {
     'el suelo de daño se fue con la Defensa: sólo existía para que no hiciera inmune');
 });
 
-test('Lo que aguanta una carta sale de su Vida, y los rasgos la suben', () => {
+test('Una criatura es coste, Ataque y Vida: nada más', () => {
+  // Los rasgos de criatura se quitaron enteros. Aquí se comprobaba que Manada
+  // sumaba Vida con otro saurópodo al lado; ya no suma nada nadie.
   const s = tablero();
   const sauropodo = poner(s, 'camarasaurus', 0, 0);
   const colosal = poner(s, 'apatosaurus', 0, 1);
   const agil = poner(s, 'dryosaurus', 0, 2);
 
   assert.equal(vidaMaxima(s, sauropodo), CARTAS.camarasaurus.vida);
-  assert.equal(vidaMaxima(s, agil), CARTAS.dryosaurus.vida, 'el que corre no aguanta');
-  // Manada: con otro saurópodo al lado, Apatosaurus aguanta más. Antes esto era
-  // Defensa; el rasgo no cambió, cambió dónde se apunta.
-  assert.equal(vidaMaxima(s, colosal),
-    CARTAS.apatosaurus.vida + BALANCE.rasgos.manadaVida,
-    'Manada suma cuando hay otro saurópodo');
+  assert.equal(vidaMaxima(s, agil), CARTAS.dryosaurus.vida);
+  assert.equal(vidaMaxima(s, colosal), CARTAS.apatosaurus.vida,
+    'tener otro saurópodo al lado ya no suma: Manada dejó de existir');
+
+  for (const c of Object.values(CARTAS)) {
+    if (c.tipo !== TIPO.DINOSAURIO) continue;
+    assert.equal(c.rasgo, 'NINGUNO', `${c.id} conserva un rasgo`);
+  }
 });
 
 test('El primer turno no hay combate', () => {
@@ -171,21 +163,6 @@ test('El primer turno no hay combate', () => {
   assert.equal(r.jugadores[1].habitat, BALANCE.vidaHabitat, 'ni el habitat recibe');
   assert.ok(r.eventos.some((e) => e.tipo === 'SIN_COMBATE'));
 });
-
-test('Tireóforo: devuelve daño a quien lo ataca', () => {
-  const s = tablero();
-  const stego = poner(s, 'stegosaurus', 1, 0);
-  assert.equal(espinasDe(s, stego), BALANCE.clados.espinasTireoforo,
-    'las púas del clado, sin extras: el Tagomizador ya no existe');
-
-  const atacante = poner(s, 'ornitholestes', 0, 0);
-  const antes = vidaActual(s, atacante);
-  const r = ejecutar(s, FASE.COMBATE);
-  assert.ok(!vivo(r, atacante) || vidaActual(r, atacante) < antes,
-    'atacar a un tireóforo cuesta caro');
-});
-
-// -------------------------------------------------------------- victorias
 
 test('Registro fósil: cada baja rival es un trofeo', () => {
   const s = tablero();
@@ -236,36 +213,6 @@ test('Allosaurus: el daño sobrante al matar pasa al habitat', () => {
 
   const r = ejecutar(s, FASE.COMBATE);
   assert.ok(r.jugadores[1].habitat < BALANCE.vidaHabitat, 'el exceso llega al habitat');
-});
-
-test('Dryosaurus: +1 Poder por cada congénere propio en el campo', () => {
-  const s = tablero();
-  const a = poner(s, 'dryosaurus', 0, 0);
-  poner(s, 'dryosaurus', 0, 1);
-  poner(s, 'dryosaurus', 1, 2);   // del rival: no cuenta
-
-  assert.equal(ataqueEfectivo(s, a), 1 + BALANCE.rasgos.gregarioAtaquePorCompanero);
-});
-
-test('Ornitholestes: engorda con cada muerte del campo', () => {
-  const s = tablero();
-  const carroniero = poner(s, 'ornitholestes', 0, 3);
-  poner(s, 'torvosaurus', 0, 0);
-  poner(s, 'dryosaurus', 1, 0);
-
-  const r = ejecutar(s, FASE.COMBATE);
-  assert.equal(vivo(r, carroniero), true);
-  assert.ok(r.instancias[carroniero].modVida > 0);
-});
-
-test('Diplodocus y Gastrolitos curan heridas al final del turno', () => {
-  const s = tablero();
-  const diplo = poner(s, 'diplodocus', 0, 0);
-  assert.equal(curacionDe(s, diplo), BALANCE.rasgos.ramoneoBajoCura);
-
-  s.instancias[diplo].heridas = 4;
-  const r = ejecutar(s, FASE.COMBATE);
-  assert.equal(r.instancias[diplo].heridas, 4 - BALANCE.rasgos.ramoneoBajoCura);
 });
 
 test('Cualquier dinosaurio propio admite una adaptación', () => {
@@ -562,18 +509,6 @@ test('efectosDe suma las copias de una misma carta en un solo apunte', () => {
   assert.equal(efectos[0].ataque, -2 * BALANCE.rasgos.fracturaAtaque);
 });
 
-test('efectosDe recoge lo que depende del campo, no sólo lo permanente', () => {
-  const s = tablero();
-  const ripa = poner(s, 'riparovenator', 0, 0);
-  assert.deepEqual(efectosDe(s, ripa), [], 'sin campo no hay nada que explicar');
-
-  s.campo = 'canal';
-  const efectos = efectosDe(s, ripa);
-  assert.equal(efectos.length, 1);
-  assert.equal(efectos[0].ataque, BALANCE.rasgos.riberenoAtaque);
-  assert.match(efectos[0].nota, /canal/);
-});
-
 test('Una unidad sin nada encima no tiene efectos que enseñar', () => {
   const s = tablero();
   const iid = poner(s, 'stegosaurus', 0, 0);
@@ -627,26 +562,6 @@ test('Dos climas en el mismo turno, no', () => {
 
 // ------------------------------------------------------------- la búsqueda
 
-test('Al jugar un buscador, lo buscado pasa del mazo a la mano', () => {
-  const s = tablero();
-  s.fase = FASE.DESPLIEGUE;
-  s.jugadores[0].biomasa = 10;
-  const torvo = enMano(s, 'torvosaurus', 0);
-
-  const opciones = buscablesDe(s, 0, 'torvosaurus');
-  assert.ok(opciones.length > 0, 'el mazo de referencia lleva climas');
-  const elegida = opciones[0];
-  const cardId = s.instancias[elegida].cardId;
-  assert.equal(carta(cardId).tipo, TIPO.CLIMA, 'el Rastreador sólo saca climas');
-
-  const mazoAntes = s.jugadores[0].mazo.length;
-  const r = reduce(s, { tipo: ACCION.DESPLEGAR, jugador: 0, iid: torvo, ranura: 0, busca: elegida });
-
-  assert.ok(r.jugadores[0].mano.includes(elegida), 'lo buscado está en la mano');
-  assert.ok(!r.jugadores[0].mazo.includes(elegida), 'y ya no en el mazo');
-  assert.equal(r.jugadores[0].mazo.length, mazoAntes - 1, 'cuesta una carta de mazo');
-});
-
 test('Cada buscador saca lo suyo y nada más', () => {
   const s = tablero();
   const deTipo = (jug, cid) => buscablesDe(s, jug, cid)
@@ -658,19 +573,6 @@ test('Cada buscador saca lo suyo y nada más', () => {
   assert.deepEqual(buscablesDe(s, 0, 'allosaurus'), [], 'un dinosaurio normal no busca nada');
 });
 
-test('No se puede buscar una carta que no está en tu mazo', () => {
-  const s = tablero();
-  s.fase = FASE.DESPLIEGUE;
-  s.jugadores[0].biomasa = 10;
-  const torvo = enMano(s, 'torvosaurus', 0);
-  const ajena = s.jugadores[1].mazo[0];
-
-  assert.match(
-    validar(s, { tipo: ACCION.DESPLEGAR, jugador: 0, iid: torvo, ranura: 0, busca: ajena }),
-    /no está en tu mazo/,
-  );
-});
-
 test('Un buscador se puede jugar aunque no haya nada que buscar', () => {
   const s = tablero();
   s.fase = FASE.DESPLIEGUE;
@@ -680,13 +582,6 @@ test('Un buscador se puede jugar aunque no haya nada que buscar', () => {
 
   assert.deepEqual(buscablesDe(s, 0, 'nodosaurus'), []);
   assert.equal(validar(s, { tipo: ACCION.DESPLEGAR, jugador: 0, iid: nodo, ranura: 0 }), null);
-});
-
-test('Ninguna carta se queda con un rasgo que el motor no conoce', () => {
-  for (const c of Object.values(CARTAS)) {
-    assert.ok(Object.values(RASGO).includes(c.rasgo), `${c.id}: rasgo «${c.rasgo}» no está en RASGO`);
-    assert.ok(c.rasgoNombre && c.rasgoTexto, `${c.id}: le falta nombre o texto de rasgo`);
-  }
 });
 
 test('Todo clado dice si es de dinosaurio, y las cifras nunca son negativas', () => {

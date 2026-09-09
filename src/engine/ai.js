@@ -39,14 +39,11 @@ function ataqueHipotetico(vista, j, cardId) {
   return poder;
 }
 
-function espinasHipoteticas(cardId) {
-  const c = carta(cardId);
-  let e = c.clado === CLADO.TIREOFORO ? BALANCE.clados.espinasTireoforo : 0;
-  return e;
+function espinasHipoteticas() {
+  return 0;
 }
 
-const bonusTrofico = (cladoA, cladoB) =>
-  (BALANCE.clados.presaDe[cladoA] === cladoB ? BALANCE.clados.bonusDepredacion : 0);
+const bonusTrofico = () => 0;
 
 // ------------------------------------------------------------------- valor
 

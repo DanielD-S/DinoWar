@@ -67,21 +67,21 @@ revisión viene a arreglar.
 
 | id | Carta | Familia | Rareza | Coste actual | Coste nuevo | A | V | Rasgo | Texto del rasgo | Mecánica nueva |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| dryosaurus | Dryosaurus altus | Ornitópodo | Común | 0 | 0 | 1 | 2 | Gregario | +1 de Ataque por cada otro Dryosaurus propio en el campo. |  |
-| ornitholestes | Ornitholestes hermanni | Terópodo | Común | 1 | 1 | 2 | 2 | Oportunista | +1 Vida permanente cada vez que muere un dinosaurio en el campo. |  |
-| ceratosaurus | Ceratosaurus nasicornis | Terópodo | Común | 1 | 1 | 3 | 3 | Caza en grupo | +2 de Ataque si hay tres Ceratosaurus tuyos en el campo. |  |
-| stegosaurus | Stegosaurus stenops | Tireóforo | Común | 2 | 2 | 1 | 9 | Muro de placas | +1 de Vida si tienes otro Stegosaurus en el campo. |  |
-| allosaurus | Allosaurus fragilis | Terópodo | Rara | 3 | 3 | 5 | 5 | Depredador dominante | Si mata a su rival, el daño sobrante que pasa al hábitat enemigo se duplica. |  |
-| camarasaurus | Camarasaurus grandis | Saurópodo | Rara | 3 | 3 | 2 | 7 | Migrador | Al jugarla, busca un evento en tu mazo y llévatelo a la mano. |  |
-| diplodocus | Diplodocus carnegii | Saurópodo | Épica | 2 | 2 | 3 | 13 | Ramoneo bajo | Recupera +1 de vida al final de cada uno de tus turnos |  |
-| apatosaurus | Apatosaurus louisae | Saurópodo | Épica | 3 | 3 | 2 | 15 | Manada | +1 de Vida si tienes otro saurópodo en el campo. |  |
-| torvosaurus | Torvosaurus tanneri | Terópodo | Legendaria | 4 | 4 | 7 | 6 | Rastreador | Al jugarla, busca un clima en tu mazo y llévatelo a la mano. |  |
-| nodosaurus | Nodosaurus textilis | Tireóforo | Rara | 2 | 2 | 2 | 8 | Llamada de manada | Al jugarla, busca un Gregarismo en tu mazo y llévatelo a la mano. |  |
-| riparovenator | Riparovenator milnerae | Terópodo | Épica | 2 | 2 | 4 | 5 | Ribereño | +2 de ataque mientras el Canal fluvial esté en el campo. |  |
-| lokiceratops | Lokiceratops rangiformis | Marginocéfalo | Épica | 3 | 3 | 4 | 8 | Gola ornamentada | +2 de Vida si tienes otro Lokiceratops en el campo. |  |
-| brachylophosaurus | Brachylophosaurus canadensis | Ornitópodo | Rara | 2 | 2 | 2 | 7 | Gregario | +1 Poder por cada copia suya que tengas en el campo. |  |
-| tyrannotitan | Tyrannotitan chubutensis | Terópodo | Legendaria | 4 | 4 | 10 | 6 | Desgarro | A quien hiere no se le cura ninguna herida ese turno. |  |
-| huaxiadraco | Huaxiadraco corollatus | Pterosaurio | Rara | 2 | 2 | 2 | 4 | Vuelo | Sobrevuela la ranura: golpea siempre al hábitat rival, pero quien tenga enfrente le alcanza igual. |  |
+| dryosaurus | Dryosaurus altus | Ornitópodo | Común | 0 | 0 | 1 | 2 |  |  |  |
+| ornitholestes | Ornitholestes hermanni | Terópodo | Común | 1 | 1 | 2 | 2 |  |  |  |
+| ceratosaurus | Ceratosaurus nasicornis | Terópodo | Común | 1 | 1 | 3 | 3 |  |  |  |
+| stegosaurus | Stegosaurus stenops | Tireóforo | Común | 2 | 2 | 1 | 9 |  |  |  |
+| allosaurus | Allosaurus fragilis | Terópodo | Rara | 3 | 3 | 5 | 5 |  |  |  |
+| camarasaurus | Camarasaurus grandis | Saurópodo | Rara | 3 | 3 | 2 | 7 |  |  |  |
+| diplodocus | Diplodocus carnegii | Saurópodo | Épica | 2 | 2 | 3 | 13 |  |  |  |
+| apatosaurus | Apatosaurus louisae | Saurópodo | Épica | 3 | 3 | 2 | 15 |  |  |  |
+| torvosaurus | Torvosaurus tanneri | Terópodo | Legendaria | 4 | 4 | 7 | 6 |  |  |  |
+| nodosaurus | Nodosaurus textilis | Tireóforo | Rara | 2 | 2 | 2 | 8 |  |  |  |
+| riparovenator | Riparovenator milnerae | Terópodo | Épica | 2 | 2 | 4 | 5 |  |  |  |
+| lokiceratops | Lokiceratops rangiformis | Marginocéfalo | Épica | 3 | 3 | 4 | 8 |  |  |  |
+| brachylophosaurus | Brachylophosaurus canadensis | Ornitópodo | Rara | 2 | 2 | 2 | 7 |  |  |  |
+| tyrannotitan | Tyrannotitan chubutensis | Terópodo | Legendaria | 4 | 4 | 10 | 6 |  |  |  |
+| huaxiadraco | Huaxiadraco corollatus | Pterosaurio | Rara | 2 | 2 | 2 | 4 |  |  |  |
 | gregarismo | Gregarismo | Evento | Rara | 1 | 1 |  |  | Gregarismo | +1 de Ataque a todos tus dinosaurios de la misma especie que el objetivo. |  |
 | gastrolitos | Gastrolitos | Evento | Épica | 1 | 1 |  |  | Gastrolitos | Cura +1 de vida a un dinosaurio al final del turno |  |
 | crecimiento_acelerado | Crecimiento acelerado | Evento | Legendaria | 1 | 1 |  |  | Crecimiento acelerado | +2 Poder y +2 Vida permanentes a un dinosaurio que elijas. |  |
@@ -98,38 +98,38 @@ revisión viene a arreglar.
 | bosque | Bosque de coníferas ribereño | Clima | Legendaria | 1 | 1 |  |  | Bosque de coníferas ribereño | Los saurópodos curan 1 herida al final de cada turno. |  |
 | aridez | Deriva árida | Clima | Legendaria | 1 | 1 |  |  | Deriva árida | Ambos jugadores pierden 5 cartas del mazo |  |
 | sabana | Sabana de helechos | Clima | Común | 1 | 1 |  |  | Sabana de helechos | +1 de Biomasa cada turno para los dos jugadores, mientras siga en el campo. |  |
-| plesiopleurodon | Plesiopleurodon wellesi | Reptil marino | Épica | 3 | 3 | 9 | 6 | Sin rasgo | Todavía no hace nada especial. |  |
-| ojoraptorsaurus | Ojoraptorsaurus boerei | Terópodo | Rara | 2 | 2 | 4 | 5 | Sin rasgo | Todavía no hace nada especial. |  |
-| dromaeosaurus | Dromaeosaurus albertensis | Terópodo | Común | 2 | 2 | 5 | 4 | Emboscada | Al entrar en juego, hace 3 de daño al dinosaurio que tenga enfrente. |  |
-| athenar | Athenar bermani | Saurópodo | Común | 2 | 2 | 2 | 7 | Sin rasgo | Todavía no hace nada especial. |  |
-| sanjuansaurus | Sanjuansaurus gordilloi | Terópodo | Rara | 2 | 2 | 5 | 4 | Sin rasgo | Todavía no hace nada especial. |  |
-| suchomimus | Suchomimus tenerensis | Terópodo | Épica | 3 | 3 | 8 | 7 | Sin rasgo | Todavía no hace nada especial. |  |
-| eosinopteryx | Eosinopteryx brevipenna | Terópodo | Común | 1 | 1 | 2 | 2 | Sin rasgo | Todavía no hace nada especial. |  |
-| troodon | Troodon formosus | Terópodo | Común | 2 | 2 | 4 | 5 | Alerta | Al entrar en juego, robas 1 carta. |  |
-| carnotaurus | Carnotaurus sastrei | Terópodo | Épica | 3 | 3 | 9 | 6 | Sin rasgo | Todavía no hace nada especial. |  |
-| spinosaurus | Spinosaurus aegyptiacus | Terópodo | Legendaria | 4 | 4 | 11 | 11 | Arrasa la ribera | Al entrar en juego, 3 de daño al hábitat rival. |  |
-| mosasaurus | Mosasaurus hoffmannii | Reptil marino | Legendaria | 4 | 4 | 12 | 10 | Devora el registro | Al entrar en juego, el rival pierde 3 cartas de su mazo. |  |
-| halszkaraptor | Halszkaraptor escuilliei | Terópodo | Común | 1 | 1 | 2 | 2 | Sin rasgo | Todavía no hace nada especial. |  |
-| tongtianlong | Tongtianlong limosus | Terópodo | Común | 1 | 1 | 1 | 3 | Sin rasgo | Todavía no hace nada especial. |  |
-| scanisaurus | Scanisaurus nazarowi | Reptil marino | Rara | 2 | 2 | 4 | 5 | Sin rasgo | Todavía no hace nada especial. |  |
-| monolophosaurus | Monolophosaurus jiangi | Terópodo | Rara | 2 | 2 | 5 | 4 | Sin rasgo | Todavía no hace nada especial. |  |
-| invictarx | Invictarx zephyri | Tireóforo | Rara | 2 | 2 | 2 | 7 | Sin rasgo | Todavía no hace nada especial. |  |
-| medusaceratops | Medusaceratops lokii | Marginocéfalo | Épica | 3 | 3 | 5 | 10 | Sin rasgo | Todavía no hace nada especial. |  |
-| platyceratops | Platyceratops tatarinovi | Marginocéfalo | Común | 1 | 1 | 1 | 3 | Sin rasgo | Todavía no hace nada especial. |  |
-| loricatosaurus | Loricatosaurus priscus | Tireóforo | Épica | 3 | 3 | 4 | 11 | Sin rasgo | Todavía no hace nada especial. |  |
-| therizinosaurus | Therizinosaurus cheloniformis | Terópodo | Épica | 3 | 3 | 6 | 9 | Sin rasgo | Todavía no hace nada especial. |  |
-| alaskacephale | Alaskacephale gangloffi | Marginocéfalo | Rara | 2 | 2 | 3 | 6 | Sin rasgo | Todavía no hace nada especial. |  |
-| titanoceratops | Titanoceratops ouranos | Marginocéfalo | Épica | 3 | 3 | 6 | 9 | Sin rasgo | Todavía no hace nada especial. |  |
-| atlasaurus | Atlasaurus imelakei | Saurópodo | Épica | 3 | 3 | 3 | 12 | Ramoneo alto | Al entrar en juego, ganas 2 de Biomasa. |  |
-| stegoceras | Stegoceras validum | Marginocéfalo | Común | 2 | 2 | 3 | 6 | Sin rasgo | Todavía no hace nada especial. |  |
-| maiasaura | Maiasaura peeblesorum | Ornitópodo | Épica | 3 | 3 | 4 | 11 | Sin rasgo | Todavía no hace nada especial. |  |
-| edmontosaurus | Edmontosaurus annectens | Ornitópodo | Legendaria | 4 | 4 | 5 | 17 | Sin rasgo | Todavía no hace nada especial. |  |
-| plateosauravus | Plateosauravus cullingworthi | Saurópodo | Común | 2 | 2 | 2 | 7 | Sin rasgo | Todavía no hace nada especial. |  |
-| gargoyleosaurus | Gargoyleosaurus parkpinorum | Tireóforo | Rara | 2 | 2 | 2 | 7 | Cierra la formación | Al entrar en juego, tus otros dinosaurios curan 2 heridas. |  |
-| wendiceratops | Wendiceratops pinhornensis | Marginocéfalo | Épica | 3 | 3 | 5 | 10 | Sin rasgo | Todavía no hace nada especial. |  |
-| antarctosaurus | Antarctosaurus wichmannianus | Saurópodo | Legendaria | 4 | 4 | 4 | 18 | Sin rasgo | Todavía no hace nada especial. |  |
-| liaoceratops | Liaoceratops yanzigouensis | Marginocéfalo | Común | 1 | 1 | 1 | 3 | Sin rasgo | Todavía no hace nada especial. |  |
-| rhinorex | Rhinorex condrupus | Ornitópodo | Épica | 3 | 3 | 4 | 11 | Sin rasgo | Todavía no hace nada especial. |  |
-| bienosaurus | Bienosaurus lufengensis | Tireóforo | Común | 1 | 1 | 1 | 3 | Sin rasgo | Todavía no hace nada especial. |  |
-| shuangmiaosaurus | Shuangmiaosaurus gilmorei | Ornitópodo | Común | 2 | 2 | 3 | 6 | Sin rasgo | Todavía no hace nada especial. |  |
-| chasmosaurus | Chasmosaurus belli | Marginocéfalo | Común | 2 | 2 | 2 | 7 | Sin rasgo | Todavía no hace nada especial. |  |
+| plesiopleurodon | Plesiopleurodon wellesi | Reptil marino | Épica | 3 | 3 | 9 | 6 |  |  |  |
+| ojoraptorsaurus | Ojoraptorsaurus boerei | Terópodo | Rara | 2 | 2 | 4 | 5 |  |  |  |
+| dromaeosaurus | Dromaeosaurus albertensis | Terópodo | Común | 2 | 2 | 5 | 4 |  |  |  |
+| athenar | Athenar bermani | Saurópodo | Común | 2 | 2 | 2 | 7 |  |  |  |
+| sanjuansaurus | Sanjuansaurus gordilloi | Terópodo | Rara | 2 | 2 | 5 | 4 |  |  |  |
+| suchomimus | Suchomimus tenerensis | Terópodo | Épica | 3 | 3 | 8 | 7 |  |  |  |
+| eosinopteryx | Eosinopteryx brevipenna | Terópodo | Común | 1 | 1 | 2 | 2 |  |  |  |
+| troodon | Troodon formosus | Terópodo | Común | 2 | 2 | 4 | 5 |  |  |  |
+| carnotaurus | Carnotaurus sastrei | Terópodo | Épica | 3 | 3 | 9 | 6 |  |  |  |
+| spinosaurus | Spinosaurus aegyptiacus | Terópodo | Legendaria | 4 | 4 | 11 | 11 |  |  |  |
+| mosasaurus | Mosasaurus hoffmannii | Reptil marino | Legendaria | 4 | 4 | 12 | 10 |  |  |  |
+| halszkaraptor | Halszkaraptor escuilliei | Terópodo | Común | 1 | 1 | 2 | 2 |  |  |  |
+| tongtianlong | Tongtianlong limosus | Terópodo | Común | 1 | 1 | 1 | 3 |  |  |  |
+| scanisaurus | Scanisaurus nazarowi | Reptil marino | Rara | 2 | 2 | 4 | 5 |  |  |  |
+| monolophosaurus | Monolophosaurus jiangi | Terópodo | Rara | 2 | 2 | 5 | 4 |  |  |  |
+| invictarx | Invictarx zephyri | Tireóforo | Rara | 2 | 2 | 2 | 7 |  |  |  |
+| medusaceratops | Medusaceratops lokii | Marginocéfalo | Épica | 3 | 3 | 5 | 10 |  |  |  |
+| platyceratops | Platyceratops tatarinovi | Marginocéfalo | Común | 1 | 1 | 1 | 3 |  |  |  |
+| loricatosaurus | Loricatosaurus priscus | Tireóforo | Épica | 3 | 3 | 4 | 11 |  |  |  |
+| therizinosaurus | Therizinosaurus cheloniformis | Terópodo | Épica | 3 | 3 | 6 | 9 |  |  |  |
+| alaskacephale | Alaskacephale gangloffi | Marginocéfalo | Rara | 2 | 2 | 3 | 6 |  |  |  |
+| titanoceratops | Titanoceratops ouranos | Marginocéfalo | Épica | 3 | 3 | 6 | 9 |  |  |  |
+| atlasaurus | Atlasaurus imelakei | Saurópodo | Épica | 3 | 3 | 3 | 12 |  |  |  |
+| stegoceras | Stegoceras validum | Marginocéfalo | Común | 2 | 2 | 3 | 6 |  |  |  |
+| maiasaura | Maiasaura peeblesorum | Ornitópodo | Épica | 3 | 3 | 4 | 11 |  |  |  |
+| edmontosaurus | Edmontosaurus annectens | Ornitópodo | Legendaria | 4 | 4 | 5 | 17 |  |  |  |
+| plateosauravus | Plateosauravus cullingworthi | Saurópodo | Común | 2 | 2 | 2 | 7 |  |  |  |
+| gargoyleosaurus | Gargoyleosaurus parkpinorum | Tireóforo | Rara | 2 | 2 | 2 | 7 |  |  |  |
+| wendiceratops | Wendiceratops pinhornensis | Marginocéfalo | Épica | 3 | 3 | 5 | 10 |  |  |  |
+| antarctosaurus | Antarctosaurus wichmannianus | Saurópodo | Legendaria | 4 | 4 | 4 | 18 |  |  |  |
+| liaoceratops | Liaoceratops yanzigouensis | Marginocéfalo | Común | 1 | 1 | 1 | 3 |  |  |  |
+| rhinorex | Rhinorex condrupus | Ornitópodo | Épica | 3 | 3 | 4 | 11 |  |  |  |
+| bienosaurus | Bienosaurus lufengensis | Tireóforo | Común | 1 | 1 | 1 | 3 |  |  |  |
+| shuangmiaosaurus | Shuangmiaosaurus gilmorei | Ornitópodo | Común | 2 | 2 | 3 | 6 |  |  |  |
+| chasmosaurus | Chasmosaurus belli | Marginocéfalo | Común | 2 | 2 | 2 | 7 |  |  |  |

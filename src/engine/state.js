@@ -242,11 +242,14 @@ function delClado(state, inst, clado, min) {
   return n >= min;
 }
 
-/** Daño devuelto a quien ataca: púas caudales. */
-export function espinasDe(state, iid) {
-  const c = carta(state.instancias[iid].cardId);
-  let e = c.clado === CLADO.TIREOFORO ? BALANCE.clados.espinasTireoforo : 0;
-  return e;
+/**
+ * Daño devuelto a quien ataca. Hoy siempre 0: las púas del tireóforo eran una
+ * regla de clado y los clados dejaron de tener reglas. Se deja la función —y su
+ * llamada en el combate— porque devolver daño es una mecánica que el autor va a
+ * querer para alguna carta, y volver a enhebrarla luego cuesta más que dejarla.
+ */
+export function espinasDe() {
+  return 0;
 }
 
 /**
@@ -257,12 +260,8 @@ export function espinasDe(state, iid) {
  * una criatura. Sin resta no hay nada de lo que protegerse, y el suelo pasaba a
  * ser una tercera regla invisible sin motivo: hacía que un Ataque de 0 pegara 1.
  */
-export function danoEntre(state, atacanteIid, defensorIid) {
-  const a = carta(state.instancias[atacanteIid].cardId);
-  const d = carta(state.instancias[defensorIid].cardId);
-  let dano = ataqueEfectivo(state, atacanteIid);
-  if (BALANCE.clados.presaDe[a.clado] === d.clado) dano += BALANCE.clados.bonusDepredacion;
-  return Math.max(0, dano);
+export function danoEntre(state, atacanteIid) {
+  return Math.max(0, ataqueEfectivo(state, atacanteIid));
 }
 
 /**
