@@ -1,17 +1,22 @@
-// DinoWar — compara los dos «cuerpos» de carta sobre las MISMAS semillas.
+// DinoWar — mide el daño SOBRANTE sobre las mismas semillas.
 //
 //   node sim/cuerpos.js            400 partidas por variante
 //   node sim/cuerpos.js 1200
 //
-//  ATAQUE_DEFENSA_VIDA  lo de hoy: la Defensa resta a cada golpe.
-//  ATAQUE_VIDA          la Defensa no existe y se suma a la Vida.
+// El daño que sobra al matar sigue hacia el hábitat rival: si pegas 5 a algo que
+// tenía 3 de Vida, los 2 que sobran pasan. Es lo que cierra el último agujero de
+// legibilidad —ningún número desaparece— y lo que este fichero mide.
 //
-// Hermana de sim/economias.js y por lo mismo: la pregunta —¿estorba la Defensa
-// más de lo que aporta?— se decide con la tabla delante, no discutiendo. Y la
-// respuesta no puede salir de `sim/cobertura.mjs`, que ajusta contra el índice
+// Nació comparando dos «cuerpos» de carta, con Defensa y sin ella. Esa pregunta
+// ya está cerrada: la Defensa se quitó y las fichas se refundieron, así que la
+// variante con Defensa no se puede reconstruir y el fichero se queda con la
+// pregunta que sigue viva.
+//
+// Hermana de sim/economias.js y por lo mismo: se decide con la tabla delante.
+// Y ojo con contestarlo desde `sim/cobertura.mjs`, que ajusta contra el índice
 // de DESPLIEGUE: eso mide lo que hace que la IA juegue una carta, y como la IA
 // valora cada unidad multiplicando por los turnos que espera aguantar, el ajuste
-// redescubre su propia preferencia por los muros. Aquí se cuentan partidas.
+// redescubre su propia preferencia. Aquí se cuentan partidas.
 //
 // El modo se lee del entorno al importar el motor, así que cada variante corre
 // en su propio proceso hijo: cambiarlo en caliente dejaría a medio motor con el
@@ -20,7 +25,10 @@
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
-export const MODOS = ['ATAQUE_DEFENSA_VIDA', 'ATAQUE_VIDA'];
+export const COMBINACIONES = [
+  { sobrante: '0', etiqueta: 'sin sobrante' },
+  { sobrante: '1', etiqueta: 'con sobrante' },
+];
 
 /** Una tanda dentro de ESTE proceso. La llama el hijo, no el padre. */
 export async function medir(n) {
@@ -87,20 +95,20 @@ export async function medir(n) {
   };
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const N = Number(process.argv[2] ?? 400);
 
   // El hijo mide y escupe JSON; el padre sólo formatea.
   if (process.env.DINOWAR_CUERPOS_HIJO === '1') {
     process.stdout.write(JSON.stringify(await medir(N)));
   } else {
-    const filas = MODOS.map((modo) => {
+    const filas = COMBINACIONES.map((c) => {
       const salida = execFileSync(process.execPath, [process.argv[1], String(N)], {
         encoding: 'utf8',
-        env: { ...process.env, DINOWAR_CUERPO: modo, DINOWAR_CUERPOS_HIJO: '1' },
+        env: { ...process.env, DINOWAR_SOBRANTE: c.sobrante, DINOWAR_CUERPOS_HIJO: '1' },
         maxBuffer: 1 << 26,
       });
-      return { modo, ...JSON.parse(salida) };
+      return { ...c, ...JSON.parse(salida) };
     });
 
     const pc = (f, m) => `${((100 * (f.vias[m] ?? 0)) / f.n).toFixed(0)}%`;
@@ -108,7 +116,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     process.stdout.write(`${'variante'.padEnd(21)} turnos  trofeos  hábitat  extinción  cartas  1º gana\n`);
     for (const f of filas) {
       process.stdout.write(
-        `${f.modo.padEnd(21)}${f.turnos.toFixed(1).padStart(6)}`
+        `${f.etiqueta.padEnd(21)}${f.turnos.toFixed(1).padStart(6)}`
         + `${pc(f, 'TROFEOS').padStart(9)}${pc(f, 'HABITAT').padStart(9)}${pc(f, 'EXTINCION').padStart(11)}`
         + `${f.distintas.toFixed(1).padStart(8)}${`${(100 * f.primero).toFixed(0)}%`.padStart(9)}\n`,
       );

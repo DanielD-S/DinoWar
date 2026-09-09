@@ -150,7 +150,6 @@ function pintarColeccion() {
         <div class="col-meta"><span class="col-rar rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span> · ${familia(c)}</div>
         ${esDino(c) ? `<div class="c-stats">
           ${statHTML('a', 'Ataque', c.ataque)}
-          ${statHTML('d', 'Defensa', c.defensa)}
           ${statHTML('v', 'Vida', c.vida)}
         </div>` : ''}
       </div>

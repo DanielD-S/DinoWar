@@ -15,10 +15,11 @@
 // se queda en la mano. Es el mismo criterio que usa run.js, medido sobre todo
 // el set en vez de sobre un mazo.
 //
-// Además ajusta por mínimos cuadrados cuánto vale un punto de cada
-// estadística. Ese número es el que dice si el «cuerpo» de una carta se puede
-// sumar como A+D+V o si hay que pesarlo: si la Defensa vale cuatro veces el
-// Ataque, contarlos por igual condena a cualquier carta ofensiva.
+// Además ajusta por mínimos cuadrados cuánto pesa un punto de cada estadística
+// EN EL DESPLIEGUE. Ojo con leerlo como «lo que vale»: la IA valora cada unidad
+// multiplicando por los turnos que espera aguantar, así que el ajuste tiende a
+// redescubrir su propia preferencia por lo que resiste. Para saber lo que vale
+// un punto hay que contar partidas ganadas, y eso es sim/cuerpos.js.
 
 import { CARTAS, TIPO } from '../src/data/cards.js';
 import { BALANCE } from '../src/data/balance.js';
@@ -85,9 +86,9 @@ const bichos = filas.filter((f) => f.c.tipo === TIPO.DINOSAURIO);
  * Sin librerías; son cinco incógnitas y se resuelve por Gauss.
  */
 function pesos(muestra) {
-  const X = muestra.map((f) => [1, f.c.ataque, f.c.defensa, f.c.vida, -f.c.coste]);
+  const X = muestra.map((f) => [1, f.c.ataque, f.c.vida, -f.c.coste]);
   const y = muestra.map((f) => f.indice);
-  const k = 5;
+  const k = 4;
   const M = Array.from({ length: k }, (_, r) => [
     ...Array.from({ length: k }, (_, c) => X.reduce((s, fila, i) => s + fila[r] * fila[c], 0)),
     X.reduce((s, fila, i) => s + fila[r] * y[i], 0),
@@ -104,7 +105,7 @@ function pesos(muestra) {
     }
   }
   const b = M.map((fila, r) => (Math.abs(fila[r]) > 1e-12 ? fila[k] / fila[r] : 0));
-  return { base: b[0], ataque: b[1], defensa: b[2], vida: b[3], coste: b[4] };
+  return { base: b[0], ataque: b[1], vida: b[2], coste: b[3] };
 }
 
 const p = pesos(bichos);
@@ -118,17 +119,16 @@ if (JSON_OUT) {
   console.log('-'.repeat(40));
   for (const f of bichos.slice().sort((a, b) => a.indice - b.indice)) {
     const marca = (f.indice < 0.7 || f.indice > 1.3) ? ' <<' : '';
-    const adv = `${f.c.ataque}/${f.c.defensa}/${f.c.vida}`;
+    const adv = `${f.c.ataque}/${f.c.vida}`;
     console.log(`${f.id.padEnd(20)} ${String(f.c.coste).padStart(2)} ${adv.padStart(7)} ${f.indice.toFixed(2).padStart(6)}${marca}`);
   }
   console.log(`\ncriaturas fuera de banda: ${fuera.length} de ${bichos.length}`);
   console.log('\nlo que vale un punto de cada cosa:');
   console.log(`  Ataque   ${p.ataque.toFixed(3)}`);
-  console.log(`  Defensa  ${p.defensa.toFixed(3)}`);
   console.log(`  Vida     ${p.vida.toFixed(3)}`);
   console.log(`  coste    −${p.coste.toFixed(3)}`);
   if (p.ataque > 0) {
-    console.log(`\nen unidades de Ataque:  1 A = 1,00 · 1 D = ${(p.defensa / p.ataque).toFixed(2)} · 1 V = ${(p.vida / p.ataque).toFixed(2)}`);
-    console.log(`el «cuerpo» de una carta no es A+D+V sino A + ${(p.defensa / p.ataque).toFixed(1)}·D + ${(p.vida / p.ataque).toFixed(1)}·V`);
+    console.log(`\nen unidades de Ataque:  1 A = 1,00 · 1 V = ${(p.vida / p.ataque).toFixed(2)}`);
+    console.log(`el «cuerpo» de una carta pesa A + ${(p.vida / p.ataque).toFixed(1)}·V`);
   }
 }

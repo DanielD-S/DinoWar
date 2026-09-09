@@ -8,7 +8,7 @@ import { CARTAS, CLADO, RASGO, TIPO, ES_DINOSAURIO, carta } from '../src/data/ca
 import {
   crearPartida, FASE, MOTIVO_FIN,
   unidadEn, unidadesDe, ataqueEfectivo, vidaActual, danoEntre,
-  espinasDe, reduccionDe, rentaDe, curacionDe, efectosDe, adheridasA, buscablesDe,
+  espinasDe, rentaDe, curacionDe, efectosDe, adheridasA, buscablesDe, vidaMaxima,
 } from '../src/engine/state.js';
 import { reduce, ACCION, avanzar, validar } from '../src/engine/actions.js';
 import { tablero, poner, enMano, ejecutar, vivo } from './helpers.js';
@@ -123,41 +123,38 @@ test('Terópodo contra ornitópodo: bonificación de depredación', () => {
   const presa = poner(s, 'dryosaurus', 1, 0);
   const otro = poner(s, 'stegosaurus', 1, 1);
 
-  // El Dryosaurus no tiene Defensa; el Stegosaurus sí, y además no es su presa.
   const atq = carta('ceratosaurus').ataque;
   assert.equal(danoEntre(s, teropodo, presa), atq + BALANCE.clados.bonusDepredacion);
-  // Sin la bonificación, el Ceratosaurus apenas atraviesa la coraza del
-  // Stegosaurus: se queda en el suelo de daño.
-  assert.equal(danoEntre(s, teropodo, otro),
-    Math.max(BALANCE.danoMinimo, atq - CARTAS.stegosaurus.defensa),
-    'sólo aplica sobre su presa');
+  // Contra quien no es su presa, su Ataque pelado.
+  assert.equal(danoEntre(s, teropodo, otro), atq, 'sólo aplica sobre su presa');
 });
 
-test('Ningún golpe se queda en cero: la Defensa resiste, no hace inmune', () => {
+test('El daño es el Ataque y nada más: no hay resta que adivinar', () => {
   const s = tablero();
-  // Ornitholestes pega 2; Loricatosaurus reduce 6. Sin suelo no le haría nada
-  // y sería invulnerable a media mitad del set, que es lo que medía 4,8 puntos
-  // de Ataque por cada punto de Defensa.
+  // Es la razón de haber quitado la Defensa. Antes esto daba 1 —el suelo— y no
+  // había forma de deducirlo mirando las dos cartas: Ornitholestes pega 2 y
+  // Loricatosaurus reducía 6.
   const debil = poner(s, 'ornitholestes', 0, 0);
   const muro = poner(s, 'loricatosaurus', 1, 0);
 
-  assert.ok(CARTAS.loricatosaurus.defensa > CARTAS.ornitholestes.ataque,
-    'el escenario pierde sentido si la coraza no supera al ataque');
-  assert.equal(danoEntre(s, debil, muro), BALANCE.danoMinimo);
-  assert.ok(BALANCE.danoMinimo > 0, 'el suelo tiene que ser mayor que cero');
+  assert.equal(danoEntre(s, debil, muro), CARTAS.ornitholestes.ataque);
+  assert.equal(BALANCE.danoMinimo, undefined,
+    'el suelo de daño se fue con la Defensa: sólo existía para que no hiciera inmune');
 });
 
-test('La Defensa sale de la carta, no del clado', () => {
+test('Lo que aguanta una carta sale de su Vida, y los rasgos la suben', () => {
   const s = tablero();
   const sauropodo = poner(s, 'camarasaurus', 0, 0);
   const colosal = poner(s, 'apatosaurus', 0, 1);
   const agil = poner(s, 'dryosaurus', 0, 2);
 
-  assert.equal(reduccionDe(s, sauropodo), CARTAS.camarasaurus.defensa);
-  assert.equal(reduccionDe(s, agil), 0, 'el que corre no para golpes');
-  assert.equal(reduccionDe(s, colosal),
-    CARTAS.apatosaurus.defensa + BALANCE.rasgos.manadaDefensa,
-    'Manada suma encima de la Defensa de su carta cuando hay otro saurópodo');
+  assert.equal(vidaMaxima(s, sauropodo), CARTAS.camarasaurus.vida);
+  assert.equal(vidaMaxima(s, agil), CARTAS.dryosaurus.vida, 'el que corre no aguanta');
+  // Manada: con otro saurópodo al lado, Apatosaurus aguanta más. Antes esto era
+  // Defensa; el rasgo no cambió, cambió dónde se apunta.
+  assert.equal(vidaMaxima(s, colosal),
+    CARTAS.apatosaurus.vida + BALANCE.rasgos.manadaVida,
+    'Manada suma cuando hay otro saurópodo');
 });
 
 test('El primer turno no hay combate', () => {
@@ -696,7 +693,7 @@ test('Todo clado dice si es de dinosaurio, y las cifras nunca son negativas', ()
   for (const c of Object.values(CARTAS)) {
     if (c.tipo !== TIPO.DINOSAURIO) continue;
     assert.equal(typeof ES_DINOSAURIO[c.clado], 'boolean', `${c.id}: clado «${c.clado}» sin clasificar`);
-    for (const k of ['coste', 'ataque', 'defensa', 'vida']) {
+    for (const k of ['coste', 'ataque', 'vida']) {
       assert.ok(Number.isInteger(c[k]) && c[k] >= 0, `${c.id}: ${k} debería ser un entero no negativo`);
     }
   }

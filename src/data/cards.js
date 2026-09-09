@@ -144,13 +144,13 @@ export const RASGO = Object.freeze({
 });
 
 const dino = (o) => Object.freeze({ tipo: TIPO.DINOSAURIO, ...o });
-const evento = (o) => Object.freeze({ tipo: TIPO.EVENTO, ataque: 0, defensa: 0, vida: 0, ...o });
+const evento = (o) => Object.freeze({ tipo: TIPO.EVENTO, ataque: 0, vida: 0, ...o });
 // Un clima no elige objetivo: ocupa la ranura de clima, y eso lo dice su tipo.
-const clima = (o) => Object.freeze({ tipo: TIPO.CLIMA, ataque: 0, defensa: 0, vida: 0, coste: 2, ...o });
+const clima = (o) => Object.freeze({ tipo: TIPO.CLIMA, ataque: 0, vida: 0, coste: 2, ...o });
 // Los pulsos se juegan BOCA ARRIBA y surten efecto al instante: dar Biomasa
 // "este turno" no sirve de nada si se resuelve después del despliegue. A cambio
 // el rival los ve venir, que es parte de su precio.
-const recurso = (o) => Object.freeze({ tipo: TIPO.RECURSO, objetivo: OBJETIVO.NINGUNO, ataque: 0, defensa: 0, vida: 0, coste: 0, ...o });
+const recurso = (o) => Object.freeze({ tipo: TIPO.RECURSO, objetivo: OBJETIVO.NINGUNO, ataque: 0, vida: 0, coste: 0, ...o });
 
 export const CARTAS = Object.freeze({
 
@@ -159,7 +159,7 @@ export const CARTAS = Object.freeze({
   dryosaurus: dino({
     id: 'dryosaurus', rareza: RAREZA.COMUN, clado: CLADO.ORNITOPODO,
     binomial: 'Dryosaurus altus',
-    coste: 0, ataque: 1, defensa: 0, vida: 2,
+    coste: 0, ataque: 1, vida: 2,
     rasgo: RASGO.GREGARIO, rasgoNombre: 'Gregario',
     rasgoTexto: '+1 de Ataque por cada otro Dryosaurus propio en el campo.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -169,7 +169,7 @@ export const CARTAS = Object.freeze({
   ornitholestes: dino({
     id: 'ornitholestes', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,
     binomial: 'Ornitholestes hermanni',
-    coste: 1, ataque: 2, defensa: 0, vida: 2,
+    coste: 1, ataque: 2, vida: 2,
     rasgo: RASGO.OPORTUNISTA, rasgoNombre: 'Oportunista',
     rasgoTexto: '+1 Vida permanente cada vez que muere un dinosaurio en el campo.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -179,7 +179,7 @@ export const CARTAS = Object.freeze({
   ceratosaurus: dino({
     id: 'ceratosaurus', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,
     binomial: 'Ceratosaurus nasicornis',
-    coste: 1, ataque: 3, defensa: 0, vida: 3,
+    coste: 1, ataque: 3, vida: 3,
     rasgo: RASGO.CAZA_EN_GRUPO, rasgoNombre: 'Caza en grupo',
     rasgoTexto: '+2 de Ataque si hay tres Ceratosaurus tuyos en el campo.',
     nivel_evidencia: EVIDENCIA.DEBATIDO,
@@ -189,9 +189,9 @@ export const CARTAS = Object.freeze({
   stegosaurus: dino({
     id: 'stegosaurus', rareza: RAREZA.COMUN, clado: CLADO.TIREOFORO,
     binomial: 'Stegosaurus stenops',
-    coste: 2, ataque: 1, defensa: 4, vida: 5,
+    coste: 2, ataque: 1, vida: 9,
     rasgo: RASGO.MURO_DE_PLACAS, rasgoNombre: 'Muro de placas',
-    rasgoTexto: '+1 de Defensa si tienes otro Stegosaurus en el campo.',
+    rasgoTexto: '+1 de Vida si tienes otro Stegosaurus en el campo.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Una vértebra caudal de Allosaurus con una perforación compatible con una púa caudal de Stegosaurus es evidencia directa de uso defensivo del tagomizador.',
   }),
@@ -199,7 +199,7 @@ export const CARTAS = Object.freeze({
   allosaurus: dino({
     id: 'allosaurus', rareza: RAREZA.RARO, clado: CLADO.TEROPODO,
     binomial: 'Allosaurus fragilis',
-    coste: 3, ataque: 5, defensa: 2, vida: 3,
+    coste: 3, ataque: 5, vida: 5,
     rasgo: RASGO.DEPREDADOR_DOMINANTE, rasgoNombre: 'Depredador dominante',
     rasgoTexto: 'Si mata a su rival, el daño sobrante pasa al hábitat enemigo.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -209,7 +209,7 @@ export const CARTAS = Object.freeze({
   camarasaurus: dino({
     id: 'camarasaurus', rareza: RAREZA.RARO, clado: CLADO.SAUROPODO,
     binomial: 'Camarasaurus grandis',
-    coste: 3, ataque: 2, defensa: 3, vida: 4,
+    coste: 3, ataque: 2, vida: 7,
     rasgo: RASGO.BUSCA_EVENTO, rasgoNombre: 'Migrador',
     rasgoTexto: 'Al jugarla, busca un evento en tu mazo y llévatelo a la mano.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -219,7 +219,7 @@ export const CARTAS = Object.freeze({
   diplodocus: dino({
     id: 'diplodocus', rareza: RAREZA.EPICO, clado: CLADO.SAUROPODO,
     binomial: 'Diplodocus carnegii',
-    coste: 2, ataque: 3, defensa: 3, vida: 10,
+    coste: 2, ataque: 3, vida: 13,
     rasgo: RASGO.RAMONEO_BAJO, rasgoNombre: 'Ramoneo bajo',
     rasgoTexto: 'Recupera +1 de vida al final de cada uno de tus turnos',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -229,9 +229,9 @@ export const CARTAS = Object.freeze({
   apatosaurus: dino({
     id: 'apatosaurus', rareza: RAREZA.EPICO, clado: CLADO.SAUROPODO,
     binomial: 'Apatosaurus louisae',
-    coste: 3, ataque: 2, defensa: 5, vida: 10,
+    coste: 3, ataque: 2, vida: 15,
     rasgo: RASGO.MANADA, rasgoNombre: 'Manada',
-    rasgoTexto: '+1 de Defensa si tienes otro saurópodo en el campo.',
+    rasgoTexto: '+1 de Vida si tienes otro saurópodo en el campo.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'La talla adulta de los diplodócidos es en sí misma la principal defensa antipredatoria. Nota: la validez de Brontosaurus como género separado sigue en discusión; el juego usa Apatosaurus.',
   }),
@@ -239,7 +239,7 @@ export const CARTAS = Object.freeze({
   torvosaurus: dino({
     id: 'torvosaurus', rareza: RAREZA.LEGENDARIO, clado: CLADO.TEROPODO,
     binomial: 'Torvosaurus tanneri',
-    coste: 4, ataque: 7, defensa: 1, vida: 5,
+    coste: 4, ataque: 7, vida: 6,
     rasgo: RASGO.BUSCA_CLIMA, rasgoNombre: 'Rastreador',
     rasgoTexto: 'Al jugarla, busca un clima en tu mazo y llévatelo a la mano.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -251,7 +251,7 @@ export const CARTAS = Object.freeze({
   nodosaurus: dino({
     id: 'nodosaurus', rareza: RAREZA.RARO, clado: CLADO.TIREOFORO,
     binomial: 'Nodosaurus textilis',
-    coste: 2, ataque: 2, defensa: 3, vida: 5,
+    coste: 2, ataque: 2, vida: 8,
     rasgo: RASGO.BUSCA_GREGARISMO, rasgoNombre: 'Llamada de manada',
     rasgoTexto: 'Al jugarla, busca un Gregarismo en tu mazo y llévatelo a la mano.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -261,7 +261,7 @@ export const CARTAS = Object.freeze({
   riparovenator: dino({
     id: 'riparovenator', rareza: RAREZA.EPICO, clado: CLADO.TEROPODO,
     binomial: 'Riparovenator milnerae',
-    coste: 2, ataque: 4, defensa: 1, vida: 4,
+    coste: 2, ataque: 4, vida: 5,
     rasgo: RASGO.RIBERENO, rasgoNombre: 'Ribereño',
     rasgoTexto: '+2 de ataque mientras el Canal fluvial esté en el campo.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -271,9 +271,9 @@ export const CARTAS = Object.freeze({
   lokiceratops: dino({
     id: 'lokiceratops', rareza: RAREZA.EPICO, clado: CLADO.MARGINOCEFALO,
     binomial: 'Lokiceratops rangiformis',
-    coste: 3, ataque: 4, defensa: 1, vida: 7,
+    coste: 3, ataque: 4, vida: 8,
     rasgo: RASGO.GOLA, rasgoNombre: 'Gola ornamentada',
-    rasgoTexto: '+2 de Defensa si tienes otro Lokiceratops en el campo.',
+    rasgoTexto: '+2 de Vida si tienes otro Lokiceratops en el campo.',
     nivel_evidencia: EVIDENCIA.DEBATIDO,
     nota_cientifica: 'Formación Judith River, Montana, Campaniense (~78 Ma), descrito en 2024. La gola lleva las mayores hojas óseas conocidas en un ceratópsido, asimétricas entre lados. Si servían para defensa, para exhibición o para reconocerse entre especies es justamente lo que se discute.',
   }),
@@ -281,7 +281,7 @@ export const CARTAS = Object.freeze({
   brachylophosaurus: dino({
     id: 'brachylophosaurus', rareza: RAREZA.RARO, clado: CLADO.ORNITOPODO,
     binomial: 'Brachylophosaurus canadensis',
-    coste: 2, ataque: 2, defensa: 1, vida: 6,
+    coste: 2, ataque: 2, vida: 7,
     rasgo: RASGO.GREGARIO, rasgoNombre: 'Gregario',
     rasgoTexto: '+1 Poder por cada copia suya que tengas en el campo.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -291,7 +291,7 @@ export const CARTAS = Object.freeze({
   tyrannotitan: dino({
     id: 'tyrannotitan', rareza: RAREZA.LEGENDARIO, clado: CLADO.TEROPODO,
     binomial: 'Tyrannotitan chubutensis',
-    coste: 4, ataque: 10, defensa: 1, vida: 5,
+    coste: 4, ataque: 10, vida: 6,
     rasgo: RASGO.DESGARRO, rasgoNombre: 'Desgarro',
     rasgoTexto: 'A quien hiere no se le cura ninguna herida ese turno.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -301,7 +301,7 @@ export const CARTAS = Object.freeze({
   huaxiadraco: dino({
     id: 'huaxiadraco', rareza: RAREZA.RARO, clado: CLADO.PTEROSAURIO,
     binomial: 'Huaxiadraco corollatus',
-    coste: 2, ataque: 2, defensa: 2, vida: 2,
+    coste: 2, ataque: 2, vida: 4,
     rasgo: RASGO.VUELO, rasgoNombre: 'Vuelo',
     rasgoTexto: 'Sobrevuela la ranura: golpea siempre al hábitat rival, pero quien tenga enfrente le alcanza igual.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -361,7 +361,7 @@ export const CARTAS = Object.freeze({
     id: 'competencia', rareza: RAREZA.EPICO, binomial: 'Competencia trófica', coste: 3,
     objetivo: OBJETIVO.RIVALES,
     rasgo: RASGO.COMPETENCIA, rasgoNombre: 'Competencia trófica',
-    rasgoTexto: '−2 de Defensa a dos dinosaurios rivales que elijas.',
+    rasgoTexto: '−2 de Vida a dos dinosaurios rivales que elijas.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: 'La coexistencia de varios saurópodos y de varios terópodos grandes en la misma formación implica reparto de recursos. La partición de nicho está sustentada por el desgaste dental; su intensidad como presión competitiva es una inferencia.',
   }),
@@ -461,7 +461,7 @@ export const CARTAS = Object.freeze({
   plesiopleurodon: dino({
     id: 'plesiopleurodon', rareza: RAREZA.EPICO, clado: CLADO.MARINO,
     binomial: 'Plesiopleurodon wellesi',
-    coste: 3, ataque: 9, defensa: 2, vida: 4,
+    coste: 3, ataque: 9, vida: 6,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -470,7 +470,7 @@ export const CARTAS = Object.freeze({
   ojoraptorsaurus: dino({
     id: 'ojoraptorsaurus', rareza: RAREZA.RARO, clado: CLADO.TEROPODO,
     binomial: 'Ojoraptorsaurus boerei',
-    coste: 2, ataque: 4, defensa: 1, vida: 4,
+    coste: 2, ataque: 4, vida: 5,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -479,7 +479,7 @@ export const CARTAS = Object.freeze({
   dromaeosaurus: dino({
     id: 'dromaeosaurus', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,
     binomial: 'Dromaeosaurus albertensis',
-    coste: 2, ataque: 5, defensa: 1, vida: 3,
+    coste: 2, ataque: 5, vida: 4,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -488,7 +488,7 @@ export const CARTAS = Object.freeze({
   athenar: dino({
     id: 'athenar', rareza: RAREZA.COMUN, clado: CLADO.SAUROPODO,
     binomial: 'Athenar bermani',
-    coste: 2, ataque: 2, defensa: 2, vida: 5,
+    coste: 2, ataque: 2, vida: 7,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
@@ -497,7 +497,7 @@ export const CARTAS = Object.freeze({
   sanjuansaurus: dino({
     id: 'sanjuansaurus', rareza: RAREZA.RARO, clado: CLADO.TEROPODO,
     binomial: 'Sanjuansaurus gordilloi',
-    coste: 2, ataque: 5, defensa: 1, vida: 3,
+    coste: 2, ataque: 5, vida: 4,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -506,7 +506,7 @@ export const CARTAS = Object.freeze({
   suchomimus: dino({
     id: 'suchomimus', rareza: RAREZA.EPICO, clado: CLADO.TEROPODO,
     binomial: 'Suchomimus tenerensis',
-    coste: 3, ataque: 8, defensa: 2, vida: 5,
+    coste: 3, ataque: 8, vida: 7,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -515,7 +515,7 @@ export const CARTAS = Object.freeze({
   eosinopteryx: dino({
     id: 'eosinopteryx', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,
     binomial: 'Eosinopteryx brevipenna',
-    coste: 1, ataque: 2, defensa: 0, vida: 2,
+    coste: 1, ataque: 2, vida: 2,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -524,7 +524,7 @@ export const CARTAS = Object.freeze({
   troodon: dino({
     id: 'troodon', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,
     binomial: 'Troodon formosus',
-    coste: 2, ataque: 4, defensa: 1, vida: 4,
+    coste: 2, ataque: 4, vida: 5,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -533,7 +533,7 @@ export const CARTAS = Object.freeze({
   carnotaurus: dino({
     id: 'carnotaurus', rareza: RAREZA.EPICO, clado: CLADO.TEROPODO,
     binomial: 'Carnotaurus sastrei',
-    coste: 3, ataque: 9, defensa: 1, vida: 5,
+    coste: 3, ataque: 9, vida: 6,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -542,7 +542,7 @@ export const CARTAS = Object.freeze({
   spinosaurus: dino({
     id: 'spinosaurus', rareza: RAREZA.LEGENDARIO, clado: CLADO.TEROPODO,
     binomial: 'Spinosaurus aegyptiacus',
-    coste: 4, ataque: 11, defensa: 2, vida: 9,
+    coste: 4, ataque: 11, vida: 11,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -551,7 +551,7 @@ export const CARTAS = Object.freeze({
   mosasaurus: dino({
     id: 'mosasaurus', rareza: RAREZA.LEGENDARIO, clado: CLADO.MARINO,
     binomial: 'Mosasaurus hoffmannii',
-    coste: 4, ataque: 12, defensa: 2, vida: 8,
+    coste: 4, ataque: 12, vida: 10,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -560,7 +560,7 @@ export const CARTAS = Object.freeze({
   halszkaraptor: dino({
     id: 'halszkaraptor', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,
     binomial: 'Halszkaraptor escuilliei',
-    coste: 1, ataque: 2, defensa: 0, vida: 2,
+    coste: 1, ataque: 2, vida: 2,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -569,7 +569,7 @@ export const CARTAS = Object.freeze({
   tongtianlong: dino({
     id: 'tongtianlong', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,
     binomial: 'Tongtianlong limosus',
-    coste: 1, ataque: 1, defensa: 1, vida: 2,
+    coste: 1, ataque: 1, vida: 3,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -578,7 +578,7 @@ export const CARTAS = Object.freeze({
   scanisaurus: dino({
     id: 'scanisaurus', rareza: RAREZA.RARO, clado: CLADO.MARINO,
     binomial: 'Scanisaurus nazarowi',
-    coste: 2, ataque: 4, defensa: 1, vida: 4,
+    coste: 2, ataque: 4, vida: 5,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -587,7 +587,7 @@ export const CARTAS = Object.freeze({
   monolophosaurus: dino({
     id: 'monolophosaurus', rareza: RAREZA.RARO, clado: CLADO.TEROPODO,
     binomial: 'Monolophosaurus jiangi',
-    coste: 2, ataque: 5, defensa: 1, vida: 3,
+    coste: 2, ataque: 5, vida: 4,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -596,7 +596,7 @@ export const CARTAS = Object.freeze({
   invictarx: dino({
     id: 'invictarx', rareza: RAREZA.RARO, clado: CLADO.TIREOFORO,
     binomial: 'Invictarx zephyri',
-    coste: 2, ataque: 2, defensa: 5, vida: 2,
+    coste: 2, ataque: 2, vida: 7,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -605,7 +605,7 @@ export const CARTAS = Object.freeze({
   medusaceratops: dino({
     id: 'medusaceratops', rareza: RAREZA.EPICO, clado: CLADO.MARGINOCEFALO,
     binomial: 'Medusaceratops lokii',
-    coste: 3, ataque: 5, defensa: 4, vida: 6,
+    coste: 3, ataque: 5, vida: 10,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -614,7 +614,7 @@ export const CARTAS = Object.freeze({
   platyceratops: dino({
     id: 'platyceratops', rareza: RAREZA.COMUN, clado: CLADO.MARGINOCEFALO,
     binomial: 'Platyceratops tatarinovi',
-    coste: 1, ataque: 1, defensa: 2, vida: 1,
+    coste: 1, ataque: 1, vida: 3,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -623,7 +623,7 @@ export const CARTAS = Object.freeze({
   loricatosaurus: dino({
     id: 'loricatosaurus', rareza: RAREZA.EPICO, clado: CLADO.TIREOFORO,
     binomial: 'Loricatosaurus priscus',
-    coste: 3, ataque: 4, defensa: 6, vida: 5,
+    coste: 3, ataque: 4, vida: 11,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -632,7 +632,7 @@ export const CARTAS = Object.freeze({
   therizinosaurus: dino({
     id: 'therizinosaurus', rareza: RAREZA.EPICO, clado: CLADO.TEROPODO,
     binomial: 'Therizinosaurus cheloniformis',
-    coste: 3, ataque: 6, defensa: 3, vida: 6,
+    coste: 3, ataque: 6, vida: 9,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -641,7 +641,7 @@ export const CARTAS = Object.freeze({
   alaskacephale: dino({
     id: 'alaskacephale', rareza: RAREZA.RARO, clado: CLADO.MARGINOCEFALO,
     binomial: 'Alaskacephale gangloffi',
-    coste: 2, ataque: 3, defensa: 3, vida: 3,
+    coste: 2, ataque: 3, vida: 6,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -650,7 +650,7 @@ export const CARTAS = Object.freeze({
   titanoceratops: dino({
     id: 'titanoceratops', rareza: RAREZA.EPICO, clado: CLADO.MARGINOCEFALO,
     binomial: 'Titanoceratops ouranos',
-    coste: 3, ataque: 6, defensa: 5, vida: 4,
+    coste: 3, ataque: 6, vida: 9,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -659,7 +659,7 @@ export const CARTAS = Object.freeze({
   atlasaurus: dino({
     id: 'atlasaurus', rareza: RAREZA.EPICO, clado: CLADO.SAUROPODO,
     binomial: 'Atlasaurus imelakei',
-    coste: 3, ataque: 3, defensa: 4, vida: 8,
+    coste: 3, ataque: 3, vida: 12,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -668,7 +668,7 @@ export const CARTAS = Object.freeze({
   stegoceras: dino({
     id: 'stegoceras', rareza: RAREZA.COMUN, clado: CLADO.MARGINOCEFALO,
     binomial: 'Stegoceras validum',
-    coste: 2, ataque: 3, defensa: 3, vida: 3,
+    coste: 2, ataque: 3, vida: 6,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -677,7 +677,7 @@ export const CARTAS = Object.freeze({
   maiasaura: dino({
     id: 'maiasaura', rareza: RAREZA.EPICO, clado: CLADO.ORNITOPODO,
     binomial: 'Maiasaura peeblesorum',
-    coste: 3, ataque: 4, defensa: 2, vida: 9,
+    coste: 3, ataque: 4, vida: 11,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -686,7 +686,7 @@ export const CARTAS = Object.freeze({
   edmontosaurus: dino({
     id: 'edmontosaurus', rareza: RAREZA.LEGENDARIO, clado: CLADO.ORNITOPODO,
     binomial: 'Edmontosaurus annectens',
-    coste: 4, ataque: 5, defensa: 3, vida: 14,
+    coste: 4, ataque: 5, vida: 17,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -695,7 +695,7 @@ export const CARTAS = Object.freeze({
   plateosauravus: dino({
     id: 'plateosauravus', rareza: RAREZA.COMUN, clado: CLADO.SAUROPODO,
     binomial: 'Plateosauravus cullingworthi',
-    coste: 2, ataque: 2, defensa: 2, vida: 5,
+    coste: 2, ataque: 2, vida: 7,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -704,7 +704,7 @@ export const CARTAS = Object.freeze({
   gargoyleosaurus: dino({
     id: 'gargoyleosaurus', rareza: RAREZA.RARO, clado: CLADO.TIREOFORO,
     binomial: 'Gargoyleosaurus parkpinorum',
-    coste: 2, ataque: 2, defensa: 4, vida: 3,
+    coste: 2, ataque: 2, vida: 7,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -713,7 +713,7 @@ export const CARTAS = Object.freeze({
   wendiceratops: dino({
     id: 'wendiceratops', rareza: RAREZA.EPICO, clado: CLADO.MARGINOCEFALO,
     binomial: 'Wendiceratops pinhornensis',
-    coste: 3, ataque: 5, defensa: 4, vida: 6,
+    coste: 3, ataque: 5, vida: 10,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -722,7 +722,7 @@ export const CARTAS = Object.freeze({
   antarctosaurus: dino({
     id: 'antarctosaurus', rareza: RAREZA.LEGENDARIO, clado: CLADO.SAUROPODO,
     binomial: 'Antarctosaurus wichmannianus',
-    coste: 4, ataque: 4, defensa: 5, vida: 13,
+    coste: 4, ataque: 4, vida: 18,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -731,7 +731,7 @@ export const CARTAS = Object.freeze({
   liaoceratops: dino({
     id: 'liaoceratops', rareza: RAREZA.COMUN, clado: CLADO.MARGINOCEFALO,
     binomial: 'Liaoceratops yanzigouensis',
-    coste: 1, ataque: 1, defensa: 1, vida: 2,
+    coste: 1, ataque: 1, vida: 3,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -740,7 +740,7 @@ export const CARTAS = Object.freeze({
   rhinorex: dino({
     id: 'rhinorex', rareza: RAREZA.EPICO, clado: CLADO.ORNITOPODO,
     binomial: 'Rhinorex condrupus',
-    coste: 3, ataque: 4, defensa: 2, vida: 9,
+    coste: 3, ataque: 4, vida: 11,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -749,7 +749,7 @@ export const CARTAS = Object.freeze({
   bienosaurus: dino({
     id: 'bienosaurus', rareza: RAREZA.COMUN, clado: CLADO.TIREOFORO,
     binomial: 'Bienosaurus lufengensis',
-    coste: 1, ataque: 1, defensa: 2, vida: 1,
+    coste: 1, ataque: 1, vida: 3,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -758,7 +758,7 @@ export const CARTAS = Object.freeze({
   shuangmiaosaurus: dino({
     id: 'shuangmiaosaurus', rareza: RAREZA.COMUN, clado: CLADO.ORNITOPODO,
     binomial: 'Shuangmiaosaurus gilmorei',
-    coste: 2, ataque: 3, defensa: 1, vida: 5,
+    coste: 2, ataque: 3, vida: 6,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -767,7 +767,7 @@ export const CARTAS = Object.freeze({
   chasmosaurus: dino({
     id: 'chasmosaurus', rareza: RAREZA.COMUN, clado: CLADO.MARGINOCEFALO,
     binomial: 'Chasmosaurus belli',
-    coste: 2, ataque: 2, defensa: 4, vida: 3,
+    coste: 2, ataque: 2, vida: 7,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
@@ -810,7 +810,7 @@ export const CARTAS_DE_JEFE = Object.freeze({
     id: 'jefe_saurophaganax',
     tipo: TIPO.DINOSAURIO, clado: CLADO.TEROPODO, rareza: RAREZA.LEGENDARIO,
     binomial: 'Saurophaganax maximus',
-    coste: 4, ataque: 7, defensa: 2, vida: 6,
+    coste: 4, ataque: 7, vida: 8,
     rasgo: RASGO.DEPREDADOR_DOMINANTE,
     evidencia: 'DEBATIDO',
     nota: 'El mayor terópodo conocido de la Formación Morrison, y también el más '
@@ -822,7 +822,7 @@ export const CARTAS_DE_JEFE = Object.freeze({
     id: 'jefe_barosaurus',
     tipo: TIPO.DINOSAURIO, clado: CLADO.SAUROPODO, rareza: RAREZA.LEGENDARIO,
     binomial: 'Barosaurus lentus',
-    coste: 4, ataque: 3, defensa: 4, vida: 9,
+    coste: 4, ataque: 3, vida: 13,
     rasgo: RASGO.MANADA,
     evidencia: 'ESTABLECIDO',
     nota: 'Diplodócido de cuello desmesurado incluso para su familia: vértebras '

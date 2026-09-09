@@ -5,7 +5,7 @@ import {
   CARTAS, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, RAREZA_NOMBRE, RASGO, ES_DINOSAURIO, carta,
 } from '../data/cards.js';
 import {
-  unidadEn, unidadesDe, ataqueEfectivo, reduccionDe, vidaMaxima, vidaActual,
+  unidadEn, unidadesDe, ataqueEfectivo, vidaMaxima, vidaActual,
   efectosDe, adheridasA,
 } from '../engine/state.js';
 import { arte, hayFoto, rutaFoto } from './art.js';
@@ -119,13 +119,12 @@ export function statHTML(k, nombre, valor, clase = '') {
  * contenido, así que los dos se van a una cinta encima y no tapan nada.
  */
 function marcoCarta(estado, cardId, {
-  poder = null, defensa = null, vidaAct = null, vidaMax = null,
+  poder = null, vidaAct = null, vidaMax = null,
   adaptada = false, mermada = false, grande = false,
 } = {}) {
   const c = carta(cardId);
   const dino = c.tipo === TIPO.DINOSAURIO;
   const atq = poder ?? c.ataque;
-  const def = defensa ?? c.defensa;
   const vm = vidaMax ?? c.vida;
   const va = vidaAct ?? vm;
   const herido = va < vm;
@@ -146,7 +145,6 @@ function marcoCarta(estado, cardId, {
       ${grande ? `<div class="c-clado">${dino ? CLADO_NOMBRE[c.clado] : TIPO_NOMBRE[c.tipo]}</div>` : ''}
       ${dino ? `<div class="c-stats">
         ${statHTML('a', 'Ataque', atq, clasePoder)}
-        ${statHTML('d', 'Defensa', def)}
         ${statHTML('v', 'Vida', `${va}${herido ? `<em>/${vm}</em>` : ''}`, herido ? ' herido' : '')}
       </div>` : ''}
       ${!dino && !grande ? `<div class="c-tipo">${TIPO_NOMBRE[c.tipo]}</div>` : ''}
@@ -212,7 +210,6 @@ function pintarRanuras(estado) {
           variante: 'ranura', dueno: bando, iid: inst.iid, clases: libre ? ['entra', 'pasa'] : ['entra'],
           datos: {
             poder: ataqueEfectivo(estado, inst.iid),
-            defensa: reduccionDe(estado, inst.iid),
             vidaAct: vidaActual(estado, inst.iid),
             vidaMax: vidaMaxima(estado, inst.iid),
             adaptada: inst.adherencias.length > 0,
@@ -243,8 +240,6 @@ function actualizarCarta(estado, nodo, inst) {
     atqNodo.classList.toggle('mejorado', p > c.ataque);
     atqNodo.classList.toggle('mermado', p < c.ataque);
   }
-  const defNodo = nodo.querySelector('.st-d b');
-  if (defNodo) defNodo.textContent = reduccionDe(estado, inst.iid);
 
   const vidaNodo = nodo.querySelector('.st-v');
   if (vidaNodo) {
@@ -428,11 +423,10 @@ function estadoEnJuegoHTML(estado, iid) {
   const signo = (n) => (n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`);
   const cifra = (e) => [
     e.ataque ? `${signo(e.ataque)} de Ataque` : '',
-    e.defensa ? `${signo(e.defensa)} de Defensa` : '',
     e.vida ? `${signo(e.vida)} de Vida` : '',
   ].filter(Boolean).join(' y ');
 
-  const filas = efectos.map((e) => `<li class="${e.ataque + (e.defensa ?? 0) + e.vida < 0 ? 'malo' : 'bueno'}">
+  const filas = efectos.map((e) => `<li class="${e.ataque + e.vida < 0 ? 'malo' : 'bueno'}">
       <b>${e.fuente}${e.veces > 1 ? ` ×${e.veces}` : ''}</b>
       <span>${cifra(e)}${e.nota ? ` · ${e.nota}` : ''}</span></li>`);
 
@@ -449,7 +443,6 @@ function estadoEnJuegoHTML(estado, iid) {
       <h3>En el campo ahora mismo</h3>
       <div class="ficha-cifras">
         ${statHTML('a', 'Ataque', atq, atq === c.ataque ? '' : (atq > c.ataque ? ' mejorado' : ' mermado'))}
-        ${statHTML('d', 'Defensa', reduccionDe(estado, iid))}
         ${statHTML('v', 'Vida', `${va}${heridas ? `<em>/${vm}</em>` : ''}`, heridas ? ' herido' : '')}
       </div>
       <ul class="ficha-efectos">${filas.join('')}</ul>
@@ -479,7 +472,6 @@ export function fichaHTML(cardId, iid = null, estado = null) {
       <div class="ficha-cifras">
         <span class="st st-c"><i aria-hidden="true">◆</i><u>Coste</u><b>${c.coste}</b></span>
         ${dino ? statHTML('a', 'Ataque', c.ataque) : ''}
-        ${dino ? statHTML('d', 'Defensa', c.defensa) : ''}
         ${dino ? statHTML('v', 'Vida', c.vida) : ''}
       </div>
       <button class="ficha-ampliar" data-zoom="${cardId}" data-modo="carta">Ver la carta en grande</button>
@@ -646,7 +638,6 @@ export function ayudaHTML() {
       <div class="anatomia-notas">
         <div><span class="n c">${c.coste}</span><span><b>Coste</b> en Biomasa. Va en el círculo, sobre el arte.</span></div>
         <div><span class="n st-a">${glifo('a')}</span><span><b>Ataque</b>: daño que reparte, una vez por turno.</span></div>
-        <div><span class="n st-d">${glifo('d')}</span><span><b>Defensa</b>: se resta de <b>cada</b> golpe que recibe, no de la Vida.</span></div>
         <div><span class="n st-v">${glifo('v')}</span><span><b>Vida</b>: heridas que aguanta antes de morir. Herida enseña <b>actual/máximo</b>, y <b>no se cura</b> salvo carta que lo diga.</span></div>
       </div>
     </div>
@@ -657,32 +648,30 @@ export function ayudaHTML() {
       cada uno se calcula sobre el estado de antes del choque, así que un intercambio puede matar a los dos.
     </p>
     <p class="ayuda-p">
-      <b>Daño = Ataque del que pega − Defensa del que recibe</b>, nunca menos de 0. Lo que pasa se queda
-      como herida y <b>se acumula turno tras turno</b>: muere quien acumula tantas heridas como Vida tiene.
+      <b>Daño = el Ataque del que pega.</b> Sin restas: lo que pone en la carta es lo que hace. Lo que
+      entra se queda como herida y <b>se acumula turno tras turno</b>: muere quien acumula tantas heridas
+      como Vida tiene.
     </p>
     <ul class="ayuda-lista">
-      <li><span class="k">Ejemplo</span><span class="v"><i>${a.binomial}</i> (Ataque ${a.ataque}, Defensa ${a.defensa}, Vida ${a.vida})
-        choca con <i>${d.binomial}</i> (Ataque ${d.ataque}, Defensa ${d.defensa}, Vida ${d.vida}).
-        Le hace ${a.ataque} − ${d.defensa} = <b>${Math.max(0, a.ataque - d.defensa)}</b>.
-        Recibe ${d.ataque} − ${a.defensa} = ${Math.max(0, d.ataque - a.defensa)}, y encima ${espinas} de púas
-        caudales, que <b>no</b> las para la Defensa: <b>${Math.max(0, d.ataque - a.defensa) + espinas}</b> en total.
-        Con ${a.vida} de Vida, el depredador cae y el ${'tireóforo'} se queda en pie con
-        ${d.vida - Math.max(0, a.ataque - d.defensa)} de ${d.vida}.</span></li>
-      <li><span class="k">Bloqueo</span><span class="v">Si ninguno pasa la Defensa del otro, los dos se quedan
-        mirándose: no muere nadie y el hábitat no recibe nada. Un muro no gana, <b>tapa</b>.</span></li>
+      <li><span class="k">Ejemplo</span><span class="v"><i>${a.binomial}</i> (Ataque ${a.ataque}, Vida ${a.vida})
+        choca con <i>${d.binomial}</i> (Ataque ${d.ataque}, Vida ${d.vida}).
+        Le hace <b>${a.ataque}</b> y recibe ${d.ataque}, más ${espinas} de púas caudales:
+        <b>${d.ataque + espinas}</b> en total.</span></li>
+      <li><span class="k">Lo que sobra</span><span class="v">Si el golpe pasa de la Vida que le quedaba, la
+        diferencia <b>sigue hasta el hábitat rival</b>. Ningún número se pierde por el camino.</span></li>
       <li><span class="k">Sin rival</span><span class="v">Ranura de enfrente vacía: el Ataque entero va al
-        hábitat contrario. La Defensa sólo cuenta contra dinosaurios.</span></li>
+        hábitat contrario.</span></li>
     </ul>
     <p class="ayuda-p">
       Mantén pulsada cualquier carta para leer su ficha con la nota científica.
-      Ejemplo: <i>${c.binomial}</i> cuesta ${c.coste}, pega ${c.ataque}, para ${c.defensa} y aguanta ${c.vida}.
+      Ejemplo: <i>${c.binomial}</i> cuesta ${c.coste}, pega ${c.ataque} y aguanta ${c.vida}.
     </p>
 
     <div class="ayuda-h">Los cuatro clados</div>
     <p class="ayuda-p">No es piedra-papel-tijera: es una red trófica.</p>
     <ul class="ayuda-lista">
       <li><span class="k">Terópodo</span><span class="v">+${BALANCE.clados.bonusDepredacion} de daño contra ornitópodos. Depredación sobre presa pequeña.</span></li>
-      <li><span class="k">Saurópodo</span><span class="v">Mucha Vida y mucha Defensa. La talla adulta es su defensa; no necesita regla aparte.</span></li>
+      <li><span class="k">Saurópodo</span><span class="v">Mucha Vida. La talla adulta es su defensa, y ahora se ve en la única cifra que la mide.</span></li>
       <li><span class="k">Tireóforo</span><span class="v">Devuelve ${BALANCE.clados.espinasTireoforo} de daño a quien lo ataque. Púas caudales.</span></li>
       <li><span class="k">Ornitópodo</span><span class="v">Barato y frágil. Es la presa.</span></li>
     </ul>

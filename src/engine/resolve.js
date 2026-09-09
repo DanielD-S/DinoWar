@@ -48,7 +48,6 @@ function recogerBajas(s, causa) {
       inst.ranura = null;
       inst.heridas = 0;
       inst.modAtaque = 0;
-      inst.modDefensa = 0;
       inst.modVida = 0;
       inst.marcas = [];
       inst.desplegadoEnTurno = null;
@@ -79,13 +78,13 @@ function recogerBajas(s, causa) {
  * copias de la misma carta se acumulan en un solo apunte: «Competencia trófica
  * ×2, −4 de Ataque» se lee mejor que dos renglones iguales.
  */
-export function marcar(inst, cardId, ataque, vida, defensa = 0) {
+export function marcar(inst, cardId, ataque, vida) {
   const previo = inst.marcas.find((m) => m.cardId === cardId);
   if (previo) {
-    previo.ataque += ataque; previo.vida += vida; previo.defensa += defensa; previo.veces += 1;
+    previo.ataque += ataque; previo.vida += vida; previo.veces += 1;
     return;
   }
-  inst.marcas.push({ cardId, ataque, vida, defensa, veces: 1 });
+  inst.marcas.push({ cardId, ataque, vida, veces: 1 });
 }
 
 export function golpearHabitat(s, bando, cantidad) {
@@ -277,14 +276,16 @@ function aplicarPresion(s, p) {
     ev(s, 'PRESION', { jugador: p.jugador, cardId, objetivo: objetivo.iid, objetivoCardId: objetivo.cardId });
 
   } else if (r === RASGO.COMPETENCIA) {
-    // Dos rivales señalados uno a uno, y le muerde a la Defensa: antes era todo
-    // un clado y le quitaba Ataque.
+    // Dos rivales señalados uno a uno, y les muerde a la Vida: antes era todo
+    // un clado y les quitaba Ataque, y entre medias fue Defensa, que ya no
+    // existe. Quitar Vida es lo más parecido a lo que hacía —desgastar sin
+    // matar— y además se ve en la carta.
     let n = 0;
     for (const oid of p.objetivos ?? []) {
       const inst = s.instancias[oid];
       if (!inst || inst.ranura === null || inst.dueno !== contrario) continue;
-      inst.modDefensa -= BALANCE.rasgos.competenciaDefensa;
-      marcar(inst, cardId, 0, 0, -BALANCE.rasgos.competenciaDefensa);
+      inst.modVida -= BALANCE.rasgos.competenciaVida;
+      marcar(inst, cardId, 0, -BALANCE.rasgos.competenciaVida);
       n += 1;
     }
     ev(s, 'PRESION', { jugador: p.jugador, cardId, objetivos: p.objetivos ?? [], afectados: n });
@@ -355,11 +356,14 @@ export function faseCombate(s) {
       if (dA > 0 && carta(a.cardId).rasgo === RASGO.DESGARRO) s.instancias[b.iid].sinCuracion = true;
       if (dB > 0 && carta(b.cardId).rasgo === RASGO.DESGARRO) s.instancias[a.iid].sinCuracion = true;
 
-      // Depredador dominante: lo que sobra al matar sigue hacia el habitat.
-      if (carta(a.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE) {
+      // Lo que sobra al matar sigue hacia el habitat. Hoy es privilegio del
+      // rasgo Depredador dominante; con `sobranteAlHabitat` es la regla para
+      // todos, que es la variante que se está midiendo.
+      const sobra = BALANCE.cuerpo.sobranteAlHabitat;
+      if (sobra || carta(a.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE) {
         alHabitat[1] += Math.max(0, dA - vidaActual(s, b.iid));
       }
-      if (carta(b.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE) {
+      if (sobra || carta(b.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE) {
         alHabitat[0] += Math.max(0, dB - vidaActual(s, a.iid));
       }
 

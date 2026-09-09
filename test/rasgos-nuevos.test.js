@@ -5,7 +5,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { FASE, vidaActual, vidaMaxima, reduccionDe, ataqueEfectivo, vuela } from '../src/engine/state.js';
+import { FASE, vidaActual, vidaMaxima, ataqueEfectivo, vuela } from '../src/engine/state.js';
 import { BALANCE } from '../src/data/balance.js';
 import { CARTAS } from '../src/data/cards.js';
 import { tablero, poner, ejecutar, vivo } from './helpers.js';
@@ -15,26 +15,26 @@ test('La Gola necesita a otro Lokiceratops delante', () => {
   const nodo = poner(s, 'nodosaurus', 0, 0);
   const loki = poner(s, 'lokiceratops', 0, 1);
 
-  assert.equal(reduccionDe(s, nodo), CARTAS.nodosaurus.defensa,
+  assert.equal(vidaMaxima(s, nodo), CARTAS.nodosaurus.vida,
     'Nodosaurus perdió la Coraza al pasar a buscador');
-  assert.equal(reduccionDe(s, loki), CARTAS.lokiceratops.defensa,
+  assert.equal(vidaMaxima(s, loki), CARTAS.lokiceratops.vida,
     'solo, la gola no vale de nada');
 
   poner(s, 'lokiceratops', 0, 2);
-  assert.equal(reduccionDe(s, loki), CARTAS.lokiceratops.defensa + BALANCE.rasgos.golaDefensa,
+  assert.equal(vidaMaxima(s, loki), CARTAS.lokiceratops.vida + BALANCE.rasgos.golaVida,
     'con otro de los suyos delante, sí');
 });
 
 test('Los rasgos de compañía sólo cuentan a los tuyos', () => {
   const s = tablero(111);
   const mio = poner(s, 'stegosaurus', 0, 0);
-  const base = CARTAS.stegosaurus.defensa;
+  const base = CARTAS.stegosaurus.vida;
 
   poner(s, 'stegosaurus', 1, 0);
-  assert.equal(reduccionDe(s, mio), base, 'un Stegosaurus del rival no te hace de muro');
+  assert.equal(vidaMaxima(s, mio), base, 'un Stegosaurus del rival no te hace de muro');
 
   poner(s, 'stegosaurus', 0, 1);
-  assert.equal(reduccionDe(s, mio), base + BALANCE.rasgos.muroDePlacasDefensa);
+  assert.equal(vidaMaxima(s, mio), base + BALANCE.rasgos.muroDePlacasVida);
 });
 
 test('Caza en grupo: con dos Ceratosaurus no basta, con tres sí', () => {
@@ -53,11 +53,11 @@ test('Caza en grupo: con dos Ceratosaurus no basta, con tres sí', () => {
 test('Manada: al Apatosaurus le vale cualquier otro saurópodo', () => {
   const s = tablero(113);
   const apato = poner(s, 'apatosaurus', 0, 0);
-  const base = CARTAS.apatosaurus.defensa + BALANCE.rasgos.manadaDefensa;
+  const base = CARTAS.apatosaurus.vida + BALANCE.rasgos.manadaVida;
 
-  assert.equal(reduccionDe(s, apato), CARTAS.apatosaurus.defensa, 'solo, no');
+  assert.equal(vidaMaxima(s, apato), CARTAS.apatosaurus.vida, 'solo, no');
   poner(s, 'diplodocus', 0, 1);
-  assert.equal(reduccionDe(s, apato), base, 'con un Diplodocus al lado, sí');
+  assert.equal(vidaMaxima(s, apato), base, 'con un Diplodocus al lado, sí');
 });
 
 test('Los climas nuevos alcanzan a los dos bandos', () => {
@@ -65,10 +65,10 @@ test('Los climas nuevos alcanzan a los dos bandos', () => {
   const mio = poner(s, 'allosaurus', 0, 0);
   const suyo = poner(s, 'allosaurus', 1, 0);
 
-  const defensa = reduccionDe(s, mio);
+  const base = vidaMaxima(s, mio);
   s.campo = 'sabana';
-  assert.equal(reduccionDe(s, mio), defensa + BALANCE.efectosCampo.sabanaDefensa);
-  assert.equal(reduccionDe(s, suyo), defensa + BALANCE.efectosCampo.sabanaDefensa,
+  assert.equal(vidaMaxima(s, mio), base + BALANCE.efectosCampo.sabanaVida);
+  assert.equal(vidaMaxima(s, suyo), base + BALANCE.efectosCampo.sabanaVida,
     'la sabana no distingue de quién es el dinosaurio');
 
   s.campo = 'canal';

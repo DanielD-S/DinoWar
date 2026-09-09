@@ -44,7 +44,6 @@ export function nuevaInstancia(iid, cardId, dueno) {
     ranura: null,
     heridas: 0,
     modAtaque: 0,
-    modDefensa: 0,
     modVida: 0,
     // Qué le ha cambiado las cifras y quién se lo hizo. modAtaque y modVida son
     // dos números sin memoria: dicen «−2» pero no de dónde salió, y en la mesa
@@ -192,47 +191,40 @@ export function ataqueEfectivo(state, iid) {
   return Math.max(0, poder);
 }
 
+/**
+ * La Vida de esta unidad ahora mismo. Aquí es donde recalaron los rasgos y el
+ * clima que antes daban Defensa: masa, osteodermos y placas siguen protegiendo,
+ * pero aguantando más golpes en vez de restar de cada uno.
+ *
+ * Es DINÁMICA, y eso tiene una consecuencia que conviene tener a la vista: un
+ * Muro de placas que se queda sin congénere pierde su Vida extra en el acto y,
+ * si estaba herido, puede caerse ahí mismo. No es nuevo —el clima del Canal ya
+ * hacía exactamente eso desde siempre— pero ahora pasa más veces.
+ */
 export function vidaMaxima(state, iid) {
   const inst = state.instancias[iid];
-  const extra = campoEs(state, RASGO.CAMPO_CANAL) ? BALANCE.efectosCampo.canalVida : 0;
-  // En la variante de dos estadísticas la Defensa no resta: se suma aquí.
-  const plegada = SIN_DEFENSA ? defensaBruta(state, iid) * BALANCE.cuerpo.defensaAVida : 0;
-  return carta(inst.cardId).vida + inst.modVida + extra + plegada;
-}
-
-export const vidaActual = (state, iid) => vidaMaxima(state, iid) - state.instancias[iid].heridas;
-
-/** ¿Corre la variante sin Defensa? Se lee una vez: el modo no cambia en caliente. */
-export const SIN_DEFENSA = BALANCE.cuerpo.modo === 'ATAQUE_VIDA';
-
-/**
- * La Defensa que tendría esta unidad: la de su ficha más lo que le añaden los
- * rasgos y el clima. Está separada de `reduccionDe` porque la variante de dos
- * estadísticas necesita el mismo número para OTRA cosa —sumarlo a la Vida— y
- * calcularlo dos veces era garantizar que un día divergieran.
- */
-export function defensaBruta(state, iid) {
-  const inst = state.instancias[iid];
   const c = carta(inst.cardId);
-  let d = (c.defensa ?? 0) + inst.modDefensa;
-  if (c.rasgo === RASGO.CORAZA) d += BALANCE.rasgos.corazaDefensa;
+  let v = c.vida + inst.modVida;
 
+  if (campoEs(state, RASGO.CAMPO_CANAL)) v += BALANCE.efectosCampo.canalVida;
+  // La sabana abierta obliga a apiñarse: los dos bandos aguantan más.
+  if (campoEs(state, RASGO.CAMPO_SABANA)) v += BALANCE.efectosCampo.sabanaVida;
+
+  if (c.rasgo === RASGO.CORAZA) v += BALANCE.rasgos.corazaVida;
   // Las que piden compañía. Se cuentan sólo los propios: un Stegosaurus rival
   // no le sirve de muro al tuyo.
   if (c.rasgo === RASGO.MURO_DE_PLACAS && conCompañía(state, inst, 1)) {
-    d += BALANCE.rasgos.muroDePlacasDefensa;
+    v += BALANCE.rasgos.muroDePlacasVida;
   }
-  if (c.rasgo === RASGO.GOLA && conCompañía(state, inst, 1)) {
-    d += BALANCE.rasgos.golaDefensa;
-  }
+  if (c.rasgo === RASGO.GOLA && conCompañía(state, inst, 1)) v += BALANCE.rasgos.golaVida;
   if (c.rasgo === RASGO.MANADA && delClado(state, inst, c.clado, 1)) {
-    d += BALANCE.rasgos.manadaDefensa;
+    v += BALANCE.rasgos.manadaVida;
   }
 
-  // La sabana abierta obliga a apiñarse: los dos bandos ganan Defensa.
-  if (campoEs(state, RASGO.CAMPO_SABANA)) d += BALANCE.efectosCampo.sabanaDefensa;
-  return Math.max(0, d);
+  return Math.max(0, v);
 }
+
+export const vidaActual = (state, iid) => vidaMaxima(state, iid) - state.instancias[iid].heridas;
 
 /** ¿Hay al menos `min` copias MÁS de esta misma carta entre las tuyas? */
 function conCompañía(state, inst, min) {
@@ -256,23 +248,19 @@ export function espinasDe(state, iid) {
 }
 
 /**
- * Defensa: reducción plana del daño recibido. Sale de la propia carta —masa,
- * osteodermos, placas—, no del clado.
+ * Daño que `atacante` inflige a `defensor`, red trófica incluida.
  *
- * En la variante ATAQUE_VIDA devuelve siempre 0: la Defensa no existe como
- * resta y ya se ha convertido en Vida dentro de `vidaMaxima`.
+ * Es su Ataque, y ya. No hay resta de Defensa —dejó de existir— ni suelo de
+ * daño, que sólo estaba ahí para impedir que una Defensa alta hiciera inmune a
+ * una criatura. Sin resta no hay nada de lo que protegerse, y el suelo pasaba a
+ * ser una tercera regla invisible sin motivo: hacía que un Ataque de 0 pegara 1.
  */
-export function reduccionDe(state, iid) {
-  return SIN_DEFENSA ? 0 : defensaBruta(state, iid);
-}
-
-/** Daño que `atacante` inflige a `defensor`, red trófica incluida. */
 export function danoEntre(state, atacanteIid, defensorIid) {
   const a = carta(state.instancias[atacanteIid].cardId);
   const d = carta(state.instancias[defensorIid].cardId);
   let dano = ataqueEfectivo(state, atacanteIid);
   if (BALANCE.clados.presaDe[a.clado] === d.clado) dano += BALANCE.clados.bonusDepredacion;
-  return Math.max(BALANCE.danoMinimo, dano - reduccionDe(state, defensorIid));
+  return Math.max(0, dano);
 }
 
 /** Daño que una unidad sin rival enfrente inflige al habitat contrario. */
@@ -323,11 +311,10 @@ export function efectosDe(state, iid) {
   const fuera = [];
 
   for (const m of inst.marcas) {
-    const def = m.defensa ?? 0;
-    if (m.ataque === 0 && m.vida === 0 && def === 0) continue;
+    if (m.ataque === 0 && m.vida === 0) continue;
     fuera.push({
       fuente: carta(m.cardId).binomial,
-      ataque: m.ataque, defensa: def, vida: m.vida, veces: m.veces,
+      ataque: m.ataque, vida: m.vida, veces: m.veces,
       nota: m.cardId === inst.cardId ? 'su propio rasgo' : '',
     });
   }
