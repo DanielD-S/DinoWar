@@ -14,11 +14,12 @@ y se revela **a la vez**: la tensión del juego es la información oculta, no el
 
 | Vía | Cómo |
 |---|---|
-| **Registro fósil** | Reúne 8 trofeos. Cada dinosaurio rival que muere te da uno. |
-| **Colapso del hábitat** | Derriba el hábitat rival, que empieza con 34 de Vida. |
+| **Registro fósil** | Reúne 10 trofeos. Cada dinosaurio rival que muere te da uno. |
+| **Colapso del hábitat** | Derriba el hábitat rival, que empieza con 70 de Vida. |
 | **Extinción** | Quien se queda sin mazo pierde. El descarte **no se rebaraja**, y hay cartas que le comen el mazo al rival. |
 
-Sobre 2.000 partidas las tres se reparten **39 % / 39 % / 22 %**: ninguna es decorado.
+Sobre 2.000 partidas las tres se reparten **45 % / 24 % / 31 %**: ninguna es decorado.
+La partida media dura **12,8 turnos**.
 
 Y de ahí sale la decisión de cada turno: **una fila llena tapa tu hábitat pero regala
 trofeos; una fila corta niega trofeos pero deja pasar el daño**. No hay postura segura.
@@ -52,7 +53,9 @@ acumulan y no se curan salvo que una carta lo diga, así que dos dinosaurios que
 no se atraviesan la Defensa se quedan bloqueados: ninguno muere y ninguno pega
 al hábitat.
 
-Ver **[SET_DE_CARTAS.md](SET_DE_CARTAS.md)** para las 31 cartas con su referencia.
+El set son **66 cartas**: 50 dinosaurios —bueno, 50 criaturas: hay un pterosaurio y
+tres marinos que no lo son y lo dicen—, 8 eventos, 5 climas y 3 de recurso. Ver
+**[SET_DE_CARTAS.md](SET_DE_CARTAS.md)** para todas, con su referencia.
 
 La mano inicial se puede **cambiar entera en el turno 1**: el primer cambio es
 gratis y roba las mismas cartas, y cada cambio siguiente roba una menos. Una mano
@@ -69,10 +72,12 @@ monedas, y fundir un sobre entero devuelve menos de lo que cuesta: reciclar lo
 que sobra no es una forma de farmear.
 
 Un mazo son 50 cartas exactas y de cada carta caben tantas copias como diga su
-rareza: 3 común, 3 rara, 2 épica, 1 legendaria. Con 31 cartas distintas ya no
-caben todas, que es justo lo que hace que construir un mazo signifique algo. Tú
-llevas el tuyo; la IA lleva siempre el de referencia, que es el que mide
-`BALANCE.md`.
+rareza: 3 común, 3 rara, 2 épica, 1 legendaria. Con 66 cartas distintas no caben
+ni de lejos todas, que es justo lo que hace que construir un mazo signifique
+algo. Tú llevas el tuyo; la IA lleva siempre el de referencia —30 dinosaurios,
+14 eventos, 3 de recurso y 3 de clima—, que es el único que mide `BALANCE.md`:
+las 39 cartas que se quedan fuera de él se juegan igual, pero su calibración no
+está comprobada.
 
 Para probar sin esperar a juntar monedas: `?pruebas=1` en la dirección da sobres
 gratis. No toca el saldo guardado, sólo deja de cobrar.
@@ -90,7 +95,7 @@ python -m http.server 8000
 y abrir <http://localhost:8000>.
 
 ```bash
-npm test        # 60 tests del motor y de la colección
+npm test        # 84 tests del motor, la colección y el arte
 npm run sim     # 2.000 partidas IA vs IA → BALANCE.md
 node sim/set.js # regenera SET_DE_CARTAS.md desde el código
 ```
@@ -127,7 +132,7 @@ src/engine/    motor de reglas: (estado, acción) → estado. Puro, sin DOM, cor
 src/ui/        interfaz: sólo lee el estado, nunca lo muta. almacen.js es el
                único fichero que toca localStorage
 sim/           simulador de balance y generador del set
-test/          60 tests
+test/          84 tests
 tools/         utilidades de desarrollo, fuera del juego servido
 v1/            versión anterior, jugable y congelada (ver v1/LEEME.md)
 ```
@@ -144,8 +149,12 @@ sobre 2.000 partidas y declara qué objetivos cumple y cuáles no.
 
 El rediseño de la v2 salió de una medición concreta: en la v1, **quien iba por delante en
 el turno 6 ganaba el 87,6 % de las partidas**, porque la renta dependía de ir ganando y la
-ventaja se realimentaba sola. Ahora la Biomasa sube por turno igual para los dos y esa
-cifra baja al **61,6 %**. La partida se juega hasta el final.
+ventaja se realimentaba sola. Ahora la Biomasa sube por turno igual para los dos y quien
+va por delante en el turno 5 gana el **64,8 %**. La partida se juega hasta el final.
+
+`BALANCE.md` declara también lo que NO cumple: hoy son **3 cartas mal calibradas**
+—*Canal fluvial trenzado* y *Torvosaurus tanneri*, que casi nadie juega, y
+*Gregarismo*, que se juega siempre— sobre un objetivo de cero.
 
 ---
 
