@@ -201,7 +201,7 @@ export const CARTAS = Object.freeze({
     binomial: 'Allosaurus fragilis',
     coste: 3, ataque: 5, vida: 5,
     rasgo: RASGO.DEPREDADOR_DOMINANTE, rasgoNombre: 'Depredador dominante',
-    rasgoTexto: 'Si mata a su rival, el daño sobrante pasa al hábitat enemigo.',
+    rasgoTexto: 'Si mata a su rival, el daño sobrante que pasa al hábitat enemigo se duplica.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Taxón de terópodo más abundante de la Morrison. Marcas de mordida atribuidas a Allosaurus aparecen en huesos de saurópodos y de Stegosaurus.',
   }),
@@ -447,7 +447,7 @@ export const CARTAS = Object.freeze({
   sabana: clima({
     id: 'sabana', coste: 1, rareza: RAREZA.COMUN, binomial: 'Sabana de helechos',
     rasgo: RASGO.CAMPO_SABANA, rasgoNombre: 'Sabana de helechos',
-    rasgoTexto: 'Terreno abierto, sin cobertura: +1 al daño contra los biomas.',
+    rasgoTexto: '+1 de Biomasa cada turno para los dos jugadores, mientras siga en el campo.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Extensiones abiertas de helechos sobre suelos semiáridos, sin dosel que rompa la línea de visión ni frene un avance.',
   }),

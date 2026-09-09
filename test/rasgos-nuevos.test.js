@@ -5,7 +5,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { FASE, vidaActual, vidaMaxima, ataqueEfectivo, vuela } from '../src/engine/state.js';
+import { FASE, vidaActual, vidaMaxima, ataqueEfectivo, vuela, rentaDe } from '../src/engine/state.js';
 import { BALANCE } from '../src/data/balance.js';
 import { CARTAS } from '../src/data/cards.js';
 import { tablero, poner, ejecutar, vivo } from './helpers.js';
@@ -65,11 +65,15 @@ test('Los climas nuevos alcanzan a los dos bandos', () => {
   const mio = poner(s, 'allosaurus', 0, 0);
   const suyo = poner(s, 'allosaurus', 1, 0);
 
-  const base = vidaMaxima(s, mio);
+  // La sabana da Biomasa a los DOS, cada turno, mientras siga en el campo. Fue
+  // «+1 al daño contra los biomas» —cuya constante alguien borró, dejando a la
+  // IA calculando NaN durante un día— y luego Defensa, que ya no existe.
+  const renta = rentaDe(s);
   s.campo = 'sabana';
-  assert.equal(vidaMaxima(s, mio), base + BALANCE.efectosCampo.sabanaVida);
-  assert.equal(vidaMaxima(s, suyo), base + BALANCE.efectosCampo.sabanaVida,
-    'la sabana no distingue de quién es el dinosaurio');
+  assert.equal(rentaDe(s), renta + BALANCE.efectosCampo.sabanaBiomasa,
+    'la sabana sube la renta');
+  assert.equal(vidaMaxima(s, mio), vidaMaxima(s, suyo),
+    'y no toca la Vida de nadie');
 
   s.campo = 'canal';
   assert.equal(vidaMaxima(s, mio), CARTAS.allosaurus.vida + BALANCE.efectosCampo.canalVida);

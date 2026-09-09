@@ -356,15 +356,23 @@ export function faseCombate(s) {
       if (dA > 0 && carta(a.cardId).rasgo === RASGO.DESGARRO) s.instancias[b.iid].sinCuracion = true;
       if (dB > 0 && carta(b.cardId).rasgo === RASGO.DESGARRO) s.instancias[a.iid].sinCuracion = true;
 
-      // Lo que sobra al matar sigue hacia el habitat. Hoy es privilegio del
-      // rasgo Depredador dominante; con `sobranteAlHabitat` es la regla para
-      // todos, que es la variante que se está midiendo.
-      const sobra = BALANCE.cuerpo.sobranteAlHabitat;
-      if (sobra || carta(a.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE) {
-        alHabitat[1] += Math.max(0, dA - vidaActual(s, b.iid));
-      }
-      if (sobra || carta(b.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE) {
-        alHabitat[0] += Math.max(0, dB - vidaActual(s, a.iid));
+      // Lo que sobra al matar sigue hacia el habitat: si pegas 5 a algo que
+      // tenía 3 de Vida, pasan 2. Es la regla para todos.
+      //
+      // DEPREDADOR DOMINANTE lo DUPLICA, y sólo aquí. El rasgo se quedó sin
+      // contenido cuando el sobrante pasó a ser general —su texto describía lo
+      // que ya hacía todo el mundo— y esto se lo devuelve sin inventar una
+      // mecánica nueva: la misma regla, el doble.
+      //
+      // Ojo a la condición: duplica el SOBRANTE, que sólo existe si venció al
+      // que tenía enfrente. Contra una ranura vacía no hay nada que doblar y su
+      // Ataque pasa tal cual, que es la rama de más abajo.
+      const dobla = (uno) => (carta(uno.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE ? 2 : 1);
+      const sobraA = Math.max(0, dA - vidaActual(s, b.iid));
+      const sobraB = Math.max(0, dB - vidaActual(s, a.iid));
+      if (BALANCE.cuerpo.sobranteAlHabitat) {
+        alHabitat[1] += sobraA * dobla(a);
+        alHabitat[0] += sobraB * dobla(b);
       }
 
       ev(s, 'CHOQUE', { ranura: r, a: a.iid, b: b.iid, danoA: dA, danoB: dB });

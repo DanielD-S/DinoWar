@@ -207,8 +207,6 @@ export function vidaMaxima(state, iid) {
   let v = c.vida + inst.modVida;
 
   if (campoEs(state, RASGO.CAMPO_CANAL)) v += BALANCE.efectosCampo.canalVida;
-  // La sabana abierta obliga a apiñarse: los dos bandos aguantan más.
-  if (campoEs(state, RASGO.CAMPO_SABANA)) v += BALANCE.efectosCampo.sabanaVida;
 
   if (c.rasgo === RASGO.CORAZA) v += BALANCE.rasgos.corazaVida;
   // Las que piden compañía. Se cuentan sólo los propios: un Stegosaurus rival
@@ -276,7 +274,12 @@ export const hayAridez = (state) => campoEs(state, RASGO.CAMPO_ARIDEZ);
 
 /** Biomasa que le entra a cada bando este turno. Plana: no depende del turno. */
 export function rentaDe(state) {
-  const extra = campoEs(state, RASGO.CAMPO_LLANURA) ? BALANCE.efectosCampo.llanuraBiomasa : 0;
+  // Los dos climas que dan Biomasa se suman: son cartas distintas y sólo puede
+  // haber un clima en el campo, así que en la práctica nunca coinciden — pero
+  // escribirlo como una cadena de `if` evita que mañana se olvide uno.
+  let extra = 0;
+  if (campoEs(state, RASGO.CAMPO_LLANURA)) extra += BALANCE.efectosCampo.llanuraBiomasa;
+  if (campoEs(state, RASGO.CAMPO_SABANA)) extra += BALANCE.efectosCampo.sabanaBiomasa;
   return BALANCE.rentaPorTurno + extra;
 }
 

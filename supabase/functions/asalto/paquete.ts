@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: 33e4f06c2420965c
+// huella: 4b4cf1029b028665
 //
 // Lleva dentro estos 16 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -241,7 +241,7 @@ var CARTAS = Object.freeze({
     vida: 5,
     rasgo: RASGO.DEPREDADOR_DOMINANTE,
     rasgoNombre: "Depredador dominante",
-    rasgoTexto: "Si mata a su rival, el da\xF1o sobrante pasa al h\xE1bitat enemigo.",
+    rasgoTexto: "Si mata a su rival, el da\xF1o sobrante que pasa al h\xE1bitat enemigo se duplica.",
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Tax\xF3n de ter\xF3podo m\xE1s abundante de la Morrison. Marcas de mordida atribuidas a Allosaurus aparecen en huesos de saur\xF3podos y de Stegosaurus."
   }),
@@ -567,7 +567,7 @@ var CARTAS = Object.freeze({
     binomial: "Sabana de helechos",
     rasgo: RASGO.CAMPO_SABANA,
     rasgoNombre: "Sabana de helechos",
-    rasgoTexto: "Terreno abierto, sin cobertura: +1 al da\xF1o contra los biomas.",
+    rasgoTexto: "+1 de Biomasa cada turno para los dos jugadores, mientras siga en el campo.",
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Extensiones abiertas de helechos sobre suelos semi\xE1ridos, sin dosel que rompa la l\xEDnea de visi\xF3n ni frene un avance."
   }),
@@ -1282,7 +1282,11 @@ var BALANCE = Object.freeze({
     // El canal y la sabana ya no tocan sólo a los tuyos: como todo clima,
     // valen para los dos bandos por igual.
     canalVida: 1,
-    sabanaVida: 1
+    // La sabana da Biomasa a los dos, cada turno, mientras siga en el campo.
+    // Fue «+1 al daño contra los biomas» —una constante que se borró y a la que
+    // la IA siguió llamando durante un día entero, calculando NaN— y luego +1 de
+    // Defensa, que dejó de existir con la Defensa.
+    sabanaBiomasa: 1
   }),
   // ------------------------------------------------------------------- mazo
   tamanoMazo: 50,
@@ -1575,7 +1579,6 @@ function vidaMaxima(state, iid) {
   const c = carta(inst.cardId);
   let v = c.vida + inst.modVida;
   if (campoEs(state, RASGO.CAMPO_CANAL)) v += BALANCE.efectosCampo.canalVida;
-  if (campoEs(state, RASGO.CAMPO_SABANA)) v += BALANCE.efectosCampo.sabanaVida;
   if (c.rasgo === RASGO.CORAZA) v += BALANCE.rasgos.corazaVida;
   if (c.rasgo === RASGO.MURO_DE_PLACAS && conCompa\u00F1\u00EDa(state, inst, 1)) {
     v += BALANCE.rasgos.muroDePlacasVida;
@@ -1613,7 +1616,9 @@ function danoAlHabitat(state, iid) {
 var vuela = (state, iid) => carta(state.instancias[iid].cardId).rasgo === RASGO.VUELO;
 var hayAridez = (state) => campoEs(state, RASGO.CAMPO_ARIDEZ);
 function rentaDe(state) {
-  const extra = campoEs(state, RASGO.CAMPO_LLANURA) ? BALANCE.efectosCampo.llanuraBiomasa : 0;
+  let extra = 0;
+  if (campoEs(state, RASGO.CAMPO_LLANURA)) extra += BALANCE.efectosCampo.llanuraBiomasa;
+  if (campoEs(state, RASGO.CAMPO_SABANA)) extra += BALANCE.efectosCampo.sabanaBiomasa;
   return BALANCE.rentaPorTurno + extra;
 }
 function curacionDe(state, iid) {
@@ -2015,12 +2020,12 @@ function faseCombate(s) {
       golpes.push({ iid: b.iid, cantidad: espinasDe(s, a.iid), causa: CAUSA.ESPINAS, por: 0 });
       if (dA > 0 && carta(a.cardId).rasgo === RASGO.DESGARRO) s.instancias[b.iid].sinCuracion = true;
       if (dB > 0 && carta(b.cardId).rasgo === RASGO.DESGARRO) s.instancias[a.iid].sinCuracion = true;
-      const sobra = BALANCE.cuerpo.sobranteAlHabitat;
-      if (sobra || carta(a.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE) {
-        alHabitat[1] += Math.max(0, dA - vidaActual(s, b.iid));
-      }
-      if (sobra || carta(b.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE) {
-        alHabitat[0] += Math.max(0, dB - vidaActual(s, a.iid));
+      const dobla = (uno) => carta(uno.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE ? 2 : 1;
+      const sobraA = Math.max(0, dA - vidaActual(s, b.iid));
+      const sobraB = Math.max(0, dB - vidaActual(s, a.iid));
+      if (BALANCE.cuerpo.sobranteAlHabitat) {
+        alHabitat[1] += sobraA * dobla(a);
+        alHabitat[0] += sobraB * dobla(b);
       }
       ev(s, "CHOQUE", { ranura: r, a: a.iid, b: b.iid, danoA: dA, danoB: dB });
     } else if (a) {
@@ -2498,18 +2503,17 @@ function mazoDe(vista, j) {
 }
 function valorEnRanura(vista, j, ranura, mio) {
   const b = unidadEn(vista, rival(j), ranura);
-  const extraSabana = campoEs(vista, RASGO.CAMPO_SABANA) ? BALANCE.efectosCampo.sabanaDanoHabitat : 0;
   if (!b) {
     const turnos2 = 1 + (IA.horizonte - 1) * 0.5;
-    return (mio.poder + extraSabana) * IA.pesoHabitat * turnos2;
+    return mio.poder * IA.pesoHabitat * turnos2;
   }
   if (mio.vuela) {
     const turnos2 = 1 + (IA.horizonte - 1) * 0.5;
-    return (mio.poder + extraSabana) * IA.pesoHabitat * turnos2;
+    return mio.poder * IA.pesoHabitat * turnos2;
   }
   if (vuela(vista, b.iid)) {
     const turnos2 = 1 + (IA.horizonte - 1) * 0.5;
-    return (mio.poder + extraSabana) * IA.pesoHabitat * turnos2;
+    return mio.poder * IA.pesoHabitat * turnos2;
   }
   const evitado = danoAlHabitat(vista, b.iid) * IA.pesoHabitat;
   const dA = Math.max(0, mio.poder + bonusTrofico(mio.clado, carta(b.cardId).clado));
@@ -2633,9 +2637,7 @@ function valorDeAccion(vista, j, a) {
       const r = carta(cardId).rasgo;
       let valor = 0;
       if (r === RASGO.CAMPO_LLANURA) valor = BALANCE.efectosCampo.llanuraBiomasa * 1.2;
-      if (r === RASGO.CAMPO_SABANA) {
-        valor = (unidadesDe(vista, j).length - unidadesDe(vista, contrario).length) * IA.pesoHabitat;
-      }
+      if (r === RASGO.CAMPO_SABANA) valor = BALANCE.efectosCampo.sabanaBiomasa * 1.2;
       if (r === RASGO.CAMPO_BOSQUE) {
         valor = unidadesDe(vista, j).filter((u) => carta(u.cardId).clado === CLADO.SAUROPODO).length * 0.8;
       }
