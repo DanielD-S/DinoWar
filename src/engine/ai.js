@@ -243,6 +243,22 @@ function valorDeAccion(vista, j, a) {
       return valor * IA.horizonte - carta(cardId).coste * IA.pesoCoste;
     }
 
+    // Devolver una carta al mazo (Llanura de inundación). No es una jugada
+    // ofensiva: es alargar el mazo. Vale algo sólo cuando el mazo escasea, y
+    // sólo si lo que se devuelve no se iba a poder jugar.
+    //
+    // Se puntúa por debajo del umbral cuando queda mazo de sobra, para que la
+    // IA no se dedique a reciclar en el turno 2 teniendo cosas que desplegar.
+    case ACCION.RECICLAR: {
+      const mazo = vista.jugadores[j].mazo.length;
+      if (mazo > IA.reciclaDesdeMazo) return 0;
+      const c = carta(vista.instancias[a.iid].cardId);
+      const alcanzable = c.coste <= vista.jugadores[j].biomasa + IA.horizonte;
+      if (alcanzable) return 0;
+      // Cuanto menos mazo queda, más urge: en 0 se pierde la partida.
+      return (IA.reciclaDesdeMazo - mazo) / IA.reciclaDesdeMazo;
+    }
+
     default:
       return 0;
   }

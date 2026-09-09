@@ -90,6 +90,8 @@ export function crearPartida(seedEntrada = 1, mazos = null) {
       // jugada del rival es la misma tensión que ya tiene el tablero.
       produccion: null,
       biomasaJugadaEsteTurno: 0,
+      // Cartas devueltas al mazo este turno; lo permite la Llanura de inundación.
+      recicladasEsteTurno: 0,
       habitat: BALANCE.vidaHabitat,
       trofeos: 0,
       mazo: b.lista,
@@ -261,6 +263,16 @@ export function danoEntre(state, atacanteIid, defensorIid) {
   return Math.max(0, dano);
 }
 
+/**
+ * ¿Puede este jugador devolver ahora una carta de su mano al mazo? Sólo con la
+ * Llanura de inundación en el campo, y una vez por turno.
+ */
+export function puedeReciclar(state, j) {
+  if (!campoEs(state, RASGO.CAMPO_LLANURA)) return false;
+  const jug = state.jugadores[j];
+  return jug.recicladasEsteTurno < BALANCE.efectosCampo.llanuraReciclaPorTurno;
+}
+
 /** Daño que una unidad sin rival enfrente inflige al habitat contrario. */
 export function danoAlHabitat(state, iid) {
   return ataqueEfectivo(state, iid);
@@ -277,9 +289,7 @@ export function rentaDe(state) {
   // Los dos climas que dan Biomasa se suman: son cartas distintas y sólo puede
   // haber un clima en el campo, así que en la práctica nunca coinciden — pero
   // escribirlo como una cadena de `if` evita que mañana se olvide uno.
-  let extra = 0;
-  if (campoEs(state, RASGO.CAMPO_LLANURA)) extra += BALANCE.efectosCampo.llanuraBiomasa;
-  if (campoEs(state, RASGO.CAMPO_SABANA)) extra += BALANCE.efectosCampo.sabanaBiomasa;
+  const extra = campoEs(state, RASGO.CAMPO_SABANA) ? BALANCE.efectosCampo.sabanaBiomasa : 0;
   return BALANCE.rentaPorTurno + extra;
 }
 

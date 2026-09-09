@@ -132,7 +132,10 @@ export function robar(s, j, n) {
 // ------------------------------------------------------------------- fases
 
 export function faseRenta(s) {
-  for (const jug of s.jugadores) jug.biomasaJugadaEsteTurno = 0;
+  for (const jug of s.jugadores) {
+    jug.biomasaJugadaEsteTurno = 0;
+    jug.recicladasEsteTurno = 0;
+  }
 
   // CARTAS: la renta no existe, la Biomasa la traen las cartas de recurso.
   // Sólo se reparte el fondo de salida, para que el turno 1 no sea en blanco.
