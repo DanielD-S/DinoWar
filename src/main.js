@@ -678,9 +678,12 @@ function iniciar() {
   montar();
   montarTutorial();
   // Las ilustraciones son opcionales: si están servidas se repinta con ellas,
-  // si no, se juega con las siluetas y nadie ve un hueco.
+  // si no, se juega con las siluetas y nadie ve un hueco. El índice llega por
+  // red y puede tardar, así que detectarFotos() corrige por su cuenta lo que ya
+  // esté pintado —incluidas las pantallas de colección, sobres y mazos, que no
+  // pasan por render()—.
   vigilarFotos();
-  detectarFotos(() => { if (estado) render(estado); }).then(calentarFotos);
+  detectarFotos().then(calentarFotos);
   pintarRecord();
   irA(APP.MENU);
 

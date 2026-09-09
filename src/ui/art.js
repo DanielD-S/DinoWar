@@ -246,9 +246,14 @@ export const focoDe = (cardId) => focos.get(cardId) ?? null;
 /**
  * Mira una sola vez qué ilustraciones hay servidas. No rechaza nunca: no tener
  * ninguna es el estado normal, no un error.
- * @param {() => void} [alCambiar] se llama sólo si hay algo que repintar.
+ *
+ * El índice llega por red y puede tardar: en el móvil da tiempo de sobra a
+ * entrar en Sobres o en Colección antes de que conteste. Lo que ya se pintó
+ * con siluetas se corrige aquí mismo, en el sitio —cambiar el `<svg>` por el
+ * `<img>`—, porque repintar la pantalla entera cortaría el volteo del sobre a
+ * media animación.
  */
-export async function detectarFotos(alCambiar) {
+export async function detectarFotos() {
   let indice = null;
   try {
     const r = await fetch('assets/dinos/indice.json', { cache: 'no-cache' });
@@ -264,7 +269,27 @@ export async function detectarFotos(alCambiar) {
   for (const [id, foco] of Object.entries(indice?.foco ?? {})) {
     if (typeof foco === 'string') focos.set(id, foco);
   }
-  if (alCambiar) alCambiar();
+  refrescarFotos();
+}
+
+/**
+ * Cambia por su ilustración las siluetas que ya están en pantalla y ahora
+ * tienen foto. Vale para cualquier pantalla —partida, colección, sobres,
+ * mazos— porque busca por marca de carta, no por dónde esté colgada.
+ */
+export function refrescarFotos() {
+  for (const svg of document.querySelectorAll('svg[data-carta]')) {
+    const cardId = svg.dataset.carta;
+    if (!hayFoto(cardId)) continue;
+    const boton = svg.closest('.ficha-arte');
+    svg.replaceWith(document.createRange().createContextualFragment(arte(cardId)));
+    // La ficha ofrece «ver la ilustración» sólo si la hay: si acaba de
+    // aparecer, el botón tiene que enterarse.
+    if (boton) {
+      boton.dataset.modo = 'foto';
+      boton.setAttribute('aria-label', 'Ver la ilustración en grande');
+    }
+  }
 }
 
 /**
@@ -290,16 +315,33 @@ const ocioso = (fn) => (window.requestIdleCallback
   ? window.requestIdleCallback(fn, { timeout: 4000 })
   : setTimeout(fn, 300));
 
+/** Cartas a las que ya se les dio una segunda oportunidad. */
+const reintentadas = new Set();
+
 /**
  * Una imagen que no carga vuelve a su silueta. Los eventos `error` de <img> no
  * burbujean, así que se escuchan en captura, y con uno basta para toda la
  * página: el índice puede quedarse desfasado y ninguna carta se queda en blanco.
+ *
+ * Pero antes de rendirse, una segunda oportunidad. En el móvil una petición se
+ * cae sola —red que va y viene, la pestaña que pasa a segundo plano— y bajar la
+ * carta a silueta por eso la dejaba sin ilustración el resto de la sesión, para
+ * todas las pantallas a la vez, porque `conFoto` es de la página entera. Un
+ * fallo es un fallo; dos seguidos ya son una imagen que no está.
  */
 export function vigilarFotos() {
   document.addEventListener('error', (e) => {
     const img = e.target;
     if (!(img instanceof HTMLImageElement) || !img.dataset.carta) return;
     const cardId = img.dataset.carta;
+    if (!reintentadas.has(cardId)) {
+      reintentadas.add(cardId);
+      // El mismo src no vuelve a pedirse solo: hay que soltarlo y devolverlo.
+      const src = img.src;
+      img.removeAttribute('src');
+      ocioso(() => { if (img.isConnected) img.src = src; });
+      return;
+    }
     conFoto.delete(cardId);
     img.replaceWith(document.createRange().createContextualFragment(arte(cardId)));
   }, true);
@@ -321,7 +363,10 @@ export function arte(cardId, color = null) {
   const [tono, escala] = TONO[cardId] ?? ['#a89170', 1];
   const relleno = color ?? tono;
   const y = (1 - escala) * 35;
-  return `<svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+  // La silueta lleva su carta encima: es lo que permite cambiarla por la
+  // ilustración cuando el índice llega tarde, sin repintar la pantalla entera.
+  return `<svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg" data-carta="${cardId}"
+               aria-hidden="true" focusable="false">
     <g fill="${relleno}" transform="translate(0 ${y.toFixed(1)}) scale(1 ${escala})">${SILUETAS[plan]}</g>
   </svg>`;
 }
