@@ -36,6 +36,7 @@
           <button id="btn-sobres" class="boton-secundario">Sobres</button>
           <button id="btn-mazos" class="boton-secundario">Mazos</button>
           <button id="btn-cuenca" class="boton-secundario">La Cuenca</button>
+          <button id="btn-cuenta" class="boton-secundario">Cuenta</button>
         </div>
         <div class="menu-fila">
           <button id="btn-ayuda-menu" class="boton-fantasma">Cómo se juega</button>
@@ -48,6 +49,10 @@
         <p class="menu-monedas"><span class="punto"></span><b id="menu-moneda">0</b> dinomonedas
           <span class="sep"></span> mazo <b id="menu-mazo">—</b></p>
         <p class="menu-record" id="menu-record"></p>
+        <!-- Quién eres, dicho sin que haya que ir a buscarlo. Jugar sin cuenta
+             es legítimo, pero que la colección viva sólo en este navegador es
+             algo que conviene saber ANTES de perderla. -->
+        <p class="menu-cuenta" id="menu-cuenta"></p>
       </div>
     </div>
   </section>
@@ -212,6 +217,16 @@
     <footer class="meta-pie">
       <button id="btn-abrir" class="boton-grande">Abrir sobre</button>
     </footer>
+  </section>
+
+  <!-- ----------------------------------------------------------- CUENTA -->
+  <section id="cuenta" class="pantalla oculta meta">
+    <header class="meta-barra">
+      <button class="meta-volver" data-volver>&lsaquo; Men&uacute;</button>
+      <h2>Cuenta</h2>
+    </header>
+    <div class="meta-cuerpo" id="cuenta-cuerpo"></div>
+    <footer class="meta-pie" id="cuenta-pie"></footer>
   </section>
 
   <section id="cuenca" class="pantalla oculta meta">

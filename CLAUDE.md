@@ -7,7 +7,7 @@ que se aprende chocándose.
 ## Verificar un cambio
 
 ```bash
-npm test              # 138 tests. Es la verificación canónica.
+npm test              # 151 tests. Es la verificación canónica.
 npm run sim           # 2.000 partidas IA vs IA → BALANCE.md
 node sim/set.js       # regenera SET_DE_CARTAS.md desde el código
 python -m http.server 8000
@@ -41,7 +41,24 @@ hay que hacer caso cuando el test lo dice.
 | `ECONOMIAS.md` | `node sim/economias.js` | — |
 | `supabase/migrations/0004_catalogo.sql` | `node tools/generar-catalogo.mjs` | `test/catalogo.test.js` |
 | `supabase/functions/asalto/paquete.ts` | `node tools/empaquetar-asalto.mjs` | `test/paquete.test.js` |
+| `supabase/migrations/0006_catalogo_cartas.sql` | `node tools/generar-cartas.mjs` | `test/cuentas.test.js` |
 | El commit anclado en `desde-url.ts` | `node tools/anclar-desde-url.mjs` | `test/anclaje.test.js` |
+
+## Windows
+
+Dos cosas que sólo fallan aquí, ya arregladas, por si reaparecen:
+
+- **Finales de línea.** Hay un `.gitattributes` con `eol=lf`. Sin él,
+  `core.autocrlf=true` entrega los ficheros con CRLF y **tres de los guardianes
+  de arriba fallan siempre**: comparan un fichero del disco contra algo generado
+  en memoria o sacado con `git show`, y esos dos caminos no pasan por la
+  conversión de git. En CI no se veía porque Linux hace checkout en LF. Un
+  guardián que falla siempre es un guardián apagado.
+- **Lanzar procesos.** `npx` no existe como ejecutable —es `npx.cmd`— y desde
+  Node 20 un `.cmd` necesita `shell: true` o da EINVAL. Y el idiom
+  ``import.meta.url === `file://${process.argv[1]}` `` no se cumple nunca,
+  porque argv llega con barras invertidas: las herramientas corrían, no escribían
+  nada y no se quejaban. Va con `pathToFileURL`.
 
 ## Variantes de economía
 
@@ -73,6 +90,37 @@ Diseño completo en [PLAN_TRIBU.md](PLAN_TRIBU.md). Lo operativo:
   `auth.uid()`, nunca de un parámetro.
 - El daño a los jefes lo calcula el servidor **re-jugando la partida**. El
   cliente manda semilla, mazo y sus jugadas; lo que diga del resultado no se lee.
+
+### La colección es del servidor
+
+`coleccion`, `mazos` y las dinomonedas viven en la base de datos. Lo que hay en
+`localStorage` es una **caché** de lo que dijo el servidor, y sigue siendo la
+verdad sólo cuando se juega sin él. La costura es `src/ui/perfil.js`, hermana de
+`red.js`: se lee de la caché de forma síncrona —los repintados de `meta.js` lo
+necesitan— y se escribe siempre contra el servidor.
+
+Las tres cosas que dan cartas o monedas pasan por la Edge Function, que despacha
+por `tipo`: `asalto`, `victoria` y `sobre`. Es UNA función y no tres a propósito:
+cada una traería su empaquetado, su anclaje y su despliegue, que son los tres
+sitios donde este proyecto ya se ha equivocado.
+
+Y las tres cierran la misma puerta desde ángulos distintos. **No basta con
+validar el mazo:** si las 50 dinomonedas de una victoria se acuñan diciendo «he
+ganado», con ellas se compran sobres y las cartas que salen son legítimas. Por
+eso la victoria contra la IA también se re-juega, y el sobre lo sortea el
+servidor con el mismo `abrirSobre()` del navegador.
+
+La comprobación de que un mazo es TUYO tiene una sola implementación,
+`private.validar_mazo`, y se llama desde `guardar_mazo` y —vía
+`public.validar_mazo_de`, que existe sólo porque el esquema `private` no se
+publica— desde la Edge Function.
+
+### Cuentas
+
+Crear una cuenta **no crea un usuario**: le pone correo y contraseña al usuario
+anónimo que ya eras (`PUT /auth/v1/user`), así que el uuid no cambia y no se
+migra nada. Jugar sin cuenta sigue funcionando; lo que no tienes sin ella es
+forma de volver a tu colección desde otro sitio, y la pantalla lo dice.
 
 ### Trampas que costaron una mañana
 
@@ -122,13 +170,17 @@ pasos. CI corre los tests en cada push y necesita `fetch-depth: 0`, porque
 
 Dicho para que nadie lo descubra tarde:
 
-- **La propiedad del mazo.** El servidor comprueba que tu mazo es legal —50
-  cartas, copias por rareza— pero no que sea tuyo: la colección vive en tu
-  `localStorage`. Cerrarlo es moverla al servidor.
 - **CAPTCHA en el alta anónima.** El límite es de 30 por hora y por IP. Antes de
   abrirlo a desconocidos hay que activar Turnstile, o la tabla de usuarios es un
   blanco fácil.
+- **La confirmación por correo está desactivada.** Se puede crear una cuenta con
+  un correo que no es tuyo. Para activarla hace falta un SMTP propio: el
+  integrado de Supabase manda 2 correos a la hora y sólo a direcciones del
+  equipo.
+- **El ELO no lo mueve nadie.** La columna existe en `jugadores` y las partidas
+  se registran, pero no hay PvP todavía.
 - **Tres cartas mal calibradas** sobre un objetivo de cero (`BALANCE.md`), y 39
   de las 66 cartas del set fuera del mazo de referencia, o sea sin calibración
   comprobada.
-- **Los proyectos gratuitos de Supabase se pausan a los 7 días sin actividad.**
+El proyecto es **de pago** (plan Pro), así que no se pausa por inactividad.
+Eso era cierto antes y ya no lo es.

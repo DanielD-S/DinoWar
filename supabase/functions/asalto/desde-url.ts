@@ -7,6 +7,12 @@
 //
 // Existe para poder desplegar sin subir 115 KB de paquete.
 //
+// SÓLO hace asaltos. La función completa despacha además `victoria` y `sobre`;
+// ésta los rechaza diciéndolo, en vez de contestar algo razonable a una
+// petición que no sabe atender. Lo que NO se recorta es la comprobación de que
+// el mazo sea tuyo: una versión corta más permisiva que la larga es un agujero
+// esperando a que alguien despliegue la de repuesto.
+//
 // Los importes son ESTÁTICOS y con la URL literal repetida, por feo que quede.
 // Con `await import(`${REPO}/...`)` la ruta se calcula en tiempo de ejecución,
 // el empaquetado del despliegue no puede verla y el módulo no viaja: la función
@@ -51,6 +57,11 @@ Deno.serve(async (req) => {
   let envio: Record<string, unknown>;
   try { envio = await req.json(); } catch { return json({ error: 'cuerpo ilegible' }, 400); }
 
+  const tipo = (envio.tipo as string) ?? 'asalto';
+  if (tipo !== 'asalto') {
+    return json({ error: `esta versión sólo hace asaltos, no «${tipo}»` }, 501);
+  }
+
   // Re-jugar la partida. El daño lo calcula el servidor; lo que diga el
   // cliente sobre el resultado no se lee.
   let resultado;
@@ -71,6 +82,14 @@ Deno.serve(async (req) => {
   const { data: jugador } = await comoServicio
     .from('jugadores').select('tribu_id').eq('id', user.id).single();
   if (!jugador?.tribu_id) return json({ error: 'no estás en ninguna tribu' }, 409);
+
+  // ¿Es TUYO ese mazo? `validarAsalto` sólo mira que sea legal; la propiedad se
+  // comprueba contra tu colección, que vive en la base de datos.
+  const { error: errMazo } = await comoServicio.rpc('validar_mazo_de', {
+    p_jugador: user.id,
+    p_cartas: Object.fromEntries((envio.mazo ?? []) as Array<[string, number]>),
+  });
+  if (errMazo) return json({ error: errMazo.message }, 422);
 
   const desde = new Date(Date.now() - 24 * 3600_000).toISOString();
   const { count } = await comoServicio

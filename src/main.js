@@ -23,8 +23,10 @@ import {
 } from './ui/tutorial.js';
 import { detectarFotos, vigilarFotos, calentarFotos } from './ui/art.js';
 import { montarMeta, abrirColeccion, abrirSobres, abrirMazos, pintarMenu, recompensar } from './ui/meta.js';
-import { mazoActivo, cargarPerfil, actualizarPerfil, anadirCartas } from './ui/almacen.js';
+import { mazoActivo, cargarPerfil, actualizarPerfil } from './ui/almacen.js';
 import { montarCuenca, abrirCuenca, pintarCuenca } from './ui/cuenca.js';
+import { montarCuenta, abrirCuenta, resumenDeCuenta } from './ui/cuenta.js';
+import { sincronizar } from './ui/perfil.js';
 import { asaltar, estadoDeTribu, entrar as entrarEnLaCuenca } from './ui/red.js';
 import { danoDeAsalto, habitatDeAsalto } from './data/tribu.js';
 import { JEFES, jefeActivo } from './data/eventos.js';
@@ -37,6 +39,7 @@ import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio } from '
 const APP = Object.freeze({
   BOOT: 'BOOT', MENU: 'MENU', PLAYING: 'PLAYING', RESOLVING: 'RESOLVING', GAME_OVER: 'GAME_OVER',
   COLECCION: 'COLECCION', SOBRES: 'SOBRES', MAZOS: 'MAZOS', CUENCA: 'CUENCA',
+  CUENTA: 'CUENTA',
 });
 
 const params = new URLSearchParams(location.search);
@@ -62,6 +65,11 @@ function leerRecord() {
 function guardarRecord(r) {
   try { localStorage.setItem(CLAVE_RECORD, JSON.stringify(r)); } catch { /* sin persistencia */ }
 }
+/** La línea del menú que dice quién eres. */
+function pintarCuentaEnMenu() {
+  if (el.menuCuenta) el.menuCuenta.textContent = resumenDeCuenta();
+}
+
 function pintarRecord() {
   const r = leerRecord();
   if (!r) { el.record.textContent = ''; return; }
@@ -90,6 +98,7 @@ function irA(nuevo) {
   el.sobres.classList.toggle('oculta', nuevo !== APP.SOBRES);
   el.mazos.classList.toggle('oculta', nuevo !== APP.MAZOS);
   el.cuenca.classList.toggle('oculta', nuevo !== APP.CUENCA);
+  el.cuenta.classList.toggle('oculta', nuevo !== APP.CUENTA);
 }
 
 const interactivo = () => app === APP.PLAYING && estado?.fase === FASE.DESPLIEGUE;
@@ -365,7 +374,10 @@ function seAcaboElTiempo(bando) {
   });
   if (cerrarAsalto(gane)) return;
   anotarResultado(gane, estado.turno);
-  el.finPremio.textContent = premioTexto(recompensar(gane));
+  // Ganar porque al rival se le acabó el tiempo no es una partida que el
+  // servidor pueda reproducir: el reloj no es una jugada del motor. Se cobra
+  // como lo que es, una partida que no se puede re-jugar.
+  cobrar(gane, false);
   sonido(gane ? 'gana' : 'pierde');
 }
 
@@ -553,7 +565,7 @@ function rendirse() {
   });
   if (cerrarAsalto(false)) return;
   anotarResultado(false, estado.turno);
-  el.finPremio.textContent = premioTexto(recompensar(false));
+  cobrar(false, false);
   sonido('pierde');
 }
 
@@ -628,8 +640,30 @@ function finPartida() {
   pintarFin({ via, gane, titular: gane ? 'Victoria' : 'Derrota', frase });
   if (cerrarAsalto(gane)) return;
   anotarResultado(gane, estado.turno);
-  el.finPremio.textContent = premioTexto(recompensar(gane));
+  cobrar(gane);
   sonido(gane ? 'gana' : 'pierde');
+}
+
+/**
+ * Pide las dinomonedas y las enseña cuando llegan. Es asíncrono porque cuando
+ * hay servidor la partida se le manda entera para que la re-juegue: lo que se
+ * cobra es lo que él calcule, no lo que crea esta pantalla.
+ *
+ * Una partida sin grabación —se acabó el tiempo, o te retiraste— no se manda:
+ * no paga nada y el servidor no podría reproducirla, porque abandonar no es una
+ * jugada del motor.
+ */
+function cobrar(gane, reproducible = true) {
+  const partida = gane && reproducible ? grabacion : null;
+  grabacion = null;
+  el.finPremio.textContent = gane ? 'Contando dinomonedas…' : premioTexto(0);
+  recompensar(partida, gane)
+    .then((n) => { el.finPremio.textContent = premioTexto(n); })
+    .catch((e) => {
+      // Igual que con un asalto: dar por buenas unas monedas que nadie apuntó
+      // sería enseñar un saldo que no existe.
+      el.finPremio.textContent = `No se pudo cobrar la partida: ${e.message}`;
+    });
 }
 
 /**
@@ -730,7 +764,15 @@ function nuevaPartida(jefe = null, jefeEvento = null) {
   const miMazo = aListaDeMazo(mazoActivo());
   // La grabación se abre ANTES de crear la partida: la primera jugada puede ser
   // el cambio de mano del turno 1, y sin ella el servidor barajaría distinto.
-  grabacion = jefe ? { jefeEvento, semilla: s, mazo: miMazo, acciones: [] } : null;
+  //
+  // Ahora se graban TODAS las partidas, no sólo los asaltos: las dinomonedas de
+  // una victoria también las paga el servidor después de re-jugarla. El perfil
+  // de IA viaja con ella porque la dificultad la eliges tú y el servidor tiene
+  // que reproducir el mismo rival; jugar en fácil es una opción del menú, no
+  // una trampa.
+  grabacion = {
+    jefeEvento, semilla: s, mazo: miMazo, acciones: [], perfil: perfilIA(),
+  };
   estado = crearPartida(s, [miMazo, jefe ? jefe.mazo.map((e) => [...e]) : null]);
   // El jefe aguanta mucho más que un rival normal. No es una regla nueva: es el
   // mismo hábitat, más alto, así que todo lo demás del motor sigue igual.
@@ -797,15 +839,25 @@ function iniciar() {
 
   montarMeta(() => irA(APP.MENU));
   montarCuenca(() => irA(APP.MENU), asaltoAlJefe);
+  montarCuenta(() => irA(APP.MENU), pintarCuentaEnMenu);
+  pintarCuentaEnMenu();
   // Entrar en la cuenca es opcional y no bloquea nada: si no hay servidor o no
-  // hay red, red.js cae a local y el juego arranca igual.
-  entrarEnLaCuenca().catch(() => {});
+  // hay red, red.js y perfil.js caen a local y el juego arranca igual.
+  //
+  // El perfil se sincroniza DESPUÉS de entrar, no a la vez: `entrar()` es quien
+  // crea al jugador y le siembra la colección de salida, y pedir el perfil
+  // antes de eso devolvería «no has entrado».
+  entrarEnLaCuenca()
+    .then(() => sincronizar())
+    .then(() => { pintarMenu(); pintarCuentaEnMenu(); })
+    .catch(() => {});
 
   el.btnJugar.addEventListener('click', () => { desbloquear(); nuevaPartida(); });
   el.btnColeccion.addEventListener('click', () => { abrirColeccion(); irA(APP.COLECCION); });
   el.btnSobres.addEventListener('click', () => { abrirSobres(); irA(APP.SOBRES); });
   el.btnMazos.addEventListener('click', () => { abrirMazos(); irA(APP.MAZOS); });
   el.btnCuenca.addEventListener('click', () => { abrirCuenca(); irA(APP.CUENCA); });
+  el.btnCuenta.addEventListener('click', () => { abrirCuenta(); irA(APP.CUENTA); });
   el.btnOtra.addEventListener('click', () => { pintarRecord(); nuevaPartida(); });
   // Terminar una partida no obligaba a jugar otra, pero lo parecía: no había
   // más salida que «Otra partida».

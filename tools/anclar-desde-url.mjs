@@ -24,6 +24,10 @@ export const MARCA = 'Motor anclado en: ';
 /** Los ficheros que la función se trae por URL y que, por tanto, hay que vigilar. */
 export const VIGILADOS = [
   'supabase/functions/_compartido/validarAsalto.js',
+  // validarAsalto.js lo importa por ruta relativa, y una ruta relativa desde
+  // una URL del CDN sigue siendo esa URL: viaja también, y por tanto también
+  // hay que vigilar que no se quede atrás.
+  'supabase/functions/_compartido/validarPartida.js',
   'src/data/tribu.js',
 ];
 
