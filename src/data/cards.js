@@ -482,13 +482,13 @@ export const CARTAS = Object.freeze({
     nota_cientifica: 'Dromeosáurido de la Formación Dinosaur Park, Alberta, Campaniense. Es el género que da nombre a toda la familia.',
   }),
   athenar: dino({
-    id: 'athenar', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,
-    binomial: 'Athenar',
+    id: 'athenar', rareza: RAREZA.COMUN, clado: CLADO.SAUROPODO,
+    binomial: 'Athenar bermani',
     coste: 1, ataque: 1, defensa: 1, vida: 1,
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
-    nivel_evidencia: EVIDENCIA.INFERIDO,
-    nota_cientifica: 'PENDIENTE: no hay ningún género válido con este nombre en la literatura. Hay que confirmar de qué taxón se trata antes de escribir su ficha.',
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Formación Morrison, cantera Carnegie del Dinosaur National Monument, Utah, Titoniense inferior (~149–145 Ma). Descrito en 2025 sobre un neurocráneo y techo craneal (CM 26552) que llevaba décadas archivado como Diplodocus. Es un dicreosáurido: saurópodos de cuello corto y talla modesta para el grupo, no un terópodo.',
   }),
   sanjuansaurus: dino({
     id: 'sanjuansaurus', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,

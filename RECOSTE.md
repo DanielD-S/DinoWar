@@ -88,7 +88,7 @@ revisión viene a arreglar.
 | plesiopleurodon | Plesiopleurodon wellesi | Reptil marino | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
 | ojoraptorsaurus | Ojoraptorsaurus boerei | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
 | dromaeosaurus | Dromaeosaurus albertensis | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
-| athenar | Athenar | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
+| athenar | Athenar bermani | Saurópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
 | sanjuansaurus | Sanjuansaurus gordilloi | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
 | suchomimus | Suchomimus tenerensis | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |
 | eosinopteryx | Eosinopteryx brevipenna | Terópodo | Común | 1 | 1 | 1 | 1 | 1 | Sin rasgo | Todavía no hace nada especial. |  |

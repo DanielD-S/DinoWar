@@ -10,7 +10,7 @@
 
 El set tiene **67 cartas distintas**. Un mazo son **50 cartas exactas**, así que no caben todas: el de referencia lleva 30 dinosaurios, 14 eventos, 3 de recurso y 3 de clima.
 
-Fuera del mazo de referencia, y por tanto sin medir aquí: Carroña abundante, Lago efímero, Llanura de inundación, Bosque de coníferas ribereño, Plesiopleurodon wellesi, Ojoraptorsaurus boerei, Dromaeosaurus albertensis, Athenar, Sanjuansaurus gordilloi, Suchomimus tenerensis, Eosinopteryx brevipenna, Troodon formosus, Carnotaurus sastrei, Spinosaurus aegyptiacus, Mosasaurus hoffmannii, Halszkaraptor escuilliei, Tongtianlong limosus, Scanisaurus nazarowi, Monolophosaurus jiangi, Invictarx zephyri, Medusaceratops lokii, Platyceratops tatarinovi, Loricatosaurus priscus, Therizinosaurus cheloniformis, Alaskacephale gangloffi, Titanoceratops ouranos, Atlasaurus imelakei, Stegoceras validum, Maiasaura peeblesorum, Edmontosaurus annectens, Plateosauravus cullingworthi, Gargoyleosaurus parkpinorum, Wendiceratops pinhornensis, Domeykosaurus chilensis, Antarctosaurus wichmannianus, Liaoceratops yanzigouensis, Rhinorex condrupus, Bienosaurus lufengensis, Shuangmiaosaurus gilmorei, Chasmosaurus belli. Se juegan igual, pero su calibración no está comprobada.
+Fuera del mazo de referencia, y por tanto sin medir aquí: Carroña abundante, Lago efímero, Llanura de inundación, Bosque de coníferas ribereño, Plesiopleurodon wellesi, Ojoraptorsaurus boerei, Dromaeosaurus albertensis, Athenar bermani, Sanjuansaurus gordilloi, Suchomimus tenerensis, Eosinopteryx brevipenna, Troodon formosus, Carnotaurus sastrei, Spinosaurus aegyptiacus, Mosasaurus hoffmannii, Halszkaraptor escuilliei, Tongtianlong limosus, Scanisaurus nazarowi, Monolophosaurus jiangi, Invictarx zephyri, Medusaceratops lokii, Platyceratops tatarinovi, Loricatosaurus priscus, Therizinosaurus cheloniformis, Alaskacephale gangloffi, Titanoceratops ouranos, Atlasaurus imelakei, Stegoceras validum, Maiasaura peeblesorum, Edmontosaurus annectens, Plateosauravus cullingworthi, Gargoyleosaurus parkpinorum, Wendiceratops pinhornensis, Domeykosaurus chilensis, Antarctosaurus wichmannianus, Liaoceratops yanzigouensis, Rhinorex condrupus, Bienosaurus lufengensis, Shuangmiaosaurus gilmorei, Chasmosaurus belli. Se juegan igual, pero su calibración no está comprobada.
 
 **Qué revisar sobre todo:** los eventos de presión y las cartas de recurso.
 Son lo único del set que no describe un animal sino una presión sobre él, y
@@ -56,7 +56,7 @@ es legendario.
 | *Plesiopleurodon wellesi* | Reptil marino | Común | 0 | 1 | 1 | 1 | 1 | undefined |
 | *Ojoraptorsaurus boerei* | Terópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
 | *Dromaeosaurus albertensis* | Terópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Athenar* | Terópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
+| *Athenar bermani* | Saurópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
 | *Sanjuansaurus gordilloi* | Terópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
 | *Suchomimus tenerensis* | Terópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
 | *Eosinopteryx brevipenna* | Terópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
@@ -266,13 +266,13 @@ es legendario.
 
 `INFERIDO` · Dromeosáurido de la Formación Dinosaur Park, Alberta, Campaniense. Es el género que da nombre a toda la familia.
 
-### *Athenar* · Terópodo · Común · fuera del mazo de referencia
+### *Athenar bermani* · Saurópodo · Común · fuera del mazo de referencia
 
 **1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
-`INFERIDO` · PENDIENTE: no hay ningún género válido con este nombre en la literatura. Hay que confirmar de qué taxón se trata antes de escribir su ficha.
+`ESTABLECIDO` · Formación Morrison, cantera Carnegie del Dinosaur National Monument, Utah, Titoniense inferior (~149–145 Ma). Descrito en 2025 sobre un neurocráneo y techo craneal (CM 26552) que llevaba décadas archivado como Diplodocus. Es un dicreosáurido: saurópodos de cuello corto y talla modesta para el grupo, no un terópodo.
 
 ### *Sanjuansaurus gordilloi* · Terópodo · Común · fuera del mazo de referencia
 
