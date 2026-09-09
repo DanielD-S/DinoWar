@@ -10,11 +10,13 @@
 // providers de OAuth. Si algún día hiciera falta realtime, esto se queda corto
 // y habrá que replantearlo; hoy no hace falta.
 //
-// Sobre las cuentas: crear una cuenta NO crea un usuario nuevo. Se le añade
-// correo y contraseña al usuario ANÓNIMO que ya tenías, que conserva su uuid y
-// con él su tribu, su yacimiento, sus aportes y su colección. Por eso `registrar`
-// es un PUT sobre el usuario y no un signup: un signup habría dejado huérfano
-// todo lo jugado antes de registrarse.
+// Sobre las cuentas: el juego EXIGE una. No hay sesión anónima ni perfil local
+// —«nada de cuentas locales en memoria»— así que este fichero ya no abre una
+// sesión por su cuenta al arrancar. `sesion()` devuelve la que haya o falla, y
+// quien la llame sin tenerla acaba en la pantalla de entrada.
+//
+// El precio de esa decisión, dicho aquí para que no sorprenda: sin conexión no
+// se juega. Antes el juego arrancaba siempre porque caía a un perfil local.
 
 import { CONFIG } from '../data/config.js';
 
@@ -81,38 +83,38 @@ async function pedir(ruta, opciones = {}, conSesion = true) {
   return cuerpo;
 }
 
+/** Hay sesión guardada, aunque haya que refrescarla. No garantiza que valga. */
+export const haySesion = () => Boolean(cargar()?.access_token);
+
 /**
- * Sesión anónima. Es lo que mantiene la promesa de «sin cuenta»: identidad
- * estable sin pedir un correo. Se guarda y se reutiliza; si caduca, se refresca
- * sola, y si el refresco falla se empieza una nueva en vez de dejar el juego
- * colgado — perder la tribu es malo, no poder jugar es peor.
+ * La sesión, refrescándola si toca. Ya NO abre una anónima cuando no hay: eso
+ * era lo que sostenía el «se juega sin cuenta», y ahora entrar es obligatorio.
+ * Si no hay sesión o el refresco falla, lanza y el arranque manda al jugador a
+ * la pantalla de entrada.
  */
-export async function sesionAnonima() {
+export async function sesionValida() {
   const s = cargar();
-  if (s?.access_token && s.expires_at * 1000 > Date.now() + 60_000) return s;
+  if (!s?.refresh_token) throw new ErrorDeRed('no has entrado', 401);
+  if (s.access_token && s.expires_at * 1000 > Date.now() + 60_000) return s;
 
-  if (s?.refresh_token) {
-    try {
-      const nueva = await pedir('/auth/v1/token?grant_type=refresh_token', {
-        method: 'POST',
-        body: JSON.stringify({ refresh_token: s.refresh_token }),
-      }, false);
-      guardar(nueva);
-      return nueva;
-    } catch { /* se cae abajo y se empieza de cero */ }
+  try {
+    const nueva = await pedir('/auth/v1/token?grant_type=refresh_token', {
+      method: 'POST',
+      body: JSON.stringify({ refresh_token: s.refresh_token }),
+    }, false);
+    guardar(nueva);
+    return nueva;
+  } catch (e) {
+    // Un refresco que falla es una sesión muerta: se suelta en vez de dejarla
+    // ahí para que falle otra vez en la siguiente llamada.
+    guardar(null);
+    throw e;
   }
-
-  const nueva = await pedir('/auth/v1/signup', {
-    method: 'POST',
-    body: JSON.stringify({ data: {} }),
-  }, false);
-  guardar(nueva);
-  return nueva;
 }
 
 /** Llama una función de la base de datos. */
 export async function rpc(nombre, argumentos = {}) {
-  await sesionAnonima();
+  await sesionValida();
   return pedir(`/rest/v1/rpc/${nombre}`, {
     method: 'POST',
     body: JSON.stringify(argumentos),
@@ -121,7 +123,7 @@ export async function rpc(nombre, argumentos = {}) {
 
 /** Invoca una Edge Function. */
 export async function funcion(nombre, cuerpo) {
-  await sesionAnonima();
+  await sesionValida();
   return pedir(`/functions/v1/${nombre}`, {
     method: 'POST',
     body: JSON.stringify(cuerpo),
@@ -132,37 +134,41 @@ export async function funcion(nombre, cuerpo) {
 export const usuarioActual = () => cargar()?.user ?? null;
 
 /**
- * ¿Estás jugando sin cuenta? Un usuario anónimo es un usuario de pleno derecho
- * —tiene uuid, tribu y colección— pero vive sólo en este navegador: si se borran
- * los datos del sitio, no hay forma de volver a él.
+ * ¿Es una cuenta de verdad? Quedan por ahí sesiones ANÓNIMAS de cuando el juego
+ * las abría solo. No valen para entrar: se tratan como no haber entrado, y el
+ * jugador acaba en la pantalla de entrada como todo el mundo.
  */
 export function esAnonimo() {
   const u = usuarioActual();
   if (!u) return true;
-  // Supabase marca `is_anonymous`, pero las sesiones guardadas por versiones
-  // anteriores no lo traen. Sin correo tampoco hay forma de recuperar la
-  // cuenta, así que a efectos del juego es lo mismo.
   return u.is_anonymous ?? !u.email;
 }
+
+/** Puedes jugar: hay sesión y es de una cuenta con correo. */
+export const estaDentro = () => haySesion() && !esAnonimo();
 
 export const correoActual = () => usuarioActual()?.email ?? null;
 
 /**
- * Convierte tu sesión anónima en una cuenta. Mismo usuario, mismo uuid: lo
- * único que cambia es que a partir de ahora se puede volver a él desde otro
- * sitio. Todo lo jugado se queda donde estaba porque nunca se movió.
+ * Crear una cuenta. Es un signup normal, no la conversión de un anónimo: ya no
+ * hay anónimo que convertir. La respuesta trae la sesión, así que quedas dentro
+ * sin tener que entrar otra vez.
+ *
+ * Si el proyecto tuviera la confirmación por correo activada, la respuesta
+ * vendría SIN sesión y habría que avisar de que hay que mirar el buzón. Está
+ * desactivada, y este `if` es lo que impide que un día se active y el juego se
+ * quede en blanco sin decir por qué.
  */
 export async function registrar(correo, clave) {
-  await sesionAnonima();
-  const u = await pedir('/auth/v1/user', {
-    method: 'PUT',
+  const r = await pedir('/auth/v1/signup', {
+    method: 'POST',
     body: JSON.stringify({ email: correo, password: clave }),
-  });
-  // La respuesta es el usuario, no una sesión: el token que tienes sigue
-  // valiendo y hay que quedarse con él, sólo que apuntando al usuario nuevo.
-  const s = cargar();
-  if (s) guardar({ ...s, user: u });
-  return u;
+  }, false);
+  if (!r?.access_token) {
+    throw new ErrorDeRed('cuenta creada, pero hay que confirmar el correo antes de entrar', 200, r);
+  }
+  guardar(r);
+  return r;
 }
 
 /** Entrar con una cuenta ya creada. Reemplaza la sesión que hubiera. */
@@ -176,8 +182,8 @@ export async function entrarConCorreo(correo, clave) {
 }
 
 /**
- * Salir. La sesión se olvida y el siguiente arranque abre una anónima nueva:
- * el juego nunca se queda sin poder jugar por no tener cuenta.
+ * Salir. La sesión se olvida y el siguiente arranque te deja en la pantalla de
+ * entrada.
  *
  * Se avisa al servidor antes de borrar nada, pero si eso falla se borra igual.
  * Una sesión que no se puede cerrar en este navegador porque el servidor no
@@ -185,7 +191,7 @@ export async function entrarConCorreo(correo, clave) {
  */
 export async function salir() {
   try {
-    await pedir('/auth/v1/logout', { method: 'POST' });
+    if (haySesion()) await pedir('/auth/v1/logout', { method: 'POST' });
   } catch { /* el token caduca solo; lo que importa es soltarlo aquí */ }
   guardar(null);
 }

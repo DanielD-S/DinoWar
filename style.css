@@ -910,6 +910,20 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .carta--ranura.entra { animation: voltear .4s ease-out var(--retardo, 0ms) both; }
 .carta--ranura.muere { opacity: 0; transform: scale(.8) rotate(-7deg); }
 .carta--ranura.golpeada { animation: sacudida .35s ease-out; }
+/* Embestir no es lo mismo que ser golpeado, y tiene que verse distinto: la
+   sacudida se lee como «me han dado». Esto empuja hacia el rival y vuelve. */
+.carta--ranura.embiste { animation: embestida .4s ease-out; }
+@keyframes embestida {
+  0%, 100% { transform: none; }
+  45% { transform: translateY(-9px) scale(1.04); filter: brightness(1.15); }
+}
+.fila-ranuras[data-bando="1"] .carta--ranura.embiste { animation-name: embestida-rival; }
+@keyframes embestida-rival {
+  0%, 100% { transform: none; }
+  45% { transform: translateY(9px) scale(1.04); filter: brightness(1.15); }
+}
+/* La barra del hábitat necesita sitio para el número flotante. */
+.habitat { position: relative; }
 .carta--ranura.pendiente { box-shadow: 0 0 0 1px var(--bio); opacity: .92; }
 
 /* La mano es una fila, no un abanico: a 360 px el abanico solapaba las cartas
@@ -1423,6 +1437,30 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   text-shadow: 0 1px 2px rgba(0, 0, 0, .55);
 }
 .cu-barra.vida i { background: var(--rival, #b4553f); }
+
+/* La puerta. Misma marca que el menú, para que entrar no parezca otra web. */
+#entrada {
+  padding: calc(var(--seguro-arriba) + 20px) 18px calc(var(--seguro-abajo) + 20px);
+  align-items: center; justify-content: center; overflow-y: auto;
+  background: radial-gradient(120% 70% at 50% 0%, rgba(217,164,65,.10), transparent 60%), var(--fondo);
+}
+.ent-caja { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 14px; }
+.ent-marca { text-align: center; margin-bottom: 4px; }
+.ent-marca h1 { margin: 6px 0 4px; }
+.ent-pestanas { justify-content: center; }
+.ent-pie { display: flex; flex-direction: column; gap: 10px; }
+
+/* El ojito. Va dentro del campo y no al lado: al lado empuja el input y en un
+   móvil de 360 px la contraseña se queda sin sitio. */
+.cu-clave { position: relative; display: block; }
+.cu-clave input { width: 100%; padding-right: 44px; }
+.cu-ojo {
+  position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+  width: 36px; height: 36px; padding: 8px; border: 0; border-radius: 8px;
+  background: none; color: inherit; opacity: .55; cursor: pointer;
+}
+.cu-ojo:hover, .cu-ojo:focus-visible { opacity: 1; }
+.cu-ojo svg { width: 100%; height: 100%; display: block; }
 
 /* Formulario de la cuenta. Comparte caja y tipografía con el resto de la
    cuenca: es la misma pantalla de «fuera de la partida». */

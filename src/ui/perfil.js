@@ -21,7 +21,7 @@
 // conteste sustituye a la caché.
 
 import {
-  hayServidor, rpc, funcion, sesionAnonima, ErrorDeRed,
+  hayServidor, rpc, funcion, sesionValida, ErrorDeRed,
 } from './supabase.js';
 import { CONFIG } from '../data/config.js';
 import {
@@ -47,13 +47,6 @@ let motivoLocal = PRUEBAS ? 'modo pruebas' : (hayServidor() ? null : 'sin servid
 export const modoPerfil = () => modo;
 export const porQuePerfilLocal = () => motivoLocal;
 
-function caerALocal(e) {
-  if (modo === MODO.LOCAL) return;
-  modo = MODO.LOCAL;
-  motivoLocal = e?.message ?? 'no hay conexión';
-  console.warn('[perfil] sin servidor, se juega con el perfil local:', motivoLocal);
-}
-
 // ------------------------------------------------------------------ lectura
 
 /**
@@ -77,6 +70,9 @@ function aFormaLocal(d) {
     sobresAbiertos: Number(d.sobres_abiertos ?? 0),
     elo: Number(d.elo ?? 1200),
     apodo: d.apodo ?? null,
+    // Cuántas veces más puedes cambiarte el nombre. Lo dice el servidor, que es
+    // quien lleva la cuenta: si lo llevara la pantalla, recargar la regalaría.
+    apodoRestantes: Number(d.apodo_restantes ?? 0),
     // La dificultad es una preferencia de ESTE navegador, no estado de juego:
     // el servidor no la lleva y no debe pisarla al sincronizar.
     dificultad: cargarPerfil().dificultad,
@@ -89,16 +85,15 @@ function aFormaLocal(d) {
  */
 export async function sincronizar() {
   if (modo === MODO.LOCAL) return cargarPerfil();
-  try {
-    await sesionAnonima();
-    const d = await rpc('mi_perfil');
-    const p = aFormaLocal(d);
-    guardarPerfil(p);
-    return p;
-  } catch (e) {
-    caerALocal(e);
-    return cargarPerfil();
-  }
+  // Ya no se cae a local si esto falla. Con la cuenta obligatoria, un perfil
+  // local sería inventarse una colección: el menú enseñaría cartas y monedas
+  // que el servidor no ha visto y el primer mazo que guardases sería rechazado.
+  // Se propaga el error y el arranque devuelve al jugador a la puerta.
+  await sesionValida();
+  const d = await rpc('mi_perfil');
+  const p = aFormaLocal(d);
+  guardarPerfil(p);
+  return p;
 }
 
 /** El perfil, de la caché. Síncrono a propósito: lo llaman los repintados. */
@@ -261,9 +256,9 @@ export async function cambiarApodo(nombre) {
     actualizarPerfil({ apodo });
     return apodo;
   }
-  const guardado = await rpc('cambiar_apodo', { p_apodo: nombre });
+  const r = await rpc('cambiar_apodo', { p_apodo: nombre });
   await sincronizar();
-  return guardado;
+  return r?.apodo ?? nombre;
 }
 
 /** Apunta una carta ganada a un jefe. En remoto ya la apuntó `reclamar_jefe`. */

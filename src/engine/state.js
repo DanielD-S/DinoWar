@@ -195,16 +195,23 @@ export function ataqueEfectivo(state, iid) {
 export function vidaMaxima(state, iid) {
   const inst = state.instancias[iid];
   const extra = campoEs(state, RASGO.CAMPO_CANAL) ? BALANCE.efectosCampo.canalVida : 0;
-  return carta(inst.cardId).vida + inst.modVida + extra;
+  // En la variante de dos estadísticas la Defensa no resta: se suma aquí.
+  const plegada = SIN_DEFENSA ? defensaBruta(state, iid) * BALANCE.cuerpo.defensaAVida : 0;
+  return carta(inst.cardId).vida + inst.modVida + extra + plegada;
 }
 
 export const vidaActual = (state, iid) => vidaMaxima(state, iid) - state.instancias[iid].heridas;
 
+/** ¿Corre la variante sin Defensa? Se lee una vez: el modo no cambia en caliente. */
+export const SIN_DEFENSA = BALANCE.cuerpo.modo === 'ATAQUE_VIDA';
+
 /**
- * Defensa: reducción plana del daño recibido. Sale de la propia carta —masa,
- * osteodermos, placas—, no del clado.
+ * La Defensa que tendría esta unidad: la de su ficha más lo que le añaden los
+ * rasgos y el clima. Está separada de `reduccionDe` porque la variante de dos
+ * estadísticas necesita el mismo número para OTRA cosa —sumarlo a la Vida— y
+ * calcularlo dos veces era garantizar que un día divergieran.
  */
-export function reduccionDe(state, iid) {
+export function defensaBruta(state, iid) {
   const inst = state.instancias[iid];
   const c = carta(inst.cardId);
   let d = (c.defensa ?? 0) + inst.modDefensa;
@@ -246,6 +253,17 @@ export function espinasDe(state, iid) {
   const c = carta(state.instancias[iid].cardId);
   let e = c.clado === CLADO.TIREOFORO ? BALANCE.clados.espinasTireoforo : 0;
   return e;
+}
+
+/**
+ * Defensa: reducción plana del daño recibido. Sale de la propia carta —masa,
+ * osteodermos, placas—, no del clado.
+ *
+ * En la variante ATAQUE_VIDA devuelve siempre 0: la Defensa no existe como
+ * resta y ya se ha convertido en Vida dentro de `vidaMaxima`.
+ */
+export function reduccionDe(state, iid) {
+  return SIN_DEFENSA ? 0 : defensaBruta(state, iid);
 }
 
 /** Daño que `atacante` inflige a `defensor`, red trófica incluida. */

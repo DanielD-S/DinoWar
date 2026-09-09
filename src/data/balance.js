@@ -173,6 +173,38 @@ export const BALANCE = Object.freeze({
   }),
 
 
+  // ------------------------------------------------------------- el cuerpo
+  //
+  //  ATAQUE_DEFENSA_VIDA  lo de hoy: la Defensa resta a cada golpe.
+  //  ATAQUE_VIDA          la Defensa no existe y se suma a la Vida.
+  //
+  // Existe porque la Defensa es la estadística que peor se lee: es una resta
+  // invisible contra un número de la OTRA carta, con dos reglas encima que no
+  // se deducen de lo que hay en pantalla —el suelo de daño y el bonus de
+  // depredación—. Y porque medida en victorias es la que menos aporta: +1 de
+  // Ataque a todas tus criaturas gana el 70,8 % de las partidas, +1 de Vida el
+  // 63,1 % y +1 de Defensa el 59,6 %, sobre un control de 46,8 %.
+  //
+  // Medido antes de escribir esto: plegada a Vida 1:1, el juego no se entera
+  // —12,5 turnos contra 12,6, y el reparto entre las tres vías de victoria se
+  // mueve dentro del ruido—.
+  //
+  // Diferencia conocida de la variante: la Defensa que dan los rasgos depende de
+  // tener compañía, así que al morir el compañero la Vida MÁXIMA baja y puede
+  // matar a la unidad en el acto. Con la Defensa como resta eso no pasaba: sólo
+  // encajabas más daño a partir de entonces. Es una de las cosas que la medición
+  // tiene que enseñar, no un descuido.
+  cuerpo: Object.freeze({
+    // Igual que la economía: por entorno y sólo desde Node. El juego publicado
+    // corre SIEMPRE en ATAQUE_DEFENSA_VIDA hasta que se decida otra cosa.
+    //   DINOWAR_CUERPO=ATAQUE_VIDA node sim/run.js
+    modo: (typeof process !== 'undefined' && process.env && process.env.DINOWAR_CUERPO)
+      || 'ATAQUE_DEFENSA_VIDA',
+    // Cuánta Vida vale un punto de Defensa al plegarla. 1 es lo medido; se deja
+    // como número para poder probar 2 y 3 sin tocar el motor.
+    defensaAVida: 1,
+  }),
+
   // --------------------------------------------------------------------- IA
   ia: Object.freeze({
     // Turnos que se espera que una unidad siga en pie aportando. Sin esto la IA

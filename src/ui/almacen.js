@@ -33,6 +33,7 @@ export function perfilInicial() {
     // tienen que existir para que las pantallas no lean undefined.
     elo: 1200,
     apodo: null,
+    apodoRestantes: 0,
     dificultad: 'heuristica',
   };
 }
@@ -74,6 +75,7 @@ function sanear(bruto) {
     sobresAbiertos: Number.isFinite(bruto.sobresAbiertos) ? Math.floor(bruto.sobresAbiertos) : 0,
     elo: Number.isFinite(bruto.elo) ? Math.floor(bruto.elo) : base.elo,
     apodo: typeof bruto.apodo === 'string' ? bruto.apodo.slice(0, 24) : null,
+    apodoRestantes: Number.isFinite(bruto.apodoRestantes) ? Math.max(0, Math.floor(bruto.apodoRestantes)) : 0,
     dificultad: bruto.dificultad === 'aleatoria' ? 'aleatoria' : base.dificultad,
   };
 }

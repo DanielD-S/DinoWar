@@ -16,7 +16,7 @@
 // hablando solo es peor que uno que admite que está sin conexión.
 
 import {
-  hayServidor, rpc, funcion, sesionAnonima, usuarioActual, olvidarSesion, ErrorDeRed,
+  hayServidor, rpc, funcion, sesionValida, usuarioActual, olvidarSesion, ErrorDeRed,
 } from './supabase.js';
 import { CONFIG } from '../data/config.js';
 import { CUENCA } from '../data/tribu.js';
@@ -40,17 +40,21 @@ function caerALocal(e) {
   console.warn('[cuenca] sin servidor, se juega en local:', motivoLocal);
 }
 
-/** Entra en la cuenca. Idempotente: se llama en cada arranque sin pensarlo. */
+/**
+ * Entra en la cuenca. Idempotente: se llama en cada arranque sin pensarlo.
+ *
+ * Desde que el juego exige cuenta, esto NO se traga su error. Es el paso que
+ * crea la fila del jugador y le siembra la colección, así que fallar aquí no es
+ * «jugarás sin tribu»: es que no hay jugador. Quien llama decide, y hoy lo que
+ * hace es devolverte a la pantalla de entrada con el motivo.
+ *
+ * @param {string|null} apodo sólo se usa al CREAR la fila; después se ignora.
+ */
 export async function entrar(apodo = null) {
   if (modo !== MODO.REMOTO) return null;
-  try {
-    await sesionAnonima();
-    await rpc('entrar', { p_apodo: apodo });
-    return usuarioActual();
-  } catch (e) {
-    caerALocal(e);
-    return null;
-  }
+  await sesionValida();
+  await rpc('entrar', { p_apodo: apodo });
+  return usuarioActual();
 }
 
 // ------------------------------------------------------------------ lectura
