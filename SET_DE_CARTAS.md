@@ -480,7 +480,7 @@ es legendario.
 
 **Sin rasgo** — Todavía no hace nada especial.
 
-`INFERIDO` · PENDIENTE: titanosaurio del norte de Chile citado en la literatura sin descripción formal completa. Hay que confirmar el estatus del nombre.
+`INFERIDO` · PENDIENTE: este nombre no existe. No está en PaleobioDB, ni en GBIF, ni en Wikipedia, ni siquiera en la lista de dinosaurios con nombre informal; sus únicas huellas son ilustraciones de aficionados y webs que las copian. Chile sí tiene titanosaurios descritos: Arackar licanantay (2021) y Atacamatitan chilensis (2011). Hay que sustituirlo por uno de ellos.
 
 ### *Antarctosaurus wichmannianus* · Saurópodo · Legendaria · fuera del mazo de referencia
 
