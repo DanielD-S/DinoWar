@@ -15,6 +15,7 @@
 //   node tools/anclar-desde-url.mjs [sha]     (por defecto, HEAD)
 
 import { execFileSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 import { readFileSync, writeFileSync } from 'node:fs';
 
 export const SALIDA = 'supabase/functions/asalto/desde-url.ts';
@@ -43,7 +44,11 @@ export function enElCommit(sha, fichero) {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Ejecutado directamente y no importado. Va con pathToFileURL porque en Windows
+// `process.argv[1]` llega con barras invertidas y la comparación contra
+// `file://` + la ruta no se cumplía nunca: la herramienta corría, no escribía
+// nada y no se quejaba.
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const sha = process.argv[2]
     ?? execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
   const viejo = shaAnclado();
