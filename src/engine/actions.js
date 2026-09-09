@@ -7,6 +7,7 @@ import { TIPO, OBJETIVO, CLADO, RASGO, carta } from '../data/cards.js';
 import {
   FASE, FASES_INTERACTIVAS, rival,
   ranuraValida, unidadesDe, ranurasLibres, buscablesDe, buscaEnElMazo, ataqueEfectivo,
+  puedeReciclar, campoEs,
 } from './state.js';
 import { barajar } from './rng.js';
 import { DIETA } from '../data/dietas.js';
@@ -29,6 +30,9 @@ export const ACCION = Object.freeze({
   MULLIGAN: 'MULLIGAN',
   PASAR: 'PASAR',
   DESCARTAR: 'DESCARTAR',
+  // Devolver una carta de la mano al fondo del mazo. Sólo con la Llanura de
+  // inundación en el campo, una vez por turno y por jugador.
+  RECICLAR: 'RECICLAR',
   AVANZAR: 'AVANZAR',
   // Sólo en las variantes de economía (BALANCE.economia.modo distinto de FIJA).
   BIOMASA: 'BIOMASA',       // bajar una carta de recurso (modo CARTAS)
@@ -127,6 +131,18 @@ export function validar(s, a) {
 
   if (!jug.mano.includes(a.iid)) return 'la carta no está en tu mano';
   const c = carta(inst.cardId);
+
+  // Reciclar no cuesta Biomasa, así que se resuelve antes del cobro: cobrar por
+  // devolver una carta al mazo sería justo lo contrario de lo que hace falta
+  // cuando vas corto.
+  if (a.tipo === ACCION.RECICLAR) {
+    if (!puedeReciclar(s, a.jugador)) {
+      return campoEs(s, RASGO.CAMPO_LLANURA)
+        ? 'ya has devuelto tu carta de este turno'
+        : 'hace falta la Llanura de inundación en el campo';
+    }
+    return null;
+  }
 
   if (a.tipo === ACCION.BIOMASA) {
     if (modoEconomia() !== MODO.CARTAS) return 'aquí la Biomasa no se juega, se cobra';
@@ -364,6 +380,18 @@ export function reduce(state, action) {
       if (s.jugadores.every((j) => j.listo)) s.fase = FASE.REVELACION;
       break;
 
+    // Al FONDO, no arriba: devolverla arriba sería robarla otra vez el turno
+    // que viene, y eso no es reciclar, es buscar. Y sin barajar, porque al fondo
+    // de un mazo de cincuenta no vuelve a verse en la misma partida.
+    case ACCION.RECICLAR: {
+      const cardId = s.instancias[action.iid].cardId;
+      jug.mano = jug.mano.filter((x) => x !== action.iid);
+      jug.mazo.push(action.iid);
+      jug.recicladasEsteTurno += 1;
+      ev(s, 'RECICLA', { jugador: action.jugador, iid: action.iid, cardId });
+      break;
+    }
+
     case ACCION.DESCARTAR:
       descartarDeMano(s, action.jugador, action.iid);
       if (!s.jugadores.some((j) => j.mano.length > BALANCE.manoMaxima)) s.fase = FASE.CHEQUEO;
@@ -413,6 +441,11 @@ export function legales(state, j) {
 
   const cambiar = { tipo: ACCION.MULLIGAN, jugador: j };
   if (!validar(s, cambiar)) salida.push(cambiar);
+
+  // Devolver una carta al mazo, si la Llanura de inundación está en el campo.
+  if (puedeReciclar(s, j)) {
+    for (const iid of jug.mano) salida.push({ tipo: ACCION.RECICLAR, jugador: j, iid });
+  }
 
   // Declarar producción (TIPADA): dos opciones y ningún coste.
   if (modoEconomia() === MODO.TIPADA) {

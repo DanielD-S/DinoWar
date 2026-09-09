@@ -5,7 +5,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { FASE, vidaActual, vidaMaxima, ataqueEfectivo, vuela, rentaDe } from '../src/engine/state.js';
+import {
+  FASE, vidaActual, vidaMaxima, ataqueEfectivo, vuela, rentaDe, puedeReciclar,
+} from '../src/engine/state.js';
+import { legales, reduce, validar, ACCION } from '../src/engine/actions.js';
 import { BALANCE } from '../src/data/balance.js';
 import { CARTAS } from '../src/data/cards.js';
 import { tablero, poner, ejecutar, vivo } from './helpers.js';
@@ -150,4 +153,47 @@ test('Volar no libra de lo que no se esquiva volando', () => {
   const r = ejecutar(conMortandad, FASE.REVELACION);
   assert.ok(r.instancias[pterosaurio].heridas >= BALANCE.rasgos.mortandadDano
     || !vivo(r, pterosaurio), 'la mortandad debería alcanzarle');
+});
+
+test('La Llanura deja devolver una carta al fondo del mazo, una vez por turno', () => {
+  // La sabana pasó a dar Biomasa a los dos y eso era, letra por letra, lo que
+  // hacía la llanura. Reciclar es lo único que ningún otro clima hace, y apunta
+  // a lo que está flojo: la extinción se quedó cerca del suelo del 15 %.
+  const s = tablero(230);
+  s.fase = FASE.DESPLIEGUE;
+  // `tablero()` deja la mano vacía a propósito; aquí hace falta que haya algo
+  // que devolver, así que se roban tres del mazo.
+  for (let i = 0; i < 3; i++) s.jugadores[0].mano.push(s.jugadores[0].mazo.shift());
+
+  assert.equal(puedeReciclar(s, 0), false, 'sin llanura no se recicla');
+  assert.equal(legales(s, 0).filter((a) => a.tipo === ACCION.RECICLAR).length, 0);
+
+  s.campo = 'llanura';
+  const opciones = legales(s, 0).filter((a) => a.tipo === ACCION.RECICLAR);
+  assert.equal(opciones.length, s.jugadores[0].mano.length, 'se puede devolver cualquiera de la mano');
+
+  const iid = opciones[0].iid;
+  const mazo = s.jugadores[0].mazo.length;
+  const mano = s.jugadores[0].mano.length;
+  const post = reduce(s, opciones[0]);
+
+  assert.equal(post.jugadores[0].mano.length, mano - 1);
+  assert.equal(post.jugadores[0].mazo.length, mazo + 1);
+  assert.equal(post.jugadores[0].mazo[post.jugadores[0].mazo.length - 1], iid,
+    'al FONDO: arriba sería robarla otra vez el turno que viene, y eso es buscar, no reciclar');
+  assert.equal(puedeReciclar(post, 0), false, 'una por turno');
+});
+
+test('Reciclar no cuesta Biomasa', () => {
+  // Cobrar por devolver una carta al mazo sería lo contrario de lo que hace
+  // falta cuando vas corto, que es justo cuando esto sirve.
+  const s = tablero(231);
+  s.fase = FASE.DESPLIEGUE;
+  s.jugadores[0].mano.push(s.jugadores[0].mazo.shift());
+  s.campo = 'llanura';
+  s.jugadores[0].biomasa = 0;
+  const opcion = legales(s, 0).find((a) => a.tipo === ACCION.RECICLAR);
+  assert.ok(opcion, 'con 0 de Biomasa se sigue pudiendo');
+  assert.equal(validar(s, opcion), null);
+  assert.equal(reduce(s, opcion).jugadores[0].biomasa, 0);
 });

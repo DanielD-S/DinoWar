@@ -149,7 +149,16 @@ export const BALANCE = Object.freeze({
 
   efectosCampo: Object.freeze({
     aridezMazo: 5,
-    llanuraBiomasa: 1,
+    // La llanura anegada deja RECICLAR: mientras esté en el campo, cada jugador
+    // puede devolver al fondo de su mazo una carta de su mano por turno, y elige
+    // cuál. Vale para los dos, como todo clima.
+    //
+    // Daba +1 de Biomasa a los dos, que es exactamente lo que ahora hace la
+    // sabana, y dos cartas idénticas con nombre distinto no son dos cartas.
+    // Reciclar es lo único que ningún otro clima hace —los cinco suman o restan
+    // números— y apunta a lo que está flojo: la extinción se quedó en el 19 %,
+    // cerca del suelo del 15, y devolver cartas alarga los mazos.
+    llanuraReciclaPorTurno: 1,
     bosqueCura: 1,
     // El canal y la sabana ya no tocan sólo a los tuyos: como todo clima,
     // valen para los dos bandos por igual.
@@ -215,6 +224,9 @@ export const BALANCE = Object.freeze({
     pesoDano: 0.35,         // valor de dejar herido sin matar
     pesoCoste: 0.5,
     umbralJugar: 0.15,
+    // A partir de cuántas cartas de mazo empieza a valer la pena devolver una
+    // con la Llanura. Por encima de eso, reciclar es perder el turno.
+    reciclaDesdeMazo: 15,
   }),
 });
 

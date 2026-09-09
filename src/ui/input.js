@@ -57,6 +57,12 @@ function destinoBajo(x, y) {
   const franja = pila.find((n) => n.classList?.contains('franja'));
   if (franja) return { tipo: 'franja', nodo: franja };
 
+  // Tu propia pila de mazo: soltar ahí una carta la devuelve al fondo, y sólo
+  // vale con la Llanura de inundación en el campo. Es el gesto que ya significa
+  // «esto vuelve al montón» sin tener que explicarlo.
+  const pilaMazo = pila.find((n) => n.id === 'p-pila' || n.closest?.('#p-pila'));
+  if (pilaMazo) return { tipo: 'mazo', nodo: document.getElementById('p-pila') };
+
   if (pila.some((n) => n === el.campo)) return { tipo: 'campo', nodo: el.campo };
   return null;
 }

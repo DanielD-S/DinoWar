@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: 4b4cf1029b028665
+// huella: 4e0fbaea5aa292ec
 //
 // Lleva dentro estos 16 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -523,7 +523,7 @@ var CARTAS = Object.freeze({
     binomial: "Llanura de inundaci\xF3n",
     rasgo: RASGO.CAMPO_LLANURA,
     rasgoNombre: "Llanura de inundaci\xF3n",
-    rasgoTexto: "+1 Biomasa para ambos jugadores",
+    rasgoTexto: "Mientras est\xE9 en el campo, cada jugador puede devolver una carta de su mano al fondo de su mazo, una vez por turno.",
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Las llanuras de inundaci\xF3n de la Morrison concentran la mayor productividad vegetal estacional de la formaci\xF3n."
   }),
@@ -1277,7 +1277,16 @@ var BALANCE = Object.freeze({
   }),
   efectosCampo: Object.freeze({
     aridezMazo: 5,
-    llanuraBiomasa: 1,
+    // La llanura anegada deja RECICLAR: mientras esté en el campo, cada jugador
+    // puede devolver al fondo de su mazo una carta de su mano por turno, y elige
+    // cuál. Vale para los dos, como todo clima.
+    //
+    // Daba +1 de Biomasa a los dos, que es exactamente lo que ahora hace la
+    // sabana, y dos cartas idénticas con nombre distinto no son dos cartas.
+    // Reciclar es lo único que ningún otro clima hace —los cinco suman o restan
+    // números— y apunta a lo que está flojo: la extinción se quedó en el 19 %,
+    // cerca del suelo del 15, y devolver cartas alarga los mazos.
+    llanuraReciclaPorTurno: 1,
     bosqueCura: 1,
     // El canal y la sabana ya no tocan sólo a los tuyos: como todo clima,
     // valen para los dos bandos por igual.
@@ -1340,7 +1349,10 @@ var BALANCE = Object.freeze({
     pesoDano: 0.35,
     // valor de dejar herido sin matar
     pesoCoste: 0.5,
-    umbralJugar: 0.15
+    umbralJugar: 0.15,
+    // A partir de cuántas cartas de mazo empieza a valer la pena devolver una
+    // con la Llanura. Por encima de eso, reciclar es perder el turno.
+    reciclaDesdeMazo: 15
   })
 });
 var MAZO = Object.freeze([
@@ -1500,6 +1512,8 @@ function crearPartida(seedEntrada = 1, mazos = null) {
       // jugada del rival es la misma tensión que ya tiene el tablero.
       produccion: null,
       biomasaJugadaEsteTurno: 0,
+      // Cartas devueltas al mazo este turno; lo permite la Llanura de inundación.
+      recicladasEsteTurno: 0,
       habitat: BALANCE.vidaHabitat,
       trofeos: 0,
       mazo: b.lista,
@@ -1610,15 +1624,18 @@ function danoEntre(state, atacanteIid, defensorIid) {
   if (BALANCE.clados.presaDe[a.clado] === d.clado) dano += BALANCE.clados.bonusDepredacion;
   return Math.max(0, dano);
 }
+function puedeReciclar(state, j) {
+  if (!campoEs(state, RASGO.CAMPO_LLANURA)) return false;
+  const jug = state.jugadores[j];
+  return jug.recicladasEsteTurno < BALANCE.efectosCampo.llanuraReciclaPorTurno;
+}
 function danoAlHabitat(state, iid) {
   return ataqueEfectivo(state, iid);
 }
 var vuela = (state, iid) => carta(state.instancias[iid].cardId).rasgo === RASGO.VUELO;
 var hayAridez = (state) => campoEs(state, RASGO.CAMPO_ARIDEZ);
 function rentaDe(state) {
-  let extra = 0;
-  if (campoEs(state, RASGO.CAMPO_LLANURA)) extra += BALANCE.efectosCampo.llanuraBiomasa;
-  if (campoEs(state, RASGO.CAMPO_SABANA)) extra += BALANCE.efectosCampo.sabanaBiomasa;
+  const extra = campoEs(state, RASGO.CAMPO_SABANA) ? BALANCE.efectosCampo.sabanaBiomasa : 0;
   return BALANCE.rentaPorTurno + extra;
 }
 function curacionDe(state, iid) {
@@ -1845,7 +1862,10 @@ function robar(s, j, n) {
   }
 }
 function faseRenta(s) {
-  for (const jug of s.jugadores) jug.biomasaJugadaEsteTurno = 0;
+  for (const jug of s.jugadores) {
+    jug.biomasaJugadaEsteTurno = 0;
+    jug.recicladasEsteTurno = 0;
+  }
   if (modoActual() === MODO.CARTAS) {
     if (s.turno === 1) {
       for (const jug of s.jugadores) {
@@ -2122,6 +2142,9 @@ var ACCION = Object.freeze({
   MULLIGAN: "MULLIGAN",
   PASAR: "PASAR",
   DESCARTAR: "DESCARTAR",
+  // Devolver una carta de la mano al fondo del mazo. Sólo con la Llanura de
+  // inundación en el campo, una vez por turno y por jugador.
+  RECICLAR: "RECICLAR",
   AVANZAR: "AVANZAR",
   // Sólo en las variantes de economía (BALANCE.economia.modo distinto de FIJA).
   BIOMASA: "BIOMASA",
@@ -2191,6 +2214,12 @@ function validar(s, a) {
   }
   if (!jug.mano.includes(a.iid)) return "la carta no est\xE1 en tu mano";
   const c = carta(inst.cardId);
+  if (a.tipo === ACCION.RECICLAR) {
+    if (!puedeReciclar(s, a.jugador)) {
+      return campoEs(s, RASGO.CAMPO_LLANURA) ? "ya has devuelto tu carta de este turno" : "hace falta la Llanura de inundaci\xF3n en el campo";
+    }
+    return null;
+  }
   if (a.tipo === ACCION.BIOMASA) {
     if (modoActual() !== MODO.CARTAS) return "aqu\xED la Biomasa no se juega, se cobra";
     if (!esCartaDeBiomasa(inst.cardId)) return "esa carta no da Biomasa";
@@ -2389,6 +2418,17 @@ function reduce(state, action) {
       jug.listo = true;
       if (s.jugadores.every((j) => j.listo)) s.fase = FASE.REVELACION;
       break;
+    // Al FONDO, no arriba: devolverla arriba sería robarla otra vez el turno
+    // que viene, y eso no es reciclar, es buscar. Y sin barajar, porque al fondo
+    // de un mazo de cincuenta no vuelve a verse en la misma partida.
+    case ACCION.RECICLAR: {
+      const cardId = s.instancias[action.iid].cardId;
+      jug.mano = jug.mano.filter((x) => x !== action.iid);
+      jug.mazo.push(action.iid);
+      jug.recicladasEsteTurno += 1;
+      ev(s, "RECICLA", { jugador: action.jugador, iid: action.iid, cardId });
+      break;
+    }
     case ACCION.DESCARTAR:
       descartarDeMano(s, action.jugador, action.iid);
       if (!s.jugadores.some((j) => j.mano.length > BALANCE.manoMaxima)) s.fase = FASE.CHEQUEO;
@@ -2419,6 +2459,9 @@ function legales(state, j) {
   salida.push({ tipo: ACCION.PASAR, jugador: j });
   const cambiar = { tipo: ACCION.MULLIGAN, jugador: j };
   if (!validar(s, cambiar)) salida.push(cambiar);
+  if (puedeReciclar(s, j)) {
+    for (const iid of jug.mano) salida.push({ tipo: ACCION.RECICLAR, jugador: j, iid });
+  }
   if (modoActual() === MODO.TIPADA) {
     for (const produccion of [DIETA.HERBIVORO, DIETA.CARNIVORO]) {
       if (jug.produccion !== produccion) salida.push({ tipo: ACCION.PRODUCIR, jugador: j, produccion });
@@ -2648,6 +2691,20 @@ function valorDeAccion(vista, j, a) {
         valor = unidadesDe(vista, j).filter((u) => carta(u.cardId).rasgo === RASGO.RIBERENO).length * BALANCE.rasgos.riberenoAtaque * IA.pesoDano;
       }
       return valor * IA.horizonte - carta(cardId).coste * IA.pesoCoste;
+    }
+    // Devolver una carta al mazo (Llanura de inundación). No es una jugada
+    // ofensiva: es alargar el mazo. Vale algo sólo cuando el mazo escasea, y
+    // sólo si lo que se devuelve no se iba a poder jugar.
+    //
+    // Se puntúa por debajo del umbral cuando queda mazo de sobra, para que la
+    // IA no se dedique a reciclar en el turno 2 teniendo cosas que desplegar.
+    case ACCION.RECICLAR: {
+      const mazo = vista.jugadores[j].mazo.length;
+      if (mazo > IA.reciclaDesdeMazo) return 0;
+      const c = carta(vista.instancias[a.iid].cardId);
+      const alcanzable = c.coste <= vista.jugadores[j].biomasa + IA.horizonte;
+      if (alcanzable) return 0;
+      return (IA.reciclaDesdeMazo - mazo) / IA.reciclaDesdeMazo;
     }
     default:
       return 0;

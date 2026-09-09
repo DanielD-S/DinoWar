@@ -662,7 +662,7 @@ cualquiera de los dos bandos puede reemplazarla, y su efecto alcanza a los dos.
 
 ### Llanura de inundación · Épica · coste 1
 
-+1 Biomasa para ambos jugadores
+Mientras esté en el campo, cada jugador puede devolver una carta de su mano al fondo de su mazo, una vez por turno.
 
 `ESTABLECIDO` · Las llanuras de inundación de la Morrison concentran la mayor productividad vegetal estacional de la formación.
 

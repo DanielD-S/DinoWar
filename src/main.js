@@ -5,6 +5,7 @@ import { BALANCE } from './data/balance.js';
 import { TIPO, OBJETIVO, CLADO, CLADO_NOMBRE, carta } from './data/cards.js';
 import {
   crearPartida, vistaDe, FASE, MOTIVO_FIN, unidadesDe, buscablesDe, buscaEnElMazo,
+  vidaActual, puedeReciclar,
 } from './engine/state.js';
 import { reduce, ACCION, legales, validar, cartasTrasMulligan } from './engine/actions.js';
 import { decidir, PERFIL } from './engine/ai.js';
@@ -151,6 +152,10 @@ function admite(cardId, destino) {
   if (!destino) return false;
   const c = carta(cardId);
 
+  // La pila del mazo acepta CUALQUIER carta, pero sólo con la Llanura puesta y
+  // una vez por turno: quien decide es el motor, aquí sólo se pregunta.
+  if (destino.tipo === 'mazo') return puedeReciclar(estado, JUGADOR);
+
   if (c.tipo === TIPO.DINOSAURIO) {
     return destino.tipo === 'ranura' && destino.bando === JUGADOR && destino.libre;
   }
@@ -168,6 +173,14 @@ function admite(cardId, destino) {
 
 function soltar(iid, cardId, destino) {
   const c = carta(cardId);
+
+  if (destino.tipo === 'mazo') {
+    if (aplicar({ tipo: ACCION.RECICLAR, jugador: JUGADOR, iid })) {
+      mensaje(`${c.binomial} vuelve al fondo de tu mazo.`);
+    }
+    return;
+  }
+
 
   if (!admite(cardId, destino)) {
     const pista = c.tipo === TIPO.DINOSAURIO ? 'Suelta los dinosaurios en una de tus ranuras libres.'
