@@ -173,9 +173,14 @@ test('La Edge Function comprueba la propiedad antes de pagar nada', () => {
     'Falta la comprobación de propiedad en alguno de los dos caminos que pagan');
 });
 
-test('La versión corta no es más permisiva que la larga', () => {
+test('La versión por URL hace lo mismo que la empaquetada', () => {
   const corta = readFileSync('supabase/functions/asalto/desde-url.ts', 'utf8');
-  // Ya pasó una vez que lo desplegado no era lo que se creía. Una versión de
-  // repuesto que se salta la comprobación es peor que no tenerla.
-  assert.match(corta, /validar_mazo_de/);
+  // Es la que está DESPLEGADA, no una de repuesto: se creyó lo contrario y por
+  // eso estuvo un rato capada a asaltos. Tiene que despachar los tres tipos y
+  // comprobar la propiedad en los dos caminos que pagan.
+  for (const tipo of ['asalto', 'victoria', 'sobre']) {
+    assert.match(corta, new RegExp(`tipo === '${tipo}'`), `no despacha «${tipo}»`);
+  }
+  assert.equal((corta.match(/validar_mazo_de/g) ?? []).length, 2,
+    'Falta la comprobación de propiedad en alguno de los dos caminos que pagan');
 });

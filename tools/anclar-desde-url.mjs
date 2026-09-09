@@ -22,13 +22,16 @@ export const SALIDA = 'supabase/functions/asalto/desde-url.ts';
 export const MARCA = 'Motor anclado en: ';
 
 /** Los ficheros que la función se trae por URL y que, por tanto, hay que vigilar. */
+// No es el cierre transitivo —detrás de estos viene el motor entero— sino los
+// que la función nombra o los que arrastran una regla que decide algo. Las
+// rutas relativas desde una URL del CDN siguen siendo esa URL, así que
+// validarPartida.js viaja aunque no aparezca en ningún import de la función.
 export const VIGILADOS = [
   'supabase/functions/_compartido/validarAsalto.js',
-  // validarAsalto.js lo importa por ruta relativa, y una ruta relativa desde
-  // una URL del CDN sigue siendo esa URL: viaja también, y por tanto también
-  // hay que vigilar que no se quede atrás.
   'supabase/functions/_compartido/validarPartida.js',
+  'supabase/functions/_compartido/validarSolitario.js',
   'src/data/tribu.js',
+  'src/data/coleccion.js',
 ];
 
 export const shaAnclado = () => (readFileSync(SALIDA, 'utf8').match(/@([0-9a-f]{40})/) ?? [])[1] ?? null;
