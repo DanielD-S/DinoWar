@@ -12,7 +12,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      # Historial completo: test/anclaje.test.js compara el validador del commit
+      # al que apunta la Edge Function con el del árbol de trabajo, y para eso
+      # necesita poder leer ese commit. Con el clon superficial que hace
+      # checkout por defecto, ese commit no está y el test falla por no
+      # encontrarlo, no por lo que vigila.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
