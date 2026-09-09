@@ -8,11 +8,11 @@
 // Existe para poder desplegar desde el editor del panel sin pegar 115 KB.
 // Si tienes un ordenador a mano, usa index.ts con la CLI y olvídate de esto.
 //
-// Motor anclado en: 44ebb64e2f7ff7e79bd7082064ed8202d2ce6bb7
+// Motor anclado en: 6533d411ac84a94d12e0f212fbb930366cea18c2
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 
-const REPO = 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@44ebb64e2f7ff7e79bd7082064ed8202d2ce6bb7';
+const REPO = 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@6533d411ac84a94d12e0f212fbb930366cea18c2';
 
 const { validarAsalto, jefeDelEvento, AsaltoInvalido } =
   await import(`${REPO}/supabase/functions/_compartido/validarAsalto.js`);
