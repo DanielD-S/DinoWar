@@ -1,0 +1,106 @@
+// DinoWar — Edge Function del asalto, versión CORTA para pegar a mano.
+//
+// Hace exactamente lo mismo que index.ts. La diferencia es de dónde saca el
+// motor: en vez de llevarlo empaquetado dentro, lo importa del repositorio
+// por URL, anclado a un commit CONCRETO. Anclado y no a una rama: así el
+// servidor no puede cambiar de código sin que alguien lo decida.
+//
+// Existe para poder desplegar desde el editor del panel sin pegar 115 KB.
+// Si tienes un ordenador a mano, usa index.ts con la CLI y olvídate de esto.
+//
+// Motor anclado en: e513747db45d969eac54c848d3d13952348aefcd
+
+import { createClient } from 'jsr:@supabase/supabase-js@2';
+
+const REPO = 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@e513747db45d969eac54c848d3d13952348aefcd';
+
+const { validarAsalto, jefeDelEvento, AsaltoInvalido } =
+  await import(`${REPO}/supabase/functions/_compartido/validarAsalto.js`);
+const { CUENCA } = await import(`${REPO}/src/data/tribu.js`);
+
+const cors = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
+
+const json = (cuerpo: unknown, status = 200) => new Response(
+  JSON.stringify(cuerpo),
+  { status, headers: { ...cors, 'Content-Type': 'application/json' } },
+);
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
+  if (req.method !== 'POST') return json({ error: 'sólo POST' }, 405);
+
+  // Quién eres lo dice el JWT, nunca el cuerpo de la petición.
+  const auth = req.headers.get('Authorization');
+  if (!auth) return json({ error: 'sin sesión' }, 401);
+
+  const comoUsuario = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_ANON_KEY')!,
+    { global: { headers: { Authorization: auth } } },
+  );
+  const { data: { user }, error: errAuth } = await comoUsuario.auth.getUser();
+  if (errAuth || !user) return json({ error: 'sesión inválida' }, 401);
+
+  let envio: Record<string, unknown>;
+  try { envio = await req.json(); } catch { return json({ error: 'cuerpo ilegible' }, 400); }
+
+  // Re-jugar la partida. El daño lo calcula el servidor; lo que diga el
+  // cliente sobre el resultado no se lee.
+  let resultado;
+  try {
+    resultado = validarAsalto(envio);
+  } catch (e) {
+    if (e instanceof AsaltoInvalido) return json({ error: e.message, detalle: e.detalle }, 422);
+    throw e;
+  }
+
+  const { evento } = jefeDelEvento(envio.jefeEvento as string);
+
+  const comoServicio = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+  );
+
+  const { data: jugador } = await comoServicio
+    .from('jugadores').select('tribu_id').eq('id', user.id).single();
+  if (!jugador?.tribu_id) return json({ error: 'no estás en ninguna tribu' }, 409);
+
+  const desde = new Date(Date.now() - 24 * 3600_000).toISOString();
+  const { count } = await comoServicio
+    .from('asaltos').select('id', { count: 'exact', head: true })
+    .eq('jugador_id', user.id).gte('jugado_en', desde);
+  if ((count ?? 0) >= CUENCA.asaltosPorDia) {
+    return json({ error: 'ya has hecho tus asaltos de hoy' }, 429);
+  }
+
+  const { data, error } = await comoServicio.rpc('aplicar_asalto', {
+    p_tribu: jugador.tribu_id,
+    p_evento: evento.id,
+    p_jugador: user.id,
+    p_semilla: envio.semilla,
+    p_dano: resultado.dano,
+    p_turnos: resultado.turnos,
+    p_ganada: resultado.ganada,
+    p_coste: CUENCA.costeAsalto,
+  });
+
+  if (error) {
+    const yaCobrada = error.code === '23505';
+    return json({ error: yaCobrada ? 'ese asalto ya se cobró' : error.message },
+      yaCobrada ? 409 : 400);
+  }
+
+  const fila = Array.isArray(data) ? data[0] : data;
+  return json({
+    dano: resultado.dano,
+    turnos: resultado.turnos,
+    ganada: resultado.ganada,
+    vida: fila?.vida ?? null,
+    cayo: fila?.cayo ?? false,
+    almacen: fila?.almacen ?? null,
+  });
+});
