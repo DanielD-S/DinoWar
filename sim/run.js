@@ -7,7 +7,7 @@
 //   node sim/run.js --json              métricas crudas por stdout
 
 import { writeFileSync } from 'node:fs';
-import { BALANCE, MAZO, TOTAL_MAZO } from '../src/data/balance.js';
+import { BALANCE, MAZO, TOTAL_MAZO, mazoConBiomasa } from '../src/data/balance.js';
 import { CARTAS, TIPO, CLADO_NOMBRE } from '../src/data/cards.js';
 import { MOTIVO_FIN } from '../src/engine/state.js';
 import { PERFIL } from '../src/engine/ai.js';
@@ -41,6 +41,14 @@ function args() {
   return o;
 }
 
+/**
+ * En la economía por cartas el mazo NO es el de referencia: no puede serlo, hay
+ * que hacerle sitio a 18 recursos. Comparar las tres economías con el mismo
+ * mazo sería comparar cualquier otra cosa.
+ */
+const mazoDeLaEconomia = (mazo) => (mazo
+  ?? (BALANCE.economia.modo === 'CARTAS' ? mazoConBiomasa() : null));
+
 const pct = (p, t) => (t === 0 ? 0 : (100 * p) / t);
 const media = (xs) => (xs.length === 0 ? 0 : xs.reduce((a, b) => a + b, 0) / xs.length);
 
@@ -69,7 +77,7 @@ export function correr({ n, seed, perfiles, mazo = null }) {
 
   for (let i = 0; i < n; i++) {
     const fotos = [];
-    const { estado, jugadas, robadas } = jugarPartida(seed + i, perfiles, (s) => fotos.push(foto(s)), true, mazo);
+    const { estado, jugadas, robadas } = jugarPartida(seed + i, perfiles, (s) => fotos.push(foto(s)), true, mazoDeLaEconomia(mazo));
 
     m.turnos.push(estado.turno);
     if (estado.ganador !== null) m.victorias[estado.ganador] += 1;

@@ -9,7 +9,7 @@
 // al cerrar. Un juego que se niega a arrancar porque no puede guardar es peor
 // que uno que no guarda.
 
-import { CARTAS } from '../data/cards.js';
+import { CARTAS, existeCarta } from '../data/cards.js';
 import { ECONOMIA, coleccionInicial, mazoPorDefecto, TAM_MAZO } from '../data/coleccion.js';
 
 const CLAVE = 'dinowar.perfil.v1';
@@ -37,14 +37,16 @@ function sanear(bruto) {
 
   const cartas = {};
   for (const [id, n] of Object.entries(bruto.cartas ?? {})) {
-    if (CARTAS[id] && Number.isFinite(n) && n > 0) cartas[id] = Math.floor(n);
+    // existeCarta y no CARTAS: las cartas de jefe no están en el set y aun así
+    // son tuyas. Filtrar por el set las borraba en la primera recarga.
+    if (existeCarta(id) && Number.isFinite(n) && n > 0) cartas[id] = Math.floor(n);
   }
 
   const mazos = (Array.isArray(bruto.mazos) ? bruto.mazos : [])
     .map((m, i) => {
       const c = {};
       for (const [id, n] of Object.entries(m?.cartas ?? {})) {
-        if (CARTAS[id] && Number.isFinite(n) && n > 0) c[id] = Math.floor(n);
+        if (existeCarta(id) && Number.isFinite(n) && n > 0) c[id] = Math.floor(n);
       }
       return { nombre: String(m?.nombre ?? `Mazo ${i + 1}`).slice(0, 24), cartas: c };
     })

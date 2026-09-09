@@ -28,6 +28,47 @@ export const BALANCE = Object.freeze({
   rentaTope: 12,            // tope de lo ahorrado, no de la renta
   rentaAcumula: true,
 
+  // --------------------------------------------------- variantes de economía
+  // Tres economías medibles. La de siempre es FIJA y es la que juega el juego
+  // publicado; las otras dos existen para decidir con datos, no discutiendo.
+  //
+  //  FIJA    lo de hoy: renta igual para los dos, garantizada, sin tipo.
+  //  TIPADA  renta igual y garantizada, pero CON tipo: declaras qué produces
+  //          un turno por adelantado y sólo paga a quien come eso. Cero
+  //          varianza, compromiso de mazo real.
+  //  CARTAS  la Biomasa es carta de recurso, al modo de las tierras de Magic:
+  //          una por turno, gratis, y el tipo lo trae la carta.
+  //
+  // El riesgo de CARTAS está medido antes de escribirla: con mano 6 y robo de
+  // 1, 18 recursos en 50 cartas dejan al jugador sin lo mínimo en el turno 4 el
+  // 29 % de las partidas, y sin NINGUNO de un tipo concreto el 13,9 %. Magic
+  // aguanta eso porque tiene mulligan con scry, cantrips y duales; aquí sólo se
+  // ven 9 cartas en el turno 4.
+  economia: Object.freeze({
+    // El modo se fija por entorno y sólo desde Node: el juego publicado corre
+    // SIEMPRE en FIJA. Es una variable y no una constante editable a mano para
+    // que medir las tres no obligue a tocar este fichero entre corridas —y para
+    // que nadie publique sin querer una variante a medio medir.
+    //   DINOWAR_ECONOMIA=TIPADA node sim/run.js
+    modo: (typeof process !== 'undefined' && process.env && process.env.DINOWAR_ECONOMIA) || 'FIJA',
+
+    // La pirámide trófica, hecha regla: la eficiencia ecológica entre niveles
+    // ronda el 10 %, así que sostener carne cuesta mucha más planta. El ratio
+    // no es un capricho de diseño, es de dónde sale la comida.
+    tipada: Object.freeze({
+      vegetal: 2,               // si declaras vegetal, cobras 2
+      animal: 1,                // si declaras animal, cobras 1
+      declaraConAntelacion: true,  // lo eliges un turno antes, a ciegas
+    }),
+
+    cartas: Object.freeze({
+      porMazo: 18,              // cuántas de las 50 son recurso
+      fraccionAnimal: 0.45,     // de esas, cuántas de tipo animal
+      porTurno: 1,              // cuántas puedes bajar por turno
+      valor: 1,                 // Biomasa que da cada una
+    }),
+  }),
+
   manoInicial: 6,
   manoMaxima: 7,
   robo: Object.freeze({ normal: 1 }),
@@ -186,6 +227,33 @@ export const MAZO = Object.freeze([
 ].map((e) => Object.freeze(e)));
 
 export const TOTAL_MAZO = MAZO.reduce((n, [, copias]) => n + copias, 0);
+
+/**
+ * El mazo de referencia adaptado a la economía por cartas: se le quitan tantas
+ * cartas como recursos entren, y siguen siendo 50.
+ *
+ * Se recortan primero las entradas con más copias, para que el mazo pierda
+ * repeticiones y no variedad: quitar la única copia de Torvosaurus cambia qué
+ * mazo es; bajar Dryosaurus de 3 a 2 sólo lo hace más fino. Esa es exactamente
+ * la factura que la variante viene a enseñar: 18 de 50 cartas dejan de ser
+ * jugadas para ser gasolina.
+ */
+export function mazoConBiomasa(economia = BALANCE.economia.cartas) {
+  const restan = economia.porMazo;
+  const lista = MAZO.map(([id, n]) => [id, n]);
+  for (let quitadas = 0; quitadas < restan;) {
+    lista.sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1));
+    if (lista[0][1] <= 0) break;
+    lista[0][1] -= 1;
+    quitadas += 1;
+  }
+  const animal = Math.round(restan * economia.fraccionAnimal);
+  return [
+    ...lista.filter(([, n]) => n > 0),
+    ['biomasa_animal', animal],
+    ['biomasa_vegetal', restan - animal],
+  ];
+}
 
 // Un mazo mal escrito no debe llegar a una partida: falla al importar, que es
 // el único momento en que el error todavía es barato.

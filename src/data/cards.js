@@ -20,6 +20,9 @@ export const TIPO = Object.freeze({
   EVENTO: 'EVENTO',     // te beneficia o le estorba al rival
   CLIMA: 'CLIMA',       // afecta a los dos bandos, para bien o para mal
   RECURSO: 'RECURSO',   // Biomasa inmediata a cambio de un inconveniente
+  // Sólo en la variante de economía por cartas. No está en CARTAS ni sale en
+  // sobres: ver CARTAS_ECONOMIA al final del fichero.
+  BIOMASA: 'BIOMASA',
 });
 
 /** Sobre qué actúa un evento. Decide dónde se suelta y qué valida el motor. */
@@ -52,6 +55,7 @@ export const RAREZA_NOMBRE = Object.freeze({
 
 export const TIPO_NOMBRE = Object.freeze({
   DINOSAURIO: 'Dinosaurio', EVENTO: 'Evento', CLIMA: 'Clima', RECURSO: 'Recurso',
+  BIOMASA: 'Biomasa',
 });
 
 /** Clados reales. El "triángulo de tipos" es una red trófica, no un capricho. */
@@ -772,8 +776,75 @@ export const CARTAS = Object.freeze({
 });
 
 
+/**
+ * Cartas que SÓLO existen en la variante de economía por cartas
+ * (`BALANCE.economia.modo === 'CARTAS'`, ver sim/economias.js).
+ *
+ * Deliberadamente fuera de CARTAS: no salen en sobres, no se coleccionan, no
+ * cuentan en el set y no las mide BALANCE.md. Están aquí y no en un módulo
+ * aparte para que `carta()` sepa resolverlas sin que cards.js dependa de nadie.
+ *
+ * No son cartas de juego: son el mazo de tierras de una variante que estamos
+ * midiendo para decidir si existe. Si la variante se descarta, se borra este
+ * bloque y no queda rastro en ninguna otra parte.
+ */
+export const CARTAS_ECONOMIA = Object.freeze({
+  biomasa_vegetal: Object.freeze({
+    id: 'biomasa_vegetal', tipo: TIPO.BIOMASA, dieta: 'HERBIVORO', coste: 0,
+    binomial: 'Ramoneo', rareza: RAREZA.COMUN, rasgo: RASGO.NINGUNO,
+  }),
+  biomasa_animal: Object.freeze({
+    id: 'biomasa_animal', tipo: TIPO.BIOMASA, dieta: 'CARNIVORO', coste: 0,
+    binomial: 'Presa abatida', rareza: RAREZA.COMUN, rasgo: RASGO.NINGUNO,
+  }),
+});
+
+/**
+ * Cartas que SÓLO se consiguen tumbando a su jefe. Fuera de CARTAS a propósito:
+ * no salen en sobres, no se funden y no cuentan en el set medido. Son la razón
+ * de que la capa cooperativa no sea un adorno — si estas cartas cayeran de un
+ * sobre, nadie coordinaría nada.
+ */
+export const CARTAS_DE_JEFE = Object.freeze({
+  jefe_saurophaganax: Object.freeze({
+    id: 'jefe_saurophaganax',
+    tipo: TIPO.DINOSAURIO, clado: CLADO.TEROPODO, rareza: RAREZA.LEGENDARIO,
+    binomial: 'Saurophaganax maximus',
+    coste: 4, ataque: 7, defensa: 2, vida: 6,
+    rasgo: RASGO.DEPREDADOR_DOMINANTE,
+    evidencia: 'DEBATIDO',
+    nota: 'El mayor terópodo conocido de la Formación Morrison, y también el más '
+      + 'discutido: parte de los autores lo consideran un Allosaurus de gran talla '
+      + 'y no un género propio. La carta lo declara porque la duda es el dato.',
+    formacion: 'Formación Morrison', edad: 'Kimmeridgiense–Titoniense (~155–150 Ma)',
+  }),
+  jefe_barosaurus: Object.freeze({
+    id: 'jefe_barosaurus',
+    tipo: TIPO.DINOSAURIO, clado: CLADO.SAUROPODO, rareza: RAREZA.LEGENDARIO,
+    binomial: 'Barosaurus lentus',
+    coste: 4, ataque: 3, defensa: 4, vida: 9,
+    rasgo: RASGO.MANADA,
+    evidencia: 'ESTABLECIDO',
+    nota: 'Diplodócido de cuello desmesurado incluso para su familia: vértebras '
+      + 'cervicales alargadas que lo hacían capaz de ramonear donde ningún otro '
+      + 'saurópodo de la Morrison llegaba.',
+    formacion: 'Formación Morrison', edad: 'Kimmeridgiense–Titoniense (~155–150 Ma)',
+  }),
+});
+
+/** ¿Existe esta carta en algún registro? El set, las de jefe o las de economía. */
+export const existeCarta = (cardId) => Boolean(
+  CARTAS[cardId] ?? CARTAS_DE_JEFE[cardId] ?? CARTAS_ECONOMIA[cardId],
+);
+
+/**
+ * Las que un mazo puede llevar: el set y las de jefe. Nunca las de economía,
+ * que no son cartas de juego sino el mazo de tierras de una variante.
+ */
+export const cartasJugables = () => ({ ...CARTAS, ...CARTAS_DE_JEFE });
+
 export function carta(cardId) {
-  const c = CARTAS[cardId];
+  const c = CARTAS[cardId] ?? CARTAS_DE_JEFE[cardId] ?? CARTAS_ECONOMIA[cardId];
   if (!c) throw new Error(`Carta desconocida: ${cardId}`);
   return c;
 }

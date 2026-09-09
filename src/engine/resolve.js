@@ -5,6 +5,7 @@
 import { BALANCE } from '../data/balance.js';
 import { RASGO, carta } from '../data/cards.js';
 import { barajar } from './rng.js';
+import { MODO, modoActual as economiaModo, rentaTipada, ingresar } from './economia.js';
 import {
   FASE, MOTIVO_FIN, CAUSA, rival,
   unidadEn, unidadesDe, todasLasUnidades,
@@ -132,8 +133,42 @@ export function robar(s, j, n) {
 // ------------------------------------------------------------------- fases
 
 export function faseRenta(s) {
+  for (const jug of s.jugadores) jug.biomasaJugadaEsteTurno = 0;
+
+  // CARTAS: la renta no existe, la Biomasa la traen las cartas de recurso.
+  // Sólo se reparte el fondo de salida, para que el turno 1 no sea en blanco.
+  if (economiaModo() === MODO.CARTAS) {
+    if (s.turno === 1) {
+      for (const jug of s.jugadores) {
+        jug.biomasa = 0;
+        jug.animal = 0;
+      }
+    }
+    ev(s, 'RENTA', { biomasa: 0, modo: MODO.CARTAS });
+    s.fase = FASE.ROBO;
+    return;
+  }
+
   // El primer turno no cobra renta: reparte el fondo inicial.
   const renta = s.turno === 1 ? BALANCE.biomasaInicial : rentaDe(s);
+
+  // TIPADA: la renta es la misma para los dos y está garantizada —eso no se
+  // toca, es la corrección de la v2—, pero viene con tipo, y el tipo lo eligió
+  // cada uno el turno pasado. Producir animal renta menos que producir vegetal.
+  if (economiaModo() === MODO.TIPADA) {
+    for (const jug of s.jugadores) {
+      const { cantidad, tipo } = rentaTipada(jug.produccion);
+      const escala = s.turno === 1 ? BALANCE.biomasaInicial / BALANCE.rentaPorTurno : 1;
+      if (!BALANCE.rentaAcumula || s.turno === 1) { jug.biomasa = 0; jug.animal = 0; }
+      ingresar(jug, Math.round(cantidad * escala), tipo);
+      // La declaración se consume: sin volver a declarar, se sigue produciendo
+      // lo mismo. Un turno despistado no te deja a cero, te deja sin cambiar.
+    }
+    ev(s, 'RENTA', { biomasa: renta, modo: MODO.TIPADA });
+    s.fase = FASE.ROBO;
+    return;
+  }
+
   for (const jug of s.jugadores) {
     // El tope es de lo ahorrado, no de la renta: nadie puede sentarse veinte
     // turnos a acumular, pero guardar dos o tres turnos sí tiene que valer.

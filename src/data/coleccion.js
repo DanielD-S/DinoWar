@@ -5,7 +5,7 @@
 // navegador. Así las probabilidades y la economía se pueden testear.
 
 import { BALANCE, MAZO, TOTAL_MAZO } from './balance.js';
-import { CARTAS, RAREZA, carta } from './cards.js';
+import { CARTAS, RAREZA, carta, existeCarta } from './cards.js';
 
 /** Tamaño exacto de un mazo legal. */
 export const TAM_MAZO = BALANCE.tamanoMazo;
@@ -208,7 +208,9 @@ export function validarMazo(mazo, cartas) {
   let total = 0;
 
   for (const [cardId, copias] of Object.entries(mazo)) {
-    if (!CARTAS[cardId] || copias <= 0) continue;
+    // Las de jefe cuentan en el mazo aunque no estén en el set: se ganan
+    // cooperando y para eso se ganan, para jugarlas.
+    if (!existeCarta(cardId) || copias <= 0) continue;
     total += copias;
     const tope = limiteDe(cardId);
     if (copias > tope) {

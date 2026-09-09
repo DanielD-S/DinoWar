@@ -9,6 +9,11 @@ import {
   ranuraValida, unidadesDe, ranurasLibres, buscablesDe, buscaEnElMazo, ataqueEfectivo,
 } from './state.js';
 import { barajar } from './rng.js';
+import { DIETA } from '../data/dietas.js';
+import {
+  MODO, modoActual as modoEconomia, puedePagar, pagar, devolver, ingresar,
+  esCartaDeBiomasa, dietaDeCarta,
+} from './economia.js';
 import {
   ev, descartarDeMano,
   faseRenta, faseRobo, faseRevelacion, faseCombate, faseChequeo,
@@ -25,6 +30,9 @@ export const ACCION = Object.freeze({
   PASAR: 'PASAR',
   DESCARTAR: 'DESCARTAR',
   AVANZAR: 'AVANZAR',
+  // Sólo en las variantes de economía (BALANCE.economia.modo distinto de FIJA).
+  BIOMASA: 'BIOMASA',       // bajar una carta de recurso (modo CARTAS)
+  PRODUCIR: 'PRODUCIR',     // declarar qué produces el turno que viene (TIPADA)
 });
 
 const CLADOS = Object.values(CLADO);
@@ -70,6 +78,16 @@ export function validar(s, a) {
   if (jug.listo) return 'ya has pasado';
   if (a.tipo === ACCION.PASAR) return null;
 
+  // Declarar producción no gasta carta ni Biomasa, así que se resuelve antes de
+  // todo lo que da por hecho que la acción trae una carta de la mano.
+  if (a.tipo === ACCION.PRODUCIR) {
+    if (modoEconomia() !== MODO.TIPADA) return 'aquí la Biomasa no tiene tipo';
+    if (a.produccion !== DIETA.CARNIVORO && a.produccion !== DIETA.HERBIVORO) {
+      return 'sólo se produce vegetal o animal';
+    }
+    return null;
+  }
+
   // Cambiar la mano inicial. Sólo en el turno 1 y antes de tocar nada: una vez
   // has comprometido una carta, el rival ya sabe algo de tu mano.
   if (a.tipo === ACCION.MULLIGAN) {
@@ -109,7 +127,20 @@ export function validar(s, a) {
 
   if (!jug.mano.includes(a.iid)) return 'la carta no está en tu mano';
   const c = carta(inst.cardId);
-  if (jug.biomasa < c.coste) return 'Biomasa insuficiente';
+
+  if (a.tipo === ACCION.BIOMASA) {
+    if (modoEconomia() !== MODO.CARTAS) return 'aquí la Biomasa no se juega, se cobra';
+    if (!esCartaDeBiomasa(inst.cardId)) return 'esa carta no da Biomasa';
+    if (jug.biomasaJugadaEsteTurno >= BALANCE.economia.cartas.porTurno) {
+      return 'ya has bajado tu recurso de este turno';
+    }
+    return null;
+  }
+  if (esCartaDeBiomasa(inst.cardId)) return 'esa carta sólo se baja como recurso';
+
+  // El coste ya no es una resta: en las economías tipadas un carnívoro no come
+  // helechos por mucha Biomasa que tenga ahorrada.
+  if (!puedePagar(jug, inst.cardId)) return 'Biomasa insuficiente';
 
   switch (a.tipo) {
     case ACCION.DESPLEGAR: {
@@ -233,8 +264,29 @@ export function reduce(state, action) {
       aplicarFaseAutomatica(s);
       break;
 
+    // Bajar un recurso (modo CARTAS). Boca arriba y al instante, como las
+    // cartas de recurso del set: la Biomasa que da se gasta este mismo turno.
+    case ACCION.BIOMASA: {
+      const cardId = s.instancias[action.iid].cardId;
+      const t = BALANCE.economia.cartas;
+      jug.mano = jug.mano.filter((x) => x !== action.iid);
+      jug.descarte.push(action.iid);
+      jug.biomasaJugadaEsteTurno += 1;
+      ingresar(jug, t.valor, dietaDeCarta(cardId) ?? DIETA.HERBIVORO);
+      ev(s, 'BIOMASA', { jugador: action.jugador, cardId, biomasa: jug.biomasa });
+      break;
+    }
+
+    // Declarar qué se produce el turno que viene (modo TIPADA). No cuesta nada
+    // y no se ve: es la parte de la economía que también se juega a ciegas.
+    case ACCION.PRODUCIR:
+      jug.produccion = action.produccion === DIETA.CARNIVORO
+        ? DIETA.CARNIVORO : DIETA.HERBIVORO;
+      ev(s, 'PRODUCCION', { jugador: action.jugador, produccion: jug.produccion });
+      break;
+
     case ACCION.DESPLEGAR:
-      jug.biomasa -= carta(s.instancias[action.iid].cardId).coste;
+      pagar(jug, s.instancias[action.iid].cardId);
       jug.mano = jug.mano.filter((x) => x !== action.iid);
       jug.pendientes.push({ tipo: 'DESPLIEGUE', iid: action.iid, ranura: action.ranura });
       // Lo buscado pasa del mazo a la mano ahora mismo: cuesta una carta de
@@ -261,14 +313,14 @@ export function reduce(state, action) {
       break;
 
     case ACCION.CLIMA:
-      jug.biomasa -= carta(s.instancias[action.iid].cardId).coste;
+      pagar(jug, s.instancias[action.iid].cardId);
       jug.mano = jug.mano.filter((x) => x !== action.iid);
       jug.pendientes.push({ tipo: 'CAMPO', iid: action.iid });
       break;
 
     case ACCION.EVENTO: {
       const c = carta(s.instancias[action.iid].cardId);
-      jug.biomasa -= c.coste;
+      pagar(jug, s.instancias[action.iid].cardId);
       jug.mano = jug.mano.filter((x) => x !== action.iid);
       jug.pendientes.push({
         tipo: c.objetivo === OBJETIVO.PROPIO ? 'ADAPTACION' : 'PRESION',
@@ -286,7 +338,7 @@ export function reduce(state, action) {
       // Un movimiento no costó Biomasa y la unidad nunca salió del campo:
       // retirarlo es sólo cancelar la orden.
       if (p.tipo !== 'MOVIMIENTO') {
-        jug.biomasa += carta(s.instancias[action.iid].cardId).coste;
+        devolver(jug, s.instancias[action.iid].cardId);
         jug.mano.push(action.iid);
       }
       ev(s, 'RETIRADA', { jugador: action.jugador, iid: action.iid, tipo: p.tipo });
@@ -362,6 +414,13 @@ export function legales(state, j) {
   const cambiar = { tipo: ACCION.MULLIGAN, jugador: j };
   if (!validar(s, cambiar)) salida.push(cambiar);
 
+  // Declarar producción (TIPADA): dos opciones y ningún coste.
+  if (modoEconomia() === MODO.TIPADA) {
+    for (const produccion of [DIETA.HERBIVORO, DIETA.CARNIVORO]) {
+      if (jug.produccion !== produccion) salida.push({ tipo: ACCION.PRODUCIR, jugador: j, produccion });
+    }
+  }
+
   const libres = ranurasLibres(s, j).filter((r) => !ranuraReservada(s, j, r));
   const propias = [
     ...unidadesDe(s, j).map((u) => u.iid),
@@ -371,7 +430,15 @@ export function legales(state, j) {
 
   for (const iid of jug.mano) {
     const c = carta(s.instancias[iid].cardId);
-    if (c.coste > jug.biomasa) continue;
+
+    if (c.tipo === TIPO.BIOMASA) {
+      const a = { tipo: ACCION.BIOMASA, jugador: j, iid };
+      if (!validar(s, a)) salida.push(a);
+      continue;
+    }
+    // La comprobación es la de la economía activa, no una resta: en las
+    // tipadas «me llega» y «me llega DE LO SUYO» no son lo mismo.
+    if (!puedePagar(jug, s.instancias[iid].cardId)) continue;
 
     if (c.tipo === TIPO.DINOSAURIO) {
       // Si la carta busca, se ofrece ya elegido a quién: enumerar cada ranura

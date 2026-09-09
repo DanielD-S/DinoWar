@@ -83,6 +83,14 @@ export function crearPartida(seedEntrada = 1, mazos = null) {
     jugadores.push({
       id: j,
       biomasa: 0,
+      // Parte del total que es Biomasa animal. En la economía FIJA no se mira:
+      // la Biomasa no tiene tipo y todo se paga con todo.
+      animal: 0,
+      // Qué tipo produces el turno que viene. Se declara a ciegas, un turno
+      // antes, igual que se despliega: comprometer la economía sin ver la
+      // jugada del rival es la misma tensión que ya tiene el tablero.
+      produccion: null,
+      biomasaJugadaEsteTurno: 0,
       habitat: BALANCE.vidaHabitat,
       trofeos: 0,
       mazo: b.lista,

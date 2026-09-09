@@ -11,6 +11,8 @@ import {
   ataqueEfectivo, vidaActual, reduccionDe, espinasDe, danoAlHabitat, campoEs, vuela,
 } from './state.js';
 import { ACCION, legales } from './actions.js';
+import { DIETA } from '../data/dietas.js';
+import { puedePagar, dietaDeCarta } from './economia.js';
 import { elegir } from './rng.js';
 
 export const PERFIL = Object.freeze({
@@ -126,6 +128,31 @@ function valorDeAccion(vista, j, a) {
   const contrario = rival(j);
 
   switch (a.tipo) {
+    // Bajar el recurso del turno es como jugar la tierra en Magic: casi nunca
+    // hay nada mejor que hacer con esa acción, porque no compite con jugar
+    // cartas — compite con no poder jugarlas el turno que viene.
+    case ACCION.BIOMASA:
+      return 100;
+
+    // Declarar producción no cuesta nada, así que la pregunta no es «¿vale la
+    // pena?» sino «¿de cuál me falta?». Se mira la mano: qué tipo desbloquea
+    // más Biomasa de cartas que ahora mismo no puedo pagar. A igualdad, vegetal,
+    // que renta el doble.
+    case ACCION.PRODUCIR: {
+      const jug = vista.jugadores[j];
+      let bloqueadoCarne = 0;
+      let bloqueadoPlanta = 0;
+      for (const iid of jug.mano) {
+        const cardId = vista.instancias[iid].cardId;
+        if (puedePagar(jug, cardId)) continue;
+        const d = dietaDeCarta(cardId);
+        if (d === DIETA.CARNIVORO) bloqueadoCarne += carta(cardId).coste;
+        else bloqueadoPlanta += carta(cardId).coste;
+      }
+      const quiere = bloqueadoCarne > bloqueadoPlanta ? DIETA.CARNIVORO : DIETA.HERBIVORO;
+      return a.produccion === quiere ? 1 : -1;
+    }
+
     case ACCION.DESPLEGAR: {
       const cardId = vista.instancias[a.iid].cardId;
       const b = unidadEn(vista, contrario, a.ranura);

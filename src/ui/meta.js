@@ -6,7 +6,7 @@
 // [cardId, copias].
 
 import {
-  CARTAS, RAREZA, RAREZA_NOMBRE, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, carta,
+  CARTAS, CARTAS_DE_JEFE, RAREZA, RAREZA_NOMBRE, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, carta,
 } from '../data/cards.js';
 import {
   ECONOMIA, PROBABILIDAD, GARANTIA, TAM_MAZO, POR_RAREZA,
@@ -81,9 +81,15 @@ const familia = (c) => (esDino(c) ? CLADO_NOMBRE[c.clado] : TIPO_NOMBRE[c.tipo])
 const totalDe = (mazo) => Object.values(mazo).reduce((a, b) => a + b, 0);
 
 /** Todas las cartas del set en orden de rareza descendente. */
+/**
+ * El set, más las cartas de jefe QUE YA TENGAS. Las de jefe no se enseñan como
+ * hueco: enseñar 'Sin ejemplares' en una carta que no se puede comprar sólo
+ * sirve para frustrar. Aparecen cuando las ganas, y no antes.
+ */
 function catalogo() {
-  return Object.values(CARTAS)
-    .slice()
+  const p = cargarPerfil();
+  const deJefe = Object.values(CARTAS_DE_JEFE).filter((c) => (p.cartas[c.id] ?? 0) > 0);
+  return [...Object.values(CARTAS), ...deJefe]
     .sort((a, b) => ORDEN.indexOf(a.rareza) - ORDEN.indexOf(b.rareza)
       || a.binomial.localeCompare(b.binomial));
 }

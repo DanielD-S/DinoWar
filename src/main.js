@@ -23,7 +23,11 @@ import {
 } from './ui/tutorial.js';
 import { detectarFotos, vigilarFotos, calentarFotos } from './ui/art.js';
 import { montarMeta, abrirColeccion, abrirSobres, abrirMazos, pintarMenu, recompensar } from './ui/meta.js';
-import { mazoActivo, cargarPerfil, actualizarPerfil } from './ui/almacen.js';
+import { mazoActivo, cargarPerfil, actualizarPerfil, anadirCartas } from './ui/almacen.js';
+import { montarCuenca, abrirCuenca, pintarCuenca } from './ui/cuenca.js';
+import { asaltar, estadoDeTribu } from './ui/red.js';
+import { danoDeAsalto, habitatDeAsalto } from './data/tribu.js';
+import { JEFES, jefeActivo } from './data/eventos.js';
 import { aListaDeMazo } from './data/coleccion.js';
 import {
   animarCombate, animarRevelacion, cancelarAnimaciones, esperar, lineasDeLog,
@@ -32,7 +36,7 @@ import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio } from '
 
 const APP = Object.freeze({
   BOOT: 'BOOT', MENU: 'MENU', PLAYING: 'PLAYING', RESOLVING: 'RESOLVING', GAME_OVER: 'GAME_OVER',
-  COLECCION: 'COLECCION', SOBRES: 'SOBRES', MAZOS: 'MAZOS',
+  COLECCION: 'COLECCION', SOBRES: 'SOBRES', MAZOS: 'MAZOS', CUENCA: 'CUENCA',
 });
 
 const params = new URLSearchParams(location.search);
@@ -85,6 +89,7 @@ function irA(nuevo) {
   el.coleccion.classList.toggle('oculta', nuevo !== APP.COLECCION);
   el.sobres.classList.toggle('oculta', nuevo !== APP.SOBRES);
   el.mazos.classList.toggle('oculta', nuevo !== APP.MAZOS);
+  el.cuenca.classList.toggle('oculta', nuevo !== APP.CUENCA);
 }
 
 const interactivo = () => app === APP.PLAYING && estado?.fase === FASE.DESPLIEGUE;
@@ -357,6 +362,7 @@ function seAcaboElTiempo(bando) {
       ? `Al rival se le acabaron sus ${minutos} minutos.`
       : `Cada bando tiene ${minutos} minutos para toda la partida, y gastaste los tuyos.`,
   });
+  if (cerrarAsalto(gane)) return;
   anotarResultado(gane, estado.turno);
   el.finPremio.textContent = premioTexto(recompensar(gane));
   sonido(gane ? 'gana' : 'pierde');
@@ -541,6 +547,7 @@ function rendirse() {
     titular: 'Derrota',
     frase: 'Abandonas el campo antes de que se decida.',
   });
+  if (cerrarAsalto(false)) return;
   anotarResultado(false, estado.turno);
   el.finPremio.textContent = premioTexto(recompensar(false));
   sonido('pierde');
@@ -615,14 +622,63 @@ function finPartida() {
   }[estado.motivoFin] ?? '';
 
   pintarFin({ via, gane, titular: gane ? 'Victoria' : 'Derrota', frase });
+  if (cerrarAsalto(gane)) return;
   anotarResultado(gane, estado.turno);
   el.finPremio.textContent = premioTexto(recompensar(gane));
   sonido(gane ? 'gana' : 'pierde');
 }
 
+/**
+ * Cierra una partida que era un asalto: el daño que le hiciste al jefe se le
+ * resta a la tribu entera. Devuelve true si la partida era un asalto, para que
+ * el final normal no siga.
+ *
+ * Un asalto NO paga dinomonedas ni cuenta en tu récord: no era una partida
+ * tuya, era trabajo para el equipo, y mezclar las dos economías haría que
+ * asaltar fuese la forma barata de farmear monedas.
+ */
+function cerrarAsalto(gane) {
+  if (!asaltando) return false;
+  const jefe = asaltando;
+  asaltando = null;
+
+  const dano = danoDeAsalto({
+    danoAlHabitat: habitatDeAsalto() - Math.max(0, estado.jugadores[RIVAL].habitat),
+    trofeos: estado.jugadores[JUGADOR].trofeos,
+    ganada: gane,
+  });
+  const r = asaltar(dano);
+  el.finPremio.textContent = r?.cayo
+    ? `${jefe.nombre} ha caído. Reclama su carta en la Cuenca.`
+    : `${dano} de daño a ${jefe.nombre}. No paga dinomonedas: esto es para la tribu.`;
+  sonido(gane ? 'gana' : 'pierde');
+  pintarCuenca();
+  return true;
+}
+
 // ------------------------------------------------------------------ arranque
 
-function nuevaPartida() {
+/**
+ * Qué jefe estás asaltando, o null si esta partida es una partida normal. Lo
+ * lleva una variable de módulo y no el estado del motor a propósito: el motor no
+ * tiene por qué enterarse de que existe una capa cooperativa encima.
+ */
+let asaltando = null;
+
+/**
+ * Un asalto es una PARTIDA NORMAL contra el mazo del jefe, con su hábitat muy
+ * alto. Reutilizar el motor entero en vez de escribir un modo aparte es lo que
+ * hace que un jefe se pelee con las mismas reglas que ya sabes, y lo que evita
+ * un segundo motor que mantener.
+ */
+function asaltoAlJefe() {
+  const activo = jefeActivo(estadoDeTribu().arranque, Date.now());
+  if (!activo) return;
+  asaltando = JEFES[activo.evento.jefe];
+  nuevaPartida(asaltando);
+}
+
+function nuevaPartida(jefe = null) {
   cancelarAnimaciones();
   soltarEntrada();
   registro = [];
@@ -633,7 +689,11 @@ function nuevaPartida() {
   const s = Number(params.get('seed')) || (Date.now() & 0x7fffffff);
   // Tú llevas tu mazo; la IA lleva el de referencia, que es el que mide el
   // simulador. Así el balance publicado sigue significando algo.
-  estado = crearPartida(s, [aListaDeMazo(mazoActivo()), null]);
+  asaltando = jefe;
+  estado = crearPartida(s, [aListaDeMazo(mazoActivo()), jefe ? jefe.mazo.map((e) => [...e]) : null]);
+  // El jefe aguanta mucho más que un rival normal. No es una regla nueva: es el
+  // mismo hábitat, más alto, así que todo lo demás del motor sigue igual.
+  if (jefe) estado.jugadores[RIVAL].habitat = habitatDeAsalto();
   rngIA = semilla(s ^ 0x5bf03635);
   reloj.arrancar({ alAgotarse: seAcaboElTiempo, alLatir: pintarReloj });
   pintarReloj();
@@ -695,11 +755,13 @@ function iniciar() {
   irA(APP.MENU);
 
   montarMeta(() => irA(APP.MENU));
+  montarCuenca(() => irA(APP.MENU), asaltoAlJefe);
 
   el.btnJugar.addEventListener('click', () => { desbloquear(); nuevaPartida(); });
   el.btnColeccion.addEventListener('click', () => { abrirColeccion(); irA(APP.COLECCION); });
   el.btnSobres.addEventListener('click', () => { abrirSobres(); irA(APP.SOBRES); });
   el.btnMazos.addEventListener('click', () => { abrirMazos(); irA(APP.MAZOS); });
+  el.btnCuenca.addEventListener('click', () => { abrirCuenca(); irA(APP.CUENCA); });
   el.btnOtra.addEventListener('click', () => { pintarRecord(); nuevaPartida(); });
   // Terminar una partida no obligaba a jugar otra, pero lo parecía: no había
   // más salida que «Otra partida».
