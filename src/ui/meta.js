@@ -199,6 +199,15 @@ function estadoDeCopia(cardId, antes, enEsteSobre) {
   return { texto: `Copia ${total} de ${tope}`, clase: '' };
 }
 
+/**
+ * De dónde salen las monedas, dicho una sola vez. Perder no paga, así que la
+ * frase no puede ser «se ganan jugando»: se ganan ganando, y enseñar un «0 por
+ * derrota» sería contar una recompensa que no existe.
+ */
+const COMO_SE_GANAN = ECONOMIA.monedasDerrota > 0
+  ? `Las monedas se ganan jugando: ${ECONOMIA.monedasVictoria} por victoria, ${ECONOMIA.monedasDerrota} por derrota.`
+  : `Las monedas se ganan ganando: ${ECONOMIA.monedasVictoria} por victoria y nada por derrota.`;
+
 /** La rareza más alta de la tirada: es la carta que se enseña en grande. */
 function mejorDeLaTirada(tirada) {
   let mejor = 0;
@@ -288,8 +297,8 @@ function pintarSobres(tirada = null, nuevas = new Set(), antesDeAbrir = {}) {
   dom.aviso.textContent = PRUEBAS
     ? `${abiertos}. Modo pruebas: los sobres no cuestan monedas. Quita ?pruebas=1 de la dirección para volver a lo normal.`
     : puede
-      ? `${abiertos}. Las monedas se ganan jugando: ${ECONOMIA.monedasVictoria} por victoria, ${ECONOMIA.monedasDerrota} por derrota.`
-      : `Te faltan ${ECONOMIA.precioSobre - p.monedas} monedas. Se ganan jugando, o fundiendo copias sobrantes en la colección.`;
+      ? `${abiertos}. ${COMO_SE_GANAN}`
+      : `Te faltan ${ECONOMIA.precioSobre - p.monedas} monedas. ${COMO_SE_GANAN} También las da fundir copias sobrantes en la colección.`;
 }
 
 function comprarSobre() {
@@ -512,7 +521,7 @@ function autocompletar() {
 
 // --------------------------------------------------------------- recompensa
 
-/** Monedas por terminar una partida. Se gana algo también perdiendo. */
+/** Monedas por ganar la partida. Perder no paga: `monedasDerrota` es 0. */
 export function recompensar(gano) {
   const p = cargarPerfil();
   const premio = gano ? ECONOMIA.monedasVictoria : ECONOMIA.monedasDerrota;

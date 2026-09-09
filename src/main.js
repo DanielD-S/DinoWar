@@ -358,7 +358,7 @@ function seAcaboElTiempo(bando) {
       : `Cada bando tiene ${minutos} minutos para toda la partida, y gastaste los tuyos.`,
   });
   anotarResultado(gane, estado.turno);
-  el.finPremio.textContent = `+${recompensar(gane)} dinomonedas`;
+  el.finPremio.textContent = premioTexto(recompensar(gane));
   sonido(gane ? 'gana' : 'pierde');
 }
 
@@ -542,9 +542,16 @@ function rendirse() {
     frase: 'Abandonas el campo antes de que se decida.',
   });
   anotarResultado(false, estado.turno);
-  el.finPremio.textContent = `+${recompensar(false)} dinomonedas`;
+  el.finPremio.textContent = premioTexto(recompensar(false));
   sonido('pierde');
 }
+
+/**
+ * La línea de premio del final. Perder no paga, y «+0 dinomonedas» se lee como
+ * un fallo de cuentas antes que como la regla: cuando no hay premio, se dice
+ * que no lo hay y por qué.
+ */
+const premioTexto = (n) => (n > 0 ? `+${n} dinomonedas` : 'Sin dinomonedas: sólo las da ganar');
 
 /**
  * Pantalla de fin: la vía de victoria arriba en versales, el titular, la frase
@@ -566,7 +573,7 @@ function pintarFin({ via, gane, titular, frase }) {
 
 function preguntarRendicion() {
   el.eleccionTitulo.textContent = '¿Abandonar la partida?';
-  el.eleccionTexto.textContent = 'Cuenta como derrota en tu récord y cobra la recompensa de derrota.';
+  el.eleccionTexto.textContent = 'Cuenta como derrota en tu récord, y perder no da dinomonedas.';
   el.eleccionCuerpo.innerHTML = `
     <button class="opcion" data-rendirse="si">Rendirse<small>La partida termina aquí.</small></button>
     <button class="opcion" data-rendirse="no">Seguir jugando<small>Vuelve al tablero.</small></button>`;
@@ -609,7 +616,7 @@ function finPartida() {
 
   pintarFin({ via, gane, titular: gane ? 'Victoria' : 'Derrota', frase });
   anotarResultado(gane, estado.turno);
-  el.finPremio.textContent = `+${recompensar(gane)} dinomonedas`;
+  el.finPremio.textContent = premioTexto(recompensar(gane));
   sonido(gane ? 'gana' : 'pierde');
 }
 

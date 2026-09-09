@@ -61,9 +61,12 @@ de la que no puedes pagar nada no es mala suerte, es un turno perdido.
 ## Colección, sobres y mazos
 
 Empiezas con las 50 cartas del mazo de referencia y 240 dinomonedas. Se ganan
-jugando —60 por victoria, 20 por derrota— y se gastan en sobres de cinco cartas,
-con la garantía de una rara o mejor. Las copias que superan el máximo de su
-rareza no caben en ningún mazo legal, así que se funden por monedas.
+**ganando** —50 por victoria y nada por derrota— y se gastan en sobres de cinco
+cartas, a 100 la unidad, con la garantía de una rara o mejor. Dos victorias son
+un sobre; una derrota no es medio paso hacia él. Las copias que superan el
+máximo de su rareza no caben en ningún mazo legal, así que se funden por
+monedas, y fundir un sobre entero devuelve menos de lo que cuesta: reciclar lo
+que sobra no es una forma de farmear.
 
 Un mazo son 50 cartas exactas y de cada carta caben tantas copias como diga su
 rareza: 3 común, 3 rara, 2 épica, 1 legendaria. Con 31 cartas distintas ya no

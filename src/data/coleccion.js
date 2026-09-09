@@ -18,16 +18,21 @@ export const limiteDe = (cardId) => BALANCE.copiasPorRareza[carta(cardId).rareza
 
 export const ECONOMIA = Object.freeze({
   // Un sobre son cinco cartas. El precio está por encima de lo que devuelve
-  // fundirlo entero (unas 56 monedas), porque si no el bucle se alimenta solo
-  // y abrir sobres deja de ser una decisión.
-  precioSobre: 120,
+  // fundirlo entero (unas 77 monedas, que lo comprueba un test), porque si no
+  // el bucle se alimenta solo y abrir sobres deja de ser una decisión.
+  precioSobre: 100,
   cartasPorSobre: 5,
 
-  // Las monedas salen de jugar, no de fundir. Fundir sólo recicla lo que ya no
-  // te cabe en ningún mazo.
+  // Las monedas salen de GANAR, no de jugar y tampoco de fundir. Fundir sólo
+  // recicla lo que ya no te cabe en ningún mazo.
+  //
+  // Perder no paga: dos victorias son un sobre y una derrota no es medio paso
+  // hacia él. El precio de eso es que quien no gana nunca se queda con los dos
+  // sobres de salida y su colección inicial, que es un mazo legal y completo
+  // —jugar nunca se bloquea—, pero la colección deja de crecer sola.
   monedasInicio: 240,
-  monedasVictoria: 60,
-  monedasDerrota: 20,
+  monedasVictoria: 50,
+  monedasDerrota: 0,
 
   fusion: Object.freeze({
     [RAREZA.COMUN]: 4,
