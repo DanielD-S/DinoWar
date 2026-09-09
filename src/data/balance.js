@@ -149,9 +149,12 @@ export const BALANCE = Object.freeze({
 
   efectosCampo: Object.freeze({
     aridezMazo: 5,
-    // La llanura anegada deja RECICLAR: mientras esté en el campo, cada jugador
-    // puede devolver al fondo de su mazo una carta de su mano por turno, y elige
-    // cuál. Vale para los dos, como todo clima.
+    // La llanura anegada deja CAMBIAR una carta: la que sueltas va al fondo del
+    // mazo y robas la de arriba. Una por turno, cada jugador elige la suya.
+    //
+    // Sin el robo era una pérdida seca y no la usaba nadie: `sim/climas.js` midió
+    // cero devoluciones en 300 partidas y la carta salía IDÉNTICA al control en
+    // las seis columnas.
     //
     // Daba +1 de Biomasa a los dos, que es exactamente lo que ahora hace la
     // sabana, y dos cartas idénticas con nombre distinto no son dos cartas.
@@ -226,7 +229,10 @@ export const BALANCE = Object.freeze({
     umbralJugar: 0.15,
     // A partir de cuántas cartas de mazo empieza a valer la pena devolver una
     // con la Llanura. Por encima de eso, reciclar es perder el turno.
-    reciclaDesdeMazo: 15,
+    // Con el robo, cambiar una carta ya no es perder una, así que la IA lo hace
+    // siempre que tenga algo impagable en la mano. El umbral de mazo se queda
+    // alto para que no sea gratis del todo cerca del final.
+    reciclaDesdeMazo: 45,
   }),
 });
 

@@ -155,7 +155,7 @@ test('Volar no libra de lo que no se esquiva volando', () => {
     || !vivo(r, pterosaurio), 'la mortandad debería alcanzarle');
 });
 
-test('La Llanura deja devolver una carta al fondo del mazo, una vez por turno', () => {
+test('La Llanura deja CAMBIAR una carta: al fondo va una y entra otra', () => {
   // La sabana pasó a dar Biomasa a los dos y eso era, letra por letra, lo que
   // hacía la llanura. Reciclar es lo único que ningún otro clima hace, y apunta
   // a lo que está flojo: la extinción se quedó cerca del suelo del 15 %.
@@ -175,12 +175,17 @@ test('La Llanura deja devolver una carta al fondo del mazo, una vez por turno', 
   const iid = opciones[0].iid;
   const mazo = s.jugadores[0].mazo.length;
   const mano = s.jugadores[0].mano.length;
+  const arriba = s.jugadores[0].mazo[0];
   const post = reduce(s, opciones[0]);
 
-  assert.equal(post.jugadores[0].mano.length, mano - 1);
-  assert.equal(post.jugadores[0].mazo.length, mazo + 1);
+  // Cambio, no pérdida: sale una y entra otra, así que la mano no encoge.
+  // Sin el robo, `sim/climas.js` midió cero usos en 300 partidas.
+  assert.equal(post.jugadores[0].mano.length, mano, 'la mano no encoge');
+  assert.equal(post.jugadores[0].mazo.length, mazo, 'el mazo tampoco');
+  assert.ok(!post.jugadores[0].mano.includes(iid), 'la soltada se va');
+  assert.ok(post.jugadores[0].mano.includes(arriba), 'y entra la de arriba del mazo');
   assert.equal(post.jugadores[0].mazo[post.jugadores[0].mazo.length - 1], iid,
-    'al FONDO: arriba sería robarla otra vez el turno que viene, y eso es buscar, no reciclar');
+    'al FONDO: arriba te devolvería la misma que acabas de soltar');
   assert.equal(puedeReciclar(post, 0), false, 'una por turno');
 });
 

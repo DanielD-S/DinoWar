@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: 4e0fbaea5aa292ec
+// huella: ad5ba98551bf1a57
 //
 // Lleva dentro estos 16 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -1277,9 +1277,12 @@ var BALANCE = Object.freeze({
   }),
   efectosCampo: Object.freeze({
     aridezMazo: 5,
-    // La llanura anegada deja RECICLAR: mientras esté en el campo, cada jugador
-    // puede devolver al fondo de su mazo una carta de su mano por turno, y elige
-    // cuál. Vale para los dos, como todo clima.
+    // La llanura anegada deja CAMBIAR una carta: la que sueltas va al fondo del
+    // mazo y robas la de arriba. Una por turno, cada jugador elige la suya.
+    //
+    // Sin el robo era una pérdida seca y no la usaba nadie: `sim/climas.js` midió
+    // cero devoluciones en 300 partidas y la carta salía IDÉNTICA al control en
+    // las seis columnas.
     //
     // Daba +1 de Biomasa a los dos, que es exactamente lo que ahora hace la
     // sabana, y dos cartas idénticas con nombre distinto no son dos cartas.
@@ -1352,7 +1355,10 @@ var BALANCE = Object.freeze({
     umbralJugar: 0.15,
     // A partir de cuántas cartas de mazo empieza a valer la pena devolver una
     // con la Llanura. Por encima de eso, reciclar es perder el turno.
-    reciclaDesdeMazo: 15
+    // Con el robo, cambiar una carta ya no es perder una, así que la IA lo hace
+    // siempre que tenga algo impagable en la mano. El umbral de mazo se queda
+    // alto para que no sea gratis del todo cerca del final.
+    reciclaDesdeMazo: 45
   })
 });
 var MAZO = Object.freeze([
@@ -2418,15 +2424,22 @@ function reduce(state, action) {
       jug.listo = true;
       if (s.jugadores.every((j) => j.listo)) s.fase = FASE.REVELACION;
       break;
-    // Al FONDO, no arriba: devolverla arriba sería robarla otra vez el turno
-    // que viene, y eso no es reciclar, es buscar. Y sin barajar, porque al fondo
-    // de un mazo de cincuenta no vuelve a verse en la misma partida.
+    // Devuelve una y ROBA una. Sin el robo era una pérdida seca —la carta salía
+    // de la mano, iba al fondo de veinte y no volvía— y medido no la usaba
+    // nadie: cero devoluciones en 300 partidas. Con el robo deja de ser
+    // «pierdes una carta» y pasa a ser «cambias la que no puedes pagar».
+    //
+    // Al FONDO, no arriba: arriba te devolvería la misma que acabas de soltar.
+    // Y el robo va DESPUÉS de meterla, para que en un mazo de una carta te
+    // lleves la tuya y no se quede el mazo vacío.
     case ACCION.RECICLAR: {
       const cardId = s.instancias[action.iid].cardId;
       jug.mano = jug.mano.filter((x) => x !== action.iid);
       jug.mazo.push(action.iid);
       jug.recicladasEsteTurno += 1;
-      ev(s, "RECICLA", { jugador: action.jugador, iid: action.iid, cardId });
+      const robada = jug.mazo.shift() ?? null;
+      if (robada !== null) jug.mano.push(robada);
+      ev(s, "RECICLA", { jugador: action.jugador, iid: action.iid, cardId, robada });
       break;
     }
     case ACCION.DESCARTAR:
