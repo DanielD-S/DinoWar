@@ -36,214 +36,214 @@ es legendario.
 
 ## 1. Dinosaurios
 
-| Taxón | Clado | Rareza | Copias | Coste | Ataque | Defensa | Vida | Sed |
-|---|---|---|---|---|---|---|---|---|
-| *Dryosaurus altus* | Ornitópodo | Común | 3 | 0 | 1 | 0 | 2 | undefined |
-| *Ornitholestes hermanni* | Terópodo | Común | 3 | 1 | 2 | 0 | 2 | undefined |
-| *Ceratosaurus nasicornis* | Terópodo | Común | 3 | 1 | 3 | 0 | 3 | undefined |
-| *Stegosaurus stenops* | Tireóforo | Común | 2 | 2 | 1 | 4 | 5 | undefined |
-| *Allosaurus fragilis* | Terópodo | Rara | 2 | 3 | 5 | 2 | 3 | undefined |
-| *Camarasaurus grandis* | Saurópodo | Rara | 2 | 3 | 2 | 3 | 4 | undefined |
-| *Diplodocus carnegii* | Saurópodo | Épica | 1 | 2 | 3 | 3 | 10 | undefined |
-| *Apatosaurus louisae* | Saurópodo | Épica | 1 | 3 | 2 | 5 | 10 | undefined |
-| *Torvosaurus tanneri* | Terópodo | Legendaria | 1 | 4 | 7 | 1 | 5 | undefined |
-| *Nodosaurus textilis* | Tireóforo | Rara | 3 | 2 | 2 | 3 | 5 | undefined |
-| *Riparovenator milnerae* | Terópodo | Épica | 2 | 2 | 4 | 1 | 4 | undefined |
-| *Lokiceratops rangiformis* | Marginocéfalo | Épica | 1 | 3 | 4 | 1 | 7 | undefined |
-| *Brachylophosaurus canadensis* | Ornitópodo | Rara | 3 | 2 | 2 | 1 | 6 | undefined |
-| *Tyrannotitan chubutensis* | Terópodo | Legendaria | 1 | 4 | 10 | 1 | 5 | undefined |
-| *Huaxiadraco corollatus* | Pterosaurio | Rara | 2 | 2 | 2 | 2 | 2 | undefined |
-| *Plesiopleurodon wellesi* | Reptil marino | Épica | 0 | 3 | 9 | 2 | 4 | undefined |
-| *Ojoraptorsaurus boerei* | Terópodo | Rara | 0 | 2 | 4 | 1 | 4 | undefined |
-| *Dromaeosaurus albertensis* | Terópodo | Común | 0 | 2 | 5 | 1 | 3 | undefined |
-| *Athenar bermani* | Saurópodo | Común | 0 | 2 | 2 | 2 | 5 | undefined |
-| *Sanjuansaurus gordilloi* | Terópodo | Rara | 0 | 2 | 5 | 1 | 3 | undefined |
-| *Suchomimus tenerensis* | Terópodo | Épica | 0 | 3 | 8 | 2 | 5 | undefined |
-| *Eosinopteryx brevipenna* | Terópodo | Común | 0 | 1 | 2 | 0 | 2 | undefined |
-| *Troodon formosus* | Terópodo | Común | 0 | 2 | 4 | 1 | 4 | undefined |
-| *Carnotaurus sastrei* | Terópodo | Épica | 0 | 3 | 9 | 1 | 5 | undefined |
-| *Spinosaurus aegyptiacus* | Terópodo | Legendaria | 0 | 4 | 11 | 2 | 9 | undefined |
-| *Mosasaurus hoffmannii* | Reptil marino | Legendaria | 0 | 4 | 12 | 2 | 8 | undefined |
-| *Halszkaraptor escuilliei* | Terópodo | Común | 0 | 1 | 2 | 0 | 2 | undefined |
-| *Tongtianlong limosus* | Terópodo | Común | 0 | 1 | 1 | 1 | 2 | undefined |
-| *Scanisaurus nazarowi* | Reptil marino | Rara | 0 | 2 | 4 | 1 | 4 | undefined |
-| *Monolophosaurus jiangi* | Terópodo | Rara | 0 | 2 | 5 | 1 | 3 | undefined |
-| *Invictarx zephyri* | Tireóforo | Rara | 0 | 2 | 2 | 5 | 2 | undefined |
-| *Medusaceratops lokii* | Marginocéfalo | Épica | 0 | 3 | 5 | 4 | 6 | undefined |
-| *Platyceratops tatarinovi* | Marginocéfalo | Común | 0 | 1 | 1 | 2 | 1 | undefined |
-| *Loricatosaurus priscus* | Tireóforo | Épica | 0 | 3 | 4 | 6 | 5 | undefined |
-| *Therizinosaurus cheloniformis* | Terópodo | Épica | 0 | 3 | 6 | 3 | 6 | undefined |
-| *Alaskacephale gangloffi* | Marginocéfalo | Rara | 0 | 2 | 3 | 3 | 3 | undefined |
-| *Titanoceratops ouranos* | Marginocéfalo | Épica | 0 | 3 | 6 | 5 | 4 | undefined |
-| *Atlasaurus imelakei* | Saurópodo | Épica | 0 | 3 | 3 | 4 | 8 | undefined |
-| *Stegoceras validum* | Marginocéfalo | Común | 0 | 2 | 3 | 3 | 3 | undefined |
-| *Maiasaura peeblesorum* | Ornitópodo | Épica | 0 | 3 | 4 | 2 | 9 | undefined |
-| *Edmontosaurus annectens* | Ornitópodo | Legendaria | 0 | 4 | 5 | 3 | 14 | undefined |
-| *Plateosauravus cullingworthi* | Saurópodo | Común | 0 | 2 | 2 | 2 | 5 | undefined |
-| *Gargoyleosaurus parkpinorum* | Tireóforo | Rara | 0 | 2 | 2 | 4 | 3 | undefined |
-| *Wendiceratops pinhornensis* | Marginocéfalo | Épica | 0 | 3 | 5 | 4 | 6 | undefined |
-| *Antarctosaurus wichmannianus* | Saurópodo | Legendaria | 0 | 4 | 4 | 5 | 13 | undefined |
-| *Liaoceratops yanzigouensis* | Marginocéfalo | Común | 0 | 1 | 1 | 1 | 2 | undefined |
-| *Rhinorex condrupus* | Ornitópodo | Épica | 0 | 3 | 4 | 2 | 9 | undefined |
-| *Bienosaurus lufengensis* | Tireóforo | Común | 0 | 1 | 1 | 2 | 1 | undefined |
-| *Shuangmiaosaurus gilmorei* | Ornitópodo | Común | 0 | 2 | 3 | 1 | 5 | undefined |
-| *Chasmosaurus belli* | Marginocéfalo | Común | 0 | 2 | 2 | 4 | 3 | undefined |
+| Taxón | Clado | Rareza | Copias | Coste | Ataque | Vida | Sed |
+|---|---|---|---|---|---|---|---|
+| *Dryosaurus altus* | Ornitópodo | Común | 3 | 0 | 1 | 2 | undefined |
+| *Ornitholestes hermanni* | Terópodo | Común | 3 | 1 | 2 | 2 | undefined |
+| *Ceratosaurus nasicornis* | Terópodo | Común | 3 | 1 | 3 | 3 | undefined |
+| *Stegosaurus stenops* | Tireóforo | Común | 2 | 2 | 1 | 9 | undefined |
+| *Allosaurus fragilis* | Terópodo | Rara | 2 | 3 | 5 | 5 | undefined |
+| *Camarasaurus grandis* | Saurópodo | Rara | 2 | 3 | 2 | 7 | undefined |
+| *Diplodocus carnegii* | Saurópodo | Épica | 1 | 2 | 3 | 13 | undefined |
+| *Apatosaurus louisae* | Saurópodo | Épica | 1 | 3 | 2 | 15 | undefined |
+| *Torvosaurus tanneri* | Terópodo | Legendaria | 1 | 4 | 7 | 6 | undefined |
+| *Nodosaurus textilis* | Tireóforo | Rara | 3 | 2 | 2 | 8 | undefined |
+| *Riparovenator milnerae* | Terópodo | Épica | 2 | 2 | 4 | 5 | undefined |
+| *Lokiceratops rangiformis* | Marginocéfalo | Épica | 1 | 3 | 4 | 8 | undefined |
+| *Brachylophosaurus canadensis* | Ornitópodo | Rara | 3 | 2 | 2 | 7 | undefined |
+| *Tyrannotitan chubutensis* | Terópodo | Legendaria | 1 | 4 | 10 | 6 | undefined |
+| *Huaxiadraco corollatus* | Pterosaurio | Rara | 2 | 2 | 2 | 4 | undefined |
+| *Plesiopleurodon wellesi* | Reptil marino | Épica | 0 | 3 | 9 | 6 | undefined |
+| *Ojoraptorsaurus boerei* | Terópodo | Rara | 0 | 2 | 4 | 5 | undefined |
+| *Dromaeosaurus albertensis* | Terópodo | Común | 0 | 2 | 5 | 4 | undefined |
+| *Athenar bermani* | Saurópodo | Común | 0 | 2 | 2 | 7 | undefined |
+| *Sanjuansaurus gordilloi* | Terópodo | Rara | 0 | 2 | 5 | 4 | undefined |
+| *Suchomimus tenerensis* | Terópodo | Épica | 0 | 3 | 8 | 7 | undefined |
+| *Eosinopteryx brevipenna* | Terópodo | Común | 0 | 1 | 2 | 2 | undefined |
+| *Troodon formosus* | Terópodo | Común | 0 | 2 | 4 | 5 | undefined |
+| *Carnotaurus sastrei* | Terópodo | Épica | 0 | 3 | 9 | 6 | undefined |
+| *Spinosaurus aegyptiacus* | Terópodo | Legendaria | 0 | 4 | 11 | 11 | undefined |
+| *Mosasaurus hoffmannii* | Reptil marino | Legendaria | 0 | 4 | 12 | 10 | undefined |
+| *Halszkaraptor escuilliei* | Terópodo | Común | 0 | 1 | 2 | 2 | undefined |
+| *Tongtianlong limosus* | Terópodo | Común | 0 | 1 | 1 | 3 | undefined |
+| *Scanisaurus nazarowi* | Reptil marino | Rara | 0 | 2 | 4 | 5 | undefined |
+| *Monolophosaurus jiangi* | Terópodo | Rara | 0 | 2 | 5 | 4 | undefined |
+| *Invictarx zephyri* | Tireóforo | Rara | 0 | 2 | 2 | 7 | undefined |
+| *Medusaceratops lokii* | Marginocéfalo | Épica | 0 | 3 | 5 | 10 | undefined |
+| *Platyceratops tatarinovi* | Marginocéfalo | Común | 0 | 1 | 1 | 3 | undefined |
+| *Loricatosaurus priscus* | Tireóforo | Épica | 0 | 3 | 4 | 11 | undefined |
+| *Therizinosaurus cheloniformis* | Terópodo | Épica | 0 | 3 | 6 | 9 | undefined |
+| *Alaskacephale gangloffi* | Marginocéfalo | Rara | 0 | 2 | 3 | 6 | undefined |
+| *Titanoceratops ouranos* | Marginocéfalo | Épica | 0 | 3 | 6 | 9 | undefined |
+| *Atlasaurus imelakei* | Saurópodo | Épica | 0 | 3 | 3 | 12 | undefined |
+| *Stegoceras validum* | Marginocéfalo | Común | 0 | 2 | 3 | 6 | undefined |
+| *Maiasaura peeblesorum* | Ornitópodo | Épica | 0 | 3 | 4 | 11 | undefined |
+| *Edmontosaurus annectens* | Ornitópodo | Legendaria | 0 | 4 | 5 | 17 | undefined |
+| *Plateosauravus cullingworthi* | Saurópodo | Común | 0 | 2 | 2 | 7 | undefined |
+| *Gargoyleosaurus parkpinorum* | Tireóforo | Rara | 0 | 2 | 2 | 7 | undefined |
+| *Wendiceratops pinhornensis* | Marginocéfalo | Épica | 0 | 3 | 5 | 10 | undefined |
+| *Antarctosaurus wichmannianus* | Saurópodo | Legendaria | 0 | 4 | 4 | 18 | undefined |
+| *Liaoceratops yanzigouensis* | Marginocéfalo | Común | 0 | 1 | 1 | 3 | undefined |
+| *Rhinorex condrupus* | Ornitópodo | Épica | 0 | 3 | 4 | 11 | undefined |
+| *Bienosaurus lufengensis* | Tireóforo | Común | 0 | 1 | 1 | 3 | undefined |
+| *Shuangmiaosaurus gilmorei* | Ornitópodo | Común | 0 | 2 | 3 | 6 | undefined |
+| *Chasmosaurus belli* | Marginocéfalo | Común | 0 | 2 | 2 | 7 | undefined |
 
 *Camarasaurus* es inmune a la Sed: sus isótopos indican que migraba.
 
 ### *Dryosaurus altus* · Ornitópodo · Común · 3 copias
 
-**0 de coste · 1 de Ataque · 2 de Vida** · Defensa propuesta: *0*
+**0 de coste · 1 de Ataque · 2 de Vida**
 
 **Gregario** — +1 de Ataque por cada otro Dryosaurus propio en el campo.
 
 `INFERIDO` · Ornitópodo pequeño y cursorial. El gregarismo se infiere de acumulaciones multiindividuo, no está demostrado.
 
-*Por qué 0 de Defensa:* Cursorial y grácil: su defensa es correr, no aguantar.
+*Sin blindaje:* Cursorial y grácil: su defensa es correr, no aguantar.
 
 ### *Ornitholestes hermanni* · Terópodo · Común · 3 copias
 
-**1 de coste · 2 de Ataque · 2 de Vida** · Defensa propuesta: *0*
+**1 de coste · 2 de Ataque · 2 de Vida**
 
 **Oportunista** — +1 Vida permanente cada vez que muere un dinosaurio en el campo.
 
 `INFERIDO` · Terópodo pequeño (~2 m). El comportamiento carroñero es una inferencia a partir de talla y analogía ecológica, no de evidencia directa.
 
-*Por qué 0 de Defensa:* Terópodo de ~2 m, sin blindaje ni masa.
+*Sin blindaje:* Terópodo de ~2 m, sin blindaje ni masa.
 
 ### *Ceratosaurus nasicornis* · Terópodo · Común · 3 copias
 
-**1 de coste · 3 de Ataque · 3 de Vida** · Defensa propuesta: *0*
+**1 de coste · 3 de Ataque · 3 de Vida**
 
 **Caza en grupo** — +2 de Ataque si hay tres Ceratosaurus tuyos en el campo.
 
 `DEBATIDO` · Menos frecuente que Allosaurus. Se ha propuesto una dieta con mayor componente de presa acuática y un uso preferente de ambientes ribereños, a partir de morfología dental y contexto de hallazgos. Hipótesis discutida.
 
-*Por qué 0 de Defensa:* Osificaciones dérmicas dorsales descritas en el holotipo.
+*De sus 3 de Vida, 1 son blindaje:* Osificaciones dérmicas dorsales descritas en el holotipo.
 
 ### *Stegosaurus stenops* · Tireóforo · Común · 2 copias
 
-**2 de coste · 1 de Ataque · 5 de Vida** · Defensa propuesta: *4*
+**2 de coste · 1 de Ataque · 9 de Vida**
 
-**Muro de placas** — +1 de Defensa si tienes otro Stegosaurus en el campo.
+**Muro de placas** — +1 de Vida si tienes otro Stegosaurus en el campo.
 
 `ESTABLECIDO` · Una vértebra caudal de Allosaurus con una perforación compatible con una púa caudal de Stegosaurus es evidencia directa de uso defensivo del tagomizador.
 
-*Por qué 4 de Defensa:* Placas dorsales y osteodermos en la garganta; el blindaje mejor documentado del set.
+*De sus 9 de Vida, 3 son blindaje:* Placas dorsales y osteodermos en la garganta; el blindaje mejor documentado del set.
 
 ### *Allosaurus fragilis* · Terópodo · Rara · 2 copias
 
-**3 de coste · 5 de Ataque · 3 de Vida** · Defensa propuesta: *2*
+**3 de coste · 5 de Ataque · 5 de Vida**
 
 **Depredador dominante** — Si mata a su rival, el daño sobrante pasa al hábitat enemigo.
 
 `ESTABLECIDO` · Taxón de terópodo más abundante de la Morrison. Marcas de mordida atribuidas a Allosaurus aparecen en huesos de saurópodos y de Stegosaurus.
 
-*Por qué 2 de Defensa:* Cráneo y esqueleto robustos, sin armadura dérmica.
+*De sus 5 de Vida, 1 son blindaje:* Cráneo y esqueleto robustos, sin armadura dérmica.
 
 ### *Camarasaurus grandis* · Saurópodo · Rara · 2 copias
 
-**3 de coste · 2 de Ataque · 4 de Vida** · Defensa propuesta: *3*
+**3 de coste · 2 de Ataque · 7 de Vida**
 
 **Migrador** — Al jugarla, busca un evento en tu mazo y llévatelo a la mano.
 
 `ESTABLECIDO` · Análisis isotópicos de esmalte dental sugieren desplazamientos estacionales hacia tierras altas durante la estación seca, a diferencia de otros saurópodos de la misma formación. El rasgo Migrador refleja ese resultado.
 
-*Por qué 3 de Defensa:* Talla adulta de ~15 t como defensa antipredatoria.
+*De sus 7 de Vida, 2 son blindaje:* Talla adulta de ~15 t como defensa antipredatoria.
 
 ### *Diplodocus carnegii* · Saurópodo · Épica · 1 copia
 
-**2 de coste · 3 de Ataque · 10 de Vida** · Defensa propuesta: *3*
+**2 de coste · 3 de Ataque · 13 de Vida**
 
 **Ramoneo bajo** — Recupera +1 de vida al final de cada uno de tus turnos
 
 `ESTABLECIDO` · El desgaste dental y la postura del cuello sustentan una partición de nicho por ramoneo bajo respecto de otros saurópodos coexistentes.
 
-*Por qué 3 de Defensa:* Talla equivalente, cuerpo más grácil.
+*De sus 13 de Vida, 2 son blindaje:* Talla equivalente, cuerpo más grácil.
 
 ### *Apatosaurus louisae* · Saurópodo · Épica · 1 copia
 
-**3 de coste · 2 de Ataque · 10 de Vida** · Defensa propuesta: *5*
+**3 de coste · 2 de Ataque · 15 de Vida**
 
-**Manada** — +1 de Defensa si tienes otro saurópodo en el campo.
+**Manada** — +1 de Vida si tienes otro saurópodo en el campo.
 
 `ESTABLECIDO` · La talla adulta de los diplodócidos es en sí misma la principal defensa antipredatoria. Nota: la validez de Brontosaurus como género separado sigue en discusión; el juego usa Apatosaurus.
 
-*Por qué 5 de Defensa:* La mayor masa del set; la talla ES la defensa.
+*De sus 15 de Vida, 3 son blindaje:* La mayor masa del set; la talla ES la defensa.
 
 ### *Torvosaurus tanneri* · Terópodo · Legendaria · 1 copia
 
-**4 de coste · 7 de Ataque · 5 de Vida** · Defensa propuesta: *1*
+**4 de coste · 7 de Ataque · 6 de Vida**
 
 **Rastreador** — Al jugarla, busca un clima en tu mazo y llévatelo a la mano.
 
 `ESTABLECIDO` · El terópodo de mayor tamaño de la formación, pero genuinamente raro en el registro. Su escasez en el mazo replica su escasez fósil.
 
-*Por qué 1 de Defensa:* El mayor terópodo, pero sin blindaje.
+*De sus 6 de Vida, 1 son blindaje:* El mayor terópodo, pero sin blindaje.
 
 ### *Nodosaurus textilis* · Tireóforo · Rara · 3 copias
 
-**2 de coste · 2 de Ataque · 5 de Vida** · Defensa propuesta: *3*
+**2 de coste · 2 de Ataque · 8 de Vida**
 
 **Llamada de manada** — Al jugarla, busca un Gregarismo en tu mazo y llévatelo a la mano.
 
 `ESTABLECIDO` · Formación Frontier, Wyoming, Cenomaniense (~100 Ma). Los osteodermos en bandas sobre el dorso están documentados directamente. El taxón en sí es material fragmentario y varios autores lo tratan como nomen dubium: la coraza es firme, la especie lo es menos.
 
-*Por qué 3 de Defensa:* Osteodermos en bandas sobre todo el dorso: coraza en el sentido literal.
+*De sus 8 de Vida, 4 son blindaje:* Osteodermos en bandas sobre todo el dorso: coraza en el sentido literal.
 
 ### *Riparovenator milnerae* · Terópodo · Épica · 2 copias
 
-**2 de coste · 4 de Ataque · 4 de Vida** · Defensa propuesta: *1*
+**2 de coste · 4 de Ataque · 5 de Vida**
 
 **Ribereño** — +2 de ataque mientras el Canal fluvial esté en el campo.
 
 `INFERIDO` · Formación Wessex, isla de Wight, Barremiense (~125 Ma), descrito en 2021. Espinosáurido de hocico alargado y dientes cónicos, morfología asociada a capturar peces. En su pariente Baryonyx se conservaron escamas de pez en la cavidad abdominal; para este género es inferencia por morfología.
 
-*Por qué 1 de Defensa:* Espinosáurido grácil, construido para pescar y no para encajar.
+*De sus 5 de Vida, 1 son blindaje:* Espinosáurido grácil, construido para pescar y no para encajar.
 
 ### *Lokiceratops rangiformis* · Marginocéfalo · Épica · 1 copia
 
-**3 de coste · 4 de Ataque · 7 de Vida** · Defensa propuesta: *1*
+**3 de coste · 4 de Ataque · 8 de Vida**
 
-**Gola ornamentada** — +2 de Defensa si tienes otro Lokiceratops en el campo.
+**Gola ornamentada** — +2 de Vida si tienes otro Lokiceratops en el campo.
 
 `DEBATIDO` · Formación Judith River, Montana, Campaniense (~78 Ma), descrito en 2024. La gola lleva las mayores hojas óseas conocidas en un ceratópsido, asimétricas entre lados. Si servían para defensa, para exhibición o para reconocerse entre especies es justamente lo que se discute.
 
-*Por qué 1 de Defensa:* La gola es hueso, pero está calada y orientada hacia arriba, no hacia el atacante.
+*De sus 8 de Vida, 2 son blindaje:* La gola es hueso, pero está calada y orientada hacia arriba, no hacia el atacante.
 
 ### *Brachylophosaurus canadensis* · Ornitópodo · Rara · 3 copias
 
-**2 de coste · 2 de Ataque · 6 de Vida** · Defensa propuesta: *1*
+**2 de coste · 2 de Ataque · 7 de Vida**
 
 **Gregario** — +1 Poder por cada copia suya que tengas en el campo.
 
 `ESTABLECIDO` · Formaciones Judith River y Oldman, Montana y Alberta, Campaniense (~78 Ma). Los lechos de huesos monoespecíficos de hadrosaurios son la mejor evidencia de vida en manada de todo el registro. De este taxón se conocen además ejemplares con tejido blando conservado.
 
-*Por qué 1 de Defensa:* Hadrosaurio sin armadura: la manada es la defensa, no el cuerpo.
+*De sus 7 de Vida, 1 son blindaje:* Hadrosaurio sin armadura: la manada es la defensa, no el cuerpo.
 
 ### *Tyrannotitan chubutensis* · Terópodo · Legendaria · 1 copia
 
-**4 de coste · 10 de Ataque · 5 de Vida** · Defensa propuesta: *1*
+**4 de coste · 10 de Ataque · 6 de Vida**
 
 **Desgarro** — A quien hiere no se le cura ninguna herida ese turno.
 
 `INFERIDO` · Formación Cerro Barcino, Chubut, Argentina, Aptiense (~113 Ma). Carcarodontosáurido de unos 12 metros con dientes comprimidos y aserrados, de filo cortante en vez de aplastante. Que eso implique cortar carne y provocar hemorragias se infiere de la forma del diente, no de una herida fósil.
 
-*Por qué 1 de Defensa:* Doce metros de depredador sin una sola placa dérmica.
+*De sus 6 de Vida, 1 son blindaje:* Doce metros de depredador sin una sola placa dérmica.
 
 ### *Huaxiadraco corollatus* · Pterosaurio · Rara · 2 copias
 
-**2 de coste · 2 de Ataque · 2 de Vida** · Defensa propuesta: *2*
+**2 de coste · 2 de Ataque · 4 de Vida**
 
 **Vuelo** — Sobrevuela la ranura: golpea siempre al hábitat rival, pero quien tenga enfrente le alcanza igual.
 
 `ESTABLECIDO` · Formación Jiufotang, Liaoning, China, Aptiense (~120 Ma). No es un dinosaurio: es un pterosaurio tapejárido, sin dientes y con cresta craneal. Los tapejáridos conservan picnofibras, filamentos tegumentarios reales — la razón por la que este juego no pone plumas a los dinosaurios es que ellos no las tienen, no una regla estética.
 
-*Por qué 2 de Defensa:* Esqueleto neumatizado de pared finísima; lo que no puede encajar, lo esquiva volando.
+*Sin blindaje:* Esqueleto neumatizado de pared finísima; lo que no puede encajar, lo esquiva volando.
 
 ### *Plesiopleurodon wellesi* · Reptil marino · Épica · fuera del mazo de referencia
 
-**3 de coste · 9 de Ataque · 4 de Vida** · Defensa propuesta: *2*
+**3 de coste · 9 de Ataque · 6 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -251,7 +251,7 @@ es legendario.
 
 ### *Ojoraptorsaurus boerei* · Terópodo · Rara · fuera del mazo de referencia
 
-**2 de coste · 4 de Ataque · 4 de Vida** · Defensa propuesta: *1*
+**2 de coste · 4 de Ataque · 5 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -259,7 +259,7 @@ es legendario.
 
 ### *Dromaeosaurus albertensis* · Terópodo · Común · fuera del mazo de referencia
 
-**2 de coste · 5 de Ataque · 3 de Vida** · Defensa propuesta: *1*
+**2 de coste · 5 de Ataque · 4 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -267,7 +267,7 @@ es legendario.
 
 ### *Athenar bermani* · Saurópodo · Común · fuera del mazo de referencia
 
-**2 de coste · 2 de Ataque · 5 de Vida** · Defensa propuesta: *2*
+**2 de coste · 2 de Ataque · 7 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -275,7 +275,7 @@ es legendario.
 
 ### *Sanjuansaurus gordilloi* · Terópodo · Rara · fuera del mazo de referencia
 
-**2 de coste · 5 de Ataque · 3 de Vida** · Defensa propuesta: *1*
+**2 de coste · 5 de Ataque · 4 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -283,7 +283,7 @@ es legendario.
 
 ### *Suchomimus tenerensis* · Terópodo · Épica · fuera del mazo de referencia
 
-**3 de coste · 8 de Ataque · 5 de Vida** · Defensa propuesta: *2*
+**3 de coste · 8 de Ataque · 7 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -291,7 +291,7 @@ es legendario.
 
 ### *Eosinopteryx brevipenna* · Terópodo · Común · fuera del mazo de referencia
 
-**1 de coste · 2 de Ataque · 2 de Vida** · Defensa propuesta: *0*
+**1 de coste · 2 de Ataque · 2 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -299,7 +299,7 @@ es legendario.
 
 ### *Troodon formosus* · Terópodo · Común · fuera del mazo de referencia
 
-**2 de coste · 4 de Ataque · 4 de Vida** · Defensa propuesta: *1*
+**2 de coste · 4 de Ataque · 5 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -307,7 +307,7 @@ es legendario.
 
 ### *Carnotaurus sastrei* · Terópodo · Épica · fuera del mazo de referencia
 
-**3 de coste · 9 de Ataque · 5 de Vida** · Defensa propuesta: *1*
+**3 de coste · 9 de Ataque · 6 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -315,7 +315,7 @@ es legendario.
 
 ### *Spinosaurus aegyptiacus* · Terópodo · Legendaria · fuera del mazo de referencia
 
-**4 de coste · 11 de Ataque · 9 de Vida** · Defensa propuesta: *2*
+**4 de coste · 11 de Ataque · 11 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -323,7 +323,7 @@ es legendario.
 
 ### *Mosasaurus hoffmannii* · Reptil marino · Legendaria · fuera del mazo de referencia
 
-**4 de coste · 12 de Ataque · 8 de Vida** · Defensa propuesta: *2*
+**4 de coste · 12 de Ataque · 10 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -331,7 +331,7 @@ es legendario.
 
 ### *Halszkaraptor escuilliei* · Terópodo · Común · fuera del mazo de referencia
 
-**1 de coste · 2 de Ataque · 2 de Vida** · Defensa propuesta: *0*
+**1 de coste · 2 de Ataque · 2 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -339,7 +339,7 @@ es legendario.
 
 ### *Tongtianlong limosus* · Terópodo · Común · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 2 de Vida** · Defensa propuesta: *1*
+**1 de coste · 1 de Ataque · 3 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -347,7 +347,7 @@ es legendario.
 
 ### *Scanisaurus nazarowi* · Reptil marino · Rara · fuera del mazo de referencia
 
-**2 de coste · 4 de Ataque · 4 de Vida** · Defensa propuesta: *1*
+**2 de coste · 4 de Ataque · 5 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -355,7 +355,7 @@ es legendario.
 
 ### *Monolophosaurus jiangi* · Terópodo · Rara · fuera del mazo de referencia
 
-**2 de coste · 5 de Ataque · 3 de Vida** · Defensa propuesta: *1*
+**2 de coste · 5 de Ataque · 4 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -363,7 +363,7 @@ es legendario.
 
 ### *Invictarx zephyri* · Tireóforo · Rara · fuera del mazo de referencia
 
-**2 de coste · 2 de Ataque · 2 de Vida** · Defensa propuesta: *5*
+**2 de coste · 2 de Ataque · 7 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -371,7 +371,7 @@ es legendario.
 
 ### *Medusaceratops lokii* · Marginocéfalo · Épica · fuera del mazo de referencia
 
-**3 de coste · 5 de Ataque · 6 de Vida** · Defensa propuesta: *4*
+**3 de coste · 5 de Ataque · 10 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -379,7 +379,7 @@ es legendario.
 
 ### *Platyceratops tatarinovi* · Marginocéfalo · Común · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *2*
+**1 de coste · 1 de Ataque · 3 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -387,7 +387,7 @@ es legendario.
 
 ### *Loricatosaurus priscus* · Tireóforo · Épica · fuera del mazo de referencia
 
-**3 de coste · 4 de Ataque · 5 de Vida** · Defensa propuesta: *6*
+**3 de coste · 4 de Ataque · 11 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -395,7 +395,7 @@ es legendario.
 
 ### *Therizinosaurus cheloniformis* · Terópodo · Épica · fuera del mazo de referencia
 
-**3 de coste · 6 de Ataque · 6 de Vida** · Defensa propuesta: *3*
+**3 de coste · 6 de Ataque · 9 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -403,7 +403,7 @@ es legendario.
 
 ### *Alaskacephale gangloffi* · Marginocéfalo · Rara · fuera del mazo de referencia
 
-**2 de coste · 3 de Ataque · 3 de Vida** · Defensa propuesta: *3*
+**2 de coste · 3 de Ataque · 6 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -411,7 +411,7 @@ es legendario.
 
 ### *Titanoceratops ouranos* · Marginocéfalo · Épica · fuera del mazo de referencia
 
-**3 de coste · 6 de Ataque · 4 de Vida** · Defensa propuesta: *5*
+**3 de coste · 6 de Ataque · 9 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -419,7 +419,7 @@ es legendario.
 
 ### *Atlasaurus imelakei* · Saurópodo · Épica · fuera del mazo de referencia
 
-**3 de coste · 3 de Ataque · 8 de Vida** · Defensa propuesta: *4*
+**3 de coste · 3 de Ataque · 12 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -427,7 +427,7 @@ es legendario.
 
 ### *Stegoceras validum* · Marginocéfalo · Común · fuera del mazo de referencia
 
-**2 de coste · 3 de Ataque · 3 de Vida** · Defensa propuesta: *3*
+**2 de coste · 3 de Ataque · 6 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -435,7 +435,7 @@ es legendario.
 
 ### *Maiasaura peeblesorum* · Ornitópodo · Épica · fuera del mazo de referencia
 
-**3 de coste · 4 de Ataque · 9 de Vida** · Defensa propuesta: *2*
+**3 de coste · 4 de Ataque · 11 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -443,7 +443,7 @@ es legendario.
 
 ### *Edmontosaurus annectens* · Ornitópodo · Legendaria · fuera del mazo de referencia
 
-**4 de coste · 5 de Ataque · 14 de Vida** · Defensa propuesta: *3*
+**4 de coste · 5 de Ataque · 17 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -451,7 +451,7 @@ es legendario.
 
 ### *Plateosauravus cullingworthi* · Saurópodo · Común · fuera del mazo de referencia
 
-**2 de coste · 2 de Ataque · 5 de Vida** · Defensa propuesta: *2*
+**2 de coste · 2 de Ataque · 7 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -459,7 +459,7 @@ es legendario.
 
 ### *Gargoyleosaurus parkpinorum* · Tireóforo · Rara · fuera del mazo de referencia
 
-**2 de coste · 2 de Ataque · 3 de Vida** · Defensa propuesta: *4*
+**2 de coste · 2 de Ataque · 7 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -467,7 +467,7 @@ es legendario.
 
 ### *Wendiceratops pinhornensis* · Marginocéfalo · Épica · fuera del mazo de referencia
 
-**3 de coste · 5 de Ataque · 6 de Vida** · Defensa propuesta: *4*
+**3 de coste · 5 de Ataque · 10 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -475,7 +475,7 @@ es legendario.
 
 ### *Antarctosaurus wichmannianus* · Saurópodo · Legendaria · fuera del mazo de referencia
 
-**4 de coste · 4 de Ataque · 13 de Vida** · Defensa propuesta: *5*
+**4 de coste · 4 de Ataque · 18 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -483,7 +483,7 @@ es legendario.
 
 ### *Liaoceratops yanzigouensis* · Marginocéfalo · Común · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 2 de Vida** · Defensa propuesta: *1*
+**1 de coste · 1 de Ataque · 3 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -491,7 +491,7 @@ es legendario.
 
 ### *Rhinorex condrupus* · Ornitópodo · Épica · fuera del mazo de referencia
 
-**3 de coste · 4 de Ataque · 9 de Vida** · Defensa propuesta: *2*
+**3 de coste · 4 de Ataque · 11 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -499,7 +499,7 @@ es legendario.
 
 ### *Bienosaurus lufengensis* · Tireóforo · Común · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *2*
+**1 de coste · 1 de Ataque · 3 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -507,7 +507,7 @@ es legendario.
 
 ### *Shuangmiaosaurus gilmorei* · Ornitópodo · Común · fuera del mazo de referencia
 
-**2 de coste · 3 de Ataque · 5 de Vida** · Defensa propuesta: *1*
+**2 de coste · 3 de Ataque · 6 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -515,7 +515,7 @@ es legendario.
 
 ### *Chasmosaurus belli* · Marginocéfalo · Común · fuera del mazo de referencia
 
-**2 de coste · 2 de Ataque · 3 de Vida** · Defensa propuesta: *4*
+**2 de coste · 2 de Ataque · 7 de Vida**
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -563,7 +563,7 @@ Se juega **sobre un dinosaurio del rival**. −2 Poder permanente a un dinosauri
 
 ### Competencia trófica · Épica · coste 3 · 1 copia
 
-Se juega **undefined**. −2 de Defensa a dos dinosaurios rivales que elijas.
+Se juega **undefined**. −2 de Vida a dos dinosaurios rivales que elijas.
 
 `INFERIDO` · La coexistencia de varios saurópodos y de varios terópodos grandes en la misma formación implica reparto de recursos. La partición de nicho está sustentada por el desgaste dental; su intensidad como presión competitiva es una inferencia.
 
@@ -611,7 +611,7 @@ Cura +1 de vida a un dinosaurio al final del turno
 
 ### Competencia trófica · Épica · coste 3 · 1 copia
 
-−2 de Defensa a dos dinosaurios rivales que elijas.
+−2 de Vida a dos dinosaurios rivales que elijas.
 
 `INFERIDO` · La coexistencia de varios saurópodos y de varios terópodos grandes en la misma formación implica reparto de recursos. La partición de nicho está sustentada por el desgaste dental; su intensidad como presión competitiva es una inferencia.
 

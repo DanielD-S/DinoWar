@@ -7,7 +7,7 @@ que se aprende chocándose.
 ## Verificar un cambio
 
 ```bash
-npm test              # 157 tests. Es la verificación canónica.
+npm test              # 158 tests. Es la verificación canónica.
 npm run sim           # 2.000 partidas IA vs IA → BALANCE.md
 node sim/set.js       # regenera SET_DE_CARTAS.md desde el código
 python -m http.server 8000
@@ -61,35 +61,49 @@ Dos cosas que sólo fallan aquí, ya arregladas, por si reaparecen:
   porque argv llega con barras invertidas: las herramientas corrían, no escribían
   nada y no se quejaban. Va con `pathToFileURL`.
 
-## Variantes: se decide midiendo, no discutiendo
+## Una carta son DOS cifras: Ataque y Vida
 
-Dos preguntas abiertas tienen su variante detrás de una variable de entorno, y
-el juego publicado corre SIEMPRE la opción de hoy. Un test lo vigila.
+La Defensa existió y se quitó. Era una **resta plana e invisible** contra un
+número de la OTRA carta, con dos reglas encima que tampoco se deducían de la
+pantalla —el suelo de daño y el bonus de depredación—. Medida **en victorias**
+era además la que menos aportaba: +1 de Ataque a todas tus criaturas gana el
+70,8 % de las partidas, +1 de Vida el 63,1 % y +1 de Defensa el 59,6 %, sobre un
+control de 46,8 %.
 
-### El cuerpo de una carta
+Con ella se fue el **suelo de daño**, que sólo existía para que una Defensa alta
+no hiciera inmune a nadie. Hoy el daño es el Ataque y ya.
+
+Los cuatro rasgos y el clima que daban Defensa dan Vida: viven en `vidaMaxima()`,
+que por eso es dinámica — un Muro de placas sin congénere pierde su Vida extra en
+el acto y, si estaba herido, puede caerse ahí mismo. No es nuevo, el clima del
+Canal ya lo hacía; ahora pasa más veces.
+
+**Lo que costó, dicho sin adornos:** el balance pasó de cumplir 5 de 6 objetivos
+a cumplir 4. La bola de nieve subió de 64,8 % a 69,8 % —la Defensa era una
+mecánica de remontada: un muro aguantaba al fuerte porque el suelo dejaba su
+golpe en 1— y las cartas descalibradas pasaron de 3 a 4. Eso pide un recoste, que
+ahora por fin se puede hacer: lo que lo bloqueaba era creer que la Defensa valía
+4× el Ataque.
+
+### El daño sobrante
 
 ```bash
-node sim/cuerpos.js 400          # compara las dos sobre las mismas semillas
-DINOWAR_CUERPO=ATAQUE_VIDA node sim/run.js
+node sim/cuerpos.js 400           # con y sin, mismas semillas
+DINOWAR_SOBRANTE=0 node sim/run.js
 ```
 
-`ATAQUE_VIDA` quita la Defensa y la suma a la Vida. Existe porque la Defensa es
-la estadística que peor se lee —una resta invisible contra un número de la OTRA
-carta, con el suelo de daño y el bonus de depredación encima, que no se deducen
-de nada de lo que hay en pantalla— y porque **medida en victorias es la que
-menos aporta**: +1 de Ataque a todas tus criaturas gana el 70,8 % de las
-partidas, +1 de Vida el 63,1 % y +1 de Defensa el 59,6 %, sobre un control de
-46,8 %.
+Lo que sobra al matar sigue al hábitat rival: si pegas 5 a algo con 3 de Vida,
+pasan 2. Antes era privilegio del rasgo Depredador dominante. Cierra el último
+agujero de legibilidad —ningún número desaparece— y sale casi gratis: deja el
+reparto entre las tres vías MÁS parejo (40/32/28 frente a 47/24/30) y sube la
+bola de nieve medio punto.
 
-Plegada 1:1, el juego no se entera: 12,5 turnos contra 12,6, y el reparto entre
-las tres vías dentro del ruido.
-
-**Cuidado con `sim/cobertura.mjs` para esto.** Ajusta contra el índice de
-DESPLIEGUE, o sea con qué frecuencia la IA saca una carta de la mano. Como la IA
-valora cada unidad multiplicando por los turnos que espera aguantar
-(`IA.horizonte`), el ajuste redescubre su propia preferencia por los muros y
-«demuestra» que la Defensa vale 3,5 veces el Ataque. Es circular. Para saber lo
-que vale un punto hay que contar partidas ganadas.
+**Cuidado con `sim/cobertura.mjs` para decidir cifras.** Ajusta contra el índice
+de DESPLIEGUE, o sea con qué frecuencia la IA saca una carta de la mano. Como la
+IA valora cada unidad multiplicando por los turnos que espera aguantar
+(`IA.horizonte`), el ajuste redescubre su propia preferencia por lo que resiste
+y «demuestra» cosas que no son. Para saber lo que vale un punto hay que contar
+partidas ganadas.
 
 ## Variantes de economía
 

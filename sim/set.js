@@ -5,10 +5,15 @@ import { writeFileSync } from 'node:fs';
 import { CARTAS, TIPO, TIPO_NOMBRE, OBJETIVO, CLADO_NOMBRE, RAREZA_NOMBRE } from '../src/data/cards.js';
 import { BALANCE, MAZO, TOTAL_MAZO } from '../src/data/balance.js';
 
-// Por qué cada carta tiene la Defensa que tiene. La cifra vive en cards.js;
-// esto es sólo el argumento, que no cabía en la carta. Si falta una entrada, la
-// línea se omite: añadir un taxón no debe romper el generador.
-const DEFENSA = {
+// Por qué cada carta aguanta lo que aguanta. Estas notas se escribieron para la
+// Defensa, cuando era una cifra aparte; al quitarla y refundirla en la Vida el
+// argumento no cambió —una coraza sigue siendo una coraza— pero ahora explica
+// parte de la Vida en vez de una columna propia. El número es cuánto de esa
+// Vida viene del blindaje.
+//
+// Si falta una entrada la línea se omite: añadir un taxón no debe romper el
+// generador.
+const BLINDAJE = {
   dryosaurus: [0, 'Cursorial y grácil: su defensa es correr, no aguantar.'],
   ornitholestes: [0, 'Terópodo de ~2 m, sin blindaje ni masa.'],
   ceratosaurus: [1, 'Osificaciones dérmicas dorsales descritas en el holotipo.'],
@@ -85,11 +90,11 @@ p('---');
 p('');
 p('## 1. Dinosaurios');
 p('');
-p('| Taxón | Clado | Rareza | Copias | Coste | Ataque | Defensa | Vida | Sed |');
-p('|---|---|---|---|---|---|---|---|---|');
+p('| Taxón | Clado | Rareza | Copias | Coste | Ataque | Vida | Sed |');
+p('|---|---|---|---|---|---|---|---|');
 for (const [id, c] of Object.entries(CARTAS)) {
   if (c.tipo !== TIPO.DINOSAURIO) continue;
-  p(`| *${c.binomial}* | ${CLADO_NOMBRE[c.clado]} | ${RAREZA_NOMBRE[c.rareza]} | ${copias[id]} | ${c.coste} | ${c.ataque} | ${c.defensa} | ${c.vida} | ${c.consumoHidrico} |`);
+  p(`| *${c.binomial}* | ${CLADO_NOMBRE[c.clado]} | ${RAREZA_NOMBRE[c.rareza]} | ${copias[id]} | ${c.coste} | ${c.ataque} | ${c.vida} | ${c.consumoHidrico} |`);
 }
 p('');
 p('*Camarasaurus* es inmune a la Sed: sus isótopos indican que migraba.');
@@ -99,14 +104,17 @@ for (const [id, c] of Object.entries(CARTAS)) {
   if (c.tipo !== TIPO.DINOSAURIO) continue;
   p(`### *${c.binomial}* · ${CLADO_NOMBRE[c.clado]} · ${RAREZA_NOMBRE[c.rareza]} · ${enMazo(id) ? `${copias[id]} ${copias[id] === 1 ? 'copia' : 'copias'}` : 'fuera del mazo de referencia'}`);
   p('');
-  p(`**${c.coste} de coste · ${c.ataque} de Ataque · ${c.vida} de Vida** · Defensa propuesta: *${c.defensa}*`);
+  p(`**${c.coste} de coste · ${c.ataque} de Ataque · ${c.vida} de Vida**`);
   p('');
   p(`**${c.rasgoNombre}** — ${c.rasgoTexto}`);
   p('');
   p(`\`${c.nivel_evidencia}\` · ${c.nota_cientifica}`);
   p('');
-  if (DEFENSA[id]) {
-    p(`*Por qué ${c.defensa} de Defensa:* ${DEFENSA[id][1]}`);
+  if (BLINDAJE[id]) {
+    const n = BLINDAJE[id][0];
+    p(n > 0
+      ? `*De sus ${c.vida} de Vida, ${n} son blindaje:* ${BLINDAJE[id][1]}`
+      : `*Sin blindaje:* ${BLINDAJE[id][1]}`);
     p('');
   }
 }

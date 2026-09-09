@@ -37,8 +37,8 @@ const PASOS = [
   {
     evento: 'combate',
     texto: 'Enfrente vacío: el Ataque entero va al <b>hábitat</b> rival. Enfrente ocupado: se golpean <b>a la vez</b>, '
-      + '<b>Ataque − Defensa</b>, y las heridas <b>se acumulan</b> hasta llegar a la Vida. '
-      + 'Un muro con mucha Defensa no gana: <b>tapa</b>.',
+      + 'su <b>Ataque</b>, sin restas, y las heridas <b>se acumulan</b> hasta llegar a la Vida. '
+      + 'Lo que sobra al matar sigue al hábitat rival. Un muro de mucha Vida no gana: <b>tapa</b>.',
   },
   {
     evento: 'turno',

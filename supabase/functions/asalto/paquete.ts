@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: 7f94f1201968a812
+// huella: 33e4f06c2420965c
 //
 // Lleva dentro estos 16 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -170,9 +170,9 @@ var RASGO = Object.freeze({
   CAMPO_ARIDEZ: "CAMPO_ARIDEZ"
 });
 var dino = (o) => Object.freeze({ tipo: TIPO.DINOSAURIO, ...o });
-var evento = (o) => Object.freeze({ tipo: TIPO.EVENTO, ataque: 0, defensa: 0, vida: 0, ...o });
-var clima = (o) => Object.freeze({ tipo: TIPO.CLIMA, ataque: 0, defensa: 0, vida: 0, coste: 2, ...o });
-var recurso = (o) => Object.freeze({ tipo: TIPO.RECURSO, objetivo: OBJETIVO.NINGUNO, ataque: 0, defensa: 0, vida: 0, coste: 0, ...o });
+var evento = (o) => Object.freeze({ tipo: TIPO.EVENTO, ataque: 0, vida: 0, ...o });
+var clima = (o) => Object.freeze({ tipo: TIPO.CLIMA, ataque: 0, vida: 0, coste: 2, ...o });
+var recurso = (o) => Object.freeze({ tipo: TIPO.RECURSO, objetivo: OBJETIVO.NINGUNO, ataque: 0, vida: 0, coste: 0, ...o });
 var CARTAS = Object.freeze({
   // ------------------------------------------------------------ dinosaurios
   dryosaurus: dino({
@@ -182,7 +182,6 @@ var CARTAS = Object.freeze({
     binomial: "Dryosaurus altus",
     coste: 0,
     ataque: 1,
-    defensa: 0,
     vida: 2,
     rasgo: RASGO.GREGARIO,
     rasgoNombre: "Gregario",
@@ -197,7 +196,6 @@ var CARTAS = Object.freeze({
     binomial: "Ornitholestes hermanni",
     coste: 1,
     ataque: 2,
-    defensa: 0,
     vida: 2,
     rasgo: RASGO.OPORTUNISTA,
     rasgoNombre: "Oportunista",
@@ -212,7 +210,6 @@ var CARTAS = Object.freeze({
     binomial: "Ceratosaurus nasicornis",
     coste: 1,
     ataque: 3,
-    defensa: 0,
     vida: 3,
     rasgo: RASGO.CAZA_EN_GRUPO,
     rasgoNombre: "Caza en grupo",
@@ -227,11 +224,10 @@ var CARTAS = Object.freeze({
     binomial: "Stegosaurus stenops",
     coste: 2,
     ataque: 1,
-    defensa: 4,
-    vida: 5,
+    vida: 9,
     rasgo: RASGO.MURO_DE_PLACAS,
     rasgoNombre: "Muro de placas",
-    rasgoTexto: "+1 de Defensa si tienes otro Stegosaurus en el campo.",
+    rasgoTexto: "+1 de Vida si tienes otro Stegosaurus en el campo.",
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Una v\xE9rtebra caudal de Allosaurus con una perforaci\xF3n compatible con una p\xFAa caudal de Stegosaurus es evidencia directa de uso defensivo del tagomizador."
   }),
@@ -242,8 +238,7 @@ var CARTAS = Object.freeze({
     binomial: "Allosaurus fragilis",
     coste: 3,
     ataque: 5,
-    defensa: 2,
-    vida: 3,
+    vida: 5,
     rasgo: RASGO.DEPREDADOR_DOMINANTE,
     rasgoNombre: "Depredador dominante",
     rasgoTexto: "Si mata a su rival, el da\xF1o sobrante pasa al h\xE1bitat enemigo.",
@@ -257,8 +252,7 @@ var CARTAS = Object.freeze({
     binomial: "Camarasaurus grandis",
     coste: 3,
     ataque: 2,
-    defensa: 3,
-    vida: 4,
+    vida: 7,
     rasgo: RASGO.BUSCA_EVENTO,
     rasgoNombre: "Migrador",
     rasgoTexto: "Al jugarla, busca un evento en tu mazo y ll\xE9vatelo a la mano.",
@@ -272,8 +266,7 @@ var CARTAS = Object.freeze({
     binomial: "Diplodocus carnegii",
     coste: 2,
     ataque: 3,
-    defensa: 3,
-    vida: 10,
+    vida: 13,
     rasgo: RASGO.RAMONEO_BAJO,
     rasgoNombre: "Ramoneo bajo",
     rasgoTexto: "Recupera +1 de vida al final de cada uno de tus turnos",
@@ -287,11 +280,10 @@ var CARTAS = Object.freeze({
     binomial: "Apatosaurus louisae",
     coste: 3,
     ataque: 2,
-    defensa: 5,
-    vida: 10,
+    vida: 15,
     rasgo: RASGO.MANADA,
     rasgoNombre: "Manada",
-    rasgoTexto: "+1 de Defensa si tienes otro saur\xF3podo en el campo.",
+    rasgoTexto: "+1 de Vida si tienes otro saur\xF3podo en el campo.",
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "La talla adulta de los diplod\xF3cidos es en s\xED misma la principal defensa antipredatoria. Nota: la validez de Brontosaurus como g\xE9nero separado sigue en discusi\xF3n; el juego usa Apatosaurus."
   }),
@@ -302,8 +294,7 @@ var CARTAS = Object.freeze({
     binomial: "Torvosaurus tanneri",
     coste: 4,
     ataque: 7,
-    defensa: 1,
-    vida: 5,
+    vida: 6,
     rasgo: RASGO.BUSCA_CLIMA,
     rasgoNombre: "Rastreador",
     rasgoTexto: "Al jugarla, busca un clima en tu mazo y ll\xE9vatelo a la mano.",
@@ -318,8 +309,7 @@ var CARTAS = Object.freeze({
     binomial: "Nodosaurus textilis",
     coste: 2,
     ataque: 2,
-    defensa: 3,
-    vida: 5,
+    vida: 8,
     rasgo: RASGO.BUSCA_GREGARISMO,
     rasgoNombre: "Llamada de manada",
     rasgoTexto: "Al jugarla, busca un Gregarismo en tu mazo y ll\xE9vatelo a la mano.",
@@ -333,8 +323,7 @@ var CARTAS = Object.freeze({
     binomial: "Riparovenator milnerae",
     coste: 2,
     ataque: 4,
-    defensa: 1,
-    vida: 4,
+    vida: 5,
     rasgo: RASGO.RIBERENO,
     rasgoNombre: "Ribere\xF1o",
     rasgoTexto: "+2 de ataque mientras el Canal fluvial est\xE9 en el campo.",
@@ -348,11 +337,10 @@ var CARTAS = Object.freeze({
     binomial: "Lokiceratops rangiformis",
     coste: 3,
     ataque: 4,
-    defensa: 1,
-    vida: 7,
+    vida: 8,
     rasgo: RASGO.GOLA,
     rasgoNombre: "Gola ornamentada",
-    rasgoTexto: "+2 de Defensa si tienes otro Lokiceratops en el campo.",
+    rasgoTexto: "+2 de Vida si tienes otro Lokiceratops en el campo.",
     nivel_evidencia: EVIDENCIA.DEBATIDO,
     nota_cientifica: "Formaci\xF3n Judith River, Montana, Campaniense (~78 Ma), descrito en 2024. La gola lleva las mayores hojas \xF3seas conocidas en un cerat\xF3psido, asim\xE9tricas entre lados. Si serv\xEDan para defensa, para exhibici\xF3n o para reconocerse entre especies es justamente lo que se discute."
   }),
@@ -363,8 +351,7 @@ var CARTAS = Object.freeze({
     binomial: "Brachylophosaurus canadensis",
     coste: 2,
     ataque: 2,
-    defensa: 1,
-    vida: 6,
+    vida: 7,
     rasgo: RASGO.GREGARIO,
     rasgoNombre: "Gregario",
     rasgoTexto: "+1 Poder por cada copia suya que tengas en el campo.",
@@ -378,8 +365,7 @@ var CARTAS = Object.freeze({
     binomial: "Tyrannotitan chubutensis",
     coste: 4,
     ataque: 10,
-    defensa: 1,
-    vida: 5,
+    vida: 6,
     rasgo: RASGO.DESGARRO,
     rasgoNombre: "Desgarro",
     rasgoTexto: "A quien hiere no se le cura ninguna herida ese turno.",
@@ -393,8 +379,7 @@ var CARTAS = Object.freeze({
     binomial: "Huaxiadraco corollatus",
     coste: 2,
     ataque: 2,
-    defensa: 2,
-    vida: 2,
+    vida: 4,
     rasgo: RASGO.VUELO,
     rasgoNombre: "Vuelo",
     rasgoTexto: "Sobrevuela la ranura: golpea siempre al h\xE1bitat rival, pero quien tenga enfrente le alcanza igual.",
@@ -471,7 +456,7 @@ var CARTAS = Object.freeze({
     objetivo: OBJETIVO.RIVALES,
     rasgo: RASGO.COMPETENCIA,
     rasgoNombre: "Competencia tr\xF3fica",
-    rasgoTexto: "\u22122 de Defensa a dos dinosaurios rivales que elijas.",
+    rasgoTexto: "\u22122 de Vida a dos dinosaurios rivales que elijas.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "La coexistencia de varios saur\xF3podos y de varios ter\xF3podos grandes en la misma formaci\xF3n implica reparto de recursos. La partici\xF3n de nicho est\xE1 sustentada por el desgaste dental; su intensidad como presi\xF3n competitiva es una inferencia."
   }),
@@ -599,8 +584,7 @@ var CARTAS = Object.freeze({
     binomial: "Plesiopleurodon wellesi",
     coste: 3,
     ataque: 9,
-    defensa: 2,
-    vida: 4,
+    vida: 6,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -614,8 +598,7 @@ var CARTAS = Object.freeze({
     binomial: "Ojoraptorsaurus boerei",
     coste: 2,
     ataque: 4,
-    defensa: 1,
-    vida: 4,
+    vida: 5,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -629,8 +612,7 @@ var CARTAS = Object.freeze({
     binomial: "Dromaeosaurus albertensis",
     coste: 2,
     ataque: 5,
-    defensa: 1,
-    vida: 3,
+    vida: 4,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -644,8 +626,7 @@ var CARTAS = Object.freeze({
     binomial: "Athenar bermani",
     coste: 2,
     ataque: 2,
-    defensa: 2,
-    vida: 5,
+    vida: 7,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -659,8 +640,7 @@ var CARTAS = Object.freeze({
     binomial: "Sanjuansaurus gordilloi",
     coste: 2,
     ataque: 5,
-    defensa: 1,
-    vida: 3,
+    vida: 4,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -674,8 +654,7 @@ var CARTAS = Object.freeze({
     binomial: "Suchomimus tenerensis",
     coste: 3,
     ataque: 8,
-    defensa: 2,
-    vida: 5,
+    vida: 7,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -689,7 +668,6 @@ var CARTAS = Object.freeze({
     binomial: "Eosinopteryx brevipenna",
     coste: 1,
     ataque: 2,
-    defensa: 0,
     vida: 2,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
@@ -704,8 +682,7 @@ var CARTAS = Object.freeze({
     binomial: "Troodon formosus",
     coste: 2,
     ataque: 4,
-    defensa: 1,
-    vida: 4,
+    vida: 5,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -719,8 +696,7 @@ var CARTAS = Object.freeze({
     binomial: "Carnotaurus sastrei",
     coste: 3,
     ataque: 9,
-    defensa: 1,
-    vida: 5,
+    vida: 6,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -734,8 +710,7 @@ var CARTAS = Object.freeze({
     binomial: "Spinosaurus aegyptiacus",
     coste: 4,
     ataque: 11,
-    defensa: 2,
-    vida: 9,
+    vida: 11,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -749,8 +724,7 @@ var CARTAS = Object.freeze({
     binomial: "Mosasaurus hoffmannii",
     coste: 4,
     ataque: 12,
-    defensa: 2,
-    vida: 8,
+    vida: 10,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -764,7 +738,6 @@ var CARTAS = Object.freeze({
     binomial: "Halszkaraptor escuilliei",
     coste: 1,
     ataque: 2,
-    defensa: 0,
     vida: 2,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
@@ -779,8 +752,7 @@ var CARTAS = Object.freeze({
     binomial: "Tongtianlong limosus",
     coste: 1,
     ataque: 1,
-    defensa: 1,
-    vida: 2,
+    vida: 3,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -794,8 +766,7 @@ var CARTAS = Object.freeze({
     binomial: "Scanisaurus nazarowi",
     coste: 2,
     ataque: 4,
-    defensa: 1,
-    vida: 4,
+    vida: 5,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -809,8 +780,7 @@ var CARTAS = Object.freeze({
     binomial: "Monolophosaurus jiangi",
     coste: 2,
     ataque: 5,
-    defensa: 1,
-    vida: 3,
+    vida: 4,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -824,8 +794,7 @@ var CARTAS = Object.freeze({
     binomial: "Invictarx zephyri",
     coste: 2,
     ataque: 2,
-    defensa: 5,
-    vida: 2,
+    vida: 7,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -839,8 +808,7 @@ var CARTAS = Object.freeze({
     binomial: "Medusaceratops lokii",
     coste: 3,
     ataque: 5,
-    defensa: 4,
-    vida: 6,
+    vida: 10,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -854,8 +822,7 @@ var CARTAS = Object.freeze({
     binomial: "Platyceratops tatarinovi",
     coste: 1,
     ataque: 1,
-    defensa: 2,
-    vida: 1,
+    vida: 3,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -869,8 +836,7 @@ var CARTAS = Object.freeze({
     binomial: "Loricatosaurus priscus",
     coste: 3,
     ataque: 4,
-    defensa: 6,
-    vida: 5,
+    vida: 11,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -884,8 +850,7 @@ var CARTAS = Object.freeze({
     binomial: "Therizinosaurus cheloniformis",
     coste: 3,
     ataque: 6,
-    defensa: 3,
-    vida: 6,
+    vida: 9,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -899,8 +864,7 @@ var CARTAS = Object.freeze({
     binomial: "Alaskacephale gangloffi",
     coste: 2,
     ataque: 3,
-    defensa: 3,
-    vida: 3,
+    vida: 6,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -914,8 +878,7 @@ var CARTAS = Object.freeze({
     binomial: "Titanoceratops ouranos",
     coste: 3,
     ataque: 6,
-    defensa: 5,
-    vida: 4,
+    vida: 9,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -929,8 +892,7 @@ var CARTAS = Object.freeze({
     binomial: "Atlasaurus imelakei",
     coste: 3,
     ataque: 3,
-    defensa: 4,
-    vida: 8,
+    vida: 12,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -944,8 +906,7 @@ var CARTAS = Object.freeze({
     binomial: "Stegoceras validum",
     coste: 2,
     ataque: 3,
-    defensa: 3,
-    vida: 3,
+    vida: 6,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -959,8 +920,7 @@ var CARTAS = Object.freeze({
     binomial: "Maiasaura peeblesorum",
     coste: 3,
     ataque: 4,
-    defensa: 2,
-    vida: 9,
+    vida: 11,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -974,8 +934,7 @@ var CARTAS = Object.freeze({
     binomial: "Edmontosaurus annectens",
     coste: 4,
     ataque: 5,
-    defensa: 3,
-    vida: 14,
+    vida: 17,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -989,8 +948,7 @@ var CARTAS = Object.freeze({
     binomial: "Plateosauravus cullingworthi",
     coste: 2,
     ataque: 2,
-    defensa: 2,
-    vida: 5,
+    vida: 7,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -1004,8 +962,7 @@ var CARTAS = Object.freeze({
     binomial: "Gargoyleosaurus parkpinorum",
     coste: 2,
     ataque: 2,
-    defensa: 4,
-    vida: 3,
+    vida: 7,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -1019,8 +976,7 @@ var CARTAS = Object.freeze({
     binomial: "Wendiceratops pinhornensis",
     coste: 3,
     ataque: 5,
-    defensa: 4,
-    vida: 6,
+    vida: 10,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -1034,8 +990,7 @@ var CARTAS = Object.freeze({
     binomial: "Antarctosaurus wichmannianus",
     coste: 4,
     ataque: 4,
-    defensa: 5,
-    vida: 13,
+    vida: 18,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -1049,8 +1004,7 @@ var CARTAS = Object.freeze({
     binomial: "Liaoceratops yanzigouensis",
     coste: 1,
     ataque: 1,
-    defensa: 1,
-    vida: 2,
+    vida: 3,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -1064,8 +1018,7 @@ var CARTAS = Object.freeze({
     binomial: "Rhinorex condrupus",
     coste: 3,
     ataque: 4,
-    defensa: 2,
-    vida: 9,
+    vida: 11,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -1079,8 +1032,7 @@ var CARTAS = Object.freeze({
     binomial: "Bienosaurus lufengensis",
     coste: 1,
     ataque: 1,
-    defensa: 2,
-    vida: 1,
+    vida: 3,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -1094,8 +1046,7 @@ var CARTAS = Object.freeze({
     binomial: "Shuangmiaosaurus gilmorei",
     coste: 2,
     ataque: 3,
-    defensa: 1,
-    vida: 5,
+    vida: 6,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -1109,8 +1060,7 @@ var CARTAS = Object.freeze({
     binomial: "Chasmosaurus belli",
     coste: 2,
     ataque: 2,
-    defensa: 4,
-    vida: 3,
+    vida: 7,
     rasgo: RASGO.NINGUNO,
     rasgoNombre: "Sin rasgo",
     rasgoTexto: "Todav\xEDa no hace nada especial.",
@@ -1147,8 +1097,7 @@ var CARTAS_DE_JEFE = Object.freeze({
     binomial: "Saurophaganax maximus",
     coste: 4,
     ataque: 7,
-    defensa: 2,
-    vida: 6,
+    vida: 8,
     rasgo: RASGO.DEPREDADOR_DOMINANTE,
     evidencia: "DEBATIDO",
     nota: "El mayor ter\xF3podo conocido de la Formaci\xF3n Morrison, y tambi\xE9n el m\xE1s discutido: parte de los autores lo consideran un Allosaurus de gran talla y no un g\xE9nero propio. La carta lo declara porque la duda es el dato.",
@@ -1163,8 +1112,7 @@ var CARTAS_DE_JEFE = Object.freeze({
     binomial: "Barosaurus lentus",
     coste: 4,
     ataque: 3,
-    defensa: 4,
-    vida: 9,
+    vida: 13,
     rasgo: RASGO.MANADA,
     evidencia: "ESTABLECIDO",
     nota: "Diplod\xF3cido de cuello desmesurado incluso para su familia: v\xE9rtebras cervicales alargadas que lo hac\xEDan capaz de ramonear donde ning\xFAn otro saur\xF3podo de la Morrison llegaba.",
@@ -1290,7 +1238,6 @@ var BALANCE = Object.freeze({
   // nada: es inmune, no resistente. Medido, un punto de Defensa llegó a valer
   // 4,8 puntos de Ataque y las cartas ofensivas quedaban muertas. Con el suelo
   // baja a 3,3 y la Vida deja de ser un adorno. Nada es invulnerable.
-  danoMinimo: 1,
   // ------------------------------------------------------------------ rasgos
   rasgos: Object.freeze({
     gregarioAtaquePorCompanero: 1,
@@ -1303,18 +1250,18 @@ var BALANCE = Object.freeze({
     crecimientoVida: 2,
     neumaticidadAtaque: 2,
     fracturaAtaque: 2,
-    competenciaDefensa: 2,
+    competenciaVida: 2,
     competenciaObjetivos: 2,
     mortandadDano: 3,
-    corazaDefensa: 2,
+    corazaVida: 2,
     // Bonificaciones que piden compañía. La de Ceratosaurus pide tres en el
     // campo, que con cinco ranuras y tres copias por mazo es el techo: cuando
     // sale, sale entera.
     cazaEnGrupoAtaque: 2,
     cazaEnGrupoMinimo: 3,
-    muroDePlacasDefensa: 1,
-    golaDefensa: 2,
-    manadaDefensa: 1,
+    muroDePlacasVida: 1,
+    golaVida: 2,
+    manadaVida: 1,
     trampaMazoRival: 5,
     trampaMazoPropio: 3
   }),
@@ -1335,7 +1282,7 @@ var BALANCE = Object.freeze({
     // El canal y la sabana ya no tocan sólo a los tuyos: como todo clima,
     // valen para los dos bandos por igual.
     canalVida: 1,
-    sabanaDefensa: 1
+    sabanaVida: 1
   }),
   // ------------------------------------------------------------------- mazo
   tamanoMazo: 50,
@@ -1351,33 +1298,28 @@ var BALANCE = Object.freeze({
   }),
   // ------------------------------------------------------------- el cuerpo
   //
-  //  ATAQUE_DEFENSA_VIDA  lo de hoy: la Defensa resta a cada golpe.
-  //  ATAQUE_VIDA          la Defensa no existe y se suma a la Vida.
+  // Una carta son DOS cifras: Ataque y Vida. La Defensa existió y se quitó.
   //
-  // Existe porque la Defensa es la estadística que peor se lee: es una resta
-  // invisible contra un número de la OTRA carta, con dos reglas encima que no
-  // se deducen de lo que hay en pantalla —el suelo de daño y el bonus de
-  // depredación—. Y porque medida en victorias es la que menos aporta: +1 de
-  // Ataque a todas tus criaturas gana el 70,8 % de las partidas, +1 de Vida el
-  // 63,1 % y +1 de Defensa el 59,6 %, sobre un control de 46,8 %.
+  // Era la estadística que peor se leía —una resta plana e invisible contra un
+  // número de la OTRA carta— y medida en victorias era la que menos aportaba:
+  // +1 de Ataque a todas tus criaturas gana el 70,8 % de las partidas, +1 de
+  // Vida el 63,1 % y +1 de Defensa el 59,6 %, sobre un control de 46,8 %.
+  // Plegada a Vida 1:1, el juego no se enteró: 12,5 turnos contra 12,6.
   //
-  // Medido antes de escribir esto: plegada a Vida 1:1, el juego no se entera
-  // —12,5 turnos contra 12,6, y el reparto entre las tres vías de victoria se
-  // mueve dentro del ruido—.
-  //
-  // Diferencia conocida de la variante: la Defensa que dan los rasgos depende de
-  // tener compañía, así que al morir el compañero la Vida MÁXIMA baja y puede
-  // matar a la unidad en el acto. Con la Defensa como resta eso no pasaba: sólo
-  // encajabas más daño a partir de entonces. Es una de las cosas que la medición
-  // tiene que enseñar, no un descuido.
+  // Con ella se fueron dos reglas que tampoco se deducían de la pantalla: el
+  // suelo de daño —que existía sólo para que una Defensa alta no hiciera
+  // inmune— y la mitad del misterio de «¿por qué ha hecho 1 y no 5?».
   cuerpo: Object.freeze({
-    // Igual que la economía: por entorno y sólo desde Node. El juego publicado
-    // corre SIEMPRE en ATAQUE_DEFENSA_VIDA hasta que se decida otra cosa.
-    //   DINOWAR_CUERPO=ATAQUE_VIDA node sim/run.js
-    modo: typeof process !== "undefined" && process.env && process.env.DINOWAR_CUERPO || "ATAQUE_DEFENSA_VIDA",
-    // Cuánta Vida vale un punto de Defensa al plegarla. 1 es lo medido; se deja
-    // como número para poder probar 2 y 3 sin tocar el motor.
-    defensaAVida: 1
+    // El daño que sobra al matar sigue hacia el hábitat rival: si pegas 5 a algo
+    // que tenía 3 de Vida, los 2 que sobran pasan. Antes era privilegio del
+    // rasgo Depredador dominante.
+    //
+    // Es lo que cierra el último agujero de legibilidad: ningún número
+    // desaparece. Y medido, no cuesta nada — al contrario, deja el reparto entre
+    // las tres vías de victoria MÁS parejo que antes (39/32/29 frente a
+    // 46/24/31) y acorta las partidas tres décimas de turno.
+    //   DINOWAR_SOBRANTE=0 node sim/run.js   para medir sin ello
+    sobranteAlHabitat: typeof process !== "undefined" && process.env && process.env.DINOWAR_SOBRANTE === "0" ? false : true
   }),
   // --------------------------------------------------------------------- IA
   ia: Object.freeze({
@@ -1516,7 +1458,6 @@ function nuevaInstancia(iid, cardId, dueno) {
     ranura: null,
     heridas: 0,
     modAtaque: 0,
-    modDefensa: 0,
     modVida: 0,
     // Qué le ha cambiado las cifras y quién se lo hizo. modAtaque y modVida son
     // dos números sin memoria: dicen «−2» pero no de dónde salió, y en la mesa
@@ -1631,29 +1572,21 @@ function ataqueEfectivo(state, iid) {
 }
 function vidaMaxima(state, iid) {
   const inst = state.instancias[iid];
-  const extra = campoEs(state, RASGO.CAMPO_CANAL) ? BALANCE.efectosCampo.canalVida : 0;
-  const plegada = SIN_DEFENSA ? defensaBruta(state, iid) * BALANCE.cuerpo.defensaAVida : 0;
-  return carta(inst.cardId).vida + inst.modVida + extra + plegada;
+  const c = carta(inst.cardId);
+  let v = c.vida + inst.modVida;
+  if (campoEs(state, RASGO.CAMPO_CANAL)) v += BALANCE.efectosCampo.canalVida;
+  if (campoEs(state, RASGO.CAMPO_SABANA)) v += BALANCE.efectosCampo.sabanaVida;
+  if (c.rasgo === RASGO.CORAZA) v += BALANCE.rasgos.corazaVida;
+  if (c.rasgo === RASGO.MURO_DE_PLACAS && conCompa\u00F1\u00EDa(state, inst, 1)) {
+    v += BALANCE.rasgos.muroDePlacasVida;
+  }
+  if (c.rasgo === RASGO.GOLA && conCompa\u00F1\u00EDa(state, inst, 1)) v += BALANCE.rasgos.golaVida;
+  if (c.rasgo === RASGO.MANADA && delClado(state, inst, c.clado, 1)) {
+    v += BALANCE.rasgos.manadaVida;
+  }
+  return Math.max(0, v);
 }
 var vidaActual = (state, iid) => vidaMaxima(state, iid) - state.instancias[iid].heridas;
-var SIN_DEFENSA = BALANCE.cuerpo.modo === "ATAQUE_VIDA";
-function defensaBruta(state, iid) {
-  const inst = state.instancias[iid];
-  const c = carta(inst.cardId);
-  let d = (c.defensa ?? 0) + inst.modDefensa;
-  if (c.rasgo === RASGO.CORAZA) d += BALANCE.rasgos.corazaDefensa;
-  if (c.rasgo === RASGO.MURO_DE_PLACAS && conCompa\u00F1\u00EDa(state, inst, 1)) {
-    d += BALANCE.rasgos.muroDePlacasDefensa;
-  }
-  if (c.rasgo === RASGO.GOLA && conCompa\u00F1\u00EDa(state, inst, 1)) {
-    d += BALANCE.rasgos.golaDefensa;
-  }
-  if (c.rasgo === RASGO.MANADA && delClado(state, inst, c.clado, 1)) {
-    d += BALANCE.rasgos.manadaDefensa;
-  }
-  if (campoEs(state, RASGO.CAMPO_SABANA)) d += BALANCE.efectosCampo.sabanaDefensa;
-  return Math.max(0, d);
-}
 function conCompa\u00F1\u00EDa(state, inst, min) {
   const n = unidadesDe(state, inst.dueno).filter((o) => o.iid !== inst.iid && o.cardId === inst.cardId).length;
   return n >= min;
@@ -1667,15 +1600,12 @@ function espinasDe(state, iid) {
   let e = c.clado === CLADO.TIREOFORO ? BALANCE.clados.espinasTireoforo : 0;
   return e;
 }
-function reduccionDe(state, iid) {
-  return SIN_DEFENSA ? 0 : defensaBruta(state, iid);
-}
 function danoEntre(state, atacanteIid, defensorIid) {
   const a = carta(state.instancias[atacanteIid].cardId);
   const d = carta(state.instancias[defensorIid].cardId);
   let dano = ataqueEfectivo(state, atacanteIid);
   if (BALANCE.clados.presaDe[a.clado] === d.clado) dano += BALANCE.clados.bonusDepredacion;
-  return Math.max(BALANCE.danoMinimo, dano - reduccionDe(state, defensorIid));
+  return Math.max(0, dano);
 }
 function danoAlHabitat(state, iid) {
   return ataqueEfectivo(state, iid);
@@ -1847,7 +1777,6 @@ function recogerBajas(s, causa) {
       inst.ranura = null;
       inst.heridas = 0;
       inst.modAtaque = 0;
-      inst.modDefensa = 0;
       inst.modVida = 0;
       inst.marcas = [];
       inst.desplegadoEnTurno = null;
@@ -1869,16 +1798,15 @@ function recogerBajas(s, causa) {
   }
   return muertes;
 }
-function marcar(inst, cardId, ataque, vida, defensa = 0) {
+function marcar(inst, cardId, ataque, vida) {
   const previo = inst.marcas.find((m) => m.cardId === cardId);
   if (previo) {
     previo.ataque += ataque;
     previo.vida += vida;
-    previo.defensa += defensa;
     previo.veces += 1;
     return;
   }
-  inst.marcas.push({ cardId, ataque, vida, defensa, veces: 1 });
+  inst.marcas.push({ cardId, ataque, vida, veces: 1 });
 }
 function golpearHabitat(s, bando, cantidad) {
   if (cantidad <= 0) return;
@@ -2036,8 +1964,8 @@ function aplicarPresion(s, p) {
     for (const oid of p.objetivos ?? []) {
       const inst = s.instancias[oid];
       if (!inst || inst.ranura === null || inst.dueno !== contrario) continue;
-      inst.modDefensa -= BALANCE.rasgos.competenciaDefensa;
-      marcar(inst, cardId, 0, 0, -BALANCE.rasgos.competenciaDefensa);
+      inst.modVida -= BALANCE.rasgos.competenciaVida;
+      marcar(inst, cardId, 0, -BALANCE.rasgos.competenciaVida);
       n += 1;
     }
     ev(s, "PRESION", { jugador: p.jugador, cardId, objetivos: p.objetivos ?? [], afectados: n });
@@ -2087,10 +2015,11 @@ function faseCombate(s) {
       golpes.push({ iid: b.iid, cantidad: espinasDe(s, a.iid), causa: CAUSA.ESPINAS, por: 0 });
       if (dA > 0 && carta(a.cardId).rasgo === RASGO.DESGARRO) s.instancias[b.iid].sinCuracion = true;
       if (dB > 0 && carta(b.cardId).rasgo === RASGO.DESGARRO) s.instancias[a.iid].sinCuracion = true;
-      if (carta(a.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE) {
+      const sobra = BALANCE.cuerpo.sobranteAlHabitat;
+      if (sobra || carta(a.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE) {
         alHabitat[1] += Math.max(0, dA - vidaActual(s, b.iid));
       }
-      if (carta(b.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE) {
+      if (sobra || carta(b.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE) {
         alHabitat[0] += Math.max(0, dB - vidaActual(s, a.iid));
       }
       ev(s, "CHOQUE", { ranura: r, a: a.iid, b: b.iid, danoA: dA, danoB: dB });
@@ -2557,11 +2486,6 @@ function ataqueHipotetico(vista, j, cardId) {
   }
   return poder;
 }
-function reduccionHipotetica(cardId) {
-  const c = carta(cardId);
-  let d = c.defensa ?? 0;
-  return d;
-}
 function espinasHipoteticas(cardId) {
   const c = carta(cardId);
   let e = c.clado === CLADO.TIREOFORO ? BALANCE.clados.espinasTireoforo : 0;
@@ -2588,8 +2512,8 @@ function valorEnRanura(vista, j, ranura, mio) {
     return (mio.poder + extraSabana) * IA.pesoHabitat * turnos2;
   }
   const evitado = danoAlHabitat(vista, b.iid) * IA.pesoHabitat;
-  const dA = Math.max(0, mio.poder + bonusTrofico(mio.clado, carta(b.cardId).clado) - reduccionDe(vista, b.iid));
-  const dB = Math.max(0, ataqueEfectivo(vista, b.iid) + bonusTrofico(carta(b.cardId).clado, mio.clado) - mio.reduccion) + mio.espinasRecibidas;
+  const dA = Math.max(0, mio.poder + bonusTrofico(mio.clado, carta(b.cardId).clado));
+  const dB = Math.max(0, ataqueEfectivo(vista, b.iid) + bonusTrofico(carta(b.cardId).clado, mio.clado)) + mio.espinasRecibidas;
   const mata = dA + mio.espinasPropias >= vidaActual(vista, b.iid);
   const muere = dB >= mio.vida;
   const turnos = muere ? 1 : Math.min(IA.horizonte, Math.ceil(mio.vida / Math.max(1, dB)));
@@ -2605,7 +2529,6 @@ function statsDeCarta(vista, j, cardId, rivalIid) {
     vida: c.vida,
     clado: c.clado,
     vuela: c.rasgo === RASGO.VUELO,
-    reduccion: reduccionHipotetica(cardId),
     espinasPropias: espinasHipoteticas(cardId),
     espinasRecibidas: rivalIid === null ? 0 : espinasDe(vista, rivalIid)
   };

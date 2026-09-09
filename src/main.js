@@ -5,7 +5,6 @@ import { BALANCE } from './data/balance.js';
 import { TIPO, OBJETIVO, CLADO, CLADO_NOMBRE, carta } from './data/cards.js';
 import {
   crearPartida, vistaDe, FASE, MOTIVO_FIN, unidadesDe, buscablesDe, buscaEnElMazo,
-  reduccionDe,
 } from './engine/state.js';
 import { reduce, ACCION, legales, validar, cartasTrasMulligan } from './engine/actions.js';
 import { decidir, PERFIL } from './engine/ai.js';
@@ -279,7 +278,7 @@ function pedirRivales(iid, c) {
       const uc = carta(u.cardId);
       const puesto = elegidos.has(u.iid);
       return `<button class="opcion${puesto ? ' marcada' : ''}" data-rival="${u.iid}">
-        ${uc.binomial}<small>ranura ${u.ranura + 1} · Defensa ${reduccionDe(estado, u.iid)}</small></button>`;
+        ${uc.binomial}<small>ranura ${u.ranura + 1} · Vida ${vidaActual(estado, u.iid)}</small></button>`;
     }).join('')
       + `<button class="opcion aplicar" data-aplicar="1"${elegidos.size ? '' : ' disabled'}>Aplicar</button>`;
   };

@@ -107,7 +107,6 @@ export const BALANCE = Object.freeze({
   // nada: es inmune, no resistente. Medido, un punto de Defensa llegó a valer
   // 4,8 puntos de Ataque y las cartas ofensivas quedaban muertas. Con el suelo
   // baja a 3,3 y la Vida deja de ser un adorno. Nada es invulnerable.
-  danoMinimo: 1,
 
   // ------------------------------------------------------------------ rasgos
   rasgos: Object.freeze({
@@ -121,18 +120,18 @@ export const BALANCE = Object.freeze({
     crecimientoVida: 2,
     neumaticidadAtaque: 2,
     fracturaAtaque: 2,
-    competenciaDefensa: 2,
+    competenciaVida: 2,
     competenciaObjetivos: 2,
     mortandadDano: 3,
-    corazaDefensa: 2,
+    corazaVida: 2,
     // Bonificaciones que piden compañía. La de Ceratosaurus pide tres en el
     // campo, que con cinco ranuras y tres copias por mazo es el techo: cuando
     // sale, sale entera.
     cazaEnGrupoAtaque: 2,
     cazaEnGrupoMinimo: 3,
-    muroDePlacasDefensa: 1,
-    golaDefensa: 2,
-    manadaDefensa: 1,
+    muroDePlacasVida: 1,
+    golaVida: 2,
+    manadaVida: 1,
     trampaMazoRival: 5,
     trampaMazoPropio: 3,
   }),
@@ -155,7 +154,7 @@ export const BALANCE = Object.freeze({
     // El canal y la sabana ya no tocan sólo a los tuyos: como todo clima,
     // valen para los dos bandos por igual.
     canalVida: 1,
-    sabanaDefensa: 1,
+    sabanaVida: 1,
   }),
 
   // ------------------------------------------------------------------- mazo
@@ -175,34 +174,29 @@ export const BALANCE = Object.freeze({
 
   // ------------------------------------------------------------- el cuerpo
   //
-  //  ATAQUE_DEFENSA_VIDA  lo de hoy: la Defensa resta a cada golpe.
-  //  ATAQUE_VIDA          la Defensa no existe y se suma a la Vida.
+  // Una carta son DOS cifras: Ataque y Vida. La Defensa existió y se quitó.
   //
-  // Existe porque la Defensa es la estadística que peor se lee: es una resta
-  // invisible contra un número de la OTRA carta, con dos reglas encima que no
-  // se deducen de lo que hay en pantalla —el suelo de daño y el bonus de
-  // depredación—. Y porque medida en victorias es la que menos aporta: +1 de
-  // Ataque a todas tus criaturas gana el 70,8 % de las partidas, +1 de Vida el
-  // 63,1 % y +1 de Defensa el 59,6 %, sobre un control de 46,8 %.
+  // Era la estadística que peor se leía —una resta plana e invisible contra un
+  // número de la OTRA carta— y medida en victorias era la que menos aportaba:
+  // +1 de Ataque a todas tus criaturas gana el 70,8 % de las partidas, +1 de
+  // Vida el 63,1 % y +1 de Defensa el 59,6 %, sobre un control de 46,8 %.
+  // Plegada a Vida 1:1, el juego no se enteró: 12,5 turnos contra 12,6.
   //
-  // Medido antes de escribir esto: plegada a Vida 1:1, el juego no se entera
-  // —12,5 turnos contra 12,6, y el reparto entre las tres vías de victoria se
-  // mueve dentro del ruido—.
-  //
-  // Diferencia conocida de la variante: la Defensa que dan los rasgos depende de
-  // tener compañía, así que al morir el compañero la Vida MÁXIMA baja y puede
-  // matar a la unidad en el acto. Con la Defensa como resta eso no pasaba: sólo
-  // encajabas más daño a partir de entonces. Es una de las cosas que la medición
-  // tiene que enseñar, no un descuido.
+  // Con ella se fueron dos reglas que tampoco se deducían de la pantalla: el
+  // suelo de daño —que existía sólo para que una Defensa alta no hiciera
+  // inmune— y la mitad del misterio de «¿por qué ha hecho 1 y no 5?».
   cuerpo: Object.freeze({
-    // Igual que la economía: por entorno y sólo desde Node. El juego publicado
-    // corre SIEMPRE en ATAQUE_DEFENSA_VIDA hasta que se decida otra cosa.
-    //   DINOWAR_CUERPO=ATAQUE_VIDA node sim/run.js
-    modo: (typeof process !== 'undefined' && process.env && process.env.DINOWAR_CUERPO)
-      || 'ATAQUE_DEFENSA_VIDA',
-    // Cuánta Vida vale un punto de Defensa al plegarla. 1 es lo medido; se deja
-    // como número para poder probar 2 y 3 sin tocar el motor.
-    defensaAVida: 1,
+    // El daño que sobra al matar sigue hacia el hábitat rival: si pegas 5 a algo
+    // que tenía 3 de Vida, los 2 que sobran pasan. Antes era privilegio del
+    // rasgo Depredador dominante.
+    //
+    // Es lo que cierra el último agujero de legibilidad: ningún número
+    // desaparece. Y medido, no cuesta nada — al contrario, deja el reparto entre
+    // las tres vías de victoria MÁS parejo que antes (39/32/29 frente a
+    // 46/24/31) y acorta las partidas tres décimas de turno.
+    //   DINOWAR_SOBRANTE=0 node sim/run.js   para medir sin ello
+    sobranteAlHabitat: (typeof process !== 'undefined' && process.env
+      && process.env.DINOWAR_SOBRANTE === '0') ? false : true,
   }),
 
   // --------------------------------------------------------------------- IA

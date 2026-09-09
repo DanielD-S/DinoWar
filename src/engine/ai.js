@@ -8,7 +8,7 @@ import { BALANCE } from '../data/balance.js';
 import { TIPO, OBJETIVO, CLADO, RASGO, carta } from '../data/cards.js';
 import {
   FASE, rival, unidadEn, unidadesDe,
-  ataqueEfectivo, vidaActual, reduccionDe, espinasDe, danoAlHabitat, campoEs, vuela,
+  ataqueEfectivo, vidaActual, espinasDe, danoAlHabitat, campoEs, vuela,
 } from './state.js';
 import { ACCION, legales } from './actions.js';
 import { DIETA } from '../data/dietas.js';
@@ -36,12 +36,6 @@ function ataqueHipotetico(vista, j, cardId) {
     poder += BALANCE.rasgos.riberenoAtaque;
   }
   return poder;
-}
-
-function reduccionHipotetica(cardId) {
-  const c = carta(cardId);
-  let d = c.defensa ?? 0;
-  return d;
 }
 
 function espinasHipoteticas(cardId) {
@@ -94,9 +88,9 @@ function valorEnRanura(vista, j, ranura, mio) {
   // Lo que ese rival me haría al habitat si dejo la ranura vacía.
   const evitado = danoAlHabitat(vista, b.iid) * IA.pesoHabitat;
 
-  const dA = Math.max(0, mio.poder + bonusTrofico(mio.clado, carta(b.cardId).clado) - reduccionDe(vista, b.iid));
+  const dA = Math.max(0, mio.poder + bonusTrofico(mio.clado, carta(b.cardId).clado));
   const dB = Math.max(0, ataqueEfectivo(vista, b.iid)
-    + bonusTrofico(carta(b.cardId).clado, mio.clado) - mio.reduccion) + mio.espinasRecibidas;
+    + bonusTrofico(carta(b.cardId).clado, mio.clado)) + mio.espinasRecibidas;
 
   const mata = dA + mio.espinasPropias >= vidaActual(vista, b.iid);
   const muere = dB >= mio.vida;
@@ -118,7 +112,6 @@ function statsDeCarta(vista, j, cardId, rivalIid) {
     vida: c.vida,
     clado: c.clado,
     vuela: c.rasgo === RASGO.VUELO,
-    reduccion: reduccionHipotetica(cardId),
     espinasPropias: espinasHipoteticas(cardId),
     espinasRecibidas: rivalIid === null ? 0 : espinasDe(vista, rivalIid),
   };

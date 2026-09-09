@@ -54,8 +54,10 @@ export function enElCommit(sha, fichero) {
 // Ejecutado directamente y no importado. Va con pathToFileURL porque en Windows
 // `process.argv[1]` llega con barras invertidas y la comparación contra
 // `file://` + la ruta no se cumplía nunca: la herramienta corría, no escribía
-// nada y no se quejaba.
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+// nada y no se quejaba. Y con la guarda de que argv[1] exista, porque con
+// `node -e` o al importarlo desde un test no hay ruta que convertir y
+// pathToFileURL(undefined) lanza.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const sha = process.argv[2]
     ?? execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
   const viejo = shaAnclado();

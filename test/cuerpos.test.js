@@ -1,64 +1,73 @@
-// La variante de dos estadísticas. El modo se lee del entorno AL IMPORTAR el
-// motor, así que no se puede cambiar en caliente: cada comprobación corre en su
-// propio proceso, igual que hace sim/cuerpos.js.
+// El cuerpo de una carta son DOS cifras: Ataque y Vida. La Defensa se quitó.
+//
+// Lo que sigue vivo detrás de una variable de entorno es el daño SOBRANTE, y el
+// modo se lee al importar el motor, así que se comprueba en otro proceso.
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 
 import { BALANCE } from '../src/data/balance.js';
-import { reduccionDe, defensaBruta, SIN_DEFENSA } from '../src/engine/state.js';
-import { MODOS } from '../sim/cuerpos.js';
+import { CARTAS, TIPO } from '../src/data/cards.js';
+import { COMBINACIONES } from '../sim/cuerpos.js';
 
-/** Corre un trozo de código con el modo puesto y devuelve lo que imprima. */
-function conModo(modo, codigo) {
-  return JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', codigo], {
+test('Ninguna carta tiene ya Defensa', () => {
+  // No es una comprobación de estilo: si una ficha nueva llega con `defensa`,
+  // el motor la ignora en silencio y la carta sale más floja de lo que su autor
+  // creía. Mejor que se note aquí.
+  const con = Object.values(CARTAS).filter((c) => c.defensa !== undefined);
+  assert.deepEqual(con.map((c) => c.id), []);
+});
+
+test('Toda criatura tiene Ataque y Vida, y la Vida es positiva', () => {
+  for (const c of Object.values(CARTAS)) {
+    if (c.tipo !== TIPO.DINOSAURIO) continue;
+    assert.equal(typeof c.ataque, 'number', `${c.id} sin Ataque`);
+    assert.ok(c.vida > 0, `${c.id} tiene ${c.vida} de Vida`);
+  }
+});
+
+test('El suelo de daño se fue con la Defensa', () => {
+  // Existía sólo para que una Defensa alta no hiciera inmune a nadie. Sin resta
+  // no hay de qué proteger, y dejarlo haría que un Ataque de 0 pegara 1.
+  assert.equal(BALANCE.danoMinimo, undefined);
+});
+
+test('El daño sobrante está encendido, y se puede apagar para medir', () => {
+  assert.equal(BALANCE.cuerpo.sobranteAlHabitat, true);
+  const apagado = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e',
+    "const { BALANCE } = await import('./src/data/balance.js');"
+    + 'process.stdout.write(JSON.stringify(BALANCE.cuerpo));'], {
     encoding: 'utf8',
-    env: { ...process.env, DINOWAR_CUERPO: modo },
+    env: { ...process.env, DINOWAR_SOBRANTE: '0' },
   }));
-}
-
-const MIRAR = `
-  const s = await import('./src/engine/state.js');
-  const e = s.crearPartida(42, [[['stegosaurus', 2], ['apatosaurus', 2]], null]);
-  const iid = Object.keys(e.instancias).find((i) => e.instancias[i].cardId === 'stegosaurus');
-  process.stdout.write(JSON.stringify({
-    sinDefensa: s.SIN_DEFENSA,
-    reduccion: s.reduccionDe(e, iid),
-    vidaMax: s.vidaMaxima(e, iid),
-    bruta: s.defensaBruta(e, iid),
-  }));`;
-
-test('El juego publicado corre SIEMPRE con las tres estadísticas', () => {
-  // Igual que la economía: la variante existe para medir, no para publicarse
-  // sin querer. Si este test falla, alguien dejó el entorno puesto.
-  assert.equal(BALANCE.cuerpo.modo, 'ATAQUE_DEFENSA_VIDA');
-  assert.equal(SIN_DEFENSA, false);
+  assert.equal(apagado.sobranteAlHabitat, false);
 });
 
-test('Con las tres, la Defensa resta y la Vida es la de la ficha', () => {
-  const r = conModo('ATAQUE_DEFENSA_VIDA', MIRAR);
-  assert.equal(r.sinDefensa, false);
-  assert.equal(r.reduccion, 4, 'Stegosaurus tiene 4 de Defensa');
-  assert.equal(r.vidaMax, 5, 'y 5 de Vida, sin tocar');
+test('Lo que sobra al matar llega al hábitat rival', () => {
+  const r = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', `
+    const s = await import('./src/engine/state.js');
+    const { reduce, ACCION } = await import('./src/engine/actions.js');
+    const e = s.crearPartida(7, [[['torvosaurus', 1]], [['dryosaurus', 3]]]);
+    // Torvosaurus pega mucho más de lo que aguanta un Dryosaurus: la diferencia
+    // tiene que aparecer en el hábitat, no evaporarse.
+    const t = Number(Object.keys(e.instancias).find((i) => e.instancias[i].cardId === 'torvosaurus'));
+    const d = Number(Object.keys(e.instancias).find((i) => e.instancias[i].cardId === 'dryosaurus'));
+    e.ranuras[0][0] = t; e.instancias[t].ranura = 0;
+    e.ranuras[1][0] = d; e.instancias[d].ranura = 0;
+    e.turno = 3; e.fase = 'COMBATE';
+    const antes = e.jugadores[1].habitat;
+    const dano = s.danoEntre(e, t, d);
+    const vida = s.vidaActual(e, d);
+    const post = reduce(e, { tipo: ACCION.AVANZAR });
+    process.stdout.write(JSON.stringify({ dano, vida, antes, despues: post.jugadores[1].habitat }));
+  `], { encoding: 'utf8' }));
+
+  assert.ok(r.dano > r.vida, 'el escenario pierde sentido si no hay sobrante');
+  assert.equal(r.antes - r.despues, r.dano - r.vida,
+    'al hábitat rival llega exactamente lo que sobró');
 });
 
-test('Sin Defensa, la reducción es 0 y esos puntos están en la Vida', () => {
-  const r = conModo('ATAQUE_VIDA', MIRAR);
-  assert.equal(r.sinDefensa, true);
-  assert.equal(r.reduccion, 0, 'la Defensa deja de restar');
-  assert.equal(r.bruta, 4, 'pero se sigue sabiendo cuánta era');
-  assert.equal(r.vidaMax, 5 + 4 * BALANCE.cuerpo.defensaAVida,
-    'y se ha convertido en Vida');
-});
-
-test('`reduccionDe` y el plegado leen la MISMA defensa', () => {
-  // Están separados a propósito —uno resta, el otro suma— y calcularla dos
-  // veces sería garantizar que un día divergieran.
-  assert.equal(typeof defensaBruta, 'function');
-  assert.equal(typeof reduccionDe, 'function');
-});
-
-test('El comparador conoce las dos variantes y ninguna más', () => {
-  assert.deepEqual(MODOS, ['ATAQUE_DEFENSA_VIDA', 'ATAQUE_VIDA']);
+test('El comparador mide con y sin sobrante, y nada más', () => {
+  assert.deepEqual(COMBINACIONES.map((c) => c.sobrante), ['0', '1']);
 });
