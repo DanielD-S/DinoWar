@@ -4,6 +4,12 @@
 // objetos planos, así que las reglas de src/data/coleccion.js se pueden probar
 // en Node sin navegador.
 //
+// Con la colección en el servidor esto cambió de PAPEL sin cambiar de forma:
+// cuando hay cuenta, lo de aquí es una CACHÉ de lo que dijo el servidor y quien
+// manda es src/ui/perfil.js. Sigue siendo la verdad cuando se juega sin
+// servidor o sin conexión, que es el caso que este fichero nunca ha dejado de
+// cubrir.
+//
 // Nada de lo que hay aquí es crítico: si el almacenamiento falla —modo privado,
 // cuota llena, permisos— se juega igual con un perfil en memoria que se pierde
 // al cerrar. Un juego que se niega a arrancar porque no puede guardar es peor
@@ -20,9 +26,13 @@ export function perfilInicial() {
     v: 1,
     monedas: ECONOMIA.monedasInicio,
     cartas: coleccionInicial(),
-    mazos: [{ nombre: 'Morrison', cartas: mazoPorDefecto() }],
+    mazos: [{ id: null, nombre: 'Morrison', cartas: mazoPorDefecto() }],
     activo: 0,
     sobresAbiertos: 0,
+    // Vienen del servidor cuando hay cuenta. Sin ella no significan nada, pero
+    // tienen que existir para que las pantallas no lean undefined.
+    elo: 1200,
+    apodo: null,
     dificultad: 'heuristica',
   };
 }
@@ -48,7 +58,10 @@ function sanear(bruto) {
       for (const [id, n] of Object.entries(m?.cartas ?? {})) {
         if (existeCarta(id) && Number.isFinite(n) && n > 0) c[id] = Math.floor(n);
       }
-      return { nombre: String(m?.nombre ?? `Mazo ${i + 1}`).slice(0, 24), cartas: c };
+      // El id lo pone el servidor; un mazo creado sin conexión no lo tiene y
+      // se queda en null hasta que se guarde con cuenta.
+      const idMazo = typeof m?.id === 'string' ? m.id : null;
+      return { id: idMazo, nombre: String(m?.nombre ?? `Mazo ${i + 1}`).slice(0, 24), cartas: c };
     })
     .slice(0, 12);
 
@@ -59,6 +72,8 @@ function sanear(bruto) {
     mazos: mazos.length ? mazos : base.mazos,
     activo: Number.isFinite(bruto.activo) ? Math.max(0, Math.floor(bruto.activo)) : 0,
     sobresAbiertos: Number.isFinite(bruto.sobresAbiertos) ? Math.floor(bruto.sobresAbiertos) : 0,
+    elo: Number.isFinite(bruto.elo) ? Math.floor(bruto.elo) : base.elo,
+    apodo: typeof bruto.apodo === 'string' ? bruto.apodo.slice(0, 24) : null,
     dificultad: bruto.dificultad === 'aleatoria' ? 'aleatoria' : base.dificultad,
   };
 }
@@ -93,14 +108,6 @@ export function actualizarPerfil(cambio) {
   const p = { ...cargarPerfil(), ...cambio };
   guardarPerfil(p);
   return p;
-}
-
-/** Suma copias a la colección. Devuelve el perfil nuevo. */
-export function anadirCartas(ids) {
-  const p = cargarPerfil();
-  const cartas = { ...p.cartas };
-  for (const id of ids) cartas[id] = (cartas[id] ?? 0) + 1;
-  return actualizarPerfil({ cartas });
 }
 
 /** Mazo activo, o el de por defecto si el guardado no da 50 cartas. */

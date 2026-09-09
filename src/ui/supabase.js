@@ -9,6 +9,12 @@
 // Lo que NO hace, y por eso cabe: realtime, storage, consultas construidas,
 // providers de OAuth. Si algún día hiciera falta realtime, esto se queda corto
 // y habrá que replantearlo; hoy no hace falta.
+//
+// Sobre las cuentas: crear una cuenta NO crea un usuario nuevo. Se le añade
+// correo y contraseña al usuario ANÓNIMO que ya tenías, que conserva su uuid y
+// con él su tribu, su yacimiento, sus aportes y su colección. Por eso `registrar`
+// es un PUT sobre el usuario y no un signup: un signup habría dejado huérfano
+// todo lo jugado antes de registrarse.
 
 import { CONFIG } from '../data/config.js';
 
@@ -124,6 +130,65 @@ export async function funcion(nombre, cuerpo) {
 
 /** Quién eres para el servidor. Null si aún no has entrado. */
 export const usuarioActual = () => cargar()?.user ?? null;
+
+/**
+ * ¿Estás jugando sin cuenta? Un usuario anónimo es un usuario de pleno derecho
+ * —tiene uuid, tribu y colección— pero vive sólo en este navegador: si se borran
+ * los datos del sitio, no hay forma de volver a él.
+ */
+export function esAnonimo() {
+  const u = usuarioActual();
+  if (!u) return true;
+  // Supabase marca `is_anonymous`, pero las sesiones guardadas por versiones
+  // anteriores no lo traen. Sin correo tampoco hay forma de recuperar la
+  // cuenta, así que a efectos del juego es lo mismo.
+  return u.is_anonymous ?? !u.email;
+}
+
+export const correoActual = () => usuarioActual()?.email ?? null;
+
+/**
+ * Convierte tu sesión anónima en una cuenta. Mismo usuario, mismo uuid: lo
+ * único que cambia es que a partir de ahora se puede volver a él desde otro
+ * sitio. Todo lo jugado se queda donde estaba porque nunca se movió.
+ */
+export async function registrar(correo, clave) {
+  await sesionAnonima();
+  const u = await pedir('/auth/v1/user', {
+    method: 'PUT',
+    body: JSON.stringify({ email: correo, password: clave }),
+  });
+  // La respuesta es el usuario, no una sesión: el token que tienes sigue
+  // valiendo y hay que quedarse con él, sólo que apuntando al usuario nuevo.
+  const s = cargar();
+  if (s) guardar({ ...s, user: u });
+  return u;
+}
+
+/** Entrar con una cuenta ya creada. Reemplaza la sesión que hubiera. */
+export async function entrarConCorreo(correo, clave) {
+  const s = await pedir('/auth/v1/token?grant_type=password', {
+    method: 'POST',
+    body: JSON.stringify({ email: correo, password: clave }),
+  }, false);
+  guardar(s);
+  return s;
+}
+
+/**
+ * Salir. La sesión se olvida y el siguiente arranque abre una anónima nueva:
+ * el juego nunca se queda sin poder jugar por no tener cuenta.
+ *
+ * Se avisa al servidor antes de borrar nada, pero si eso falla se borra igual.
+ * Una sesión que no se puede cerrar en este navegador porque el servidor no
+ * contesta es peor que un token que caduca solo dentro de una hora.
+ */
+export async function salir() {
+  try {
+    await pedir('/auth/v1/logout', { method: 'POST' });
+  } catch { /* el token caduca solo; lo que importa es soltarlo aquí */ }
+  guardar(null);
+}
 
 /** Sólo para pruebas: olvida la sesión y empieza como alguien nuevo. */
 export function olvidarSesion() {

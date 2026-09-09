@@ -15,15 +15,23 @@
 //   node tools/anclar-desde-url.mjs [sha]     (por defecto, HEAD)
 
 import { execFileSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 import { readFileSync, writeFileSync } from 'node:fs';
 
 export const SALIDA = 'supabase/functions/asalto/desde-url.ts';
 export const MARCA = 'Motor anclado en: ';
 
 /** Los ficheros que la función se trae por URL y que, por tanto, hay que vigilar. */
+// No es el cierre transitivo —detrás de estos viene el motor entero— sino los
+// que la función nombra o los que arrastran una regla que decide algo. Las
+// rutas relativas desde una URL del CDN siguen siendo esa URL, así que
+// validarPartida.js viaja aunque no aparezca en ningún import de la función.
 export const VIGILADOS = [
   'supabase/functions/_compartido/validarAsalto.js',
+  'supabase/functions/_compartido/validarPartida.js',
+  'supabase/functions/_compartido/validarSolitario.js',
   'src/data/tribu.js',
+  'src/data/coleccion.js',
 ];
 
 export const shaAnclado = () => (readFileSync(SALIDA, 'utf8').match(/@([0-9a-f]{40})/) ?? [])[1] ?? null;
@@ -43,7 +51,11 @@ export function enElCommit(sha, fichero) {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Ejecutado directamente y no importado. Va con pathToFileURL porque en Windows
+// `process.argv[1]` llega con barras invertidas y la comparación contra
+// `file://` + la ruta no se cumplía nunca: la herramienta corría, no escribía
+// nada y no se quejaba.
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const sha = process.argv[2]
     ?? execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
   const viejo = shaAnclado();

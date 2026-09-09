@@ -34,6 +34,11 @@ export const ECONOMIA = Object.freeze({
   monedasVictoria: 50,
   monedasDerrota: 0,
 
+  // Tope de victorias PAGADAS al día. No es una regla de juego —jugar no se
+  // limita— sino una cota al abuso: el servidor re-juega cada partida que cobra
+  // y eso cuesta CPU, así que un cliente hostil no puede pedir mil.
+  victoriasPorDia: 50,
+
   fusion: Object.freeze({
     [RAREZA.COMUN]: 4,
     [RAREZA.RARO]: 12,

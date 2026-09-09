@@ -27,7 +27,14 @@ const meta = join(tmp, 'meta.json');
 // esbuild no da metafile si escribe a stdout, así que se le pide un fichero y
 // se lee después. El temporal se va con la sesión.
 const salidaTmp = join(tmp, 'asalto.js');
-execFileSync('npx', [
+// En Windows esto no arrancaba de dos maneras seguidas: `npx` a secas no
+// existe —el ejecutable es `npx.cmd`— y desde Node 20 un `.cmd` tampoco se
+// puede lanzar sin `shell: true`, que da EINVAL. Con shell hay que entrecomillar
+// los argumentos a mano, porque ya no los separa el sistema.
+const enWindows = process.platform === 'win32';
+const npx = enWindows ? 'npx.cmd' : 'npx';
+const arg = (s) => (enWindows && /[\s"]/.test(s) ? `"${s.replace(/"/g, '\\"')}"` : s);
+execFileSync(npx, [
   '--yes', 'esbuild@0.25.0',
   'supabase/functions/asalto/index.ts',
   '--bundle',
@@ -41,7 +48,7 @@ execFileSync('npx', [
   '--external:jsr:*',
   '--external:npm:*',
   '--external:https://*',
-], { encoding: 'utf8', maxBuffer: 1 << 26 });
+].map(arg), { encoding: 'utf8', maxBuffer: 1 << 26, shell: enWindows });
 const bundle = readFileSync(salidaTmp, 'utf8');
 
 // Qué ficheros entraron de verdad, según esbuild. Se pregunta en vez de

@@ -1,0 +1,19 @@
+# DinoWar — finales de línea.
+#
+# Todo el repositorio va en LF, también en el árbol de trabajo de Windows.
+#
+# No es una preferencia: tres tests comparan un fichero del disco contra algo
+# generado en memoria o sacado con `git show`, y esos dos caminos no pasan por
+# la conversión de git. Con core.autocrlf=true el fichero llega con CRLF, la
+# comparación no cuadra y el anclaje, el catálogo y el paquete fallan siempre.
+# En CI no se veía porque Linux hace checkout en LF.
+#
+# Un guardián que falla siempre es un guardián apagado, así que la conversión
+# se desactiva en vez de enseñarle a cada test a ignorar los \r.
+* text=auto eol=lf
+
+# Las ilustraciones son binarias y no se tocan.
+*.PNG binary
+*.png binary
+*.jpg binary
+*.xlsx binary

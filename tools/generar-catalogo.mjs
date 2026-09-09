@@ -14,6 +14,7 @@
 // Escribe supabase/migrations/0004_catalogo.sql.
 
 import { writeFileSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 import { CUENCA, ritmoPorHora, depositoDe } from '../src/data/tribu.js';
 import { CALENDARIO, JEFES, CICLO, TIPO_EVENTO } from '../src/data/eventos.js';
 
@@ -108,7 +109,11 @@ export function generar() {
   return `${L.join('\n')}`;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Ejecutado directamente y no importado. Va con pathToFileURL porque en Windows
+// `process.argv[1]` llega con barras invertidas y la comparación contra
+// `file://` + la ruta no se cumplía nunca: la herramienta corría, no escribía
+// nada y no se quejaba.
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const sqlTexto = generar();
   writeFileSync(SALIDA, sqlTexto);
   process.stdout.write(`→ ${SALIDA} · ${sqlTexto.split('\n').length} líneas\n`);

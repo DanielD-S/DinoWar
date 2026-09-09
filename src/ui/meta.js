@@ -1,31 +1,35 @@
 // DinoWar — pantallas de colección, sobres y mazos.
 //
 // Es la capa de "fuera de la partida": nada de aquí toca el motor de reglas.
-// Lee y escribe el perfil con almacen.js y aplica las reglas puras de
-// src/data/coleccion.js. La partida sólo recibe, al final, una lista de pares
-// [cardId, copias].
+// La partida sólo recibe, al final, una lista de pares [cardId, copias].
+//
+// LEE de la caché local, de forma síncrona, porque estas pantallas se repintan
+// enteras a cada clic. ESCRIBE contra src/ui/perfil.js, que es quien sabe si la
+// colección vive en este navegador o en el servidor. Por eso las funciones que
+// cambian algo son asíncronas y las que sólo pintan no.
+//
+// Las reglas puras de src/data/coleccion.js siguen aplicándose aquí para poder
+// decir POR QUÉ un mazo no vale antes de mandarlo, pero la comprobación que
+// manda es la del servidor: ésta es una cortesía para la pantalla.
 
 import {
   CARTAS, CARTAS_DE_JEFE, RAREZA, RAREZA_NOMBRE, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, carta,
 } from '../data/cards.js';
 import {
   ECONOMIA, PROBABILIDAD, GARANTIA, TAM_MAZO, POR_RAREZA,
-  abrirSobre, excedente, valorFusion, limiteDe, validarMazo, mazoPorDefecto,
+  excedente, valorFusion, limiteDe, validarMazo, mazoPorDefecto,
 } from '../data/coleccion.js';
+import { cargarPerfil, perfilInicial } from './almacen.js';
 import {
-  cargarPerfil, actualizarPerfil, anadirCartas, perfilInicial,
-} from './almacen.js';
+  PRUEBAS, comprarSobre as pedirSobre, fundir, guardarMazo, usarMazo, cobrarPartida,
+} from './perfil.js';
 import { arte } from './art.js';
 import { fichaHTML, abrirFicha, statHTML } from './render.js';
 
 const id = (s) => document.getElementById(s);
 
-/**
- * Modo de pruebas: ?pruebas=1 en la URL da monedas infinitas para poder abrir
- * sobres a discreción. No toca el perfil guardado — sólo deja de cobrar — así
- * que salir del modo devuelve el saldo que tuvieras.
- */
-const PRUEBAS = new URLSearchParams(location.search).get('pruebas') === '1';
+// El modo pruebas (?pruebas=1) da monedas infinitas y vive en perfil.js, que es
+// quien puede garantizarlo: sólo funciona con el perfil local.
 const MONEDAS = () => (PRUEBAS ? '∞' : cargarPerfil().monedas);
 const ORDEN = [RAREZA.LEGENDARIO, RAREZA.EPICO, RAREZA.RARO, RAREZA.COMUN];
 
@@ -169,15 +173,18 @@ function pintarColeccion() {
  * nada jugable: una copia por encima del tope no se puede poner en ningún mazo
  * legal, así que fundirla no cambia lo que puedes construir.
  */
-function fundirSobrantes() {
-  const p = cargarPerfil();
-  const sobra = excedente(p.cartas);
-  const valor = valorFusion(p.cartas);
-  if (valor === 0) return;
-
-  const cartas = { ...p.cartas };
-  for (const [cid, n] of Object.entries(sobra)) cartas[cid] -= n;
-  actualizarPerfil({ cartas, monedas: p.monedas + valor });
+async function fundirSobrantes() {
+  if (valorFusion(cargarPerfil().cartas) === 0) return;
+  dom.btnFundir.disabled = true;
+  try {
+    await fundir();
+  } catch (e) {
+    // Fundir es irreversible, así que un fallo tiene que verse. Callarlo
+    // dejaría la pantalla enseñando copias que el servidor ya no tiene, o al
+    // revés.
+    dom.resumen.innerHTML += `<p class="meta-nota mal">No se pudo fundir: ${e.message}</p>`;
+  }
+  dom.btnFundir.disabled = false;
   pintarColeccion();
   pintarMenu();
 }
@@ -307,19 +314,27 @@ function pintarSobres(tirada = null, nuevas = new Set(), antesDeAbrir = {}) {
       : `Te faltan ${ECONOMIA.precioSobre - p.monedas} monedas. ${COMO_SE_GANAN} También las da fundir copias sobrantes en la colección.`;
 }
 
-function comprarSobre() {
-  const p = cargarPerfil();
-  if (!PRUEBAS && p.monedas < ECONOMIA.precioSobre) return;
+async function comprarSobre() {
+  if (!PRUEBAS && cargarPerfil().monedas < ECONOMIA.precioSobre) return;
 
-  const tirada = abrirSobre(Math.random, p.cartas);
-  const nuevas = new Set(tirada.filter((cid) => (p.cartas[cid] ?? 0) === 0));
-  const antesDeAbrir = { ...p.cartas };
+  // El sorteo ya no se hace aquí cuando hay servidor: las cinco cartas las saca
+  // él. Pedirle que apunte las que hubiera sorteado el navegador sería pedirle
+  // cinco legendarias y que dijese que sí.
+  dom.btnAbrir.disabled = true;
+  let tirada;
+  let antesDeAbrir;
+  try {
+    const r = await pedirSobre();
+    tirada = r.cartas;
+    antesDeAbrir = r.antes;
+  } catch (e) {
+    dom.btnAbrir.disabled = false;
+    dom.aviso.textContent = `No se pudo abrir el sobre: ${e.message}`;
+    return;
+  }
+  dom.btnAbrir.disabled = false;
 
-  actualizarPerfil({
-    monedas: PRUEBAS ? p.monedas : p.monedas - ECONOMIA.precioSobre,
-    sobresAbiertos: p.sobresAbiertos + 1,
-  });
-  anadirCartas(tirada);
+  const nuevas = new Set(tirada.filter((cid) => (antesDeAbrir[cid] ?? 0) === 0));
   pintarSobres(tirada, nuevas, antesDeAbrir);
   pintarMenu();
 
@@ -360,7 +375,12 @@ function pintarMazos() {
   dom.mazosCuerpo.onclick = (e) => {
     const usar = e.target.closest('[data-usar]');
     const editar = e.target.closest('[data-editar]');
-    if (usar && !usar.disabled) { actualizarPerfil({ activo: Number(usar.dataset.usar) }); pintarMazos(); pintarMenu(); }
+    if (usar && !usar.disabled) {
+      usar.disabled = true;
+      usarMazo(Number(usar.dataset.usar))
+        .catch((err) => { dom.mazosPie.innerHTML += `<p class="meta-nota mal">${err.message}</p>`; })
+        .finally(() => { pintarMazos(); pintarMenu(); });
+    }
     if (editar) {
       const i = Number(editar.dataset.editar);
       editando = { indice: i, nombre: p.mazos[i].nombre, cartas: { ...p.mazos[i].cartas } };
@@ -484,17 +504,19 @@ function pintarEditor() {
     if (e.target.closest('[data-vaciar]')) { editando.cartas = {}; pintarEditor(); return; }
     const g = e.target.closest('[data-guardar]');
     if (!g || g.disabled) return;
-    const perfil = cargarPerfil();
-    const mazos = perfil.mazos.slice();
-    const entrada = { nombre: editando.nombre.trim() || 'Sin nombre', cartas: editando.cartas };
-    const indice = editando.indice < 0 ? mazos.length : editando.indice;
-    if (editando.indice < 0) mazos.push(entrada); else mazos[indice] = entrada;
     // Guardar y USAR: guardarlo y dejarlo sin activar obligaba a un segundo
     // viaje a la lista para hacer lo único que se quería hacer.
-    actualizarPerfil({ mazos, activo: indice });
-    editando = null;
-    pintarMazos();
-    pintarMenu();
+    g.disabled = true;
+    g.textContent = 'Guardando…';
+    guardarMazo(editando.indice, editando.nombre.trim() || 'Sin nombre', editando.cartas)
+      .then(() => { editando = null; pintarMazos(); pintarMenu(); })
+      .catch((err) => {
+        // El servidor comprueba que el mazo sea TUYO, no sólo que sea legal.
+        // Si dice que no, se enseña su motivo tal cual: es el único que ha
+        // mirado la colección de verdad.
+        pintarEditor();
+        dom.mazosPie.innerHTML += `<p class="meta-nota mal">No se pudo guardar: ${err.message}</p>`;
+      });
   };
 }
 
@@ -527,11 +549,18 @@ function autocompletar() {
 
 // --------------------------------------------------------------- recompensa
 
-/** Monedas por ganar la partida. Perder no paga: `monedasDerrota` es 0. */
-export function recompensar(gano) {
-  const p = cargarPerfil();
-  const premio = gano ? ECONOMIA.monedasVictoria : ECONOMIA.monedasDerrota;
-  actualizarPerfil({ monedas: p.monedas + premio });
+/**
+ * Dinomonedas por la partida. Perder no paga: `monedasDerrota` es 0.
+ *
+ * Ya no las suma este fichero. Cuando hay servidor, la partida entera —semilla,
+ * mazo y jugadas— se le manda y él decide si la ganaste antes de pagar: una
+ * victoria afirmada era una carta regalada, porque las monedas compran sobres.
+ *
+ * @param {object|null} partida lo que hay que mandarle al servidor
+ * @param {boolean} gano lo que cree el navegador, para el modo local
+ */
+export async function recompensar(partida, gano) {
+  const premio = await cobrarPartida(partida, gano);
   pintarMenu();
   return premio;
 }

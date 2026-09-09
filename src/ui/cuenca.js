@@ -11,7 +11,7 @@ import {
   estadoDeTribu, aportar, mejorarYacimiento, reclamar, crearTribu, entrarEnTribu,
   YO, modoActual, porQueLocal, MODO,
 } from './red.js';
-import { anadirCartas } from './almacen.js';
+import { anotarRecompensa } from './perfil.js';
 import { arte } from './art.js';
 
 const id = (s) => document.getElementById(s);
@@ -62,8 +62,11 @@ export function montarCuenca(volver, asaltar) {
         const cardId = await reclamar();
         if (cardId) {
           // A la colección de verdad, no sólo a la cuenca: una carta que no
-          // puedes meter en un mazo no es una recompensa, es un cromo.
-          anadirCartas([cardId]);
+          // puedes meter en un mazo no es una recompensa, es un cromo. Cuando
+          // hay servidor ya la apuntó `reclamar_jefe`, y esto sólo refresca la
+          // caché: era la última carta del juego que entraba en la colección
+          // porque el navegador lo dijera.
+          await anotarRecompensa(cardId);
           anunciarCarta(cardId);
         }
       }

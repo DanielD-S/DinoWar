@@ -12,9 +12,9 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: a4e1a42b80dc063a
+// huella: f99e805ee00761c3
 //
-// Lleva dentro estos 13 ficheros del repositorio. La lista la da
+// Lleva dentro estos 16 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
 // aparece aquí solo. Un test recalcula la huella sobre esta misma lista y falla
 // si el paquete se ha quedado atrás del código.
@@ -29,7 +29,10 @@
 // fuente: src/engine/ai.js
 // fuente: src/data/tribu.js
 // fuente: src/data/eventos.js
+// fuente: supabase/functions/_compartido/validarPartida.js
 // fuente: supabase/functions/_compartido/validarAsalto.js
+// fuente: src/data/coleccion.js
+// fuente: supabase/functions/_compartido/validarSolitario.js
 // fuente: supabase/functions/asalto/index.ts
 
 // supabase/functions/asalto/index.ts
@@ -2749,7 +2752,7 @@ var CUENCA = Object.freeze({
   // Subir el yacimiento se paga con los mismos fósiles que se aportan a la
   // tribu. Ésa es toda la tensión del recurso: ayudar hoy o producir más
   // mañana. Si la mejora se pagara con monedas no habría decisión ninguna.
-  costeMejora: (nivel) => 300 * nivel * nivel,
+  costeMejora: (nivel2) => 300 * nivel2 * nivel2,
   nivelMaximo: 8,
   // ------------------------------------------------------------------ tribu
   miembrosMaximo: 8,
@@ -2895,61 +2898,65 @@ var CALENDARIO = Object.freeze([
 ]);
 var CICLO = CALENDARIO.reduce((n, e) => Math.max(n, e.dia + e.dura), 0);
 
-// supabase/functions/_compartido/validarAsalto.js
+// supabase/functions/_compartido/validarPartida.js
 var LIMITES = Object.freeze({
   acciones: 4e3,
   // una partida normal no pasa de unos cientos
   pasosPorFase: 200
   // el mismo tope que usa el simulador
 });
-var AsaltoInvalido = class extends Error {
+var PartidaInvalida = class extends Error {
   constructor(motivo, detalle = null) {
     super(motivo);
-    this.name = "AsaltoInvalido";
+    this.name = "PartidaInvalida";
     this.detalle = detalle;
   }
 };
-function validarMazoDeAsalto(mazo) {
-  if (!Array.isArray(mazo) || mazo.length === 0) throw new AsaltoInvalido("mazo ausente");
+function validarMazoLegal(mazo) {
+  if (!Array.isArray(mazo) || mazo.length === 0) throw new PartidaInvalida("mazo ausente");
   let total = 0;
   for (const entrada of mazo) {
-    if (!Array.isArray(entrada) || entrada.length !== 2) throw new AsaltoInvalido("mazo mal formado");
+    if (!Array.isArray(entrada) || entrada.length !== 2) throw new PartidaInvalida("mazo mal formado");
     const [cardId, copias] = entrada;
     if (typeof cardId !== "string" || !existeCarta(cardId)) {
-      throw new AsaltoInvalido("carta desconocida", cardId);
+      throw new PartidaInvalida("carta desconocida", cardId);
     }
-    if (!Number.isInteger(copias) || copias <= 0) throw new AsaltoInvalido("copias inv\xE1lidas", cardId);
+    if (!Number.isInteger(copias) || copias <= 0) throw new PartidaInvalida("copias inv\xE1lidas", cardId);
     const tope = BALANCE.copiasPorRareza[carta(cardId).rareza];
-    if (copias > tope) throw new AsaltoInvalido("copias por encima de la rareza", cardId);
+    if (copias > tope) throw new PartidaInvalida("copias por encima de la rareza", cardId);
     total += copias;
   }
   if (total !== BALANCE.tamanoMazo) {
-    throw new AsaltoInvalido("el mazo no suma las cartas exactas", total);
+    throw new PartidaInvalida("el mazo no suma las cartas exactas", total);
   }
   return true;
 }
-function jefeDelEvento(eventoId) {
-  const evento2 = CALENDARIO.find((e) => e.id === eventoId && e.tipo === TIPO_EVENTO.JEFE);
-  if (!evento2) throw new AsaltoInvalido("ese evento no es una caza", eventoId);
-  const jefe = JEFES[evento2.jefe];
-  if (!jefe) throw new AsaltoInvalido("jefe inexistente", evento2.jefe);
-  return { evento: evento2, jefe };
+function perfilValido(nombre, porDefecto = PERFIL.HEURISTICA) {
+  if (nombre === void 0 || nombre === null) return porDefecto;
+  const conocidos = Object.values(PERFIL);
+  if (!conocidos.includes(nombre)) throw new PartidaInvalida("perfil de IA desconocido", nombre);
+  return nombre;
 }
-function validarAsalto(envio) {
-  if (!envio || typeof envio !== "object") throw new AsaltoInvalido("env\xEDo vac\xEDo");
-  const { jefeEvento, semilla: seed, mazo, acciones } = envio;
-  if (!Number.isInteger(seed)) throw new AsaltoInvalido("semilla inv\xE1lida");
-  if (!Array.isArray(acciones)) throw new AsaltoInvalido("faltan las jugadas");
-  if (acciones.length > LIMITES.acciones) throw new AsaltoInvalido("demasiadas jugadas", acciones.length);
-  const { jefe } = jefeDelEvento(jefeEvento);
-  validarMazoDeAsalto(mazo);
-  let s = crearPartida(seed, [mazo, jefe.mazo.map((e) => [...e])]);
-  s.jugadores[1].habitat = habitatDeAsalto();
+function validarPartida(envio, opciones = {}) {
+  if (!envio || typeof envio !== "object") throw new PartidaInvalida("env\xEDo vac\xEDo");
+  const { semilla: seed, mazo, acciones } = envio;
+  const { mazoRival = null, habitatRival = null, perfil = PERFIL.HEURISTICA } = opciones;
+  if (!Number.isInteger(seed)) throw new PartidaInvalida("semilla inv\xE1lida");
+  if (!Array.isArray(acciones)) throw new PartidaInvalida("faltan las jugadas");
+  if (acciones.length > LIMITES.acciones) {
+    throw new PartidaInvalida("demasiadas jugadas", acciones.length);
+  }
+  validarMazoLegal(mazo);
+  let s = crearPartida(seed, [mazo, mazoRival]);
+  const habitatInicial = habitatRival ?? s.jugadores[1].habitat;
+  s.jugadores[1].habitat = habitatInicial;
   let rngIA = semilla(seed ^ 1542469173);
   const pendientes = acciones.slice();
   const siguienteDelJugador = (estado) => {
     if (pendientes.length) return pendientes.shift();
-    if (estado.fase === FASE.DESCARTE) throw new AsaltoInvalido("faltan jugadas: la partida no llega al final");
+    if (estado.fase === FASE.DESCARTE) {
+      throw new PartidaInvalida("faltan jugadas: la partida no llega al final");
+    }
     return { tipo: ACCION.PASAR, jugador: 0 };
   };
   while (s.fase !== FASE.FIN) {
@@ -2962,40 +2969,157 @@ function validarAsalto(envio) {
         while (s.fase === faseInicial && legales(s, 0).length > 0) {
           const a = { ...siguienteDelJugador(s), jugador: 0 };
           const motivo = validar(s, a);
-          if (motivo) throw new AsaltoInvalido("jugada ilegal", { accion: a.tipo, motivo });
+          if (motivo) throw new PartidaInvalida("jugada ilegal", { accion: a.tipo, motivo });
           s = reduce(s, a);
           actuo = true;
           if (a.tipo === ACCION.PASAR || a.tipo === ACCION.DESCARTAR) break;
-          if (++tuyas > LIMITES.pasosPorFase) throw new AsaltoInvalido("la fase no converge");
+          if (++tuyas > LIMITES.pasosPorFase) throw new PartidaInvalida("la fase no converge");
         }
         let suyas = 0;
         while (s.fase === faseInicial && legales(s, 1).length > 0) {
-          const d = decidir(vistaDe(s, 1), 1, rngIA, PERFIL.HEURISTICA);
+          const d = decidir(vistaDe(s, 1), 1, rngIA, perfil);
           rngIA = d.rng;
           if (!d.accion) break;
           s = reduce(s, d.accion);
           actuo = true;
           if (d.accion.tipo === ACCION.PASAR || d.accion.tipo === ACCION.DESCARTAR) break;
-          if (++suyas > LIMITES.pasosPorFase) throw new AsaltoInvalido("la fase no converge");
+          if (++suyas > LIMITES.pasosPorFase) throw new PartidaInvalida("la fase no converge");
         }
         if (!actuo) break;
-        if (++pasos > LIMITES.pasosPorFase) throw new AsaltoInvalido("la fase no converge");
+        if (++pasos > LIMITES.pasosPorFase) throw new PartidaInvalida("la fase no converge");
       }
-      if (s.fase === faseInicial) throw new AsaltoInvalido("la fase se qued\xF3 bloqueada");
+      if (s.fase === faseInicial) throw new PartidaInvalida("la fase se qued\xF3 bloqueada");
       continue;
     }
     s = reduce(s, { tipo: ACCION.AVANZAR });
   }
-  const ganada = s.ganador === 0;
-  const danoAlHabitat2 = habitatDeAsalto() - Math.max(0, s.jugadores[1].habitat);
-  const trofeos = s.jugadores[0].trofeos;
   return {
-    dano: danoDeAsalto({ danoAlHabitat: danoAlHabitat2, trofeos, ganada }),
-    danoAlHabitat: danoAlHabitat2,
-    trofeos,
+    ganada: s.ganador === 0,
+    danoAlHabitat: habitatInicial - Math.max(0, s.jugadores[1].habitat),
+    trofeos: s.jugadores[0].trofeos,
     turnos: s.turno,
-    ganada,
     motivoFin: s.motivoFin
+  };
+}
+
+// supabase/functions/_compartido/validarAsalto.js
+var AsaltoInvalido = PartidaInvalida;
+function jefeDelEvento(eventoId) {
+  const evento2 = CALENDARIO.find((e) => e.id === eventoId && e.tipo === TIPO_EVENTO.JEFE);
+  if (!evento2) throw new AsaltoInvalido("ese evento no es una caza", eventoId);
+  const jefe = JEFES[evento2.jefe];
+  if (!jefe) throw new AsaltoInvalido("jefe inexistente", evento2.jefe);
+  return { evento: evento2, jefe };
+}
+function validarAsalto(envio) {
+  if (!envio || typeof envio !== "object") throw new AsaltoInvalido("env\xEDo vac\xEDo");
+  const { jefe } = jefeDelEvento(envio.jefeEvento);
+  const r = validarPartida(envio, {
+    mazoRival: jefe.mazo.map((e) => [...e]),
+    habitatRival: habitatDeAsalto(),
+    perfil: PERFIL.HEURISTICA
+  });
+  return { ...r, dano: danoDeAsalto(r) };
+}
+
+// src/data/coleccion.js
+var TAM_MAZO = BALANCE.tamanoMazo;
+var limiteDe = (cardId) => BALANCE.copiasPorRareza[carta(cardId).rareza];
+var ECONOMIA = Object.freeze({
+  // Un sobre son cinco cartas. El precio está por encima de lo que devuelve
+  // fundirlo entero (unas 77 monedas, que lo comprueba un test), porque si no
+  // el bucle se alimenta solo y abrir sobres deja de ser una decisión.
+  precioSobre: 100,
+  cartasPorSobre: 5,
+  // Las monedas salen de GANAR, no de jugar y tampoco de fundir. Fundir sólo
+  // recicla lo que ya no te cabe en ningún mazo.
+  //
+  // Perder no paga: dos victorias son un sobre y una derrota no es medio paso
+  // hacia él. El precio de eso es que quien no gana nunca se queda con los dos
+  // sobres de salida y su colección inicial, que es un mazo legal y completo
+  // —jugar nunca se bloquea—, pero la colección deja de crecer sola.
+  monedasInicio: 240,
+  monedasVictoria: 50,
+  monedasDerrota: 0,
+  // Tope de victorias PAGADAS al día. No es una regla de juego —jugar no se
+  // limita— sino una cota al abuso: el servidor re-juega cada partida que cobra
+  // y eso cuesta CPU, así que un cliente hostil no puede pedir mil.
+  victoriasPorDia: 50,
+  fusion: Object.freeze({
+    [RAREZA.COMUN]: 4,
+    [RAREZA.RARO]: 12,
+    [RAREZA.EPICO]: 35,
+    [RAREZA.LEGENDARIO]: 100
+  })
+});
+var GARANTIA = RAREZA.RARO;
+var ESCALA = Object.freeze([RAREZA.COMUN, RAREZA.RARO, RAREZA.EPICO, RAREZA.LEGENDARIO]);
+var nivel = (rareza) => ESCALA.indexOf(rareza);
+var POR_RAREZA = Object.freeze(Object.fromEntries(
+  ESCALA.map((r) => [r, Object.freeze(Object.values(CARTAS).filter((c) => c.rareza === r).map((c) => c.id))])
+));
+var CUOTA = Object.freeze(Object.fromEntries(
+  ESCALA.map((r) => [r, POR_RAREZA[r].length * BALANCE.copiasPorRareza[r]])
+));
+var COLECCION_COMPLETA = ESCALA.reduce((n, r) => n + CUOTA[r], 0);
+var PESO = Object.freeze({
+  [RAREZA.COMUN]: 8,
+  [RAREZA.RARO]: 4,
+  [RAREZA.EPICO]: 2,
+  [RAREZA.LEGENDARIO]: 1
+});
+var PROBABILIDAD = Object.freeze((() => {
+  const bruto = ESCALA.map((r) => POR_RAREZA[r].length * PESO[r]);
+  const total = bruto.reduce((a, b) => a + b, 0);
+  return Object.fromEntries(ESCALA.map((r, i) => [r, bruto[i] / total]));
+})());
+function rarezaAlAzar(azar, minima = RAREZA.COMUN) {
+  const desde = nivel(minima);
+  const candidatas = ESCALA.slice(desde);
+  const total = candidatas.reduce((n, r) => n + PROBABILIDAD[r], 0);
+  let t = azar() * total;
+  for (const r of candidatas) {
+    t -= PROBABILIDAD[r];
+    if (t < 0) return r;
+  }
+  return candidatas[candidatas.length - 1];
+}
+function abrirSobre(azar, tengo = null) {
+  const salida = [];
+  const cuenta = tengo ? { ...tengo } : null;
+  for (let i = 0; i < ECONOMIA.cartasPorSobre; i++) {
+    const ultima = i === ECONOMIA.cartasPorSobre - 1;
+    const cumplida = salida.some((id2) => nivel(carta(id2).rareza) >= nivel(GARANTIA));
+    const r = rarezaAlAzar(azar, ultima && !cumplida ? GARANTIA : RAREZA.COMUN);
+    let pool = POR_RAREZA[r];
+    if (cuenta) {
+      const faltan = pool.filter((id2) => (cuenta[id2] ?? 0) < limiteDe(id2));
+      if (faltan.length) pool = faltan;
+      else {
+        const sinRepetir = pool.filter((id2) => !salida.includes(id2));
+        if (sinRepetir.length) pool = sinRepetir;
+      }
+    }
+    const id = pool[Math.min(pool.length - 1, Math.floor(azar() * pool.length))];
+    if (cuenta) cuenta[id] = (cuenta[id] ?? 0) + 1;
+    salida.push(id);
+  }
+  return salida;
+}
+
+// supabase/functions/_compartido/validarSolitario.js
+function validarSolitario(envio) {
+  const r = validarPartida(envio, {
+    // null es el mazo de referencia. Es lo que hace `crearPartida` en el
+    // navegador cuando la partida no es un asalto, así que reproducirlo es
+    // literalmente no pasarle nada.
+    mazoRival: null,
+    habitatRival: null,
+    perfil: perfilValido(envio.perfil)
+  });
+  return {
+    ...r,
+    premio: r.ganada ? ECONOMIA.monedasVictoria : ECONOMIA.monedasDerrota
   };
 }
 
@@ -3009,6 +3133,14 @@ var json = (cuerpo, status = 200) => new Response(
   JSON.stringify(cuerpo),
   { status, headers: { ...cors, "Content-Type": "application/json" } }
 );
+var aObjeto = (mazo) => Object.fromEntries(
+  Array.isArray(mazo) ? mazo : []
+);
+async function enUnDia(servicio, tabla, jugador, columna) {
+  const desde = new Date(Date.now() - 24 * 36e5).toISOString();
+  const { count } = await servicio.from(tabla).select("id", { count: "exact", head: true }).eq("jugador_id", jugador).gte(columna, desde);
+  return count ?? 0;
+}
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "s\xF3lo POST" }, 405);
@@ -3027,31 +3159,40 @@ Deno.serve(async (req) => {
   } catch {
     return json({ error: "cuerpo ilegible" }, 400);
   }
-  let resultado;
+  const servicio = createClient(
+    Deno.env.get("SUPABASE_URL"),
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
+  );
+  const tipo = envio.tipo ?? "asalto";
   try {
-    resultado = validarAsalto(envio);
+    if (tipo === "asalto") return await hacerAsalto(servicio, user.id, envio);
+    if (tipo === "victoria") return await hacerVictoria(servicio, user.id, envio);
+    if (tipo === "sobre") return await hacerSobre(servicio, user.id);
+    return json({ error: `no s\xE9 hacer \xAB${tipo}\xBB` }, 400);
   } catch (e) {
     if (e instanceof AsaltoInvalido) {
       return json({ error: e.message, detalle: e.detalle }, 422);
     }
     throw e;
   }
+});
+async function hacerAsalto(servicio, jugadorId, envio) {
+  const resultado = validarAsalto(envio);
   const { evento: evento2 } = jefeDelEvento(envio.jefeEvento);
-  const comoServicio = createClient(
-    Deno.env.get("SUPABASE_URL"),
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
-  );
-  const { data: jugador } = await comoServicio.from("jugadores").select("tribu_id").eq("id", user.id).single();
+  const { data: jugador } = await servicio.from("jugadores").select("tribu_id").eq("id", jugadorId).single();
   if (!jugador?.tribu_id) return json({ error: "no est\xE1s en ninguna tribu" }, 409);
-  const desde = new Date(Date.now() - 24 * 36e5).toISOString();
-  const { count } = await comoServicio.from("asaltos").select("id", { count: "exact", head: true }).eq("jugador_id", user.id).gte("jugado_en", desde);
-  if ((count ?? 0) >= CUENCA.asaltosPorDia) {
+  const { error: errMazo } = await servicio.rpc("validar_mazo_de", {
+    p_jugador: jugadorId,
+    p_cartas: aObjeto(envio.mazo)
+  });
+  if (errMazo) return json({ error: errMazo.message }, 422);
+  if (await enUnDia(servicio, "asaltos", jugadorId, "jugado_en") >= CUENCA.asaltosPorDia) {
     return json({ error: "ya has hecho tus asaltos de hoy" }, 429);
   }
-  const { data, error } = await comoServicio.rpc("aplicar_asalto", {
+  const { data, error } = await servicio.rpc("aplicar_asalto", {
     p_tribu: jugador.tribu_id,
     p_evento: evento2.id,
-    p_jugador: user.id,
+    p_jugador: jugadorId,
     p_semilla: envio.semilla,
     p_dano: resultado.dano,
     p_turnos: resultado.turnos,
@@ -3074,4 +3215,48 @@ Deno.serve(async (req) => {
     cayo: fila?.cayo ?? false,
     almacen: fila?.almacen ?? null
   });
-});
+}
+async function hacerVictoria(servicio, jugadorId, envio) {
+  const resultado = validarSolitario(envio);
+  const { error: errMazo } = await servicio.rpc("validar_mazo_de", {
+    p_jugador: jugadorId,
+    p_cartas: aObjeto(envio.mazo)
+  });
+  if (errMazo) return json({ error: errMazo.message }, 422);
+  if (await enUnDia(servicio, "partidas", jugadorId, "jugado_en") >= ECONOMIA.victoriasPorDia) {
+    return json({ error: "ya has cobrado tus partidas de hoy" }, 429);
+  }
+  const { data, error } = await servicio.rpc("aplicar_partida", {
+    p_jugador: jugadorId,
+    p_semilla: envio.semilla,
+    p_turnos: resultado.turnos,
+    p_ganada: resultado.ganada,
+    p_monedas: resultado.premio
+  });
+  if (error) {
+    const yaCobrada = error.code === "23505";
+    return json(
+      { error: yaCobrada ? "esa partida ya se cobr\xF3" : error.message },
+      yaCobrada ? 409 : 400
+    );
+  }
+  return json({
+    ganada: resultado.ganada,
+    turnos: resultado.turnos,
+    premio: data?.premio ?? 0,
+    monedas: data?.monedas ?? null
+  });
+}
+async function hacerSobre(servicio, jugadorId) {
+  const { data: filas, error: errCol } = await servicio.from("coleccion").select("card_id, copias").eq("jugador_id", jugadorId);
+  if (errCol) return json({ error: errCol.message }, 400);
+  const tengo = Object.fromEntries((filas ?? []).map((f) => [f.card_id, f.copias]));
+  const azar = () => crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
+  const cartas = abrirSobre(azar, tengo);
+  const { data, error } = await servicio.rpc("aplicar_sobre", {
+    p_jugador: jugadorId,
+    p_cartas: cartas
+  });
+  if (error) return json({ error: error.message }, 409);
+  return json({ cartas, monedas: data?.monedas ?? null, precio: ECONOMIA.precioSobre });
+}
