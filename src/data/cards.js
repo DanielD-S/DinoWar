@@ -426,7 +426,7 @@ export const CARTAS = Object.freeze({
   llanura: clima({
     id: 'llanura', coste: 1, rareza: RAREZA.EPICO, binomial: 'Llanura de inundación',
     rasgo: RASGO.CAMPO_LLANURA, rasgoNombre: 'Llanura de inundación',
-    rasgoTexto: 'Mientras esté en el campo, cada jugador puede devolver una carta de su mano al fondo de su mazo, una vez por turno.',
+    rasgoTexto: 'Mientras esté en el campo, cada jugador puede cambiar una carta de su mano por otra del mazo, una vez por turno.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Las llanuras de inundación de la Morrison concentran la mayor productividad vegetal estacional de la formación.',
   }),
@@ -434,7 +434,7 @@ export const CARTAS = Object.freeze({
   canal: clima({
     id: 'canal', coste: 1, rareza: RAREZA.LEGENDARIO, binomial: 'Canal fluvial trenzado',
     rasgo: RASGO.CAMPO_CANAL, rasgoNombre: 'Canal fluvial trenzado',
-    rasgoTexto: 'Agua permanente en el campo: los ribereños pelean a gusto.',
+    rasgoTexto: 'Agua permanente: +1 de Vida a todos los dinosaurios del campo, y los ribereños pelean a gusto.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Los sistemas fluviales trenzados de la formación mantienen agua durante la estación seca, con vegetación ribereña estrecha a ambos lados.',
   }),
@@ -822,7 +822,8 @@ export const CARTAS_DE_JEFE = Object.freeze({
     tipo: TIPO.DINOSAURIO, clado: CLADO.TEROPODO, rareza: RAREZA.LEGENDARIO,
     binomial: 'Saurophaganax maximus',
     coste: 4, ataque: 7, vida: 8,
-    rasgo: RASGO.DEPREDADOR_DOMINANTE,
+    rasgo: RASGO.DEPREDADOR_DOMINANTE, rasgoNombre: 'Depredador dominante',
+    rasgoTexto: 'Si mata a su rival, el daño sobrante que pasa al hábitat enemigo se duplica.',
     evidencia: 'DEBATIDO',
     nota: 'El mayor terópodo conocido de la Formación Morrison, y también el más '
       + 'discutido: parte de los autores lo consideran un Allosaurus de gran talla '
@@ -834,7 +835,8 @@ export const CARTAS_DE_JEFE = Object.freeze({
     tipo: TIPO.DINOSAURIO, clado: CLADO.SAUROPODO, rareza: RAREZA.LEGENDARIO,
     binomial: 'Barosaurus lentus',
     coste: 4, ataque: 3, vida: 13,
-    rasgo: RASGO.MANADA,
+    rasgo: RASGO.MANADA, rasgoNombre: 'Manada',
+    rasgoTexto: '+1 de Vida si tienes otro saurópodo en el campo.',
     evidencia: 'ESTABLECIDO',
     nota: 'Diplodócido de cuello desmesurado incluso para su familia: vértebras '
       + 'cervicales alargadas que lo hacían capaz de ramonear donde ningún otro '

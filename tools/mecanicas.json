@@ -65,7 +65,7 @@
       "nombre": "Canal fluvial trenzado",
       "cartas": 1,
       "quienes": "Canal fluvial trenzado",
-      "texto": "Agua permanente en el campo: los ribereños pelean a gusto.",
+      "texto": "Agua permanente: +1 de Vida a todos los dinosaurios del campo, y los ribereños pelean a gusto.",
       "constante": "efectosCampo.canalVida",
       "valor": 1,
       "sentido": "Vida a todos los del campo"
@@ -225,7 +225,7 @@
       "nombre": "Llanura de inundación",
       "cartas": 1,
       "quienes": "Llanura de inundación",
-      "texto": "Mientras esté en el campo, cada jugador puede devolver una carta de su mano al fondo de su mazo, una vez por turno.",
+      "texto": "Mientras esté en el campo, cada jugador puede cambiar una carta de su mano por otra del mazo, una vez por turno.",
       "constante": "efectosCampo.llanuraReciclaPorTurno",
       "valor": 1,
       "sentido": "cambio de carta por turno y jugador"

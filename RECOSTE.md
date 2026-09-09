@@ -93,8 +93,8 @@ revisión viene a arreglar.
 | rebrote | Rebrote tras incendio | Recurso | Rara | 0 | 0 |  |  | Rebrote tras incendio | +2 Biomasa ahora mismo. Todos tus dinosaurios reciben 1 herida. |  |
 | carrona | Carroña abundante | Recurso | Legendaria | 0 | 0 |  |  | Carroña abundante | +3 Biomasa ahora mismo. El rival gana 1 Biomasa. |  |
 | lago | Lago efímero | Recurso | Épica | 0 | 0 |  |  | Lago efímero | +2 Biomasa ahora mismo. Tu hábitat pierde 2 puntos. |  |
-| llanura | Llanura de inundación | Clima | Épica | 1 | 1 |  |  | Llanura de inundación | Mientras esté en el campo, cada jugador puede devolver una carta de su mano al fondo de su mazo, una vez por turno. |  |
-| canal | Canal fluvial trenzado | Clima | Legendaria | 1 | 1 |  |  | Canal fluvial trenzado | Agua permanente en el campo: los ribereños pelean a gusto. |  |
+| llanura | Llanura de inundación | Clima | Épica | 1 | 1 |  |  | Llanura de inundación | Mientras esté en el campo, cada jugador puede cambiar una carta de su mano por otra del mazo, una vez por turno. |  |
+| canal | Canal fluvial trenzado | Clima | Legendaria | 1 | 1 |  |  | Canal fluvial trenzado | Agua permanente: +1 de Vida a todos los dinosaurios del campo, y los ribereños pelean a gusto. |  |
 | bosque | Bosque de coníferas ribereño | Clima | Legendaria | 1 | 1 |  |  | Bosque de coníferas ribereño | Los saurópodos curan 1 herida al final de cada turno. |  |
 | aridez | Deriva árida | Clima | Legendaria | 1 | 1 |  |  | Deriva árida | Ambos jugadores pierden 5 cartas del mazo |  |
 | sabana | Sabana de helechos | Clima | Común | 1 | 1 |  |  | Sabana de helechos | +1 de Biomasa cada turno para los dos jugadores, mientras siga en el campo. |  |

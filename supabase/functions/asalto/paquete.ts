@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: c37c7ff4ca1c6b97
+// huella: ea306975ba4e25fb
 //
 // Lleva dentro estos 17 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -541,7 +541,7 @@ var CARTAS = Object.freeze({
     binomial: "Llanura de inundaci\xF3n",
     rasgo: RASGO.CAMPO_LLANURA,
     rasgoNombre: "Llanura de inundaci\xF3n",
-    rasgoTexto: "Mientras est\xE9 en el campo, cada jugador puede devolver una carta de su mano al fondo de su mazo, una vez por turno.",
+    rasgoTexto: "Mientras est\xE9 en el campo, cada jugador puede cambiar una carta de su mano por otra del mazo, una vez por turno.",
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Las llanuras de inundaci\xF3n de la Morrison concentran la mayor productividad vegetal estacional de la formaci\xF3n."
   }),
@@ -552,7 +552,7 @@ var CARTAS = Object.freeze({
     binomial: "Canal fluvial trenzado",
     rasgo: RASGO.CAMPO_CANAL,
     rasgoNombre: "Canal fluvial trenzado",
-    rasgoTexto: "Agua permanente en el campo: los ribere\xF1os pelean a gusto.",
+    rasgoTexto: "Agua permanente: +1 de Vida a todos los dinosaurios del campo, y los ribere\xF1os pelean a gusto.",
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Los sistemas fluviales trenzados de la formaci\xF3n mantienen agua durante la estaci\xF3n seca, con vegetaci\xF3n ribere\xF1a estrecha a ambos lados."
   }),
@@ -1117,6 +1117,8 @@ var CARTAS_DE_JEFE = Object.freeze({
     ataque: 7,
     vida: 8,
     rasgo: RASGO.DEPREDADOR_DOMINANTE,
+    rasgoNombre: "Depredador dominante",
+    rasgoTexto: "Si mata a su rival, el da\xF1o sobrante que pasa al h\xE1bitat enemigo se duplica.",
     evidencia: "DEBATIDO",
     nota: "El mayor ter\xF3podo conocido de la Formaci\xF3n Morrison, y tambi\xE9n el m\xE1s discutido: parte de los autores lo consideran un Allosaurus de gran talla y no un g\xE9nero propio. La carta lo declara porque la duda es el dato.",
     formacion: "Formaci\xF3n Morrison",
@@ -1132,6 +1134,8 @@ var CARTAS_DE_JEFE = Object.freeze({
     ataque: 3,
     vida: 13,
     rasgo: RASGO.MANADA,
+    rasgoNombre: "Manada",
+    rasgoTexto: "+1 de Vida si tienes otro saur\xF3podo en el campo.",
     evidencia: "ESTABLECIDO",
     nota: "Diplod\xF3cido de cuello desmesurado incluso para su familia: v\xE9rtebras cervicales alargadas que lo hac\xEDan capaz de ramonear donde ning\xFAn otro saur\xF3podo de la Morrison llegaba.",
     formacion: "Formaci\xF3n Morrison",
