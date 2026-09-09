@@ -659,12 +659,11 @@ function cerrarAsalto(gane) {
   el.finPremio.textContent = `${estimado} de daño a ${jefe.nombre}…`;
   sonido(gane ? 'gana' : 'pierde');
 
-  asaltar(partida ?? estimado)
+  asaltar({ ...(partida ?? {}), dano: estimado })
     .then((r) => {
-      const dano = r?.dano ?? estimado;
-      el.finPremio.textContent = r?.cayo
+      el.finPremio.textContent = r.cayo
         ? `${jefe.nombre} ha caído. Reclama su carta en la Cuenca.`
-        : `${dano} de daño a ${jefe.nombre}. No paga dinomonedas: esto es para la tribu.`;
+        : `${r.dano} de daño a ${jefe.nombre}. No paga dinomonedas: esto es para la tribu.`;
       return pintarCuenca();
     })
     .catch((e) => {

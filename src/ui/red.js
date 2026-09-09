@@ -15,7 +15,9 @@
 // pantalla lo enseña. Un juego que dice «tu tribu» cuando en realidad está
 // hablando solo es peor que uno que admite que está sin conexión.
 
-import { hayServidor, rpc, funcion, sesionAnonima, usuarioActual, olvidarSesion } from './supabase.js';
+import {
+  hayServidor, rpc, funcion, sesionAnonima, usuarioActual, olvidarSesion, ErrorDeRed,
+} from './supabase.js';
 import { CONFIG } from '../data/config.js';
 import { CUENCA } from '../data/tribu.js';
 import { JEFES, CALENDARIO, TIPO_EVENTO } from '../data/eventos.js';
@@ -160,16 +162,42 @@ export async function entrarEnTribu(codigo) {
  */
 export async function asaltar(partida, ahora = Date.now()) {
   if (modo === MODO.LOCAL) {
-    // En local sí se acepta un número: no hay nadie a quien engañar.
-    return local.asaltar(typeof partida === 'number' ? partida : partida.dano, ahora);
+    // En local sí vale un número: no hay nadie a quien engañar, y el daño lo
+    // calculó ya el navegador al cerrar la partida.
+    const dano = typeof partida === 'number' ? partida : partida?.dano;
+    if (!Number.isFinite(dano)) throw new Error('el asalto no trae daño que apuntar');
+    return { ...local.asaltar(dano, ahora), dano };
   }
+
   const r = await funcion(CONFIG.supabase.funcionAsalto, {
     jefeEvento: partida.jefeEvento,
     semilla: partida.semilla,
     mazo: partida.mazo,
     acciones: partida.acciones,
   });
-  return { vida: Number(r.vida), cayo: Boolean(r.cayo), dano: Number(r.dano) };
+
+  return { vida: Number(r?.vida), cayo: Boolean(r?.cayo), dano: danoDeRespuesta(r) };
+}
+
+/**
+ * El daño que dice el servidor, o un error que enseña lo que contestó de verdad.
+ *
+ * Existe aparte y exportada para poder probarla: la primera vez que un asalto
+ * llegó al servidor, la respuesta no traía daño y la pantalla pintó «NaN de
+ * daño a Saurophaganax maximus» como si nada hubiera fallado. Un número roto
+ * enseñado con naturalidad es peor que un error: parece que funcionó.
+ */
+export function danoDeRespuesta(r) {
+  // `Number(null)` es 0, no NaN: sin este descarte, un servidor que contesta
+  // «dano: null» —o sea, que no lo sabe— pasaría por un asalto de cero daño,
+  // que es una respuesta legítima y muy distinta.
+  const crudo = r?.dano;
+  const dano = crudo === null || crudo === undefined || crudo === '' ? NaN : Number(crudo);
+  if (Number.isFinite(dano)) return dano;
+  throw new ErrorDeRed(
+    `el servidor no devolvió el daño (contestó: ${String(JSON.stringify(r)).slice(0, 200)})`,
+    200, r,
+  );
 }
 
 export async function reclamar(ahora = Date.now()) {
