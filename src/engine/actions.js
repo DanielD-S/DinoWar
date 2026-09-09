@@ -380,15 +380,22 @@ export function reduce(state, action) {
       if (s.jugadores.every((j) => j.listo)) s.fase = FASE.REVELACION;
       break;
 
-    // Al FONDO, no arriba: devolverla arriba sería robarla otra vez el turno
-    // que viene, y eso no es reciclar, es buscar. Y sin barajar, porque al fondo
-    // de un mazo de cincuenta no vuelve a verse en la misma partida.
+    // Devuelve una y ROBA una. Sin el robo era una pérdida seca —la carta salía
+    // de la mano, iba al fondo de veinte y no volvía— y medido no la usaba
+    // nadie: cero devoluciones en 300 partidas. Con el robo deja de ser
+    // «pierdes una carta» y pasa a ser «cambias la que no puedes pagar».
+    //
+    // Al FONDO, no arriba: arriba te devolvería la misma que acabas de soltar.
+    // Y el robo va DESPUÉS de meterla, para que en un mazo de una carta te
+    // lleves la tuya y no se quede el mazo vacío.
     case ACCION.RECICLAR: {
       const cardId = s.instancias[action.iid].cardId;
       jug.mano = jug.mano.filter((x) => x !== action.iid);
       jug.mazo.push(action.iid);
       jug.recicladasEsteTurno += 1;
-      ev(s, 'RECICLA', { jugador: action.jugador, iid: action.iid, cardId });
+      const robada = jug.mazo.shift() ?? null;
+      if (robada !== null) jug.mano.push(robada);
+      ev(s, 'RECICLA', { jugador: action.jugador, iid: action.iid, cardId, robada });
       break;
     }
 

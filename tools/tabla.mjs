@@ -37,7 +37,6 @@ function escribir() {
       // bajaban solos en cada vuelta.
       c.coste,
       dino ? c.ataque : '',
-      dino ? c.defensa : '',
       dino ? c.vida : '',
       c.rasgoNombre,
       esc(c.rasgoTexto),
@@ -48,7 +47,7 @@ function escribir() {
   const cabecera = `# RECOSTE.md — la tabla editable del set
 
 > La genera y la aplica \`node tools/tabla.mjs\`. **Edita «Rareza», «Coste
-> nuevo», «A», «D», «V», «Rasgo» y «Texto del rasgo»**: el id es la llave, y
+> nuevo», «A», «V», «Rasgo» y «Texto del rasgo»**: el id es la llave, y
 > «Carta», «Familia» y «Coste actual» son de referencia y se ignoran.
 >
 > Cambiar la rareza mueve tres cosas a la vez: cuántas copias caben en un mazo,
@@ -112,7 +111,7 @@ que correr \`npm test\` y \`npm run sim\`: los seis objetivos del balance salen 
 estos números, y el que hoy falla —cartas descalibradas— es justo el que esta
 revisión viene a arreglar.
 
-| id | Carta | Familia | Rareza | Coste actual | Coste nuevo | A | D | V | Rasgo | Texto del rasgo | Mecánica nueva |
+| id | Carta | Familia | Rareza | Coste actual | Coste nuevo | A | V | Rasgo | Texto del rasgo | Mecánica nueva |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 `;
   writeFileSync(RUTA, cabecera + filas.join('\n') + '\n');
@@ -127,7 +126,7 @@ function aplicar() {
     // split están vacíos: fuera los dos antes de leer columnas. La barra
     // escapada («\\|») va dentro de una celda y no la parte.
     .map((l) => l.split(/(?<!\\)\|/).slice(1, -1).map((x) => x.trim()))
-    .filter((cols) => cols.length >= 11 && CARTAS[cols[0]]);
+    .filter((cols) => cols.length >= 10 && CARTAS[cols[0]]);
 
   if (filas.length === 0) throw new Error('RECOSTE.md no tiene filas reconocibles');
 
@@ -139,7 +138,7 @@ function aplicar() {
   const pedidos = [];
 
   for (const cols of filas) {
-    const [id, , , rarezaTexto, , costeNuevo, a, d, v, rasgoNombre, rasgoTexto, mecanica] = cols;
+    const [id, , , rarezaTexto, , costeNuevo, a, v, rasgoNombre, rasgoTexto, mecanica] = cols;
     if (mecanica) pedidos.push(`${id}: ${mecanica}`);
     const c = CARTAS[id];
     const bloque = bloqueDe(src, id);
@@ -155,7 +154,7 @@ function aplicar() {
     const coste = num(costeNuevo);
     if (coste !== null && coste !== c.coste) nuevo = sustituirCampo(nuevo, 'coste', coste);
     if (c.tipo === TIPO.DINOSAURIO) {
-      for (const [campo, valor] of [['ataque', num(a)], ['defensa', num(d)], ['vida', num(v)]]) {
+      for (const [campo, valor] of [['ataque', num(a)], ['vida', num(v)]]) {
         if (valor !== null && valor !== c[campo]) nuevo = sustituirCampo(nuevo, campo, valor);
       }
     }

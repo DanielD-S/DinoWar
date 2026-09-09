@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: df5f082bad50edd5
+// huella: ea306975ba4e25fb
 //
 // Lleva dentro estos 17 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -541,7 +541,7 @@ var CARTAS = Object.freeze({
     binomial: "Llanura de inundaci\xF3n",
     rasgo: RASGO.CAMPO_LLANURA,
     rasgoNombre: "Llanura de inundaci\xF3n",
-    rasgoTexto: "Mientras est\xE9 en el campo, cada jugador puede devolver una carta de su mano al fondo de su mazo, una vez por turno.",
+    rasgoTexto: "Mientras est\xE9 en el campo, cada jugador puede cambiar una carta de su mano por otra del mazo, una vez por turno.",
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Las llanuras de inundaci\xF3n de la Morrison concentran la mayor productividad vegetal estacional de la formaci\xF3n."
   }),
@@ -552,7 +552,7 @@ var CARTAS = Object.freeze({
     binomial: "Canal fluvial trenzado",
     rasgo: RASGO.CAMPO_CANAL,
     rasgoNombre: "Canal fluvial trenzado",
-    rasgoTexto: "Agua permanente en el campo: los ribere\xF1os pelean a gusto.",
+    rasgoTexto: "Agua permanente: +1 de Vida a todos los dinosaurios del campo, y los ribere\xF1os pelean a gusto.",
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Los sistemas fluviales trenzados de la formaci\xF3n mantienen agua durante la estaci\xF3n seca, con vegetaci\xF3n ribere\xF1a estrecha a ambos lados."
   }),
@@ -1117,6 +1117,8 @@ var CARTAS_DE_JEFE = Object.freeze({
     ataque: 7,
     vida: 8,
     rasgo: RASGO.DEPREDADOR_DOMINANTE,
+    rasgoNombre: "Depredador dominante",
+    rasgoTexto: "Si mata a su rival, el da\xF1o sobrante que pasa al h\xE1bitat enemigo se duplica.",
     evidencia: "DEBATIDO",
     nota: "El mayor ter\xF3podo conocido de la Formaci\xF3n Morrison, y tambi\xE9n el m\xE1s discutido: parte de los autores lo consideran un Allosaurus de gran talla y no un g\xE9nero propio. La carta lo declara porque la duda es el dato.",
     formacion: "Formaci\xF3n Morrison",
@@ -1132,6 +1134,8 @@ var CARTAS_DE_JEFE = Object.freeze({
     ataque: 3,
     vida: 13,
     rasgo: RASGO.MANADA,
+    rasgoNombre: "Manada",
+    rasgoTexto: "+1 de Vida si tienes otro saur\xF3podo en el campo.",
     evidencia: "ESTABLECIDO",
     nota: "Diplod\xF3cido de cuello desmesurado incluso para su familia: v\xE9rtebras cervicales alargadas que lo hac\xEDan capaz de ramonear donde ning\xFAn otro saur\xF3podo de la Morrison llegaba.",
     formacion: "Formaci\xF3n Morrison",
@@ -1295,9 +1299,12 @@ var BALANCE = Object.freeze({
   }),
   efectosCampo: Object.freeze({
     aridezMazo: 5,
-    // La llanura anegada deja RECICLAR: mientras esté en el campo, cada jugador
-    // puede devolver al fondo de su mazo una carta de su mano por turno, y elige
-    // cuál. Vale para los dos, como todo clima.
+    // La llanura anegada deja CAMBIAR una carta: la que sueltas va al fondo del
+    // mazo y robas la de arriba. Una por turno, cada jugador elige la suya.
+    //
+    // Sin el robo era una pérdida seca y no la usaba nadie: `sim/climas.js` midió
+    // cero devoluciones en 300 partidas y la carta salía IDÉNTICA al control en
+    // las seis columnas.
     //
     // Daba +1 de Biomasa a los dos, que es exactamente lo que ahora hace la
     // sabana, y dos cartas idénticas con nombre distinto no son dos cartas.
@@ -1394,7 +1401,10 @@ var BALANCE = Object.freeze({
     umbralJugar: 0.15,
     // A partir de cuántas cartas de mazo empieza a valer la pena devolver una
     // con la Llanura. Por encima de eso, reciclar es perder el turno.
-    reciclaDesdeMazo: 15
+    // Con el robo, cambiar una carta ya no es perder una, así que la IA lo hace
+    // siempre que tenga algo impagable en la mano. El umbral de mazo se queda
+    // alto para que no sea gratis del todo cerca del final.
+    reciclaDesdeMazo: 45
   })
 });
 var MAZO = Object.freeze([
@@ -2566,15 +2576,22 @@ function reduce(state, action) {
       jug.listo = true;
       if (s.jugadores.every((j) => j.listo)) s.fase = FASE.REVELACION;
       break;
-    // Al FONDO, no arriba: devolverla arriba sería robarla otra vez el turno
-    // que viene, y eso no es reciclar, es buscar. Y sin barajar, porque al fondo
-    // de un mazo de cincuenta no vuelve a verse en la misma partida.
+    // Devuelve una y ROBA una. Sin el robo era una pérdida seca —la carta salía
+    // de la mano, iba al fondo de veinte y no volvía— y medido no la usaba
+    // nadie: cero devoluciones en 300 partidas. Con el robo deja de ser
+    // «pierdes una carta» y pasa a ser «cambias la que no puedes pagar».
+    //
+    // Al FONDO, no arriba: arriba te devolvería la misma que acabas de soltar.
+    // Y el robo va DESPUÉS de meterla, para que en un mazo de una carta te
+    // lleves la tuya y no se quede el mazo vacío.
     case ACCION.RECICLAR: {
       const cardId = s.instancias[action.iid].cardId;
       jug.mano = jug.mano.filter((x) => x !== action.iid);
       jug.mazo.push(action.iid);
       jug.recicladasEsteTurno += 1;
-      ev(s, "RECICLA", { jugador: action.jugador, iid: action.iid, cardId });
+      const robada = jug.mazo.shift() ?? null;
+      if (robada !== null) jug.mano.push(robada);
+      ev(s, "RECICLA", { jugador: action.jugador, iid: action.iid, cardId, robada });
       break;
     }
     case ACCION.DESCARTAR:

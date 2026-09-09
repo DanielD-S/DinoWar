@@ -662,13 +662,13 @@ cualquiera de los dos bandos puede reemplazarla, y su efecto alcanza a los dos.
 
 ### Llanura de inundación · Épica · coste 1
 
-Mientras esté en el campo, cada jugador puede devolver una carta de su mano al fondo de su mazo, una vez por turno.
+Mientras esté en el campo, cada jugador puede cambiar una carta de su mano por otra del mazo, una vez por turno.
 
 `ESTABLECIDO` · Las llanuras de inundación de la Morrison concentran la mayor productividad vegetal estacional de la formación.
 
 ### Canal fluvial trenzado · Legendaria · coste 1
 
-Agua permanente en el campo: los ribereños pelean a gusto.
+Agua permanente: +1 de Vida a todos los dinosaurios del campo, y los ribereños pelean a gusto.
 
 `ESTABLECIDO` · Los sistemas fluviales trenzados de la formación mantienen agua durante la estación seca, con vegetación ribereña estrecha a ambos lados.
 

@@ -1,0 +1,560 @@
+{
+  "mecanicas": [
+    {
+      "rasgo": "DEPREDADOR_DOMINANTE",
+      "nombre": "Depredador dominante",
+      "cartas": 2,
+      "quienes": "Allosaurus fragilis, Saurophaganax maximus",
+      "texto": "Si mata a su rival, el daño sobrante que pasa al hábitat enemigo se duplica.",
+      "constante": "",
+      "valor": "",
+      "sentido": "no lleva número: es una regla, no una cifra"
+    },
+    {
+      "rasgo": "GREGARIO",
+      "nombre": "Gregario",
+      "cartas": 2,
+      "quienes": "Dryosaurus altus, Brachylophosaurus canadensis",
+      "texto": "+1 de Ataque por cada otro Dryosaurus propio en el campo.",
+      "constante": "rasgos.gregarioAtaquePorCompanero",
+      "valor": 1,
+      "sentido": "Ataque por cada congénere en el campo"
+    },
+    {
+      "rasgo": "MANADA",
+      "nombre": "Manada",
+      "cartas": 2,
+      "quienes": "Apatosaurus louisae, Barosaurus lentus",
+      "texto": "+1 de Vida si tienes otro saurópodo en el campo.",
+      "constante": "rasgos.manadaVida",
+      "valor": 1,
+      "sentido": "Vida con otro del mismo clado"
+    },
+    {
+      "rasgo": "ENTRADA_ALERTA",
+      "nombre": "Alerta",
+      "cartas": 1,
+      "quienes": "Troodon formosus",
+      "texto": "Al entrar en juego, robas 1 carta.",
+      "constante": "entradas.alertaRoba",
+      "valor": 1,
+      "sentido": "cartas que robas al entrar"
+    },
+    {
+      "rasgo": "ENTRADA_ARRASA",
+      "nombre": "Arrasa la ribera",
+      "cartas": 1,
+      "quienes": "Spinosaurus aegyptiacus",
+      "texto": "Al entrar en juego, 3 de daño al hábitat rival.",
+      "constante": "entradas.arrasaHabitat",
+      "valor": 3,
+      "sentido": "de daño al hábitat rival, al entrar"
+    },
+    {
+      "rasgo": "CAMPO_BOSQUE",
+      "nombre": "Bosque de coníferas ribereño",
+      "cartas": 1,
+      "quienes": "Bosque de coníferas ribereño",
+      "texto": "Los saurópodos curan 1 herida al final de cada turno.",
+      "constante": "efectosCampo.bosqueCura",
+      "valor": 1,
+      "sentido": "heridas que curan los saurópodos"
+    },
+    {
+      "rasgo": "CAMPO_CANAL",
+      "nombre": "Canal fluvial trenzado",
+      "cartas": 1,
+      "quienes": "Canal fluvial trenzado",
+      "texto": "Agua permanente: +1 de Vida a todos los dinosaurios del campo, y los ribereños pelean a gusto.",
+      "constante": "efectosCampo.canalVida",
+      "valor": 1,
+      "sentido": "Vida a todos los del campo"
+    },
+    {
+      "rasgo": "CARRONA",
+      "nombre": "Carroña abundante",
+      "cartas": 1,
+      "quienes": "Carroña abundante",
+      "texto": "+3 Biomasa ahora mismo. El rival gana 1 Biomasa.",
+      "constante": "",
+      "valor": "",
+      "sentido": "no lleva número: es una regla, no una cifra"
+    },
+    {
+      "rasgo": "CAZA_EN_GRUPO",
+      "nombre": "Caza en grupo",
+      "cartas": 1,
+      "quienes": "Ceratosaurus nasicornis",
+      "texto": "+2 de Ataque si hay tres Ceratosaurus tuyos en el campo.",
+      "constante": "rasgos.cazaEnGrupoAtaque",
+      "valor": 2,
+      "sentido": "Ataque si hay bastantes copias en el campo"
+    },
+    {
+      "rasgo": "ENTRADA_MANADA_SANA",
+      "nombre": "Cierra la formación",
+      "cartas": 1,
+      "quienes": "Gargoyleosaurus parkpinorum",
+      "texto": "Al entrar en juego, tus otros dinosaurios curan 2 heridas.",
+      "constante": "entradas.manadaSanaCura",
+      "valor": 2,
+      "sentido": "heridas que curan tus OTROS dinosaurios"
+    },
+    {
+      "rasgo": "COMPETENCIA",
+      "nombre": "Competencia trófica",
+      "cartas": 1,
+      "quienes": "Competencia trófica",
+      "texto": "−2 de Vida a dos dinosaurios rivales que elijas.",
+      "constante": "rasgos.competenciaVida",
+      "valor": 2,
+      "sentido": "Vida que se quita, a dos rivales"
+    },
+    {
+      "rasgo": "CRECIMIENTO_ACELERADO",
+      "nombre": "Crecimiento acelerado",
+      "cartas": 1,
+      "quienes": "Crecimiento acelerado",
+      "texto": "+2 Poder y +2 Vida permanentes a un dinosaurio que elijas.",
+      "constante": "rasgos.crecimientoAtaque",
+      "valor": 2,
+      "sentido": "Ataque, y otro tanto de Vida"
+    },
+    {
+      "rasgo": "CAMPO_ARIDEZ",
+      "nombre": "Deriva árida",
+      "cartas": 1,
+      "quienes": "Deriva árida",
+      "texto": "Ambos jugadores pierden 5 cartas del mazo",
+      "constante": "efectosCampo.aridezMazo",
+      "valor": 5,
+      "sentido": "cartas de mazo que pierden los DOS"
+    },
+    {
+      "rasgo": "DESGARRO",
+      "nombre": "Desgarro",
+      "cartas": 1,
+      "quienes": "Tyrannotitan chubutensis",
+      "texto": "A quien hiere no se le cura ninguna herida ese turno.",
+      "constante": "",
+      "valor": "",
+      "sentido": "no lleva número: es una regla, no una cifra"
+    },
+    {
+      "rasgo": "ENTRADA_DEVORA_MAZO",
+      "nombre": "Devora el registro",
+      "cartas": 1,
+      "quienes": "Mosasaurus hoffmannii",
+      "texto": "Al entrar en juego, el rival pierde 3 cartas de su mazo.",
+      "constante": "entradas.devoraMazo",
+      "valor": 3,
+      "sentido": "cartas de mazo que pierde el rival"
+    },
+    {
+      "rasgo": "ENTRADA_EMBOSCADA",
+      "nombre": "Emboscada",
+      "cartas": 1,
+      "quienes": "Dromaeosaurus albertensis",
+      "texto": "Al entrar en juego, hace 3 de daño al dinosaurio que tenga enfrente.",
+      "constante": "entradas.emboscadaDano",
+      "valor": 3,
+      "sentido": "de daño al que tenga enfrente, al entrar"
+    },
+    {
+      "rasgo": "FRACTURA",
+      "nombre": "Fractura consolidada",
+      "cartas": 1,
+      "quienes": "Fractura consolidada",
+      "texto": "−2 Poder permanente a un dinosaurio rival.",
+      "constante": "rasgos.fracturaAtaque",
+      "valor": 2,
+      "sentido": "Ataque que se quita"
+    },
+    {
+      "rasgo": "GASTROLITOS",
+      "nombre": "Gastrolitos",
+      "cartas": 1,
+      "quienes": "Gastrolitos",
+      "texto": "Cura +1 de vida a un dinosaurio al final del turno",
+      "constante": "rasgos.gastrolitosCura",
+      "valor": 1,
+      "sentido": "heridas curadas a un dinosaurio"
+    },
+    {
+      "rasgo": "GOLA",
+      "nombre": "Gola ornamentada",
+      "cartas": 1,
+      "quienes": "Lokiceratops rangiformis",
+      "texto": "+2 de Vida si tienes otro Lokiceratops en el campo.",
+      "constante": "rasgos.golaVida",
+      "valor": 2,
+      "sentido": "Vida con otra copia en el campo"
+    },
+    {
+      "rasgo": "GREGARISMO",
+      "nombre": "Gregarismo",
+      "cartas": 1,
+      "quienes": "Gregarismo",
+      "texto": "+1 de Ataque a todos tus dinosaurios de la misma especie que el objetivo.",
+      "constante": "rasgos.gregarismoAtaque",
+      "valor": 1,
+      "sentido": "Ataque a toda la especie"
+    },
+    {
+      "rasgo": "LAGO",
+      "nombre": "Lago efímero",
+      "cartas": 1,
+      "quienes": "Lago efímero",
+      "texto": "+2 Biomasa ahora mismo. Tu hábitat pierde 2 puntos.",
+      "constante": "",
+      "valor": "",
+      "sentido": "no lleva número: es una regla, no una cifra"
+    },
+    {
+      "rasgo": "BUSCA_GREGARISMO",
+      "nombre": "Llamada de manada",
+      "cartas": 1,
+      "quienes": "Nodosaurus textilis",
+      "texto": "Al jugarla, busca un Gregarismo en tu mazo y llévatelo a la mano.",
+      "constante": "",
+      "valor": "",
+      "sentido": "no lleva número: es una regla, no una cifra"
+    },
+    {
+      "rasgo": "CAMPO_LLANURA",
+      "nombre": "Llanura de inundación",
+      "cartas": 1,
+      "quienes": "Llanura de inundación",
+      "texto": "Mientras esté en el campo, cada jugador puede cambiar una carta de su mano por otra del mazo, una vez por turno.",
+      "constante": "efectosCampo.llanuraReciclaPorTurno",
+      "valor": 1,
+      "sentido": "cambio de carta por turno y jugador"
+    },
+    {
+      "rasgo": "BUSCA_EVENTO",
+      "nombre": "Migrador",
+      "cartas": 1,
+      "quienes": "Camarasaurus grandis",
+      "texto": "Al jugarla, busca un evento en tu mazo y llévatelo a la mano.",
+      "constante": "",
+      "valor": "",
+      "sentido": "no lleva número: es una regla, no una cifra"
+    },
+    {
+      "rasgo": "MORTANDAD",
+      "nombre": "Mortandad estacional",
+      "cartas": 1,
+      "quienes": "Mortandad estacional",
+      "texto": "3 de daño a TODOS los dinosaurios del campo, incluidos los tuyos.",
+      "constante": "rasgos.mortandadDano",
+      "valor": 3,
+      "sentido": "de daño a TODOS, incluidos los tuyos"
+    },
+    {
+      "rasgo": "MURO_DE_PLACAS",
+      "nombre": "Muro de placas",
+      "cartas": 1,
+      "quienes": "Stegosaurus stenops",
+      "texto": "+1 de Vida si tienes otro Stegosaurus en el campo.",
+      "constante": "rasgos.muroDePlacasVida",
+      "valor": 1,
+      "sentido": "Vida con otra copia en el campo"
+    },
+    {
+      "rasgo": "NEUMATICIDAD",
+      "nombre": "Neumaticidad ósea",
+      "cartas": 1,
+      "quienes": "Neumaticidad ósea",
+      "texto": "+2 de Ataque permanentes. Sólo sobre terópodos y saurópodos.",
+      "constante": "rasgos.neumaticidadAtaque",
+      "valor": 2,
+      "sentido": "Ataque permanente"
+    },
+    {
+      "rasgo": "OPORTUNISTA",
+      "nombre": "Oportunista",
+      "cartas": 1,
+      "quienes": "Ornitholestes hermanni",
+      "texto": "+1 Vida permanente cada vez que muere un dinosaurio en el campo.",
+      "constante": "rasgos.oportunistaVidaPorMuerte",
+      "valor": 1,
+      "sentido": "Vida permanente por cada muerte"
+    },
+    {
+      "rasgo": "ENTRADA_RAMONEO",
+      "nombre": "Ramoneo alto",
+      "cartas": 1,
+      "quienes": "Atlasaurus imelakei",
+      "texto": "Al entrar en juego, ganas 2 de Biomasa.",
+      "constante": "entradas.ramoneoBiomasa",
+      "valor": 2,
+      "sentido": "Biomasa que ganas al entrar"
+    },
+    {
+      "rasgo": "RAMONEO_BAJO",
+      "nombre": "Ramoneo bajo",
+      "cartas": 1,
+      "quienes": "Diplodocus carnegii",
+      "texto": "Recupera +1 de vida al final de cada uno de tus turnos",
+      "constante": "rasgos.ramoneoBajoCura",
+      "valor": 1,
+      "sentido": "heridas curadas al final del turno"
+    },
+    {
+      "rasgo": "BUSCA_CLIMA",
+      "nombre": "Rastreador",
+      "cartas": 1,
+      "quienes": "Torvosaurus tanneri",
+      "texto": "Al jugarla, busca un clima en tu mazo y llévatelo a la mano.",
+      "constante": "",
+      "valor": "",
+      "sentido": "no lleva número: es una regla, no una cifra"
+    },
+    {
+      "rasgo": "REBROTE",
+      "nombre": "Rebrote tras incendio",
+      "cartas": 1,
+      "quienes": "Rebrote tras incendio",
+      "texto": "+2 Biomasa ahora mismo. Todos tus dinosaurios reciben 1 herida.",
+      "constante": "",
+      "valor": "",
+      "sentido": "no lleva número: es una regla, no una cifra"
+    },
+    {
+      "rasgo": "RIBERENO",
+      "nombre": "Ribereño",
+      "cartas": 1,
+      "quienes": "Riparovenator milnerae",
+      "texto": "+2 de ataque mientras el Canal fluvial esté en el campo.",
+      "constante": "rasgos.riberenoAtaque",
+      "valor": 2,
+      "sentido": "Ataque con el Canal en el campo"
+    },
+    {
+      "rasgo": "CAMPO_SABANA",
+      "nombre": "Sabana de helechos",
+      "cartas": 1,
+      "quienes": "Sabana de helechos",
+      "texto": "+1 de Biomasa cada turno para los dos jugadores, mientras siga en el campo.",
+      "constante": "efectosCampo.sabanaBiomasa",
+      "valor": 1,
+      "sentido": "Biomasa por turno a los DOS"
+    },
+    {
+      "rasgo": "TRAMPA",
+      "nombre": "Trampa de depredadores",
+      "cartas": 1,
+      "quienes": "Trampa de depredadores",
+      "texto": "El rival pierde 5 cartas de su mazo. Tú pierdes 3: el fango no distingue.",
+      "constante": "rasgos.trampaMazoRival",
+      "valor": 5,
+      "sentido": "cartas que pierde el rival"
+    },
+    {
+      "rasgo": "VUELO",
+      "nombre": "Vuelo",
+      "cartas": 1,
+      "quienes": "Huaxiadraco corollatus",
+      "texto": "Sobrevuela la ranura: golpea siempre al hábitat rival, pero quien tenga enfrente le alcanza igual.",
+      "constante": "",
+      "valor": "",
+      "sentido": "no lleva número: es una regla, no una cifra"
+    }
+  ],
+  "reglas": [
+    [
+      "Tablero",
+      "Ranuras enfrentadas",
+      5,
+      "Cada una pelea contra la de enfrente"
+    ],
+    [
+      "Tablero",
+      "Vida del hábitat",
+      70,
+      "Llegar a 0 pierde la partida"
+    ],
+    [
+      "Tablero",
+      "Trofeos para ganar",
+      10,
+      "Cada baja rival es un trofeo"
+    ],
+    [
+      "Tablero",
+      "Límite de turnos",
+      40,
+      "Se decide por trofeos y luego por hábitat"
+    ],
+    [
+      "Mano",
+      "Mano inicial",
+      6,
+      "Se puede cambiar entera una vez (mulligan)"
+    ],
+    [
+      "Mano",
+      "Mano máxima",
+      7,
+      "Por encima hay que descartar"
+    ],
+    [
+      "Mazo",
+      "Cartas del mazo",
+      50,
+      "Quedarse sin mazo pierde la partida"
+    ],
+    [
+      "Economía",
+      "Renta por turno",
+      2,
+      "Biomasa, plana, igual para los dos"
+    ],
+    [
+      "Combate",
+      "Daño de un golpe",
+      "el Ataque",
+      "Sin restas: no hay Defensa ni suelo de daño"
+    ],
+    [
+      "Combate",
+      "Bonus de depredación",
+      2,
+      "Terópodo contra ornitópodo"
+    ],
+    [
+      "Combate",
+      "Púas del tireóforo",
+      2,
+      "Se devuelven a quien le ataque"
+    ],
+    [
+      "Combate",
+      "Daño sobrante",
+      "sí pasa",
+      "Lo que sobra al matar sigue al hábitat rival"
+    ],
+    [
+      "Colección",
+      "Precio del sobre",
+      100,
+      "5 cartas"
+    ],
+    [
+      "Colección",
+      "Monedas por victoria",
+      50,
+      "Perder no paga nada"
+    ],
+    [
+      "Colección",
+      "Monedas de inicio",
+      240,
+      ""
+    ],
+    [
+      "Rareza",
+      "Copias por mazo · comun",
+      3,
+      "Fundir una copia sobrante da 4 monedas"
+    ],
+    [
+      "Rareza",
+      "Copias por mazo · raro",
+      3,
+      "Fundir una copia sobrante da 12 monedas"
+    ],
+    [
+      "Rareza",
+      "Copias por mazo · epico",
+      2,
+      "Fundir una copia sobrante da 35 monedas"
+    ],
+    [
+      "Rareza",
+      "Copias por mazo · legendario",
+      1,
+      "Fundir una copia sobrante da 100 monedas"
+    ]
+  ],
+  "clados": [
+    {
+      "clado": "Ornitópodo",
+      "cartas": 6,
+      "ataque": "3.2",
+      "vida": "9.0",
+      "regla": "es la presa del terópodo"
+    },
+    {
+      "clado": "Terópodo",
+      "cartas": 18,
+      "ataque": "5.2",
+      "vida": "4.9",
+      "regla": "+2 de daño contra ornitópodos"
+    },
+    {
+      "clado": "Tireóforo",
+      "cartas": 6,
+      "ataque": "2.0",
+      "vida": "7.5",
+      "regla": "devuelve 2 de daño a quien le ataque"
+    },
+    {
+      "clado": "Saurópodo",
+      "cartas": 7,
+      "ataque": "2.6",
+      "vida": "11.3",
+      "regla": "sin regla propia"
+    },
+    {
+      "clado": "Marginocéfalo",
+      "cartas": 9,
+      "ataque": "3.3",
+      "vida": "6.9",
+      "regla": "sin regla propia"
+    },
+    {
+      "clado": "Pterosaurio",
+      "cartas": 1,
+      "ataque": "2.0",
+      "vida": "4.0",
+      "regla": "sin regla propia"
+    },
+    {
+      "clado": "Reptil marino",
+      "cartas": 3,
+      "ataque": "8.3",
+      "vida": "7.0",
+      "regla": "sin regla propia"
+    }
+  ],
+  "mazo": {
+    "dryosaurus": 3,
+    "ornitholestes": 3,
+    "ceratosaurus": 3,
+    "nodosaurus": 3,
+    "stegosaurus": 2,
+    "allosaurus": 2,
+    "camarasaurus": 2,
+    "riparovenator": 2,
+    "lokiceratops": 1,
+    "brachylophosaurus": 3,
+    "huaxiadraco": 2,
+    "diplodocus": 1,
+    "apatosaurus": 1,
+    "torvosaurus": 1,
+    "tyrannotitan": 1,
+    "gregarismo": 3,
+    "trampa": 3,
+    "rebrote": 3,
+    "gastrolitos": 2,
+    "fractura": 2,
+    "sabana": 1,
+    "aridez": 1,
+    "canal": 1,
+    "mortandad": 1,
+    "crecimiento_acelerado": 1,
+    "neumaticidad": 1,
+    "competencia": 1
+  }
+}
