@@ -695,7 +695,7 @@ export const CARTAS = Object.freeze({
     rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
-    nota_cientifica: 'Sauropodomorfo basal de la Formación Elliot, Sudáfrica, Triásico Superior. No es un saurópodo verdadero; se agrupa aquí por plan corporal.',
+    nota_cientifica: 'Sauropodomorfo basal de la Formación Elliot, Sudáfrica, Triásico Superior. No es un saurópodo verdadero; se agrupa aquí por plan corporal. Su posición es incierta incluso dentro de los plateosaurios, y parte del material asignado se considera indeterminado.',
   }),
   gargoyleosaurus: dino({
     id: 'gargoyleosaurus', rareza: RAREZA.RARO, clado: CLADO.TIREOFORO,
@@ -714,15 +714,6 @@ export const CARTAS = Object.freeze({
     rasgoTexto: 'Todavía no hace nada especial.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: 'Ceratópsido centrosaurino de la Formación Oldman, Alberta, Campaniense.',
-  }),
-  domeykosaurus: dino({
-    id: 'domeykosaurus', rareza: RAREZA.EPICO, clado: CLADO.SAUROPODO,
-    binomial: 'Domeykosaurus chilensis',
-    coste: 3, ataque: 3, defensa: 4, vida: 8,
-    rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
-    rasgoTexto: 'Todavía no hace nada especial.',
-    nivel_evidencia: EVIDENCIA.INFERIDO,
-    nota_cientifica: 'PENDIENTE: este nombre no existe. No está en PaleobioDB, ni en GBIF, ni en Wikipedia, ni siquiera en la lista de dinosaurios con nombre informal; sus únicas huellas son ilustraciones de aficionados y webs que las copian. Chile sí tiene titanosaurios descritos: Arackar licanantay (2021) y Atacamatitan chilensis (2011). Hay que sustituirlo por uno de ellos.',
   }),
   antarctosaurus: dino({
     id: 'antarctosaurus', rareza: RAREZA.LEGENDARIO, clado: CLADO.SAUROPODO,

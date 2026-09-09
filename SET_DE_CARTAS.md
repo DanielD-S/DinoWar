@@ -8,9 +8,9 @@
 > **Sed**: heridas que recibe cuando sale *Sequía estacional*. **No es un
 > segundo coste**: no se paga al jugarla, sólo cuando el clima lo cobra.
 
-El set tiene **67 cartas distintas**. Un mazo son **50 cartas exactas**, así que no caben todas: el de referencia lleva 30 dinosaurios, 14 eventos, 3 de recurso y 3 de clima.
+El set tiene **66 cartas distintas**. Un mazo son **50 cartas exactas**, así que no caben todas: el de referencia lleva 30 dinosaurios, 14 eventos, 3 de recurso y 3 de clima.
 
-Fuera del mazo de referencia, y por tanto sin medir aquí: Carroña abundante, Lago efímero, Llanura de inundación, Bosque de coníferas ribereño, Plesiopleurodon wellesi, Ojoraptorsaurus boerei, Dromaeosaurus albertensis, Athenar bermani, Sanjuansaurus gordilloi, Suchomimus tenerensis, Eosinopteryx brevipenna, Troodon formosus, Carnotaurus sastrei, Spinosaurus aegyptiacus, Mosasaurus hoffmannii, Halszkaraptor escuilliei, Tongtianlong limosus, Scanisaurus nazarowi, Monolophosaurus jiangi, Invictarx zephyri, Medusaceratops lokii, Platyceratops tatarinovi, Loricatosaurus priscus, Therizinosaurus cheloniformis, Alaskacephale gangloffi, Titanoceratops ouranos, Atlasaurus imelakei, Stegoceras validum, Maiasaura peeblesorum, Edmontosaurus annectens, Plateosauravus cullingworthi, Gargoyleosaurus parkpinorum, Wendiceratops pinhornensis, Domeykosaurus chilensis, Antarctosaurus wichmannianus, Liaoceratops yanzigouensis, Rhinorex condrupus, Bienosaurus lufengensis, Shuangmiaosaurus gilmorei, Chasmosaurus belli. Se juegan igual, pero su calibración no está comprobada.
+Fuera del mazo de referencia, y por tanto sin medir aquí: Carroña abundante, Lago efímero, Llanura de inundación, Bosque de coníferas ribereño, Plesiopleurodon wellesi, Ojoraptorsaurus boerei, Dromaeosaurus albertensis, Athenar bermani, Sanjuansaurus gordilloi, Suchomimus tenerensis, Eosinopteryx brevipenna, Troodon formosus, Carnotaurus sastrei, Spinosaurus aegyptiacus, Mosasaurus hoffmannii, Halszkaraptor escuilliei, Tongtianlong limosus, Scanisaurus nazarowi, Monolophosaurus jiangi, Invictarx zephyri, Medusaceratops lokii, Platyceratops tatarinovi, Loricatosaurus priscus, Therizinosaurus cheloniformis, Alaskacephale gangloffi, Titanoceratops ouranos, Atlasaurus imelakei, Stegoceras validum, Maiasaura peeblesorum, Edmontosaurus annectens, Plateosauravus cullingworthi, Gargoyleosaurus parkpinorum, Wendiceratops pinhornensis, Antarctosaurus wichmannianus, Liaoceratops yanzigouensis, Rhinorex condrupus, Bienosaurus lufengensis, Shuangmiaosaurus gilmorei, Chasmosaurus belli. Se juegan igual, pero su calibración no está comprobada.
 
 **Qué revisar sobre todo:** los eventos de presión y las cartas de recurso.
 Son lo único del set que no describe un animal sino una presión sobre él, y
@@ -29,7 +29,7 @@ es legendario.
 |---|---|---|---|
 | Común | 3 | 18 | 12 |
 | Rara | 3 | 15 | 21 |
-| Épica | 2 | 22 | 11 |
+| Épica | 2 | 21 | 11 |
 | Legendaria | 1 | 12 | 6 |
 
 ---
@@ -82,7 +82,6 @@ es legendario.
 | *Plateosauravus cullingworthi* | Saurópodo | Común | 0 | 2 | 2 | 2 | 5 | undefined |
 | *Gargoyleosaurus parkpinorum* | Tireóforo | Rara | 0 | 2 | 2 | 4 | 3 | undefined |
 | *Wendiceratops pinhornensis* | Marginocéfalo | Épica | 0 | 3 | 5 | 4 | 6 | undefined |
-| *Domeykosaurus chilensis* | Saurópodo | Épica | 0 | 3 | 3 | 4 | 8 | undefined |
 | *Antarctosaurus wichmannianus* | Saurópodo | Legendaria | 0 | 4 | 4 | 5 | 13 | undefined |
 | *Liaoceratops yanzigouensis* | Marginocéfalo | Común | 0 | 1 | 1 | 1 | 2 | undefined |
 | *Rhinorex condrupus* | Ornitópodo | Épica | 0 | 3 | 4 | 2 | 9 | undefined |
@@ -456,7 +455,7 @@ es legendario.
 
 **Sin rasgo** — Todavía no hace nada especial.
 
-`INFERIDO` · Sauropodomorfo basal de la Formación Elliot, Sudáfrica, Triásico Superior. No es un saurópodo verdadero; se agrupa aquí por plan corporal.
+`INFERIDO` · Sauropodomorfo basal de la Formación Elliot, Sudáfrica, Triásico Superior. No es un saurópodo verdadero; se agrupa aquí por plan corporal. Su posición es incierta incluso dentro de los plateosaurios, y parte del material asignado se considera indeterminado.
 
 ### *Gargoyleosaurus parkpinorum* · Tireóforo · Rara · fuera del mazo de referencia
 
@@ -473,14 +472,6 @@ es legendario.
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Ceratópsido centrosaurino de la Formación Oldman, Alberta, Campaniense.
-
-### *Domeykosaurus chilensis* · Saurópodo · Épica · fuera del mazo de referencia
-
-**3 de coste · 3 de Ataque · 8 de Vida** · Defensa propuesta: *4*
-
-**Sin rasgo** — Todavía no hace nada especial.
-
-`INFERIDO` · PENDIENTE: este nombre no existe. No está en PaleobioDB, ni en GBIF, ni en Wikipedia, ni siquiera en la lista de dinosaurios con nombre informal; sus únicas huellas son ilustraciones de aficionados y webs que las copian. Chile sí tiene titanosaurios descritos: Arackar licanantay (2021) y Atacamatitan chilensis (2011). Hay que sustituirlo por uno de ellos.
 
 ### *Antarctosaurus wichmannianus* · Saurópodo · Legendaria · fuera del mazo de referencia
 

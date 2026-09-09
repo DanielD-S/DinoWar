@@ -127,7 +127,6 @@ revisión viene a arreglar.
 | plateosauravus | Plateosauravus cullingworthi | Saurópodo | Común | 2 | 2 | 2 | 2 | 5 | Sin rasgo | Todavía no hace nada especial. |  |
 | gargoyleosaurus | Gargoyleosaurus parkpinorum | Tireóforo | Rara | 2 | 2 | 2 | 4 | 3 | Sin rasgo | Todavía no hace nada especial. |  |
 | wendiceratops | Wendiceratops pinhornensis | Marginocéfalo | Épica | 3 | 3 | 5 | 4 | 6 | Sin rasgo | Todavía no hace nada especial. |  |
-| domeykosaurus | Domeykosaurus chilensis | Saurópodo | Épica | 3 | 3 | 3 | 4 | 8 | Sin rasgo | Todavía no hace nada especial. |  |
 | antarctosaurus | Antarctosaurus wichmannianus | Saurópodo | Legendaria | 4 | 4 | 4 | 5 | 13 | Sin rasgo | Todavía no hace nada especial. |  |
 | liaoceratops | Liaoceratops yanzigouensis | Marginocéfalo | Común | 1 | 1 | 1 | 1 | 2 | Sin rasgo | Todavía no hace nada especial. |  |
 | rhinorex | Rhinorex condrupus | Ornitópodo | Épica | 3 | 3 | 4 | 2 | 9 | Sin rasgo | Todavía no hace nada especial. |  |
