@@ -17,7 +17,7 @@
 //
 // Al cambiar cualquier fichero servido hay que subir VERSION: activa la limpieza
 // de las cachés anteriores.
-const VERSION = 'dinowar-v23';
+const VERSION = 'dinowar-v24';
 const ESENCIALES = [
   './', './index.html', './style.css', './manifest.json', './src/main.js',
   './assets/fuentes/inter-latin.woff2',
@@ -52,15 +52,25 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
+  // El código y los datos se revalidan siempre; las ilustraciones no pasan por
+  // aquí porque van de caché primero, que para eso no cambian.
   e.respondWith(
-    guardar(request).catch(() => caches.match(request)
+    guardar(request, true).catch(() => caches.match(request)
       .then((hit) => hit ?? caches.match('./index.html'))),
   );
 });
 
 /** Pide a la red y se queda una copia. Sólo guarda respuestas completas. */
-async function guardar(request) {
-  const respuesta = await fetch(request);
+async function guardar(request, revalidar = false) {
+  // `cache: 'no-cache'` NO es «no guardes»: es «pregunta al servidor si ha
+  // cambiado». Sin esto, «red primero» era mentira — fetch() pasa por la caché
+  // HTTP del navegador, y GitHub Pages sirve con max-age, así que durante
+  // minutos la «red» devolvía la versión vieja. Pasó: se arregló un fallo, se
+  // publicó, se recargó y el juego siguió ejecutando el código de antes.
+  //
+  // El coste es una petición condicional que casi siempre contesta 304 sin
+  // cuerpo. Barato, y es lo único que hace que publicar signifique algo.
+  const respuesta = await fetch(request, revalidar ? { cache: 'no-cache' } : undefined);
   if (respuesta.ok && respuesta.type === 'basic') {
     const copia = respuesta.clone();
     const cache = await caches.open(VERSION);
