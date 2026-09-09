@@ -67,6 +67,28 @@ def id_de(nombre, validos):
     return None
 
 
+def subir_version_sw():
+    """Sube la VERSION del service worker.
+
+    Sin esto, un navegador que ya entró se queda con el índice viejo y sigue
+    dibujando siluetas para las cartas nuevas. Pasó con treinta y seis
+    ilustraciones: el aviso escrito en sw.js no bastó, porque de lo que hay que
+    acordarse a mano uno se olvida.
+    """
+    sw = RAIZ / 'sw.js'
+    if not sw.exists():
+        return
+    texto = sw.read_text(encoding='utf-8')
+    m = re.search(r"const VERSION = 'dinowar-v(\d+)';", texto)
+    if not m:
+        print('aviso: no se ha encontrado la VERSION en sw.js, súbela a mano')
+        return
+    n = int(m.group(1)) + 1
+    sw.write_text(texto.replace(m.group(0), f"const VERSION = 'dinowar-v{n}';", 1),
+                  encoding='utf-8')
+    print(f'sw.js: VERSION subida a dinowar-v{n}, porque el índice ha cambiado')
+
+
 def main():
     if not ORIGEN.is_dir():
         sys.exit(f'No existe {ORIGEN.relative_to(RAIZ)}. Deja ahí los originales.')
@@ -125,9 +147,12 @@ def main():
         except json.JSONDecodeError:
             pass
 
-    indice_ruta.write_text(
-        json.dumps({'cartas': sorted(hechas), 'foco': foco}, ensure_ascii=False, indent=2) + '\n',
-        encoding='utf-8')
+    nuevo = json.dumps({'cartas': sorted(hechas), 'foco': foco},
+                       ensure_ascii=False, indent=2) + '\n'
+    cambio = (not indice_ruta.exists()) or indice_ruta.read_text(encoding='utf-8') != nuevo
+    indice_ruta.write_text(nuevo, encoding='utf-8')
+    if cambio:
+        subir_version_sw()
 
     print(f'\n{len(hechas)} ilustraciones, {kb_total:.0f} KB en total → assets/dinos/')
     if ignoradas:

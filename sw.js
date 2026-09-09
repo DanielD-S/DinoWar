@@ -10,17 +10,22 @@
 // primero la caché dejaría a la gente jugando una versión vieja sin manera de
 // saberlo. La caché es la red de seguridad para cuando no hay red, no un
 // acelerador. Las ilustraciones sí van de caché primero: pesan, no cambian y no
-// arreglan nada al recargarlas.
+// arreglan nada al recargarlas. Su ÍNDICE no: `indice.json` dice qué cartas
+// tienen ilustración, así que servirlo de caché congela el juego en el set que
+// hubiera cuando se guardó. Pasó: se añadieron treinta y seis ilustraciones y
+// los navegadores que ya habían entrado siguieron dibujando siluetas.
 //
 // Al cambiar cualquier fichero servido hay que subir VERSION: activa la limpieza
 // de las cachés anteriores.
-const VERSION = 'dinowar-v12';
+const VERSION = 'dinowar-v14';
 const ESENCIALES = [
   './', './index.html', './style.css', './manifest.json', './src/main.js',
   './assets/fuentes/inter-latin.woff2',
 ];
 
-const esIlustracion = (url) => url.pathname.includes('/assets/dinos/');
+// El índice va aparte: es la lista de lo que hay, no una de las cosas que hay.
+const esIndice = (url) => url.pathname.endsWith('/assets/dinos/indice.json');
+const esIlustracion = (url) => url.pathname.includes('/assets/dinos/') && !esIndice(url);
 
 self.addEventListener('install', (e) => {
   // Que falte un fichero del precacheado no debe dejar el service worker sin
