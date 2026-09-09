@@ -5,7 +5,7 @@ import { CARTAS, CLADO, RAREZA } from './cards.js';
 
 export const BALANCE = Object.freeze({
   // ------------------------------------------------------------- victorias
-  trofeosParaGanar: 7,      // registro fósil
+  trofeosParaGanar: 10,      // registro fósil
   vidaHabitat: 70,            // colapso del habitat
   // la tercera, extinción, no tiene número: es quedarse sin cartas al robar
 
@@ -24,7 +24,7 @@ export const BALANCE = Object.freeze({
   // El turno 1 se abre con tres, para que la primera jugada exista: con una
   // sola Biomasa casi nada era pagable y el turno se iba en pulsar Listo.
   biomasaInicial: 3,
-  rentaPorTurno: 1,         // a partir de ahí, se suma a lo que ya tenías
+  rentaPorTurno: 2,         // a partir de ahí, se suma a lo que ya tenías
   rentaTope: 12,            // tope de lo ahorrado, no de la renta
   rentaAcumula: true,
 

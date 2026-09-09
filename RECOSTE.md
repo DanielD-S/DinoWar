@@ -34,10 +34,23 @@ lenguaje llano, qué debería hacer la carta. Esa columna no la aplica ninguna
 herramienta —hay que escribirla en el motor y medirla—, pero `aplicar` la lee
 y la lista al terminar para que no se quede olvidada.
 
-La renta es de **1 de Biomasa por turno acumulativa**, con un tope de
-12 de ahorro. Eso da un presupuesto de unas doce Biomasas por
-partida de once turnos, que es la escala que tienen que respetar los costes: hoy
-van de 0 a 3 y el gasto medido es de 12,1 en 10,8 cartas por bando.
+La renta es de **2 de Biomasa por turno acumulativa**, con un
+tope de 12 de ahorro. En una partida de trece turnos eso son unas
+26 Biomasas para las once cartas que se llegan a desplegar, así que
+**el coste medio de una carta debería rondar el 2**, no el 1.
+
+Y la curva tiene que ser más que proporcional. Robas una carta por turno y ganas
+2 de Biomasa, así que una carta de coste 4 te cuesta dos turnos de renta
+**y** una de tus cinco ranuras, mientras que cuatro de coste 1 tapan cuatro
+carriles. Para que valga la pena, el cuerpo (A+D+V) tiene que crecer más deprisa
+que el coste; la escala medida que funciona es del orden de **4 / 9 / 15 / 22**
+para costes de 1 a 4.
+
+Esto no es teoría: con renta 1 el índice de calibración era casi una función del
+coste —1,31 para el coste 0 y 0,10 para *Torvosaurus*, que costaba 4— y quince
+cartas se salían de banda. Subir el robo en vez de la renta lo empeoraba, lo que
+confirma que el problema era la proporción entre cartas y Biomasa, no que
+faltaran recursos.
 
 Cambiar la **rareza** mueve tres cosas a la vez: cuántas copias caben en un mazo
 (3 común y rara, 2 épica, 1 legendaria), cada cuánto sale la carta en un sobre

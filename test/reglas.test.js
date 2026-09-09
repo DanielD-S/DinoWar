@@ -52,7 +52,8 @@ test('Lo que no gastas sigue ahí al turno siguiente', () => {
   s.turno = 6;
   s.jugadores[0].biomasa = 3;
   const r = ejecutar(s, FASE.RENTA);
-  assert.equal(r.jugadores[0].biomasa, 4, 'gastar poco un turno tiene que valer para el siguiente');
+  assert.equal(r.jugadores[0].biomasa, 3 + BALANCE.rentaPorTurno,
+    'gastar poco un turno tiene que valer para el siguiente');
 });
 
 test('Lo ahorrado tiene tope: no se puede acampar veinte turnos', () => {
