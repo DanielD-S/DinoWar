@@ -26,7 +26,9 @@ import { montarMeta, abrirColeccion, abrirSobres, abrirMazos, pintarMenu, recomp
 import { mazoActivo, cargarPerfil, actualizarPerfil } from './ui/almacen.js';
 import { montarCuenca, abrirCuenca, pintarCuenca } from './ui/cuenca.js';
 import { montarCuenta, abrirCuenta, resumenDeCuenta } from './ui/cuenta.js';
-import { sincronizar } from './ui/perfil.js';
+import { montarEntrada, abrirEntrada } from './ui/entrada.js';
+import { estaDentro } from './ui/supabase.js';
+import { sincronizar, modoPerfil, MODO as MODO_PERFIL } from './ui/perfil.js';
 import { asaltar, estadoDeTribu, entrar as entrarEnLaCuenca } from './ui/red.js';
 import { danoDeAsalto, habitatDeAsalto } from './data/tribu.js';
 import { JEFES, jefeActivo } from './data/eventos.js';
@@ -39,7 +41,7 @@ import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio } from '
 const APP = Object.freeze({
   BOOT: 'BOOT', MENU: 'MENU', PLAYING: 'PLAYING', RESOLVING: 'RESOLVING', GAME_OVER: 'GAME_OVER',
   COLECCION: 'COLECCION', SOBRES: 'SOBRES', MAZOS: 'MAZOS', CUENCA: 'CUENCA',
-  CUENTA: 'CUENTA',
+  CUENTA: 'CUENTA', ENTRADA: 'ENTRADA',
 });
 
 const params = new URLSearchParams(location.search);
@@ -65,6 +67,32 @@ function leerRecord() {
 function guardarRecord(r) {
   try { localStorage.setItem(CLAVE_RECORD, JSON.stringify(r)); } catch { /* sin persistencia */ }
 }
+/**
+ * Lo que pasa justo después de entrar, y también al arrancar con sesión ya
+ * guardada. Es el único camino al menú.
+ *
+ * El orden importa y no es casual: `entrar()` es quien CREA la fila del jugador
+ * —y con ella siembra la colección de salida y fija el nombre— así que pedir el
+ * perfil antes devolvería «no has entrado». Y el nombre sólo viaja aquí, en el
+ * alta: ponerlo después gastaría el único cambio que se permite.
+ *
+ * Si algo de esto falla no se entra al juego a medias: se vuelve a la puerta
+ * con el motivo. Un menú que enseña 0 dinomonedas porque el perfil no llegó es
+ * peor que una pantalla que dice qué ha pasado.
+ */
+async function presentarse(nombre) {
+  await entrarEnLaCuenca(nombre);
+  const p = await sincronizar();
+  if (!p || modoPerfil() !== MODO_PERFIL.REMOTO) {
+    throw new Error('no se pudo traer tu perfil del servidor');
+  }
+  pintarMenu();
+  pintarCuentaEnMenu();
+  pintarRecord();
+  irA(APP.MENU);
+  return p;
+}
+
 /** La línea del menú que dice quién eres. */
 function pintarCuentaEnMenu() {
   if (el.menuCuenta) el.menuCuenta.textContent = resumenDeCuenta();
@@ -99,6 +127,7 @@ function irA(nuevo) {
   el.mazos.classList.toggle('oculta', nuevo !== APP.MAZOS);
   el.cuenca.classList.toggle('oculta', nuevo !== APP.CUENCA);
   el.cuenta.classList.toggle('oculta', nuevo !== APP.CUENTA);
+  el.entrada.classList.toggle('oculta', nuevo !== APP.ENTRADA);
 }
 
 const interactivo = () => app === APP.PLAYING && estado?.fase === FASE.DESPLIEGUE;
@@ -835,22 +864,22 @@ function iniciar() {
   vigilarFotos();
   detectarFotos().then(calentarFotos);
   pintarRecord();
-  irA(APP.MENU);
 
   montarMeta(() => irA(APP.MENU));
   montarCuenca(() => irA(APP.MENU), asaltoAlJefe);
-  montarCuenta(() => irA(APP.MENU), pintarCuentaEnMenu);
-  pintarCuentaEnMenu();
-  // Entrar en la cuenca es opcional y no bloquea nada: si no hay servidor o no
-  // hay red, red.js y perfil.js caen a local y el juego arranca igual.
-  //
-  // El perfil se sincroniza DESPUÉS de entrar, no a la vez: `entrar()` es quien
-  // crea al jugador y le siembra la colección de salida, y pedir el perfil
-  // antes de eso devolvería «no has entrado».
-  entrarEnLaCuenca()
-    .then(() => sincronizar())
-    .then(() => { pintarMenu(); pintarCuentaEnMenu(); })
-    .catch(() => {});
+  montarCuenta(() => irA(APP.MENU), pintarCuentaEnMenu,
+    () => { abrirEntrada('Sesión cerrada.'); irA(APP.ENTRADA); });
+  montarEntrada(presentarse);
+
+  // LA PUERTA. Sin sesión de una cuenta con correo no se pasa de aquí: el menú,
+  // la colección y el tablero no se pintan. Las sesiones anónimas que quedaran
+  // de la versión anterior no cuentan como haber entrado.
+  if (estaDentro()) {
+    presentarse(null).catch((e) => { irA(APP.ENTRADA); abrirEntrada(e.message); });
+  } else {
+    abrirEntrada();
+    irA(APP.ENTRADA);
+  }
 
   el.btnJugar.addEventListener('click', () => { desbloquear(); nuevaPartida(); });
   el.btnColeccion.addEventListener('click', () => { abrirColeccion(); irA(APP.COLECCION); });

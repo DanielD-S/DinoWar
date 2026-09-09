@@ -7,7 +7,7 @@ que se aprende chocándose.
 ## Verificar un cambio
 
 ```bash
-npm test              # 151 tests. Es la verificación canónica.
+npm test              # 157 tests. Es la verificación canónica.
 npm run sim           # 2.000 partidas IA vs IA → BALANCE.md
 node sim/set.js       # regenera SET_DE_CARTAS.md desde el código
 python -m http.server 8000
@@ -42,6 +42,7 @@ hay que hacer caso cuando el test lo dice.
 | `supabase/migrations/0004_catalogo.sql` | `node tools/generar-catalogo.mjs` | `test/catalogo.test.js` |
 | `supabase/functions/asalto/paquete.ts` | `node tools/empaquetar-asalto.mjs` | `test/paquete.test.js` |
 | `supabase/migrations/0006_catalogo_cartas.sql` | `node tools/generar-cartas.mjs` | `test/cuentas.test.js` |
+| `BALANCE.md` de la variante | `node sim/cuerpos.js` | — |
 | El commit anclado en `desde-url.ts` | `node tools/anclar-desde-url.mjs` | `test/anclaje.test.js` |
 
 ## Windows
@@ -59,6 +60,36 @@ Dos cosas que sólo fallan aquí, ya arregladas, por si reaparecen:
   ``import.meta.url === `file://${process.argv[1]}` `` no se cumple nunca,
   porque argv llega con barras invertidas: las herramientas corrían, no escribían
   nada y no se quejaban. Va con `pathToFileURL`.
+
+## Variantes: se decide midiendo, no discutiendo
+
+Dos preguntas abiertas tienen su variante detrás de una variable de entorno, y
+el juego publicado corre SIEMPRE la opción de hoy. Un test lo vigila.
+
+### El cuerpo de una carta
+
+```bash
+node sim/cuerpos.js 400          # compara las dos sobre las mismas semillas
+DINOWAR_CUERPO=ATAQUE_VIDA node sim/run.js
+```
+
+`ATAQUE_VIDA` quita la Defensa y la suma a la Vida. Existe porque la Defensa es
+la estadística que peor se lee —una resta invisible contra un número de la OTRA
+carta, con el suelo de daño y el bonus de depredación encima, que no se deducen
+de nada de lo que hay en pantalla— y porque **medida en victorias es la que
+menos aporta**: +1 de Ataque a todas tus criaturas gana el 70,8 % de las
+partidas, +1 de Vida el 63,1 % y +1 de Defensa el 59,6 %, sobre un control de
+46,8 %.
+
+Plegada 1:1, el juego no se entera: 12,5 turnos contra 12,6, y el reparto entre
+las tres vías dentro del ruido.
+
+**Cuidado con `sim/cobertura.mjs` para esto.** Ajusta contra el índice de
+DESPLIEGUE, o sea con qué frecuencia la IA saca una carta de la mano. Como la IA
+valora cada unidad multiplicando por los turnos que espera aguantar
+(`IA.horizonte`), el ajuste redescubre su propia preferencia por los muros y
+«demuestra» que la Defensa vale 3,5 veces el Ataque. Es circular. Para saber lo
+que vale un punto hay que contar partidas ganadas.
 
 ## Variantes de economía
 
@@ -115,12 +146,27 @@ La comprobación de que un mazo es TUYO tiene una sola implementación,
 `public.validar_mazo_de`, que existe sólo porque el esquema `private` no se
 publica— desde la Edge Function.
 
-### Cuentas
+### Cuentas: son obligatorias
 
-Crear una cuenta **no crea un usuario**: le pone correo y contraseña al usuario
-anónimo que ya eras (`PUT /auth/v1/user`), así que el uuid no cambia y no se
-migra nada. Jugar sin cuenta sigue funcionando; lo que no tienes sin ella es
-forma de volver a tu colección desde otro sitio, y la pantalla lo dice.
+`src/ui/entrada.js` es la puerta y es lo primero que se pinta. Sin sesión de una
+cuenta con correo no se enseña ni el menú. **No hay sesión anónima ni perfil
+local**: `sesionValida()` ya no abre una sesión por su cuenta y `sincronizar()`
+ya no se cae a local, porque un perfil local sería inventarse una colección que
+el servidor no ha visto —el menú enseñaría cartas que no tienes y el primer mazo
+que guardases sería rechazado—.
+
+La factura, dicha aquí para que no sorprenda: **sin conexión no se juega**.
+Antes el juego arrancaba siempre. Fue una decisión del autor, no un descuido.
+
+El nombre de jugador es único y se cambia **una sola vez**. El que se elige al
+crear la cuenta no gasta el cambio: lo pone `entrar()` en el insert de la fila,
+que no pasa por `cambiar_apodo`. Es lo que va a salir en una tabla de ELO, y un
+nombre que se cambia a voluntad no identifica a nadie.
+
+El alta son DOS pasos —crear el usuario de auth y crear su fila de jugador— y si
+el segundo falla el primero ya está hecho. Por eso un «User already registered»
+en la pestaña de crear cuenta NO es el final: se entra con ese correo y se sigue.
+Pasó de verdad y dejaba la cuenta inservible.
 
 ### Trampas que costaron una mañana
 

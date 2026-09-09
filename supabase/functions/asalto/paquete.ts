@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: f99e805ee00761c3
+// huella: 7f94f1201968a812
 //
 // Lleva dentro estos 16 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -1349,6 +1349,36 @@ var BALANCE = Object.freeze({
     [RAREZA.EPICO]: 2,
     [RAREZA.LEGENDARIO]: 1
   }),
+  // ------------------------------------------------------------- el cuerpo
+  //
+  //  ATAQUE_DEFENSA_VIDA  lo de hoy: la Defensa resta a cada golpe.
+  //  ATAQUE_VIDA          la Defensa no existe y se suma a la Vida.
+  //
+  // Existe porque la Defensa es la estadística que peor se lee: es una resta
+  // invisible contra un número de la OTRA carta, con dos reglas encima que no
+  // se deducen de lo que hay en pantalla —el suelo de daño y el bonus de
+  // depredación—. Y porque medida en victorias es la que menos aporta: +1 de
+  // Ataque a todas tus criaturas gana el 70,8 % de las partidas, +1 de Vida el
+  // 63,1 % y +1 de Defensa el 59,6 %, sobre un control de 46,8 %.
+  //
+  // Medido antes de escribir esto: plegada a Vida 1:1, el juego no se entera
+  // —12,5 turnos contra 12,6, y el reparto entre las tres vías de victoria se
+  // mueve dentro del ruido—.
+  //
+  // Diferencia conocida de la variante: la Defensa que dan los rasgos depende de
+  // tener compañía, así que al morir el compañero la Vida MÁXIMA baja y puede
+  // matar a la unidad en el acto. Con la Defensa como resta eso no pasaba: sólo
+  // encajabas más daño a partir de entonces. Es una de las cosas que la medición
+  // tiene que enseñar, no un descuido.
+  cuerpo: Object.freeze({
+    // Igual que la economía: por entorno y sólo desde Node. El juego publicado
+    // corre SIEMPRE en ATAQUE_DEFENSA_VIDA hasta que se decida otra cosa.
+    //   DINOWAR_CUERPO=ATAQUE_VIDA node sim/run.js
+    modo: typeof process !== "undefined" && process.env && process.env.DINOWAR_CUERPO || "ATAQUE_DEFENSA_VIDA",
+    // Cuánta Vida vale un punto de Defensa al plegarla. 1 es lo medido; se deja
+    // como número para poder probar 2 y 3 sin tocar el motor.
+    defensaAVida: 1
+  }),
   // --------------------------------------------------------------------- IA
   ia: Object.freeze({
     // Turnos que se espera que una unidad siga en pie aportando. Sin esto la IA
@@ -1602,10 +1632,12 @@ function ataqueEfectivo(state, iid) {
 function vidaMaxima(state, iid) {
   const inst = state.instancias[iid];
   const extra = campoEs(state, RASGO.CAMPO_CANAL) ? BALANCE.efectosCampo.canalVida : 0;
-  return carta(inst.cardId).vida + inst.modVida + extra;
+  const plegada = SIN_DEFENSA ? defensaBruta(state, iid) * BALANCE.cuerpo.defensaAVida : 0;
+  return carta(inst.cardId).vida + inst.modVida + extra + plegada;
 }
 var vidaActual = (state, iid) => vidaMaxima(state, iid) - state.instancias[iid].heridas;
-function reduccionDe(state, iid) {
+var SIN_DEFENSA = BALANCE.cuerpo.modo === "ATAQUE_VIDA";
+function defensaBruta(state, iid) {
   const inst = state.instancias[iid];
   const c = carta(inst.cardId);
   let d = (c.defensa ?? 0) + inst.modDefensa;
@@ -1634,6 +1666,9 @@ function espinasDe(state, iid) {
   const c = carta(state.instancias[iid].cardId);
   let e = c.clado === CLADO.TIREOFORO ? BALANCE.clados.espinasTireoforo : 0;
   return e;
+}
+function reduccionDe(state, iid) {
+  return SIN_DEFENSA ? 0 : defensaBruta(state, iid);
 }
 function danoEntre(state, atacanteIid, defensorIid) {
   const a = carta(state.instancias[atacanteIid].cardId);

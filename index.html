@@ -20,7 +20,17 @@
 <div id="app">
 
   <!-- ------------------------------------------------------------- MENU -->
-  <section id="menu" class="pantalla">
+  <!-- ---------------------------------------------------------- ENTRADA -->
+  <!-- La puerta. Es lo primero que se pinta y no se pasa de aqu&iacute; sin sesi&oacute;n
+       de una cuenta con correo: el juego no se ense&ntilde;a a quien no ha entrado. -->
+  <section id="entrada" class="pantalla oculta">
+    <div class="ent-caja">
+      <div id="entrada-cuerpo"></div>
+      <div id="entrada-pie" class="ent-pie"></div>
+    </div>
+  </section>
+
+  <section id="menu" class="pantalla oculta">
     <!-- Héroe a sangre: la ilustración ocupa la mitad de arriba y se funde con
          el fondo. Si el JPG no está, queda el degradado y no se ve un hueco. -->
     <img class="menu-heroe" src="assets/dinos/allosaurus.jpg" alt="">

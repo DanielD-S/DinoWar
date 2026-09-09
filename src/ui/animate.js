@@ -120,23 +120,36 @@ export async function animarCombate(estadoPrevio, estadoPosterior, eventos, alTe
       golpear(choque.b, choque.danoA);
       golpear(choque.a, choque.danoB);
     } else {
-      const c = cartaNodo(avance.iid);
-      c?.classList.add('golpeada');
+      // Una ranura sin nadie enfrente: tu criatura AVANZA y le pega al hábitat
+      // rival. Aquí `avance.iid` y `avance.bando` son los del ATACANTE, o sea
+      // los tuyos, y durante un tiempo esta rama los trataba como si fueran los
+      // de la víctima: marcaba tu propia carta como «golpeada» —la misma
+      // sacudida que recibir un golpe— y le hacía flotar un «−N» encima. La
+      // animación decía justo lo contrario de lo que pasaba, y quien la miraba
+      // veía a su dinosaurio recibiendo el daño que estaba repartiendo.
+      cartaNodo(avance.iid)?.classList.add('embiste');
+
+      const habitat = avance.bando === JUGADOR
+        ? el.campo.querySelector('.habitat.rival')
+        : el.campo.querySelector('.habitat.propio');
+
       // Con el Ataque a 0 —una presión rival encima— la unidad avanza y no hace
       // nada. Sacudir la barra del hábitat entonces mentía: parecía que pegaba
       // y el número no se movía. Se dice que no hace daño y no se toca la barra.
       if (avance.dano > 0) {
-        const habitat = avance.bando === JUGADOR ? el.campo.querySelector('.habitat.rival') : el.campo.querySelector('.habitat.propio');
         habitat?.classList.add('golpe');
+        // El número, sobre la barra que de verdad baja.
+        flotante(habitat, `−${avance.dano}`);
+      } else {
+        flotante(ranuraNodo(avance.bando, r), 'sin daño', 'nulo');
       }
-      if (avance.dano > 0) flotante(ranuraNodo(avance.bando, r), `−${avance.dano}`);
-      else flotante(ranuraNodo(avance.bando, r), 'sin daño', 'nulo');
     }
     await pausa(430);
   }
 
   if (mia !== generacion) return;
   for (const n of document.querySelectorAll('.golpeada')) n.classList.remove('golpeada');
+  for (const n of document.querySelectorAll('.embiste')) n.classList.remove('embiste');
 
   const muertes = eventos.filter((e) => e.tipo === 'MUERTE');
   if (muertes.length > 0) {

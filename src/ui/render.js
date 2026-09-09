@@ -29,6 +29,7 @@ export function montar() {
     coleccion: id('coleccion'), sobres: id('sobres'), mazos: id('mazos'),
     cuenca: id('cuenca'),
     cuenta: id('cuenta'),
+    entrada: id('entrada'),
     btnColeccion: id('btn-coleccion'), btnSobres: id('btn-sobres'), btnMazos: id('btn-mazos'),
     btnCuenca: id('btn-cuenca'),
     btnCuenta: id('btn-cuenta'),
