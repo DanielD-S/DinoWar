@@ -33,17 +33,29 @@ function grabarAsalto(seed) {
     if (s.fase === FASE.DESPLIEGUE || s.fase === FASE.DESCARTE) {
       const f = s.fase;
       let pasos = 0;
+      // Se graba EN EL ORDEN DEL NAVEGADOR: tú terminas tu turno entero y sólo
+      // entonces juega el jefe. Grabarlo alternando daría otra partida — está
+      // medido: 2 de cada 40 semillas cambian de resultado.
       while (s.fase === f) {
         let actuo = false;
-        if (legales(s, 0).length) {
+        let n = 0;
+        while (s.fase === f && legales(s, 0).length && n++ < 200) {
           const d = decidir(vistaDe(s, 0), 0, rng0, PERFIL.HEURISTICA);
           rng0 = d.rng;
-          if (d.accion) { acciones.push(d.accion); s = reduce(s, d.accion); actuo = true; }
+          if (!d.accion) break;
+          acciones.push(d.accion);
+          s = reduce(s, d.accion);
+          actuo = true;
+          if (d.accion.tipo === ACCION.PASAR || d.accion.tipo === ACCION.DESCARTAR) break;
         }
-        if (s.fase === f && legales(s, 1).length) {
+        let m = 0;
+        while (s.fase === f && legales(s, 1).length && m++ < 200) {
           const d = decidir(vistaDe(s, 1), 1, rng1, PERFIL.HEURISTICA);
           rng1 = d.rng;
-          if (d.accion) { s = reduce(s, d.accion); actuo = true; }
+          if (!d.accion) break;
+          s = reduce(s, d.accion);
+          actuo = true;
+          if (d.accion.tipo === ACCION.PASAR || d.accion.tipo === ACCION.DESCARTAR) break;
         }
         if (!actuo) break;
         if (++pasos > 200) throw new Error('no converge');

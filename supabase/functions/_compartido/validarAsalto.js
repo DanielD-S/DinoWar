@@ -126,24 +126,39 @@ export function validarAsalto(envio) {
     if (s.fase === FASE.DESPLIEGUE || s.fase === FASE.DESCARTE) {
       const faseInicial = s.fase;
       let pasos = 0;
+      // EL ORDEN IMPORTA, y no es una suposición: medido sobre 40 semillas,
+      // alternar jugador-jefe en vez de respetar el turno entero cambia el
+      // resultado en 2 de ellas. En el navegador tú haces TODAS tus jugadas y
+      // luego pulsas Listo; sólo entonces juega el rival. Si el servidor
+      // alternase, reproduciría otra partida y te cobraría un daño que no es el
+      // que viste.
       while (s.fase === faseInicial) {
         let actuo = false;
 
-        // Jugador: sale de la lista que mandó, y cada una pasa por validar().
-        if (legales(s, 0).length > 0) {
+        // Tu turno entero: de la lista que mandaste, hasta que pasas o se acaba.
+        // Cada jugada pasa por validar(): no hay forma de colar una ilegal.
+        let tuyas = 0;
+        while (s.fase === faseInicial && legales(s, 0).length > 0) {
           const a = { ...siguienteDelJugador(s), jugador: 0 };
           const motivo = validar(s, a);
           if (motivo) throw new AsaltoInvalido('jugada ilegal', { accion: a.tipo, motivo });
           s = reduce(s, a);
           actuo = true;
+          if (a.tipo === ACCION.PASAR || a.tipo === ACCION.DESCARTAR) break;
+          if (++tuyas > LIMITES.pasosPorFase) throw new AsaltoInvalido('la fase no converge');
         }
 
-        // Jefe: lo decide el servidor. Lo que el cliente diga de este bando se
-        // ignora porque ni se lee.
-        if (s.fase === faseInicial && legales(s, 1).length > 0) {
+        // Y ahora el jefe, su turno entero. Lo decide el SERVIDOR con su propia
+        // IA: lo que el cliente diga de este bando ni se lee.
+        let suyas = 0;
+        while (s.fase === faseInicial && legales(s, 1).length > 0) {
           const d = decidir(vistaDe(s, 1), 1, rngIA, PERFIL.HEURISTICA);
           rngIA = d.rng;
-          if (d.accion) { s = reduce(s, d.accion); actuo = true; }
+          if (!d.accion) break;
+          s = reduce(s, d.accion);
+          actuo = true;
+          if (d.accion.tipo === ACCION.PASAR || d.accion.tipo === ACCION.DESCARTAR) break;
+          if (++suyas > LIMITES.pasosPorFase) throw new AsaltoInvalido('la fase no converge');
         }
 
         if (!actuo) break;

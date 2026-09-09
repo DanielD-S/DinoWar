@@ -25,7 +25,7 @@ import { detectarFotos, vigilarFotos, calentarFotos } from './ui/art.js';
 import { montarMeta, abrirColeccion, abrirSobres, abrirMazos, pintarMenu, recompensar } from './ui/meta.js';
 import { mazoActivo, cargarPerfil, actualizarPerfil, anadirCartas } from './ui/almacen.js';
 import { montarCuenca, abrirCuenca, pintarCuenca } from './ui/cuenca.js';
-import { asaltar, estadoDeTribu } from './ui/red.js';
+import { asaltar, estadoDeTribu, entrar as entrarEnLaCuenca } from './ui/red.js';
 import { danoDeAsalto, habitatDeAsalto } from './data/tribu.js';
 import { JEFES, jefeActivo } from './data/eventos.js';
 import { aListaDeMazo } from './data/coleccion.js';
@@ -97,6 +97,7 @@ const interactivo = () => app === APP.PLAYING && estado?.fase === FASE.DESPLIEGU
 function aplicar(accion) {
   const motivo = validar(estado, accion);
   if (motivo) { mensaje(motivo, true); sonido('error'); return false; }
+  grabar(accion);
   estado = reduce(estado, accion);
   render(estado);
   // Comprometer una carta cierra el cambio de mano: a partir de ahí el rival ya
@@ -391,6 +392,7 @@ async function alPulsarListo() {
   el.btnListo.disabled = true;
   el.mulligan.classList.add('oculta');
   cerrarHojas();
+  grabar({ tipo: ACCION.PASAR, jugador: JUGADOR });
   estado = reduce(estado, { tipo: ACCION.PASAR, jugador: JUGADOR });
   jugarIA();
   await bucle();
@@ -509,7 +511,9 @@ function pedirDescarte() {
     reloj.detener();
     el.eleccion.classList.add('oculta');
     el.eleccionCuerpo.onclick = null;
-    estado = reduce(estado, { tipo: ACCION.DESCARTAR, jugador: JUGADOR, iid: Number(b.dataset.iid) });
+    const descarte = { tipo: ACCION.DESCARTAR, jugador: JUGADOR, iid: Number(b.dataset.iid) };
+    grabar(descarte);
+    estado = reduce(estado, descarte);
     render(estado);
     await bucle();
   };
@@ -640,19 +644,34 @@ function finPartida() {
 function cerrarAsalto(gane) {
   if (!asaltando) return false;
   const jefe = asaltando;
+  const partida = grabacion;
   asaltando = null;
+  grabacion = null;
 
-  const dano = danoDeAsalto({
+  // Lo que se calcula aquí es SÓLO para enseñarlo mientras el servidor
+  // contesta. El daño que cuenta es el que él calcule re-jugando la partida;
+  // si difiere, manda el suyo y se repinta con su número.
+  const estimado = danoDeAsalto({
     danoAlHabitat: habitatDeAsalto() - Math.max(0, estado.jugadores[RIVAL].habitat),
     trofeos: estado.jugadores[JUGADOR].trofeos,
     ganada: gane,
   });
-  const r = asaltar(dano);
-  el.finPremio.textContent = r?.cayo
-    ? `${jefe.nombre} ha caído. Reclama su carta en la Cuenca.`
-    : `${dano} de daño a ${jefe.nombre}. No paga dinomonedas: esto es para la tribu.`;
+  el.finPremio.textContent = `${estimado} de daño a ${jefe.nombre}…`;
   sonido(gane ? 'gana' : 'pierde');
-  pintarCuenca();
+
+  asaltar(partida ?? estimado)
+    .then((r) => {
+      const dano = r?.dano ?? estimado;
+      el.finPremio.textContent = r?.cayo
+        ? `${jefe.nombre} ha caído. Reclama su carta en la Cuenca.`
+        : `${dano} de daño a ${jefe.nombre}. No paga dinomonedas: esto es para la tribu.`;
+      return pintarCuenca();
+    })
+    .catch((e) => {
+      // Un asalto que no llega al servidor no cuenta, y hay que decirlo: dar
+      // por bueno un daño que nadie registró sería mentirle a la tribu.
+      el.finPremio.textContent = `No se pudo registrar el asalto: ${e.message}`;
+    });
   return true;
 }
 
@@ -666,19 +685,38 @@ function cerrarAsalto(gane) {
 let asaltando = null;
 
 /**
+ * Tus jugadas de este asalto, en orden. El servidor no acepta que le digas
+ * cuánto daño hiciste: le mandas la partida y la re-juega. Esto es la partida.
+ *
+ * Sólo se graban las TUYAS: al jefe lo juega el servidor con su propia IA. Y se
+ * graban en el orden en que las haces, que es el orden en que el servidor las
+ * reproduce — medido, alternar los bandos cambia el resultado en 2 de cada 40
+ * partidas, así que ese detalle no es cosmético.
+ */
+let grabacion = null;
+
+/** Apunta una jugada tuya si esta partida es un asalto. */
+function grabar(accion) {
+  if (grabacion && (accion.jugador === JUGADOR || accion.jugador === undefined)) {
+    grabacion.acciones.push(accion);
+  }
+}
+
+/**
  * Un asalto es una PARTIDA NORMAL contra el mazo del jefe, con su hábitat muy
  * alto. Reutilizar el motor entero en vez de escribir un modo aparte es lo que
  * hace que un jefe se pelee con las mismas reglas que ya sabes, y lo que evita
  * un segundo motor que mantener.
  */
-function asaltoAlJefe() {
-  const activo = jefeActivo(estadoDeTribu().arranque, Date.now());
+async function asaltoAlJefe() {
+  const cuenca = await estadoDeTribu();
+  const activo = jefeActivo(cuenca.arranque, Date.now());
   if (!activo) return;
   asaltando = JEFES[activo.evento.jefe];
-  nuevaPartida(asaltando);
+  nuevaPartida(asaltando, activo.evento.id);
 }
 
-function nuevaPartida(jefe = null) {
+function nuevaPartida(jefe = null, jefeEvento = null) {
   cancelarAnimaciones();
   soltarEntrada();
   registro = [];
@@ -690,7 +728,11 @@ function nuevaPartida(jefe = null) {
   // Tú llevas tu mazo; la IA lleva el de referencia, que es el que mide el
   // simulador. Así el balance publicado sigue significando algo.
   asaltando = jefe;
-  estado = crearPartida(s, [aListaDeMazo(mazoActivo()), jefe ? jefe.mazo.map((e) => [...e]) : null]);
+  const miMazo = aListaDeMazo(mazoActivo());
+  // La grabación se abre ANTES de crear la partida: la primera jugada puede ser
+  // el cambio de mano del turno 1, y sin ella el servidor barajaría distinto.
+  grabacion = jefe ? { jefeEvento, semilla: s, mazo: miMazo, acciones: [] } : null;
+  estado = crearPartida(s, [miMazo, jefe ? jefe.mazo.map((e) => [...e]) : null]);
   // El jefe aguanta mucho más que un rival normal. No es una regla nueva: es el
   // mismo hábitat, más alto, así que todo lo demás del motor sigue igual.
   if (jefe) estado.jugadores[RIVAL].habitat = habitatDeAsalto();
@@ -756,6 +798,9 @@ function iniciar() {
 
   montarMeta(() => irA(APP.MENU));
   montarCuenca(() => irA(APP.MENU), asaltoAlJefe);
+  // Entrar en la cuenca es opcional y no bloquea nada: si no hay servidor o no
+  // hay red, red.js cae a local y el juego arranca igual.
+  entrarEnLaCuenca().catch(() => {});
 
   el.btnJugar.addEventListener('click', () => { desbloquear(); nuevaPartida(); });
   el.btnColeccion.addEventListener('click', () => { abrirColeccion(); irA(APP.COLECCION); });

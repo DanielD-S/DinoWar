@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: 723e8350798cf1d9
+// huella: a4e1a42b80dc063a
 //
 // Lleva dentro estos 13 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -2958,20 +2958,25 @@ function validarAsalto(envio) {
       let pasos = 0;
       while (s.fase === faseInicial) {
         let actuo = false;
-        if (legales(s, 0).length > 0) {
+        let tuyas = 0;
+        while (s.fase === faseInicial && legales(s, 0).length > 0) {
           const a = { ...siguienteDelJugador(s), jugador: 0 };
           const motivo = validar(s, a);
           if (motivo) throw new AsaltoInvalido("jugada ilegal", { accion: a.tipo, motivo });
           s = reduce(s, a);
           actuo = true;
+          if (a.tipo === ACCION.PASAR || a.tipo === ACCION.DESCARTAR) break;
+          if (++tuyas > LIMITES.pasosPorFase) throw new AsaltoInvalido("la fase no converge");
         }
-        if (s.fase === faseInicial && legales(s, 1).length > 0) {
+        let suyas = 0;
+        while (s.fase === faseInicial && legales(s, 1).length > 0) {
           const d = decidir(vistaDe(s, 1), 1, rngIA, PERFIL.HEURISTICA);
           rngIA = d.rng;
-          if (d.accion) {
-            s = reduce(s, d.accion);
-            actuo = true;
-          }
+          if (!d.accion) break;
+          s = reduce(s, d.accion);
+          actuo = true;
+          if (d.accion.tipo === ACCION.PASAR || d.accion.tipo === ACCION.DESCARTAR) break;
+          if (++suyas > LIMITES.pasosPorFase) throw new AsaltoInvalido("la fase no converge");
         }
         if (!actuo) break;
         if (++pasos > LIMITES.pasosPorFase) throw new AsaltoInvalido("la fase no converge");

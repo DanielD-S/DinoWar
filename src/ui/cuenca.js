@@ -7,7 +7,9 @@ import { CUENCA, depositoDe, ritmoPorHora, costeDeMejora, faltaParaLlenar,
   puedeAsaltar, saludDeJefe, tablaDeAportes, totalAportado } from '../data/tribu.js';
 import { CARTAS_DE_JEFE, eventosActivos, ventanaDe, TIPO_EVENTO } from '../data/eventos.js';
 import { carta } from '../data/cards.js';
-import { estadoDeTribu, aportar, mejorarYacimiento, reclamar, YO } from './red.js';
+import {
+  estadoDeTribu, aportar, mejorarYacimiento, reclamar, YO, modoActual, porQueLocal, MODO,
+} from './red.js';
 import { anadirCartas } from './almacen.js';
 import { arte } from './art.js';
 
@@ -34,24 +36,31 @@ export function montarCuenca(volver, asaltar) {
   alAsaltar = asaltar;
   dom = { pantalla: id('cuenca'), cuerpo: id('cuenca-cuerpo'), pie: id('cuenca-pie') };
 
-  dom.cuerpo.addEventListener('click', (e) => {
+  dom.cuerpo.addEventListener('click', async (e) => {
     const b = e.target.closest('[data-accion]');
     if (!b) return;
-    if (b.dataset.accion === 'aportar') {
-      const c = estadoDeTribu();
-      aportar(Number(b.dataset.cuanto) || c.yacimiento.fosiles);
-    } else if (b.dataset.accion === 'mejorar') {
-      mejorarYacimiento(Number(b.dataset.coste));
-    } else if (b.dataset.accion === 'reclamar') {
-      const cardId = reclamar();
-      if (cardId) {
-        // A la colección de verdad, no sólo a la cuenca: una carta que no puedes
-        // meter en un mazo no es una recompensa, es un cromo.
-        anadirCartas([cardId]);
-        anunciarCarta(cardId);
+    // Mientras el servidor contesta, el botón se apaga: pulsarlo dos veces
+    // mandaría dos aportes, y el segundo no siempre es inofensivo.
+    b.disabled = true;
+    try {
+      if (b.dataset.accion === 'aportar') {
+        const c = await estadoDeTribu();
+        await aportar(Number(b.dataset.cuanto) || c.yacimiento.fosiles);
+      } else if (b.dataset.accion === 'mejorar') {
+        await mejorarYacimiento(Number(b.dataset.coste));
+      } else if (b.dataset.accion === 'reclamar') {
+        const cardId = await reclamar();
+        if (cardId) {
+          // A la colección de verdad, no sólo a la cuenca: una carta que no
+          // puedes meter en un mazo no es una recompensa, es un cromo.
+          anadirCartas([cardId]);
+          anunciarCarta(cardId);
+        }
       }
+    } catch (err) {
+      avisar(err.message);
     }
-    pintarCuenca();
+    await pintarCuenca();
   });
 
   dom.pie.addEventListener('click', (e) => {
@@ -60,8 +69,21 @@ export function montarCuenca(volver, asaltar) {
 }
 
 export function abrirCuenca() {
+  // Se pinta un armazón inmediato y el contenido llega cuando conteste el
+  // servidor: una pantalla en blanco durante dos segundos se lee como rota.
+  dom.cuerpo.innerHTML = '<p class="cu-cargando">Bajando a la cuenca…</p>';
+  dom.pie.innerHTML = '';
   pintarCuenca();
   return dom.pantalla;
+}
+
+/** Un aviso que no interrumpe. Los errores del servidor vienen ya redactados. */
+function avisar(texto) {
+  const p = document.createElement('p');
+  p.className = 'cu-nota mal';
+  p.textContent = texto;
+  dom.pie.prepend(p);
+  setTimeout(() => p.remove(), 6000);
 }
 
 // ------------------------------------------------------------------ pintado
@@ -175,9 +197,9 @@ function bloqueCartas(c) {
   </section>`;
 }
 
-export function pintarCuenca() {
+export async function pintarCuenca() {
   const ahora = Date.now();
-  const c = estadoDeTribu(ahora);
+  const c = await estadoDeTribu(ahora);
 
   dom.cuerpo.innerHTML = [
     bloqueEventos(c, ahora),
@@ -185,9 +207,13 @@ export function pintarCuenca() {
     bloqueYacimiento(c, ahora),
     bloqueTribu(c),
     bloqueCartas(c),
-    `<p class="cu-aviso">Tus compañeros de tribu todavía no son personas: los simula
-      el propio juego con las mismas reglas y los mismos ritmos. Cooperar de verdad
-      necesita un servidor, y eso va aparte (ver PLAN_TRIBU.md).</p>`,
+    modoActual() === MODO.LOCAL
+      ? `<p class="cu-aviso"><b>Estás jugando la cuenca en local</b> (${porQueLocal()}).
+          Tus compañeros de tribu no son personas: los simula el propio juego con
+          las mismas reglas y los mismos ritmos. Lo que hagas aquí no lo ve nadie más.</p>`
+      : `<p class="cu-aviso">Cuenca compartida. El daño a los jefes lo calcula el
+          servidor re-jugando tu partida, así que lo que aporta cada uno es lo que
+          hizo de verdad.</p>`,
   ].join('');
 
   const j = c.jefe;
