@@ -25,12 +25,39 @@ listas enormes para quemar CPU. No hace falta desplegar para ejecutarlos.
 
 ## Desplegar
 
+Las Edge Functions **no son SQL** y no se despliegan desde el editor SQL: son
+TypeScript sobre Deno y van por su propio camino. Hay dos.
+
+### Con la CLI, desde un ordenador
+
 ```bash
 supabase functions deploy asalto --project-ref <ref>
 ```
 
-Necesita `SUPABASE_URL`, `SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY`, que
-Supabase inyecta solo.
+Resuelve los imports ella sola, así que despliega `index.ts` tal cual.
+
+### Desde el panel, que también vale desde el móvil
+
+Edge Functions → **Deploy a new function** → **Via Editor**. Pero el editor es
+de UN fichero y esta función importa el motor entero, así que hay que pegar el
+paquete:
+
+```bash
+node tools/empaquetar-asalto.mjs      # → asalto/paquete.ts
+```
+
+Se pega el contenido de `paquete.ts`, se llama la función `asalto` y se
+despliega. Ojo a lo que avisa la documentación de Supabase: **el editor del
+panel no tiene control de versiones ni vuelta atrás**, así que la fuente de
+verdad sigue siendo el repositorio.
+
+`paquete.ts` es una segunda copia del motor y eso sólo es aceptable si no puede
+quedarse atrás en silencio: lleva dentro la huella de los ficheros que empaquetó
+y `test/paquete.test.js` la recalcula y falla si no cuadra.
+
+En los dos casos, `SUPABASE_URL`, `SUPABASE_ANON_KEY` y
+`SUPABASE_SERVICE_ROLE_KEY` las inyecta Supabase sola: no hay que configurar
+ningún secreto.
 
 ## Lo que todavía NO cierra
 
