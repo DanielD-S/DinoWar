@@ -61,6 +61,13 @@ export const BALANCE = Object.freeze({
     espinasTireoforo: 2,      // daño devuelto a quien ataca a un tireóforo
   }),
 
+  // Suelo del daño en combate. La Defensa resta daño plano a CADA golpe, así
+  // que sin suelo una carta con más Defensa que el Ataque del rival no recibe
+  // nada: es inmune, no resistente. Medido, un punto de Defensa llegó a valer
+  // 4,8 puntos de Ataque y las cartas ofensivas quedaban muertas. Con el suelo
+  // baja a 3,3 y la Vida deja de ser un adorno. Nada es invulnerable.
+  danoMinimo: 1,
+
   // ------------------------------------------------------------------ rasgos
   rasgos: Object.freeze({
     gregarioAtaquePorCompanero: 1,

@@ -126,10 +126,25 @@ test('Terópodo contra ornitópodo: bonificación de depredación', () => {
   // El Dryosaurus no tiene Defensa; el Stegosaurus sí, y además no es su presa.
   const atq = carta('ceratosaurus').ataque;
   assert.equal(danoEntre(s, teropodo, presa), atq + BALANCE.clados.bonusDepredacion);
-  // Sin la bonificación, el Ceratosaurus no llega a atravesar la coraza del
-  // Stegosaurus: el daño no baja de cero.
-  assert.equal(danoEntre(s, teropodo, otro), Math.max(0, atq - CARTAS.stegosaurus.defensa),
+  // Sin la bonificación, el Ceratosaurus apenas atraviesa la coraza del
+  // Stegosaurus: se queda en el suelo de daño.
+  assert.equal(danoEntre(s, teropodo, otro),
+    Math.max(BALANCE.danoMinimo, atq - CARTAS.stegosaurus.defensa),
     'sólo aplica sobre su presa');
+});
+
+test('Ningún golpe se queda en cero: la Defensa resiste, no hace inmune', () => {
+  const s = tablero();
+  // Ornitholestes pega 2; Loricatosaurus reduce 6. Sin suelo no le haría nada
+  // y sería invulnerable a media mitad del set, que es lo que medía 4,8 puntos
+  // de Ataque por cada punto de Defensa.
+  const debil = poner(s, 'ornitholestes', 0, 0);
+  const muro = poner(s, 'loricatosaurus', 1, 0);
+
+  assert.ok(CARTAS.loricatosaurus.defensa > CARTAS.ornitholestes.ataque,
+    'el escenario pierde sentido si la coraza no supera al ataque');
+  assert.equal(danoEntre(s, debil, muro), BALANCE.danoMinimo);
+  assert.ok(BALANCE.danoMinimo > 0, 'el suelo tiene que ser mayor que cero');
 });
 
 test('La Defensa sale de la carta, no del clado', () => {

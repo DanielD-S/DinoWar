@@ -246,7 +246,7 @@ export function danoEntre(state, atacanteIid, defensorIid) {
   const d = carta(state.instancias[defensorIid].cardId);
   let dano = ataqueEfectivo(state, atacanteIid);
   if (BALANCE.clados.presaDe[a.clado] === d.clado) dano += BALANCE.clados.bonusDepredacion;
-  return Math.max(0, dano - reduccionDe(state, defensorIid));
+  return Math.max(BALANCE.danoMinimo, dano - reduccionDe(state, defensorIid));
 }
 
 /** Daño que una unidad sin rival enfrente inflige al habitat contrario. */
