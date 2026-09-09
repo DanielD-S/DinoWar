@@ -121,6 +121,17 @@ export const RASGO = Object.freeze({
   BUSCA_EVENTO: 'BUSCA_EVENTO',
   BUSCA_CLIMA: 'BUSCA_CLIMA',
   BUSCA_GREGARISMO: 'BUSCA_GREGARISMO',
+  // Habilidades AL ENTRAR EN JUEGO: se disparan una vez, cuando la criatura
+  // llega al campo, y se acabó. Van aparte de los rasgos de arriba porque son
+  // otra cosa: aquéllos son pasivos y condicionales —estado que hay que llevar
+  // en la cabeza— y éstos, un disparo que se ve y se olvida. Ver
+  // src/engine/entradas.js.
+  ENTRADA_ALERTA: 'ENTRADA_ALERTA',             // roba cartas
+  ENTRADA_EMBOSCADA: 'ENTRADA_EMBOSCADA',       // daña al de enfrente
+  ENTRADA_MANADA_SANA: 'ENTRADA_MANADA_SANA',   // cura a los tuyos
+  ENTRADA_DEVORA_MAZO: 'ENTRADA_DEVORA_MAZO',   // muele mazo rival
+  ENTRADA_RAMONEO: 'ENTRADA_RAMONEO',           // da Biomasa
+  ENTRADA_ARRASA: 'ENTRADA_ARRASA',             // daño al hábitat rival
   // adaptaciones
   GREGARISMO: 'GREGARISMO',
   GASTROLITOS: 'GASTROLITOS',
@@ -480,8 +491,8 @@ export const CARTAS = Object.freeze({
     id: 'dromaeosaurus', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,
     binomial: 'Dromaeosaurus albertensis',
     coste: 2, ataque: 5, vida: 4,
-    rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
-    rasgoTexto: 'Todavía no hace nada especial.',
+    rasgo: RASGO.ENTRADA_EMBOSCADA, rasgoNombre: 'Emboscada',
+    rasgoTexto: 'Al entrar en juego, hace 3 de daño al dinosaurio que tenga enfrente.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: 'Dromeosáurido de la Formación Dinosaur Park, Alberta, Campaniense. Es el género que da nombre a toda la familia.',
   }),
@@ -525,8 +536,8 @@ export const CARTAS = Object.freeze({
     id: 'troodon', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,
     binomial: 'Troodon formosus',
     coste: 2, ataque: 4, vida: 5,
-    rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
-    rasgoTexto: 'Todavía no hace nada especial.',
+    rasgo: RASGO.ENTRADA_ALERTA, rasgoNombre: 'Alerta',
+    rasgoTexto: 'Al entrar en juego, robas 1 carta.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: 'Terópodo maniraptor del Cretácico Superior de Norteamérica. El nombre se basa en dientes aislados y su validez está discutida.',
   }),
@@ -543,8 +554,8 @@ export const CARTAS = Object.freeze({
     id: 'spinosaurus', rareza: RAREZA.LEGENDARIO, clado: CLADO.TEROPODO,
     binomial: 'Spinosaurus aegyptiacus',
     coste: 4, ataque: 11, vida: 11,
-    rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
-    rasgoTexto: 'Todavía no hace nada especial.',
+    rasgo: RASGO.ENTRADA_ARRASA, rasgoNombre: 'Arrasa la ribera',
+    rasgoTexto: 'Al entrar en juego, 3 de daño al hábitat rival.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: 'Espinosáurido de los Kem Kem, Marruecos, Cenomaniense. Vela dorsal y un estilo de vida acuático que sigue debatiéndose.',
   }),
@@ -552,8 +563,8 @@ export const CARTAS = Object.freeze({
     id: 'mosasaurus', rareza: RAREZA.LEGENDARIO, clado: CLADO.MARINO,
     binomial: 'Mosasaurus hoffmannii',
     coste: 4, ataque: 12, vida: 10,
-    rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
-    rasgoTexto: 'Todavía no hace nada especial.',
+    rasgo: RASGO.ENTRADA_DEVORA_MAZO, rasgoNombre: 'Devora el registro',
+    rasgoTexto: 'Al entrar en juego, el rival pierde 3 cartas de su mazo.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: 'Mosasaurio del Maastrichtiense. No es un dinosaurio: es un escamoso marino, pariente de varanos y serpientes.',
   }),
@@ -660,8 +671,8 @@ export const CARTAS = Object.freeze({
     id: 'atlasaurus', rareza: RAREZA.EPICO, clado: CLADO.SAUROPODO,
     binomial: 'Atlasaurus imelakei',
     coste: 3, ataque: 3, vida: 12,
-    rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
-    rasgoTexto: 'Todavía no hace nada especial.',
+    rasgo: RASGO.ENTRADA_RAMONEO, rasgoNombre: 'Ramoneo alto',
+    rasgoTexto: 'Al entrar en juego, ganas 2 de Biomasa.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: 'Saurópodo del Jurásico Medio de Marruecos. Extremidades desproporcionadamente largas para un saurópodo.',
   }),
@@ -705,8 +716,8 @@ export const CARTAS = Object.freeze({
     id: 'gargoyleosaurus', rareza: RAREZA.RARO, clado: CLADO.TIREOFORO,
     binomial: 'Gargoyleosaurus parkpinorum',
     coste: 2, ataque: 2, vida: 7,
-    rasgo: RASGO.NINGUNO, rasgoNombre: 'Sin rasgo',
-    rasgoTexto: 'Todavía no hace nada especial.',
+    rasgo: RASGO.ENTRADA_MANADA_SANA, rasgoNombre: 'Cierra la formación',
+    rasgoTexto: 'Al entrar en juego, tus otros dinosaurios curan 2 heridas.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: 'Anquilosaurio de la Formación Morrison, Jurásico Superior. Uno de los anquilosaurios más antiguos que se conocen bien.',
   }),

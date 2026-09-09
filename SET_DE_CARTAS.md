@@ -261,7 +261,7 @@ es legendario.
 
 **2 de coste · 5 de Ataque · 4 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**Emboscada** — Al entrar en juego, hace 3 de daño al dinosaurio que tenga enfrente.
 
 `INFERIDO` · Dromeosáurido de la Formación Dinosaur Park, Alberta, Campaniense. Es el género que da nombre a toda la familia.
 
@@ -301,7 +301,7 @@ es legendario.
 
 **2 de coste · 4 de Ataque · 5 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**Alerta** — Al entrar en juego, robas 1 carta.
 
 `INFERIDO` · Terópodo maniraptor del Cretácico Superior de Norteamérica. El nombre se basa en dientes aislados y su validez está discutida.
 
@@ -317,7 +317,7 @@ es legendario.
 
 **4 de coste · 11 de Ataque · 11 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**Arrasa la ribera** — Al entrar en juego, 3 de daño al hábitat rival.
 
 `INFERIDO` · Espinosáurido de los Kem Kem, Marruecos, Cenomaniense. Vela dorsal y un estilo de vida acuático que sigue debatiéndose.
 
@@ -325,7 +325,7 @@ es legendario.
 
 **4 de coste · 12 de Ataque · 10 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**Devora el registro** — Al entrar en juego, el rival pierde 3 cartas de su mazo.
 
 `INFERIDO` · Mosasaurio del Maastrichtiense. No es un dinosaurio: es un escamoso marino, pariente de varanos y serpientes.
 
@@ -421,7 +421,7 @@ es legendario.
 
 **3 de coste · 3 de Ataque · 12 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**Ramoneo alto** — Al entrar en juego, ganas 2 de Biomasa.
 
 `INFERIDO` · Saurópodo del Jurásico Medio de Marruecos. Extremidades desproporcionadamente largas para un saurópodo.
 
@@ -461,7 +461,7 @@ es legendario.
 
 **2 de coste · 2 de Ataque · 7 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**Cierra la formación** — Al entrar en juego, tus otros dinosaurios curan 2 heridas.
 
 `INFERIDO` · Anquilosaurio de la Formación Morrison, Jurásico Superior. Uno de los anquilosaurios más antiguos que se conocen bien.
 

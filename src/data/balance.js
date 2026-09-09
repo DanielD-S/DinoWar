@@ -212,6 +212,25 @@ export const BALANCE = Object.freeze({
       && process.env.DINOWAR_SOBRANTE === '0') ? false : true,
   }),
 
+  // ------------------------------------------- habilidades al entrar en juego
+  //
+  // Se disparan una vez y se acabó. Prueba de seis, sobre criaturas que hoy no
+  // tienen NADA: así no se rompe ninguna carta que ya funcione y se ataca de
+  // paso el problema medido —30 de 50 criaturas fuera de banda, casi todas sin
+  // mecánica—.
+  //
+  // Se apagan con DINOWAR_ENTRADAS=0 para poder medir con y sin.
+  entradas: Object.freeze({
+    alertaRoba: 1,        // Troodon: ojos y bulbos olfatorios enormes
+    emboscadaDano: 3,     // Dromaeosaurus: cae encima del de enfrente
+    manadaSanaCura: 2,    // Gargoyleosaurus: llega y cierra la formación
+    // El más peligroso de los seis y por eso el más caro y de una sola copia:
+    // moler es lo que hace que la Deriva árida gane el 100 % de sus partidas.
+    devoraMazo: 3,        // Mosasaurus
+    ramoneoBiomasa: 2,    // Atlasaurus: alcanza el dosel que nadie alcanza
+    arrasaHabitat: 3,     // Spinosaurus: doce metros entrando en la llanura
+  }),
+
   // --------------------------------------------------------------------- IA
   ia: Object.freeze({
     // Turnos que se espera que una unidad siga en pie aportando. Sin esto la IA

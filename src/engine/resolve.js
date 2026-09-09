@@ -12,6 +12,7 @@ import {
   ataqueEfectivo, vidaActual, danoEntre, danoAlHabitat, espinasDe,
   curacionDe, rentaDe, hayAridez, campoEs, vuela,
 } from './state.js';
+import { alEntrar } from './entradas.js';
 
 export function ev(s, tipo, datos = {}) {
   s.eventos.push({ turno: s.turno, tipo, ...datos });
@@ -217,6 +218,14 @@ export function faseRevelacion(s) {
       inst.desplegadoEnTurno = s.turno;
       s.ranuras[p.jugador][p.ranura] = p.iid;
       ev(s, 'REVELADA', { jugador: p.jugador, iid: p.iid, cardId: inst.cardId, ranura: p.ranura });
+
+      // Y su habilidad de entrada, si tiene. Aquí y no antes: la criatura ya
+      // está en su ranura, así que una emboscada puede mirar quién tiene
+      // enfrente. El orden de disparo es el de `pendientes`, que está fijado por
+      // tipo y luego por iid — sin ese orden, dos máquinas re-jugando la misma
+      // partida llegarían a resultados distintos, y el servidor las valida
+      // re-jugándolas.
+      alEntrar(s, inst, { ev, herir, rival, unidadEn, unidadesDe, CAUSA });
 
     } else if (p.tipo === 'MOVIMIENTO') {
       if (inst.ranura === null || s.ranuras[p.jugador][p.ranura] !== null) continue;

@@ -29,6 +29,8 @@ export const CAUSA = Object.freeze({
   COMBATE: 'COMBATE',
   ESPINAS: 'ESPINAS',
   MORTANDAD: 'MORTANDAD',
+  // Daño de una habilidad al entrar en juego.
+  ENTRADA: 'ENTRADA',
 });
 
 export const rival = (j) => (j === 0 ? 1 : 0);

@@ -5,6 +5,7 @@
 // jugador vería.
 
 import { BALANCE } from '../data/balance.js';
+import { valorDeEntrada } from './entradas.js';
 import { TIPO, OBJETIVO, CLADO, RASGO, carta } from '../data/cards.js';
 import {
   FASE, rival, unidadEn, unidadesDe,
@@ -148,7 +149,15 @@ function valorDeAccion(vista, j, a) {
       const cardId = vista.instancias[a.iid].cardId;
       const b = unidadEn(vista, contrario, a.ranura);
       const mio = statsDeCarta(vista, j, cardId, b ? b.iid : null);
-      return valorEnRanura(vista, j, a.ranura, mio) - carta(cardId).coste * IA.pesoCoste;
+      // La habilidad de entrada se suma APARTE y sin multiplicar por los turnos
+      // que aguante: se dispara una vez y punto. Ahí está media gracia de esta
+      // forma de rasgo — lo pasivo se infla con `IA.horizonte` y por eso el
+      // ajuste de cobertura llegó a «decir» que la Defensa valía 4 veces el
+      // Ataque. Y sin este sumando la IA las ignoraría, que es lo que le pasó a
+      // la Llanura hasta que se le puso número: cero usos en 300 partidas.
+      return valorEnRanura(vista, j, a.ranura, mio)
+        + valorDeEntrada(cardId)
+        - carta(cardId).coste * IA.pesoCoste;
     }
 
     case ACCION.MOVER: {
