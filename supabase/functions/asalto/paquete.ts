@@ -12,14 +12,15 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: 4e0fbaea5aa292ec
+// huella: df5f082bad50edd5
 //
-// Lleva dentro estos 16 ficheros del repositorio. La lista la da
+// Lleva dentro estos 17 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
 // aparece aquí solo. Un test recalcula la huella sobre esta misma lista y falla
 // si el paquete se ha quedado atrás del código.
 // fuente: src/data/cards.js
 // fuente: src/data/balance.js
+// fuente: src/engine/entradas.js
 // fuente: src/engine/rng.js
 // fuente: src/engine/state.js
 // fuente: src/data/dietas.js
@@ -148,6 +149,23 @@ var RASGO = Object.freeze({
   BUSCA_EVENTO: "BUSCA_EVENTO",
   BUSCA_CLIMA: "BUSCA_CLIMA",
   BUSCA_GREGARISMO: "BUSCA_GREGARISMO",
+  // Habilidades AL ENTRAR EN JUEGO: se disparan una vez, cuando la criatura
+  // llega al campo, y se acabó. Van aparte de los rasgos de arriba porque son
+  // otra cosa: aquéllos son pasivos y condicionales —estado que hay que llevar
+  // en la cabeza— y éstos, un disparo que se ve y se olvida. Ver
+  // src/engine/entradas.js.
+  ENTRADA_ALERTA: "ENTRADA_ALERTA",
+  // roba cartas
+  ENTRADA_EMBOSCADA: "ENTRADA_EMBOSCADA",
+  // daña al de enfrente
+  ENTRADA_MANADA_SANA: "ENTRADA_MANADA_SANA",
+  // cura a los tuyos
+  ENTRADA_DEVORA_MAZO: "ENTRADA_DEVORA_MAZO",
+  // muele mazo rival
+  ENTRADA_RAMONEO: "ENTRADA_RAMONEO",
+  // da Biomasa
+  ENTRADA_ARRASA: "ENTRADA_ARRASA",
+  // daño al hábitat rival
   // adaptaciones
   GREGARISMO: "GREGARISMO",
   GASTROLITOS: "GASTROLITOS",
@@ -613,9 +631,9 @@ var CARTAS = Object.freeze({
     coste: 2,
     ataque: 5,
     vida: 4,
-    rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
+    rasgo: RASGO.ENTRADA_EMBOSCADA,
+    rasgoNombre: "Emboscada",
+    rasgoTexto: "Al entrar en juego, hace 3 de da\xF1o al dinosaurio que tenga enfrente.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Dromeos\xE1urido de la Formaci\xF3n Dinosaur Park, Alberta, Campaniense. Es el g\xE9nero que da nombre a toda la familia."
   }),
@@ -683,9 +701,9 @@ var CARTAS = Object.freeze({
     coste: 2,
     ataque: 4,
     vida: 5,
-    rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
+    rasgo: RASGO.ENTRADA_ALERTA,
+    rasgoNombre: "Alerta",
+    rasgoTexto: "Al entrar en juego, robas 1 carta.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Ter\xF3podo maniraptor del Cret\xE1cico Superior de Norteam\xE9rica. El nombre se basa en dientes aislados y su validez est\xE1 discutida."
   }),
@@ -711,9 +729,9 @@ var CARTAS = Object.freeze({
     coste: 4,
     ataque: 11,
     vida: 11,
-    rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
+    rasgo: RASGO.ENTRADA_ARRASA,
+    rasgoNombre: "Arrasa la ribera",
+    rasgoTexto: "Al entrar en juego, 3 de da\xF1o al h\xE1bitat rival.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Espinos\xE1urido de los Kem Kem, Marruecos, Cenomaniense. Vela dorsal y un estilo de vida acu\xE1tico que sigue debati\xE9ndose."
   }),
@@ -725,9 +743,9 @@ var CARTAS = Object.freeze({
     coste: 4,
     ataque: 12,
     vida: 10,
-    rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
+    rasgo: RASGO.ENTRADA_DEVORA_MAZO,
+    rasgoNombre: "Devora el registro",
+    rasgoTexto: "Al entrar en juego, el rival pierde 3 cartas de su mazo.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Mosasaurio del Maastrichtiense. No es un dinosaurio: es un escamoso marino, pariente de varanos y serpientes."
   }),
@@ -893,9 +911,9 @@ var CARTAS = Object.freeze({
     coste: 3,
     ataque: 3,
     vida: 12,
-    rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
+    rasgo: RASGO.ENTRADA_RAMONEO,
+    rasgoNombre: "Ramoneo alto",
+    rasgoTexto: "Al entrar en juego, ganas 2 de Biomasa.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Saur\xF3podo del Jur\xE1sico Medio de Marruecos. Extremidades desproporcionadamente largas para un saur\xF3podo."
   }),
@@ -963,9 +981,9 @@ var CARTAS = Object.freeze({
     coste: 2,
     ataque: 2,
     vida: 7,
-    rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
+    rasgo: RASGO.ENTRADA_MANADA_SANA,
+    rasgoNombre: "Cierra la formaci\xF3n",
+    rasgoTexto: "Al entrar en juego, tus otros dinosaurios curan 2 heridas.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Anquilosaurio de la Formaci\xF3n Morrison, Jur\xE1sico Superior. Uno de los anquilosaurios m\xE1s antiguos que se conocen bien."
   }),
@@ -1334,6 +1352,30 @@ var BALANCE = Object.freeze({
     //   DINOWAR_SOBRANTE=0 node sim/run.js   para medir sin ello
     sobranteAlHabitat: typeof process !== "undefined" && process.env && process.env.DINOWAR_SOBRANTE === "0" ? false : true
   }),
+  // ------------------------------------------- habilidades al entrar en juego
+  //
+  // Se disparan una vez y se acabó. Prueba de seis, sobre criaturas que hoy no
+  // tienen NADA: así no se rompe ninguna carta que ya funcione y se ataca de
+  // paso el problema medido —30 de 50 criaturas fuera de banda, casi todas sin
+  // mecánica—.
+  //
+  // Se apagan con DINOWAR_ENTRADAS=0 para poder medir con y sin.
+  entradas: Object.freeze({
+    alertaRoba: 1,
+    // Troodon: ojos y bulbos olfatorios enormes
+    emboscadaDano: 3,
+    // Dromaeosaurus: cae encima del de enfrente
+    manadaSanaCura: 2,
+    // Gargoyleosaurus: llega y cierra la formación
+    // El más peligroso de los seis y por eso el más caro y de una sola copia:
+    // moler es lo que hace que la Deriva árida gane el 100 % de sus partidas.
+    devoraMazo: 3,
+    // Mosasaurus
+    ramoneoBiomasa: 2,
+    // Atlasaurus: alcanza el dosel que nadie alcanza
+    arrasaHabitat: 3
+    // Spinosaurus: doce metros entrando en la llanura
+  }),
   // --------------------------------------------------------------------- IA
   ia: Object.freeze({
     // Turnos que se espera que una unidad siga en pie aportando. Sin esto la IA
@@ -1409,6 +1451,109 @@ if (TOTAL_MAZO !== BALANCE.tamanoMazo) {
   throw new Error(`MAZO suma ${TOTAL_MAZO} cartas y deber\xEDan ser ${BALANCE.tamanoMazo}`);
 }
 
+// src/engine/entradas.js
+var HAY_ENTRADAS = !(typeof process !== "undefined" && process.env && process.env.DINOWAR_ENTRADAS === "0");
+var ES_ENTRADA = Object.freeze({
+  [RASGO.ENTRADA_ALERTA]: true,
+  [RASGO.ENTRADA_EMBOSCADA]: true,
+  [RASGO.ENTRADA_MANADA_SANA]: true,
+  [RASGO.ENTRADA_DEVORA_MAZO]: true,
+  [RASGO.ENTRADA_RAMONEO]: true,
+  [RASGO.ENTRADA_ARRASA]: true
+});
+function valorDeEntrada(cardId) {
+  if (!HAY_ENTRADAS) return 0;
+  const E = BALANCE.entradas;
+  switch (carta(cardId).rasgo) {
+    case RASGO.ENTRADA_ALERTA:
+      return E.alertaRoba * 1.4;
+    case RASGO.ENTRADA_EMBOSCADA:
+      return E.emboscadaDano;
+    case RASGO.ENTRADA_MANADA_SANA:
+      return E.manadaSanaCura;
+    case RASGO.ENTRADA_DEVORA_MAZO:
+      return E.devoraMazo * 0.4;
+    case RASGO.ENTRADA_RAMONEO:
+      return E.ramoneoBiomasa * 1.2;
+    case RASGO.ENTRADA_ARRASA:
+      return E.arrasaHabitat * BALANCE.ia.pesoHabitat;
+    default:
+      return 0;
+  }
+}
+function alEntrar(s, inst, ayudas) {
+  if (!HAY_ENTRADAS) return;
+  const { ev: ev2, herir: herir2, rival: rival2, unidadEn: unidadEn2, unidadesDe: unidadesDe2, CAUSA: CAUSA2 } = ayudas;
+  const c = carta(inst.cardId);
+  const j = inst.dueno;
+  const contrario = rival2(j);
+  const E = BALANCE.entradas;
+  const jug = s.jugadores[j];
+  switch (c.rasgo) {
+    // Ojos enormes y bulbos olfatorios grandes: ve venir las cosas.
+    case RASGO.ENTRADA_ALERTA: {
+      let robadas = 0;
+      for (let k = 0; k < E.alertaRoba && jug.mazo.length > 0; k++) {
+        jug.mano.push(jug.mazo.shift());
+        robadas += 1;
+      }
+      ev2(s, "ENTRADA", { iid: inst.iid, cardId: inst.cardId, dueno: j, efecto: "roba", n: robadas });
+      break;
+    }
+    // Cae encima del que tiene enfrente antes de que se coloque.
+    case RASGO.ENTRADA_EMBOSCADA: {
+      const enfrente = unidadEn2(s, contrario, inst.ranura);
+      if (enfrente) herir2(s, enfrente.iid, E.emboscadaDano, CAUSA2.ENTRADA, j);
+      ev2(s, "ENTRADA", {
+        iid: inst.iid,
+        cardId: inst.cardId,
+        dueno: j,
+        efecto: "emboscada",
+        n: enfrente ? E.emboscadaDano : 0
+      });
+      break;
+    }
+    // La coraza que llega y cierra la formación.
+    case RASGO.ENTRADA_MANADA_SANA: {
+      let curados = 0;
+      for (const u of unidadesDe2(s, j)) {
+        const otra = s.instancias[u.iid];
+        if (otra.iid === inst.iid || otra.heridas <= 0) continue;
+        otra.heridas = Math.max(0, otra.heridas - E.manadaSanaCura);
+        curados += 1;
+      }
+      ev2(s, "ENTRADA", { iid: inst.iid, cardId: inst.cardId, dueno: j, efecto: "cura", n: curados });
+      break;
+    }
+    // Depredador de mar abierto: lo que caza no vuelve al registro.
+    case RASGO.ENTRADA_DEVORA_MAZO: {
+      const otro = s.jugadores[contrario];
+      let molidas = 0;
+      for (let k = 0; k < E.devoraMazo && otro.mazo.length > 0; k++) {
+        otro.descarte.push(otro.mazo.shift());
+        molidas += 1;
+      }
+      ev2(s, "ENTRADA", { iid: inst.iid, cardId: inst.cardId, dueno: j, efecto: "muele", n: molidas });
+      break;
+    }
+    // Alcanza el dosel que nadie más alcanza.
+    case RASGO.ENTRADA_RAMONEO: {
+      jug.biomasa += E.ramoneoBiomasa;
+      ev2(s, "ENTRADA", { iid: inst.iid, cardId: inst.cardId, dueno: j, efecto: "biomasa", n: E.ramoneoBiomasa });
+      break;
+    }
+    // Doce metros entrando en una llanura de inundación.
+    case RASGO.ENTRADA_ARRASA: {
+      const otro = s.jugadores[contrario];
+      otro.habitat = Math.max(0, otro.habitat - E.arrasaHabitat);
+      ev2(s, "ENTRADA", { iid: inst.iid, cardId: inst.cardId, dueno: j, efecto: "habitat", n: E.arrasaHabitat });
+      break;
+    }
+    default:
+      break;
+  }
+}
+
 // src/engine/rng.js
 function siguiente(rng) {
   let t = rng + 1831565813 >>> 0;
@@ -1463,7 +1608,9 @@ var MOTIVO_FIN = Object.freeze({
 var CAUSA = Object.freeze({
   COMBATE: "COMBATE",
   ESPINAS: "ESPINAS",
-  MORTANDAD: "MORTANDAD"
+  MORTANDAD: "MORTANDAD",
+  // Daño de una habilidad al entrar en juego.
+  ENTRADA: "ENTRADA"
 });
 var rival = (j) => j === 0 ? 1 : 0;
 function nuevaInstancia(iid, cardId, dueno) {
@@ -1928,6 +2075,7 @@ function faseRevelacion(s) {
       inst.desplegadoEnTurno = s.turno;
       s.ranuras[p.jugador][p.ranura] = p.iid;
       ev(s, "REVELADA", { jugador: p.jugador, iid: p.iid, cardId: inst.cardId, ranura: p.ranura });
+      alEntrar(s, inst, { ev, herir, rival, unidadEn, unidadesDe, CAUSA });
     } else if (p.tipo === "MOVIMIENTO") {
       if (inst.ranura === null || s.ranuras[p.jugador][p.ranura] !== null) continue;
       s.ranuras[p.jugador][inst.ranura] = null;
@@ -2610,7 +2758,7 @@ function valorDeAccion(vista, j, a) {
       const cardId = vista.instancias[a.iid].cardId;
       const b = unidadEn(vista, contrario, a.ranura);
       const mio = statsDeCarta(vista, j, cardId, b ? b.iid : null);
-      return valorEnRanura(vista, j, a.ranura, mio) - carta(cardId).coste * IA.pesoCoste;
+      return valorEnRanura(vista, j, a.ranura, mio) + valorDeEntrada(cardId) - carta(cardId).coste * IA.pesoCoste;
     }
     case ACCION.MOVER: {
       const inst = vista.instancias[a.iid];
