@@ -27,10 +27,10 @@ es legendario.
 
 | Rareza | Copias máximas | Cartas distintas | En el mazo de referencia |
 |---|---|---|---|
-| Común | 3 | 41 | 12 |
-| Rara | 3 | 8 | 21 |
-| Épica | 2 | 10 | 11 |
-| Legendaria | 1 | 8 | 6 |
+| Común | 3 | 18 | 12 |
+| Rara | 3 | 15 | 21 |
+| Épica | 2 | 22 | 11 |
+| Legendaria | 1 | 12 | 6 |
 
 ---
 
@@ -39,7 +39,7 @@ es legendario.
 | Taxón | Clado | Rareza | Copias | Coste | Ataque | Defensa | Vida | Sed |
 |---|---|---|---|---|---|---|---|---|
 | *Dryosaurus altus* | Ornitópodo | Común | 3 | 0 | 1 | 0 | 2 | undefined |
-| *Ornitholestes hermanni* | Terópodo | Común | 3 | 1 | 1 | 1 | 1 | undefined |
+| *Ornitholestes hermanni* | Terópodo | Común | 3 | 1 | 2 | 0 | 2 | undefined |
 | *Ceratosaurus nasicornis* | Terópodo | Común | 3 | 1 | 3 | 0 | 3 | undefined |
 | *Stegosaurus stenops* | Tireóforo | Común | 2 | 2 | 1 | 4 | 5 | undefined |
 | *Allosaurus fragilis* | Terópodo | Rara | 2 | 3 | 5 | 2 | 3 | undefined |
@@ -53,42 +53,42 @@ es legendario.
 | *Brachylophosaurus canadensis* | Ornitópodo | Rara | 3 | 2 | 2 | 1 | 6 | undefined |
 | *Tyrannotitan chubutensis* | Terópodo | Legendaria | 1 | 4 | 10 | 1 | 5 | undefined |
 | *Huaxiadraco corollatus* | Pterosaurio | Rara | 2 | 2 | 2 | 2 | 2 | undefined |
-| *Plesiopleurodon wellesi* | Reptil marino | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Ojoraptorsaurus boerei* | Terópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Dromaeosaurus albertensis* | Terópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Athenar bermani* | Saurópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Sanjuansaurus gordilloi* | Terópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Suchomimus tenerensis* | Terópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Eosinopteryx brevipenna* | Terópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Troodon formosus* | Terópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Carnotaurus sastrei* | Terópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Spinosaurus aegyptiacus* | Terópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Mosasaurus hoffmannii* | Reptil marino | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Halszkaraptor escuilliei* | Terópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Tongtianlong limosus* | Terópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Scanisaurus nazarowi* | Reptil marino | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Monolophosaurus jiangi* | Terópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Invictarx zephyri* | Tireóforo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Medusaceratops lokii* | Marginocéfalo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Platyceratops tatarinovi* | Marginocéfalo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Loricatosaurus priscus* | Tireóforo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Therizinosaurus cheloniformis* | Terópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Alaskacephale gangloffi* | Marginocéfalo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Titanoceratops ouranos* | Marginocéfalo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Atlasaurus imelakei* | Saurópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Stegoceras validum* | Marginocéfalo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Maiasaura peeblesorum* | Ornitópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Edmontosaurus annectens* | Ornitópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Plateosauravus cullingworthi* | Saurópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Gargoyleosaurus parkpinorum* | Tireóforo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Wendiceratops pinhornensis* | Marginocéfalo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Domeykosaurus chilensis* | Saurópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Antarctosaurus wichmannianus* | Saurópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Liaoceratops yanzigouensis* | Marginocéfalo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Rhinorex condrupus* | Ornitópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Bienosaurus lufengensis* | Tireóforo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Shuangmiaosaurus gilmorei* | Ornitópodo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
-| *Chasmosaurus belli* | Marginocéfalo | Común | 0 | 1 | 1 | 1 | 1 | undefined |
+| *Plesiopleurodon wellesi* | Reptil marino | Épica | 0 | 3 | 9 | 2 | 4 | undefined |
+| *Ojoraptorsaurus boerei* | Terópodo | Rara | 0 | 2 | 4 | 1 | 4 | undefined |
+| *Dromaeosaurus albertensis* | Terópodo | Común | 0 | 2 | 5 | 1 | 3 | undefined |
+| *Athenar bermani* | Saurópodo | Común | 0 | 2 | 2 | 2 | 5 | undefined |
+| *Sanjuansaurus gordilloi* | Terópodo | Rara | 0 | 2 | 5 | 1 | 3 | undefined |
+| *Suchomimus tenerensis* | Terópodo | Épica | 0 | 3 | 8 | 2 | 5 | undefined |
+| *Eosinopteryx brevipenna* | Terópodo | Común | 0 | 1 | 2 | 0 | 2 | undefined |
+| *Troodon formosus* | Terópodo | Común | 0 | 2 | 4 | 1 | 4 | undefined |
+| *Carnotaurus sastrei* | Terópodo | Épica | 0 | 3 | 9 | 1 | 5 | undefined |
+| *Spinosaurus aegyptiacus* | Terópodo | Legendaria | 0 | 4 | 11 | 2 | 9 | undefined |
+| *Mosasaurus hoffmannii* | Reptil marino | Legendaria | 0 | 4 | 12 | 2 | 8 | undefined |
+| *Halszkaraptor escuilliei* | Terópodo | Común | 0 | 1 | 2 | 0 | 2 | undefined |
+| *Tongtianlong limosus* | Terópodo | Común | 0 | 1 | 1 | 1 | 2 | undefined |
+| *Scanisaurus nazarowi* | Reptil marino | Rara | 0 | 2 | 4 | 1 | 4 | undefined |
+| *Monolophosaurus jiangi* | Terópodo | Rara | 0 | 2 | 5 | 1 | 3 | undefined |
+| *Invictarx zephyri* | Tireóforo | Rara | 0 | 2 | 2 | 5 | 2 | undefined |
+| *Medusaceratops lokii* | Marginocéfalo | Épica | 0 | 3 | 5 | 4 | 6 | undefined |
+| *Platyceratops tatarinovi* | Marginocéfalo | Común | 0 | 1 | 1 | 2 | 1 | undefined |
+| *Loricatosaurus priscus* | Tireóforo | Épica | 0 | 3 | 4 | 6 | 5 | undefined |
+| *Therizinosaurus cheloniformis* | Terópodo | Épica | 0 | 3 | 6 | 3 | 6 | undefined |
+| *Alaskacephale gangloffi* | Marginocéfalo | Rara | 0 | 2 | 3 | 3 | 3 | undefined |
+| *Titanoceratops ouranos* | Marginocéfalo | Épica | 0 | 3 | 6 | 5 | 4 | undefined |
+| *Atlasaurus imelakei* | Saurópodo | Épica | 0 | 3 | 3 | 4 | 8 | undefined |
+| *Stegoceras validum* | Marginocéfalo | Común | 0 | 2 | 3 | 3 | 3 | undefined |
+| *Maiasaura peeblesorum* | Ornitópodo | Épica | 0 | 3 | 4 | 2 | 9 | undefined |
+| *Edmontosaurus annectens* | Ornitópodo | Legendaria | 0 | 4 | 5 | 3 | 14 | undefined |
+| *Plateosauravus cullingworthi* | Saurópodo | Común | 0 | 2 | 2 | 2 | 5 | undefined |
+| *Gargoyleosaurus parkpinorum* | Tireóforo | Rara | 0 | 2 | 2 | 4 | 3 | undefined |
+| *Wendiceratops pinhornensis* | Marginocéfalo | Épica | 0 | 3 | 5 | 4 | 6 | undefined |
+| *Domeykosaurus chilensis* | Saurópodo | Épica | 0 | 3 | 3 | 4 | 8 | undefined |
+| *Antarctosaurus wichmannianus* | Saurópodo | Legendaria | 0 | 4 | 4 | 5 | 13 | undefined |
+| *Liaoceratops yanzigouensis* | Marginocéfalo | Común | 0 | 1 | 1 | 1 | 2 | undefined |
+| *Rhinorex condrupus* | Ornitópodo | Épica | 0 | 3 | 4 | 2 | 9 | undefined |
+| *Bienosaurus lufengensis* | Tireóforo | Común | 0 | 1 | 1 | 2 | 1 | undefined |
+| *Shuangmiaosaurus gilmorei* | Ornitópodo | Común | 0 | 2 | 3 | 1 | 5 | undefined |
+| *Chasmosaurus belli* | Marginocéfalo | Común | 0 | 2 | 2 | 4 | 3 | undefined |
 
 *Camarasaurus* es inmune a la Sed: sus isótopos indican que migraba.
 
@@ -104,13 +104,13 @@ es legendario.
 
 ### *Ornitholestes hermanni* · Terópodo · Común · 3 copias
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**1 de coste · 2 de Ataque · 2 de Vida** · Defensa propuesta: *0*
 
 **Oportunista** — +1 Vida permanente cada vez que muere un dinosaurio en el campo.
 
 `INFERIDO` · Terópodo pequeño (~2 m). El comportamiento carroñero es una inferencia a partir de talla y analogía ecológica, no de evidencia directa.
 
-*Por qué 1 de Defensa:* Terópodo de ~2 m, sin blindaje ni masa.
+*Por qué 0 de Defensa:* Terópodo de ~2 m, sin blindaje ni masa.
 
 ### *Ceratosaurus nasicornis* · Terópodo · Común · 3 copias
 
@@ -242,17 +242,17 @@ es legendario.
 
 *Por qué 2 de Defensa:* Esqueleto neumatizado de pared finísima; lo que no puede encajar, lo esquiva volando.
 
-### *Plesiopleurodon wellesi* · Reptil marino · Común · fuera del mazo de referencia
+### *Plesiopleurodon wellesi* · Reptil marino · Épica · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**3 de coste · 9 de Ataque · 4 de Vida** · Defensa propuesta: *2*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Plesiosaurio pliosáurido del Cretácico Superior de Wyoming. No es un dinosaurio: es un reptil marino de cuello corto y cráneo enorme.
 
-### *Ojoraptorsaurus boerei* · Terópodo · Común · fuera del mazo de referencia
+### *Ojoraptorsaurus boerei* · Terópodo · Rara · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**2 de coste · 4 de Ataque · 4 de Vida** · Defensa propuesta: *1*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -260,7 +260,7 @@ es legendario.
 
 ### *Dromaeosaurus albertensis* · Terópodo · Común · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**2 de coste · 5 de Ataque · 3 de Vida** · Defensa propuesta: *1*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -268,23 +268,23 @@ es legendario.
 
 ### *Athenar bermani* · Saurópodo · Común · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**2 de coste · 2 de Ataque · 5 de Vida** · Defensa propuesta: *2*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `ESTABLECIDO` · Formación Morrison, cantera Carnegie del Dinosaur National Monument, Utah, Titoniense inferior (~149–145 Ma). Descrito en 2025 sobre un neurocráneo y techo craneal (CM 26552) que llevaba décadas archivado como Diplodocus. Es un dicreosáurido: saurópodos de cuello corto y talla modesta para el grupo, no un terópodo.
 
-### *Sanjuansaurus gordilloi* · Terópodo · Común · fuera del mazo de referencia
+### *Sanjuansaurus gordilloi* · Terópodo · Rara · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**2 de coste · 5 de Ataque · 3 de Vida** · Defensa propuesta: *1*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Herrerasáurido de la Formación Ischigualasto, Argentina, Carniense (~231 Ma). Los herrerasáuridos son saurisquios muy basales; su colocación entre los terópodos se discute.
 
-### *Suchomimus tenerensis* · Terópodo · Común · fuera del mazo de referencia
+### *Suchomimus tenerensis* · Terópodo · Épica · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**3 de coste · 8 de Ataque · 5 de Vida** · Defensa propuesta: *2*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -292,7 +292,7 @@ es legendario.
 
 ### *Eosinopteryx brevipenna* · Terópodo · Común · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**1 de coste · 2 de Ataque · 2 de Vida** · Defensa propuesta: *0*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -300,31 +300,31 @@ es legendario.
 
 ### *Troodon formosus* · Terópodo · Común · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**2 de coste · 4 de Ataque · 4 de Vida** · Defensa propuesta: *1*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Terópodo maniraptor del Cretácico Superior de Norteamérica. El nombre se basa en dientes aislados y su validez está discutida.
 
-### *Carnotaurus sastrei* · Terópodo · Común · fuera del mazo de referencia
+### *Carnotaurus sastrei* · Terópodo · Épica · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**3 de coste · 9 de Ataque · 5 de Vida** · Defensa propuesta: *1*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Abelisáurido de la Formación La Colonia, Argentina, Maastrichtiense. Cuernos frontales y brazos reducidos al extremo.
 
-### *Spinosaurus aegyptiacus* · Terópodo · Común · fuera del mazo de referencia
+### *Spinosaurus aegyptiacus* · Terópodo · Legendaria · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**4 de coste · 11 de Ataque · 9 de Vida** · Defensa propuesta: *2*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Espinosáurido de los Kem Kem, Marruecos, Cenomaniense. Vela dorsal y un estilo de vida acuático que sigue debatiéndose.
 
-### *Mosasaurus hoffmannii* · Reptil marino · Común · fuera del mazo de referencia
+### *Mosasaurus hoffmannii* · Reptil marino · Legendaria · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**4 de coste · 12 de Ataque · 8 de Vida** · Defensa propuesta: *2*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -332,7 +332,7 @@ es legendario.
 
 ### *Halszkaraptor escuilliei* · Terópodo · Común · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**1 de coste · 2 de Ataque · 2 de Vida** · Defensa propuesta: *0*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -340,39 +340,39 @@ es legendario.
 
 ### *Tongtianlong limosus* · Terópodo · Común · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**1 de coste · 1 de Ataque · 2 de Vida** · Defensa propuesta: *1*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Oviraptorosaurio de la Formación Nanxiong, China, Maastrichtiense. El holotipo se conservó en postura de haber quedado atrapado en el barro.
 
-### *Scanisaurus nazarowi* · Reptil marino · Común · fuera del mazo de referencia
+### *Scanisaurus nazarowi* · Reptil marino · Rara · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**2 de coste · 4 de Ataque · 4 de Vida** · Defensa propuesta: *1*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Plesiosaurio elasmosáurido del Cretácico Superior del Báltico. No es un dinosaurio, y su validez como género está discutida.
 
-### *Monolophosaurus jiangi* · Terópodo · Común · fuera del mazo de referencia
+### *Monolophosaurus jiangi* · Terópodo · Rara · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**2 de coste · 5 de Ataque · 3 de Vida** · Defensa propuesta: *1*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Terópodo tetanuro de la Formación Shishugou, China, Jurásico Medio. Una sola cresta ósea recorre el cráneo.
 
-### *Invictarx zephyri* · Tireóforo · Común · fuera del mazo de referencia
+### *Invictarx zephyri* · Tireóforo · Rara · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**2 de coste · 2 de Ataque · 2 de Vida** · Defensa propuesta: *5*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Anquilosaurio nodosáurido de la Formación Menefee, Nuevo México, Campaniense.
 
-### *Medusaceratops lokii* · Marginocéfalo · Común · fuera del mazo de referencia
+### *Medusaceratops lokii* · Marginocéfalo · Épica · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**3 de coste · 5 de Ataque · 6 de Vida** · Defensa propuesta: *4*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -380,47 +380,47 @@ es legendario.
 
 ### *Platyceratops tatarinovi* · Marginocéfalo · Común · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *2*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Ceratopsio bagaceratópsido de Mongolia, Campaniense. Pequeño y sin cuernos.
 
-### *Loricatosaurus priscus* · Tireóforo · Común · fuera del mazo de referencia
+### *Loricatosaurus priscus* · Tireóforo · Épica · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**3 de coste · 4 de Ataque · 5 de Vida** · Defensa propuesta: *6*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Estegosáurido del Calloviense de Inglaterra y Francia. Se separó del material antes atribuido a Lexovisaurus.
 
-### *Therizinosaurus cheloniformis* · Terópodo · Común · fuera del mazo de referencia
+### *Therizinosaurus cheloniformis* · Terópodo · Épica · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**3 de coste · 6 de Ataque · 6 de Vida** · Defensa propuesta: *3*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Terizinosaurio de la Formación Nemegt, Mongolia, Maastrichtiense. Terópodo herbívoro con las garras manuales más largas que se conocen.
 
-### *Alaskacephale gangloffi* · Marginocéfalo · Común · fuera del mazo de referencia
+### *Alaskacephale gangloffi* · Marginocéfalo · Rara · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**2 de coste · 3 de Ataque · 3 de Vida** · Defensa propuesta: *3*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Paquicefalosaurio de la Formación Prince Creek, Alaska, Campaniense.
 
-### *Titanoceratops ouranos* · Marginocéfalo · Común · fuera del mazo de referencia
+### *Titanoceratops ouranos* · Marginocéfalo · Épica · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**3 de coste · 6 de Ataque · 4 de Vida** · Defensa propuesta: *5*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Ceratópsido casmosaurino de Nuevo México, Campaniense. Se propuso separándolo de material asignado a Pentaceratops, y no todos lo aceptan.
 
-### *Atlasaurus imelakei* · Saurópodo · Común · fuera del mazo de referencia
+### *Atlasaurus imelakei* · Saurópodo · Épica · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**3 de coste · 3 de Ataque · 8 de Vida** · Defensa propuesta: *4*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -428,23 +428,23 @@ es legendario.
 
 ### *Stegoceras validum* · Marginocéfalo · Común · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**2 de coste · 3 de Ataque · 3 de Vida** · Defensa propuesta: *3*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Paquicefalosaurio de la Formación Dinosaur Park, Alberta, Campaniense. Domo craneal grueso.
 
-### *Maiasaura peeblesorum* · Ornitópodo · Común · fuera del mazo de referencia
+### *Maiasaura peeblesorum* · Ornitópodo · Épica · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**3 de coste · 4 de Ataque · 9 de Vida** · Defensa propuesta: *2*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Hadrosáurido de la Formación Two Medicine, Montana, Campaniense. Sus nidadas documentan cuidado parental.
 
-### *Edmontosaurus annectens* · Ornitópodo · Común · fuera del mazo de referencia
+### *Edmontosaurus annectens* · Ornitópodo · Legendaria · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**4 de coste · 5 de Ataque · 14 de Vida** · Defensa propuesta: *3*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -452,39 +452,39 @@ es legendario.
 
 ### *Plateosauravus cullingworthi* · Saurópodo · Común · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**2 de coste · 2 de Ataque · 5 de Vida** · Defensa propuesta: *2*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Sauropodomorfo basal de la Formación Elliot, Sudáfrica, Triásico Superior. No es un saurópodo verdadero; se agrupa aquí por plan corporal.
 
-### *Gargoyleosaurus parkpinorum* · Tireóforo · Común · fuera del mazo de referencia
+### *Gargoyleosaurus parkpinorum* · Tireóforo · Rara · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**2 de coste · 2 de Ataque · 3 de Vida** · Defensa propuesta: *4*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Anquilosaurio de la Formación Morrison, Jurásico Superior. Uno de los anquilosaurios más antiguos que se conocen bien.
 
-### *Wendiceratops pinhornensis* · Marginocéfalo · Común · fuera del mazo de referencia
+### *Wendiceratops pinhornensis* · Marginocéfalo · Épica · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**3 de coste · 5 de Ataque · 6 de Vida** · Defensa propuesta: *4*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Ceratópsido centrosaurino de la Formación Oldman, Alberta, Campaniense.
 
-### *Domeykosaurus chilensis* · Saurópodo · Común · fuera del mazo de referencia
+### *Domeykosaurus chilensis* · Saurópodo · Épica · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**3 de coste · 3 de Ataque · 8 de Vida** · Defensa propuesta: *4*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · PENDIENTE: titanosaurio del norte de Chile citado en la literatura sin descripción formal completa. Hay que confirmar el estatus del nombre.
 
-### *Antarctosaurus wichmannianus* · Saurópodo · Común · fuera del mazo de referencia
+### *Antarctosaurus wichmannianus* · Saurópodo · Legendaria · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**4 de coste · 4 de Ataque · 13 de Vida** · Defensa propuesta: *5*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -492,15 +492,15 @@ es legendario.
 
 ### *Liaoceratops yanzigouensis* · Marginocéfalo · Común · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**1 de coste · 1 de Ataque · 2 de Vida** · Defensa propuesta: *1*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
 `INFERIDO` · Neoceratopsio basal de la Formación Yixian, China, Barremiense. Pequeño y sin gola desarrollada.
 
-### *Rhinorex condrupus* · Ornitópodo · Común · fuera del mazo de referencia
+### *Rhinorex condrupus* · Ornitópodo · Épica · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**3 de coste · 4 de Ataque · 9 de Vida** · Defensa propuesta: *2*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -508,7 +508,7 @@ es legendario.
 
 ### *Bienosaurus lufengensis* · Tireóforo · Común · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *2*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -516,7 +516,7 @@ es legendario.
 
 ### *Shuangmiaosaurus gilmorei* · Ornitópodo · Común · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**2 de coste · 3 de Ataque · 5 de Vida** · Defensa propuesta: *1*
 
 **Sin rasgo** — Todavía no hace nada especial.
 
@@ -524,7 +524,7 @@ es legendario.
 
 ### *Chasmosaurus belli* · Marginocéfalo · Común · fuera del mazo de referencia
 
-**1 de coste · 1 de Ataque · 1 de Vida** · Defensa propuesta: *1*
+**2 de coste · 2 de Ataque · 3 de Vida** · Defensa propuesta: *4*
 
 **Sin rasgo** — Todavía no hace nada especial.
 

@@ -139,7 +139,15 @@ export function abrirSobre(azar, tengo = null) {
     let pool = POR_RAREZA[r];
     if (cuenta) {
       const faltan = pool.filter((id) => (cuenta[id] ?? 0) < limiteDe(id));
+      // Si no falta ninguna de esa rareza se reparte entre todas —eso es lo que
+      // alimenta la fusión— pero sin repetir dentro del mismo sobre mientras
+      // queden alternativas: sacar dos veces la misma legendaria de una tirada
+      // se lee como un fallo, no como suerte.
       if (faltan.length) pool = faltan;
+      else {
+        const sinRepetir = pool.filter((id) => !salida.includes(id));
+        if (sinRepetir.length) pool = sinRepetir;
+      }
     }
 
     const id = pool[Math.min(pool.length - 1, Math.floor(azar() * pool.length))];

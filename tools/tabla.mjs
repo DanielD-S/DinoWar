@@ -8,6 +8,7 @@
 // se aplican las columnas numéricas y los textos; el id nunca cambia.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { CARTAS, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, RAREZA, RAREZA_NOMBRE } from '../src/data/cards.js';
 import { BALANCE } from '../src/data/balance.js';
 
@@ -198,9 +199,17 @@ function comprobar(src) {
     + "const v = Object.entries(POR_RAREZA).filter(([,i]) => i.length === 0).map(([r]) => r);"
     + "if (v.length) throw new Error('ninguna carta queda en: ' + v.join(', '));"
     + "console.log(Object.keys(CARTAS).length);";
+  // fileURLToPath y no .pathname: en Windows el pathname de un file:// es
+  // «/C:/…», con barra delante, que no es una ruta válida. spawnSync fallaba
+  // sin llegar a lanzar nada, devolvía stderr vacío y el mensaje de error que
+  // salía era el de leer ese vacío, no el del problema real.
   const r = spawnSync(process.execPath, ['--input-type=module', '-e', guion],
-    { cwd: new URL('.', import.meta.url).pathname, encoding: 'utf8' });
+    { cwd: fileURLToPath(new URL('.', import.meta.url)), encoding: 'utf8' });
 
+  if (r.error) {
+    writeFileSync(CARDS, previo);
+    throw new Error(`no se pudo lanzar la comprobación: ${r.error.message}`);
+  }
   if (r.status !== 0) {
     writeFileSync(CARDS, previo);
     // Del volcado del subproceso interesa la línea del error, no su pila.
