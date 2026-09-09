@@ -7,7 +7,7 @@ que se aprende chocándose.
 ## Verificar un cambio
 
 ```bash
-npm test              # 159 tests. Es la verificación canónica.
+npm test              # 172 tests. Es la verificación canónica.
 npm run sim           # 2.000 partidas IA vs IA → BALANCE.md
 node sim/set.js       # regenera SET_DE_CARTAS.md desde el código
 python -m http.server 8000
@@ -43,6 +43,8 @@ hay que hacer caso cuando el test lo dice.
 | `supabase/functions/asalto/paquete.ts` | `node tools/empaquetar-asalto.mjs` | `test/paquete.test.js` |
 | `supabase/migrations/0006_catalogo_cartas.sql` | `node tools/generar-cartas.mjs` | `test/cuentas.test.js` |
 | `BALANCE.md` de la variante | `node sim/cuerpos.js` | — |
+| `RECOSTE.md` y `RECOSTE.xlsx` | `node tools/tabla.mjs escribir`, `python tools/excel.py escribir` | `test/cuentas.test.js` |
+| `tools/mecanicas.json` | `node tools/mecanicas.mjs` | — |
 | El commit anclado en `desde-url.ts` | `node tools/anclar-desde-url.mjs` | `test/anclaje.test.js` |
 
 **El anclaje hay que rehacerlo cuando cambia el MOTOR, no sólo los validadores.**
@@ -56,6 +58,56 @@ ficheros— así que añadir un import extiende la vigilancia solo.
 
 Y después de re-anclar hay que **volver a desplegar**: el anclaje en el
 repositorio no mueve nada por sí solo.
+
+## Los cuatro simuladores, y qué NO ve cada uno
+
+Es el error que más veces se ha repetido: cambiar una carta, correr `npm run sim`,
+ver los seis números idénticos y creer que el cambio no hace nada.
+
+| herramienta | qué juega | punto ciego |
+|---|---|---|
+| `npm run sim` | el mazo de REFERENCIA, 27 entradas | las 39 cartas que no están en él. La Llanura se rediseñó dos veces y `BALANCE.md` no se movió un decimal |
+| `node sim/cobertura.mjs` | mazos aleatorios de todo el set | su ajuste filtra a CRIATURAS: ningún clima ni evento aparece |
+| `node sim/climas.js` | fuerza cada clima al campo | no dice si la carta es buena, sólo qué le hace al juego mientras está puesta |
+| `node sim/entradas.js` | un mazo con las seis de habilidad de entrada | sólo esas seis |
+
+Y el aviso que se ganó a pulso: **el ajuste de `cobertura.mjs` mide DESPLIEGUES,
+no victorias.** La IA valora cada unidad multiplicando por los turnos que espera
+que aguante, así que redescubre su propia preferencia por lo que resiste. De ahí
+salió el «la Defensa vale 4 veces el Ataque» que bloqueó el recoste durante días.
+Para saber lo que vale un punto hay que contar partidas ganadas.
+
+## Los rasgos: pasivos frente a habilidades de entrada
+
+Conviven dos familias y no son equivalentes.
+
+Los **pasivos** son los de siempre: «+1 de Vida si tienes otro Stegosaurus».
+Estado condicional que hay que llevar en la cabeza, y que además infla la
+tasación por lo dicho arriba.
+
+Las **habilidades al entrar en juego** (`src/engine/entradas.js`) se disparan una
+vez, cuando la criatura llega al campo, y se acabó. Se disparan en la fase de
+revelación, que es simultánea y con orden determinista por tipo y luego por
+`iid`: sin ese orden, dos máquinas re-jugando la misma partida llegarían a
+resultados distintos, y el servidor las valida re-jugándolas.
+
+Hay seis de prueba, sobre criaturas que no tenían nada. Medido: 7 disparos por
+partida y la bola de nieve no se mueve (65 % → 66 %).
+
+**Toda habilidad nueva necesita su número en `valorDeEntrada()`.** Sin él la IA
+la ignora y la carta no se juega nunca — le pasó a la Llanura, que midió cero
+usos en 300 partidas hasta que se le puso valor.
+
+## Las cartas mienten si nadie las vigila
+
+Cuatro veces en dos días el texto de una carta y lo que el motor hace se
+separaron: la Sabana describía una constante borrada, el Canal callaba su efecto
+principal, la Llanura prometía una pérdida y hacía un cambio, y las dos cartas de
+jefe no tenían texto ninguno.
+
+`test/textos.test.js` lo vigila: si un rasgo lleva número, el texto tiene que
+citarlo, y toda carta con rasgo necesita nombre y texto. No prueba que el texto
+sea CIERTO, pero sí que no se quedó atrás cuando el número cambió.
 
 ## Windows
 
