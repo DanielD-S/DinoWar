@@ -166,10 +166,16 @@ function bloqueSinTribu() {
 
 function bloqueTribu(c) {
   if (!c.tribu && modoActual() === MODO.REMOTO) return bloqueSinTribu();
-  return `<section class="cu-bloque">
-    ${c.tribu ? `<h3 class="cu-titulo">${c.tribu.nombre}
-      <span class="cu-nivel">código <b class="cu-codigo">${c.tribu.codigo}</b></span></h3>
-      <p class="cu-nota">Pasa ese código a quien quieras en tu cuenca.</p>` : ''}
+  // Dos tarjetas y no una: quién es tu tribu y cuánto tiene el almacén son dos
+  // preguntas distintas, y apilar dos encabezados dentro del mismo recuadro las
+  // leía como si fueran la misma.
+  const cabecera = c.tribu ? `<section class="cu-bloque cu-tribu">
+    <h3 class="cu-titulo">${c.tribu.nombre}</h3>
+    <p class="cu-linea">Código para entrar: <b class="cu-codigo">${c.tribu.codigo}</b></p>
+    <p class="cu-nota">Pásaselo a quien quieras en tu cuenca. Hasta ${CUENCA.miembrosMaximo}.</p>
+  </section>` : '';
+
+  return `${cabecera}<section class="cu-bloque">
     <h3 class="cu-titulo">Almacén de la tribu</h3>
     <p class="cu-cifra">${numero(c.almacen)} <small>fósiles</small></p>
     <p class="cu-linea">Cada asalto al jefe cuesta <b>${CUENCA.costeAsalto}</b> del común.
@@ -273,7 +279,7 @@ export async function pintarCuenca() {
   const motivo = j ? puedeAsaltar({ almacen: c.almacen, asaltosHoy: c.asaltosHoy }, ahora, j) : 'no hay jefe';
   dom.pie.innerHTML = `<button class="boton-grande" data-accion="asaltar" ${motivo ? 'disabled' : ''}>
     ${motivo ? 'No puedes asaltar' : `Asaltar · ${CUENCA.costeAsalto} fósiles`}</button>`;
-  for (const m of document.querySelectorAll('#cuenca .moneda')) m.textContent = numero(c.almacen);
+  for (const m of document.querySelectorAll('#cuenca .fosil')) m.textContent = numero(c.almacen);
 }
 
 /** Aviso de carta nueva. Reutiliza la ficha, que ya sabe enseñar una carta. */

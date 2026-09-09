@@ -1502,3 +1502,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   background: rgba(180, 85, 63, .14); border: 1px solid rgba(180, 85, 63, .4);
   color: var(--rival, #d98b7a); font-size: .9rem; line-height: 1.45;
 }
+
+/* Los fósiles no llevan el rombo de las dinomonedas: son otro recurso. */
+.meta-fosil { font-size: 13px; color: var(--tenue); min-width: 54px; text-align: right; }
+.meta-fosil b { color: var(--acento-claro, #e0b872); font-size: 15px; }
+.meta-fosil::after { content: ' fósiles'; opacity: .6; font-size: 11px; }
+.cu-tribu .cu-codigo { font-size: 1.05rem; }
