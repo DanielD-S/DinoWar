@@ -66,3 +66,47 @@ ningún secreto.
   tu `localStorage`. Cerrarlo es mover la colección al servidor.
 - **CAPTCHA en el alta anónima.** El límite es de 30 altas por hora y por IP;
   antes de abrirlo a desconocidos hay que activar Turnstile.
+
+## Desplegar desde aquí, sin tocar el panel
+
+El servidor MCP de Supabase puede desplegar la función directamente. Es la vía
+buena: el editor del panel viene con una plantilla «Hello World» ya escrita, y si
+el pegado no la reemplaza entera se despliega la plantilla. Pasó cuatro veces
+seguidas, y desde fuera parecía un fallo del código: la función arrancaba bien,
+contestaba 200 y devolvía `{"message":"Hello undefined!"}`.
+
+**Cómo saber qué hay desplegado de verdad**: `ezbr_sha256`, en la lista de
+funciones. Cambia cuando cambia el código. Si repite entre dos despliegues, es
+que subiste lo mismo.
+
+## Importes por URL: estáticos, siempre
+
+`desde-url.ts` trae el motor del repositorio por URL. Los importes tienen que ser
+**estáticos y con la URL literal**, aunque haya que repetirla en cada línea. Con
+un `await import(`${REPO}/...`)` la ruta se calcula en tiempo de ejecución, el
+empaquetado del despliegue no ve la dependencia y no la incluye: la función
+arranca y muere con `Module not found` **aunque la URL conteste 200**. Cuesta
+diagnosticarlo porque todo lo demás está bien. Lo vigila `test/anclaje.test.js`.
+
+## Cómo probar la función sin un navegador
+
+Se puede invocar desde la propia base de datos, que sí la alcanza:
+
+```sql
+create extension if not exists http with schema extensions;
+
+select status, content from extensions.http((
+  'POST', 'https://<ref>.supabase.co/functions/v1/asalto',
+  array[extensions.http_header('apikey','<clave publicable>'),
+        extensions.http_header('Authorization','Bearer <clave publicable>')],
+  'application/json', '{}')::extensions.http_request);
+
+drop extension http;   -- no dejarlo puesto
+```
+
+Hacen falta LAS DOS cabeceras: sin `apikey`, la pasarela contesta
+`INVALID_CREDENTIALS` antes de llegar a la función.
+
+Con la clave publicable como sesión, la respuesta correcta es
+`401 {"error":"sesión inválida"}` — eso significa que tu código está vivo y
+rechazando a quien no se identifica. Si contesta otra cosa, no es tu código.

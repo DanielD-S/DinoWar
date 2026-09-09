@@ -5,18 +5,21 @@
 // por URL, anclado a un commit CONCRETO. Anclado y no a una rama: así el
 // servidor no puede cambiar de código sin que alguien lo decida.
 //
-// Existe para poder desplegar desde el editor del panel sin pegar 115 KB.
-// Si tienes un ordenador a mano, usa index.ts con la CLI y olvídate de esto.
+// Existe para poder desplegar sin subir 115 KB de paquete.
+//
+// Los importes son ESTÁTICOS y con la URL literal repetida, por feo que quede.
+// Con `await import(`${REPO}/...`)` la ruta se calcula en tiempo de ejecución,
+// el empaquetado del despliegue no puede verla y el módulo no viaja: la función
+// arranca y muere con «Module not found» AUNQUE LA URL CONTESTE 200. Costó
+// verlo porque todo lo demás —el commit, la URL, el contenido— estaba bien.
 //
 // Motor anclado en: fd0d31e9558c5bbfbccaf78da58804618b58ad4d
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
-
-const REPO = 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@fd0d31e9558c5bbfbccaf78da58804618b58ad4d';
-
-const { validarAsalto, jefeDelEvento, AsaltoInvalido } =
-  await import(`${REPO}/supabase/functions/_compartido/validarAsalto.js`);
-const { CUENCA } = await import(`${REPO}/src/data/tribu.js`);
+import {
+  validarAsalto, jefeDelEvento, AsaltoInvalido,
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@fd0d31e9558c5bbfbccaf78da58804618b58ad4d/supabase/functions/_compartido/validarAsalto.js';
+import { CUENCA } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@fd0d31e9558c5bbfbccaf78da58804618b58ad4d/src/data/tribu.js';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',

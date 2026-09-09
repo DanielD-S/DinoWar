@@ -28,6 +28,12 @@ export const VIGILADOS = [
 
 export const shaAnclado = () => (readFileSync(SALIDA, 'utf8').match(/@([0-9a-f]{40})/) ?? [])[1] ?? null;
 
+/**
+ * Los importes llevan la URL literal repetida —no se puede componer con una
+ * constante— así que el SHA aparece varias veces y hay que cambiarlas todas.
+ */
+export const APARICIONES_MINIMAS = 3;
+
 /** Cómo era un fichero en un commit. Null si ese commit no lo tenía. */
 export function enElCommit(sha, fichero) {
   try {
