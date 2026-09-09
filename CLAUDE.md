@@ -7,7 +7,7 @@ que se aprende chocándose.
 ## Verificar un cambio
 
 ```bash
-npm test              # 158 tests. Es la verificación canónica.
+npm test              # 159 tests. Es la verificación canónica.
 npm run sim           # 2.000 partidas IA vs IA → BALANCE.md
 node sim/set.js       # regenera SET_DE_CARTAS.md desde el código
 python -m http.server 8000
@@ -44,6 +44,18 @@ hay que hacer caso cuando el test lo dice.
 | `supabase/migrations/0006_catalogo_cartas.sql` | `node tools/generar-cartas.mjs` | `test/cuentas.test.js` |
 | `BALANCE.md` de la variante | `node sim/cuerpos.js` | — |
 | El commit anclado en `desde-url.ts` | `node tools/anclar-desde-url.mjs` | `test/anclaje.test.js` |
+
+**El anclaje hay que rehacerlo cuando cambia el MOTOR, no sólo los validadores.**
+La función re-juega tus partidas con el código del commit anclado; si el
+navegador estrena reglas y el anclaje se queda atrás, el servidor reproduce otra
+partida y la rechaza. Pasó al quitar la Defensa: cuatro de cada cuatro partidas
+respondían «jugada ilegal», ninguna victoria pagaba, y `npm test` estaba en
+verde porque `VIGILADOS` era una lista a mano de cinco ficheros y el motor no
+estaba en ella. Ahora sale de lo que esbuild dice que entra en el paquete —16
+ficheros— así que añadir un import extiende la vigilancia solo.
+
+Y después de re-anclar hay que **volver a desplegar**: el anclaje en el
+repositorio no mueve nada por sí solo.
 
 ## Windows
 

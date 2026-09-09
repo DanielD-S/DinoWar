@@ -49,3 +49,18 @@ test('El commit anclado lleva el mismo motor que el árbol de trabajo', () => {
     );
   }
 });
+
+test('La vigilancia cubre el MOTOR, no sólo los validadores', () => {
+  // Regresión de un fallo real: VIGILADOS era una lista a mano de cinco
+  // ficheros. Al quitar la Defensa cambió el motor, ninguno de los cinco se
+  // movió, el anclaje se quedó apuntando al motor viejo y la función siguió
+  // re-jugando las partidas con tres estadísticas. Cuatro de cada cuatro se
+  // rechazaban con «jugada ilegal» y este fichero de tests estaba en verde.
+  for (const imprescindible of [
+    'src/engine/state.js', 'src/engine/actions.js', 'src/engine/resolve.js',
+    'src/engine/ai.js', 'src/data/cards.js', 'src/data/balance.js',
+  ]) {
+    assert.ok(VIGILADOS.includes(imprescindible),
+      `${imprescindible} decide el resultado de una partida y nadie vigila que viaje al día`);
+  }
+});
