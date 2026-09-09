@@ -1482,3 +1482,23 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .cu-anuncio-nota { margin: 0 0 8px; font-size: .86rem; opacity: .78; line-height: 1.5; }
 
 .cu-cargando { color: var(--tr-ink, inherit); opacity: .55; padding: 28px 0; text-align: center; }
+
+/* Alta de tribu. Campos grandes: se rellenan con el pulgar. */
+.cu-formulario { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+.cu-campo { display: flex; flex-direction: column; gap: 4px; }
+.cu-campo span { font-size: .8rem; opacity: .68; }
+.cu-campo input {
+  font: 400 1rem/1.4 inherit; color: inherit;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 8px; padding: 11px 12px; width: 100%;
+}
+.cu-campo input:focus-visible { outline: 2px solid var(--acento, #c9a227); outline-offset: 1px; }
+.cu-codigo-campo { text-transform: uppercase; letter-spacing: .18em; font-family: ui-monospace, monospace; }
+.cu-codigo { font-family: ui-monospace, monospace; letter-spacing: .12em; color: var(--acento-claro, #e0b872); }
+
+.cu-aviso-error {
+  margin: 0 0 14px; padding: 12px 14px; border-radius: 10px;
+  background: rgba(180, 85, 63, .14); border: 1px solid rgba(180, 85, 63, .4);
+  color: var(--rival, #d98b7a); font-size: .9rem; line-height: 1.45;
+}

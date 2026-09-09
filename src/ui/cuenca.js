@@ -8,7 +8,8 @@ import { CUENCA, depositoDe, ritmoPorHora, costeDeMejora, faltaParaLlenar,
 import { CARTAS_DE_JEFE, eventosActivos, ventanaDe, TIPO_EVENTO } from '../data/eventos.js';
 import { carta } from '../data/cards.js';
 import {
-  estadoDeTribu, aportar, mejorarYacimiento, reclamar, YO, modoActual, porQueLocal, MODO,
+  estadoDeTribu, aportar, mejorarYacimiento, reclamar, crearTribu, entrarEnTribu,
+  YO, modoActual, porQueLocal, MODO,
 } from './red.js';
 import { anadirCartas } from './almacen.js';
 import { arte } from './art.js';
@@ -42,12 +43,21 @@ export function montarCuenca(volver, asaltar) {
     // Mientras el servidor contesta, el botón se apaga: pulsarlo dos veces
     // mandaría dos aportes, y el segundo no siempre es inofensivo.
     b.disabled = true;
+    let fallo = null;
     try {
       if (b.dataset.accion === 'aportar') {
         const c = await estadoDeTribu();
         await aportar(Number(b.dataset.cuanto) || c.yacimiento.fosiles);
       } else if (b.dataset.accion === 'mejorar') {
         await mejorarYacimiento(Number(b.dataset.coste));
+      } else if (b.dataset.accion === 'crear-tribu') {
+        const nombre = id('cu-nombre')?.value ?? '';
+        if (nombre.trim().length < 3) throw new Error('El nombre necesita al menos 3 letras.');
+        await crearTribu(nombre);
+      } else if (b.dataset.accion === 'entrar-tribu') {
+        const codigo = (id('cu-codigo')?.value ?? '').trim();
+        if (codigo.length < 4) throw new Error('El código son 6 caracteres.');
+        await entrarEnTribu(codigo);
       } else if (b.dataset.accion === 'reclamar') {
         const cardId = await reclamar();
         if (cardId) {
@@ -58,9 +68,12 @@ export function montarCuenca(volver, asaltar) {
         }
       }
     } catch (err) {
-      avisar(err.message);
+      fallo = err;
     }
+    // El aviso va DESPUÉS de repintar: al revés, el repintado se lo llevaba por
+    // delante y el botón parecía no hacer nada.
     await pintarCuenca();
+    if (fallo) avisar(fallo.message);
   });
 
   dom.pie.addEventListener('click', (e) => {
@@ -80,10 +93,14 @@ export function abrirCuenca() {
 /** Un aviso que no interrumpe. Los errores del servidor vienen ya redactados. */
 function avisar(texto) {
   const p = document.createElement('p');
-  p.className = 'cu-nota mal';
+  p.className = 'cu-aviso-error';
+  p.setAttribute('role', 'status');
   p.textContent = texto;
-  dom.pie.prepend(p);
-  setTimeout(() => p.remove(), 6000);
+  // Al principio del cuerpo y no en el pie: sin tribu el pie está vacío, y un
+  // aviso en una franja que no existe no lo lee nadie.
+  dom.cuerpo.prepend(p);
+  p.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  setTimeout(() => p.remove(), 7000);
 }
 
 // ------------------------------------------------------------------ pintado
@@ -117,8 +134,42 @@ function bloqueYacimiento(c, ahora) {
   </section>`;
 }
 
-function bloqueTribu(c) {
+/**
+ * Sin tribu no hay cuenca. Es la primera pantalla que ve alguien que entra al
+ * servidor, así que dice las dos cosas que puede hacer y nada más: fundar una,
+ * o entrar en la de alguien con su código.
+ */
+function bloqueSinTribu() {
   return `<section class="cu-bloque">
+    <h3 class="cu-titulo">Todavía no estás en ninguna tribu</h3>
+    <p class="cu-linea">Un jefe tiene miles de Vida y no cabe en una persona.
+      Funda una cuenca y pasa el código, o entra en la de alguien.</p>
+    <div class="cu-formulario">
+      <label class="cu-campo">
+        <span>Nombre de tu cuenca</span>
+        <input id="cu-nombre" type="text" maxlength="32" placeholder="Cuenca del Morrison"
+               autocomplete="off" enterkeyhint="done">
+      </label>
+      <button class="boton-grande" data-accion="crear-tribu">Fundar la cuenca</button>
+    </div>
+    <div class="cu-formulario">
+      <label class="cu-campo">
+        <span>O el código de una que ya exista</span>
+        <input id="cu-codigo" type="text" maxlength="6" placeholder="ABC123"
+               autocomplete="off" autocapitalize="characters" spellcheck="false"
+               enterkeyhint="go" class="cu-codigo-campo">
+      </label>
+      <button class="boton-secundario" data-accion="entrar-tribu">Entrar con el código</button>
+    </div>
+  </section>`;
+}
+
+function bloqueTribu(c) {
+  if (!c.tribu && modoActual() === MODO.REMOTO) return bloqueSinTribu();
+  return `<section class="cu-bloque">
+    ${c.tribu ? `<h3 class="cu-titulo">${c.tribu.nombre}
+      <span class="cu-nivel">código <b class="cu-codigo">${c.tribu.codigo}</b></span></h3>
+      <p class="cu-nota">Pasa ese código a quien quieras en tu cuenca.</p>` : ''}
     <h3 class="cu-titulo">Almacén de la tribu</h3>
     <p class="cu-cifra">${numero(c.almacen)} <small>fósiles</small></p>
     <p class="cu-linea">Cada asalto al jefe cuesta <b>${CUENCA.costeAsalto}</b> del común.
@@ -201,9 +252,10 @@ export async function pintarCuenca() {
   const ahora = Date.now();
   const c = await estadoDeTribu(ahora);
 
+  const sinTribu = !c.tribu && modoActual() === MODO.REMOTO;
   dom.cuerpo.innerHTML = [
-    bloqueEventos(c, ahora),
-    bloqueJefe(c, ahora),
+    sinTribu ? '' : bloqueEventos(c, ahora),
+    sinTribu ? '' : bloqueJefe(c, ahora),
     bloqueYacimiento(c, ahora),
     bloqueTribu(c),
     bloqueCartas(c),
@@ -216,6 +268,7 @@ export async function pintarCuenca() {
           hizo de verdad.</p>`,
   ].join('');
 
+  if (sinTribu) { dom.pie.innerHTML = ''; return; }
   const j = c.jefe;
   const motivo = j ? puedeAsaltar({ almacen: c.almacen, asaltosHoy: c.asaltosHoy }, ahora, j) : 'no hay jefe';
   dom.pie.innerHTML = `<button class="boton-grande" data-accion="asaltar" ${motivo ? 'disabled' : ''}>
