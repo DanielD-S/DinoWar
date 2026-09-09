@@ -5,7 +5,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { FASE, vidaActual, vidaMaxima, ataqueEfectivo, vuela, rentaDe } from '../src/engine/state.js';
+import {
+  FASE, vidaActual, vidaMaxima, ataqueEfectivo, vuela, rentaDe, danoAlHabitat, frenoDelCampo,
+} from '../src/engine/state.js';
 import { BALANCE } from '../src/data/balance.js';
 import { CARTAS } from '../src/data/cards.js';
 import { tablero, poner, ejecutar, vivo } from './helpers.js';
@@ -150,4 +152,35 @@ test('Volar no libra de lo que no se esquiva volando', () => {
   const r = ejecutar(conMortandad, FASE.REVELACION);
   assert.ok(r.instancias[pterosaurio].heridas >= BALANCE.rasgos.mortandadDano
     || !vivo(r, pterosaurio), 'la mortandad debería alcanzarle');
+});
+
+test('La llanura anegada frena los golpes que llegan a un hábitat', () => {
+  // Nace de un choque: la sabana pasó a dar Biomasa a los dos y eso era, letra
+  // por letra, lo que hacía la llanura. Dos cartas idénticas con nombre distinto
+  // no son dos cartas.
+  //
+  // Frenar es lo único que ningún otro clima hacía —los demás suman— y va contra
+  // el problema medido: el sobrante duplicado se llevó 13 puntos de las victorias
+  // por trofeos al hábitat.
+  const s = tablero(220);
+  const mio = poner(s, 'allosaurus', 0, 0);
+  const suelto = danoAlHabitat(s, mio);
+
+  s.campo = 'llanura';
+  assert.equal(danoAlHabitat(s, mio), suelto - BALANCE.efectosCampo.llanuraFreno,
+    'avanzar contra una ranura vacía llega frenado');
+  assert.equal(frenoDelCampo(s), BALANCE.efectosCampo.llanuraFreno);
+
+  s.campo = null;
+  assert.equal(frenoDelCampo(s), 0, 'sin llanura no frena nada');
+});
+
+test('El freno nunca deja el daño en negativo', () => {
+  const s = tablero(221);
+  // Un dinosaurio con el Ataque a cero por una presión rival: frenar 1 sobre 0
+  // no puede curar al hábitat.
+  const flojo = poner(s, 'dryosaurus', 0, 0);
+  s.instancias[flojo].modAtaque = -99;
+  s.campo = 'llanura';
+  assert.equal(danoAlHabitat(s, flojo), 0);
 });

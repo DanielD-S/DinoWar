@@ -662,7 +662,7 @@ cualquiera de los dos bandos puede reemplazarla, y su efecto alcanza a los dos.
 
 ### Llanura de inundación · Épica · coste 1
 
-+1 Biomasa para ambos jugadores
+Terreno anegado: cada golpe que llega a un hábitat hace 1 menos, en los dos bandos.
 
 `ESTABLECIDO` · Las llanuras de inundación de la Morrison concentran la mayor productividad vegetal estacional de la formación.
 

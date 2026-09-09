@@ -223,7 +223,12 @@ function valorDeAccion(vista, j, a) {
       if (vista.campo === cardId) return -Infinity;
       const r = carta(cardId).rasgo;
       let valor = 0;
-      if (r === RASGO.CAMPO_LLANURA) valor = BALANCE.efectosCampo.llanuraBiomasa * 1.2;
+      // La llanura frena los golpes al hábitat: vale más cuanto más te están
+      // pegando ahí, o sea cuanto más descubierto estés.
+      if (r === RASGO.CAMPO_LLANURA) {
+        const descubierto = BALANCE.ranuras - unidadesDe(vista, j).length;
+        valor = BALANCE.efectosCampo.llanuraFreno * descubierto * IA.pesoHabitat;
+      }
       // La sabana hace lo mismo que la llanura: Biomasa para los dos.
       if (r === RASGO.CAMPO_SABANA) valor = BALANCE.efectosCampo.sabanaBiomasa * 1.2;
       if (r === RASGO.CAMPO_BOSQUE) {

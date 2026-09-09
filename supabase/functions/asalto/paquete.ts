@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: 4b4cf1029b028665
+// huella: f9c2cdb1aca362d3
 //
 // Lleva dentro estos 16 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -523,7 +523,7 @@ var CARTAS = Object.freeze({
     binomial: "Llanura de inundaci\xF3n",
     rasgo: RASGO.CAMPO_LLANURA,
     rasgoNombre: "Llanura de inundaci\xF3n",
-    rasgoTexto: "+1 Biomasa para ambos jugadores",
+    rasgoTexto: "Terreno anegado: cada golpe que llega a un h\xE1bitat hace 1 menos, en los dos bandos.",
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Las llanuras de inundaci\xF3n de la Morrison concentran la mayor productividad vegetal estacional de la formaci\xF3n."
   }),
@@ -1277,7 +1277,14 @@ var BALANCE = Object.freeze({
   }),
   efectosCampo: Object.freeze({
     aridezMazo: 5,
-    llanuraBiomasa: 1,
+    // La llanura anegada FRENA: cada golpe que llega a un hábitat hace 1 menos.
+    //
+    // Daba +1 de Biomasa a los dos, que es lo que ahora hace la sabana, y dos
+    // cartas idénticas con nombre distinto no son dos cartas. Frenar es lo
+    // único que ningún otro clima hacía —los demás suman— y va contra el
+    // problema medido: el sobrante duplicado se llevó 13 puntos de las victorias
+    // por trofeos al hábitat (47/31/22 → 36/44/19).
+    llanuraFreno: 1,
     bosqueCura: 1,
     // El canal y la sabana ya no tocan sólo a los tuyos: como todo clima,
     // valen para los dos bandos por igual.
@@ -1610,15 +1617,14 @@ function danoEntre(state, atacanteIid, defensorIid) {
   if (BALANCE.clados.presaDe[a.clado] === d.clado) dano += BALANCE.clados.bonusDepredacion;
   return Math.max(0, dano);
 }
+var frenoDelCampo = (state) => campoEs(state, RASGO.CAMPO_LLANURA) ? BALANCE.efectosCampo.llanuraFreno : 0;
 function danoAlHabitat(state, iid) {
-  return ataqueEfectivo(state, iid);
+  return Math.max(0, ataqueEfectivo(state, iid) - frenoDelCampo(state));
 }
 var vuela = (state, iid) => carta(state.instancias[iid].cardId).rasgo === RASGO.VUELO;
 var hayAridez = (state) => campoEs(state, RASGO.CAMPO_ARIDEZ);
 function rentaDe(state) {
-  let extra = 0;
-  if (campoEs(state, RASGO.CAMPO_LLANURA)) extra += BALANCE.efectosCampo.llanuraBiomasa;
-  if (campoEs(state, RASGO.CAMPO_SABANA)) extra += BALANCE.efectosCampo.sabanaBiomasa;
+  const extra = campoEs(state, RASGO.CAMPO_SABANA) ? BALANCE.efectosCampo.sabanaBiomasa : 0;
   return BALANCE.rentaPorTurno + extra;
 }
 function curacionDe(state, iid) {
@@ -2021,11 +2027,12 @@ function faseCombate(s) {
       if (dA > 0 && carta(a.cardId).rasgo === RASGO.DESGARRO) s.instancias[b.iid].sinCuracion = true;
       if (dB > 0 && carta(b.cardId).rasgo === RASGO.DESGARRO) s.instancias[a.iid].sinCuracion = true;
       const dobla = (uno) => carta(uno.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE ? 2 : 1;
+      const freno = frenoDelCampo(s);
       const sobraA = Math.max(0, dA - vidaActual(s, b.iid));
       const sobraB = Math.max(0, dB - vidaActual(s, a.iid));
       if (BALANCE.cuerpo.sobranteAlHabitat) {
-        alHabitat[1] += sobraA * dobla(a);
-        alHabitat[0] += sobraB * dobla(b);
+        if (sobraA > 0) alHabitat[1] += Math.max(0, sobraA * dobla(a) - freno);
+        if (sobraB > 0) alHabitat[0] += Math.max(0, sobraB * dobla(b) - freno);
       }
       ev(s, "CHOQUE", { ranura: r, a: a.iid, b: b.iid, danoA: dA, danoB: dB });
     } else if (a) {
@@ -2636,7 +2643,10 @@ function valorDeAccion(vista, j, a) {
       if (vista.campo === cardId) return -Infinity;
       const r = carta(cardId).rasgo;
       let valor = 0;
-      if (r === RASGO.CAMPO_LLANURA) valor = BALANCE.efectosCampo.llanuraBiomasa * 1.2;
+      if (r === RASGO.CAMPO_LLANURA) {
+        const descubierto = BALANCE.ranuras - unidadesDe(vista, j).length;
+        valor = BALANCE.efectosCampo.llanuraFreno * descubierto * IA.pesoHabitat;
+      }
       if (r === RASGO.CAMPO_SABANA) valor = BALANCE.efectosCampo.sabanaBiomasa * 1.2;
       if (r === RASGO.CAMPO_BOSQUE) {
         valor = unidadesDe(vista, j).filter((u) => carta(u.cardId).clado === CLADO.SAUROPODO).length * 0.8;

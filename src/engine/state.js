@@ -261,9 +261,17 @@ export function danoEntre(state, atacanteIid, defensorIid) {
   return Math.max(0, dano);
 }
 
+/**
+ * Lo que la llanura anegada le resta a CADA golpe que llega a un hábitat. Vive
+ * aparte porque se aplica en dos sitios —el avance contra ranura vacía y el daño
+ * sobrante— y tenerlo en uno solo dejaría media regla sin cumplir.
+ */
+export const frenoDelCampo = (state) => (
+  campoEs(state, RASGO.CAMPO_LLANURA) ? BALANCE.efectosCampo.llanuraFreno : 0);
+
 /** Daño que una unidad sin rival enfrente inflige al habitat contrario. */
 export function danoAlHabitat(state, iid) {
-  return ataqueEfectivo(state, iid);
+  return Math.max(0, ataqueEfectivo(state, iid) - frenoDelCampo(state));
 }
 
 /** ¿Sobrevuela la ranura en vez de chocar con quien tiene enfrente? */
@@ -277,9 +285,7 @@ export function rentaDe(state) {
   // Los dos climas que dan Biomasa se suman: son cartas distintas y sólo puede
   // haber un clima en el campo, así que en la práctica nunca coinciden — pero
   // escribirlo como una cadena de `if` evita que mañana se olvide uno.
-  let extra = 0;
-  if (campoEs(state, RASGO.CAMPO_LLANURA)) extra += BALANCE.efectosCampo.llanuraBiomasa;
-  if (campoEs(state, RASGO.CAMPO_SABANA)) extra += BALANCE.efectosCampo.sabanaBiomasa;
+  const extra = campoEs(state, RASGO.CAMPO_SABANA) ? BALANCE.efectosCampo.sabanaBiomasa : 0;
   return BALANCE.rentaPorTurno + extra;
 }
 

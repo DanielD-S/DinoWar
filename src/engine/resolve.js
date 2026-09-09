@@ -9,7 +9,7 @@ import { MODO, modoActual as economiaModo, rentaTipada, ingresar } from './econo
 import {
   FASE, MOTIVO_FIN, CAUSA, rival,
   unidadEn, unidadesDe, todasLasUnidades,
-  ataqueEfectivo, vidaActual, danoEntre, danoAlHabitat, espinasDe,
+  ataqueEfectivo, vidaActual, danoEntre, danoAlHabitat, espinasDe, frenoDelCampo,
   curacionDe, rentaDe, hayAridez, campoEs, vuela,
 } from './state.js';
 
@@ -368,11 +368,14 @@ export function faseCombate(s) {
       // que tenía enfrente. Contra una ranura vacía no hay nada que doblar y su
       // Ataque pasa tal cual, que es la rama de más abajo.
       const dobla = (uno) => (carta(uno.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE ? 2 : 1);
+      const freno = frenoDelCampo(s);
       const sobraA = Math.max(0, dA - vidaActual(s, b.iid));
       const sobraB = Math.max(0, dB - vidaActual(s, a.iid));
       if (BALANCE.cuerpo.sobranteAlHabitat) {
-        alHabitat[1] += sobraA * dobla(a);
-        alHabitat[0] += sobraB * dobla(b);
+        // El freno se aplica DESPUÉS de doblar: la llanura frena el golpe que
+        // llega, no la habilidad del que lo manda.
+        if (sobraA > 0) alHabitat[1] += Math.max(0, sobraA * dobla(a) - freno);
+        if (sobraB > 0) alHabitat[0] += Math.max(0, sobraB * dobla(b) - freno);
       }
 
       ev(s, 'CHOQUE', { ranura: r, a: a.iid, b: b.iid, danoA: dA, danoB: dB });

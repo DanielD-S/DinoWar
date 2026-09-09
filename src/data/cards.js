@@ -415,7 +415,7 @@ export const CARTAS = Object.freeze({
   llanura: clima({
     id: 'llanura', coste: 1, rareza: RAREZA.EPICO, binomial: 'Llanura de inundación',
     rasgo: RASGO.CAMPO_LLANURA, rasgoNombre: 'Llanura de inundación',
-    rasgoTexto: '+1 Biomasa para ambos jugadores',
+    rasgoTexto: 'Terreno anegado: cada golpe que llega a un hábitat hace 1 menos, en los dos bandos.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Las llanuras de inundación de la Morrison concentran la mayor productividad vegetal estacional de la formación.',
   }),

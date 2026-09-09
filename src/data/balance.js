@@ -149,7 +149,14 @@ export const BALANCE = Object.freeze({
 
   efectosCampo: Object.freeze({
     aridezMazo: 5,
-    llanuraBiomasa: 1,
+    // La llanura anegada FRENA: cada golpe que llega a un hábitat hace 1 menos.
+    //
+    // Daba +1 de Biomasa a los dos, que es lo que ahora hace la sabana, y dos
+    // cartas idénticas con nombre distinto no son dos cartas. Frenar es lo
+    // único que ningún otro clima hacía —los demás suman— y va contra el
+    // problema medido: el sobrante duplicado se llevó 13 puntos de las victorias
+    // por trofeos al hábitat (47/31/22 → 36/44/19).
+    llanuraFreno: 1,
     bosqueCura: 1,
     // El canal y la sabana ya no tocan sólo a los tuyos: como todo clima,
     // valen para los dos bandos por igual.
