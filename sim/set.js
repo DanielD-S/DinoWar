@@ -198,9 +198,7 @@ p('El clado no es piedra-papel-tijera: cada relación se apoya en la misma evide
 p('');
 p('| Relación | Efecto |');
 p('|---|---|');
-p(`| Terópodo ataca a Ornitópodo | +${BALANCE.clados.bonusDepredacion} de daño |`);
 
-p(`| Atacar a un Tireóforo | devuelve ${BALANCE.clados.espinasTireoforo} de daño |`);
 p('');
 p('**Resuelto así:** la Defensa por carta **sustituye** a la reducción del clado.');
 p('Si se acumulasen, *Apatosaurus* reduciría 5 de cada golpe —más que el Ataque');

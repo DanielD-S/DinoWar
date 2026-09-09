@@ -92,8 +92,7 @@ export function reglas() {
     ['Mazo', 'Cartas del mazo', B.tamanoMazo, 'Quedarse sin mazo pierde la partida'],
     ['Economía', 'Renta por turno', B.rentaPorTurno, 'Biomasa, plana, igual para los dos'],
     ['Combate', 'Daño de un golpe', 'el Ataque', 'Sin restas: no hay Defensa ni suelo de daño'],
-    ['Combate', 'Bonus de depredación', B.clados.bonusDepredacion, 'Terópodo contra ornitópodo'],
-    ['Combate', 'Púas del tireóforo', B.clados.espinasTireoforo, 'Se devuelven a quien le ataque'],
+    ['Combate', 'Reglas de clado', 'ninguna', 'El clado es clasificación, no cambia números'],
     ['Combate', 'Daño sobrante', B.cuerpo.sobranteAlHabitat ? 'sí pasa' : 'no pasa',
       'Lo que sobra al matar sigue al hábitat rival'],
     ['Colección', 'Precio del sobre', ECONOMIA.precioSobre, `${ECONOMIA.cartasPorSobre} cartas`],
@@ -111,11 +110,8 @@ export function clados() {
   const por = {};
   for (const c of dinos) (por[c.clado] ??= []).push(c);
   const media = (cs, k) => (cs.reduce((n, c) => n + c[k], 0) / cs.length).toFixed(1);
-  const REGLA = {
-    TEROPODO: `+${BALANCE.clados.bonusDepredacion} de daño contra ornitópodos`,
-    TIREOFORO: `devuelve ${BALANCE.clados.espinasTireoforo} de daño a quien le ataque`,
-    ORNITOPODO: 'es la presa del terópodo',
-  };
+  // Ningún clado tiene ya regla propia: se quitaron las dos que había.
+  const REGLA = {};
   return Object.entries(por).map(([clado, cs]) => ({
     clado: CLADO_NOMBRE[clado],
     cartas: cs.length,

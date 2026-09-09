@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: ea306975ba4e25fb
+// huella: b4cda870507d86a2
 //
 // Lleva dentro estos 17 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -201,9 +201,7 @@ var CARTAS = Object.freeze({
     coste: 0,
     ataque: 1,
     vida: 2,
-    rasgo: RASGO.GREGARIO,
-    rasgoNombre: "Gregario",
-    rasgoTexto: "+1 de Ataque por cada otro Dryosaurus propio en el campo.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Ornit\xF3podo peque\xF1o y cursorial. El gregarismo se infiere de acumulaciones multiindividuo, no est\xE1 demostrado."
   }),
@@ -215,9 +213,7 @@ var CARTAS = Object.freeze({
     coste: 1,
     ataque: 2,
     vida: 2,
-    rasgo: RASGO.OPORTUNISTA,
-    rasgoNombre: "Oportunista",
-    rasgoTexto: "+1 Vida permanente cada vez que muere un dinosaurio en el campo.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Ter\xF3podo peque\xF1o (~2 m). El comportamiento carro\xF1ero es una inferencia a partir de talla y analog\xEDa ecol\xF3gica, no de evidencia directa."
   }),
@@ -229,9 +225,7 @@ var CARTAS = Object.freeze({
     coste: 1,
     ataque: 3,
     vida: 3,
-    rasgo: RASGO.CAZA_EN_GRUPO,
-    rasgoNombre: "Caza en grupo",
-    rasgoTexto: "+2 de Ataque si hay tres Ceratosaurus tuyos en el campo.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.DEBATIDO,
     nota_cientifica: "Menos frecuente que Allosaurus. Se ha propuesto una dieta con mayor componente de presa acu\xE1tica y un uso preferente de ambientes ribere\xF1os, a partir de morfolog\xEDa dental y contexto de hallazgos. Hip\xF3tesis discutida."
   }),
@@ -243,9 +237,7 @@ var CARTAS = Object.freeze({
     coste: 2,
     ataque: 1,
     vida: 9,
-    rasgo: RASGO.MURO_DE_PLACAS,
-    rasgoNombre: "Muro de placas",
-    rasgoTexto: "+1 de Vida si tienes otro Stegosaurus en el campo.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Una v\xE9rtebra caudal de Allosaurus con una perforaci\xF3n compatible con una p\xFAa caudal de Stegosaurus es evidencia directa de uso defensivo del tagomizador."
   }),
@@ -257,9 +249,7 @@ var CARTAS = Object.freeze({
     coste: 3,
     ataque: 5,
     vida: 5,
-    rasgo: RASGO.DEPREDADOR_DOMINANTE,
-    rasgoNombre: "Depredador dominante",
-    rasgoTexto: "Si mata a su rival, el da\xF1o sobrante que pasa al h\xE1bitat enemigo se duplica.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Tax\xF3n de ter\xF3podo m\xE1s abundante de la Morrison. Marcas de mordida atribuidas a Allosaurus aparecen en huesos de saur\xF3podos y de Stegosaurus."
   }),
@@ -271,9 +261,7 @@ var CARTAS = Object.freeze({
     coste: 3,
     ataque: 2,
     vida: 7,
-    rasgo: RASGO.BUSCA_EVENTO,
-    rasgoNombre: "Migrador",
-    rasgoTexto: "Al jugarla, busca un evento en tu mazo y ll\xE9vatelo a la mano.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "An\xE1lisis isot\xF3picos de esmalte dental sugieren desplazamientos estacionales hacia tierras altas durante la estaci\xF3n seca, a diferencia de otros saur\xF3podos de la misma formaci\xF3n. El rasgo Migrador refleja ese resultado."
   }),
@@ -285,9 +273,7 @@ var CARTAS = Object.freeze({
     coste: 2,
     ataque: 3,
     vida: 13,
-    rasgo: RASGO.RAMONEO_BAJO,
-    rasgoNombre: "Ramoneo bajo",
-    rasgoTexto: "Recupera +1 de vida al final de cada uno de tus turnos",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "El desgaste dental y la postura del cuello sustentan una partici\xF3n de nicho por ramoneo bajo respecto de otros saur\xF3podos coexistentes."
   }),
@@ -299,9 +285,7 @@ var CARTAS = Object.freeze({
     coste: 3,
     ataque: 2,
     vida: 15,
-    rasgo: RASGO.MANADA,
-    rasgoNombre: "Manada",
-    rasgoTexto: "+1 de Vida si tienes otro saur\xF3podo en el campo.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "La talla adulta de los diplod\xF3cidos es en s\xED misma la principal defensa antipredatoria. Nota: la validez de Brontosaurus como g\xE9nero separado sigue en discusi\xF3n; el juego usa Apatosaurus."
   }),
@@ -313,9 +297,7 @@ var CARTAS = Object.freeze({
     coste: 4,
     ataque: 7,
     vida: 6,
-    rasgo: RASGO.BUSCA_CLIMA,
-    rasgoNombre: "Rastreador",
-    rasgoTexto: "Al jugarla, busca un clima en tu mazo y ll\xE9vatelo a la mano.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "El ter\xF3podo de mayor tama\xF1o de la formaci\xF3n, pero genuinamente raro en el registro. Su escasez en el mazo replica su escasez f\xF3sil."
   }),
@@ -328,9 +310,7 @@ var CARTAS = Object.freeze({
     coste: 2,
     ataque: 2,
     vida: 8,
-    rasgo: RASGO.BUSCA_GREGARISMO,
-    rasgoNombre: "Llamada de manada",
-    rasgoTexto: "Al jugarla, busca un Gregarismo en tu mazo y ll\xE9vatelo a la mano.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Formaci\xF3n Frontier, Wyoming, Cenomaniense (~100 Ma). Los osteodermos en bandas sobre el dorso est\xE1n documentados directamente. El tax\xF3n en s\xED es material fragmentario y varios autores lo tratan como nomen dubium: la coraza es firme, la especie lo es menos."
   }),
@@ -342,9 +322,7 @@ var CARTAS = Object.freeze({
     coste: 2,
     ataque: 4,
     vida: 5,
-    rasgo: RASGO.RIBERENO,
-    rasgoNombre: "Ribere\xF1o",
-    rasgoTexto: "+2 de ataque mientras el Canal fluvial est\xE9 en el campo.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Formaci\xF3n Wessex, isla de Wight, Barremiense (~125 Ma), descrito en 2021. Espinos\xE1urido de hocico alargado y dientes c\xF3nicos, morfolog\xEDa asociada a capturar peces. En su pariente Baryonyx se conservaron escamas de pez en la cavidad abdominal; para este g\xE9nero es inferencia por morfolog\xEDa."
   }),
@@ -356,9 +334,7 @@ var CARTAS = Object.freeze({
     coste: 3,
     ataque: 4,
     vida: 8,
-    rasgo: RASGO.GOLA,
-    rasgoNombre: "Gola ornamentada",
-    rasgoTexto: "+2 de Vida si tienes otro Lokiceratops en el campo.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.DEBATIDO,
     nota_cientifica: "Formaci\xF3n Judith River, Montana, Campaniense (~78 Ma), descrito en 2024. La gola lleva las mayores hojas \xF3seas conocidas en un cerat\xF3psido, asim\xE9tricas entre lados. Si serv\xEDan para defensa, para exhibici\xF3n o para reconocerse entre especies es justamente lo que se discute."
   }),
@@ -370,9 +346,7 @@ var CARTAS = Object.freeze({
     coste: 2,
     ataque: 2,
     vida: 7,
-    rasgo: RASGO.GREGARIO,
-    rasgoNombre: "Gregario",
-    rasgoTexto: "+1 Poder por cada copia suya que tengas en el campo.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Formaciones Judith River y Oldman, Montana y Alberta, Campaniense (~78 Ma). Los lechos de huesos monoespec\xEDficos de hadrosaurios son la mejor evidencia de vida en manada de todo el registro. De este tax\xF3n se conocen adem\xE1s ejemplares con tejido blando conservado."
   }),
@@ -384,9 +358,7 @@ var CARTAS = Object.freeze({
     coste: 4,
     ataque: 10,
     vida: 6,
-    rasgo: RASGO.DESGARRO,
-    rasgoNombre: "Desgarro",
-    rasgoTexto: "A quien hiere no se le cura ninguna herida ese turno.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Formaci\xF3n Cerro Barcino, Chubut, Argentina, Aptiense (~113 Ma). Carcarodontos\xE1urido de unos 12 metros con dientes comprimidos y aserrados, de filo cortante en vez de aplastante. Que eso implique cortar carne y provocar hemorragias se infiere de la forma del diente, no de una herida f\xF3sil."
   }),
@@ -398,9 +370,7 @@ var CARTAS = Object.freeze({
     coste: 2,
     ataque: 2,
     vida: 4,
-    rasgo: RASGO.VUELO,
-    rasgoNombre: "Vuelo",
-    rasgoTexto: "Sobrevuela la ranura: golpea siempre al h\xE1bitat rival, pero quien tenga enfrente le alcanza igual.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Formaci\xF3n Jiufotang, Liaoning, China, Aptiense (~120 Ma). No es un dinosaurio: es un pterosaurio tapej\xE1rido, sin dientes y con cresta craneal. Los tapej\xE1ridos conservan picnofibras, filamentos tegumentarios reales \u2014 la raz\xF3n por la que este juego no pone plumas a los dinosaurios es que ellos no las tienen, no una regla est\xE9tica."
   }),
@@ -604,8 +574,6 @@ var CARTAS = Object.freeze({
     ataque: 9,
     vida: 6,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Plesiosaurio plios\xE1urido del Cret\xE1cico Superior de Wyoming. No es un dinosaurio: es un reptil marino de cuello corto y cr\xE1neo enorme."
   }),
@@ -618,8 +586,6 @@ var CARTAS = Object.freeze({
     ataque: 4,
     vida: 5,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Oviraptorosaurio caenagn\xE1tido de la Formaci\xF3n Ojo Alamo, Nuevo M\xE9xico, Maastrichtiense. Se conoce por poco material p\xE9lvico."
   }),
@@ -631,9 +597,7 @@ var CARTAS = Object.freeze({
     coste: 2,
     ataque: 5,
     vida: 4,
-    rasgo: RASGO.ENTRADA_EMBOSCADA,
-    rasgoNombre: "Emboscada",
-    rasgoTexto: "Al entrar en juego, hace 3 de da\xF1o al dinosaurio que tenga enfrente.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Dromeos\xE1urido de la Formaci\xF3n Dinosaur Park, Alberta, Campaniense. Es el g\xE9nero que da nombre a toda la familia."
   }),
@@ -646,8 +610,6 @@ var CARTAS = Object.freeze({
     ataque: 2,
     vida: 7,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Formaci\xF3n Morrison, cantera Carnegie del Dinosaur National Monument, Utah, Titoniense inferior (~149\u2013145 Ma). Descrito en 2025 sobre un neurocr\xE1neo y techo craneal (CM 26552) que llevaba d\xE9cadas archivado como Diplodocus. Es un dicreos\xE1urido: saur\xF3podos de cuello corto y talla modesta para el grupo, no un ter\xF3podo."
   }),
@@ -660,8 +622,6 @@ var CARTAS = Object.freeze({
     ataque: 5,
     vida: 4,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Herreras\xE1urido de la Formaci\xF3n Ischigualasto, Argentina, Carniense (~231 Ma). Los herreras\xE1uridos son saurisquios muy basales; su colocaci\xF3n entre los ter\xF3podos se discute."
   }),
@@ -674,8 +634,6 @@ var CARTAS = Object.freeze({
     ataque: 8,
     vida: 7,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Espinos\xE1urido de la Formaci\xF3n Elrhaz, N\xEDger, Aptiense. Hocico largo y c\xF3nico, adaptado a la pesca."
   }),
@@ -688,8 +646,6 @@ var CARTAS = Object.freeze({
     ataque: 2,
     vida: 2,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Paraviano diminuto de la Formaci\xF3n Tiaojishan, China, Jur\xE1sico Superior. Conserva impresiones de plumas."
   }),
@@ -701,9 +657,7 @@ var CARTAS = Object.freeze({
     coste: 2,
     ataque: 4,
     vida: 5,
-    rasgo: RASGO.ENTRADA_ALERTA,
-    rasgoNombre: "Alerta",
-    rasgoTexto: "Al entrar en juego, robas 1 carta.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Ter\xF3podo maniraptor del Cret\xE1cico Superior de Norteam\xE9rica. El nombre se basa en dientes aislados y su validez est\xE1 discutida."
   }),
@@ -716,8 +670,6 @@ var CARTAS = Object.freeze({
     ataque: 9,
     vida: 6,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Abelis\xE1urido de la Formaci\xF3n La Colonia, Argentina, Maastrichtiense. Cuernos frontales y brazos reducidos al extremo."
   }),
@@ -729,9 +681,7 @@ var CARTAS = Object.freeze({
     coste: 4,
     ataque: 11,
     vida: 11,
-    rasgo: RASGO.ENTRADA_ARRASA,
-    rasgoNombre: "Arrasa la ribera",
-    rasgoTexto: "Al entrar en juego, 3 de da\xF1o al h\xE1bitat rival.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Espinos\xE1urido de los Kem Kem, Marruecos, Cenomaniense. Vela dorsal y un estilo de vida acu\xE1tico que sigue debati\xE9ndose."
   }),
@@ -743,9 +693,7 @@ var CARTAS = Object.freeze({
     coste: 4,
     ataque: 12,
     vida: 10,
-    rasgo: RASGO.ENTRADA_DEVORA_MAZO,
-    rasgoNombre: "Devora el registro",
-    rasgoTexto: "Al entrar en juego, el rival pierde 3 cartas de su mazo.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Mosasaurio del Maastrichtiense. No es un dinosaurio: es un escamoso marino, pariente de varanos y serpientes."
   }),
@@ -758,8 +706,6 @@ var CARTAS = Object.freeze({
     ataque: 2,
     vida: 2,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Dromeos\xE1urido halszkaraptorino de Mongolia, Campaniense. Cuello largo y hocico con muchos dientes peque\xF1os; se ha propuesto un modo de vida semiacu\xE1tico."
   }),
@@ -772,8 +718,6 @@ var CARTAS = Object.freeze({
     ataque: 1,
     vida: 3,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Oviraptorosaurio de la Formaci\xF3n Nanxiong, China, Maastrichtiense. El holotipo se conserv\xF3 en postura de haber quedado atrapado en el barro."
   }),
@@ -786,8 +730,6 @@ var CARTAS = Object.freeze({
     ataque: 4,
     vida: 5,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Plesiosaurio elasmos\xE1urido del Cret\xE1cico Superior del B\xE1ltico. No es un dinosaurio, y su validez como g\xE9nero est\xE1 discutida."
   }),
@@ -800,8 +742,6 @@ var CARTAS = Object.freeze({
     ataque: 5,
     vida: 4,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Ter\xF3podo tetanuro de la Formaci\xF3n Shishugou, China, Jur\xE1sico Medio. Una sola cresta \xF3sea recorre el cr\xE1neo."
   }),
@@ -814,8 +754,6 @@ var CARTAS = Object.freeze({
     ataque: 2,
     vida: 7,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Anquilosaurio nodos\xE1urido de la Formaci\xF3n Menefee, Nuevo M\xE9xico, Campaniense."
   }),
@@ -828,8 +766,6 @@ var CARTAS = Object.freeze({
     ataque: 5,
     vida: 10,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Cerat\xF3psido casmosaurino de la Formaci\xF3n Judith River, Montana, Campaniense."
   }),
@@ -842,8 +778,6 @@ var CARTAS = Object.freeze({
     ataque: 1,
     vida: 3,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Ceratopsio bagacerat\xF3psido de Mongolia, Campaniense. Peque\xF1o y sin cuernos."
   }),
@@ -856,8 +790,6 @@ var CARTAS = Object.freeze({
     ataque: 4,
     vida: 11,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Estegos\xE1urido del Calloviense de Inglaterra y Francia. Se separ\xF3 del material antes atribuido a Lexovisaurus."
   }),
@@ -870,8 +802,6 @@ var CARTAS = Object.freeze({
     ataque: 6,
     vida: 9,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Terizinosaurio de la Formaci\xF3n Nemegt, Mongolia, Maastrichtiense. Ter\xF3podo herb\xEDvoro con las garras manuales m\xE1s largas que se conocen."
   }),
@@ -884,8 +814,6 @@ var CARTAS = Object.freeze({
     ataque: 3,
     vida: 6,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Paquicefalosaurio de la Formaci\xF3n Prince Creek, Alaska, Campaniense."
   }),
@@ -898,8 +826,6 @@ var CARTAS = Object.freeze({
     ataque: 6,
     vida: 9,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Cerat\xF3psido casmosaurino de Nuevo M\xE9xico, Campaniense. Se propuso separ\xE1ndolo de material asignado a Pentaceratops, y no todos lo aceptan."
   }),
@@ -911,9 +837,7 @@ var CARTAS = Object.freeze({
     coste: 3,
     ataque: 3,
     vida: 12,
-    rasgo: RASGO.ENTRADA_RAMONEO,
-    rasgoNombre: "Ramoneo alto",
-    rasgoTexto: "Al entrar en juego, ganas 2 de Biomasa.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Saur\xF3podo del Jur\xE1sico Medio de Marruecos. Extremidades desproporcionadamente largas para un saur\xF3podo."
   }),
@@ -926,8 +850,6 @@ var CARTAS = Object.freeze({
     ataque: 3,
     vida: 6,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Paquicefalosaurio de la Formaci\xF3n Dinosaur Park, Alberta, Campaniense. Domo craneal grueso."
   }),
@@ -940,8 +862,6 @@ var CARTAS = Object.freeze({
     ataque: 4,
     vida: 11,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Hadros\xE1urido de la Formaci\xF3n Two Medicine, Montana, Campaniense. Sus nidadas documentan cuidado parental."
   }),
@@ -954,8 +874,6 @@ var CARTAS = Object.freeze({
     ataque: 5,
     vida: 17,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Hadros\xE1urido del Maastrichtiense de Norteam\xE9rica. Uno de los dinosaurios con m\xE1s ejemplares conocidos."
   }),
@@ -968,8 +886,6 @@ var CARTAS = Object.freeze({
     ataque: 2,
     vida: 7,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Sauropodomorfo basal de la Formaci\xF3n Elliot, Sud\xE1frica, Tri\xE1sico Superior. No es un saur\xF3podo verdadero; se agrupa aqu\xED por plan corporal. Su posici\xF3n es incierta incluso dentro de los plateosaurios, y parte del material asignado se considera indeterminado."
   }),
@@ -981,9 +897,7 @@ var CARTAS = Object.freeze({
     coste: 2,
     ataque: 2,
     vida: 7,
-    rasgo: RASGO.ENTRADA_MANADA_SANA,
-    rasgoNombre: "Cierra la formaci\xF3n",
-    rasgoTexto: "Al entrar en juego, tus otros dinosaurios curan 2 heridas.",
+    rasgo: RASGO.NINGUNO,
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Anquilosaurio de la Formaci\xF3n Morrison, Jur\xE1sico Superior. Uno de los anquilosaurios m\xE1s antiguos que se conocen bien."
   }),
@@ -996,8 +910,6 @@ var CARTAS = Object.freeze({
     ataque: 5,
     vida: 10,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Cerat\xF3psido centrosaurino de la Formaci\xF3n Oldman, Alberta, Campaniense."
   }),
@@ -1010,8 +922,6 @@ var CARTAS = Object.freeze({
     ataque: 4,
     vida: 18,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Titanosaurio del Cret\xE1cico Superior de Argentina. El material asignado al g\xE9nero es heterog\xE9neo y su validez se discute."
   }),
@@ -1024,8 +934,6 @@ var CARTAS = Object.freeze({
     ataque: 1,
     vida: 3,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Neoceratopsio basal de la Formaci\xF3n Yixian, China, Barremiense. Peque\xF1o y sin gola desarrollada."
   }),
@@ -1038,8 +946,6 @@ var CARTAS = Object.freeze({
     ataque: 4,
     vida: 11,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Hadros\xE1urido saurolofino de la Formaci\xF3n Neslen, Utah, Campaniense. Destaca por el gran arco nasal."
   }),
@@ -1052,8 +958,6 @@ var CARTAS = Object.freeze({
     ataque: 1,
     vida: 3,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Tire\xF3foro basal de la Formaci\xF3n Lufeng, China, Jur\xE1sico Inferior. Se conoce por una mand\xEDbula, y su validez est\xE1 discutida."
   }),
@@ -1066,8 +970,6 @@ var CARTAS = Object.freeze({
     ataque: 3,
     vida: 6,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Hadrosauroideo basal de la Formaci\xF3n Sunjiawan, China, Cret\xE1cico Superior."
   }),
@@ -1080,8 +982,6 @@ var CARTAS = Object.freeze({
     ataque: 2,
     vida: 7,
     rasgo: RASGO.NINGUNO,
-    rasgoNombre: "Sin rasgo",
-    rasgoTexto: "Todav\xEDa no hace nada especial.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Cerat\xF3psido casmosaurino de la Formaci\xF3n Dinosaur Park, Alberta, Campaniense. Gola muy grande con dos aberturas amplias."
   })
@@ -1116,9 +1016,7 @@ var CARTAS_DE_JEFE = Object.freeze({
     coste: 4,
     ataque: 7,
     vida: 8,
-    rasgo: RASGO.DEPREDADOR_DOMINANTE,
-    rasgoNombre: "Depredador dominante",
-    rasgoTexto: "Si mata a su rival, el da\xF1o sobrante que pasa al h\xE1bitat enemigo se duplica.",
+    rasgo: RASGO.NINGUNO,
     evidencia: "DEBATIDO",
     nota: "El mayor ter\xF3podo conocido de la Formaci\xF3n Morrison, y tambi\xE9n el m\xE1s discutido: parte de los autores lo consideran un Allosaurus de gran talla y no un g\xE9nero propio. La carta lo declara porque la duda es el dato.",
     formacion: "Formaci\xF3n Morrison",
@@ -1133,9 +1031,7 @@ var CARTAS_DE_JEFE = Object.freeze({
     coste: 4,
     ataque: 3,
     vida: 13,
-    rasgo: RASGO.MANADA,
-    rasgoNombre: "Manada",
-    rasgoTexto: "+1 de Vida si tienes otro saur\xF3podo en el campo.",
+    rasgo: RASGO.NINGUNO,
     evidencia: "ESTABLECIDO",
     nota: "Diplod\xF3cido de cuello desmesurado incluso para su familia: v\xE9rtebras cervicales alargadas que lo hac\xEDan capaz de ramonear donde ning\xFAn otro saur\xF3podo de la Morrison llegaba.",
     formacion: "Formaci\xF3n Morrison",
@@ -1248,13 +1144,12 @@ var BALANCE = Object.freeze({
   // evidencia que cita la carta correspondiente.
   // La reducción de daño ya NO vive aquí: cada dinosaurio lleva su propia
   // Defensa. Un clado no necesita regla especial si sus números ya lo dicen.
-  clados: Object.freeze({
-    bonusDepredacion: 2,
-    // terópodo sobre presa pequeña y cursorial
-    presaDe: Object.freeze({ [CLADO.TEROPODO]: CLADO.ORNITOPODO }),
-    espinasTireoforo: 2
-    // daño devuelto a quien ataca a un tireóforo
-  }),
+  // Los clados ya no tienen reglas. Eran dos —+2 del terópodo contra
+  // ornitópodos y 2 de púas del tireóforo— y medidas valían unos dos puntos de
+  // reparto entre las tres vías de victoria: apagarlas movía 36/43/21 a
+  // 38/43/19. El clado sigue en la ficha como CLASIFICACIÓN, que es lo que hace
+  // que un Diplodocus y un Barosaurus no sean la misma carta con otra foto, pero
+  // no mueve ningún número.
   // Suelo del daño en combate. La Defensa resta daño plano a CADA golpe, así
   // que sin suelo una carta con más Defensa que el Ataque del rival no recibe
   // nada: es inmune, no resistente. Medido, un punto de Defensa llegó a valer
@@ -1769,17 +1664,11 @@ function delClado(state, inst, clado, min) {
   const n = unidadesDe(state, inst.dueno).filter((o) => o.iid !== inst.iid && carta(o.cardId).clado === clado).length;
   return n >= min;
 }
-function espinasDe(state, iid) {
-  const c = carta(state.instancias[iid].cardId);
-  let e = c.clado === CLADO.TIREOFORO ? BALANCE.clados.espinasTireoforo : 0;
-  return e;
+function espinasDe() {
+  return 0;
 }
-function danoEntre(state, atacanteIid, defensorIid) {
-  const a = carta(state.instancias[atacanteIid].cardId);
-  const d = carta(state.instancias[defensorIid].cardId);
-  let dano = ataqueEfectivo(state, atacanteIid);
-  if (BALANCE.clados.presaDe[a.clado] === d.clado) dano += BALANCE.clados.bonusDepredacion;
-  return Math.max(0, dano);
+function danoEntre(state, atacanteIid) {
+  return Math.max(0, ataqueEfectivo(state, atacanteIid));
 }
 function puedeReciclar(state, j) {
   if (!campoEs(state, RASGO.CAMPO_LLANURA)) return false;
@@ -2699,12 +2588,10 @@ function ataqueHipotetico(vista, j, cardId) {
   }
   return poder;
 }
-function espinasHipoteticas(cardId) {
-  const c = carta(cardId);
-  let e = c.clado === CLADO.TIREOFORO ? BALANCE.clados.espinasTireoforo : 0;
-  return e;
+function espinasHipoteticas() {
+  return 0;
 }
-var bonusTrofico = (cladoA, cladoB) => BALANCE.clados.presaDe[cladoA] === cladoB ? BALANCE.clados.bonusDepredacion : 0;
+var bonusTrofico = () => 0;
 function mazoDe(vista, j) {
   const m = vista.jugadores[j].mazo;
   return typeof m === "number" ? m : m.length;

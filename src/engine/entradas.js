@@ -1,7 +1,17 @@
-// DinoWar — habilidades AL ENTRAR EN JUEGO.
+// DinoWar — habilidades AL ENTRAR EN JUEGO. EL ARMAZÓN, SIN CARTAS.
 //
 // Un rasgo que se dispara una vez, cuando la criatura llega al campo, y se
 // acabó. Nada de estado que llevar en la cabeza.
+//
+// AHORA MISMO NINGUNA CARTA LLEVA NINGUNA. Las 52 criaturas son coste, Ataque y
+// Vida y nada más — decisión del autor, que va a diseñar las habilidades a mano
+// sobre la hoja de recoste. Esto se queda montado y enhebrado en la fase de
+// revelación para que ponerlas sea escribir una entrada en `cards.js` y un caso
+// en el switch de abajo, y no volver a levantar la fontanería.
+//
+// Las seis que hubo aquí de prueba —Troodon roba, Spinosaurus arrasa el hábitat,
+// Mosasaurus muele mazo, Dromaeosaurus embosca, Gargoyleosaurus cura, Atlasaurus
+// da Biomasa— quedan como ejemplo de la forma, con sus números en balance.js.
 //
 // Por qué esta forma y no la de antes. Los rasgos de siempre son PASIVOS y
 // condicionales —«+1 de Vida si tienes otro Stegosaurus»— y eso tiene dos

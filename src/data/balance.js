@@ -96,11 +96,13 @@ export const BALANCE = Object.freeze({
   // evidencia que cita la carta correspondiente.
   // La reducción de daño ya NO vive aquí: cada dinosaurio lleva su propia
   // Defensa. Un clado no necesita regla especial si sus números ya lo dicen.
-  clados: Object.freeze({
-    bonusDepredacion: 2,      // terópodo sobre presa pequeña y cursorial
-    presaDe: Object.freeze({ [CLADO.TEROPODO]: CLADO.ORNITOPODO }),
-    espinasTireoforo: 2,      // daño devuelto a quien ataca a un tireóforo
-  }),
+  // Los clados ya no tienen reglas. Eran dos —+2 del terópodo contra
+  // ornitópodos y 2 de púas del tireóforo— y medidas valían unos dos puntos de
+  // reparto entre las tres vías de victoria: apagarlas movía 36/43/21 a
+  // 38/43/19. El clado sigue en la ficha como CLASIFICACIÓN, que es lo que hace
+  // que un Diplodocus y un Barosaurus no sean la misma carta con otra foto, pero
+  // no mueve ningún número.
+
 
   // Suelo del daño en combate. La Defensa resta daño plano a CADA golpe, así
   // que sin suelo una carta con más Defensa que el Ataque del rival no recibe

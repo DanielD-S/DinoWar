@@ -38,8 +38,11 @@ function escribir() {
       c.coste,
       dino ? c.ataque : '',
       dino ? c.vida : '',
-      c.rasgoNombre,
-      esc(c.rasgoTexto),
+      // Las criaturas ya no tienen rasgo: sin el `?? ''` sale la CADENA
+      // «undefined» en la celda, y al aplicar de vuelta se escribiría tal cual
+      // en cards.js como si fuera el nombre del rasgo.
+      c.rasgoNombre ?? '',
+      c.rasgoTexto ? esc(c.rasgoTexto) : '',
       '',
     ].map((x) => ` ${x} `).join('|').replace(/^/, '|').replace(/$/, '|');
   });

@@ -95,7 +95,7 @@ es legendario.
 
 **0 de coste · 1 de Ataque · 2 de Vida**
 
-**Gregario** — +1 de Ataque por cada otro Dryosaurus propio en el campo.
+**undefined** — undefined
 
 `INFERIDO` · Ornitópodo pequeño y cursorial. El gregarismo se infiere de acumulaciones multiindividuo, no está demostrado.
 
@@ -105,7 +105,7 @@ es legendario.
 
 **1 de coste · 2 de Ataque · 2 de Vida**
 
-**Oportunista** — +1 Vida permanente cada vez que muere un dinosaurio en el campo.
+**undefined** — undefined
 
 `INFERIDO` · Terópodo pequeño (~2 m). El comportamiento carroñero es una inferencia a partir de talla y analogía ecológica, no de evidencia directa.
 
@@ -115,7 +115,7 @@ es legendario.
 
 **1 de coste · 3 de Ataque · 3 de Vida**
 
-**Caza en grupo** — +2 de Ataque si hay tres Ceratosaurus tuyos en el campo.
+**undefined** — undefined
 
 `DEBATIDO` · Menos frecuente que Allosaurus. Se ha propuesto una dieta con mayor componente de presa acuática y un uso preferente de ambientes ribereños, a partir de morfología dental y contexto de hallazgos. Hipótesis discutida.
 
@@ -125,7 +125,7 @@ es legendario.
 
 **2 de coste · 1 de Ataque · 9 de Vida**
 
-**Muro de placas** — +1 de Vida si tienes otro Stegosaurus en el campo.
+**undefined** — undefined
 
 `ESTABLECIDO` · Una vértebra caudal de Allosaurus con una perforación compatible con una púa caudal de Stegosaurus es evidencia directa de uso defensivo del tagomizador.
 
@@ -135,7 +135,7 @@ es legendario.
 
 **3 de coste · 5 de Ataque · 5 de Vida**
 
-**Depredador dominante** — Si mata a su rival, el daño sobrante que pasa al hábitat enemigo se duplica.
+**undefined** — undefined
 
 `ESTABLECIDO` · Taxón de terópodo más abundante de la Morrison. Marcas de mordida atribuidas a Allosaurus aparecen en huesos de saurópodos y de Stegosaurus.
 
@@ -145,7 +145,7 @@ es legendario.
 
 **3 de coste · 2 de Ataque · 7 de Vida**
 
-**Migrador** — Al jugarla, busca un evento en tu mazo y llévatelo a la mano.
+**undefined** — undefined
 
 `ESTABLECIDO` · Análisis isotópicos de esmalte dental sugieren desplazamientos estacionales hacia tierras altas durante la estación seca, a diferencia de otros saurópodos de la misma formación. El rasgo Migrador refleja ese resultado.
 
@@ -155,7 +155,7 @@ es legendario.
 
 **2 de coste · 3 de Ataque · 13 de Vida**
 
-**Ramoneo bajo** — Recupera +1 de vida al final de cada uno de tus turnos
+**undefined** — undefined
 
 `ESTABLECIDO` · El desgaste dental y la postura del cuello sustentan una partición de nicho por ramoneo bajo respecto de otros saurópodos coexistentes.
 
@@ -165,7 +165,7 @@ es legendario.
 
 **3 de coste · 2 de Ataque · 15 de Vida**
 
-**Manada** — +1 de Vida si tienes otro saurópodo en el campo.
+**undefined** — undefined
 
 `ESTABLECIDO` · La talla adulta de los diplodócidos es en sí misma la principal defensa antipredatoria. Nota: la validez de Brontosaurus como género separado sigue en discusión; el juego usa Apatosaurus.
 
@@ -175,7 +175,7 @@ es legendario.
 
 **4 de coste · 7 de Ataque · 6 de Vida**
 
-**Rastreador** — Al jugarla, busca un clima en tu mazo y llévatelo a la mano.
+**undefined** — undefined
 
 `ESTABLECIDO` · El terópodo de mayor tamaño de la formación, pero genuinamente raro en el registro. Su escasez en el mazo replica su escasez fósil.
 
@@ -185,7 +185,7 @@ es legendario.
 
 **2 de coste · 2 de Ataque · 8 de Vida**
 
-**Llamada de manada** — Al jugarla, busca un Gregarismo en tu mazo y llévatelo a la mano.
+**undefined** — undefined
 
 `ESTABLECIDO` · Formación Frontier, Wyoming, Cenomaniense (~100 Ma). Los osteodermos en bandas sobre el dorso están documentados directamente. El taxón en sí es material fragmentario y varios autores lo tratan como nomen dubium: la coraza es firme, la especie lo es menos.
 
@@ -195,7 +195,7 @@ es legendario.
 
 **2 de coste · 4 de Ataque · 5 de Vida**
 
-**Ribereño** — +2 de ataque mientras el Canal fluvial esté en el campo.
+**undefined** — undefined
 
 `INFERIDO` · Formación Wessex, isla de Wight, Barremiense (~125 Ma), descrito en 2021. Espinosáurido de hocico alargado y dientes cónicos, morfología asociada a capturar peces. En su pariente Baryonyx se conservaron escamas de pez en la cavidad abdominal; para este género es inferencia por morfología.
 
@@ -205,7 +205,7 @@ es legendario.
 
 **3 de coste · 4 de Ataque · 8 de Vida**
 
-**Gola ornamentada** — +2 de Vida si tienes otro Lokiceratops en el campo.
+**undefined** — undefined
 
 `DEBATIDO` · Formación Judith River, Montana, Campaniense (~78 Ma), descrito en 2024. La gola lleva las mayores hojas óseas conocidas en un ceratópsido, asimétricas entre lados. Si servían para defensa, para exhibición o para reconocerse entre especies es justamente lo que se discute.
 
@@ -215,7 +215,7 @@ es legendario.
 
 **2 de coste · 2 de Ataque · 7 de Vida**
 
-**Gregario** — +1 Poder por cada copia suya que tengas en el campo.
+**undefined** — undefined
 
 `ESTABLECIDO` · Formaciones Judith River y Oldman, Montana y Alberta, Campaniense (~78 Ma). Los lechos de huesos monoespecíficos de hadrosaurios son la mejor evidencia de vida en manada de todo el registro. De este taxón se conocen además ejemplares con tejido blando conservado.
 
@@ -225,7 +225,7 @@ es legendario.
 
 **4 de coste · 10 de Ataque · 6 de Vida**
 
-**Desgarro** — A quien hiere no se le cura ninguna herida ese turno.
+**undefined** — undefined
 
 `INFERIDO` · Formación Cerro Barcino, Chubut, Argentina, Aptiense (~113 Ma). Carcarodontosáurido de unos 12 metros con dientes comprimidos y aserrados, de filo cortante en vez de aplastante. Que eso implique cortar carne y provocar hemorragias se infiere de la forma del diente, no de una herida fósil.
 
@@ -235,7 +235,7 @@ es legendario.
 
 **2 de coste · 2 de Ataque · 4 de Vida**
 
-**Vuelo** — Sobrevuela la ranura: golpea siempre al hábitat rival, pero quien tenga enfrente le alcanza igual.
+**undefined** — undefined
 
 `ESTABLECIDO` · Formación Jiufotang, Liaoning, China, Aptiense (~120 Ma). No es un dinosaurio: es un pterosaurio tapejárido, sin dientes y con cresta craneal. Los tapejáridos conservan picnofibras, filamentos tegumentarios reales — la razón por la que este juego no pone plumas a los dinosaurios es que ellos no las tienen, no una regla estética.
 
@@ -245,7 +245,7 @@ es legendario.
 
 **3 de coste · 9 de Ataque · 6 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Plesiosaurio pliosáurido del Cretácico Superior de Wyoming. No es un dinosaurio: es un reptil marino de cuello corto y cráneo enorme.
 
@@ -253,7 +253,7 @@ es legendario.
 
 **2 de coste · 4 de Ataque · 5 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Oviraptorosaurio caenagnátido de la Formación Ojo Alamo, Nuevo México, Maastrichtiense. Se conoce por poco material pélvico.
 
@@ -261,7 +261,7 @@ es legendario.
 
 **2 de coste · 5 de Ataque · 4 de Vida**
 
-**Emboscada** — Al entrar en juego, hace 3 de daño al dinosaurio que tenga enfrente.
+**undefined** — undefined
 
 `INFERIDO` · Dromeosáurido de la Formación Dinosaur Park, Alberta, Campaniense. Es el género que da nombre a toda la familia.
 
@@ -269,7 +269,7 @@ es legendario.
 
 **2 de coste · 2 de Ataque · 7 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `ESTABLECIDO` · Formación Morrison, cantera Carnegie del Dinosaur National Monument, Utah, Titoniense inferior (~149–145 Ma). Descrito en 2025 sobre un neurocráneo y techo craneal (CM 26552) que llevaba décadas archivado como Diplodocus. Es un dicreosáurido: saurópodos de cuello corto y talla modesta para el grupo, no un terópodo.
 
@@ -277,7 +277,7 @@ es legendario.
 
 **2 de coste · 5 de Ataque · 4 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Herrerasáurido de la Formación Ischigualasto, Argentina, Carniense (~231 Ma). Los herrerasáuridos son saurisquios muy basales; su colocación entre los terópodos se discute.
 
@@ -285,7 +285,7 @@ es legendario.
 
 **3 de coste · 8 de Ataque · 7 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Espinosáurido de la Formación Elrhaz, Níger, Aptiense. Hocico largo y cónico, adaptado a la pesca.
 
@@ -293,7 +293,7 @@ es legendario.
 
 **1 de coste · 2 de Ataque · 2 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Paraviano diminuto de la Formación Tiaojishan, China, Jurásico Superior. Conserva impresiones de plumas.
 
@@ -301,7 +301,7 @@ es legendario.
 
 **2 de coste · 4 de Ataque · 5 de Vida**
 
-**Alerta** — Al entrar en juego, robas 1 carta.
+**undefined** — undefined
 
 `INFERIDO` · Terópodo maniraptor del Cretácico Superior de Norteamérica. El nombre se basa en dientes aislados y su validez está discutida.
 
@@ -309,7 +309,7 @@ es legendario.
 
 **3 de coste · 9 de Ataque · 6 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Abelisáurido de la Formación La Colonia, Argentina, Maastrichtiense. Cuernos frontales y brazos reducidos al extremo.
 
@@ -317,7 +317,7 @@ es legendario.
 
 **4 de coste · 11 de Ataque · 11 de Vida**
 
-**Arrasa la ribera** — Al entrar en juego, 3 de daño al hábitat rival.
+**undefined** — undefined
 
 `INFERIDO` · Espinosáurido de los Kem Kem, Marruecos, Cenomaniense. Vela dorsal y un estilo de vida acuático que sigue debatiéndose.
 
@@ -325,7 +325,7 @@ es legendario.
 
 **4 de coste · 12 de Ataque · 10 de Vida**
 
-**Devora el registro** — Al entrar en juego, el rival pierde 3 cartas de su mazo.
+**undefined** — undefined
 
 `INFERIDO` · Mosasaurio del Maastrichtiense. No es un dinosaurio: es un escamoso marino, pariente de varanos y serpientes.
 
@@ -333,7 +333,7 @@ es legendario.
 
 **1 de coste · 2 de Ataque · 2 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Dromeosáurido halszkaraptorino de Mongolia, Campaniense. Cuello largo y hocico con muchos dientes pequeños; se ha propuesto un modo de vida semiacuático.
 
@@ -341,7 +341,7 @@ es legendario.
 
 **1 de coste · 1 de Ataque · 3 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Oviraptorosaurio de la Formación Nanxiong, China, Maastrichtiense. El holotipo se conservó en postura de haber quedado atrapado en el barro.
 
@@ -349,7 +349,7 @@ es legendario.
 
 **2 de coste · 4 de Ataque · 5 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Plesiosaurio elasmosáurido del Cretácico Superior del Báltico. No es un dinosaurio, y su validez como género está discutida.
 
@@ -357,7 +357,7 @@ es legendario.
 
 **2 de coste · 5 de Ataque · 4 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Terópodo tetanuro de la Formación Shishugou, China, Jurásico Medio. Una sola cresta ósea recorre el cráneo.
 
@@ -365,7 +365,7 @@ es legendario.
 
 **2 de coste · 2 de Ataque · 7 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Anquilosaurio nodosáurido de la Formación Menefee, Nuevo México, Campaniense.
 
@@ -373,7 +373,7 @@ es legendario.
 
 **3 de coste · 5 de Ataque · 10 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Ceratópsido casmosaurino de la Formación Judith River, Montana, Campaniense.
 
@@ -381,7 +381,7 @@ es legendario.
 
 **1 de coste · 1 de Ataque · 3 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Ceratopsio bagaceratópsido de Mongolia, Campaniense. Pequeño y sin cuernos.
 
@@ -389,7 +389,7 @@ es legendario.
 
 **3 de coste · 4 de Ataque · 11 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Estegosáurido del Calloviense de Inglaterra y Francia. Se separó del material antes atribuido a Lexovisaurus.
 
@@ -397,7 +397,7 @@ es legendario.
 
 **3 de coste · 6 de Ataque · 9 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Terizinosaurio de la Formación Nemegt, Mongolia, Maastrichtiense. Terópodo herbívoro con las garras manuales más largas que se conocen.
 
@@ -405,7 +405,7 @@ es legendario.
 
 **2 de coste · 3 de Ataque · 6 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Paquicefalosaurio de la Formación Prince Creek, Alaska, Campaniense.
 
@@ -413,7 +413,7 @@ es legendario.
 
 **3 de coste · 6 de Ataque · 9 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Ceratópsido casmosaurino de Nuevo México, Campaniense. Se propuso separándolo de material asignado a Pentaceratops, y no todos lo aceptan.
 
@@ -421,7 +421,7 @@ es legendario.
 
 **3 de coste · 3 de Ataque · 12 de Vida**
 
-**Ramoneo alto** — Al entrar en juego, ganas 2 de Biomasa.
+**undefined** — undefined
 
 `INFERIDO` · Saurópodo del Jurásico Medio de Marruecos. Extremidades desproporcionadamente largas para un saurópodo.
 
@@ -429,7 +429,7 @@ es legendario.
 
 **2 de coste · 3 de Ataque · 6 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Paquicefalosaurio de la Formación Dinosaur Park, Alberta, Campaniense. Domo craneal grueso.
 
@@ -437,7 +437,7 @@ es legendario.
 
 **3 de coste · 4 de Ataque · 11 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Hadrosáurido de la Formación Two Medicine, Montana, Campaniense. Sus nidadas documentan cuidado parental.
 
@@ -445,7 +445,7 @@ es legendario.
 
 **4 de coste · 5 de Ataque · 17 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Hadrosáurido del Maastrichtiense de Norteamérica. Uno de los dinosaurios con más ejemplares conocidos.
 
@@ -453,7 +453,7 @@ es legendario.
 
 **2 de coste · 2 de Ataque · 7 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Sauropodomorfo basal de la Formación Elliot, Sudáfrica, Triásico Superior. No es un saurópodo verdadero; se agrupa aquí por plan corporal. Su posición es incierta incluso dentro de los plateosaurios, y parte del material asignado se considera indeterminado.
 
@@ -461,7 +461,7 @@ es legendario.
 
 **2 de coste · 2 de Ataque · 7 de Vida**
 
-**Cierra la formación** — Al entrar en juego, tus otros dinosaurios curan 2 heridas.
+**undefined** — undefined
 
 `INFERIDO` · Anquilosaurio de la Formación Morrison, Jurásico Superior. Uno de los anquilosaurios más antiguos que se conocen bien.
 
@@ -469,7 +469,7 @@ es legendario.
 
 **3 de coste · 5 de Ataque · 10 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Ceratópsido centrosaurino de la Formación Oldman, Alberta, Campaniense.
 
@@ -477,7 +477,7 @@ es legendario.
 
 **4 de coste · 4 de Ataque · 18 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Titanosaurio del Cretácico Superior de Argentina. El material asignado al género es heterogéneo y su validez se discute.
 
@@ -485,7 +485,7 @@ es legendario.
 
 **1 de coste · 1 de Ataque · 3 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Neoceratopsio basal de la Formación Yixian, China, Barremiense. Pequeño y sin gola desarrollada.
 
@@ -493,7 +493,7 @@ es legendario.
 
 **3 de coste · 4 de Ataque · 11 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Hadrosáurido saurolofino de la Formación Neslen, Utah, Campaniense. Destaca por el gran arco nasal.
 
@@ -501,7 +501,7 @@ es legendario.
 
 **1 de coste · 1 de Ataque · 3 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Tireóforo basal de la Formación Lufeng, China, Jurásico Inferior. Se conoce por una mandíbula, y su validez está discutida.
 
@@ -509,7 +509,7 @@ es legendario.
 
 **2 de coste · 3 de Ataque · 6 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Hadrosauroideo basal de la Formación Sunjiawan, China, Cretácico Superior.
 
@@ -517,7 +517,7 @@ es legendario.
 
 **2 de coste · 2 de Ataque · 7 de Vida**
 
-**Sin rasgo** — Todavía no hace nada especial.
+**undefined** — undefined
 
 `INFERIDO` · Ceratópsido casmosaurino de la Formación Dinosaur Park, Alberta, Campaniense. Gola muy grande con dos aberturas amplias.
 
@@ -698,8 +698,6 @@ El clado no es piedra-papel-tijera: cada relación se apoya en la misma evidenci
 
 | Relación | Efecto |
 |---|---|
-| Terópodo ataca a Ornitópodo | +2 de daño |
-| Atacar a un Tireóforo | devuelve 2 de daño |
 
 **Resuelto así:** la Defensa por carta **sustituye** a la reducción del clado.
 Si se acumulasen, *Apatosaurus* reduciría 5 de cada golpe —más que el Ataque

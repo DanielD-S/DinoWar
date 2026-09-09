@@ -597,7 +597,6 @@ export function ayudaHTML() {
   // cambia la cuenta que se enseña.
   const a = carta('allosaurus');
   const d = carta('stegosaurus');
-  const espinas = BALANCE.clados.espinasTireoforo + BALANCE.rasgos.tagomizadorExtra;   // púas + Tagomizador
   const n = document.createElement('div');
   n.className = 'carta carta--ranura';
   n.innerHTML = marcoCarta(null, ejemplo);
@@ -655,8 +654,7 @@ export function ayudaHTML() {
     <ul class="ayuda-lista">
       <li><span class="k">Ejemplo</span><span class="v"><i>${a.binomial}</i> (Ataque ${a.ataque}, Vida ${a.vida})
         choca con <i>${d.binomial}</i> (Ataque ${d.ataque}, Vida ${d.vida}).
-        Le hace <b>${a.ataque}</b> y recibe ${d.ataque}, más ${espinas} de púas caudales:
-        <b>${d.ataque + espinas}</b> en total.</span></li>
+        Le hace <b>${a.ataque}</b> y recibe <b>${d.ataque}</b>. Los dos pegan a la vez.</span></li>
       <li><span class="k">Lo que sobra</span><span class="v">Si el golpe pasa de la Vida que le quedaba, la
         diferencia <b>sigue hasta el hábitat rival</b>. Ningún número se pierde por el camino.</span></li>
       <li><span class="k">Sin rival</span><span class="v">Ranura de enfrente vacía: el Ataque entero va al
@@ -667,14 +665,10 @@ export function ayudaHTML() {
       Ejemplo: <i>${c.binomial}</i> cuesta ${c.coste}, pega ${c.ataque} y aguanta ${c.vida}.
     </p>
 
-    <div class="ayuda-h">Los cuatro clados</div>
-    <p class="ayuda-p">No es piedra-papel-tijera: es una red trófica.</p>
-    <ul class="ayuda-lista">
-      <li><span class="k">Terópodo</span><span class="v">+${BALANCE.clados.bonusDepredacion} de daño contra ornitópodos. Depredación sobre presa pequeña.</span></li>
-      <li><span class="k">Saurópodo</span><span class="v">Mucha Vida. La talla adulta es su defensa, y ahora se ve en la única cifra que la mide.</span></li>
-      <li><span class="k">Tireóforo</span><span class="v">Devuelve ${BALANCE.clados.espinasTireoforo} de daño a quien lo ataque. Púas caudales.</span></li>
-      <li><span class="k">Ornitópodo</span><span class="v">Barato y frágil. Es la presa.</span></li>
-    </ul>
+    <div class="ayuda-h">Los clados</div>
+    <p class="ayuda-p">Son la clasificación biológica del taxón y no cambian ninguna regla:
+      un terópodo no pega más a un ornitópodo por serlo. Están para saber qué animal tienes
+      delante — y porque todos existieron de verdad.</p>
 
     <div class="ayuda-h">Las otras cartas</div>
     <ul class="ayuda-lista">
