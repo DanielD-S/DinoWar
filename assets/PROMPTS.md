@@ -253,3 +253,71 @@ uno a cada carta de soporte** —el Canal `#3f7d8c`, el Bosque `#4e7a4a`, la Seq
 Que una carta de clima se distinga de un vistazo no es adorno: en su día una
 Mortandad se podía soltar sobre la franja del clima y parecía que la estabas
 poniendo de clima.
+
+## El reverso: son dos piezas, no una
+
+Antes de generar nada: **el reverso ya existe y es CSS**. Vive en `--escamas`
+—dos degradados radiales que dibujan un motivo de escamas— más un `◆` metido en
+un círculo. Lo pintan hoy el sobre sin abrir (`.sobre-paquete`, 116×162) y el
+dorso del volteo (`.sobre-dorso`, del tamaño de la carta). El bloque
+`.carta-dorso` de `style.css` se quedó sin usar al reescribir el render: su
+comentario todavía promete que lo comparten «la ranura oculta, la pila de mazo y
+el sobre», y de esos tres hoy sólo queda el sobre.
+
+Y lo que decide el encargo: **el motivo cambia de escala según dónde esté** —16 px
+de baldosa en la carta, 22 px en el sobre—. Una imagen de reverso entero,
+estirada, pierde eso: en el sobre grande se vería el mismo dibujo hinchado en vez
+de más escamas. Así que hacen falta **dos ficheros**, no uno:
+
+1. **El mosaico**, repetible y sin costura, que sustituye a `--escamas`.
+2. **El emblema**, centrado y con fondo transparente, que sustituye al `◆`.
+
+La idea que los une, y que es de este juego y no de otro: **el anverso es el
+animal vivo; el reverso es la roca de la que salió.** Un juego donde cada taxón
+está descrito formalmente y cada carta lleva su nivel de evidencia se merece un
+dorso que sea sedimento, no un dragón heráldico.
+
+### 1 · El mosaico
+
+> Textura cuadrada **sin costuras**, que se repita en mosaico sin junta visible
+> por ningún borde. Motivo: impresiones fósiles de piel escamosa de dinosaurio
+> sobre roca oscura, del tipo que deja un molde en arenisca — escamas poligonales
+> irregulares, algunas nítidas y otras medio borradas por el sedimento. Relieve
+> muy bajo, como grabado. Paleta casi monocroma: negro y gris carbón, con el
+> filo de algunas escamas apenas insinuado en oro viejo muy apagado.
+> **Iluminación completamente plana y uniforme**: ninguna sombra direccional,
+> ningún viñeteado, ningún punto más claro que otro. Contraste bajo. Ningún
+> elemento único ni centro de atención: el motivo tiene que ser igual de
+> interesante en cualquier trozo. Sin texto, sin logotipo, sin marco.
+
+La iluminación plana no es un capricho: **una sola luz direccional destruye el
+mosaico**, porque al repetirse aparece una rejilla de claros y oscuros que se ve
+antes que el dibujo. Es el error que arruina nueve de cada diez texturas
+generadas.
+
+Exportar a **512×512 en JPEG**: no necesita transparencia y así pesa 40 KB en vez
+de 200.
+
+### 2 · El emblema
+
+> Emblema circular único, centrado, sobre fondo **transparente**. Una huella
+> tridáctila de terópodo impresa en relieve dentro de un anillo de piedra, con el
+> anillo grabado con bandas concéntricas finas que sugieran estratos. Oro viejo
+> sobre piedra oscura, mismo metal y mismo acabado que el marco de las cartas.
+> Formas macizas y trazo grueso; ningún detalle fino. Iluminación lateral suave
+> que marque el relieve. Sin texto, sin letras, sin marca de agua. Nada fuera del
+> círculo.
+
+**El trazo grueso es la única regla que importa aquí.** El emblema se pinta a
+26 px en la carta: cualquier filigrana se convierte en una mancha. Para
+comprobarlo, encoge la imagen al tamaño de una uña — si no reconoces la huella,
+no sirve por bien que se vea en grande.
+
+Exportar a **256×256 en PNG con alfa**.
+
+### Sobre la simetría
+
+Un reverso de cartas físicas debe ser simétrico a 180°, o el dorso delata la
+orientación y las cartas quedan marcadas. **En DinoWar no aplica**: el reverso no
+se gira nunca en pantalla. Pero si algún día se imprime, la huella hay que
+duplicarla en espejo o cambiarla por un motivo que gire sobre sí mismo.
