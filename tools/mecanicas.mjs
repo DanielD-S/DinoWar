@@ -16,6 +16,7 @@
 import { writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { CARTAS, CARTAS_DE_JEFE, TIPO, CLADO_NOMBRE, RASGO } from '../src/data/cards.js';
+import { QUE, TODOS } from '../src/data/mecanicas.js';
 import { BALANCE, MAZO } from '../src/data/balance.js';
 import { ECONOMIA } from '../src/data/coleccion.js';
 
@@ -40,13 +41,6 @@ const NUMERO_DE = {
   [RASGO.MORTANDAD]: ['rasgos.mortandadDano', 'de daño a TODOS, incluidos los tuyos'],
   [RASGO.TRAMPA]: ['rasgos.trampaMazoRival', 'cartas que pierde el rival'],
   [RASGO.GREGARISMO]: ['rasgos.gregarismoAtaque', 'Ataque a toda la especie'],
-  // Habilidades al entrar en juego. Se disparan una vez y se acabó.
-  [RASGO.ENTRADA_ALERTA]: ['entradas.alertaRoba', 'cartas que robas al entrar'],
-  [RASGO.ENTRADA_EMBOSCADA]: ['entradas.emboscadaDano', 'de daño al que tenga enfrente, al entrar'],
-  [RASGO.ENTRADA_MANADA_SANA]: ['entradas.manadaSanaCura', 'heridas que curan tus OTROS dinosaurios'],
-  [RASGO.ENTRADA_DEVORA_MAZO]: ['entradas.devoraMazo', 'cartas de mazo que pierde el rival'],
-  [RASGO.ENTRADA_RAMONEO]: ['entradas.ramoneoBiomasa', 'Biomasa que ganas al entrar'],
-  [RASGO.ENTRADA_ARRASA]: ['entradas.arrasaHabitat', 'de daño al hábitat rival, al entrar'],
   [RASGO.CAMPO_LLANURA]: ['efectosCampo.llanuraReciclaPorTurno', 'cambio de carta por turno y jugador'],
   [RASGO.CAMPO_CANAL]: ['efectosCampo.canalVida', 'Vida a todos los del campo'],
   [RASGO.CAMPO_BOSQUE]: ['efectosCampo.bosqueCura', 'heridas que curan los saurópodos'],
@@ -78,6 +72,56 @@ export function mecanicas() {
       };
     })
     .sort((a, b) => b.cartas - a.cartas || a.nombre.localeCompare(b.nombre));
+}
+
+/**
+ * Las FORMAS de habilidad que el motor sabe aplicar a una criatura, con las
+ * cartas que las usan hoy.
+ *
+ * Es la hoja que le hace falta al autor para escribir la siguiente ronda: sin
+ * ella, pedir «una habilidad como la de Medusaceratops» obliga a ir carta por
+ * carta buscando cuál era. Y va generada porque lo único que la puede mantener
+ * al día es el propio set: si mañana una forma se queda sin cartas, sale con el
+ * hueco a la vista en vez de desaparecer sin más.
+ */
+export function formas() {
+  const criaturas = Object.values(CARTAS).filter((c) => c.tipo === TIPO.DINOSAURIO);
+  const cuenta = (c) => (c.mecanica.cuenta.que === QUE.CLADO ? 'por clado' : 'por especie');
+  const ETIQUETA = {
+    cuenta: (c) => `Contador ${cuenta(c)}`,
+    aura: (c) => (c.mecanica.aura.clado === TODOS ? 'Aura de todo el bando' : 'Aura de clado'),
+    si: (c) => `Condicional · ${c.mecanica.si.cuando}`,
+    trio: () => 'Umbral permanente',
+    inmune: (c) => `Inmunidad a ${c.mecanica.inmune}`,
+    regenera: (c) => (c.mecanica.regenera.aliados ? 'Cura a los tuyos' : 'Se cura sola'),
+    espinas: () => 'Devuelve daño',
+    costeExtra: () => 'Coste añadido',
+    busca: () => 'Busca en el mazo',
+    entrada: (c) => `Al entrar · ${Object.keys(c.mecanica.entrada).join(' + ')}`,
+  };
+
+  const por = new Map();
+  for (const c of criaturas) {
+    for (const campo of Object.keys(c.mecanica)) {
+      const clave = `${campo}|${ETIQUETA[campo](c)}`;
+      if (!por.has(clave)) por.set(clave, []);
+      por.get(clave).push(c);
+    }
+  }
+
+  return [...por.entries()]
+    .map(([clave, cs]) => {
+      const [campo, etiqueta] = clave.split('|');
+      return {
+        campo,
+        forma: etiqueta,
+        cartas: cs.length,
+        quienes: cs.map((c) => c.binomial).join(', '),
+        ejemplo: cs[0].rasgoTexto,
+      };
+    })
+    .sort((a, b) => a.campo.localeCompare(b.campo) || b.cartas - a.cartas
+      || a.forma.localeCompare(b.forma));
 }
 
 export function reglas() {
@@ -127,12 +171,14 @@ export const enMazoDeReferencia = () => Object.fromEntries(MAZO);
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const datos = {
     mecanicas: mecanicas(),
+    formas: formas(),
     reglas: reglas(),
     clados: clados(),
     mazo: enMazoDeReferencia(),
   };
   writeFileSync(SALIDA, `${JSON.stringify(datos, null, 2)}\n`);
   process.stdout.write(
-    `→ ${SALIDA} · ${datos.mecanicas.length} mecánicas, ${datos.reglas.length} reglas\n`,
+    `→ ${SALIDA} · ${datos.mecanicas.length} mecánicas de soporte, `
+    + `${datos.formas.length} formas de criatura, ${datos.reglas.length} reglas\n`,
   );
 }

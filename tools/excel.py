@@ -290,6 +290,17 @@ def hojas_de_mecanicas(wb):
     )
 
     _tabla(
+        wb.create_sheet('Formas'),
+        'Las formas de habilidad que el motor ya sabe aplicar',
+        'Para pedir una habilidad nueva en «Mecánica nueva», lo más barato es describirla con '
+        'una de estas formas y otros números: eso es un dato, no código. Una forma que no esté '
+        'aquí se puede hacer igual, pero hay que escribirla en el motor.',
+        ['Campo', 'Forma', 'Cartas', 'Quiénes la llevan', 'Ejemplo de texto'],
+        [[f['campo'], f['forma'], f['cartas'], f['quienes'], f['ejemplo']] for f in d['formas']],
+        [14, 30, 8, 46, 62],
+    )
+
+    _tabla(
         wb.create_sheet('Reglas'),
         'Las reglas del tablero',
         'Contra esto se tasa una carta. Un coste no significa nada sin saber cuánta renta '

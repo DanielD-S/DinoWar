@@ -5,7 +5,7 @@ import { BALANCE } from './data/balance.js';
 import { TIPO, OBJETIVO, CLADO, CLADO_NOMBRE, carta } from './data/cards.js';
 import {
   crearPartida, vistaDe, FASE, MOTIVO_FIN, unidadesDe, buscablesDe, buscaEnElMazo,
-  vidaActual, puedeReciclar,
+  vidaActual, puedeReciclar, mecanicaDe,
 } from './engine/state.js';
 import { reduce, ACCION, legales, validar, cartasTrasMulligan } from './engine/actions.js';
 import { decidir, PERFIL } from './engine/ai.js';
@@ -196,6 +196,11 @@ function soltar(iid, cardId, destino) {
   }
 
   if (c.tipo === TIPO.DINOSAURIO) {
+    // El coste añadido va PRIMERO: si no puedes pagarlo la carta no se juega, y
+    // preguntar qué buscas para después decirte que no llega es peor que no
+    // preguntar.
+    const extra = mecanicaDe(cardId)?.costeExtra;
+    if (extra?.descartar) { pedirDescartes(iid, c, destino.ranura, extra.descartar); return; }
     if (buscaEnElMazo(cardId)) { pedirBusqueda(iid, c, destino.ranura); return; }
     desplegar(iid, c, destino.ranura);
     return;
@@ -220,11 +225,56 @@ function soltar(iid, cardId, destino) {
   }
 }
 
-function desplegar(iid, c, ranura, busca = null) {
-  if (!aplicar({ tipo: ACCION.DESPLEGAR, jugador: JUGADOR, iid, ranura, busca })) return;
+function desplegar(iid, c, ranura, busca = null, descartes = undefined) {
+  if (!aplicar({ tipo: ACCION.DESPLEGAR, jugador: JUGADOR, iid, ranura, busca, descartes })) return;
   const traido = busca === null ? '' : ` Te llevas ${carta(estado.instancias[busca].cardId).binomial} a la mano.`;
-  mensaje(`${c.binomial} queda boca abajo en la ranura ${ranura + 1}.${traido}`);
+  const pagado = descartes ? ` Sueltas ${descartes.length} cartas.` : '';
+  mensaje(`${c.binomial} queda boca abajo en la ranura ${ranura + 1}.${traido}${pagado}`);
   pasoTutorial('desplegada');
+}
+
+/**
+ * El coste añadido: hay cartas que además de Biomasa piden cartas de la mano. Se
+ * eligen a mano y no las coge el juego por ti, porque cuál sueltas ES la
+ * decisión — la IA se queda con las más baratas, pero un jugador puede estar
+ * guardando una para el turno siguiente.
+ */
+function pedirDescartes(iid, c, ranura, cuantas) {
+  const mano = estado.jugadores[JUGADOR].mano.filter((x) => x !== iid);
+  if (mano.length < cuantas) {
+    mensaje(`${c.binomial} pide descartar ${cuantas} cartas y no te quedan tantas.`, true);
+    sonido('error');
+    return;
+  }
+
+  const elegidas = new Set();
+  el.eleccionTitulo.textContent = c.rasgoNombre;
+  const pintar = () => {
+    el.eleccionTexto.textContent = `${c.binomial} pide ${cuantas} cartas de tu mano.`
+      + ` Llevas ${elegidas.size}.`;
+    el.eleccionCuerpo.innerHTML = mano.map((mid) => {
+      const mc = carta(estado.instancias[mid].cardId);
+      const puesta = elegidas.has(mid);
+      return `<button class="opcion${puesta ? ' marcada' : ''}" data-suelta="${mid}">
+        ${mc.binomial}<small>coste ${mc.coste}</small></button>`;
+    }).join('');
+  };
+  pintar();
+  el.eleccion.classList.remove('oculta');
+
+  el.eleccionCuerpo.onclick = (e) => {
+    const b = e.target.closest('[data-suelta]');
+    if (!b) return;
+    const mid = Number(b.dataset.suelta);
+    if (elegidas.has(mid)) elegidas.delete(mid); else elegidas.add(mid);
+    if (elegidas.size < cuantas) { pintar(); return; }
+
+    el.eleccion.classList.add('oculta');
+    el.eleccionCuerpo.onclick = null;
+    const descartes = [...elegidas];
+    if (buscaEnElMazo(c.id)) { pedirBusqueda(iid, c, ranura, descartes); return; }
+    desplegar(iid, c, ranura, null, descartes);
+  };
 }
 
 /**
@@ -232,10 +282,10 @@ function desplegar(iid, c, ranura, busca = null) {
  * y parar la revelación para preguntar le diría al rival que has buscado algo.
  * Como se elige del propio mazo, enseñarlo entero no filtra nada.
  */
-function pedirBusqueda(iid, c, ranura) {
+function pedirBusqueda(iid, c, ranura, descartes = undefined) {
   const opciones = buscablesDe(estado, JUGADOR, c.id);
   if (opciones.length === 0) {
-    desplegar(iid, c, ranura);
+    desplegar(iid, c, ranura, null, descartes);
     mensaje(`${c.binomial} no encuentra nada que buscar en tu mazo.`, true);
     return;
   }
@@ -263,7 +313,7 @@ function pedirBusqueda(iid, c, ranura) {
     if (!b) return;
     el.eleccion.classList.add('oculta');
     el.eleccionCuerpo.onclick = null;
-    desplegar(iid, c, ranura, Number(b.dataset.busca));
+    desplegar(iid, c, ranura, Number(b.dataset.busca), descartes);
   };
 }
 

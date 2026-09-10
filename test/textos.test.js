@@ -49,6 +49,33 @@ test('Si un rasgo lleva número, el texto de la carta lo dice', () => {
   assert.deepEqual(mal, [], `\n${mal.join('\n')}`);
 });
 
+test('Si la mecánica de una criatura lleva números, el texto los dice', () => {
+  // Lo mismo que el test de arriba, del otro lado de la frontera: las 16 de
+  // soporte llevan su número en `BALANCE`, y las 50 criaturas, en su propia
+  // `mecanica`. Es la clase de desajuste más barata de cometer —cambiar un 2
+  // por un 3 en cards.js y no bajar a la línea del texto— y la más cara de
+  // encontrar, porque la carta sigue funcionando: sólo miente.
+  const mal = [];
+
+  const numeros = (obj) => Object.entries(obj).flatMap(([clave, valor]) => {
+    if (typeof valor === 'number') return [[clave, valor]];
+    if (valor && typeof valor === 'object') return numeros(valor);
+    return [];
+  });
+
+  for (const c of Object.values({ ...CARTAS, ...CARTAS_DE_JEFE })) {
+    if (!c.mecanica) continue;
+    for (const [clave, valor] of numeros(c.mecanica)) {
+      const cita = new RegExp(`(^|[^0-9])${valor}([^0-9]|$)`);
+      if (!cita.test(c.rasgoTexto ?? '')) {
+        mal.push(`${c.id}: «${c.rasgoTexto}» — pero ${clave} vale ${valor}`);
+      }
+    }
+  }
+
+  assert.deepEqual(mal, [], `\n${mal.join('\n')}`);
+});
+
 test('Toda carta con rasgo tiene nombre y texto de rasgo', () => {
   // Las dos cartas de jefe llegaron sin ninguno de los dos y su ficha enseñaba
   // un rasgo en blanco — las dos únicas recompensas del juego cooperativo.

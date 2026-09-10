@@ -3,11 +3,15 @@
 //   node sim/entradas.js            400 partidas por tanda
 //   node sim/entradas.js 1200
 //
-// Las seis criaturas que las llevan NO están en el mazo de referencia, así que
-// `npm run sim` no las ve — es el mismo punto ciego que dejó a la Llanura de
-// inundación sin medir durante dos rediseños seguidos. Aquí se arma un mazo que
-// SÍ las lleva y se juega dos veces con las mismas semillas: con las
+// La mayoría de las criaturas que las llevan NO están en el mazo de referencia,
+// así que `npm run sim` no las ve — es el mismo punto ciego que dejó a la
+// Llanura de inundación sin medir durante dos rediseños seguidos. Aquí se arma
+// un mazo que SÍ las lleva y se juega dos veces con las mismas semillas: con las
 // habilidades encendidas y con `DINOWAR_ENTRADAS=0`.
+//
+// Lo que sale de aquí NO es el balance del juego: es un mazo deliberadamente
+// cargado de disparos, así que sus cifras son la COTA de lo que hacen, no su
+// efecto en una partida normal. Para eso está `npm run sim`.
 //
 // Comparar contra el mazo de referencia no diría nada: serían dos mazos
 // distintos. Lo que se compara es el MISMO mazo con y sin disparadores, así que
@@ -21,18 +25,24 @@ import { esEntrada } from '../src/engine/entradas.js';
 
 /**
  * Las criaturas con habilidad de entrada. Se DESCUBREN del set en vez de ir
- * escritas: hoy no hay ninguna —las 52 son planas por decisión del autor— y en
- * cuanto se le ponga una a una carta, esta herramienta la mide sin tocarla.
+ * escritas, así que una carta nueva entra en la medición sin tocar esto. Cuando
+ * el set estuvo plano la lista quedó vacía y la herramienta lo dijo en vez de
+ * medir aire.
  */
 export const CON_ENTRADA = Object.values(CARTAS)
   .filter((c) => esEntrada(c.id))
   .map((c) => c.id);
 
 /**
- * Un mazo legal de 50 que lleva las seis. Se parte del de referencia, se meten
- * las nuevas al máximo de copias que permite su rareza y se recorta el resto
- * empezando por las entradas con más copias — así el mazo pierde repeticiones y
- * no variedad, que es el mismo criterio que usa `mazoConBiomasa`.
+ * Un mazo legal de 50 que las lleva todas. Se parte del de referencia, se meten
+ * las que disparan al máximo de copias que permite su rareza y se recorta el
+ * resto empezando por las entradas con más copias — así el mazo pierde
+ * repeticiones y no variedad, que es el mismo criterio que usa `mazoConBiomasa`.
+ *
+ * Cuando las que se miden no caben en 50 sin tocarlas, se les recortan COPIAS
+ * pero nunca la última: el mazo tiene que seguir llevándolas todas. Antes esto
+ * se rendía con un `break` y devolvía un mazo de 53 cartas, o sea ilegal, y la
+ * herramienta lo medía igual sin decir nada.
  */
 export function mazoConEntradas() {
   const cuenta = new Map(MAZO.map(([id, n]) => [id, n]));
@@ -41,14 +51,21 @@ export function mazoConEntradas() {
   }
 
   const total = () => [...cuenta.values()].reduce((a, b) => a + b, 0);
-  while (total() > BALANCE.tamanoMazo) {
-    // La que más copias tenga, sin tocar las seis que se están midiendo.
+  const recortar = (protegidas) => {
     const candidatas = [...cuenta.entries()]
-      .filter(([id, n]) => n > 0 && !CON_ENTRADA.includes(id))
+      .filter(([id, n]) => n > (protegidas ? 0 : 1)
+        && (protegidas ? !CON_ENTRADA.includes(id) : true))
       .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
-    if (candidatas.length === 0) break;
+    if (candidatas.length === 0) return false;
     const [id, n] = candidatas[0];
     if (n <= 1) cuenta.delete(id); else cuenta.set(id, n - 1);
+    return true;
+  };
+
+  while (total() > BALANCE.tamanoMazo) {
+    if (recortar(true)) continue;
+    if (recortar(false)) continue;
+    throw new Error(`no cabe un mazo de ${BALANCE.tamanoMazo} con las ${CON_ENTRADA.length} entradas`);
   }
   return [...cuenta.entries()];
 }
@@ -160,7 +177,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const pc = (f, m) => `${((100 * (f.vias[m] ?? 0)) / f.n).toFixed(0)}%`;
     const total = mazo.reduce((a, [, x]) => a + x, 0);
     process.stdout.write(`${N} partidas por tanda, mismo mazo (${total} cartas) y mismas semillas.\n`);
-    process.stdout.write(`Las seis: ${CON_ENTRADA.join(', ')}\n\n`);
+    process.stdout.write(`Las ${CON_ENTRADA.length}: ${CON_ENTRADA.join(', ')}\n\n`);
     process.stdout.write(`${'tanda'.padEnd(18)} turnos  trofeos  hábitat  extinción   bola   1º  disparos\n`);
     for (const f of filas) {
       process.stdout.write(
@@ -171,6 +188,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       );
     }
     process.stdout.write('\n«bola» es P(ganar | ir por delante en el turno 5); el objetivo es 55–70 %.\n'
-      + '«disparos» son habilidades de entrada que llegan a resolverse por partida.\n');
+      + '«disparos» son habilidades de entrada que llegan a resolverse por partida.\n'
+      + 'Este mazo está cargado a propósito: es la cota, no el balance del juego.\n');
   }
 }

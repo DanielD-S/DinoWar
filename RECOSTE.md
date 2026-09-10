@@ -67,21 +67,21 @@ revisión viene a arreglar.
 
 | id | Carta | Familia | Rareza | Coste actual | Coste nuevo | A | V | Rasgo | Texto del rasgo | Mecánica nueva |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| dryosaurus | Dryosaurus altus | Ornitópodo | Común | 0 | 0 | 1 | 2 |  |  |  |
-| ornitholestes | Ornitholestes hermanni | Terópodo | Común | 1 | 1 | 2 | 2 |  |  |  |
-| ceratosaurus | Ceratosaurus nasicornis | Terópodo | Común | 1 | 1 | 3 | 3 |  |  |  |
-| stegosaurus | Stegosaurus stenops | Tireóforo | Común | 2 | 2 | 1 | 9 |  |  |  |
-| allosaurus | Allosaurus fragilis | Terópodo | Rara | 3 | 3 | 5 | 5 |  |  |  |
-| camarasaurus | Camarasaurus grandis | Saurópodo | Rara | 3 | 3 | 2 | 7 |  |  |  |
-| diplodocus | Diplodocus carnegii | Saurópodo | Épica | 2 | 2 | 3 | 13 |  |  |  |
-| apatosaurus | Apatosaurus louisae | Saurópodo | Épica | 3 | 3 | 2 | 15 |  |  |  |
-| torvosaurus | Torvosaurus tanneri | Terópodo | Legendaria | 4 | 4 | 7 | 6 |  |  |  |
-| nodosaurus | Nodosaurus textilis | Tireóforo | Rara | 2 | 2 | 2 | 8 |  |  |  |
-| riparovenator | Riparovenator milnerae | Terópodo | Épica | 2 | 2 | 4 | 5 |  |  |  |
-| lokiceratops | Lokiceratops rangiformis | Marginocéfalo | Épica | 3 | 3 | 4 | 8 |  |  |  |
-| brachylophosaurus | Brachylophosaurus canadensis | Ornitópodo | Rara | 2 | 2 | 2 | 7 |  |  |  |
-| tyrannotitan | Tyrannotitan chubutensis | Terópodo | Legendaria | 4 | 4 | 10 | 6 |  |  |  |
-| huaxiadraco | Huaxiadraco corollatus | Pterosaurio | Rara | 2 | 2 | 2 | 4 |  |  |  |
+| dryosaurus | Dryosaurus altus | Ornitópodo | Común | 0 | 0 | 1 | 2 | Bandada nerviosa | Gana +1 de Ataque por cada Dryosaurus en juego, sea de quien sea y este incluido. |  |
+| ornitholestes | Ornitholestes hermanni | Terópodo | Común | 1 | 1 | 2 | 2 | Salto de entrada | Cuando entra en juego hiere en 2 al dinosaurio de enfrente. |  |
+| ceratosaurus | Ceratosaurus nasicornis | Terópodo | Común | 2 | 2 | 4 | 2 | Ayuno del cazador | Cuando entra en juego descarta 2 cartas de tu mazo. |  |
+| stegosaurus | Stegosaurus stenops | Tireóforo | Común | 2 | 2 | 1 | 5 | Muro de placas | Gana +1 de Ataque por cada Stegosaurus que tengas en juego, este incluido. |  |
+| allosaurus | Allosaurus fragilis | Terópodo | Rara | 3 | 3 | 5 | 5 | Zarpazo por sorpresa | Cuando entra en juego descarta 1 carta al azar de la mano de tu rival. |  |
+| camarasaurus | Camarasaurus grandis | Saurópodo | Rara | 3 | 3 | 1 | 8 | Rumia | Al final de tu turno recupera 1 de Vida. |  |
+| diplodocus | Diplodocus carnegii | Saurópodo | Rara | 2 | 2 | 3 | 8 | Pisa y abona | Cuando entra en juego tu hábitat recupera 1 punto. |  |
+| apatosaurus | Apatosaurus louisae | Saurópodo | Rara | 3 | 3 | 2 | 10 | Pisa y abona | Cuando entra en juego tu hábitat recupera 1 punto. |  |
+| torvosaurus | Torvosaurus tanneri | Terópodo | Épica | 4 | 4 | 8 | 5 | Indiferente al cielo | No le afectan los efectos del clima. |  |
+| nodosaurus | Nodosaurus textilis | Tireóforo | Épica | 3 | 3 | 3 | 8 | Indiferente al cielo | No le afectan los efectos del clima. |  |
+| riparovenator | Riparovenator milnerae | Terópodo | Épica | 3 | 3 | 3 | 3 | Fuera del alcance | No le afectan las cartas de evento de tu rival. |  |
+| lokiceratops | Lokiceratops rangiformis | Marginocéfalo | Épica | 3 | 3 | 4 | 7 | Fuera del alcance | No le afectan las cartas de evento de tu rival. |  |
+| brachylophosaurus | Brachylophosaurus canadensis | Ornitópodo | Rara | 2 | 2 | 0 | 10 | Rebaño de tres | Si llegas a tener 3 Brachylophosaurus en juego, éste gana +6 de Ataque para siempre. |  |
+| tyrannotitan | Tyrannotitan chubutensis | Terópodo | Legendaria | 4 | 4 | 10 | 7 | Tijera | Cuando entra en juego manda al descarte 1 dinosaurio rival de hasta 4 de Vida. |  |
+| huaxiadraco | Huaxiadraco corollatus | Pterosaurio | Rara | 2 | 2 | 2 | 4 | Vuelo de reconocimiento | Cuando entra en juego robas 1 carta. |  |
 | gregarismo | Gregarismo | Evento | Rara | 1 | 1 |  |  | Gregarismo | +1 de Ataque a todos tus dinosaurios de la misma especie que el objetivo. |  |
 | gastrolitos | Gastrolitos | Evento | Épica | 1 | 1 |  |  | Gastrolitos | Cura +1 de vida a un dinosaurio al final del turno |  |
 | crecimiento_acelerado | Crecimiento acelerado | Evento | Legendaria | 1 | 1 |  |  | Crecimiento acelerado | +2 Poder y +2 Vida permanentes a un dinosaurio que elijas. |  |
@@ -98,38 +98,38 @@ revisión viene a arreglar.
 | bosque | Bosque de coníferas ribereño | Clima | Legendaria | 1 | 1 |  |  | Bosque de coníferas ribereño | Los saurópodos curan 1 herida al final de cada turno. |  |
 | aridez | Deriva árida | Clima | Legendaria | 1 | 1 |  |  | Deriva árida | Ambos jugadores pierden 5 cartas del mazo |  |
 | sabana | Sabana de helechos | Clima | Común | 1 | 1 |  |  | Sabana de helechos | +1 de Biomasa cada turno para los dos jugadores, mientras siga en el campo. |  |
-| plesiopleurodon | Plesiopleurodon wellesi | Reptil marino | Épica | 3 | 3 | 9 | 6 |  |  |  |
-| ojoraptorsaurus | Ojoraptorsaurus boerei | Terópodo | Rara | 2 | 2 | 4 | 5 |  |  |  |
-| dromaeosaurus | Dromaeosaurus albertensis | Terópodo | Común | 2 | 2 | 5 | 4 |  |  |  |
-| athenar | Athenar bermani | Saurópodo | Común | 2 | 2 | 2 | 7 |  |  |  |
-| sanjuansaurus | Sanjuansaurus gordilloi | Terópodo | Rara | 2 | 2 | 5 | 4 |  |  |  |
-| suchomimus | Suchomimus tenerensis | Terópodo | Épica | 3 | 3 | 8 | 7 |  |  |  |
-| eosinopteryx | Eosinopteryx brevipenna | Terópodo | Común | 1 | 1 | 2 | 2 |  |  |  |
-| troodon | Troodon formosus | Terópodo | Común | 2 | 2 | 4 | 5 |  |  |  |
-| carnotaurus | Carnotaurus sastrei | Terópodo | Épica | 3 | 3 | 9 | 6 |  |  |  |
-| spinosaurus | Spinosaurus aegyptiacus | Terópodo | Legendaria | 4 | 4 | 11 | 11 |  |  |  |
-| mosasaurus | Mosasaurus hoffmannii | Reptil marino | Legendaria | 4 | 4 | 12 | 10 |  |  |  |
-| halszkaraptor | Halszkaraptor escuilliei | Terópodo | Común | 1 | 1 | 2 | 2 |  |  |  |
-| tongtianlong | Tongtianlong limosus | Terópodo | Común | 1 | 1 | 1 | 3 |  |  |  |
-| scanisaurus | Scanisaurus nazarowi | Reptil marino | Rara | 2 | 2 | 4 | 5 |  |  |  |
-| monolophosaurus | Monolophosaurus jiangi | Terópodo | Rara | 2 | 2 | 5 | 4 |  |  |  |
-| invictarx | Invictarx zephyri | Tireóforo | Rara | 2 | 2 | 2 | 7 |  |  |  |
-| medusaceratops | Medusaceratops lokii | Marginocéfalo | Épica | 3 | 3 | 5 | 10 |  |  |  |
-| platyceratops | Platyceratops tatarinovi | Marginocéfalo | Común | 1 | 1 | 1 | 3 |  |  |  |
-| loricatosaurus | Loricatosaurus priscus | Tireóforo | Épica | 3 | 3 | 4 | 11 |  |  |  |
-| therizinosaurus | Therizinosaurus cheloniformis | Terópodo | Épica | 3 | 3 | 6 | 9 |  |  |  |
-| alaskacephale | Alaskacephale gangloffi | Marginocéfalo | Rara | 2 | 2 | 3 | 6 |  |  |  |
-| titanoceratops | Titanoceratops ouranos | Marginocéfalo | Épica | 3 | 3 | 6 | 9 |  |  |  |
-| atlasaurus | Atlasaurus imelakei | Saurópodo | Épica | 3 | 3 | 3 | 12 |  |  |  |
-| stegoceras | Stegoceras validum | Marginocéfalo | Común | 2 | 2 | 3 | 6 |  |  |  |
-| maiasaura | Maiasaura peeblesorum | Ornitópodo | Épica | 3 | 3 | 4 | 11 |  |  |  |
-| edmontosaurus | Edmontosaurus annectens | Ornitópodo | Legendaria | 4 | 4 | 5 | 17 |  |  |  |
-| plateosauravus | Plateosauravus cullingworthi | Saurópodo | Común | 2 | 2 | 2 | 7 |  |  |  |
-| gargoyleosaurus | Gargoyleosaurus parkpinorum | Tireóforo | Rara | 2 | 2 | 2 | 7 |  |  |  |
-| wendiceratops | Wendiceratops pinhornensis | Marginocéfalo | Épica | 3 | 3 | 5 | 10 |  |  |  |
-| antarctosaurus | Antarctosaurus wichmannianus | Saurópodo | Legendaria | 4 | 4 | 4 | 18 |  |  |  |
-| liaoceratops | Liaoceratops yanzigouensis | Marginocéfalo | Común | 1 | 1 | 1 | 3 |  |  |  |
-| rhinorex | Rhinorex condrupus | Ornitópodo | Épica | 3 | 3 | 4 | 11 |  |  |  |
-| bienosaurus | Bienosaurus lufengensis | Tireóforo | Común | 1 | 1 | 1 | 3 |  |  |  |
-| shuangmiaosaurus | Shuangmiaosaurus gilmorei | Ornitópodo | Común | 2 | 2 | 3 | 6 |  |  |  |
-| chasmosaurus | Chasmosaurus belli | Marginocéfalo | Común | 2 | 2 | 2 | 7 |  |  |  |
+| plesiopleurodon | Plesiopleurodon wellesi | Reptil marino | Épica | 3 | 3 | 8 | 4 | Sigue a los grandes | Gana +2 de Ataque si tienes en juego algún dinosaurio con más de 6 de Vida. |  |
+| ojoraptorsaurus | Ojoraptorsaurus boerei | Terópodo | Rara | 2 | 2 | 2 | 4 | Salto de entrada | Cuando entra en juego hiere en 2 al dinosaurio de enfrente. |  |
+| dromaeosaurus | Dromaeosaurus albertensis | Terópodo | Común | 2 | 2 | 3 | 3 | Jauría | Gana +1 de Ataque por cada Dromaeosaurus en juego, sea de quien sea y este incluido. |  |
+| athenar | Athenar bermani | Saurópodo | Común | 2 | 2 | 2 | 3 | Olfato de tormenta | Al jugarlo, puedes llevarte a la mano una carta de evento de tu mazo. |  |
+| sanjuansaurus | Sanjuansaurus gordilloi | Terópodo | Rara | 2 | 2 | 3 | 3 | Olfato de tormenta | Al jugarlo, puedes llevarte a la mano una carta de clima de tu mazo. |  |
+| suchomimus | Suchomimus tenerensis | Terópodo | Épica | 3 | 3 | 7 | 7 | Rastreo de orilla | Cuando entra en juego descarta 1 carta del mazo de tu rival. |  |
+| eosinopteryx | Eosinopteryx brevipenna | Terópodo | Común | 0 | 0 | 1 | 1 | Percha compartida | Gana +1 de Vida por cada Eosinopteryx que tengas en juego, este incluido. |  |
+| troodon | Troodon formosus | Terópodo | Común | 1 | 1 | 1 | 2 | Caza coordinada | Gana +1 de Ataque por cada Troodon que tengas en juego, este incluido. |  |
+| carnotaurus | Carnotaurus sastrei | Terópodo | Épica | 3 | 3 | 7 | 3 | Territorio exclusivo | Para jugarlo tienes que descartar 2 cartas de tu mano. |  |
+| spinosaurus | Spinosaurus aegyptiacus | Terópodo | Legendaria | 4 | 4 | 10 | 8 | Draga el río | Cuando entra en juego descarta 5 cartas del mazo de tu rival y 2 del tuyo. |  |
+| mosasaurus | Mosasaurus hoffmannii | Reptil marino | Legendaria | 4 | 4 | 8 | 10 | Draga el río | Cuando entra en juego descarta 5 cartas del mazo de tu rival y 2 del tuyo. |  |
+| halszkaraptor | Halszkaraptor escuilliei | Terópodo | Rara | 1 | 1 | 2 | 2 | Nadador de temporal | Gana +2 de Vida mientras haya un clima en el campo. |  |
+| tongtianlong | Tongtianlong limosus | Terópodo | Común | 1 | 1 | 1 | 1 | Nadador de temporal | Gana +2 de Ataque mientras haya un clima en el campo. |  |
+| scanisaurus | Scanisaurus nazarowi | Reptil marino | Rara | 4 | 4 | 3 | 3 | Banco de caza | Mientras esté en juego, tus reptiles marinos ganan +1 de Ataque. |  |
+| monolophosaurus | Monolophosaurus jiangi | Terópodo | Rara | 4 | 4 | 3 | 3 | Cresta de mando | Mientras esté en juego, tus terópodos ganan +1 de Vida. |  |
+| invictarx | Invictarx zephyri | Tireóforo | Rara | 3 | 3 | 1 | 1 | Formación cerrada | Mientras esté en juego, tus tireóforos ganan +1 de Vida. |  |
+| medusaceratops | Medusaceratops lokii | Marginocéfalo | Épica | 3 | 3 | 2 | 10 | Muralla de golas | Mientras esté en juego, tus marginocéfalos ganan +1 de Ataque y +1 de Vida. |  |
+| platyceratops | Platyceratops tatarinovi | Marginocéfalo | Común | 1 | 1 | 1 | 2 | Llamada de manada | Al jugarlo, puedes llevarte a la mano otro Platyceratops de tu mazo. |  |
+| loricatosaurus | Loricatosaurus priscus | Tireóforo | Común | 3 | 3 | 0 | 8 | Terraplén | Cuando entra en juego tu hábitat recupera 2 puntos. |  |
+| therizinosaurus | Therizinosaurus cheloniformis | Terópodo | Común | 3 | 3 | 1 | 6 | Garra de sequía | Gana +3 de Ataque mientras haya un clima en el campo. |  |
+| alaskacephale | Alaskacephale gangloffi | Marginocéfalo | Rara | 2 | 2 | 2 | 4 | Testarazo | Cuando entra en juego hiere en 2 al dinosaurio de enfrente. |  |
+| titanoceratops | Titanoceratops ouranos | Marginocéfalo | Épica | 3 | 3 | 5 | 7 | Cuerno mayor | Gana +1 de Ataque por cada marginocéfalo que tengas en juego, este incluido. |  |
+| atlasaurus | Atlasaurus imelakei | Saurópodo | Épica | 3 | 3 | 2 | 10 | Sombra del cuello | Mientras esté en juego, tus saurópodos ganan +1 de Vida. |  |
+| stegoceras | Stegoceras validum | Marginocéfalo | Común | 2 | 2 | 1 | 8 | Cabezazo de vuelta | Devuelve 2 de daño a quien lo hiera en combate. |  |
+| maiasaura | Maiasaura peeblesorum | Ornitópodo | Legendaria | 3 | 3 | 3 | 10 | Buena madre | Al final de tu turno, todos tus dinosaurios recuperan 1 de Vida. |  |
+| edmontosaurus | Edmontosaurus annectens | Ornitópodo | Legendaria | 4 | 4 | 2 | 10 | Migración en masa | Mientras esté en juego, tus ornitópodos ganan +1 de Ataque y +1 de Vida. |  |
+| plateosauravus | Plateosauravus cullingworthi | Saurópodo | Común | 2 | 2 | 2 | 2 | Colonia de ribera | Gana +1 de Ataque y +1 de Vida por cada Plateosauravus que tengas en juego, este incluido. |  |
+| gargoyleosaurus | Gargoyleosaurus parkpinorum | Tireóforo | Rara | 2 | 2 | 2 | 4 | Osteodermos | Devuelve 3 de daño a quien lo hiera en combate. |  |
+| wendiceratops | Wendiceratops pinhornensis | Marginocéfalo | Épica | 3 | 3 | 5 | 8 | Embestida | Cuando entra en juego manda al descarte 1 dinosaurio rival de hasta 2 de Vida. |  |
+| antarctosaurus | Antarctosaurus wichmannianus | Saurópodo | Legendaria | 4 | 4 | 2 | 12 | Refugio polar | Mientras esté en juego, a ninguno de tus dinosaurios le afectan los efectos del clima. |  |
+| liaoceratops | Liaoceratops yanzigouensis | Marginocéfalo | Común | 1 | 1 | 1 | 3 | Grito de aviso | Al jugarlo, puedes llevarte a la mano un marginocéfalo de tu mazo. |  |
+| rhinorex | Rhinorex condrupus | Ornitópodo | Épica | 3 | 3 | 3 | 8 | Última llanura | Gana +2 de Ataque mientras tu hábitat esté por debajo del de tu rival. |  |
+| bienosaurus | Bienosaurus lufengensis | Tireóforo | Común | 1 | 1 | 1 | 3 | Cría acorazada | Gana +1 de Vida por cada tireóforo que tengas en juego, este incluido. |  |
+| shuangmiaosaurus | Shuangmiaosaurus gilmorei | Ornitópodo | Común | 2 | 2 | 2 | 4 | Ramoneo de orilla | Cuando entra en juego tu hábitat recupera 1 punto. |  |
+| chasmosaurus | Chasmosaurus belli | Marginocéfalo | Común | 2 | 2 | 2 | 4 | Vigía de la gola | Cuando entra en juego robas 1 carta. |  |

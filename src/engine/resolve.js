@@ -10,7 +10,7 @@ import {
   FASE, MOTIVO_FIN, CAUSA, rival,
   unidadEn, unidadesDe, todasLasUnidades,
   ataqueEfectivo, vidaActual, danoEntre, danoAlHabitat, espinasDe,
-  curacionDe, rentaDe, hayAridez, campoEs, vuela,
+  curacionDe, rentaDe, hayAridez, campoEs, vuela, mecanicaDe, inmuneA,
 } from './state.js';
 import { alEntrar } from './entradas.js';
 
@@ -225,7 +225,7 @@ export function faseRevelacion(s) {
       // tipo y luego por iid — sin ese orden, dos máquinas re-jugando la misma
       // partida llegarían a resultados distintos, y el servidor las valida
       // re-jugándolas.
-      alEntrar(s, inst, { ev, herir, rival, unidadEn, unidadesDe, CAUSA });
+      alEntrar(s, inst, { ev, herir, rival, unidadEn, unidadesDe, CAUSA, vidaActual });
 
     } else if (p.tipo === 'MOVIMIENTO') {
       if (inst.ranura === null || s.ranuras[p.jugador][p.ranura] !== null) continue;
@@ -271,8 +271,36 @@ export function faseRevelacion(s) {
     }
   }
 
+  aplicarUmbrales(s);
   recogerBajas(s, CAUSA.MORTANDAD);
   s.fase = FASE.COMBATE;
+}
+
+/**
+ * Los umbrales que, una vez alcanzados, ya no se pierden. Hoy sólo el rebaño de
+ * tres del Brachylophosaurus.
+ *
+ * Va aparte de `ataqueEfectivo` porque NO es lo mismo que un contador: un
+ * contador se recalcula y baja cuando el compañero muere; esto se cobra una vez
+ * y se queda. Se guarda en `modAtaque` —con su marca, para que el jugador vea
+ * de dónde salen los puntos— y la marca es además lo que impide cobrarlo dos
+ * veces: el segundo turno con tres en el campo ya no suma nada.
+ */
+function aplicarUmbrales(s) {
+  for (const inst of todasLasUnidades(s)) {
+    const trio = mecanicaDe(inst.cardId)?.trio;
+    if (!trio) continue;
+    if (inst.marcas.some((m) => m.cardId === inst.cardId)) continue;
+    const suyos = unidadesDe(s, inst.dueno).filter((o) => o.cardId === inst.cardId).length;
+    if (suyos < trio.copias) continue;
+    inst.modAtaque += trio.ataque ?? 0;
+    inst.modVida += trio.vida ?? 0;
+    marcar(inst, inst.cardId, trio.ataque ?? 0, trio.vida ?? 0);
+    ev(s, 'UMBRAL', {
+      iid: inst.iid, dueno: inst.dueno, cardId: inst.cardId,
+      ataque: trio.ataque ?? 0, vida: trio.vida ?? 0,
+    });
+  }
 }
 
 function aplicarPresion(s, p) {
@@ -280,9 +308,16 @@ function aplicarPresion(s, p) {
   const r = carta(cardId).rasgo;
   const contrario = rival(p.jugador);
 
+  // Una unidad inmune a los eventos ni se elige ni se ve: la carta se juega
+  // igual —ya se pagó y el rival la ha visto— pero sobre ella no pasa nada.
+  const alcanzable = (iid) => {
+    const o = s.instancias[iid];
+    return o && o.ranura !== null && !inmuneA(s, iid, 'EVENTO');
+  };
+
   if (r === RASGO.FRACTURA) {
     const objetivo = s.instancias[p.objetivo];
-    if (!objetivo || objetivo.ranura === null) return;
+    if (!objetivo || !alcanzable(p.objetivo)) return;
     objetivo.modAtaque -= BALANCE.rasgos.fracturaAtaque;
     marcar(objetivo, cardId, -BALANCE.rasgos.fracturaAtaque, 0);
     ev(s, 'PRESION', { jugador: p.jugador, cardId, objetivo: objetivo.iid, objetivoCardId: objetivo.cardId });
@@ -295,7 +330,7 @@ function aplicarPresion(s, p) {
     let n = 0;
     for (const oid of p.objetivos ?? []) {
       const inst = s.instancias[oid];
-      if (!inst || inst.ranura === null || inst.dueno !== contrario) continue;
+      if (!inst || !alcanzable(oid) || inst.dueno !== contrario) continue;
       inst.modVida -= BALANCE.rasgos.competenciaVida;
       marcar(inst, cardId, 0, -BALANCE.rasgos.competenciaVida);
       n += 1;
@@ -308,7 +343,10 @@ function aplicarPresion(s, p) {
     ev(s, 'PRESION', { jugador: p.jugador, cardId });
 
   } else if (r === RASGO.MORTANDAD) {
+    // Pega a TODOS, los propios incluidos, así que la inmunidad sólo tapa a los
+    // del rival: la carta es tuya y de los tuyos no te libras.
     for (const inst of todasLasUnidades(s)) {
+      if (inst.dueno === contrario && !alcanzable(inst.iid)) continue;
       herir(s, inst.iid, BALANCE.rasgos.mortandadDano, CAUSA.MORTANDAD, p.jugador);
     }
     ev(s, 'PRESION', { jugador: p.jugador, cardId });

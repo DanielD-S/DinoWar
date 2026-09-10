@@ -32,7 +32,7 @@ export const JEFES = Object.freeze({
     mazo: Object.freeze([
       ['allosaurus', 2], ['torvosaurus', 1], ['ceratosaurus', 3], ['ornitholestes', 3],
       ['tyrannotitan', 1], ['riparovenator', 2], ['carnotaurus', 2], ['dromaeosaurus', 3],
-      ['stegosaurus', 2], ['nodosaurus', 3], ['camarasaurus', 2], ['diplodocus', 1],
+      ['stegosaurus', 3], ['nodosaurus', 2], ['camarasaurus', 2], ['diplodocus', 1],
       ['apatosaurus', 1], ['dryosaurus', 3], ['brachylophosaurus', 3],
       ['gregarismo', 3], ['trampa', 3], ['rebrote', 3], ['gastrolitos', 2],
       ['fractura', 2], ['mortandad', 1], ['aridez', 1], ['crecimiento_acelerado', 1],
@@ -49,11 +49,11 @@ export const JEFES = Object.freeze({
     mazo: Object.freeze([
       ['camarasaurus', 2], ['diplodocus', 1], ['apatosaurus', 1], ['athenar', 3],
       ['atlasaurus', 2], ['antarctosaurus', 1], ['plateosauravus', 3],
-      ['stegosaurus', 2], ['nodosaurus', 3], ['loricatosaurus', 2], ['invictarx', 3],
-      ['dryosaurus', 3], ['maiasaura', 2], ['edmontosaurus', 1], ['brachylophosaurus', 3],
+      ['stegosaurus', 2], ['nodosaurus', 2], ['loricatosaurus', 3], ['invictarx', 3],
+      ['dryosaurus', 3], ['maiasaura', 1], ['edmontosaurus', 1], ['brachylophosaurus', 3],
       ['gregarismo', 3], ['rebrote', 3], ['gastrolitos', 2], ['fractura', 2],
       ['canal', 1], ['sabana', 1], ['bosque', 1], ['neumaticidad', 1], ['competencia', 1],
-      ['crecimiento_acelerado', 1], ['shuangmiaosaurus', 2],
+      ['crecimiento_acelerado', 1], ['shuangmiaosaurus', 3],
     ]),
     nota: 'No pega fuerte. Aguanta, que es peor.',
   }),

@@ -283,19 +283,24 @@ test('Carroña abundante también da Biomasa al rival', () => {
 test('Ranuras cruzadas: cada uno pega al hábitat contrario, y con el Ataque a 0 no pega', () => {
   const s = tablero();
   s.turno = BALANCE.turnoPrimerCombate;
-  const mio = poner(s, 'dryosaurus', 0, 3);     // Ataque 1, nadie enfrente
-  poner(s, 'dryosaurus', 1, 0);                 // Ataque 1, nadie enfrente
+  const mio = poner(s, 'dryosaurus', 0, 3);     // nadie enfrente
+  poner(s, 'dryosaurus', 1, 0);                 // nadie enfrente
+  // Su Ataque no se escribe a mano: Dryosaurus cuenta a los suyos, y a los del
+  // rival, así que depende de quién esté puesto. Lo que prueba este test es el
+  // CRUCE, no la cifra.
+  const pega = ataqueEfectivo(s, mio);
+  assert.ok(pega > 0);
 
   const r = ejecutar(s, FASE.COMBATE);
-  assert.equal(r.jugadores[0].habitat, BALANCE.vidaHabitat - 1);
-  assert.equal(r.jugadores[1].habitat, BALANCE.vidaHabitat - 1, 'el cruce es simétrico');
+  assert.equal(r.jugadores[0].habitat, BALANCE.vidaHabitat - pega);
+  assert.equal(r.jugadores[1].habitat, BALANCE.vidaHabitat - pega, 'el cruce es simétrico');
 
-  // Una Fractura consolidada encima deja el Ataque en 0: avanza y no hace nada.
-  s.instancias[mio].modAtaque = -BALANCE.rasgos.fracturaAtaque;
+  // Con el Ataque a 0 avanza y no hace nada.
+  s.instancias[mio].modAtaque = -pega;
   assert.equal(ataqueEfectivo(s, mio), 0);
   const r2 = ejecutar(s, FASE.COMBATE);
   assert.equal(r2.jugadores[1].habitat, BALANCE.vidaHabitat, 'sin Ataque no hay daño al hábitat');
-  assert.equal(r2.jugadores[0].habitat, BALANCE.vidaHabitat - 1, 'el suyo sí pega');
+  assert.equal(r2.jugadores[0].habitat, BALANCE.vidaHabitat - pega, 'el suyo sí pega');
   const avance = r2.eventos.find((e) => e.tipo === 'AVANCE' && e.bando === 0);
   assert.equal(avance.dano, 0, 'el evento se emite igual, con 0: el registro lo cuenta');
 });
@@ -509,10 +514,16 @@ test('efectosDe suma las copias de una misma carta en un solo apunte', () => {
   assert.equal(efectos[0].ataque, -2 * BALANCE.rasgos.fracturaAtaque);
 });
 
-test('Una unidad sin nada encima no tiene efectos que enseñar', () => {
+test('Una unidad sin nada encima sólo enseña lo suyo', () => {
+  // Ya no hay ninguna carta muda: las cincuenta criaturas tienen habilidad. Lo
+  // que este test defiende sigue siendo lo de antes —que `efectosDe` no invente
+  // renglones— pero ahora se dice así: el único apunte que puede salir es el de
+  // su propio rasgo, y nada pegado encima.
   const s = tablero();
   const iid = poner(s, 'stegosaurus', 0, 0);
-  assert.deepEqual(efectosDe(s, iid), []);
+  const efectos = efectosDe(s, iid);
+  assert.equal(efectos.length, 1);
+  assert.equal(efectos[0].fuente, CARTAS.stegosaurus.rasgoNombre);
   assert.deepEqual(adheridasA(s, iid), []);
 });
 

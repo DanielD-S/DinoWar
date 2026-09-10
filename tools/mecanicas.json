@@ -161,6 +161,169 @@
       "sentido": "cartas que pierde el rival"
     }
   ],
+  "formas": [
+    {
+      "campo": "aura",
+      "forma": "Aura de clado",
+      "cartas": 6,
+      "quienes": "Scanisaurus nazarowi, Monolophosaurus jiangi, Invictarx zephyri, Medusaceratops lokii, Atlasaurus imelakei, Edmontosaurus annectens",
+      "ejemplo": "Mientras esté en juego, tus reptiles marinos ganan +1 de Ataque."
+    },
+    {
+      "campo": "aura",
+      "forma": "Aura de todo el bando",
+      "cartas": 1,
+      "quienes": "Antarctosaurus wichmannianus",
+      "ejemplo": "Mientras esté en juego, a ninguno de tus dinosaurios le afectan los efectos del clima."
+    },
+    {
+      "campo": "busca",
+      "forma": "Busca en el mazo",
+      "cartas": 4,
+      "quienes": "Athenar bermani, Sanjuansaurus gordilloi, Platyceratops tatarinovi, Liaoceratops yanzigouensis",
+      "ejemplo": "Al jugarlo, puedes llevarte a la mano una carta de evento de tu mazo."
+    },
+    {
+      "campo": "costeExtra",
+      "forma": "Coste añadido",
+      "cartas": 1,
+      "quienes": "Carnotaurus sastrei",
+      "ejemplo": "Para jugarlo tienes que descartar 2 cartas de tu mano."
+    },
+    {
+      "campo": "cuenta",
+      "forma": "Contador por especie",
+      "cartas": 6,
+      "quienes": "Dryosaurus altus, Stegosaurus stenops, Dromaeosaurus albertensis, Eosinopteryx brevipenna, Troodon formosus, Plateosauravus cullingworthi",
+      "ejemplo": "Gana +1 de Ataque por cada Dryosaurus en juego, sea de quien sea y este incluido."
+    },
+    {
+      "campo": "cuenta",
+      "forma": "Contador por clado",
+      "cartas": 2,
+      "quienes": "Titanoceratops ouranos, Bienosaurus lufengensis",
+      "ejemplo": "Gana +1 de Ataque por cada marginocéfalo que tengas en juego, este incluido."
+    },
+    {
+      "campo": "entrada",
+      "forma": "Al entrar · curaHabitat",
+      "cartas": 4,
+      "quienes": "Diplodocus carnegii, Apatosaurus louisae, Loricatosaurus priscus, Shuangmiaosaurus gilmorei",
+      "ejemplo": "Cuando entra en juego tu hábitat recupera 1 punto."
+    },
+    {
+      "campo": "entrada",
+      "forma": "Al entrar · emboscada",
+      "cartas": 3,
+      "quienes": "Ornitholestes hermanni, Ojoraptorsaurus boerei, Alaskacephale gangloffi",
+      "ejemplo": "Cuando entra en juego hiere en 2 al dinosaurio de enfrente."
+    },
+    {
+      "campo": "entrada",
+      "forma": "Al entrar · fulmina",
+      "cartas": 2,
+      "quienes": "Tyrannotitan chubutensis, Wendiceratops pinhornensis",
+      "ejemplo": "Cuando entra en juego manda al descarte 1 dinosaurio rival de hasta 4 de Vida."
+    },
+    {
+      "campo": "entrada",
+      "forma": "Al entrar · mueleRival + muelePropio",
+      "cartas": 2,
+      "quienes": "Spinosaurus aegyptiacus, Mosasaurus hoffmannii",
+      "ejemplo": "Cuando entra en juego descarta 5 cartas del mazo de tu rival y 2 del tuyo."
+    },
+    {
+      "campo": "entrada",
+      "forma": "Al entrar · roba",
+      "cartas": 2,
+      "quienes": "Huaxiadraco corollatus, Chasmosaurus belli",
+      "ejemplo": "Cuando entra en juego robas 1 carta."
+    },
+    {
+      "campo": "entrada",
+      "forma": "Al entrar · manoRival",
+      "cartas": 1,
+      "quienes": "Allosaurus fragilis",
+      "ejemplo": "Cuando entra en juego descarta 1 carta al azar de la mano de tu rival."
+    },
+    {
+      "campo": "entrada",
+      "forma": "Al entrar · muelePropio",
+      "cartas": 1,
+      "quienes": "Ceratosaurus nasicornis",
+      "ejemplo": "Cuando entra en juego descarta 2 cartas de tu mazo."
+    },
+    {
+      "campo": "entrada",
+      "forma": "Al entrar · mueleRival",
+      "cartas": 1,
+      "quienes": "Suchomimus tenerensis",
+      "ejemplo": "Cuando entra en juego descarta 1 carta del mazo de tu rival."
+    },
+    {
+      "campo": "espinas",
+      "forma": "Devuelve daño",
+      "cartas": 2,
+      "quienes": "Stegoceras validum, Gargoyleosaurus parkpinorum",
+      "ejemplo": "Devuelve 2 de daño a quien lo hiera en combate."
+    },
+    {
+      "campo": "inmune",
+      "forma": "Inmunidad a CLIMA",
+      "cartas": 2,
+      "quienes": "Torvosaurus tanneri, Nodosaurus textilis",
+      "ejemplo": "No le afectan los efectos del clima."
+    },
+    {
+      "campo": "inmune",
+      "forma": "Inmunidad a EVENTO",
+      "cartas": 2,
+      "quienes": "Riparovenator milnerae, Lokiceratops rangiformis",
+      "ejemplo": "No le afectan las cartas de evento de tu rival."
+    },
+    {
+      "campo": "regenera",
+      "forma": "Cura a los tuyos",
+      "cartas": 1,
+      "quienes": "Maiasaura peeblesorum",
+      "ejemplo": "Al final de tu turno, todos tus dinosaurios recuperan 1 de Vida."
+    },
+    {
+      "campo": "regenera",
+      "forma": "Se cura sola",
+      "cartas": 1,
+      "quienes": "Camarasaurus grandis",
+      "ejemplo": "Al final de tu turno recupera 1 de Vida."
+    },
+    {
+      "campo": "si",
+      "forma": "Condicional · CLIMA",
+      "cartas": 3,
+      "quienes": "Halszkaraptor escuilliei, Tongtianlong limosus, Therizinosaurus cheloniformis",
+      "ejemplo": "Gana +2 de Vida mientras haya un clima en el campo."
+    },
+    {
+      "campo": "si",
+      "forma": "Condicional · ALIADO_CON_VIDA",
+      "cartas": 1,
+      "quienes": "Plesiopleurodon wellesi",
+      "ejemplo": "Gana +2 de Ataque si tienes en juego algún dinosaurio con más de 6 de Vida."
+    },
+    {
+      "campo": "si",
+      "forma": "Condicional · HABITAT_DETRAS",
+      "cartas": 1,
+      "quienes": "Rhinorex condrupus",
+      "ejemplo": "Gana +2 de Ataque mientras tu hábitat esté por debajo del de tu rival."
+    },
+    {
+      "campo": "trio",
+      "forma": "Umbral permanente",
+      "cartas": 1,
+      "quienes": "Brachylophosaurus canadensis",
+      "ejemplo": "Si llegas a tener 3 Brachylophosaurus en juego, éste gana +6 de Ataque para siempre."
+    }
+  ],
   "reglas": [
     [
       "Tablero",
@@ -275,36 +438,36 @@
     {
       "clado": "Ornitópodo",
       "cartas": 6,
-      "ataque": "3.2",
-      "vida": "9.0",
+      "ataque": "1.8",
+      "vida": "7.3",
       "regla": "sin regla propia"
     },
     {
       "clado": "Terópodo",
       "cartas": 18,
-      "ataque": "5.2",
-      "vida": "4.9",
+      "ataque": "4.1",
+      "vida": "3.7",
       "regla": "sin regla propia"
     },
     {
       "clado": "Tireóforo",
       "cartas": 6,
-      "ataque": "2.0",
-      "vida": "7.5",
+      "ataque": "1.3",
+      "vida": "4.8",
       "regla": "sin regla propia"
     },
     {
       "clado": "Saurópodo",
       "cartas": 7,
-      "ataque": "2.6",
-      "vida": "11.3",
+      "ataque": "2.0",
+      "vida": "7.6",
       "regla": "sin regla propia"
     },
     {
       "clado": "Marginocéfalo",
       "cartas": 9,
-      "ataque": "3.3",
-      "vida": "6.9",
+      "ataque": "2.6",
+      "vida": "5.9",
       "regla": "sin regla propia"
     },
     {
@@ -317,8 +480,8 @@
     {
       "clado": "Reptil marino",
       "cartas": 3,
-      "ataque": "8.3",
-      "vida": "7.0",
+      "ataque": "6.3",
+      "vida": "5.7",
       "regla": "sin regla propia"
     }
   ],
@@ -326,8 +489,8 @@
     "dryosaurus": 3,
     "ornitholestes": 3,
     "ceratosaurus": 3,
-    "nodosaurus": 3,
-    "stegosaurus": 2,
+    "nodosaurus": 2,
+    "stegosaurus": 3,
     "allosaurus": 2,
     "camarasaurus": 2,
     "riparovenator": 2,
