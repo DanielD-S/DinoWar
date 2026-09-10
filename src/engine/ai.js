@@ -135,8 +135,10 @@ function valorEnRanura(vista, j, ranura, mio) {
     return mio.poder * IA.pesoHabitat * turnos;
   }
 
-  // Lo que ese rival me haría al habitat si dejo la ranura vacía.
-  const evitado = danoAlHabitat(vista, b.iid) * IA.pesoHabitat;
+  // Lo que ese rival me haría al habitat si dejo la ranura vacía. Con `j` de
+  // defensor, para que la guardia propia se descuente: si no, la IA sobrevalora
+  // tapar ranuras cuando ya tiene puesto quien amortigua.
+  const evitado = danoAlHabitat(vista, b.iid, j) * IA.pesoHabitat;
 
   const dA = Math.max(0, mio.poder + bonusTrofico(mio.clado, carta(b.cardId).clado));
   const dB = Math.max(0, ataqueEfectivo(vista, b.iid)
@@ -165,6 +167,21 @@ function statsDeCarta(vista, j, cardId, rivalIid) {
     espinasPropias: espinasHipoteticas(cardId),
     espinasRecibidas: rivalIid === null ? 0 : espinasDe(vista, rivalIid),
   };
+}
+
+/**
+ * Lo que vale amortiguar el hábitat. No sube ni el Ataque ni la Vida de quien lo
+ * trae, así que `pasivoHipotetico` no lo ve y sin esto la IA no bajaría nunca la
+ * carta — el mismo agujero que dejó a la Llanura con cero usos en 300 partidas.
+ *
+ * Se tasa por lo que de verdad ahorra: un punto por cada dinosaurio rival que
+ * hoy podría llegar al hábitat, y por los turnos que se espera que aguante.
+ */
+function valorDeGuardia(vista, j, cardId) {
+  const g = mecanicaDe(cardId)?.guardia?.habitat ?? 0;
+  if (!g) return 0;
+  const amenazas = Math.max(1, unidadesDe(vista, rival(j)).length);
+  return g * amenazas * IA.pesoHabitat * IA.horizonte;
 }
 
 function valorDeAccion(vista, j, a) {
@@ -208,6 +225,7 @@ function valorDeAccion(vista, j, a) {
       // la Llanura hasta que se le puso número: cero usos en 300 partidas.
       return valorEnRanura(vista, j, a.ranura, mio)
         + valorDeEntrada(cardId)
+        + valorDeGuardia(vista, j, cardId)
         - carta(cardId).coste * IA.pesoCoste;
     }
 

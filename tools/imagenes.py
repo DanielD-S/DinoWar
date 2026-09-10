@@ -58,10 +58,18 @@ def ids_de_cartas():
 
 
 def id_de(nombre, validos):
-    """Del nombre del fichero al id de la carta. Acepta binomio o id."""
+    """Del nombre del fichero al id de la carta. Acepta binomio, id o género.
+
+    El prefijo `jefe_` se prueba al final porque las dos recompensas del modo
+    cooperativo llevan ese prefijo en su id y no en el nombre del fichero: las
+    ilustraciones llegaron como «Saurophaganax.PNG» y «Barosaurus.PNG» y se
+    quedaron dos meses en la lista de «sin usar», con el juego dibujando la
+    silueta de las dos únicas cartas que se ganan cooperando.
+    """
     limpio = nombre.strip().lower().replace('-', ' ').replace('_', ' ')
     genero = limpio.split()[0] if limpio.split() else ''
-    for candidato in (limpio.replace(' ', '_'), limpio.replace(' ', ''), genero):
+    sueltos = (limpio.replace(' ', '_'), limpio.replace(' ', ''), genero)
+    for candidato in sueltos + tuple(f'jefe_{c}' for c in sueltos):
         if candidato in validos:
             return candidato
     return None

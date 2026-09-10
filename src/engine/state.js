@@ -353,9 +353,29 @@ export function puedeReciclar(state, j) {
   return jug.recicladasEsteTurno < BALANCE.efectosCampo.llanuraReciclaPorTurno;
 }
 
-/** Daño que una unidad sin rival enfrente inflige al habitat contrario. */
-export function danoAlHabitat(state, iid) {
-  return ataqueEfectivo(state, iid);
+/**
+ * Cuánto le quita a cada golpe que llegue al hábitat de este bando. Se suma
+ * entre las unidades que lo dan, y se aplica UNA VEZ POR DINOSAURIO ATACANTE,
+ * no al total del turno: es lo que dice la carta y es lo que impide que dos
+ * defensores dejen el tablero en cero.
+ */
+export function guardiaDe(state, bando) {
+  let n = 0;
+  for (const u of unidadesDe(state, bando)) n += mecanicaDe(u.cardId)?.guardia?.habitat ?? 0;
+  return n;
+}
+
+/**
+ * Daño que una unidad sin rival enfrente inflige al habitat contrario.
+ *
+ * `defensor` es quien recibe. Es opcional para no romper a quien sólo quiera
+ * saber lo que pega una carta, pero el combate SIEMPRE lo pasa: sin él la
+ * guardia no se aplicaría y la carta que la da no haría nada.
+ */
+export function danoAlHabitat(state, iid, defensor = null) {
+  const bruto = ataqueEfectivo(state, iid);
+  if (defensor === null) return bruto;
+  return Math.max(0, bruto - guardiaDe(state, defensor));
 }
 
 /** ¿Sobrevuela la ranura en vez de chocar con quien tiene enfrente? */

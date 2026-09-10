@@ -10,7 +10,7 @@ import {
   FASE, MOTIVO_FIN, CAUSA, rival,
   unidadEn, unidadesDe, todasLasUnidades,
   ataqueEfectivo, vidaActual, danoEntre, danoAlHabitat, espinasDe,
-  curacionDe, rentaDe, hayAridez, campoEs, vuela, mecanicaDe, inmuneA,
+  curacionDe, rentaDe, hayAridez, campoEs, vuela, mecanicaDe, inmuneA, guardiaDe,
 } from './state.js';
 import { alEntrar } from './entradas.js';
 
@@ -381,7 +381,7 @@ export function faseCombate(s) {
     if (volA || volB) {
       for (const [uno, bando, vuela1] of [[a, 0, volA], [b, 1, volB]]) {
         if (!uno) continue;
-        const d = danoAlHabitat(s, uno.iid);
+        const d = danoAlHabitat(s, uno.iid, rival(bando));
         alHabitat[rival(bando)] += d;
         ev(s, vuela1 ? 'SOBREVUELO' : 'AVANCE', { ranura: r, iid: uno.iid, bando, dano: d });
       }
@@ -420,20 +420,24 @@ export function faseCombate(s) {
       const dobla = (uno) => (carta(uno.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE ? 2 : 1);
       const sobraA = Math.max(0, dA - vidaActual(s, b.iid));
       const sobraB = Math.max(0, dB - vidaActual(s, a.iid));
+      // La guardia también muerde aquí: lo que sobra al matar es daño de un
+      // dinosaurio rival como cualquier otro, y cada atacante aporta una sola
+      // vez por turno —o sobrante, o golpe a ranura vacía, o sobrevuelo— así
+      // que restar en las tres ramas es restar una vez por dinosaurio.
       if (BALANCE.cuerpo.sobranteAlHabitat) {
-        alHabitat[1] += sobraA * dobla(a);
-        alHabitat[0] += sobraB * dobla(b);
+        alHabitat[1] += Math.max(0, sobraA * dobla(a) - guardiaDe(s, 1));
+        alHabitat[0] += Math.max(0, sobraB * dobla(b) - guardiaDe(s, 0));
       }
 
       ev(s, 'CHOQUE', { ranura: r, a: a.iid, b: b.iid, danoA: dA, danoB: dB });
 
     } else if (a) {
-      const d = danoAlHabitat(s, a.iid);
+      const d = danoAlHabitat(s, a.iid, 1);
       alHabitat[1] += d;
       ev(s, 'AVANCE', { ranura: r, iid: a.iid, bando: 0, dano: d });
 
     } else if (b) {
-      const d = danoAlHabitat(s, b.iid);
+      const d = danoAlHabitat(s, b.iid, 0);
       alHabitat[0] += d;
       ev(s, 'AVANCE', { ranura: r, iid: b.iid, bando: 1, dano: d });
     }

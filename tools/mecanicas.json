@@ -1,21 +1,11 @@
 {
   "mecanicas": [
     {
-      "rasgo": "CAMPO_BOSQUE",
-      "nombre": "Bosque de coníferas ribereño",
-      "cartas": 1,
-      "quienes": "Bosque de coníferas ribereño",
-      "texto": "Los saurópodos curan 1 herida al final de cada turno.",
-      "constante": "efectosCampo.bosqueCura",
-      "valor": 1,
-      "sentido": "heridas que curan los saurópodos"
-    },
-    {
       "rasgo": "CAMPO_CANAL",
-      "nombre": "Canal fluvial trenzado",
+      "nombre": "Bruma de valle",
       "cartas": 1,
-      "quienes": "Canal fluvial trenzado",
-      "texto": "Agua permanente: +1 de Vida a todos los dinosaurios del campo, y los ribereños pelean a gusto.",
+      "quienes": "Bruma de valle",
+      "texto": "+1 de Vida a todos los dinosaurios del campo, mientras siga en el campo.",
       "constante": "efectosCampo.canalVida",
       "valor": 1,
       "sentido": "Vida a todos los del campo"
@@ -41,6 +31,16 @@
       "sentido": "Vida que se quita, a dos rivales"
     },
     {
+      "rasgo": "CAMPO_LLANURA",
+      "nombre": "Crecida estacional",
+      "cartas": 1,
+      "quienes": "Crecida estacional",
+      "texto": "Mientras esté en el campo, cada jugador puede cambiar una carta de su mano por otra del mazo, una vez por turno.",
+      "constante": "efectosCampo.llanuraReciclaPorTurno",
+      "valor": 1,
+      "sentido": "cambio de carta por turno y jugador"
+    },
+    {
       "rasgo": "CRECIMIENTO_ACELERADO",
       "nombre": "Crecimiento acelerado",
       "cartas": 1,
@@ -51,14 +51,14 @@
       "sentido": "Ataque, y otro tanto de Vida"
     },
     {
-      "rasgo": "CAMPO_ARIDEZ",
-      "nombre": "Deriva árida",
+      "rasgo": "CAMPO_BOSQUE",
+      "nombre": "Estación de lluvias",
       "cartas": 1,
-      "quienes": "Deriva árida",
-      "texto": "Ambos jugadores pierden 5 cartas del mazo",
-      "constante": "efectosCampo.aridezMazo",
-      "valor": 5,
-      "sentido": "cartas de mazo que pierden los DOS"
+      "quienes": "Estación de lluvias",
+      "texto": "Los saurópodos curan 1 herida al final de cada turno.",
+      "constante": "efectosCampo.bosqueCura",
+      "valor": 1,
+      "sentido": "heridas que curan los saurópodos"
     },
     {
       "rasgo": "FRACTURA",
@@ -101,14 +101,14 @@
       "sentido": "no lleva número: es una regla, no una cifra"
     },
     {
-      "rasgo": "CAMPO_LLANURA",
-      "nombre": "Llanura de inundación",
+      "rasgo": "CAMPO_SABANA",
+      "nombre": "Monzón de verano",
       "cartas": 1,
-      "quienes": "Llanura de inundación",
-      "texto": "Mientras esté en el campo, cada jugador puede cambiar una carta de su mano por otra del mazo, una vez por turno.",
-      "constante": "efectosCampo.llanuraReciclaPorTurno",
+      "quienes": "Monzón de verano",
+      "texto": "+1 de Biomasa cada turno para los dos jugadores, mientras siga en el campo.",
+      "constante": "efectosCampo.sabanaBiomasa",
       "valor": 1,
-      "sentido": "cambio de carta por turno y jugador"
+      "sentido": "Biomasa por turno a los DOS"
     },
     {
       "rasgo": "MORTANDAD",
@@ -141,14 +141,14 @@
       "sentido": "no lleva número: es una regla, no una cifra"
     },
     {
-      "rasgo": "CAMPO_SABANA",
-      "nombre": "Sabana de helechos",
+      "rasgo": "CAMPO_ARIDEZ",
+      "nombre": "Sequía prolongada",
       "cartas": 1,
-      "quienes": "Sabana de helechos",
-      "texto": "+1 de Biomasa cada turno para los dos jugadores, mientras siga en el campo.",
-      "constante": "efectosCampo.sabanaBiomasa",
-      "valor": 1,
-      "sentido": "Biomasa por turno a los DOS"
+      "quienes": "Sequía prolongada",
+      "texto": "Ambos jugadores pierden 5 cartas del mazo cada turno.",
+      "constante": "efectosCampo.aridezMazo",
+      "valor": 5,
+      "sentido": "cartas de mazo que pierden los DOS"
     },
     {
       "rasgo": "TRAMPA",

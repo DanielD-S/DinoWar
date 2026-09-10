@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: e6e2544c4146a4b9
+// huella: b3eca610bc35ac8e
 //
 // Lleva dentro estos 18 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -569,56 +569,56 @@ var CARTAS = Object.freeze({
     id: "llanura",
     coste: 1,
     rareza: RAREZA.EPICO,
-    binomial: "Llanura de inundaci\xF3n",
+    binomial: "Crecida estacional",
     rasgo: RASGO.CAMPO_LLANURA,
-    rasgoNombre: "Llanura de inundaci\xF3n",
+    rasgoNombre: "Crecida estacional",
     rasgoTexto: "Mientras est\xE9 en el campo, cada jugador puede cambiar una carta de su mano por otra del mazo, una vez por turno.",
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
-    nota_cientifica: "Las llanuras de inundaci\xF3n de la Morrison concentran la mayor productividad vegetal estacional de la formaci\xF3n."
+    nota_cientifica: "La riada estacional desborda el cauce y revuelve el paisaje: lo que hab\xEDa en un sitio aparece en otro."
   }),
   canal: clima({
     id: "canal",
     coste: 1,
     rareza: RAREZA.LEGENDARIO,
-    binomial: "Canal fluvial trenzado",
+    binomial: "Bruma de valle",
     rasgo: RASGO.CAMPO_CANAL,
-    rasgoNombre: "Canal fluvial trenzado",
-    rasgoTexto: "Agua permanente: +1 de Vida a todos los dinosaurios del campo, y los ribere\xF1os pelean a gusto.",
+    rasgoNombre: "Bruma de valle",
+    rasgoTexto: "+1 de Vida a todos los dinosaurios del campo, mientras siga en el campo.",
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
-    nota_cientifica: "Los sistemas fluviales trenzados de la formaci\xF3n mantienen agua durante la estaci\xF3n seca, con vegetaci\xF3n ribere\xF1a estrecha a ambos lados."
+    nota_cientifica: "Niebla de radiaci\xF3n en los fondos de valle al amanecer. Baja el estr\xE9s t\xE9rmico de todo lo que respira, y en un clima estacionalmente seco eso es aguante."
   }),
   bosque: clima({
     id: "bosque",
     coste: 1,
     rareza: RAREZA.LEGENDARIO,
-    binomial: "Bosque de con\xEDferas ribere\xF1o",
+    binomial: "Estaci\xF3n de lluvias",
     rasgo: RASGO.CAMPO_BOSQUE,
-    rasgoNombre: "Bosque de con\xEDferas ribere\xF1o",
+    rasgoNombre: "Estaci\xF3n de lluvias",
     rasgoTexto: "Los saur\xF3podos curan 1 herida al final de cada turno.",
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
-    nota_cientifica: "Los bosques de con\xEDferas ribere\xF1os ofrecen ramoneo alto sostenido, el estrato del que dependen los saur\xF3podos de cuello elevado."
+    nota_cientifica: "La estaci\xF3n h\xFAmeda rebrota el dosel de con\xEDferas de ribera, al que s\xF3lo llegan los cuellos largos: es comida que los dem\xE1s no alcanzan."
   }),
   aridez: clima({
     id: "aridez",
     coste: 1,
     rareza: RAREZA.LEGENDARIO,
-    binomial: "Deriva \xE1rida",
+    binomial: "Sequ\xEDa prolongada",
     rasgo: RASGO.CAMPO_ARIDEZ,
-    rasgoNombre: "Deriva \xE1rida",
-    rasgoTexto: "Ambos jugadores pierden 5 cartas del mazo",
+    rasgoNombre: "Sequ\xEDa prolongada",
+    rasgoTexto: "Ambos jugadores pierden 5 cartas del mazo cada turno.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
-    nota_cientifica: "Los paleosuelos calc\xE1reos, las evaporitas y los dep\xF3sitos e\xF3licos de la Morrison documentan un clima semi\xE1rido y muy estacional que se acent\xFAa hacia el techo de la formaci\xF3n. Que esa deriva mermara las poblaciones es una inferencia razonable, no una medida."
+    nota_cientifica: "Las secas del Kimmeridgiense dejaron paleosuelos con n\xF3dulos de caliche y acumulaciones de huesos en las charcas que se iban quedando sin agua."
   }),
   sabana: clima({
     id: "sabana",
     coste: 1,
     rareza: RAREZA.COMUN,
-    binomial: "Sabana de helechos",
+    binomial: "Monz\xF3n de verano",
     rasgo: RASGO.CAMPO_SABANA,
-    rasgoNombre: "Sabana de helechos",
+    rasgoNombre: "Monz\xF3n de verano",
     rasgoTexto: "+1 de Biomasa cada turno para los dos jugadores, mientras siga en el campo.",
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
-    nota_cientifica: "Extensiones abiertas de helechos sobre suelos semi\xE1ridos, sin dosel que rompa la l\xEDnea de visi\xF3n ni frene un avance."
+    nota_cientifica: "La Morrison estaba bajo circulaci\xF3n monz\xF3nica: lluvias de verano concentradas que disparaban la productividad vegetal y dejaban el resto del a\xF1o seco."
   }),
   // --------------------------------------------------- fauna por estrenar
   //
@@ -1183,6 +1183,9 @@ var CARTAS_DE_JEFE = Object.freeze({
     ataque: 7,
     vida: 8,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Due\xF1o de la llanura",
+    rasgoTexto: "Mientras est\xE9 en juego, tus ter\xF3podos ganan +1 de Ataque.",
+    mecanica: Object.freeze({ aura: { clado: CLADO.TEROPODO, ataque: 1 } }),
     evidencia: "DEBATIDO",
     nota: "El mayor ter\xF3podo conocido de la Formaci\xF3n Morrison, y tambi\xE9n el m\xE1s discutido: parte de los autores lo consideran un Allosaurus de gran talla y no un g\xE9nero propio. La carta lo declara porque la duda es el dato.",
     formacion: "Formaci\xF3n Morrison",
@@ -1198,6 +1201,9 @@ var CARTAS_DE_JEFE = Object.freeze({
     ataque: 3,
     vida: 13,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Cortina de cuellos",
+    rasgoTexto: "Mientras est\xE9 en juego, tu h\xE1bitat recibe 1 punto menos de da\xF1o de cada dinosaurio rival.",
+    mecanica: Object.freeze({ guardia: { habitat: 1 } }),
     evidencia: "ESTABLECIDO",
     nota: "Diplod\xF3cido de cuello desmesurado incluso para su familia: v\xE9rtebras cervicales alargadas que lo hac\xEDan capaz de ramonear donde ning\xFAn otro saur\xF3podo de la Morrison llegaba.",
     formacion: "Formaci\xF3n Morrison",
@@ -1792,8 +1798,15 @@ function puedeReciclar(state, j) {
   const jug = state.jugadores[j];
   return jug.recicladasEsteTurno < BALANCE.efectosCampo.llanuraReciclaPorTurno;
 }
-function danoAlHabitat(state, iid) {
-  return ataqueEfectivo(state, iid);
+function guardiaDe(state, bando) {
+  let n = 0;
+  for (const u of unidadesDe(state, bando)) n += mecanicaDe(u.cardId)?.guardia?.habitat ?? 0;
+  return n;
+}
+function danoAlHabitat(state, iid, defensor = null) {
+  const bruto = ataqueEfectivo(state, iid);
+  if (defensor === null) return bruto;
+  return Math.max(0, bruto - guardiaDe(state, defensor));
 }
 var vuela = (state, iid) => carta(state.instancias[iid].cardId).rasgo === RASGO.VUELO;
 var hayAridez = (state) => campoEs(state, RASGO.CAMPO_ARIDEZ);
@@ -2323,7 +2336,7 @@ function faseCombate(s) {
     if (volA || volB) {
       for (const [uno, bando, vuela1] of [[a, 0, volA], [b, 1, volB]]) {
         if (!uno) continue;
-        const d = danoAlHabitat(s, uno.iid);
+        const d = danoAlHabitat(s, uno.iid, rival(bando));
         alHabitat[rival(bando)] += d;
         ev(s, vuela1 ? "SOBREVUELO" : "AVANCE", { ranura: r, iid: uno.iid, bando, dano: d });
       }
@@ -2346,16 +2359,16 @@ function faseCombate(s) {
       const sobraA = Math.max(0, dA - vidaActual(s, b.iid));
       const sobraB = Math.max(0, dB - vidaActual(s, a.iid));
       if (BALANCE.cuerpo.sobranteAlHabitat) {
-        alHabitat[1] += sobraA * dobla(a);
-        alHabitat[0] += sobraB * dobla(b);
+        alHabitat[1] += Math.max(0, sobraA * dobla(a) - guardiaDe(s, 1));
+        alHabitat[0] += Math.max(0, sobraB * dobla(b) - guardiaDe(s, 0));
       }
       ev(s, "CHOQUE", { ranura: r, a: a.iid, b: b.iid, danoA: dA, danoB: dB });
     } else if (a) {
-      const d = danoAlHabitat(s, a.iid);
+      const d = danoAlHabitat(s, a.iid, 1);
       alHabitat[1] += d;
       ev(s, "AVANCE", { ranura: r, iid: a.iid, bando: 0, dano: d });
     } else if (b) {
-      const d = danoAlHabitat(s, b.iid);
+      const d = danoAlHabitat(s, b.iid, 0);
       alHabitat[0] += d;
       ev(s, "AVANCE", { ranura: r, iid: b.iid, bando: 1, dano: d });
     }
@@ -2937,7 +2950,7 @@ function valorEnRanura(vista, j, ranura, mio) {
     const turnos2 = 1 + (IA.horizonte - 1) * 0.5;
     return mio.poder * IA.pesoHabitat * turnos2;
   }
-  const evitado = danoAlHabitat(vista, b.iid) * IA.pesoHabitat;
+  const evitado = danoAlHabitat(vista, b.iid, j) * IA.pesoHabitat;
   const dA = Math.max(0, mio.poder + bonusTrofico(mio.clado, carta(b.cardId).clado));
   const dB = Math.max(0, ataqueEfectivo(vista, b.iid) + bonusTrofico(carta(b.cardId).clado, mio.clado)) + mio.espinasRecibidas;
   const mata = dA + mio.espinasPropias >= vidaActual(vista, b.iid);
@@ -2958,6 +2971,12 @@ function statsDeCarta(vista, j, cardId, rivalIid) {
     espinasPropias: espinasHipoteticas(cardId),
     espinasRecibidas: rivalIid === null ? 0 : espinasDe(vista, rivalIid)
   };
+}
+function valorDeGuardia(vista, j, cardId) {
+  const g = mecanicaDe(cardId)?.guardia?.habitat ?? 0;
+  if (!g) return 0;
+  const amenazas = Math.max(1, unidadesDe(vista, rival(j)).length);
+  return g * amenazas * IA.pesoHabitat * IA.horizonte;
 }
 function valorDeAccion(vista, j, a) {
   const contrario = rival(j);
@@ -2989,7 +3008,7 @@ function valorDeAccion(vista, j, a) {
       const cardId = vista.instancias[a.iid].cardId;
       const b = unidadEn(vista, contrario, a.ranura);
       const mio = statsDeCarta(vista, j, cardId, b ? b.iid : null);
-      return valorEnRanura(vista, j, a.ranura, mio) + valorDeEntrada(cardId) - carta(cardId).coste * IA.pesoCoste;
+      return valorEnRanura(vista, j, a.ranura, mio) + valorDeEntrada(cardId) + valorDeGuardia(vista, j, cardId) - carta(cardId).coste * IA.pesoCoste;
     }
     case ACCION.MOVER: {
       const inst = vista.instancias[a.iid];
