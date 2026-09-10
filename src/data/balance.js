@@ -10,7 +10,24 @@ export const BALANCE = Object.freeze({
   // la tercera, extinción, no tiene número: es quedarse sin cartas al robar
 
   // ---------------------------------------------------------------- campo
-  ranuras: 5,
+  // CUATRO carriles. Eran cinco hasta que se midió el cambio sobre 2.000
+  // partidas por variante: los dos cumplen 6 de los 7 objetivos, pero con
+  // cuatro la ventaja del que empieza sube de 46,1 a 47,8 —el objetivo que
+  // falla, y se acerca—, el reparto de vías se equilibra (trofeos 35,7 → 46,4,
+  // hábitat 44,3 → 31,8) y la biomasa ahorrada casi se dobla, de 8,4 a 14,4:
+  // con un carril menos guardar es una decisión mucho más frecuente.
+  //
+  // Se puede medir otro número sin tocar el fichero, igual que la economía y el
+  // daño sobrante:
+  //   DINOWAR_RANURAS=5 node sim/run.js --out BALANCE_5.md
+  //
+  // CUIDADO: el navegador no tiene `process`, así que ahí siempre sale el valor
+  // de reserva. Poner esta variable en el entorno del SERVIDOR haría que la
+  // Edge Function re-jugase con otro campo y rechazara todas las partidas. Es
+  // para medir en local y nada más.
+  ranuras: Number(
+    (typeof process !== 'undefined' && process.env && process.env.DINOWAR_RANURAS) || 4,
+  ),
 
   // -------------------------------------------------------------- recursos
   // La renta NO depende de dominar el campo. Es la corrección central de la v2:
