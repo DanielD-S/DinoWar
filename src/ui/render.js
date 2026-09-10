@@ -463,7 +463,7 @@ export function fichaHTML(cardId, iid = null, estado = null) {
   // recortaba medio animal, que es justo lo que esta pantalla viene a enseñar.
   return `
     <div class="ficha-cab">
-      <button class="ficha-arte" data-zoom="${cardId}" data-modo="${hayFoto(cardId) ? 'foto' : 'carta'}"
+      <button class="ficha-arte" data-zoom="${cardId}" data-modo="${hayFoto(cardId) ? 'foto' : 'original'}"
               aria-label="${hayFoto(cardId) ? 'Ver la ilustración en grande' : 'Ver la carta en grande'}">
         ${arte(cardId)}<span class="ficha-lupa" aria-hidden="true">⤢</span>
       </button>
@@ -474,7 +474,7 @@ export function fichaHTML(cardId, iid = null, estado = null) {
         ${dino ? statHTML('a', 'Ataque', c.ataque) : ''}
         ${dino ? statHTML('v', 'Vida', c.vida) : ''}
       </div>
-      <button class="ficha-ampliar" data-zoom="${cardId}" data-modo="carta">Ver la carta en grande</button>
+      <button class="ficha-ampliar" data-zoom="${cardId}" data-modo="original">Ver la carta en grande</button>
     </div>
     ${iid === null ? '' : estadoEnJuegoHTML(estado, iid)}
     <div class="ficha-rasgo">
@@ -516,6 +516,10 @@ let visorCarta = null;
  *
  * Se enseñan sólo los modos que existen para esta carta: sin ilustración no hay
  * selector, y sin carta entera hay dos chips en vez de tres.
+ *
+ * Pedir un modo que esta carta no tiene NO es un error: cae a `carta`, que
+ * existe siempre. Eso es lo que deja que los botones pidan «original» sin
+ * preguntar antes si la hay — hoy la tiene una de sesenta y ocho.
  * @param {string} cardId
  * @param {'carta'|'foto'|'original'} [modo]
  */
