@@ -201,3 +201,55 @@ Tres cosas que decide este prompt y conviene entender:
 Y el aviso que ya mordió dos veces en la capa visual: `box-shadow` lo ocupa el
 aro de rareza y `transform` las animaciones del tablero. Un marco que pida
 resplandor propio choca ahí.
+
+### Un marco por rareza
+
+La rareza **no puede vivir en la cantidad de adorno**. A 82 px nadie cuenta
+filigrana: lo que sobrevive a ese tamaño es el TONO DEL METAL. Piedra desnuda,
+bronce, acero pálido y oro se distinguen de un vistazo aunque el dibujo sea
+ilegible; «tres volutas frente a cinco» no se distingue nunca.
+
+Lo que tiene que ser **idéntico** en los cuatro, o las cartas dan un salto al
+pasar de una a otra en la colección:
+
+- el grosor de la banda y la geometría entera,
+- dónde empieza y acaba cada tramo recto,
+- el tamaño y la posición del adorno de cada esquina.
+
+Lo único que cambia es el material. Al bloque del marco de arriba se le sustituye
+la frase de la paleta por una de estas cuatro:
+
+| rareza | material |
+|---|---|
+| Común | Roca gris desnuda, sin ningún metal. Los filetes que recorren la banda son de piedra pulida algo más clara, tipo pizarra. Los fósiles de las esquinas apenas insinuados, del mismo tono gris que el resto. |
+| Rara | Roca oscura con filetes de bronce mate y vetas finas de cobre oxidado en las grietas. Los fósiles de las esquinas, en bronce. |
+| Épica | Roca de tono azulado frío con filetes de acero pálido y vetas de plata en las grietas. Los fósiles de las esquinas, en plata. |
+| Legendaria | Roca casi negra con filetes de oro viejo y vetas de oro fundido recorriendo las grietas, brillantes. Los fósiles de las esquinas en oro y en alto relieve. |
+
+**Y antes de generar cuatro, considera generar uno.** Cuatro PNG de 512 px son
+unos 480 KB que se descargan y se cachean; uno solo, autorizado en gris neutro y
+teñido con un filtro CSS por rareza, son 120 KB y una sola cosa que mantener. Se
+ve en el banco de marcos: los cuatro escalones de ahí son el MISMO fichero con
+cuatro filtros. El precio es que el tinte no distingue entre el oro de un filete
+y el gris de la roca, así que el contraste entre metal y piedra se aplana un
+poco. Con cuatro ficheros se controla exacto y pesa cuatro veces más.
+
+## La fila de abajo cambia en las de soporte
+
+No hacen falta dos plantillas para criaturas y para soporte. Hace falta **un
+módulo distinto en la fila de abajo**, porque las 16 de soporte no tienen Ataque
+ni Vida: son 0/0. Dejarles las dos esquinas de cifras las deja vacías en 16 de
+las 68 cartas, y una esquina vacía no se lee como «este tipo no tiene cifras»,
+se lee como que algo se rompió.
+
+Esa fila lleva en su lugar el tipo y **sobre qué cae la carta** —el `objetivo`:
+PROPIO, RIVAL, CLADO, RIVALES o NINGUNO—, que es el dato que el jugador necesita
+antes de soltarla y que hoy no está en la cara de la carta por ninguna parte.
+
+Para teñirla no hay que elegir colores: **`TONO` en `src/ui/art.js` ya le asigna
+uno a cada carta de soporte** —el Canal `#3f7d8c`, el Bosque `#4e7a4a`, la Sequía
+`#c2a04e`— y lleva ahí desde que se dibujaron las siluetas.
+
+Que una carta de clima se distinga de un vistazo no es adorno: en su día una
+Mortandad se podía soltar sobre la franja del clima y parecía que la estabas
+poniendo de clima.
