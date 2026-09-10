@@ -1541,6 +1541,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   max-width: 100%; max-height: 100%; object-fit: contain;
   border-radius: var(--radio); border: 1px solid var(--borde);
 }
+/* La carta entera trae su propio borde dibujado, así que no se le pone otro
+   encima: quedaría un filete gris rodeando la piedra. */
+.visor-entera {
+  max-width: 100%; max-height: 100%; object-fit: contain;
+  border-radius: 10px; filter: drop-shadow(0 6px 18px rgba(0, 0, 0, .6));
+}
 .visor-pie { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
 .visor-modos { display: flex; gap: 6px; }
 .visor-cerrar {

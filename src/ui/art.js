@@ -240,6 +240,37 @@ const conFoto = new Set();
 const focos = new Map();
 
 export const rutaFoto = (cardId) => `assets/dinos/${cardId}.jpg`;
+
+/**
+ * Cartas ENTERAS: la carta ya compuesta —marco, nombre y cifras incluidos— tal
+ * y como se diseñó fuera del juego. No se usan para jugar y no pueden usarse:
+ * la Vida de una carta en el campo cambia con las heridas y el Ataque con
+ * `ataqueEfectivo()`, y unas cifras cocidas en píxeles no se enteran de
+ * ninguna de las dos. Viven sólo en el modo «Original» del visor, que es una
+ * vista de coleccionista: estática, grande y sin partida detrás.
+ *
+ * Por lo mismo no entran en `calentarFotos()`: pesan un cuarto de mega cada
+ * una y casi nadie abre ese modo. Se bajan cuando se piden.
+ */
+const enteras = new Set();
+export const rutaEntera = (cardId) => `assets/cartas/${cardId}.jpg`;
+export const hayEntera = (cardId) => enteras.has(cardId);
+
+/**
+ * Igual que `detectarFotos()` y con la misma regla: no tener ninguna es el
+ * estado normal, así que no rechaza nunca.
+ */
+export async function detectarEnteras() {
+  try {
+    const r = await fetch('assets/cartas/indice.json', { cache: 'no-cache' });
+    if (!r.ok) return;
+    const ids = (await r.json())?.cartas;
+    if (!Array.isArray(ids)) return;
+    for (const id of ids) if (typeof id === 'string') enteras.add(id);
+  } catch {
+    /* sin índice no hay modo «Original», y ya está */
+  }
+}
 export const hayFoto = (cardId) => conFoto.has(cardId);
 export const focoDe = (cardId) => focos.get(cardId) ?? null;
 

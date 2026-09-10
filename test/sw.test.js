@@ -23,8 +23,24 @@ test('El código se pide revalidando, o «red primero» es mentira', () => {
 test('Las ilustraciones NO revalidan: pesan y no cambian', () => {
   // Revalidarlas sería una petición condicional por imagen y por carga, a
   // cambio de nada: una ilustración nueva trae nombre nuevo.
-  assert.match(sw, /esIlustracion\(url\)\)\s*\{\s*\n\s*e\.respondWith\(caches\.match/,
-    'las ilustraciones deben seguir siendo caché primero');
+  assert.match(sw, /esImagenDeCarta\(url\)\)\s*\{\s*\n\s*e\.respondWith\(caches\.match/,
+    'las imágenes de carta deben seguir siendo caché primero');
+});
+
+test('Las dos carpetas de imagen van por la misma rama', () => {
+  // `assets/cartas/` llegó después que `assets/dinos/`. Quedarse fuera de la
+  // rama de caché no daría error: pediría la carta entera por red en cada
+  // apertura del visor, y sin conexión no la enseñaría.
+  for (const carpeta of ['/assets/dinos/', '/assets/cartas/']) {
+    assert.ok(sw.includes(carpeta), `el service worker no conoce ${carpeta}`);
+  }
+});
+
+test('Los índices quedan fuera de la caché primero', () => {
+  // Un índice cacheado sin revalidar congela la lista: la ilustración nueva
+  // está servida y el juego sigue dibujando su silueta.
+  assert.match(sw, /esIndice\s*=\s*\(url\)\s*=>\s*url\.pathname\.endsWith\('\/indice\.json'\)/,
+    'los dos índices tienen que reconocerse como índice');
 });
 
 test('La versión de la caché sube cuando cambia lo servido', () => {
