@@ -77,26 +77,58 @@ que aguante, así que redescubre su propia preferencia por lo que resiste. De ah
 salió el «la Defensa vale 4 veces el Ataque» que bloqueó el recoste durante días.
 Para saber lo que vale un punto hay que contar partidas ganadas.
 
-## Los rasgos: pasivos frente a habilidades de entrada
+## Las habilidades son DATOS, no ramas
 
-Conviven dos familias y no son equivalentes.
+Hay dos sistemas de mecánica y la frontera no es un accidente.
 
-Los **pasivos** son los de siempre: «+1 de Vida si tienes otro Stegosaurus».
-Estado condicional que hay que llevar en la cabeza, y que además infla la
-tasación por lo dicho arriba.
+Las **16 cartas de soporte** llevan la suya en `rasgo`, un valor del enum de
+`cards.js`, con su constante en `BALANCE` y su caso en el motor. Son dieciséis
+reglas y ninguna se parece a otra: un caso por carta es lo honesto.
 
-Las **habilidades al entrar en juego** (`src/engine/entradas.js`) se disparan una
-vez, cuando la criatura llega al campo, y se acabó. Se disparan en la fase de
-revelación, que es simultánea y con orden determinista por tipo y luego por
-`iid`: sin ese orden, dos máquinas re-jugando la misma partida llegarían a
-resultados distintos, y el servidor las valida re-jugándolas.
+Las **50 criaturas** llevan la suya en `mecanica`, un objeto de datos descrito en
+[`src/data/mecanicas.js`](src/data/mecanicas.js). Son cincuenta habilidades pero
+diez FORMAS: contadores, auras de clado, condicionales, inmunidades, espinas,
+coste añadido, búsquedas y disparos al entrar. Escritas como cincuenta ramas de
+`if` dentro de `ataqueEfectivo()` no habría quien las leyera, y `efectosDe()` —la
+función que le explica al jugador por qué su carta no marca lo que trae impresa—
+habría necesitado otras cincuenta.
 
-Hay seis de prueba, sobre criaturas que no tenían nada. Medido: 7 disparos por
-partida y la bola de nieve no se mueve (65 % → 66 %).
+Los campos se acumulan: una carta puede llevar `aura` y `entrada` a la vez, y
+`entrada` es un saco de efectos porque Spinosaurus muele los dos mazos de una
+sola llegada.
 
-**Toda habilidad nueva necesita su número en `valorDeEntrada()`.** Sin él la IA
-la ignora y la carta no se juega nunca — le pasó a la Llanura, que midió cero
-usos en 300 partidas hasta que se le puso valor.
+**Poner una carta nueva es escribir un objeto en `cards.js`.** Sólo se toca el
+motor cuando hace falta una FORMA que no existe, y entonces hay que tocar cuatro
+sitios: aplicarla (`state.js` o `entradas.js`), enseñarla (`efectosDe`), tasarla
+(`ai.js` / `valorDeEntrada`) y nombrarla en la lista de `test/entradas.test.js`.
+
+Y la trampa de este diseño, que ya tiene guardián: **un campo mal escrito produce
+una carta que se juega, se paga y no hace nada.** `entrda: { roba: 1 }` no es un
+error de sintaxis. Lo caza `test/entradas.test.js` comparando los campos de cada
+carta contra el vocabulario, y `test/textos.test.js` comprueba además que todo
+número de la mecánica aparezca en el texto de la carta.
+
+**Toda entrada nueva necesita su peso en `BALANCE.valorEntrada`.** Sin él la IA la
+ignora y la carta no se juega nunca — le pasó a la Llanura, que midió cero usos
+en 300 partidas hasta que se le puso valor.
+
+Los disparos al entrar se resuelven en la fase de revelación, que es simultánea y
+con orden determinista por tipo y luego por `iid`: sin ese orden, dos máquinas
+re-jugando la misma partida llegarían a resultados distintos, y el servidor las
+valida re-jugándolas. Por lo mismo **ninguno pregunta nada**: el objetivo de
+Tijera sale de una regla fija —el de más Ataque entre los que caben— y no de una
+elección, que en una fase simultánea habría que resolver a ciegas.
+
+Tres decisiones que conviene conocer antes de discutirlas:
+
+- **Un contador se cuenta a sí mismo.** Un Troodon solo ya está «en juego», así
+  que suma uno. Lo dice su texto, que por eso termina en «este incluido».
+- **La inmunidad a eventos cubre sólo los del RIVAL.** Literalmente taparía
+  también las adaptaciones que le pone encima su dueño, y una carta que rechaza
+  las buenas no está protegida: tiene un defecto.
+- **Las búsquedas se eligen AL JUGAR la carta, no al revelarla.** El despliegue es
+  a ciegas; parar la revelación para preguntar le diría al rival que has buscado
+  algo.
 
 ## Las cartas mienten si nadie las vigila
 
@@ -306,5 +338,14 @@ Dicho para que nadie lo descubra tarde:
 - **Tres cartas mal calibradas** sobre un objetivo de cero (`BALANCE.md`), y 39
   de las 66 cartas del set fuera del mazo de referencia, o sea sin calibración
   comprobada.
+- **La inmunidad al clima no muerde.** Torvosaurus y Nodosaurus dicen «no le
+  afectan los efectos del clima», y hoy los dos únicos efectos del clima sobre una
+  criatura son BUENOS: el Canal da +1 de Vida y el Bosque cura saurópodos. O sea
+  que la inmunidad es un inconveniente pequeño disfrazado de ventaja. Se arregla
+  por cualquiera de los dos lados —darle al clima algo que doler, o cambiarles la
+  habilidad— pero es una decisión de diseño, no un arreglo.
+- **La Deriva árida sigue ganando el 100 %** de las partidas en que se pone
+  (`node sim/climas.js`): muele 5 cartas de los dos mazos y la extinción llega en
+  6,4 turnos. Es el desajuste más grande del set y no lo toca este recoste.
 El proyecto es **de pago** (plan Pro), así que no se pausa por inactividad.
 Eso era cierto antes y ya no lo es.

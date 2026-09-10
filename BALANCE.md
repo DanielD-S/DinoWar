@@ -5,18 +5,18 @@
 - Partidas: **2000** · semilla base **1** · perfiles **heuristica vs heuristica**
 - Ranuras: **5** · Habitat: **70** · Trofeos para ganar: **10**
 - Renta: **2/turno hasta 12**, acumula · Mazo: **50**
-- Tiempo: 117.7 s
+- Tiempo: 228.1 s
 
 ## Objetivos (PLAN_V2.md §8)
 
 | Métrica | Resultado | Objetivo | |
 |---|---|---|---|
-| Duración media | 11.65 turnos | 10 – 14 | ✅ |
-| Victorias del jugador inicial | 49.0 % | 48 – 55 % | ✅ |
+| Duración media | 11.43 turnos | 10 – 14 | ✅ |
+| Victorias del jugador inicial | 46.1 % | 48 – 55 % | ❌ |
 | Cartas mal calibradas | 3 | 0 | ❌ |
 | Partidas sin decisión | 0.0 % | < 2 % | ✅ |
-| P(ganar | ventaja en el turno 5) | 68.2 % | 55 – 70 % | ✅ |
-| Reparto entre las tres victorias | 51% / 35% / 14% | cada una 15 – 60 % | ❌ |
+| P(ganar | ventaja en el turno 5) | 66.6 % | 55 – 70 % | ✅ |
+| Reparto entre las tres victorias | 36% / 44% / 20% | cada una 15 – 60 % | ✅ |
 
 **Hay objetivos incumplidos.**
 
@@ -24,27 +24,27 @@
 
 Es la razón de existir de la v2. En la v1, quien iba por delante en el turno 6 ganaba el **87,6 %** de las partidas y los últimos siete turnos eran trámite.
 
-Aquí, quien va por delante en el turno 5 gana el **68.2 %**.
+Aquí, quien va por delante en el turno 5 gana el **66.6 %**.
 
 ## Duración y finales
 
 | | Turnos |
 |---|---|
-| Mínimo | 6 |
-| P10 | 9 |
-| Mediana | 12 |
-| Media | 11.65 |
-| P90 | 14 |
-| Máximo | 18 |
+| Mínimo | 5 |
+| P10 | 8 |
+| Mediana | 11 |
+| Media | 11.43 |
+| P90 | 15 |
+| Máximo | 20 |
 
 | Vía de victoria | % |
 |---|---|
-| Registro fósil (10 trofeos) | 50.8 |
-| Colapso del habitat | 34.8 |
-| Extinción (sin cartas) | 14.4 |
+| Registro fósil (10 trofeos) | 35.7 |
+| Colapso del habitat | 44.3 |
+| Extinción (sin cartas) | 20.1 |
 | Sin decisión (tope de 40 turnos) | 0.0 |
 
-Unidades vivas medias por bando: **2.32** de 5 ranuras.
+Unidades vivas medias por bando: **2.13** de 5 ranuras.
 
 ## Calibración por carta
 
@@ -54,40 +54,40 @@ Unidades vivas medias por bando: **2.32** de 5 ranuras.
 
 | Carta | Familia | Coste | % partidas | Índice | Uso | |
 |---|---|---|---|---|---|---|
-| Trampa de depredadores | Campo | 1 | 92.8 % | 1.12 | 99 % | ✅ |
-| *Diplodocus carnegii* | Saurópodo | 2 | 57.4 % | 1.11 | 99 % | ✅ |
-| *Dryosaurus altus* | Ornitópodo | 0 | 93.3 % | 1.11 | 97 % | ✅ |
-| Gregarismo | Campo | 1 | 91.2 % | 1.10 | 98 % | ✅ |
-| *Nodosaurus textilis* | Tireóforo | 2 | 91.9 % | 1.10 | 98 % | ✅ |
-| *Ceratosaurus nasicornis* | Terópodo | 1 | 91.8 % | 1.10 | 99 % | ✅ |
-| *Allosaurus fragilis* | Terópodo | 3 | 82.7 % | 1.09 | 94 % | ✅ |
-| Crecimiento acelerado | Campo | 1 | 57.3 % | 1.09 | 99 % | ✅ |
-| *Ornitholestes hermanni* | Terópodo | 1 | 93.2 % | 1.08 | 97 % | ✅ |
-| *Brachylophosaurus canadensis* | Ornitópodo | 2 | 91.3 % | 1.08 | 98 % | ✅ |
-| *Riparovenator milnerae* | Terópodo | 2 | 81.0 % | 1.07 | 99 % | ✅ |
-| *Stegosaurus stenops* | Tireóforo | 2 | 80.2 % | 1.07 | 98 % | ✅ |
-| Gastrolitos | Campo | 1 | 80.0 % | 1.07 | 98 % | ✅ |
-| *Huaxiadraco corollatus* | Pterosaurio | 2 | 79.3 % | 1.05 | 96 % | ✅ |
-| *Lokiceratops rangiformis* | Marginocéfalo | 3 | 55.1 % | 1.03 | 94 % | ✅ |
-| Fractura consolidada | Campo | 2 | 76.2 % | 1.00 | 93 % | ✅ |
-| Sabana de helechos | Campo | 1 | 58.5 % | 0.99 | 87 % | ✅ |
-| *Apatosaurus louisae* | Saurópodo | 3 | 52.9 % | 0.98 | 93 % | ✅ |
-| Rebrote tras incendio | Campo | 0 | 90.8 % | 0.98 | 89 % | ✅ |
-| Neumaticidad ósea | Campo | 2 | 51.5 % | 0.98 | 88 % | ✅ |
-| *Camarasaurus grandis* | Saurópodo | 3 | 75.5 % | 0.95 | 85 % | ✅ |
-| *Tyrannotitan chubutensis* | Terópodo | 4 | 50.0 % | 0.94 | 86 % | ✅ |
-| Mortandad estacional | Campo | 1 | 47.9 % | 0.88 | 80 % | ✅ |
-| *Torvosaurus tanneri* | Terópodo | 4 | 47.5 % | 0.86 | 80 % | ✅ |
-| Deriva árida | Campo | 1 | 31.4 % | 0.50 | 45 % | ❌ |
+| *Dryosaurus altus* | Ornitópodo | 0 | 93.7 % | 1.16 | 98 % | ✅ |
+| *Ornitholestes hermanni* | Terópodo | 1 | 92.1 % | 1.14 | 97 % | ✅ |
+| *Diplodocus carnegii* | Saurópodo | 2 | 57.1 % | 1.14 | 98 % | ✅ |
+| Trampa de depredadores | Campo | 1 | 92.7 % | 1.13 | 94 % | ✅ |
+| *Ceratosaurus nasicornis* | Terópodo | 2 | 92.5 % | 1.12 | 95 % | ✅ |
+| Gastrolitos | Campo | 1 | 82.0 % | 1.11 | 96 % | ✅ |
+| *Stegosaurus stenops* | Tireóforo | 2 | 91.3 % | 1.11 | 95 % | ✅ |
+| *Huaxiadraco corollatus* | Pterosaurio | 2 | 78.4 % | 1.11 | 96 % | ✅ |
+| Gregarismo | Campo | 1 | 89.8 % | 1.10 | 92 % | ✅ |
+| *Allosaurus fragilis* | Terópodo | 3 | 80.7 % | 1.10 | 92 % | ✅ |
+| Crecimiento acelerado | Campo | 1 | 54.9 % | 1.08 | 96 % | ✅ |
+| Rebrote tras incendio | Campo | 0 | 92.5 % | 1.08 | 92 % | ✅ |
+| *Lokiceratops rangiformis* | Marginocéfalo | 3 | 54.0 % | 1.06 | 90 % | ✅ |
+| Sabana de helechos | Campo | 1 | 59.3 % | 1.03 | 85 % | ✅ |
+| *Nodosaurus textilis* | Tireóforo | 3 | 76.0 % | 1.02 | 86 % | ✅ |
+| *Apatosaurus louisae* | Saurópodo | 3 | 51.4 % | 1.00 | 87 % | ✅ |
+| *Brachylophosaurus canadensis* | Ornitópodo | 2 | 88.7 % | 1.00 | 88 % | ✅ |
+| *Tyrannotitan chubutensis* | Terópodo | 4 | 49.7 % | 0.96 | 82 % | ✅ |
+| Neumaticidad ósea | Campo | 2 | 48.5 % | 0.95 | 80 % | ✅ |
+| Fractura consolidada | Campo | 2 | 72.6 % | 0.95 | 83 % | ✅ |
+| *Riparovenator milnerae* | Terópodo | 3 | 67.7 % | 0.85 | 72 % | ✅ |
+| Mortandad estacional | Campo | 1 | 44.8 % | 0.85 | 74 % | ✅ |
+| *Camarasaurus grandis* | Saurópodo | 3 | 67.9 % | 0.84 | 73 % | ✅ |
+| *Torvosaurus tanneri* | Terópodo | 4 | 44.3 % | 0.82 | 71 % | ✅ |
+| Deriva árida | Campo | 1 | 36.9 % | 0.61 | 53 % | ❌ |
 | Canal fluvial trenzado | Campo | 1 | 0.0 % | 0.00 | 0 % | ❌ |
 | Competencia trófica | Campo | 3 | 0.0 % | 0.00 | 0 % | ❌ |
 
 ## Diagnóstico
 
+- **Victorias del jugador inicial**: 46.1 % (objetivo 48 – 55 %).
 - **Cartas mal calibradas**: 3 (objetivo 0).
-- **Reparto entre las tres victorias**: 51% / 35% / 14% (objetivo cada una 15 – 60 %).
 
   - Canal fluvial trenzado — índice 0.00, uso 0 % (coste 1)
   - Competencia trófica — índice 0.00, uso 0 % (coste 3)
-  - Deriva árida — índice 0.50, uso 45 % (coste 1)
+  - Deriva árida — índice 0.61, uso 53 % (coste 1)
 

@@ -177,7 +177,10 @@ test('Un mazo ilegal dice POR QUÉ lo es', () => {
 
   const pasado = validarMazo({ ...mazoPorDefecto(), torvosaurus: 3 }, col);
   assert.equal(pasado.valido, false);
-  assert.match(pasado.problemas.join(' '), /el máximo es 1/);
+  // El tope sale de la rareza, que el autor recostea: escribirlo a mano aquí
+  // hacía fallar el test el día que Torvosaurus pasó de Legendario a Épico.
+  assert.match(pasado.problemas.join(' '),
+    new RegExp(`el máximo es ${limiteDe('torvosaurus')}`));
 
   const sinTener = validarMazo({ ...mazoPorDefecto(), torvosaurus: 3 }, mazoPorDefecto());
   assert.match(sinTener.problemas.join(' '), /tienes 1 y el mazo pide 3/);

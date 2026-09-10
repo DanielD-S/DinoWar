@@ -219,21 +219,24 @@ export const BALANCE = Object.freeze({
 
   // ------------------------------------------- habilidades al entrar en juego
   //
-  // Se disparan una vez y se acabó. Prueba de seis, sobre criaturas que hoy no
-  // tienen NADA: así no se rompe ninguna carta que ya funcione y se ataca de
-  // paso el problema medido —30 de 50 criaturas fuera de banda, casi todas sin
-  // mecánica—.
+  // CUÁNTO hace cada una lo dice la carta —está en su `mecanica`, en cards.js—
+  // porque el mismo efecto sale con números distintos: Suchomimus muele 1 y
+  // Spinosaurus 5. Lo que hay aquí es lo OTRO: cuánto vale un punto de cada
+  // efecto para la IA que decide si baja la carta.
+  //
+  // Sin este número la carta no se juega jamás. No es una advertencia teórica:
+  // le pasó a la Llanura de inundación, cero usos en 300 partidas hasta que se
+  // le puso valor. Toda entrada nueva necesita su peso aquí.
   //
   // Se apagan con DINOWAR_ENTRADAS=0 para poder medir con y sin.
-  entradas: Object.freeze({
-    alertaRoba: 1,        // Troodon: ojos y bulbos olfatorios enormes
-    emboscadaDano: 3,     // Dromaeosaurus: cae encima del de enfrente
-    manadaSanaCura: 2,    // Gargoyleosaurus: llega y cierra la formación
-    // El más peligroso de los seis y por eso el más caro y de una sola copia:
-    // moler es lo que hace que la Deriva árida gane el 100 % de sus partidas.
-    devoraMazo: 3,        // Mosasaurus
-    ramoneoBiomasa: 2,    // Atlasaurus: alcanza el dosel que nadie alcanza
-    arrasaHabitat: 3,     // Spinosaurus: doce metros entrando en la llanura
+  valorEntrada: Object.freeze({
+    roba: 1.4,          // una carta en la mano vale más que su punto
+    emboscada: 1,       // un punto de daño es un punto
+    manoRival: 1.2,     // quitarle una carta al otro, algo más
+    curaHabitat: 1,     // se multiplica por ia.pesoHabitat al tasarla
+    mueleRival: 0.4,    // acerca la extinción, pero lento
+    muelePropio: -0.4,  // es un COSTE: te la acercas a ti
+    fulmina: 3,         // matar algo del campo sin pelearlo
   }),
 
   // --------------------------------------------------------------------- IA
@@ -269,11 +272,14 @@ export const BALANCE = Object.freeze({
  * Fuera se quedan cuatro cartas, jugables por el jugador pero no medidas aquí:
  * bosque, llanura, carroña y lago.
  */
+// Nodosaurus bajó a 2 copias al pasar de Rara a Épica en el recoste del autor, y
+// el hueco fue a Stegosaurus: es el otro tireóforo del mazo y su mecánica nueva
+// —+1 de Ataque por cada Stegosaurus propio— premia llevar la tercera.
 export const MAZO = Object.freeze([
   // dinosaurios — 30
   ['dryosaurus', 3], ['ornitholestes', 3], ['ceratosaurus', 3],
-  ['nodosaurus', 3],
-  ['stegosaurus', 2], ['allosaurus', 2], ['camarasaurus', 2],
+  ['nodosaurus', 2],
+  ['stegosaurus', 3], ['allosaurus', 2], ['camarasaurus', 2],
   // Lokiceratops pasó a legendaria y sólo admite una copia. La plaza que deja
   // va a Brachylophosaurus, que con la rareza nueva admite tres y es el otro
   // gregario del mazo: la lista sigue siendo la misma clase de mazo.

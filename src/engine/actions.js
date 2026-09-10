@@ -7,8 +7,9 @@ import { TIPO, OBJETIVO, CLADO, RASGO, carta } from '../data/cards.js';
 import {
   FASE, FASES_INTERACTIVAS, rival,
   ranuraValida, unidadesDe, ranurasLibres, buscablesDe, buscaEnElMazo, ataqueEfectivo,
-  puedeReciclar, campoEs,
+  puedeReciclar, campoEs, mecanicaDe, inmuneA,
 } from './state.js';
+import { INMUNE } from '../data/mecanicas.js';
 import { barajar } from './rng.js';
 import { DIETA } from '../data/dietas.js';
 import {
@@ -165,6 +166,22 @@ export function validar(s, a) {
       if (s.ranuras[a.jugador][a.ranura] !== null) return 'esa ranura está ocupada';
       if (ranuraReservada(s, a.jugador, a.ranura)) return 'ya has comprometido esa ranura';
 
+      // Coste añadido: hay cartas que además de Biomasa piden cartas de la
+      // mano. Se comprueba ANTES de la búsqueda porque si no puedes pagarlo la
+      // carta no llega a jugarse y no hay nada que buscar.
+      const extra = mecanicaDe(inst.cardId)?.costeExtra;
+      if (extra?.descartar) {
+        const dan = a.descartes ?? [];
+        if (!Array.isArray(dan) || dan.length !== extra.descartar) {
+          return `esta carta pide descartar ${extra.descartar} cartas de tu mano`;
+        }
+        if (new Set(dan).size !== dan.length) return 'no puedes descartar dos veces la misma';
+        for (const did of dan) {
+          if (did === a.iid) return 'no puedes pagarla con ella misma';
+          if (!jug.mano.includes(did)) return 'esa carta no está en tu mano';
+        }
+      }
+
       // La búsqueda es opcional en el sentido de que puede no haber nada que
       // buscar, pero si se nombra una carta tiene que valer.
       if (a.busca !== undefined && a.busca !== null) {
@@ -205,6 +222,7 @@ export function validar(s, a) {
         const objetivo = s.instancias[a.objetivo];
         if (!objetivo || objetivo.dueno !== rival(a.jugador)) return 'el objetivo no es del rival';
         if (objetivo.ranura === null) return 'el objetivo no está en el campo';
+        if (inmuneA(s, a.objetivo, INMUNE.EVENTO)) return 'a ése no le afectan tus eventos';
       } else if (c.objetivo === OBJETIVO.CLADO) {
         if (!CLADOS.includes(a.clado)) return 'clado inexistente';
       } else if (c.objetivo === OBJETIVO.RIVALES) {
@@ -219,6 +237,7 @@ export function validar(s, a) {
           const o = s.instancias[oid];
           if (!o || o.dueno !== rival(a.jugador)) return 'el objetivo no es del rival';
           if (o.ranura === null) return 'el objetivo no está en el campo';
+          if (inmuneA(s, oid, INMUNE.EVENTO)) return 'a ése no le afectan tus eventos';
         }
       }
       return null;
@@ -301,10 +320,22 @@ export function reduce(state, action) {
       ev(s, 'PRODUCCION', { jugador: action.jugador, produccion: jug.produccion });
       break;
 
-    case ACCION.DESPLEGAR:
+    case ACCION.DESPLEGAR: {
       pagar(jug, s.instancias[action.iid].cardId);
       jug.mano = jug.mano.filter((x) => x !== action.iid);
       jug.pendientes.push({ tipo: 'DESPLIEGUE', iid: action.iid, ranura: action.ranura });
+      // El coste añadido se cobra AHORA, no en la revelación: es parte de jugar
+      // la carta, igual que la Biomasa, y al rival le da lo mismo verlo —lo que
+      // sigue oculto es qué carta ha bajado, no cuántas ha soltado—.
+      const extra = mecanicaDe(s.instancias[action.iid].cardId)?.costeExtra;
+      if (extra?.descartar) {
+        for (const did of action.descartes ?? []) descartarDeMano(s, action.jugador, did);
+        ev(s, 'COSTE_EXTRA', {
+          jugador: action.jugador,
+          cardId: s.instancias[action.iid].cardId,
+          cartas: extra.descartar,
+        });
+      }
       // Lo buscado pasa del mazo a la mano ahora mismo: cuesta una carta de
       // mazo, igual que robar, y el mazo es el reloj de la extinción.
       if (action.busca !== undefined && action.busca !== null) {
@@ -317,6 +348,7 @@ export function reduce(state, action) {
         });
       }
       break;
+    }
 
     case ACCION.MOVER:
       jug.pendientes.push({ tipo: 'MOVIMIENTO', iid: action.iid, ranura: action.ranura });
@@ -433,6 +465,22 @@ function mejorBusqueda(s, j, cardId) {
   return mejor;
 }
 
+/**
+ * Qué cartas suelta de la mano para pagar el coste añadido, o null si no le
+ * llegan. Las más baratas primero, y a igualdad la de menor iid: la misma
+ * semilla tiene que dar la misma partida en el navegador y en el servidor.
+ */
+function pagoExtra(s, j, cardId, iid) {
+  const extra = mecanicaDe(cardId)?.costeExtra;
+  if (!extra?.descartar) return undefined;
+  const resto = s.jugadores[j].mano.filter((x) => x !== iid);
+  if (resto.length < extra.descartar) return null;
+  return resto
+    .sort((a, b) => carta(s.instancias[a].cardId).coste - carta(s.instancias[b].cardId).coste
+      || a - b)
+    .slice(0, extra.descartar);
+}
+
 export function legales(state, j) {
   const s = state;
   const jug = s.jugadores[j];
@@ -466,7 +514,13 @@ export function legales(state, j) {
     ...unidadesDe(s, j).map((u) => u.iid),
     ...jug.pendientes.filter((p) => p.tipo === 'DESPLIEGUE').map((p) => p.iid),
   ];
-  const ajenas = unidadesDe(s, rival(j)).map((u) => u.iid);
+  // Las inmunes a eventos se caen de la lista aquí y no en `validar`: los
+  // eventos que apuntan al rival se ofrecen sin validar —son siempre legales—
+  // así que sin esto la IA gastaría la carta contra alguien a quien no le hace
+  // nada, y el jugador vería un objetivo que no lo es.
+  const ajenas = unidadesDe(s, rival(j))
+    .filter((u) => !inmuneA(s, u.iid, INMUNE.EVENTO))
+    .map((u) => u.iid);
 
   for (const iid of jug.mano) {
     const c = carta(s.instancias[iid].cardId);
@@ -487,7 +541,14 @@ export function legales(state, j) {
       // poder pagar por tu cuenta, y a igualdad la primera del mazo, para que
       // la misma semilla siga dando la misma partida.
       const busca = mejorBusqueda(s, j, s.instancias[iid].cardId);
-      for (const r of libres) salida.push({ tipo: ACCION.DESPLEGAR, jugador: j, iid, ranura: r, busca });
+      // Y lo mismo con el coste añadido: se ofrece ya pagado. Suelta lo más
+      // barato que le queda en la mano, que es el criterio con el que la IA
+      // descarta de todos modos cuando se pasa del límite.
+      const descartes = pagoExtra(s, j, s.instancias[iid].cardId, iid);
+      if (descartes === null) continue;
+      for (const r of libres) {
+        salida.push({ tipo: ACCION.DESPLEGAR, jugador: j, iid, ranura: r, busca, descartes });
+      }
     } else if (c.tipo === TIPO.RECURSO) {
       salida.push({ tipo: ACCION.RECURSO, jugador: j, iid });
     } else if (c.tipo === TIPO.CLIMA) {

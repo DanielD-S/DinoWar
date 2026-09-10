@@ -214,17 +214,31 @@ export function lineasDeLog(eventos) {
         push(`Ranura ${e.ranura + 1} sin defensa: <b>${e.dano}</b> al hábitat`, e.bando);
         break;
       case 'ENTRADA': {
+        // Un efecto sin renglón aquí sale como «hace su efecto», que es mentira
+        // a medias: el jugador ve que pasó algo y no qué. Cada entrada nueva
+        // necesita su frase.
         const q = {
           roba: `roba ${e.n} carta${e.n === 1 ? '' : 's'}`,
           emboscada: e.n > 0 ? `embosca: <b>${e.n}</b> de daño al de enfrente` : 'embosca, pero no hay nadie enfrente',
-          cura: e.n > 0 ? `cura ${e.n} de los tuyos` : 'cura, pero nadie estaba herido',
           muele: `el rival pierde <b>${e.n}</b> del mazo`,
-          biomasa: `+${e.n} de Biomasa`,
-          habitat: `<b>${e.n}</b> al hábitat rival`,
+          muelePropio: `tú pierdes <b>${e.n}</b> del mazo`,
+          manoRival: e.n > 0 ? `al rival se le cae <b>${e.n}</b> de la mano` : 'le buscaría la mano, pero está vacía',
+          curaHabitat: e.n > 0 ? `tu hábitat recupera <b>${e.n}</b>` : 'tu hábitat ya estaba entero',
+          fulmina: e.objetivoCardId
+            ? `se lleva por delante a <i>${carta(e.objetivoCardId).binomial}</i>`
+            : 'busca a quién llevarse y no lo encuentra',
         }[e.efecto] ?? 'hace su efecto';
         push(`<i>${carta(e.cardId).binomial}</i> entra en juego: ${q}`, e.dueno);
         break;
       }
+      case 'UMBRAL':
+        push(`<i>${carta(e.cardId).binomial}</i> completa su grupo:`
+          + ` <b>+${e.ataque}</b> de Ataque para siempre`, e.dueno);
+        break;
+      case 'COSTE_EXTRA':
+        push(`<b>${bando(e.jugador)}</b> descarta ${e.cartas} cartas para jugar`
+          + ` <i>${carta(e.cardId).binomial}</i>`, e.jugador);
+        break;
       case 'MUERTE':
         push(`Muere <i>${carta(e.cardId).binomial}</i> de <b>${e.dueno === JUGADOR ? 'los tuyos' : 'el rival'}</b> ${CAUSA_TEXTO[e.causa] ?? ''}`, e.dueno);
         break;

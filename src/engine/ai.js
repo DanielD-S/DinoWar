@@ -9,8 +9,9 @@ import { valorDeEntrada } from './entradas.js';
 import { TIPO, OBJETIVO, CLADO, RASGO, carta } from '../data/cards.js';
 import {
   FASE, rival, unidadEn, unidadesDe,
-  ataqueEfectivo, vidaActual, espinasDe, danoAlHabitat, campoEs, vuela,
+  ataqueEfectivo, vidaActual, espinasDe, danoAlHabitat, campoEs, vuela, mecanicaDe,
 } from './state.js';
+import { QUE, CUANDO, TODOS } from '../data/mecanicas.js';
 import { ACCION, legales } from './actions.js';
 import { DIETA } from '../data/dietas.js';
 import { puedePagar, dietaDeCarta } from './economia.js';
@@ -36,12 +37,65 @@ function ataqueHipotetico(vista, j, cardId) {
   if (c.rasgo === RASGO.RIBERENO && campoEs(vista, RASGO.CAMPO_CANAL)) {
     poder += BALANCE.rasgos.riberenoAtaque;
   }
-  return poder;
+  return poder + pasivoHipotetico(vista, j, cardId).ataque;
 }
 
-function espinasHipoteticas() {
-  return 0;
+/**
+ * Lo que le sumarán a esta carta sus pasivos EN CUANTO ENTRE, calculado desde
+ * la mano: cuenta lo que ya hay en el campo y se cuenta a sí misma, porque va a
+ * estar. Sin esto la IA tasa a Medusaceratops por sus cifras impresas y no
+ * entiende por qué el segundo Stegosaurus vale más que el primero.
+ *
+ * Es una estimación y no la verdad: `ataqueEfectivo` y `vidaMaxima` son las que
+ * mandan una vez la carta está puesta. Lo que se busca aquí es sólo que la IA
+ * no las ignore.
+ */
+function pasivoHipotetico(vista, j, cardId) {
+  const c = carta(cardId);
+  const m = mecanicaDe(cardId);
+  let ataque = 0;
+  let vida = 0;
+  if (!m) return { ataque, vida };
+
+  if (m.cuenta) {
+    const bandos = m.cuenta.ambos ? [0, 1] : [j];
+    let n = 1;   // ella misma, que es la que está a punto de entrar
+    for (const b of bandos) {
+      for (const u of unidadesDe(vista, b)) {
+        const uc = carta(u.cardId);
+        if (m.cuenta.que === QUE.CLADO ? uc.clado === c.clado : u.cardId === cardId) n += 1;
+      }
+    }
+    ataque += n * (m.cuenta.ataque ?? 0);
+    vida += n * (m.cuenta.vida ?? 0);
+  }
+
+  if (m.si) {
+    const jug = vista.jugadores[j];
+    const otro = vista.jugadores[rival(j)];
+    const vale = m.si.cuando === CUANDO.CLIMA ? vista.campo !== null
+      : m.si.cuando === CUANDO.HABITAT_DETRAS ? jug.habitat < otro.habitat
+        : unidadesDe(vista, j).some((u) => carta(u.cardId).vida > m.si.umbral);
+    if (vale) { ataque += m.si.ataque ?? 0; vida += m.si.vida ?? 0; }
+  }
+
+  // El aura se la da a sí misma si es de su clado, y también a los que ya están
+  // puestos — pero eso último no se tasa aquí: esto valora UNA carta.
+  if (m.aura && (m.aura.clado === TODOS || m.aura.clado === c.clado)) {
+    ataque += m.aura.ataque ?? 0;
+    vida += m.aura.vida ?? 0;
+  }
+  for (const u of unidadesDe(vista, j)) {
+    const a = mecanicaDe(u.cardId)?.aura;
+    if (!a || (a.clado !== TODOS && a.clado !== c.clado)) continue;
+    ataque += a.ataque ?? 0;
+    vida += a.vida ?? 0;
+  }
+
+  return { ataque, vida };
 }
+
+const espinasHipoteticas = (cardId) => mecanicaDe(cardId)?.espinas ?? 0;
 
 const bonusTrofico = () => 0;
 
@@ -105,7 +159,7 @@ function statsDeCarta(vista, j, cardId, rivalIid) {
   const c = carta(cardId);
   return {
     poder: ataqueHipotetico(vista, j, cardId),
-    vida: c.vida,
+    vida: c.vida + pasivoHipotetico(vista, j, cardId).vida,
     clado: c.clado,
     vuela: c.rasgo === RASGO.VUELO,
     espinasPropias: espinasHipoteticas(cardId),

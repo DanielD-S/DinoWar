@@ -3,6 +3,7 @@
 
 import { BALANCE, MAZO } from '../data/balance.js';
 import { CARTAS, TIPO, CLADO, RASGO, carta } from '../data/cards.js';
+import { QUE, CUANDO, INMUNE, TODOS } from '../data/mecanicas.js';
 import { barajar, semilla } from './rng.js';
 
 export const FASE = Object.freeze({
@@ -162,6 +163,72 @@ function adherenciasCon(state, inst, rasgo) {
   return n;
 }
 
+/** La habilidad declarada de una carta, o null si no lleva ninguna. */
+export const mecanicaDe = (cardId) => carta(cardId).mecanica ?? null;
+
+/**
+ * ¿Cuántas cuentan para un contador? Se incluye a sí misma —es lo que dice el
+ * texto de la carta— así que una sola en el campo ya suma uno.
+ */
+function cuantasCuentan(state, inst, cuenta) {
+  const c = carta(inst.cardId);
+  const bandos = cuenta.ambos ? [0, 1] : [inst.dueno];
+  let n = 0;
+  for (const b of bandos) {
+    for (const o of unidadesDe(state, b)) {
+      const oc = carta(o.cardId);
+      if (cuenta.que === QUE.CLADO ? oc.clado === c.clado : o.cardId === inst.cardId) n += 1;
+    }
+  }
+  return n;
+}
+
+/** ¿Se cumple la condición de un `si`? */
+function seCumple(state, inst, si) {
+  if (si.cuando === CUANDO.CLIMA) return state.campo !== null;
+  if (si.cuando === CUANDO.HABITAT_DETRAS) {
+    return state.jugadores[inst.dueno].habitat < state.jugadores[rival(inst.dueno)].habitat;
+  }
+  if (si.cuando === CUANDO.ALIADO_CON_VIDA) {
+    // Mira la Vida IMPRESA y no la efectiva: preguntar por la efectiva sería
+    // preguntarle a `vidaMaxima` desde dentro de `vidaMaxima`, y dos cartas que
+    // se miran la una a la otra no terminarían nunca.
+    return unidadesDe(state, inst.dueno)
+      .some((o) => o.iid !== inst.iid && carta(o.cardId).vida > si.umbral);
+  }
+  return false;
+}
+
+/** Lo que le suman a esta unidad las auras de sus compañeros de bando. */
+function aurasSobre(state, inst) {
+  const c = carta(inst.cardId);
+  let ataque = 0;
+  let vida = 0;
+  for (const o of unidadesDe(state, inst.dueno)) {
+    const a = mecanicaDe(o.cardId)?.aura;
+    if (!a || (a.clado !== TODOS && a.clado !== c.clado)) continue;
+    ataque += a.ataque ?? 0;
+    vida += a.vida ?? 0;
+  }
+  return { ataque, vida };
+}
+
+/**
+ * ¿Es inmune a esta familia de efectos? Puede serlo por su propia habilidad o
+ * porque un compañero se lo dé.
+ *
+ * La inmunidad a EVENTO cubre sólo las cartas del RIVAL. Literalmente «no puede
+ * verse afectado por carta de evento» taparía también las adaptaciones que le
+ * pone su dueño encima, y una carta que rechaza los buenos no es una carta
+ * protegida: es una carta con un defecto. Lo dice su texto, así que no engaña.
+ */
+export function inmuneA(state, iid, que) {
+  const inst = state.instancias[iid];
+  if (mecanicaDe(inst.cardId)?.inmune === que) return true;
+  return unidadesDe(state, inst.dueno)
+    .some((o) => mecanicaDe(o.cardId)?.aura?.inmune === que);
+}
+
 /** Poder de ataque con todos los modificadores estáticos. */
 export function ataqueEfectivo(state, iid) {
   const inst = state.instancias[iid];
@@ -192,6 +259,12 @@ export function ataqueEfectivo(state, iid) {
     poder += adherenciasCon(state, otro, RASGO.GREGARISMO) * BALANCE.rasgos.gregarismoAtaque;
   }
 
+  // Y lo que declare su propia habilidad.
+  const m = mecanicaDe(inst.cardId);
+  if (m?.cuenta?.ataque) poder += m.cuenta.ataque * cuantasCuentan(state, inst, m.cuenta);
+  if (m?.si?.ataque && seCumple(state, inst, m.si)) poder += m.si.ataque;
+  poder += aurasSobre(state, inst).ataque;
+
   return Math.max(0, poder);
 }
 
@@ -210,7 +283,9 @@ export function vidaMaxima(state, iid) {
   const c = carta(inst.cardId);
   let v = c.vida + inst.modVida;
 
-  if (campoEs(state, RASGO.CAMPO_CANAL)) v += BALANCE.efectosCampo.canalVida;
+  if (campoEs(state, RASGO.CAMPO_CANAL) && !inmuneA(state, iid, INMUNE.CLIMA)) {
+    v += BALANCE.efectosCampo.canalVida;
+  }
 
   if (c.rasgo === RASGO.CORAZA) v += BALANCE.rasgos.corazaVida;
   // Las que piden compañía. Se cuentan sólo los propios: un Stegosaurus rival
@@ -222,6 +297,11 @@ export function vidaMaxima(state, iid) {
   if (c.rasgo === RASGO.MANADA && delClado(state, inst, c.clado, 1)) {
     v += BALANCE.rasgos.manadaVida;
   }
+
+  const m = mecanicaDe(inst.cardId);
+  if (m?.cuenta?.vida) v += m.cuenta.vida * cuantasCuentan(state, inst, m.cuenta);
+  if (m?.si?.vida && seCumple(state, inst, m.si)) v += m.si.vida;
+  v += aurasSobre(state, inst).vida;
 
   return Math.max(0, v);
 }
@@ -243,13 +323,12 @@ function delClado(state, inst, clado, min) {
 }
 
 /**
- * Daño devuelto a quien ataca. Hoy siempre 0: las púas del tireóforo eran una
- * regla de clado y los clados dejaron de tener reglas. Se deja la función —y su
- * llamada en el combate— porque devolver daño es una mecánica que el autor va a
- * querer para alguna carta, y volver a enhebrarla luego cuesta más que dejarla.
+ * Daño devuelto a quien la hiere en combate. La función se dejó montada cuando
+ * los clados perdieron sus reglas, apostando a que el autor querría devolver
+ * daño en alguna carta; lo quiso, y por eso esto es una línea y no un injerto.
  */
-export function espinasDe() {
-  return 0;
+export function espinasDe(state, iid) {
+  return mecanicaDe(state.instancias[iid].cardId)?.espinas ?? 0;
 }
 
 /**
@@ -301,8 +380,15 @@ export function curacionDe(state, iid) {
   let cura = 0;
   if (c.rasgo === RASGO.RAMONEO_BAJO) cura += BALANCE.rasgos.ramoneoBajoCura;
   cura += adherenciasCon(state, inst, RASGO.GASTROLITOS) * BALANCE.rasgos.gastrolitosCura;
-  if (campoEs(state, RASGO.CAMPO_BOSQUE) && c.clado === CLADO.SAUROPODO) {
+  if (campoEs(state, RASGO.CAMPO_BOSQUE) && c.clado === CLADO.SAUROPODO
+      && !inmuneA(state, iid, INMUNE.CLIMA)) {
     cura += BALANCE.efectosCampo.bosqueCura;
+  }
+
+  // Lo suyo, y lo que le regale un compañero que cuide de los demás.
+  cura += mecanicaDe(inst.cardId)?.regenera?.propia ?? 0;
+  for (const o of unidadesDe(state, inst.dueno)) {
+    cura += mecanicaDe(o.cardId)?.regenera?.aliados ?? 0;
   }
   return cura;
 }
@@ -365,8 +451,45 @@ export function efectosDe(state, iid) {
     }
   }
 
+  // Las habilidades declaradas. Salen aquí solas, sin una rama por carta: es la
+  // mitad de por qué son datos y no cincuenta `if` repartidos por el motor.
+  const m = mecanicaDe(inst.cardId);
+  if (m?.cuenta) {
+    const n = cuantasCuentan(state, inst, m.cuenta);
+    if (n > 0 && ((m.cuenta.ataque ?? 0) || (m.cuenta.vida ?? 0))) {
+      fuera.push({
+        fuente: c.rasgoNombre,
+        ataque: n * (m.cuenta.ataque ?? 0), vida: n * (m.cuenta.vida ?? 0), veces: n,
+        nota: m.cuenta.que === QUE.CLADO ? `${n} de su clado en el campo` : `${n} en el campo`,
+      });
+    }
+  }
+  if (m?.si && seCumple(state, inst, m.si)) {
+    fuera.push({
+      fuente: c.rasgoNombre,
+      ataque: m.si.ataque ?? 0, vida: m.si.vida ?? 0, veces: 1,
+      nota: NOTA_SI[m.si.cuando] ?? '',
+    });
+  }
+  for (const o of unidadesDe(state, inst.dueno)) {
+    const a = mecanicaDe(o.cardId)?.aura;
+    if (!a || (a.clado !== TODOS && a.clado !== c.clado)) continue;
+    if (!(a.ataque ?? 0) && !(a.vida ?? 0)) continue;
+    fuera.push({
+      fuente: carta(o.cardId).binomial,
+      ataque: a.ataque ?? 0, vida: a.vida ?? 0, veces: 1,
+      nota: o.iid === inst.iid ? 'su propio rasgo' : 'aura de un compañero',
+    });
+  }
+
   return fuera;
 }
+
+const NOTA_SI = Object.freeze({
+  [CUANDO.CLIMA]: 'hay un clima en el campo',
+  [CUANDO.ALIADO_CON_VIDA]: 'tiene al lado a uno grande',
+  [CUANDO.HABITAT_DETRAS]: 'tu hábitat va por detrás',
+});
 
 /** Cartas pegadas a esta unidad que no le cambian las cifras pero sí lo que hace. */
 export function adheridasA(state, iid) {
@@ -386,19 +509,27 @@ export function adheridasA(state, iid) {
  * @returns {number[]} iids del mazo del jugador que valen como objetivo
  */
 export function buscablesDe(state, jugador, cardId) {
-  const filtro = FILTRO_BUSQUEDA[carta(cardId).rasgo];
+  const filtro = filtroDeBusqueda(cardId);
   if (!filtro) return [];
   return state.jugadores[jugador].mazo.filter((iid) => filtro(carta(state.instancias[iid].cardId)));
 }
 
 /** ¿Esta carta busca algo en el mazo al jugarse? */
-export const buscaEnElMazo = (cardId) => FILTRO_BUSQUEDA[carta(cardId).rasgo] !== undefined;
+export const buscaEnElMazo = (cardId) => filtroDeBusqueda(cardId) !== null;
 
-const FILTRO_BUSQUEDA = Object.freeze({
-  [RASGO.BUSCA_EVENTO]: (c) => c.tipo === TIPO.EVENTO,
-  [RASGO.BUSCA_CLIMA]: (c) => c.tipo === TIPO.CLIMA,
-  [RASGO.BUSCA_GREGARISMO]: (c) => c.rasgo === RASGO.GREGARISMO,
-});
+/**
+ * Qué acepta la búsqueda de esta carta. `busca` es una etiqueta —evento, clima,
+ * otra copia de sí misma— o directamente un clado, que es lo que hace falta
+ * para «llévate a la mano un marginocéfalo».
+ */
+function filtroDeBusqueda(cardId) {
+  const busca = mecanicaDe(cardId)?.busca;
+  if (!busca) return null;
+  if (busca === QUE.EVENTO) return (c) => c.tipo === TIPO.EVENTO;
+  if (busca === QUE.CLIMA) return (c) => c.tipo === TIPO.CLIMA;
+  if (busca === QUE.MISMA) return (c) => c.id === cardId;
+  return (c) => c.tipo === TIPO.DINOSAURIO && c.clado === busca;
+}
 
 /** Ranuras propias libres. */
 export const ranurasLibres = (state, bando) =>

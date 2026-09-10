@@ -12,17 +12,18 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: b4cda870507d86a2
+// huella: e6e2544c4146a4b9
 //
-// Lleva dentro estos 17 ficheros del repositorio. La lista la da
+// Lleva dentro estos 18 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
 // aparece aquí solo. Un test recalcula la huella sobre esta misma lista y falla
 // si el paquete se ha quedado atrás del código.
+// fuente: src/data/mecanicas.js
 // fuente: src/data/cards.js
 // fuente: src/data/balance.js
-// fuente: src/engine/entradas.js
 // fuente: src/engine/rng.js
 // fuente: src/engine/state.js
+// fuente: src/engine/entradas.js
 // fuente: src/data/dietas.js
 // fuente: src/engine/economia.js
 // fuente: src/engine/resolve.js
@@ -38,6 +39,34 @@
 
 // supabase/functions/asalto/index.ts
 import { createClient } from "jsr:@supabase/supabase-js@2";
+
+// src/data/mecanicas.js
+var QUE = Object.freeze({
+  /** Otras copias de la MISMA carta. */
+  MISMA: "MISMA",
+  /** Cualquier carta del mismo clado. */
+  CLADO: "CLADO",
+  EVENTO: "EVENTO",
+  CLIMA: "CLIMA"
+});
+var CUANDO = Object.freeze({
+  /** Hay una carta de clima en el campo, la haya puesto quien la haya puesto. */
+  CLIMA: "CLIMA",
+  /** Tienes en juego alguna criatura con más de `umbral` de Vida. */
+  ALIADO_CON_VIDA: "ALIADO_CON_VIDA",
+  /**
+   * Tu hábitat está por debajo del de tu rival. Es la única condición del set
+   * que premia ir perdiendo, y está aquí a propósito: la bola de nieve —quien
+   * va por delante en el turno 5 gana el 70 % de las veces— es el problema de
+   * balance abierto más viejo del proyecto.
+   */
+  HABITAT_DETRAS: "HABITAT_DETRAS"
+});
+var INMUNE = Object.freeze({
+  CLIMA: "CLIMA",
+  EVENTO: "EVENTO"
+});
+var TODOS = "TODOS";
 
 // src/data/cards.js
 var EVIDENCIA = Object.freeze({
@@ -145,27 +174,14 @@ var RASGO = Object.freeze({
   // Lokiceratops: con otro igual
   MANADA: "MANADA",
   // Apatosaurus: con otro saurópodo
-  // Buscar en el propio mazo al jugar la carta.
-  BUSCA_EVENTO: "BUSCA_EVENTO",
-  BUSCA_CLIMA: "BUSCA_CLIMA",
-  BUSCA_GREGARISMO: "BUSCA_GREGARISMO",
-  // Habilidades AL ENTRAR EN JUEGO: se disparan una vez, cuando la criatura
-  // llega al campo, y se acabó. Van aparte de los rasgos de arriba porque son
-  // otra cosa: aquéllos son pasivos y condicionales —estado que hay que llevar
-  // en la cabeza— y éstos, un disparo que se ve y se olvida. Ver
-  // src/engine/entradas.js.
-  ENTRADA_ALERTA: "ENTRADA_ALERTA",
-  // roba cartas
-  ENTRADA_EMBOSCADA: "ENTRADA_EMBOSCADA",
-  // daña al de enfrente
-  ENTRADA_MANADA_SANA: "ENTRADA_MANADA_SANA",
-  // cura a los tuyos
-  ENTRADA_DEVORA_MAZO: "ENTRADA_DEVORA_MAZO",
-  // muele mazo rival
-  ENTRADA_RAMONEO: "ENTRADA_RAMONEO",
-  // da Biomasa
-  ENTRADA_ARRASA: "ENTRADA_ARRASA",
-  // daño al hábitat rival
+  // Las búsquedas en el mazo y los disparos al entrar en juego ESTUVIERON aquí,
+  // como nueve etiquetas más de este enum. Se fueron a `mecanica` —el campo de
+  // datos de cada criatura, descrito en mecanicas.js— porque el mismo efecto
+  // sale con números distintos en cada carta y una etiqueta no lleva número:
+  // hacían falta nueve constantes de balance para seis cartas.
+  //
+  // Lo que queda aquí es lo de las 16 cartas de SOPORTE, que son dieciséis
+  // reglas distintas y ninguna se repite. Ésas sí son un enum.
   // adaptaciones
   GREGARISMO: "GREGARISMO",
   GASTROLITOS: "GASTROLITOS",
@@ -202,6 +218,9 @@ var CARTAS = Object.freeze({
     ataque: 1,
     vida: 2,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Bandada nerviosa",
+    rasgoTexto: "Gana +1 de Ataque por cada Dryosaurus en juego, sea de quien sea y este incluido.",
+    mecanica: Object.freeze({ cuenta: { que: QUE.MISMA, ambos: true, ataque: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Ornit\xF3podo peque\xF1o y cursorial. El gregarismo se infiere de acumulaciones multiindividuo, no est\xE1 demostrado."
   }),
@@ -214,6 +233,9 @@ var CARTAS = Object.freeze({
     ataque: 2,
     vida: 2,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Salto de entrada",
+    rasgoTexto: "Cuando entra en juego hiere en 2 al dinosaurio de enfrente.",
+    mecanica: Object.freeze({ entrada: { emboscada: 2 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Ter\xF3podo peque\xF1o (~2 m). El comportamiento carro\xF1ero es una inferencia a partir de talla y analog\xEDa ecol\xF3gica, no de evidencia directa."
   }),
@@ -222,10 +244,13 @@ var CARTAS = Object.freeze({
     rareza: RAREZA.COMUN,
     clado: CLADO.TEROPODO,
     binomial: "Ceratosaurus nasicornis",
-    coste: 1,
-    ataque: 3,
-    vida: 3,
+    coste: 2,
+    ataque: 4,
+    vida: 2,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Ayuno del cazador",
+    rasgoTexto: "Cuando entra en juego descarta 2 cartas de tu mazo.",
+    mecanica: Object.freeze({ entrada: { muelePropio: 2 } }),
     nivel_evidencia: EVIDENCIA.DEBATIDO,
     nota_cientifica: "Menos frecuente que Allosaurus. Se ha propuesto una dieta con mayor componente de presa acu\xE1tica y un uso preferente de ambientes ribere\xF1os, a partir de morfolog\xEDa dental y contexto de hallazgos. Hip\xF3tesis discutida."
   }),
@@ -236,8 +261,11 @@ var CARTAS = Object.freeze({
     binomial: "Stegosaurus stenops",
     coste: 2,
     ataque: 1,
-    vida: 9,
+    vida: 5,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Muro de placas",
+    rasgoTexto: "Gana +1 de Ataque por cada Stegosaurus que tengas en juego, este incluido.",
+    mecanica: Object.freeze({ cuenta: { que: QUE.MISMA, ambos: false, ataque: 1 } }),
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Una v\xE9rtebra caudal de Allosaurus con una perforaci\xF3n compatible con una p\xFAa caudal de Stegosaurus es evidencia directa de uso defensivo del tagomizador."
   }),
@@ -250,6 +278,9 @@ var CARTAS = Object.freeze({
     ataque: 5,
     vida: 5,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Zarpazo por sorpresa",
+    rasgoTexto: "Cuando entra en juego descarta 1 carta al azar de la mano de tu rival.",
+    mecanica: Object.freeze({ entrada: { manoRival: 1 } }),
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Tax\xF3n de ter\xF3podo m\xE1s abundante de la Morrison. Marcas de mordida atribuidas a Allosaurus aparecen en huesos de saur\xF3podos y de Stegosaurus."
   }),
@@ -259,58 +290,73 @@ var CARTAS = Object.freeze({
     clado: CLADO.SAUROPODO,
     binomial: "Camarasaurus grandis",
     coste: 3,
-    ataque: 2,
-    vida: 7,
+    ataque: 1,
+    vida: 8,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Rumia",
+    rasgoTexto: "Al final de tu turno recupera 1 de Vida.",
+    mecanica: Object.freeze({ regenera: { propia: 1 } }),
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "An\xE1lisis isot\xF3picos de esmalte dental sugieren desplazamientos estacionales hacia tierras altas durante la estaci\xF3n seca, a diferencia de otros saur\xF3podos de la misma formaci\xF3n. El rasgo Migrador refleja ese resultado."
   }),
   diplodocus: dino({
     id: "diplodocus",
-    rareza: RAREZA.EPICO,
+    rareza: RAREZA.RARO,
     clado: CLADO.SAUROPODO,
     binomial: "Diplodocus carnegii",
     coste: 2,
     ataque: 3,
-    vida: 13,
+    vida: 8,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Pisa y abona",
+    rasgoTexto: "Cuando entra en juego tu h\xE1bitat recupera 1 punto.",
+    mecanica: Object.freeze({ entrada: { curaHabitat: 1 } }),
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "El desgaste dental y la postura del cuello sustentan una partici\xF3n de nicho por ramoneo bajo respecto de otros saur\xF3podos coexistentes."
   }),
   apatosaurus: dino({
     id: "apatosaurus",
-    rareza: RAREZA.EPICO,
+    rareza: RAREZA.RARO,
     clado: CLADO.SAUROPODO,
     binomial: "Apatosaurus louisae",
     coste: 3,
     ataque: 2,
-    vida: 15,
+    vida: 10,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Pisa y abona",
+    rasgoTexto: "Cuando entra en juego tu h\xE1bitat recupera 1 punto.",
+    mecanica: Object.freeze({ entrada: { curaHabitat: 1 } }),
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "La talla adulta de los diplod\xF3cidos es en s\xED misma la principal defensa antipredatoria. Nota: la validez de Brontosaurus como g\xE9nero separado sigue en discusi\xF3n; el juego usa Apatosaurus."
   }),
   torvosaurus: dino({
     id: "torvosaurus",
-    rareza: RAREZA.LEGENDARIO,
+    rareza: RAREZA.EPICO,
     clado: CLADO.TEROPODO,
     binomial: "Torvosaurus tanneri",
     coste: 4,
-    ataque: 7,
-    vida: 6,
+    ataque: 8,
+    vida: 5,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Indiferente al cielo",
+    rasgoTexto: "No le afectan los efectos del clima.",
+    mecanica: Object.freeze({ inmune: INMUNE.CLIMA }),
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "El ter\xF3podo de mayor tama\xF1o de la formaci\xF3n, pero genuinamente raro en el registro. Su escasez en el mazo replica su escasez f\xF3sil."
   }),
   // --------------------------------- fuera de la Morrison (ver README, §fauna)
   nodosaurus: dino({
     id: "nodosaurus",
-    rareza: RAREZA.RARO,
+    rareza: RAREZA.EPICO,
     clado: CLADO.TIREOFORO,
     binomial: "Nodosaurus textilis",
-    coste: 2,
-    ataque: 2,
+    coste: 3,
+    ataque: 3,
     vida: 8,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Indiferente al cielo",
+    rasgoTexto: "No le afectan los efectos del clima.",
+    mecanica: Object.freeze({ inmune: INMUNE.CLIMA }),
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Formaci\xF3n Frontier, Wyoming, Cenomaniense (~100 Ma). Los osteodermos en bandas sobre el dorso est\xE1n documentados directamente. El tax\xF3n en s\xED es material fragmentario y varios autores lo tratan como nomen dubium: la coraza es firme, la especie lo es menos."
   }),
@@ -319,10 +365,13 @@ var CARTAS = Object.freeze({
     rareza: RAREZA.EPICO,
     clado: CLADO.TEROPODO,
     binomial: "Riparovenator milnerae",
-    coste: 2,
-    ataque: 4,
-    vida: 5,
+    coste: 3,
+    ataque: 3,
+    vida: 3,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Fuera del alcance",
+    rasgoTexto: "No le afectan las cartas de evento de tu rival.",
+    mecanica: Object.freeze({ inmune: INMUNE.EVENTO }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Formaci\xF3n Wessex, isla de Wight, Barremiense (~125 Ma), descrito en 2021. Espinos\xE1urido de hocico alargado y dientes c\xF3nicos, morfolog\xEDa asociada a capturar peces. En su pariente Baryonyx se conservaron escamas de pez en la cavidad abdominal; para este g\xE9nero es inferencia por morfolog\xEDa."
   }),
@@ -333,8 +382,11 @@ var CARTAS = Object.freeze({
     binomial: "Lokiceratops rangiformis",
     coste: 3,
     ataque: 4,
-    vida: 8,
+    vida: 7,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Fuera del alcance",
+    rasgoTexto: "No le afectan las cartas de evento de tu rival.",
+    mecanica: Object.freeze({ inmune: INMUNE.EVENTO }),
     nivel_evidencia: EVIDENCIA.DEBATIDO,
     nota_cientifica: "Formaci\xF3n Judith River, Montana, Campaniense (~78 Ma), descrito en 2024. La gola lleva las mayores hojas \xF3seas conocidas en un cerat\xF3psido, asim\xE9tricas entre lados. Si serv\xEDan para defensa, para exhibici\xF3n o para reconocerse entre especies es justamente lo que se discute."
   }),
@@ -344,9 +396,12 @@ var CARTAS = Object.freeze({
     clado: CLADO.ORNITOPODO,
     binomial: "Brachylophosaurus canadensis",
     coste: 2,
-    ataque: 2,
-    vida: 7,
+    ataque: 0,
+    vida: 10,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Reba\xF1o de tres",
+    rasgoTexto: "Si llegas a tener 3 Brachylophosaurus en juego, \xE9ste gana +6 de Ataque para siempre.",
+    mecanica: Object.freeze({ trio: { copias: 3, ataque: 6 } }),
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Formaciones Judith River y Oldman, Montana y Alberta, Campaniense (~78 Ma). Los lechos de huesos monoespec\xEDficos de hadrosaurios son la mejor evidencia de vida en manada de todo el registro. De este tax\xF3n se conocen adem\xE1s ejemplares con tejido blando conservado."
   }),
@@ -357,8 +412,11 @@ var CARTAS = Object.freeze({
     binomial: "Tyrannotitan chubutensis",
     coste: 4,
     ataque: 10,
-    vida: 6,
+    vida: 7,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Tijera",
+    rasgoTexto: "Cuando entra en juego manda al descarte 1 dinosaurio rival de hasta 4 de Vida.",
+    mecanica: Object.freeze({ entrada: { fulmina: 4 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Formaci\xF3n Cerro Barcino, Chubut, Argentina, Aptiense (~113 Ma). Carcarodontos\xE1urido de unos 12 metros con dientes comprimidos y aserrados, de filo cortante en vez de aplastante. Que eso implique cortar carne y provocar hemorragias se infiere de la forma del diente, no de una herida f\xF3sil."
   }),
@@ -371,6 +429,9 @@ var CARTAS = Object.freeze({
     ataque: 2,
     vida: 4,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Vuelo de reconocimiento",
+    rasgoTexto: "Cuando entra en juego robas 1 carta.",
+    mecanica: Object.freeze({ entrada: { roba: 1 } }),
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Formaci\xF3n Jiufotang, Liaoning, China, Aptiense (~120 Ma). No es un dinosaurio: es un pterosaurio tapej\xE1rido, sin dientes y con cresta craneal. Los tapej\xE1ridos conservan picnofibras, filamentos tegumentarios reales \u2014 la raz\xF3n por la que este juego no pone plumas a los dinosaurios es que ellos no las tienen, no una regla est\xE9tica."
   }),
@@ -571,9 +632,12 @@ var CARTAS = Object.freeze({
     clado: CLADO.MARINO,
     binomial: "Plesiopleurodon wellesi",
     coste: 3,
-    ataque: 9,
-    vida: 6,
+    ataque: 8,
+    vida: 4,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Sigue a los grandes",
+    rasgoTexto: "Gana +2 de Ataque si tienes en juego alg\xFAn dinosaurio con m\xE1s de 6 de Vida.",
+    mecanica: Object.freeze({ si: { cuando: CUANDO.ALIADO_CON_VIDA, umbral: 6, ataque: 2 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Plesiosaurio plios\xE1urido del Cret\xE1cico Superior de Wyoming. No es un dinosaurio: es un reptil marino de cuello corto y cr\xE1neo enorme."
   }),
@@ -583,9 +647,12 @@ var CARTAS = Object.freeze({
     clado: CLADO.TEROPODO,
     binomial: "Ojoraptorsaurus boerei",
     coste: 2,
-    ataque: 4,
-    vida: 5,
+    ataque: 2,
+    vida: 4,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Salto de entrada",
+    rasgoTexto: "Cuando entra en juego hiere en 2 al dinosaurio de enfrente.",
+    mecanica: Object.freeze({ entrada: { emboscada: 2 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Oviraptorosaurio caenagn\xE1tido de la Formaci\xF3n Ojo Alamo, Nuevo M\xE9xico, Maastrichtiense. Se conoce por poco material p\xE9lvico."
   }),
@@ -595,9 +662,12 @@ var CARTAS = Object.freeze({
     clado: CLADO.TEROPODO,
     binomial: "Dromaeosaurus albertensis",
     coste: 2,
-    ataque: 5,
-    vida: 4,
+    ataque: 3,
+    vida: 3,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Jaur\xEDa",
+    rasgoTexto: "Gana +1 de Ataque por cada Dromaeosaurus en juego, sea de quien sea y este incluido.",
+    mecanica: Object.freeze({ cuenta: { que: QUE.MISMA, ambos: true, ataque: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Dromeos\xE1urido de la Formaci\xF3n Dinosaur Park, Alberta, Campaniense. Es el g\xE9nero que da nombre a toda la familia."
   }),
@@ -608,8 +678,11 @@ var CARTAS = Object.freeze({
     binomial: "Athenar bermani",
     coste: 2,
     ataque: 2,
-    vida: 7,
+    vida: 3,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Olfato de tormenta",
+    rasgoTexto: "Al jugarlo, puedes llevarte a la mano una carta de evento de tu mazo.",
+    mecanica: Object.freeze({ busca: QUE.EVENTO }),
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Formaci\xF3n Morrison, cantera Carnegie del Dinosaur National Monument, Utah, Titoniense inferior (~149\u2013145 Ma). Descrito en 2025 sobre un neurocr\xE1neo y techo craneal (CM 26552) que llevaba d\xE9cadas archivado como Diplodocus. Es un dicreos\xE1urido: saur\xF3podos de cuello corto y talla modesta para el grupo, no un ter\xF3podo."
   }),
@@ -619,9 +692,12 @@ var CARTAS = Object.freeze({
     clado: CLADO.TEROPODO,
     binomial: "Sanjuansaurus gordilloi",
     coste: 2,
-    ataque: 5,
-    vida: 4,
+    ataque: 3,
+    vida: 3,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Olfato de tormenta",
+    rasgoTexto: "Al jugarlo, puedes llevarte a la mano una carta de clima de tu mazo.",
+    mecanica: Object.freeze({ busca: QUE.CLIMA }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Herreras\xE1urido de la Formaci\xF3n Ischigualasto, Argentina, Carniense (~231 Ma). Los herreras\xE1uridos son saurisquios muy basales; su colocaci\xF3n entre los ter\xF3podos se discute."
   }),
@@ -631,9 +707,12 @@ var CARTAS = Object.freeze({
     clado: CLADO.TEROPODO,
     binomial: "Suchomimus tenerensis",
     coste: 3,
-    ataque: 8,
+    ataque: 7,
     vida: 7,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Rastreo de orilla",
+    rasgoTexto: "Cuando entra en juego descarta 1 carta del mazo de tu rival.",
+    mecanica: Object.freeze({ entrada: { mueleRival: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Espinos\xE1urido de la Formaci\xF3n Elrhaz, N\xEDger, Aptiense. Hocico largo y c\xF3nico, adaptado a la pesca."
   }),
@@ -642,10 +721,13 @@ var CARTAS = Object.freeze({
     rareza: RAREZA.COMUN,
     clado: CLADO.TEROPODO,
     binomial: "Eosinopteryx brevipenna",
-    coste: 1,
-    ataque: 2,
-    vida: 2,
+    coste: 0,
+    ataque: 1,
+    vida: 1,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Percha compartida",
+    rasgoTexto: "Gana +1 de Vida por cada Eosinopteryx que tengas en juego, este incluido.",
+    mecanica: Object.freeze({ cuenta: { que: QUE.MISMA, ambos: false, vida: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Paraviano diminuto de la Formaci\xF3n Tiaojishan, China, Jur\xE1sico Superior. Conserva impresiones de plumas."
   }),
@@ -654,10 +736,13 @@ var CARTAS = Object.freeze({
     rareza: RAREZA.COMUN,
     clado: CLADO.TEROPODO,
     binomial: "Troodon formosus",
-    coste: 2,
-    ataque: 4,
-    vida: 5,
+    coste: 1,
+    ataque: 1,
+    vida: 2,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Caza coordinada",
+    rasgoTexto: "Gana +1 de Ataque por cada Troodon que tengas en juego, este incluido.",
+    mecanica: Object.freeze({ cuenta: { que: QUE.MISMA, ambos: false, ataque: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Ter\xF3podo maniraptor del Cret\xE1cico Superior de Norteam\xE9rica. El nombre se basa en dientes aislados y su validez est\xE1 discutida."
   }),
@@ -667,9 +752,12 @@ var CARTAS = Object.freeze({
     clado: CLADO.TEROPODO,
     binomial: "Carnotaurus sastrei",
     coste: 3,
-    ataque: 9,
-    vida: 6,
+    ataque: 7,
+    vida: 3,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Territorio exclusivo",
+    rasgoTexto: "Para jugarlo tienes que descartar 2 cartas de tu mano.",
+    mecanica: Object.freeze({ costeExtra: { descartar: 2 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Abelis\xE1urido de la Formaci\xF3n La Colonia, Argentina, Maastrichtiense. Cuernos frontales y brazos reducidos al extremo."
   }),
@@ -679,9 +767,12 @@ var CARTAS = Object.freeze({
     clado: CLADO.TEROPODO,
     binomial: "Spinosaurus aegyptiacus",
     coste: 4,
-    ataque: 11,
-    vida: 11,
+    ataque: 10,
+    vida: 8,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Draga el r\xEDo",
+    rasgoTexto: "Cuando entra en juego descarta 5 cartas del mazo de tu rival y 2 del tuyo.",
+    mecanica: Object.freeze({ entrada: { mueleRival: 5, muelePropio: 2 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Espinos\xE1urido de los Kem Kem, Marruecos, Cenomaniense. Vela dorsal y un estilo de vida acu\xE1tico que sigue debati\xE9ndose."
   }),
@@ -691,21 +782,27 @@ var CARTAS = Object.freeze({
     clado: CLADO.MARINO,
     binomial: "Mosasaurus hoffmannii",
     coste: 4,
-    ataque: 12,
+    ataque: 8,
     vida: 10,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Draga el r\xEDo",
+    rasgoTexto: "Cuando entra en juego descarta 5 cartas del mazo de tu rival y 2 del tuyo.",
+    mecanica: Object.freeze({ entrada: { mueleRival: 5, muelePropio: 2 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Mosasaurio del Maastrichtiense. No es un dinosaurio: es un escamoso marino, pariente de varanos y serpientes."
   }),
   halszkaraptor: dino({
     id: "halszkaraptor",
-    rareza: RAREZA.COMUN,
+    rareza: RAREZA.RARO,
     clado: CLADO.TEROPODO,
     binomial: "Halszkaraptor escuilliei",
     coste: 1,
     ataque: 2,
     vida: 2,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Nadador de temporal",
+    rasgoTexto: "Gana +2 de Vida mientras haya un clima en el campo.",
+    mecanica: Object.freeze({ si: { cuando: CUANDO.CLIMA, vida: 2 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Dromeos\xE1urido halszkaraptorino de Mongolia, Campaniense. Cuello largo y hocico con muchos dientes peque\xF1os; se ha propuesto un modo de vida semiacu\xE1tico."
   }),
@@ -716,8 +813,11 @@ var CARTAS = Object.freeze({
     binomial: "Tongtianlong limosus",
     coste: 1,
     ataque: 1,
-    vida: 3,
+    vida: 1,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Nadador de temporal",
+    rasgoTexto: "Gana +2 de Ataque mientras haya un clima en el campo.",
+    mecanica: Object.freeze({ si: { cuando: CUANDO.CLIMA, ataque: 2 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Oviraptorosaurio de la Formaci\xF3n Nanxiong, China, Maastrichtiense. El holotipo se conserv\xF3 en postura de haber quedado atrapado en el barro."
   }),
@@ -726,10 +826,13 @@ var CARTAS = Object.freeze({
     rareza: RAREZA.RARO,
     clado: CLADO.MARINO,
     binomial: "Scanisaurus nazarowi",
-    coste: 2,
-    ataque: 4,
-    vida: 5,
+    coste: 4,
+    ataque: 3,
+    vida: 3,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Banco de caza",
+    rasgoTexto: "Mientras est\xE9 en juego, tus reptiles marinos ganan +1 de Ataque.",
+    mecanica: Object.freeze({ aura: { clado: CLADO.MARINO, ataque: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Plesiosaurio elasmos\xE1urido del Cret\xE1cico Superior del B\xE1ltico. No es un dinosaurio, y su validez como g\xE9nero est\xE1 discutida."
   }),
@@ -738,10 +841,13 @@ var CARTAS = Object.freeze({
     rareza: RAREZA.RARO,
     clado: CLADO.TEROPODO,
     binomial: "Monolophosaurus jiangi",
-    coste: 2,
-    ataque: 5,
-    vida: 4,
+    coste: 4,
+    ataque: 3,
+    vida: 3,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Cresta de mando",
+    rasgoTexto: "Mientras est\xE9 en juego, tus ter\xF3podos ganan +1 de Vida.",
+    mecanica: Object.freeze({ aura: { clado: CLADO.TEROPODO, vida: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Ter\xF3podo tetanuro de la Formaci\xF3n Shishugou, China, Jur\xE1sico Medio. Una sola cresta \xF3sea recorre el cr\xE1neo."
   }),
@@ -750,10 +856,13 @@ var CARTAS = Object.freeze({
     rareza: RAREZA.RARO,
     clado: CLADO.TIREOFORO,
     binomial: "Invictarx zephyri",
-    coste: 2,
-    ataque: 2,
-    vida: 7,
+    coste: 3,
+    ataque: 1,
+    vida: 1,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Formaci\xF3n cerrada",
+    rasgoTexto: "Mientras est\xE9 en juego, tus tire\xF3foros ganan +1 de Vida.",
+    mecanica: Object.freeze({ aura: { clado: CLADO.TIREOFORO, vida: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Anquilosaurio nodos\xE1urido de la Formaci\xF3n Menefee, Nuevo M\xE9xico, Campaniense."
   }),
@@ -763,9 +872,12 @@ var CARTAS = Object.freeze({
     clado: CLADO.MARGINOCEFALO,
     binomial: "Medusaceratops lokii",
     coste: 3,
-    ataque: 5,
+    ataque: 2,
     vida: 10,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Muralla de golas",
+    rasgoTexto: "Mientras est\xE9 en juego, tus marginoc\xE9falos ganan +1 de Ataque y +1 de Vida.",
+    mecanica: Object.freeze({ aura: { clado: CLADO.MARGINOCEFALO, ataque: 1, vida: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Cerat\xF3psido casmosaurino de la Formaci\xF3n Judith River, Montana, Campaniense."
   }),
@@ -776,32 +888,41 @@ var CARTAS = Object.freeze({
     binomial: "Platyceratops tatarinovi",
     coste: 1,
     ataque: 1,
-    vida: 3,
+    vida: 2,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Llamada de manada",
+    rasgoTexto: "Al jugarlo, puedes llevarte a la mano otro Platyceratops de tu mazo.",
+    mecanica: Object.freeze({ busca: QUE.MISMA }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Ceratopsio bagacerat\xF3psido de Mongolia, Campaniense. Peque\xF1o y sin cuernos."
   }),
   loricatosaurus: dino({
     id: "loricatosaurus",
-    rareza: RAREZA.EPICO,
+    rareza: RAREZA.COMUN,
     clado: CLADO.TIREOFORO,
     binomial: "Loricatosaurus priscus",
     coste: 3,
-    ataque: 4,
-    vida: 11,
+    ataque: 0,
+    vida: 8,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Terrapl\xE9n",
+    rasgoTexto: "Cuando entra en juego tu h\xE1bitat recupera 2 puntos.",
+    mecanica: Object.freeze({ entrada: { curaHabitat: 2 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Estegos\xE1urido del Calloviense de Inglaterra y Francia. Se separ\xF3 del material antes atribuido a Lexovisaurus."
   }),
   therizinosaurus: dino({
     id: "therizinosaurus",
-    rareza: RAREZA.EPICO,
+    rareza: RAREZA.COMUN,
     clado: CLADO.TEROPODO,
     binomial: "Therizinosaurus cheloniformis",
     coste: 3,
-    ataque: 6,
-    vida: 9,
+    ataque: 1,
+    vida: 6,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Garra de sequ\xEDa",
+    rasgoTexto: "Gana +3 de Ataque mientras haya un clima en el campo.",
+    mecanica: Object.freeze({ si: { cuando: CUANDO.CLIMA, ataque: 3 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Terizinosaurio de la Formaci\xF3n Nemegt, Mongolia, Maastrichtiense. Ter\xF3podo herb\xEDvoro con las garras manuales m\xE1s largas que se conocen."
   }),
@@ -811,9 +932,12 @@ var CARTAS = Object.freeze({
     clado: CLADO.MARGINOCEFALO,
     binomial: "Alaskacephale gangloffi",
     coste: 2,
-    ataque: 3,
-    vida: 6,
+    ataque: 2,
+    vida: 4,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Testarazo",
+    rasgoTexto: "Cuando entra en juego hiere en 2 al dinosaurio de enfrente.",
+    mecanica: Object.freeze({ entrada: { emboscada: 2 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Paquicefalosaurio de la Formaci\xF3n Prince Creek, Alaska, Campaniense."
   }),
@@ -823,9 +947,12 @@ var CARTAS = Object.freeze({
     clado: CLADO.MARGINOCEFALO,
     binomial: "Titanoceratops ouranos",
     coste: 3,
-    ataque: 6,
-    vida: 9,
+    ataque: 5,
+    vida: 7,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Cuerno mayor",
+    rasgoTexto: "Gana +1 de Ataque por cada marginoc\xE9falo que tengas en juego, este incluido.",
+    mecanica: Object.freeze({ cuenta: { que: QUE.CLADO, ambos: false, ataque: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Cerat\xF3psido casmosaurino de Nuevo M\xE9xico, Campaniense. Se propuso separ\xE1ndolo de material asignado a Pentaceratops, y no todos lo aceptan."
   }),
@@ -835,9 +962,12 @@ var CARTAS = Object.freeze({
     clado: CLADO.SAUROPODO,
     binomial: "Atlasaurus imelakei",
     coste: 3,
-    ataque: 3,
-    vida: 12,
+    ataque: 2,
+    vida: 10,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Sombra del cuello",
+    rasgoTexto: "Mientras est\xE9 en juego, tus saur\xF3podos ganan +1 de Vida.",
+    mecanica: Object.freeze({ aura: { clado: CLADO.SAUROPODO, vida: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Saur\xF3podo del Jur\xE1sico Medio de Marruecos. Extremidades desproporcionadamente largas para un saur\xF3podo."
   }),
@@ -847,21 +977,27 @@ var CARTAS = Object.freeze({
     clado: CLADO.MARGINOCEFALO,
     binomial: "Stegoceras validum",
     coste: 2,
-    ataque: 3,
-    vida: 6,
+    ataque: 1,
+    vida: 8,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Cabezazo de vuelta",
+    rasgoTexto: "Devuelve 2 de da\xF1o a quien lo hiera en combate.",
+    mecanica: Object.freeze({ espinas: 2 }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Paquicefalosaurio de la Formaci\xF3n Dinosaur Park, Alberta, Campaniense. Domo craneal grueso."
   }),
   maiasaura: dino({
     id: "maiasaura",
-    rareza: RAREZA.EPICO,
+    rareza: RAREZA.LEGENDARIO,
     clado: CLADO.ORNITOPODO,
     binomial: "Maiasaura peeblesorum",
     coste: 3,
-    ataque: 4,
-    vida: 11,
+    ataque: 3,
+    vida: 10,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Buena madre",
+    rasgoTexto: "Al final de tu turno, todos tus dinosaurios recuperan 1 de Vida.",
+    mecanica: Object.freeze({ regenera: { aliados: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Hadros\xE1urido de la Formaci\xF3n Two Medicine, Montana, Campaniense. Sus nidadas documentan cuidado parental."
   }),
@@ -871,9 +1007,12 @@ var CARTAS = Object.freeze({
     clado: CLADO.ORNITOPODO,
     binomial: "Edmontosaurus annectens",
     coste: 4,
-    ataque: 5,
-    vida: 17,
+    ataque: 2,
+    vida: 10,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Migraci\xF3n en masa",
+    rasgoTexto: "Mientras est\xE9 en juego, tus ornit\xF3podos ganan +1 de Ataque y +1 de Vida.",
+    mecanica: Object.freeze({ aura: { clado: CLADO.ORNITOPODO, ataque: 1, vida: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Hadros\xE1urido del Maastrichtiense de Norteam\xE9rica. Uno de los dinosaurios con m\xE1s ejemplares conocidos."
   }),
@@ -884,8 +1023,11 @@ var CARTAS = Object.freeze({
     binomial: "Plateosauravus cullingworthi",
     coste: 2,
     ataque: 2,
-    vida: 7,
+    vida: 2,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Colonia de ribera",
+    rasgoTexto: "Gana +1 de Ataque y +1 de Vida por cada Plateosauravus que tengas en juego, este incluido.",
+    mecanica: Object.freeze({ cuenta: { que: QUE.MISMA, ambos: false, ataque: 1, vida: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Sauropodomorfo basal de la Formaci\xF3n Elliot, Sud\xE1frica, Tri\xE1sico Superior. No es un saur\xF3podo verdadero; se agrupa aqu\xED por plan corporal. Su posici\xF3n es incierta incluso dentro de los plateosaurios, y parte del material asignado se considera indeterminado."
   }),
@@ -896,8 +1038,11 @@ var CARTAS = Object.freeze({
     binomial: "Gargoyleosaurus parkpinorum",
     coste: 2,
     ataque: 2,
-    vida: 7,
+    vida: 4,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Osteodermos",
+    rasgoTexto: "Devuelve 3 de da\xF1o a quien lo hiera en combate.",
+    mecanica: Object.freeze({ espinas: 3 }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Anquilosaurio de la Formaci\xF3n Morrison, Jur\xE1sico Superior. Uno de los anquilosaurios m\xE1s antiguos que se conocen bien."
   }),
@@ -908,8 +1053,11 @@ var CARTAS = Object.freeze({
     binomial: "Wendiceratops pinhornensis",
     coste: 3,
     ataque: 5,
-    vida: 10,
+    vida: 8,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Embestida",
+    rasgoTexto: "Cuando entra en juego manda al descarte 1 dinosaurio rival de hasta 2 de Vida.",
+    mecanica: Object.freeze({ entrada: { fulmina: 2 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Cerat\xF3psido centrosaurino de la Formaci\xF3n Oldman, Alberta, Campaniense."
   }),
@@ -919,9 +1067,12 @@ var CARTAS = Object.freeze({
     clado: CLADO.SAUROPODO,
     binomial: "Antarctosaurus wichmannianus",
     coste: 4,
-    ataque: 4,
-    vida: 18,
+    ataque: 2,
+    vida: 12,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Refugio polar",
+    rasgoTexto: "Mientras est\xE9 en juego, a ninguno de tus dinosaurios le afectan los efectos del clima.",
+    mecanica: Object.freeze({ aura: { clado: TODOS, inmune: INMUNE.CLIMA } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Titanosaurio del Cret\xE1cico Superior de Argentina. El material asignado al g\xE9nero es heterog\xE9neo y su validez se discute."
   }),
@@ -934,6 +1085,9 @@ var CARTAS = Object.freeze({
     ataque: 1,
     vida: 3,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Grito de aviso",
+    rasgoTexto: "Al jugarlo, puedes llevarte a la mano un marginoc\xE9falo de tu mazo.",
+    mecanica: Object.freeze({ busca: CLADO.MARGINOCEFALO }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Neoceratopsio basal de la Formaci\xF3n Yixian, China, Barremiense. Peque\xF1o y sin gola desarrollada."
   }),
@@ -943,9 +1097,12 @@ var CARTAS = Object.freeze({
     clado: CLADO.ORNITOPODO,
     binomial: "Rhinorex condrupus",
     coste: 3,
-    ataque: 4,
-    vida: 11,
+    ataque: 3,
+    vida: 8,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "\xDAltima llanura",
+    rasgoTexto: "Gana +2 de Ataque mientras tu h\xE1bitat est\xE9 por debajo del de tu rival.",
+    mecanica: Object.freeze({ si: { cuando: CUANDO.HABITAT_DETRAS, ataque: 2 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Hadros\xE1urido saurolofino de la Formaci\xF3n Neslen, Utah, Campaniense. Destaca por el gran arco nasal."
   }),
@@ -958,6 +1115,9 @@ var CARTAS = Object.freeze({
     ataque: 1,
     vida: 3,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Cr\xEDa acorazada",
+    rasgoTexto: "Gana +1 de Vida por cada tire\xF3foro que tengas en juego, este incluido.",
+    mecanica: Object.freeze({ cuenta: { que: QUE.CLADO, ambos: false, vida: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Tire\xF3foro basal de la Formaci\xF3n Lufeng, China, Jur\xE1sico Inferior. Se conoce por una mand\xEDbula, y su validez est\xE1 discutida."
   }),
@@ -967,9 +1127,12 @@ var CARTAS = Object.freeze({
     clado: CLADO.ORNITOPODO,
     binomial: "Shuangmiaosaurus gilmorei",
     coste: 2,
-    ataque: 3,
-    vida: 6,
+    ataque: 2,
+    vida: 4,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Ramoneo de orilla",
+    rasgoTexto: "Cuando entra en juego tu h\xE1bitat recupera 1 punto.",
+    mecanica: Object.freeze({ entrada: { curaHabitat: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Hadrosauroideo basal de la Formaci\xF3n Sunjiawan, China, Cret\xE1cico Superior."
   }),
@@ -980,8 +1143,11 @@ var CARTAS = Object.freeze({
     binomial: "Chasmosaurus belli",
     coste: 2,
     ataque: 2,
-    vida: 7,
+    vida: 4,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Vig\xEDa de la gola",
+    rasgoTexto: "Cuando entra en juego robas 1 carta.",
+    mecanica: Object.freeze({ entrada: { roba: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Cerat\xF3psido casmosaurino de la Formaci\xF3n Dinosaur Park, Alberta, Campaniense. Gola muy grande con dos aberturas amplias."
   })
@@ -1256,27 +1422,31 @@ var BALANCE = Object.freeze({
   }),
   // ------------------------------------------- habilidades al entrar en juego
   //
-  // Se disparan una vez y se acabó. Prueba de seis, sobre criaturas que hoy no
-  // tienen NADA: así no se rompe ninguna carta que ya funcione y se ataca de
-  // paso el problema medido —30 de 50 criaturas fuera de banda, casi todas sin
-  // mecánica—.
+  // CUÁNTO hace cada una lo dice la carta —está en su `mecanica`, en cards.js—
+  // porque el mismo efecto sale con números distintos: Suchomimus muele 1 y
+  // Spinosaurus 5. Lo que hay aquí es lo OTRO: cuánto vale un punto de cada
+  // efecto para la IA que decide si baja la carta.
+  //
+  // Sin este número la carta no se juega jamás. No es una advertencia teórica:
+  // le pasó a la Llanura de inundación, cero usos en 300 partidas hasta que se
+  // le puso valor. Toda entrada nueva necesita su peso aquí.
   //
   // Se apagan con DINOWAR_ENTRADAS=0 para poder medir con y sin.
-  entradas: Object.freeze({
-    alertaRoba: 1,
-    // Troodon: ojos y bulbos olfatorios enormes
-    emboscadaDano: 3,
-    // Dromaeosaurus: cae encima del de enfrente
-    manadaSanaCura: 2,
-    // Gargoyleosaurus: llega y cierra la formación
-    // El más peligroso de los seis y por eso el más caro y de una sola copia:
-    // moler es lo que hace que la Deriva árida gane el 100 % de sus partidas.
-    devoraMazo: 3,
-    // Mosasaurus
-    ramoneoBiomasa: 2,
-    // Atlasaurus: alcanza el dosel que nadie alcanza
-    arrasaHabitat: 3
-    // Spinosaurus: doce metros entrando en la llanura
+  valorEntrada: Object.freeze({
+    roba: 1.4,
+    // una carta en la mano vale más que su punto
+    emboscada: 1,
+    // un punto de daño es un punto
+    manoRival: 1.2,
+    // quitarle una carta al otro, algo más
+    curaHabitat: 1,
+    // se multiplica por ia.pesoHabitat al tasarla
+    mueleRival: 0.4,
+    // acerca la extinción, pero lento
+    muelePropio: -0.4,
+    // es un COSTE: te la acercas a ti
+    fulmina: 3
+    // matar algo del campo sin pelearlo
   }),
   // --------------------------------------------------------------------- IA
   ia: Object.freeze({
@@ -1307,8 +1477,8 @@ var MAZO = Object.freeze([
   ["dryosaurus", 3],
   ["ornitholestes", 3],
   ["ceratosaurus", 3],
-  ["nodosaurus", 3],
-  ["stegosaurus", 2],
+  ["nodosaurus", 2],
+  ["stegosaurus", 3],
   ["allosaurus", 2],
   ["camarasaurus", 2],
   // Lokiceratops pasó a legendaria y sólo admite una copia. La plaza que deja
@@ -1354,109 +1524,6 @@ for (const [cardId, copias] of MAZO) {
 }
 if (TOTAL_MAZO !== BALANCE.tamanoMazo) {
   throw new Error(`MAZO suma ${TOTAL_MAZO} cartas y deber\xEDan ser ${BALANCE.tamanoMazo}`);
-}
-
-// src/engine/entradas.js
-var HAY_ENTRADAS = !(typeof process !== "undefined" && process.env && process.env.DINOWAR_ENTRADAS === "0");
-var ES_ENTRADA = Object.freeze({
-  [RASGO.ENTRADA_ALERTA]: true,
-  [RASGO.ENTRADA_EMBOSCADA]: true,
-  [RASGO.ENTRADA_MANADA_SANA]: true,
-  [RASGO.ENTRADA_DEVORA_MAZO]: true,
-  [RASGO.ENTRADA_RAMONEO]: true,
-  [RASGO.ENTRADA_ARRASA]: true
-});
-function valorDeEntrada(cardId) {
-  if (!HAY_ENTRADAS) return 0;
-  const E = BALANCE.entradas;
-  switch (carta(cardId).rasgo) {
-    case RASGO.ENTRADA_ALERTA:
-      return E.alertaRoba * 1.4;
-    case RASGO.ENTRADA_EMBOSCADA:
-      return E.emboscadaDano;
-    case RASGO.ENTRADA_MANADA_SANA:
-      return E.manadaSanaCura;
-    case RASGO.ENTRADA_DEVORA_MAZO:
-      return E.devoraMazo * 0.4;
-    case RASGO.ENTRADA_RAMONEO:
-      return E.ramoneoBiomasa * 1.2;
-    case RASGO.ENTRADA_ARRASA:
-      return E.arrasaHabitat * BALANCE.ia.pesoHabitat;
-    default:
-      return 0;
-  }
-}
-function alEntrar(s, inst, ayudas) {
-  if (!HAY_ENTRADAS) return;
-  const { ev: ev2, herir: herir2, rival: rival2, unidadEn: unidadEn2, unidadesDe: unidadesDe2, CAUSA: CAUSA2 } = ayudas;
-  const c = carta(inst.cardId);
-  const j = inst.dueno;
-  const contrario = rival2(j);
-  const E = BALANCE.entradas;
-  const jug = s.jugadores[j];
-  switch (c.rasgo) {
-    // Ojos enormes y bulbos olfatorios grandes: ve venir las cosas.
-    case RASGO.ENTRADA_ALERTA: {
-      let robadas = 0;
-      for (let k = 0; k < E.alertaRoba && jug.mazo.length > 0; k++) {
-        jug.mano.push(jug.mazo.shift());
-        robadas += 1;
-      }
-      ev2(s, "ENTRADA", { iid: inst.iid, cardId: inst.cardId, dueno: j, efecto: "roba", n: robadas });
-      break;
-    }
-    // Cae encima del que tiene enfrente antes de que se coloque.
-    case RASGO.ENTRADA_EMBOSCADA: {
-      const enfrente = unidadEn2(s, contrario, inst.ranura);
-      if (enfrente) herir2(s, enfrente.iid, E.emboscadaDano, CAUSA2.ENTRADA, j);
-      ev2(s, "ENTRADA", {
-        iid: inst.iid,
-        cardId: inst.cardId,
-        dueno: j,
-        efecto: "emboscada",
-        n: enfrente ? E.emboscadaDano : 0
-      });
-      break;
-    }
-    // La coraza que llega y cierra la formación.
-    case RASGO.ENTRADA_MANADA_SANA: {
-      let curados = 0;
-      for (const u of unidadesDe2(s, j)) {
-        const otra = s.instancias[u.iid];
-        if (otra.iid === inst.iid || otra.heridas <= 0) continue;
-        otra.heridas = Math.max(0, otra.heridas - E.manadaSanaCura);
-        curados += 1;
-      }
-      ev2(s, "ENTRADA", { iid: inst.iid, cardId: inst.cardId, dueno: j, efecto: "cura", n: curados });
-      break;
-    }
-    // Depredador de mar abierto: lo que caza no vuelve al registro.
-    case RASGO.ENTRADA_DEVORA_MAZO: {
-      const otro = s.jugadores[contrario];
-      let molidas = 0;
-      for (let k = 0; k < E.devoraMazo && otro.mazo.length > 0; k++) {
-        otro.descarte.push(otro.mazo.shift());
-        molidas += 1;
-      }
-      ev2(s, "ENTRADA", { iid: inst.iid, cardId: inst.cardId, dueno: j, efecto: "muele", n: molidas });
-      break;
-    }
-    // Alcanza el dosel que nadie más alcanza.
-    case RASGO.ENTRADA_RAMONEO: {
-      jug.biomasa += E.ramoneoBiomasa;
-      ev2(s, "ENTRADA", { iid: inst.iid, cardId: inst.cardId, dueno: j, efecto: "biomasa", n: E.ramoneoBiomasa });
-      break;
-    }
-    // Doce metros entrando en una llanura de inundación.
-    case RASGO.ENTRADA_ARRASA: {
-      const otro = s.jugadores[contrario];
-      otro.habitat = Math.max(0, otro.habitat - E.arrasaHabitat);
-      ev2(s, "ENTRADA", { iid: inst.iid, cardId: inst.cardId, dueno: j, efecto: "habitat", n: E.arrasaHabitat });
-      break;
-    }
-    default:
-      break;
-  }
 }
 
 // src/engine/rng.js
@@ -1619,6 +1686,46 @@ function adherenciasCon(state, inst, rasgo) {
   }
   return n;
 }
+var mecanicaDe = (cardId) => carta(cardId).mecanica ?? null;
+function cuantasCuentan(state, inst, cuenta) {
+  const c = carta(inst.cardId);
+  const bandos = cuenta.ambos ? [0, 1] : [inst.dueno];
+  let n = 0;
+  for (const b of bandos) {
+    for (const o of unidadesDe(state, b)) {
+      const oc = carta(o.cardId);
+      if (cuenta.que === QUE.CLADO ? oc.clado === c.clado : o.cardId === inst.cardId) n += 1;
+    }
+  }
+  return n;
+}
+function seCumple(state, inst, si) {
+  if (si.cuando === CUANDO.CLIMA) return state.campo !== null;
+  if (si.cuando === CUANDO.HABITAT_DETRAS) {
+    return state.jugadores[inst.dueno].habitat < state.jugadores[rival(inst.dueno)].habitat;
+  }
+  if (si.cuando === CUANDO.ALIADO_CON_VIDA) {
+    return unidadesDe(state, inst.dueno).some((o) => o.iid !== inst.iid && carta(o.cardId).vida > si.umbral);
+  }
+  return false;
+}
+function aurasSobre(state, inst) {
+  const c = carta(inst.cardId);
+  let ataque = 0;
+  let vida = 0;
+  for (const o of unidadesDe(state, inst.dueno)) {
+    const a = mecanicaDe(o.cardId)?.aura;
+    if (!a || a.clado !== TODOS && a.clado !== c.clado) continue;
+    ataque += a.ataque ?? 0;
+    vida += a.vida ?? 0;
+  }
+  return { ataque, vida };
+}
+function inmuneA(state, iid, que) {
+  const inst = state.instancias[iid];
+  if (mecanicaDe(inst.cardId)?.inmune === que) return true;
+  return unidadesDe(state, inst.dueno).some((o) => mecanicaDe(o.cardId)?.aura?.inmune === que);
+}
 function ataqueEfectivo(state, iid) {
   const inst = state.instancias[iid];
   const c = carta(inst.cardId);
@@ -1638,13 +1745,19 @@ function ataqueEfectivo(state, iid) {
     if (otro.cardId !== inst.cardId) continue;
     poder += adherenciasCon(state, otro, RASGO.GREGARISMO) * BALANCE.rasgos.gregarismoAtaque;
   }
+  const m = mecanicaDe(inst.cardId);
+  if (m?.cuenta?.ataque) poder += m.cuenta.ataque * cuantasCuentan(state, inst, m.cuenta);
+  if (m?.si?.ataque && seCumple(state, inst, m.si)) poder += m.si.ataque;
+  poder += aurasSobre(state, inst).ataque;
   return Math.max(0, poder);
 }
 function vidaMaxima(state, iid) {
   const inst = state.instancias[iid];
   const c = carta(inst.cardId);
   let v = c.vida + inst.modVida;
-  if (campoEs(state, RASGO.CAMPO_CANAL)) v += BALANCE.efectosCampo.canalVida;
+  if (campoEs(state, RASGO.CAMPO_CANAL) && !inmuneA(state, iid, INMUNE.CLIMA)) {
+    v += BALANCE.efectosCampo.canalVida;
+  }
   if (c.rasgo === RASGO.CORAZA) v += BALANCE.rasgos.corazaVida;
   if (c.rasgo === RASGO.MURO_DE_PLACAS && conCompa\u00F1\u00EDa(state, inst, 1)) {
     v += BALANCE.rasgos.muroDePlacasVida;
@@ -1653,6 +1766,10 @@ function vidaMaxima(state, iid) {
   if (c.rasgo === RASGO.MANADA && delClado(state, inst, c.clado, 1)) {
     v += BALANCE.rasgos.manadaVida;
   }
+  const m = mecanicaDe(inst.cardId);
+  if (m?.cuenta?.vida) v += m.cuenta.vida * cuantasCuentan(state, inst, m.cuenta);
+  if (m?.si?.vida && seCumple(state, inst, m.si)) v += m.si.vida;
+  v += aurasSobre(state, inst).vida;
   return Math.max(0, v);
 }
 var vidaActual = (state, iid) => vidaMaxima(state, iid) - state.instancias[iid].heridas;
@@ -1664,8 +1781,8 @@ function delClado(state, inst, clado, min) {
   const n = unidadesDe(state, inst.dueno).filter((o) => o.iid !== inst.iid && carta(o.cardId).clado === clado).length;
   return n >= min;
 }
-function espinasDe() {
-  return 0;
+function espinasDe(state, iid) {
+  return mecanicaDe(state.instancias[iid].cardId)?.espinas ?? 0;
 }
 function danoEntre(state, atacanteIid) {
   return Math.max(0, ataqueEfectivo(state, atacanteIid));
@@ -1690,22 +1807,34 @@ function curacionDe(state, iid) {
   let cura = 0;
   if (c.rasgo === RASGO.RAMONEO_BAJO) cura += BALANCE.rasgos.ramoneoBajoCura;
   cura += adherenciasCon(state, inst, RASGO.GASTROLITOS) * BALANCE.rasgos.gastrolitosCura;
-  if (campoEs(state, RASGO.CAMPO_BOSQUE) && c.clado === CLADO.SAUROPODO) {
+  if (campoEs(state, RASGO.CAMPO_BOSQUE) && c.clado === CLADO.SAUROPODO && !inmuneA(state, iid, INMUNE.CLIMA)) {
     cura += BALANCE.efectosCampo.bosqueCura;
+  }
+  cura += mecanicaDe(inst.cardId)?.regenera?.propia ?? 0;
+  for (const o of unidadesDe(state, inst.dueno)) {
+    cura += mecanicaDe(o.cardId)?.regenera?.aliados ?? 0;
   }
   return cura;
 }
+var NOTA_SI = Object.freeze({
+  [CUANDO.CLIMA]: "hay un clima en el campo",
+  [CUANDO.ALIADO_CON_VIDA]: "tiene al lado a uno grande",
+  [CUANDO.HABITAT_DETRAS]: "tu h\xE1bitat va por detr\xE1s"
+});
 function buscablesDe(state, jugador, cardId) {
-  const filtro = FILTRO_BUSQUEDA[carta(cardId).rasgo];
+  const filtro = filtroDeBusqueda(cardId);
   if (!filtro) return [];
   return state.jugadores[jugador].mazo.filter((iid) => filtro(carta(state.instancias[iid].cardId)));
 }
-var buscaEnElMazo = (cardId) => FILTRO_BUSQUEDA[carta(cardId).rasgo] !== void 0;
-var FILTRO_BUSQUEDA = Object.freeze({
-  [RASGO.BUSCA_EVENTO]: (c) => c.tipo === TIPO.EVENTO,
-  [RASGO.BUSCA_CLIMA]: (c) => c.tipo === TIPO.CLIMA,
-  [RASGO.BUSCA_GREGARISMO]: (c) => c.rasgo === RASGO.GREGARISMO
-});
+var buscaEnElMazo = (cardId) => filtroDeBusqueda(cardId) !== null;
+function filtroDeBusqueda(cardId) {
+  const busca = mecanicaDe(cardId)?.busca;
+  if (!busca) return null;
+  if (busca === QUE.EVENTO) return (c) => c.tipo === TIPO.EVENTO;
+  if (busca === QUE.CLIMA) return (c) => c.tipo === TIPO.CLIMA;
+  if (busca === QUE.MISMA) return (c) => c.id === cardId;
+  return (c) => c.tipo === TIPO.DINOSAURIO && c.clado === busca;
+}
 var ranurasLibres = (state, bando) => state.ranuras[bando].map((x, i) => x === null ? i : -1).filter((i) => i >= 0);
 function vistaDe(state, j) {
   const v = structuredClone(state);
@@ -1725,6 +1854,107 @@ function vistaDe(state, j) {
   v.perspectiva = j;
   return v;
 }
+
+// src/engine/entradas.js
+var HAY_ENTRADAS = !(typeof process !== "undefined" && process.env && process.env.DINOWAR_ENTRADAS === "0");
+var EFECTOS = Object.freeze([
+  "roba",
+  "muelePropio",
+  "mueleRival",
+  "manoRival",
+  "curaHabitat",
+  "emboscada",
+  "fulmina"
+]);
+var entradaDe = (cardId) => mecanicaDe(cardId)?.entrada ?? null;
+function valorDeEntrada(cardId) {
+  if (!HAY_ENTRADAS) return 0;
+  const e = entradaDe(cardId);
+  if (!e) return 0;
+  const V = BALANCE.valorEntrada;
+  let valor = 0;
+  for (const efecto of EFECTOS) {
+    const n = e[efecto] ?? 0;
+    if (n === 0) continue;
+    const peso = efecto === "curaHabitat" ? V.curaHabitat * BALANCE.ia.pesoHabitat : V[efecto];
+    valor += n * peso;
+  }
+  return valor;
+}
+function alEntrar(s, inst, ayudas) {
+  if (!HAY_ENTRADAS) return;
+  const e = entradaDe(inst.cardId);
+  if (!e) return;
+  const { ev: ev2, herir: herir2, rival: rival2, unidadEn: unidadEn2, unidadesDe: unidadesDe2, CAUSA: CAUSA2, vidaActual: vidaActual2 } = ayudas;
+  const j = inst.dueno;
+  const contrario = rival2(j);
+  const jug = s.jugadores[j];
+  const otro = s.jugadores[contrario];
+  const contar = (efecto, n) => ev2(s, "ENTRADA", {
+    iid: inst.iid,
+    cardId: inst.cardId,
+    dueno: j,
+    efecto,
+    n
+  });
+  const moler = (quien, cuantas) => {
+    let molidas = 0;
+    for (let k = 0; k < cuantas && quien.mazo.length > 0; k++) {
+      quien.descarte.push(quien.mazo.shift());
+      molidas += 1;
+    }
+    return molidas;
+  };
+  if (e.roba) {
+    let robadas = 0;
+    for (let k = 0; k < e.roba && jug.mazo.length > 0; k++) {
+      jug.mano.push(jug.mazo.shift());
+      robadas += 1;
+    }
+    contar("roba", robadas);
+  }
+  if (e.mueleRival) contar("muele", moler(otro, e.mueleRival));
+  if (e.muelePropio) contar("muelePropio", moler(jug, e.muelePropio));
+  if (e.manoRival) {
+    let quitadas = 0;
+    for (let k = 0; k < e.manoRival && otro.mano.length > 0; k++) {
+      const d = entero(s.rng, otro.mano.length);
+      s.rng = d.rng;
+      otro.descarte.push(otro.mano.splice(d.valor, 1)[0]);
+      quitadas += 1;
+    }
+    contar("manoRival", quitadas);
+  }
+  if (e.curaHabitat) {
+    const antes = jug.habitat;
+    jug.habitat = Math.min(BALANCE.vidaHabitat, jug.habitat + e.curaHabitat);
+    contar("curaHabitat", jug.habitat - antes);
+  }
+  if (e.emboscada) {
+    const enfrente = unidadEn2(s, contrario, inst.ranura);
+    if (enfrente) herir2(s, enfrente.iid, e.emboscada, CAUSA2.ENTRADA, j);
+    contar("emboscada", enfrente ? e.emboscada : 0);
+  }
+  if (e.fulmina) {
+    const candidatos = unidadesDe2(s, contrario).filter((u) => vidaActual2(s, u.iid) <= e.fulmina).sort((a, b) => ataqueDe(s, b) - ataqueDe(s, a) || a.iid - b.iid);
+    const victima = candidatos[0] ?? null;
+    if (victima) {
+      s.ranuras[contrario][victima.ranura] = null;
+      victima.ranura = null;
+      otro.descarte.push(victima.iid);
+    }
+    ev2(s, "ENTRADA", {
+      iid: inst.iid,
+      cardId: inst.cardId,
+      dueno: j,
+      efecto: "fulmina",
+      n: victima ? 1 : 0,
+      objetivo: victima ? victima.iid : null,
+      objetivoCardId: victima ? victima.cardId : null
+    });
+  }
+}
+var ataqueDe = (s, inst) => carta(inst.cardId).ataque + inst.modAtaque;
 
 // src/data/dietas.js
 var DIETA = Object.freeze({
@@ -1974,7 +2204,7 @@ function faseRevelacion(s) {
       inst.desplegadoEnTurno = s.turno;
       s.ranuras[p.jugador][p.ranura] = p.iid;
       ev(s, "REVELADA", { jugador: p.jugador, iid: p.iid, cardId: inst.cardId, ranura: p.ranura });
-      alEntrar(s, inst, { ev, herir, rival, unidadEn, unidadesDe, CAUSA });
+      alEntrar(s, inst, { ev, herir, rival, unidadEn, unidadesDe, CAUSA, vidaActual });
     } else if (p.tipo === "MOVIMIENTO") {
       if (inst.ranura === null || s.ranuras[p.jugador][p.ranura] !== null) continue;
       s.ranuras[p.jugador][inst.ranura] = null;
@@ -2018,16 +2248,40 @@ function faseRevelacion(s) {
       s.jugadores[p.jugador].descarte.push(p.iid);
     }
   }
+  aplicarUmbrales(s);
   recogerBajas(s, CAUSA.MORTANDAD);
   s.fase = FASE.COMBATE;
+}
+function aplicarUmbrales(s) {
+  for (const inst of todasLasUnidades(s)) {
+    const trio = mecanicaDe(inst.cardId)?.trio;
+    if (!trio) continue;
+    if (inst.marcas.some((m) => m.cardId === inst.cardId)) continue;
+    const suyos = unidadesDe(s, inst.dueno).filter((o) => o.cardId === inst.cardId).length;
+    if (suyos < trio.copias) continue;
+    inst.modAtaque += trio.ataque ?? 0;
+    inst.modVida += trio.vida ?? 0;
+    marcar(inst, inst.cardId, trio.ataque ?? 0, trio.vida ?? 0);
+    ev(s, "UMBRAL", {
+      iid: inst.iid,
+      dueno: inst.dueno,
+      cardId: inst.cardId,
+      ataque: trio.ataque ?? 0,
+      vida: trio.vida ?? 0
+    });
+  }
 }
 function aplicarPresion(s, p) {
   const cardId = s.instancias[p.iid].cardId;
   const r = carta(cardId).rasgo;
   const contrario = rival(p.jugador);
+  const alcanzable = (iid) => {
+    const o = s.instancias[iid];
+    return o && o.ranura !== null && !inmuneA(s, iid, "EVENTO");
+  };
   if (r === RASGO.FRACTURA) {
     const objetivo = s.instancias[p.objetivo];
-    if (!objetivo || objetivo.ranura === null) return;
+    if (!objetivo || !alcanzable(p.objetivo)) return;
     objetivo.modAtaque -= BALANCE.rasgos.fracturaAtaque;
     marcar(objetivo, cardId, -BALANCE.rasgos.fracturaAtaque, 0);
     ev(s, "PRESION", { jugador: p.jugador, cardId, objetivo: objetivo.iid, objetivoCardId: objetivo.cardId });
@@ -2035,7 +2289,7 @@ function aplicarPresion(s, p) {
     let n = 0;
     for (const oid of p.objetivos ?? []) {
       const inst = s.instancias[oid];
-      if (!inst || inst.ranura === null || inst.dueno !== contrario) continue;
+      if (!inst || !alcanzable(oid) || inst.dueno !== contrario) continue;
       inst.modVida -= BALANCE.rasgos.competenciaVida;
       marcar(inst, cardId, 0, -BALANCE.rasgos.competenciaVida);
       n += 1;
@@ -2047,6 +2301,7 @@ function aplicarPresion(s, p) {
     ev(s, "PRESION", { jugador: p.jugador, cardId });
   } else if (r === RASGO.MORTANDAD) {
     for (const inst of todasLasUnidades(s)) {
+      if (inst.dueno === contrario && !alcanzable(inst.iid)) continue;
       herir(s, inst.iid, BALANCE.rasgos.mortandadDano, CAUSA.MORTANDAD, p.jugador);
     }
     ev(s, "PRESION", { jugador: p.jugador, cardId });
@@ -2283,6 +2538,18 @@ function validar(s, a) {
       if (!ranuraValida(a.ranura)) return "ranura inexistente";
       if (s.ranuras[a.jugador][a.ranura] !== null) return "esa ranura est\xE1 ocupada";
       if (ranuraReservada(s, a.jugador, a.ranura)) return "ya has comprometido esa ranura";
+      const extra = mecanicaDe(inst.cardId)?.costeExtra;
+      if (extra?.descartar) {
+        const dan = a.descartes ?? [];
+        if (!Array.isArray(dan) || dan.length !== extra.descartar) {
+          return `esta carta pide descartar ${extra.descartar} cartas de tu mano`;
+        }
+        if (new Set(dan).size !== dan.length) return "no puedes descartar dos veces la misma";
+        for (const did of dan) {
+          if (did === a.iid) return "no puedes pagarla con ella misma";
+          if (!jug.mano.includes(did)) return "esa carta no est\xE1 en tu mano";
+        }
+      }
       if (a.busca !== void 0 && a.busca !== null) {
         if (!buscaEnElMazo(a.cardId ?? inst.cardId)) return "esa carta no busca nada en el mazo";
         if (!buscablesDe(s, a.jugador, inst.cardId).includes(a.busca)) {
@@ -2317,6 +2584,7 @@ function validar(s, a) {
         const objetivo = s.instancias[a.objetivo];
         if (!objetivo || objetivo.dueno !== rival(a.jugador)) return "el objetivo no es del rival";
         if (objetivo.ranura === null) return "el objetivo no est\xE1 en el campo";
+        if (inmuneA(s, a.objetivo, INMUNE.EVENTO)) return "a \xE9se no le afectan tus eventos";
       } else if (c.objetivo === OBJETIVO.CLADO) {
         if (!CLADOS.includes(a.clado)) return "clado inexistente";
       } else if (c.objetivo === OBJETIVO.RIVALES) {
@@ -2329,6 +2597,7 @@ function validar(s, a) {
           const o = s.instancias[oid];
           if (!o || o.dueno !== rival(a.jugador)) return "el objetivo no es del rival";
           if (o.ranura === null) return "el objetivo no est\xE1 en el campo";
+          if (inmuneA(s, oid, INMUNE.EVENTO)) return "a \xE9se no le afectan tus eventos";
         }
       }
       return null;
@@ -2402,10 +2671,19 @@ function reduce(state, action) {
       jug.produccion = action.produccion === DIETA.CARNIVORO ? DIETA.CARNIVORO : DIETA.HERBIVORO;
       ev(s, "PRODUCCION", { jugador: action.jugador, produccion: jug.produccion });
       break;
-    case ACCION.DESPLEGAR:
+    case ACCION.DESPLEGAR: {
       pagar(jug, s.instancias[action.iid].cardId);
       jug.mano = jug.mano.filter((x) => x !== action.iid);
       jug.pendientes.push({ tipo: "DESPLIEGUE", iid: action.iid, ranura: action.ranura });
+      const extra = mecanicaDe(s.instancias[action.iid].cardId)?.costeExtra;
+      if (extra?.descartar) {
+        for (const did of action.descartes ?? []) descartarDeMano(s, action.jugador, did);
+        ev(s, "COSTE_EXTRA", {
+          jugador: action.jugador,
+          cardId: s.instancias[action.iid].cardId,
+          cartas: extra.descartar
+        });
+      }
       if (action.busca !== void 0 && action.busca !== null) {
         jug.mazo = jug.mazo.filter((x) => x !== action.busca);
         jug.mano.push(action.busca);
@@ -2416,6 +2694,7 @@ function reduce(state, action) {
         });
       }
       break;
+    }
     case ACCION.MOVER:
       jug.pendientes.push({ tipo: "MOVIMIENTO", iid: action.iid, ranura: action.ranura });
       break;
@@ -2501,6 +2780,13 @@ function mejorBusqueda(s, j, cardId) {
   }
   return mejor;
 }
+function pagoExtra(s, j, cardId, iid) {
+  const extra = mecanicaDe(cardId)?.costeExtra;
+  if (!extra?.descartar) return void 0;
+  const resto = s.jugadores[j].mano.filter((x) => x !== iid);
+  if (resto.length < extra.descartar) return null;
+  return resto.sort((a, b) => carta(s.instancias[a].cardId).coste - carta(s.instancias[b].cardId).coste || a - b).slice(0, extra.descartar);
+}
 function legales(state, j) {
   const s = state;
   const jug = s.jugadores[j];
@@ -2526,7 +2812,7 @@ function legales(state, j) {
     ...unidadesDe(s, j).map((u) => u.iid),
     ...jug.pendientes.filter((p) => p.tipo === "DESPLIEGUE").map((p) => p.iid)
   ];
-  const ajenas = unidadesDe(s, rival(j)).map((u) => u.iid);
+  const ajenas = unidadesDe(s, rival(j)).filter((u) => !inmuneA(s, u.iid, INMUNE.EVENTO)).map((u) => u.iid);
   for (const iid of jug.mano) {
     const c = carta(s.instancias[iid].cardId);
     if (c.tipo === TIPO.BIOMASA) {
@@ -2537,7 +2823,11 @@ function legales(state, j) {
     if (!puedePagar(jug, s.instancias[iid].cardId)) continue;
     if (c.tipo === TIPO.DINOSAURIO) {
       const busca = mejorBusqueda(s, j, s.instancias[iid].cardId);
-      for (const r of libres) salida.push({ tipo: ACCION.DESPLEGAR, jugador: j, iid, ranura: r, busca });
+      const descartes = pagoExtra(s, j, s.instancias[iid].cardId, iid);
+      if (descartes === null) continue;
+      for (const r of libres) {
+        salida.push({ tipo: ACCION.DESPLEGAR, jugador: j, iid, ranura: r, busca, descartes });
+      }
     } else if (c.tipo === TIPO.RECURSO) {
       salida.push({ tipo: ACCION.RECURSO, jugador: j, iid });
     } else if (c.tipo === TIPO.CLIMA) {
@@ -2586,11 +2876,48 @@ function ataqueHipotetico(vista, j, cardId) {
   if (c.rasgo === RASGO.RIBERENO && campoEs(vista, RASGO.CAMPO_CANAL)) {
     poder += BALANCE.rasgos.riberenoAtaque;
   }
-  return poder;
+  return poder + pasivoHipotetico(vista, j, cardId).ataque;
 }
-function espinasHipoteticas() {
-  return 0;
+function pasivoHipotetico(vista, j, cardId) {
+  const c = carta(cardId);
+  const m = mecanicaDe(cardId);
+  let ataque = 0;
+  let vida = 0;
+  if (!m) return { ataque, vida };
+  if (m.cuenta) {
+    const bandos = m.cuenta.ambos ? [0, 1] : [j];
+    let n = 1;
+    for (const b of bandos) {
+      for (const u of unidadesDe(vista, b)) {
+        const uc = carta(u.cardId);
+        if (m.cuenta.que === QUE.CLADO ? uc.clado === c.clado : u.cardId === cardId) n += 1;
+      }
+    }
+    ataque += n * (m.cuenta.ataque ?? 0);
+    vida += n * (m.cuenta.vida ?? 0);
+  }
+  if (m.si) {
+    const jug = vista.jugadores[j];
+    const otro = vista.jugadores[rival(j)];
+    const vale = m.si.cuando === CUANDO.CLIMA ? vista.campo !== null : m.si.cuando === CUANDO.HABITAT_DETRAS ? jug.habitat < otro.habitat : unidadesDe(vista, j).some((u) => carta(u.cardId).vida > m.si.umbral);
+    if (vale) {
+      ataque += m.si.ataque ?? 0;
+      vida += m.si.vida ?? 0;
+    }
+  }
+  if (m.aura && (m.aura.clado === TODOS || m.aura.clado === c.clado)) {
+    ataque += m.aura.ataque ?? 0;
+    vida += m.aura.vida ?? 0;
+  }
+  for (const u of unidadesDe(vista, j)) {
+    const a = mecanicaDe(u.cardId)?.aura;
+    if (!a || a.clado !== TODOS && a.clado !== c.clado) continue;
+    ataque += a.ataque ?? 0;
+    vida += a.vida ?? 0;
+  }
+  return { ataque, vida };
 }
+var espinasHipoteticas = (cardId) => mecanicaDe(cardId)?.espinas ?? 0;
 var bonusTrofico = () => 0;
 function mazoDe(vista, j) {
   const m = vista.jugadores[j].mazo;
@@ -2625,7 +2952,7 @@ function statsDeCarta(vista, j, cardId, rivalIid) {
   const c = carta(cardId);
   return {
     poder: ataqueHipotetico(vista, j, cardId),
-    vida: c.vida,
+    vida: c.vida + pasivoHipotetico(vista, j, cardId).vida,
     clado: c.clado,
     vuela: c.rasgo === RASGO.VUELO,
     espinasPropias: espinasHipoteticas(cardId),
@@ -2870,8 +3197,8 @@ var JEFES = Object.freeze({
       ["riparovenator", 2],
       ["carnotaurus", 2],
       ["dromaeosaurus", 3],
-      ["stegosaurus", 2],
-      ["nodosaurus", 3],
+      ["stegosaurus", 3],
+      ["nodosaurus", 2],
       ["camarasaurus", 2],
       ["diplodocus", 1],
       ["apatosaurus", 1],
@@ -2905,11 +3232,11 @@ var JEFES = Object.freeze({
       ["antarctosaurus", 1],
       ["plateosauravus", 3],
       ["stegosaurus", 2],
-      ["nodosaurus", 3],
-      ["loricatosaurus", 2],
+      ["nodosaurus", 2],
+      ["loricatosaurus", 3],
       ["invictarx", 3],
       ["dryosaurus", 3],
-      ["maiasaura", 2],
+      ["maiasaura", 1],
       ["edmontosaurus", 1],
       ["brachylophosaurus", 3],
       ["gregarismo", 3],
@@ -2922,7 +3249,7 @@ var JEFES = Object.freeze({
       ["neumaticidad", 1],
       ["competencia", 1],
       ["crecimiento_acelerado", 1],
-      ["shuangmiaosaurus", 2]
+      ["shuangmiaosaurus", 3]
     ]),
     nota: "No pega fuerte. Aguanta, que es peor."
   })
