@@ -88,26 +88,59 @@ export function generar() {
   L.push(');');
   L.push('');
 
+  // NADA DE `truncate`. Aquí hubo un `truncate public.catalogo_cartas cascade`
+  // y era una bomba: `coleccion` tiene una clave foránea contra esta tabla, así
+  // que el cascade se habría llevado por delante las cartas de TODOS los
+  // jugadores y habría dejado sus mazos guardados apuntando al vacío. Se
+  // escribió con la base recién creada, cuando vaciarla no costaba nada, y
+  // siguió ahí cuando ya había gente dentro.
+  //
+  // Lo que hay ahora se puede aplicar sobre una base viva y las veces que haga
+  // falta: mete o actualiza cada fila, y borra sólo las que ya no están en el
+  // set. El `delete` va con su propia red — si una carta que desaparece está en
+  // la colección de alguien, la clave foránea lo para en vez de tragárselo.
   const cartas = coleccionables();
-  L.push('truncate public.catalogo_inicial;');
-  L.push('truncate public.catalogo_cartas cascade;');
   L.push('insert into public.catalogo_cartas (card_id, tipo, rareza, copias_max, valor_fusion, es_jefe) values');
   L.push(`${cartas.map((c) => `  (${sql(c.id)}, ${sql(c.tipo)}, ${sql(c.rareza)}, `
-    + `${BALANCE.copiasPorRareza[c.rareza]}, ${ECONOMIA.fusion[c.rareza]}, ${c.jefe})`).join(',\n')};`);
+    + `${BALANCE.copiasPorRareza[c.rareza]}, ${ECONOMIA.fusion[c.rareza]}, ${c.jefe})`).join(',\n')}`);
+  L.push('on conflict (card_id) do update set');
+  L.push('  tipo = excluded.tipo, rareza = excluded.rareza,');
+  L.push('  copias_max = excluded.copias_max, valor_fusion = excluded.valor_fusion,');
+  L.push('  es_jefe = excluded.es_jefe;');
   L.push('');
-
   L.push('insert into public.catalogo_inicial (card_id, copias) values');
   const inicial = Object.entries(coleccionInicial());
-  L.push(`${inicial.map(([id, n]) => `  (${sql(id)}, ${n})`).join(',\n')};`);
+  L.push(`${inicial.map(([id, n]) => `  (${sql(id)}, ${n})`).join(',\n')}`);
+  L.push('on conflict (card_id) do update set copias = excluded.copias;');
+  L.push('');
+  L.push('delete from public.catalogo_inicial where card_id not in (');
+  L.push(`${inicial.map(([id]) => `  ${sql(id)}`).join(',\n')}`);
+  L.push(');');
   L.push('');
 
-  L.push('truncate public.catalogo_economia;');
+  // Las bajas de cartas van al final y en este orden: `catalogo_inicial` apunta
+  // a `catalogo_cartas`, así que quitar del set una carta que todavía figura en
+  // la colección de salida fallaría contra su propia clave foránea.
+  L.push('delete from public.catalogo_cartas where card_id not in (');
+  L.push(`${cartas.map((c) => `  ${sql(c.id)}`).join(',\n')}`);
+  L.push(');');
+  L.push('');
+
+
   L.push('insert into public.catalogo_economia');
   L.push('  (id, precio_sobre, cartas_por_sobre, monedas_inicio, monedas_victoria,');
   L.push('   monedas_derrota, tamano_mazo, mazos_maximo)');
   L.push(`values (1, ${ECONOMIA.precioSobre}, ${ECONOMIA.cartasPorSobre}, `
     + `${ECONOMIA.monedasInicio}, ${ECONOMIA.monedasVictoria}, `
-    + `${ECONOMIA.monedasDerrota}, ${BALANCE.tamanoMazo}, ${MAZOS_MAXIMO});`);
+    + `${ECONOMIA.monedasDerrota}, ${BALANCE.tamanoMazo}, ${MAZOS_MAXIMO})`);
+  L.push('on conflict (id) do update set');
+  L.push('  precio_sobre = excluded.precio_sobre,');
+  L.push('  cartas_por_sobre = excluded.cartas_por_sobre,');
+  L.push('  monedas_inicio = excluded.monedas_inicio,');
+  L.push('  monedas_victoria = excluded.monedas_victoria,');
+  L.push('  monedas_derrota = excluded.monedas_derrota,');
+  L.push('  tamano_mazo = excluded.tamano_mazo,');
+  L.push('  mazos_maximo = excluded.mazos_maximo;');
   L.push('');
 
   L.push('-- El catálogo lo lee cualquiera que haya entrado: son las reglas del');

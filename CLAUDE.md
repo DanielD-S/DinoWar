@@ -278,6 +278,47 @@ el segundo falla el primero ya está hecho. Por eso un «User already registered
 en la pestaña de crear cuenta NO es el final: se entra con ese correo y se sigue.
 Pasó de verdad y dejaba la cuenta inservible.
 
+### Regenerar el catálogo no es aplicarlo
+
+`node tools/generar-cartas.mjs` reescribe el SQL; **la base de datos no se entera
+hasta que alguien lo aplica**. Es la misma trampa que el anclaje de la Edge
+Function, un piso más abajo, y la primera vez pasó desapercibida: ocho cartas
+cambiaron de rareza en el recoste, el fichero se regeneró en el mismo commit y el
+servidor siguió con las viejas.
+
+Lo que rompe es silencioso y sólo del lado del servidor: **el navegador te deja
+guardar un mazo con 3 Diplodocus y el servidor lo rechaza**, porque el límite de
+copias sale de la rareza y cada uno miraba la suya. La partida se juega y no se
+cobra. Para comprobarlo no hace falta jugar:
+
+```sql
+select card_id, rareza, copias_max from public.catalogo_cartas order by card_id;
+```
+
+y comparar contra `BALANCE.copiasPorRareza[c.rareza]`.
+
+**Y `0006_catalogo_cartas.sql` no se puede re-ejecutar tal cual venía.** Llevaba
+un `truncate public.catalogo_cartas cascade`, y `coleccion` tiene una clave
+foránea contra esa tabla: aplicarlo habría borrado las cartas de los ocho
+jugadores y habría dejado los cinco mazos guardados apuntando al vacío. Se
+escribió con la base recién creada, cuando vaciarla no costaba nada, y siguió ahí
+cuando ya había gente dentro.
+
+Ahora el generador emite `insert … on conflict do update` y borra sólo lo que ya
+no está en el set, así que la migración es repetible y no destructiva.
+`test/cuentas.test.js` falla si vuelve a aparecer un `truncate`. **Antes de correr
+cualquier migración generada contra una base con jugadores, mirar qué la
+referencia:**
+
+```sql
+select conrelid::regclass from pg_constraint
+ where contype = 'f' and confrelid = 'public.<tabla>'::regclass;
+```
+
+`information_schema` para esto miente por omisión si la consulta se hace mal —a mí
+me devolvió cero filas para una tabla que tenía dos referencias— así que
+`pg_constraint`.
+
 ### Trampas que costaron una mañana
 
 **El editor del panel viene con una plantilla «Hello World».** Si el pegado no

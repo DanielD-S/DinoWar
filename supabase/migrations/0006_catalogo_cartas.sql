@@ -39,8 +39,6 @@ create table if not exists public.catalogo_economia (
   mazos_maximo      int not null
 );
 
-truncate public.catalogo_inicial;
-truncate public.catalogo_cartas cascade;
 insert into public.catalogo_cartas (card_id, tipo, rareza, copias_max, valor_fusion, es_jefe) values
   ('dryosaurus', 'DINOSAURIO', 'COMUN', 3, 4, false),
   ('ornitholestes', 'DINOSAURIO', 'COMUN', 3, 4, false),
@@ -109,7 +107,11 @@ insert into public.catalogo_cartas (card_id, tipo, rareza, copias_max, valor_fus
   ('shuangmiaosaurus', 'DINOSAURIO', 'COMUN', 3, 4, false),
   ('chasmosaurus', 'DINOSAURIO', 'COMUN', 3, 4, false),
   ('jefe_saurophaganax', 'DINOSAURIO', 'LEGENDARIO', 1, 100, true),
-  ('jefe_barosaurus', 'DINOSAURIO', 'LEGENDARIO', 1, 100, true);
+  ('jefe_barosaurus', 'DINOSAURIO', 'LEGENDARIO', 1, 100, true)
+on conflict (card_id) do update set
+  tipo = excluded.tipo, rareza = excluded.rareza,
+  copias_max = excluded.copias_max, valor_fusion = excluded.valor_fusion,
+  es_jefe = excluded.es_jefe;
 
 insert into public.catalogo_inicial (card_id, copias) values
   ('dryosaurus', 3),
@@ -138,13 +140,122 @@ insert into public.catalogo_inicial (card_id, copias) values
   ('mortandad', 1),
   ('crecimiento_acelerado', 1),
   ('neumaticidad', 1),
-  ('competencia', 1);
+  ('competencia', 1)
+on conflict (card_id) do update set copias = excluded.copias;
 
-truncate public.catalogo_economia;
+delete from public.catalogo_inicial where card_id not in (
+  'dryosaurus',
+  'ornitholestes',
+  'ceratosaurus',
+  'nodosaurus',
+  'stegosaurus',
+  'allosaurus',
+  'camarasaurus',
+  'riparovenator',
+  'lokiceratops',
+  'brachylophosaurus',
+  'huaxiadraco',
+  'diplodocus',
+  'apatosaurus',
+  'torvosaurus',
+  'tyrannotitan',
+  'gregarismo',
+  'trampa',
+  'rebrote',
+  'gastrolitos',
+  'fractura',
+  'sabana',
+  'aridez',
+  'canal',
+  'mortandad',
+  'crecimiento_acelerado',
+  'neumaticidad',
+  'competencia'
+);
+
+delete from public.catalogo_cartas where card_id not in (
+  'dryosaurus',
+  'ornitholestes',
+  'ceratosaurus',
+  'stegosaurus',
+  'allosaurus',
+  'camarasaurus',
+  'diplodocus',
+  'apatosaurus',
+  'torvosaurus',
+  'nodosaurus',
+  'riparovenator',
+  'lokiceratops',
+  'brachylophosaurus',
+  'tyrannotitan',
+  'huaxiadraco',
+  'gregarismo',
+  'gastrolitos',
+  'crecimiento_acelerado',
+  'neumaticidad',
+  'fractura',
+  'competencia',
+  'trampa',
+  'mortandad',
+  'rebrote',
+  'carrona',
+  'lago',
+  'llanura',
+  'canal',
+  'bosque',
+  'aridez',
+  'sabana',
+  'plesiopleurodon',
+  'ojoraptorsaurus',
+  'dromaeosaurus',
+  'athenar',
+  'sanjuansaurus',
+  'suchomimus',
+  'eosinopteryx',
+  'troodon',
+  'carnotaurus',
+  'spinosaurus',
+  'mosasaurus',
+  'halszkaraptor',
+  'tongtianlong',
+  'scanisaurus',
+  'monolophosaurus',
+  'invictarx',
+  'medusaceratops',
+  'platyceratops',
+  'loricatosaurus',
+  'therizinosaurus',
+  'alaskacephale',
+  'titanoceratops',
+  'atlasaurus',
+  'stegoceras',
+  'maiasaura',
+  'edmontosaurus',
+  'plateosauravus',
+  'gargoyleosaurus',
+  'wendiceratops',
+  'antarctosaurus',
+  'liaoceratops',
+  'rhinorex',
+  'bienosaurus',
+  'shuangmiaosaurus',
+  'chasmosaurus',
+  'jefe_saurophaganax',
+  'jefe_barosaurus'
+);
+
 insert into public.catalogo_economia
   (id, precio_sobre, cartas_por_sobre, monedas_inicio, monedas_victoria,
    monedas_derrota, tamano_mazo, mazos_maximo)
-values (1, 100, 5, 240, 50, 0, 50, 12);
+values (1, 100, 5, 240, 50, 0, 50, 12)
+on conflict (id) do update set
+  precio_sobre = excluded.precio_sobre,
+  cartas_por_sobre = excluded.cartas_por_sobre,
+  monedas_inicio = excluded.monedas_inicio,
+  monedas_victoria = excluded.monedas_victoria,
+  monedas_derrota = excluded.monedas_derrota,
+  tamano_mazo = excluded.tamano_mazo,
+  mazos_maximo = excluded.mazos_maximo;
 
 -- El catálogo lo lee cualquiera que haya entrado: son las reglas del
 -- juego, no datos de nadie. Escribirlo, sólo las migraciones.

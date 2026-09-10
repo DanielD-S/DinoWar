@@ -34,6 +34,25 @@ test('La migración del catálogo de cartas es la que saldría hoy del código',
   );
 });
 
+test('La migración del catálogo se puede aplicar sobre una base con jugadores', () => {
+  // Aquí hubo un `truncate public.catalogo_cartas cascade`. Escrito con la base
+  // recién creada, cuando vaciarla no costaba nada, y seguía ahí cuando ya había
+  // ocho cuentas dentro — con `coleccion` apuntando a esa tabla por clave
+  // foránea. Aplicarlo se habría llevado por delante las cartas de todo el mundo
+  // y habría dejado los mazos guardados apuntando al vacío. No llegó a correrse.
+  //
+  // Una migración de catálogo se vuelve a aplicar cada vez que el set cambia, o
+  // sea que tiene que ser idempotente Y no destructiva. `truncate` no es ninguna
+  // de las dos cosas.
+  const sql = readFileSync(SALIDA, 'utf8');
+  assert.doesNotMatch(sql, /truncate/i, 'una migración de catálogo no vacía tablas');
+  for (const tabla of ['catalogo_cartas', 'catalogo_inicial', 'catalogo_economia']) {
+    assert.match(sql, new RegExp(`insert into public\\.${tabla}`), `${tabla} no se rellena`);
+  }
+  // Y cada insert cierra con su `on conflict`, que es lo que lo hace repetible.
+  assert.equal((sql.match(/on conflict/g) ?? []).length, 3);
+});
+
 test('Todas las cartas coleccionables están en el SQL con su rareza', () => {
   const sql = readFileSync(SALIDA, 'utf8');
   for (const c of coleccionables()) {
