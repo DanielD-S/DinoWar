@@ -75,7 +75,7 @@ def id_de(nombre, validos):
     return None
 
 
-def subir_version_sw():
+def subir_version_sw(motivo):
     """Sube la VERSION del service worker.
 
     Sin esto, un navegador que ya entró se queda con el índice viejo y sigue
@@ -94,7 +94,7 @@ def subir_version_sw():
     n = int(m.group(1)) + 1
     sw.write_text(texto.replace(m.group(0), f"const VERSION = 'dinowar-v{n}';", 1),
                   encoding='utf-8')
-    print(f'sw.js: VERSION subida a dinowar-v{n}, porque el índice ha cambiado')
+    print(f'sw.js: VERSION subida a dinowar-v{n}, porque {motivo}')
 
 
 def main():
@@ -104,7 +104,7 @@ def main():
     validos = ids_de_cartas()
     DESTINO.mkdir(parents=True, exist_ok=True)
 
-    hechas, kb_total, ignoradas = [], 0.0, []
+    hechas, kb_total, ignoradas, reemplazadas = [], 0.0, [], []
     for f in sorted(ORIGEN.iterdir()):
         if not f.is_file() or f.name.startswith('.') or f.suffix.lower() == '.md':
             continue
@@ -137,7 +137,10 @@ def main():
                            Image.LANCZOS)
 
         salida = DESTINO / f'{cid}.jpg'
+        antes = salida.read_bytes() if salida.exists() else None
         im.save(salida, 'JPEG', quality=CALIDAD, optimize=True, progressive=True)
+        if salida.read_bytes() != antes:
+            reemplazadas.append(cid)
         kb = salida.stat().st_size / 1024
         kb_total += kb
         hechas.append(cid)
@@ -167,10 +170,22 @@ def main():
 
     nuevo = json.dumps({'cartas': servidas, 'foco': foco},
                        ensure_ascii=False, indent=2) + '\n'
-    cambio = (not indice_ruta.exists()) or indice_ruta.read_text(encoding='utf-8') != nuevo
+    # La VERSION sube si cambia CUALQUIER byte servido, no sólo la lista.
+    #
+    # Antes subía sólo con el índice, y sustituir una ilustración por otra mejor
+    # no cambia la lista: el fichero nuevo se escribía y el service worker seguía
+    # sirviendo el viejo de la caché para siempre, porque las ilustraciones están
+    # cacheadas sin revalidar a propósito —pesan y se supone que no cambian—.
+    cambio = ((not indice_ruta.exists())
+              or indice_ruta.read_text(encoding='utf-8') != nuevo
+              or bool(reemplazadas))
     indice_ruta.write_text(nuevo, encoding='utf-8')
     if cambio:
-        subir_version_sw()
+        if reemplazadas:
+            subir_version_sw('han cambiado ilustraciones ya servidas: '
+                             + ', '.join(sorted(reemplazadas)))
+        else:
+            subir_version_sw('el índice ha cambiado')
 
     print(f'\n{len(hechas)} ilustraciones, {kb_total:.0f} KB en total → assets/dinos/')
     if ignoradas:
