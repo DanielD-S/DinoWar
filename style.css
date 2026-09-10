@@ -898,6 +898,162 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .carta.rareza-RARO, .carta.rareza-EPICO { box-shadow: 0 0 0 1px var(--borde-fuerte); }
 .carta.rareza-LEGENDARIO { box-shadow: 0 0 0 1px var(--bio); }
 .col-carta.rareza-RARO, .col-carta.rareza-EPICO { box-shadow: 0 0 0 1px var(--borde-fuerte); }
+
+/* ==================================================== el guión de eventos
+
+   Los gestos que `src/ui/guion.js` puede pedir. Cada uno es una clase que se
+   pone y se quita sola, y ninguno cambia el tamaño de la carta: se pintan en
+   `box-shadow`, `filter` y pseudoelementos porque el tablero es una rejilla y
+   una carta que crece de verdad empuja a las de al lado a media animación. */
+
+/* Dispara una habilidad: se enciende desde dentro. */
+.carta.dispara { animation: disparar .5s ease-out; }
+@keyframes disparar {
+  0%   { box-shadow: 0 0 0 0 rgba(232,192,121,.0); filter: brightness(1); }
+  35%  { box-shadow: 0 0 0 3px rgba(232,192,121,.55), 0 0 20px rgba(232,192,121,.4);
+         filter: brightness(1.35); }
+  100% { box-shadow: 0 0 0 0 rgba(232,192,121,0); filter: brightness(1); }
+}
+
+/* Gana algo permanente. */
+.carta.crece { animation: crecer .68s ease-out; }
+@keyframes crecer {
+  0%   { filter: brightness(1); box-shadow: 0 0 0 0 rgba(140,200,120,0); }
+  40%  { filter: brightness(1.25) saturate(1.2);
+         box-shadow: 0 0 0 2px rgba(140,200,120,.6), 0 0 18px rgba(140,200,120,.35); }
+  100% { filter: brightness(1); box-shadow: 0 0 0 0 rgba(140,200,120,0); }
+}
+
+/* Le quitan algo. */
+.carta.merma { animation: mermar .68s ease-out; }
+@keyframes mermar {
+  0%   { filter: brightness(1) saturate(1); }
+  35%  { filter: brightness(.72) saturate(.5);
+         box-shadow: 0 0 0 2px var(--rival), 0 0 16px rgba(224,138,103,.4); }
+  100% { filter: brightness(1) saturate(1); box-shadow: 0 0 0 0 transparent; }
+}
+
+/* Se cura. */
+.carta.cura { animation: curarse .6s ease-out; }
+@keyframes curarse {
+  0%, 100% { filter: brightness(1); }
+  45%      { filter: brightness(1.2) hue-rotate(-8deg); }
+}
+
+/* El nombre del rasgo, SOBRE la carta que lo dispara y no colgando de su borde
+   superior: colgado se recortaba contra la cabecera en la fila del rival y
+   contra la franja de clima en la tuya, y encima cambiaba de sitio según la
+   fila. Centrado no depende de dónde esté la carta. */
+.rotulo-rasgo {
+  position: absolute; left: 50%; top: 50%; z-index: 6;
+  transform: translate(-50%, -50%);
+  padding: 2px 7px; border-radius: 4px;
+  background: rgba(20,16,12,.92); box-shadow: 0 0 0 1px var(--bio);
+  color: var(--acento-vivo); font-size: 9px; font-weight: 600;
+  white-space: nowrap; pointer-events: none;
+  animation: rotular 1.1s ease-out both;
+}
+.rotulo-rasgo.bueno { box-shadow: 0 0 0 1px #8cc878; color: #b7e0a6; }
+@keyframes rotular {
+  0%   { opacity: 0; transform: translate(-50%, calc(-50% + 8px)) scale(.92); }
+  15%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  72%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, calc(-50% - 14px)) scale(1); }
+}
+
+/* Lo que no cuelga de ninguna carta: la Mortandad, el clima que se impone. */
+.anuncio {
+  position: absolute; left: 50%; top: 50%; z-index: 8;
+  transform: translate(-50%, -50%);
+  padding: 7px 16px; border-radius: 6px;
+  background: rgba(20,16,12,.94); box-shadow: 0 0 0 1px var(--borde-fuerte);
+  color: var(--texto); font-size: 13px; font-weight: 600; letter-spacing: .3px;
+  white-space: nowrap; pointer-events: none;
+  animation: anunciar 1.2s ease-out both;
+}
+.anuncio.malo { box-shadow: 0 0 0 1px var(--rival); color: var(--vida); }
+.anuncio.bueno { box-shadow: 0 0 0 1px #8cc878; color: #b7e0a6; }
+.anuncio.clima { box-shadow: 0 0 0 1px var(--bio); color: var(--acento-vivo); }
+@keyframes anunciar {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(.9); }
+  12%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  78%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -62%) scale(1); }
+}
+
+/* Un contador del marcador que acaba de moverse. */
+.pulso { animation: pulsar .5s ease-out; }
+@keyframes pulsar {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  40%      { box-shadow: 0 0 0 2px var(--bio), 0 0 12px rgba(217,164,65,.35); }
+}
+
+/* ======================================================== la carta tiene cuerpo
+
+   Hasta ahora una carta era un rectángulo plano con un borde. Esto le da
+   volumen sin tocar el layout ni una sola vez:
+
+   - un BRILLO ESPECULAR fijo en diagonal, que es lo que hace que una superficie
+     parezca material y no un div;
+   - una SOMBRA propia que la levanta del tablero;
+   - una INCLINACIÓN que sigue al puntero, sólo en la mano y sólo donde hay
+     puntero fino.
+
+   La inclinación NO lleva envoltorio y NO se aplica en el tablero, por la misma
+   razón las dos veces: `transform` es una sola propiedad y quien la escriba
+   último gana. En el tablero las cartas corren `aterrizar`, `embestida` y
+   `voltear`; en la mano ya estaba `alzada` con su `translateY`. Así que en la
+   mano se compone todo en un solo `transform` con variables —`--alzar` para el
+   gesto de coger, `--tx`/`--ty` para la inclinación— y en el tablero no se
+   toca. */
+
+.carta::before {
+  content: ''; position: absolute; inset: 0; z-index: 3;
+  pointer-events: none; border-radius: inherit;
+  background: linear-gradient(150deg,
+    rgba(255,255,255,.11) 0%, rgba(255,255,255,.03) 26%,
+    transparent 46%, transparent 100%);
+}
+
+.carta--mano {
+  --alzar: 0px;
+  --tx: 0;
+  --ty: 0;
+  /* La sombra que la levanta va en `filter` y no en `box-shadow`: el aro de
+     rareza ya ocupa el box-shadow y gana por especificidad —`.carta.rareza-RARO`
+     son dos clases—, así que puestas ahí las dos, la profundidad desaparecía en
+     todo lo que no fuera común. En `filter` conviven. */
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,.55));
+  transform: translateY(var(--alzar))
+             perspective(620px)
+             rotateX(calc(var(--ty) * -7deg))
+             rotateY(calc(var(--tx) * 9deg));
+  transition: transform .18s ease-out, filter .18s ease-out;
+}
+
+/* El arte se mueve un poco menos que el marco: eso es el paralaje, y es lo que
+   convierte una inclinación en profundidad en vez de en un giro. El `scale`
+   sobra por los bordes justo lo que el desplazamiento va a descubrir. */
+.carta--mano .c-arte > * {
+  transform: translate(calc(var(--tx) * -3px), calc(var(--ty) * -3px)) scale(1.07);
+  transition: transform .18s ease-out;
+}
+
+/* Mientras se arrastra manda el arrastre. */
+.carta--mano.arrastrando { --tx: 0; --ty: 0; transition: none; }
+
+@media (hover: none) {
+  /* Sin puntero fino no hay inclinación que seguir: se queda el brillo. */
+  .carta--mano { --tx: 0; --ty: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carta--mano, .carta--mano .c-arte > * { transition: none; }
+  .carta--mano { --tx: 0; --ty: 0; }
+  .carta.dispara, .carta.crece, .carta.merma, .carta.cura, .pulso { animation: none; }
+  .rotulo-rasgo, .anuncio { animation-duration: .01s; animation-timing-function: step-end; }
+}
+
 /* ------------------------------------------------ las legendarias se ven
 
    Doce de las sesenta y seis, y hasta ahora se distinguían por un borde de 1 px
@@ -1000,7 +1156,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .carta--mano .st { justify-content: flex-start; gap: 2px; }
 .carta--mano.impagable { opacity: .45; }
 .carta--mano.impagable .c-coste { border-color: var(--peligro); color: var(--peligro); }
-.carta--mano.alzada { box-shadow: 0 0 0 1px var(--bio), 0 10px 26px rgba(0,0,0,.6); transform: translateY(-6px); }
+/* `--alzar` y no `transform`: la carta de la mano compone el gesto de coger y
+   la inclinación del puntero en una sola propiedad, y escribir `transform` aquí
+   habría borrado la inclinación justo al levantarla, que es cuando se mira. */
+.carta--mano.alzada { box-shadow: 0 0 0 1px var(--bio), 0 10px 26px rgba(0,0,0,.6); --alzar: -6px; }
 .carta--mano.arrastrando { opacity: .25; }
 
 .c-adap { position: absolute; right: 3px; top: 3px; width: 7px; height: 7px; border-radius: 50%;
