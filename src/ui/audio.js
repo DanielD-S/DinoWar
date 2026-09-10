@@ -69,6 +69,27 @@ export function sonido(tipo) {
     case 'pierde':
       [392, 330, 262, 196].forEach((f, i) => tono(f, f, 0.2, 'sine', 0.06, i * 0.12));
       break;
+
+    // Los del guión de eventos. Cada compás pide el suyo y un `tipo` que no
+    // esté aquí cae en `default` sin ruido y sin error, así que una carta nueva
+    // nunca se queda muda por un nombre mal escrito — se queda callada, que es
+    // recuperable.
+    case 'entrada': tono(440, 700, 0.11, 'triangle', 0.055); break;
+    case 'adaptar': tono(523, 784, 0.13, 'sine', 0.05); break;
+    case 'presion': tono(300, 180, 0.15, 'sawtooth', 0.045); break;
+    case 'clima':
+      [262, 349, 440].forEach((f, i) => tono(f, f * 1.2, 0.26, 'sine', 0.045, i * 0.07));
+      break;
+    case 'mazo': tono(240, 150, 0.13, 'square', 0.035); break;
+    case 'descarte': tono(280, 190, 0.1, 'square', 0.04); break;
+    case 'buscar': tono(600, 880, 0.12, 'sine', 0.05); break;
+    case 'reciclar': tono(500, 380, 0.12, 'triangle', 0.045); break;
+    case 'biomasa': tono(350, 520, 0.1, 'sine', 0.05); break;
+    case 'curar': tono(560, 740, 0.16, 'sine', 0.045); break;
+    case 'trofeo':
+      [523, 659, 880].forEach((f, i) => tono(f, f, 0.14, 'triangle', 0.06, i * 0.06));
+      break;
+
     default: break;
   }
 }

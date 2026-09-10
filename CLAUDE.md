@@ -7,7 +7,7 @@ que se aprende chocándose.
 ## Verificar un cambio
 
 ```bash
-npm test              # 176 tests. Es la verificación canónica.
+npm test              # 181 tests. Es la verificación canónica.
 npm run sim           # 2.000 partidas IA vs IA → BALANCE.md
 node sim/set.js       # regenera SET_DE_CARTAS.md desde el código
 node sim/carta.mjs X  # ¿está rota la carta X? 50 % da igual, 70 % rota
@@ -160,6 +160,69 @@ de originales sin publicarse porque se llamaban `Saurophaganax.PNG` en vez de
 
 Son las **únicas dos recompensas del juego cooperativo**. Al tocar cualquier cosa
 que recorra el set, comprobar si hay que sumarles `CARTAS_DE_JEFE`.
+
+## El guión: qué se ve cuando pasa cada cosa
+
+El motor emite **treinta y un tipos de evento**. Durante mucho tiempo se
+animaban CUATRO —choque, avance, golpe al hábitat y muerte— porque el animador
+era una sucesión de `if` contra esos cuatro. Todo lo demás cambiaba el tablero de
+golpe y salía como un renglón de texto.
+
+Se notaba justo donde más duele: las once habilidades al entrar, la Tijera que se
+lleva un dinosaurio del campo, el trío que se completa, las cartas que descartan
+de tu mano. **Cada carta que se diseñaba nacía invisible**, y arreglarlo pedía
+volver a tocar el animador.
+
+Ahora [`src/ui/guion.js`](src/ui/guion.js) es una tabla: cada evento declara
+cuánto ocupa, a qué suena y qué toca en el DOM. Añadir una carta pide, como
+mucho, una entrada ahí.
+
+- `guion.js` dice **QUÉ** se ve; `animate.js` sabe **CÓMO** tocarlo y lleva el
+  ritmo. El guión recibe un `api` en vez de importar el DOM, igual que
+  `alEntrar()` recibe sus ayudas en el motor. Sin esa costura, el guión acabaría
+  siendo otro animador.
+- Los gestos disponibles son deliberadamente pocos —`marcar`, `rotulo`,
+  `anuncio`, `flota`, `enMazo`, `enMano`, `enHabitat`—. Si una carta pide algo
+  que no está, es que hace falta un gesto nuevo, y un gesto nuevo se piensa una
+  vez y lo reutilizan todas.
+- **Ninguno cambia el tamaño de una carta.** El tablero es una rejilla y una
+  carta que crece de verdad empuja a las de al lado a media animación. Se pinta
+  en `box-shadow`, `filter` y pseudoelementos.
+- El COMBATE sigue en `animarCombate`: recorre ranura a ranura y necesita su
+  propio ritmo. Meterlo en la tabla la habría convertido en un caso especial con
+  forma de tabla.
+
+`test/guion.test.js` obliga a DECIDIR: todo evento del motor o tiene compás o
+está en `CALLADOS` con su motivo escrito. La primera vez que se corrió encontró
+uno sin decidir. Y ningún compás puede pasar de 600 ms: con el campo lleno se
+disparan diez habilidades, y a medio segundo cada una eso deja de ser ritmo y
+pasa a ser una espera.
+
+## `transform` es una sola propiedad, y quien la escribe último gana
+
+Es la trampa de toda la capa visual y ya ha mordido dos veces.
+
+Las cartas del TABLERO corren `aterrizar`, `embestida` y `voltear`, todas sobre
+`transform`. Por eso la inclinación con el puntero **no se aplica ahí**: se
+pisarían. En la MANO ya estaba `alzada` con su `translateY`, así que las dos
+cosas se componen en un solo `transform` con variables —`--alzar` para el gesto
+de coger, `--tx`/`--ty` para la inclinación— y `alzada` escribe `--alzar`, no
+`transform`.
+
+Lo mismo con `box-shadow`: el aro de rareza lo ocupa y gana por especificidad
+—`.carta.rareza-RARO` son dos clases—, así que la sombra que levanta la carta de
+la mano va en `filter: drop-shadow`. Puestas las dos en `box-shadow`, la
+profundidad desaparecía en todo lo que no fuera común.
+
+Y al depurar esto, tres cosas que costaron un rato y no eran bugs:
+
+- **`getComputedStyle().transform` a mitad de una transición devuelve el valor de
+  partida.** Hay que apagar la transición y forzar un reflujo para leer el real.
+- **Con CSS anidado, toda `CSSStyleRule` tiene `.cssRules`**, así que un
+  recorrido que haga `if (r.cssRules) { recurse; continue; }` se salta todos los
+  selectores y «demuestra» que la regla no existe.
+- **Una declaración con `var()` devuelve cadena vacía en `rule.style.<prop>`**:
+  es una pending-substitution value. No es que se haya perdido.
 
 ## Las cartas mienten si nadie las vigila
 

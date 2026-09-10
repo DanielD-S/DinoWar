@@ -5,18 +5,25 @@
 import { BALANCE } from '../data/balance.js';
 import { CLADO_NOMBRE, carta } from '../data/cards.js';
 import { CAUSA } from '../engine/state.js';
-import { el, JUGADOR, render } from './render.js';
+import { el, JUGADOR, RIVAL, render } from './render.js';
+import { compasDe, seVe } from './guion.js';
+import { sonido } from './audio.js';
 
 const temporizadores = new Set();
 let generacion = 0;
+
+/** Todo lo que el guión puede dejar puesto. Si se olvida una, se queda pegada. */
+const MARCAS = ['golpeada', 'destino', 'dispara', 'crece', 'merma', 'cura', 'embiste', 'muere'];
 
 export function cancelarAnimaciones() {
   generacion += 1;
   for (const t of temporizadores) clearTimeout(t);
   temporizadores.clear();
-  for (const n of document.querySelectorAll('.dano-flotante')) n.remove();
-  for (const n of document.querySelectorAll('.golpeada, .destino')) n.classList.remove('golpeada', 'destino');
-  for (const n of document.querySelectorAll('.habitat.golpe')) n.classList.remove('golpe');
+  for (const n of document.querySelectorAll('.dano-flotante, .rotulo-rasgo, .anuncio')) n.remove();
+  for (const n of document.querySelectorAll(`.${MARCAS.join(', .')}`)) n.classList.remove(...MARCAS);
+  for (const n of document.querySelectorAll('.habitat.golpe, .pila.pulso')) {
+    n.classList.remove('golpe', 'pulso');
+  }
 }
 
 function pausa(ms) {
@@ -94,6 +101,95 @@ function golpear(iid, cantidad) {
   const mia = generacion;
   const t = setTimeout(() => { temporizadores.delete(t); if (mia === generacion) c.classList.remove('golpeada'); }, 400);
   temporizadores.add(t);
+}
+
+/**
+ * Quita una clase pasado un rato, sin dejar temporizadores vivos tras reiniciar.
+ */
+function marcar(nodo, clase, ms) {
+  if (!nodo) return;
+  nodo.classList.add(clase);
+  const mia = generacion;
+  const t = setTimeout(() => {
+    temporizadores.delete(t);
+    if (mia === generacion) nodo.classList.remove(clase);
+  }, ms);
+  temporizadores.add(t);
+}
+
+/** El nombre del rasgo, encima de la carta que lo dispara. */
+function rotulo(nodo, texto, clase = '') {
+  if (!nodo || !texto) return;
+  const n = document.createElement('span');
+  n.className = `rotulo-rasgo${clase ? ` ${clase}` : ''}`;
+  n.textContent = texto;
+  (nodo.closest('.ranura') ?? nodo).appendChild(n);
+  const mia = generacion;
+  const t = setTimeout(() => { temporizadores.delete(t); if (mia === generacion) n.remove(); }, 1100);
+  temporizadores.add(t);
+}
+
+/** Un cartel en mitad del tablero, para lo que no cuelga de ninguna carta. */
+function anuncio(texto, clase = '') {
+  const n = document.createElement('div');
+  n.className = `anuncio${clase ? ` ${clase}` : ''}`;
+  n.textContent = texto;
+  el.campo.appendChild(n);
+  const mia = generacion;
+  const t = setTimeout(() => { temporizadores.delete(t); if (mia === generacion) n.remove(); }, 1200);
+  temporizadores.add(t);
+}
+
+/** Un número flotando sobre un contador del marcador —mazo, mano, hábitat—. */
+function sobreContador(nodo, texto, clase) {
+  if (!nodo) return;
+  marcar(nodo, 'pulso', 500);
+  flotante(nodo, texto, clase);
+}
+
+const habitatNodo = (bando) => el.campo.querySelector(
+  bando === JUGADOR ? '.habitat.propio' : '.habitat.rival',
+);
+
+/**
+ * Lo que el guión puede tocar. Es deliberadamente corto: si para contar una
+ * carta nueva hace falta algo que no está aquí, es que hace falta un gesto
+ * nuevo, y un gesto nuevo se piensa una vez y lo reutilizan todas.
+ */
+const API = Object.freeze({
+  carta: cartaNodo,
+  ranura: ranuraNodo,
+  contrario: (j) => (j === JUGADOR ? RIVAL : JUGADOR),
+  marcar,
+  rotulo,
+  anuncio,
+  flota: (nodo, texto, clase) => flotante(nodo?.closest('.ranura') ?? nodo, texto, clase),
+  embiste: (iid) => marcar(cartaNodo(iid), 'embiste', 420),
+  fulmina: (iid) => marcar(cartaNodo(iid), 'muere', 520),
+  enMazo: (j, texto, clase) => sobreContador(j === JUGADOR ? el.pPila : el.rPila, texto, clase),
+  enMano: (j, texto, clase) => sobreContador(j === JUGADOR ? el.pMano : el.rMano, texto, clase),
+  enHabitat: (j, texto, clase) => sobreContador(habitatNodo(j), texto, clase),
+});
+
+/**
+ * Toca los eventos en el orden en que los emitió el motor, cada uno con su
+ * compás. Es el reemplazo del `if` por evento: `guion.js` dice qué se ve y esto
+ * sólo lo lleva al ritmo.
+ *
+ * Los que no tienen compás se saltan SIN esperar. Importa: el motor emite
+ * treinta y un tipos y la mayoría son contabilidad —RENTA, PRODUCCION,
+ * RECHAZADA— que no debe costar ni un milisegundo de turno.
+ */
+export async function animarEventos(eventos) {
+  const mia = generacion;
+  for (const e of eventos) {
+    if (mia !== generacion) return;
+    if (!seVe(e)) continue;
+    const c = compasDe(e);
+    if (c.sonido) sonido(c.sonido);
+    c.hacer?.(e, API);
+    await pausa(c.dura);
+  }
 }
 
 /**

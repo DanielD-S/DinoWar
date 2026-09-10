@@ -24,6 +24,7 @@ export function soltarEntrada() {
   for (const [nodo, tipo, fn, opciones] of listeners) nodo.removeEventListener(tipo, fn, opciones);
   listeners.length = 0;
   clearTimeout(temporizadorLargo);
+  enderezar();
   gesto = null;
   api = null;
   el.arrastre.classList.add('oculta');
@@ -166,10 +167,44 @@ function alTocarCampo(e) {
   if (f?.dataset.card) api.ficha(f.dataset.card);
 }
 
+let inclinada = null;
+
+/**
+ * Inclina la carta que hay bajo el puntero. Escribe `--tx` y `--ty` en el rango
+ * [-1, 1] y el CSS decide cuántos grados son eso: aquí no hay ni un ángulo.
+ *
+ * Sólo con puntero FINO. Con el dedo, el puntero está justo donde está la carta
+ * —o sea, tapándola— y la inclinación sería un temblor bajo el pulgar. El CSS
+ * también lo anula con `(hover: none)`, pero no calcularlo ahorra un
+ * `getBoundingClientRect` por cada píxel de arrastre en el móvil.
+ */
+function inclinar(e) {
+  if (e.pointerType !== 'mouse') return;
+  const nodo = e.target.closest?.('.carta--mano');
+  // Al pasar de una carta a otra hay que enderezar la que se deja: si no, se
+  // queda torcida para siempre porque nadie más le va a tocar las variables.
+  if (nodo !== inclinada) enderezar();
+  if (!nodo) return;
+  inclinada = nodo;
+  const r = nodo.getBoundingClientRect();
+  nodo.style.setProperty('--tx', (((e.clientX - r.left) / r.width) * 2 - 1).toFixed(3));
+  nodo.style.setProperty('--ty', (((e.clientY - r.top) / r.height) * 2 - 1).toFixed(3));
+}
+
+/** Devuelve la última carta inclinada a su sitio. */
+function enderezar() {
+  if (!inclinada) return;
+  inclinada.style.removeProperty('--tx');
+  inclinada.style.removeProperty('--ty');
+  inclinada = null;
+}
+
 export function tomarEntrada(nuevaApi) {
   soltarEntrada();
   api = nuevaApi;
 
+  on(el.mano, 'pointermove', inclinar, { passive: true });
+  on(el.mano, 'pointerleave', enderezar, { passive: true });
   on(el.mano, 'pointerdown', alBajar);
   on(el.mano, 'pointermove', alMover, { passive: false });
   on(el.mano, 'pointerup', alSoltar);

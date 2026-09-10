@@ -34,7 +34,7 @@ import { danoDeAsalto, habitatDeAsalto } from './data/tribu.js';
 import { JEFES, jefeActivo } from './data/eventos.js';
 import { aListaDeMazo } from './data/coleccion.js';
 import {
-  animarCombate, animarRevelacion, cancelarAnimaciones, esperar, lineasDeLog,
+  animarCombate, animarRevelacion, animarEventos, cancelarAnimaciones, esperar, lineasDeLog,
 } from './ui/animate.js';
 import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio } from './ui/audio.js';
 
@@ -562,6 +562,12 @@ async function bucle() {
       // lleno son diez cartas y 700 ms las cortaba por la mitad.
       const volteadas = animarRevelacion(antes, estado);
       await esperar(volteadas > 0 ? 480 + volteadas * 90 : 500);
+      // Y AHORA lo que pasó al revelar: las habilidades al entrar, los eventos
+      // que caen encima, el clima que se impone, el trío que se completa. Todo
+      // esto ya ocurría —el tablero salía cambiado— pero sólo se leía en el
+      // registro. Va después de los volteos porque las cartas tienen que estar
+      // boca arriba para poder señalarlas.
+      await animarEventos(estado.eventos.slice(desdeRev));
       pasoTutorial('revelado');
       await esperarTutorial();
       continue;
@@ -583,8 +589,16 @@ async function bucle() {
 
     if (estado.fase === FASE.CHEQUEO) archivarLog();
 
+    // El resto de fases son automáticas y cortas, pero emiten cosas que el
+    // jugador tiene que ver: la aridez mordiendo los dos mazos en el robo, las
+    // curaciones al final del turno.
+    const desdeFase = estado.eventos.length;
+    const faseQueEra = estado.fase;
     estado = reduce(estado, { tipo: ACCION.AVANZAR });
     render(estado);
+    if (faseQueEra === FASE.ROBO || faseQueEra === FASE.CHEQUEO) {
+      await animarEventos(estado.eventos.slice(desdeFase));
+    }
   }
   throw new Error('el bucle de partida no converge');
 }
