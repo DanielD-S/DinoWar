@@ -20,3 +20,6 @@ node_modules/
 # Lo que se sirve es assets/dinos/, que sí va en el repositorio.
 src/dinos/
 __pycache__/
+
+# Originales de las cartas enteras: mismo motivo que src/dinos/.
+src/cartas/

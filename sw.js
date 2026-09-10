@@ -17,15 +17,19 @@
 //
 // Al cambiar cualquier fichero servido hay que subir VERSION: activa la limpieza
 // de las cachés anteriores.
-const VERSION = 'dinowar-v33';
+const VERSION = 'dinowar-v34';
 const ESENCIALES = [
   './', './index.html', './style.css', './manifest.json', './src/main.js',
   './assets/fuentes/inter-latin.woff2',
 ];
 
-// El índice va aparte: es la lista de lo que hay, no una de las cosas que hay.
-const esIndice = (url) => url.pathname.endsWith('/assets/dinos/indice.json');
-const esIlustracion = (url) => url.pathname.includes('/assets/dinos/') && !esIndice(url);
+// Los índices van aparte: son la lista de lo que hay, no una de las cosas que
+// hay. Si se cachearan como imagen, una ilustración nueva no aparecería nunca.
+const esIndice = (url) => url.pathname.endsWith('/indice.json');
+// Dos carpetas, misma regla de caché: las ilustraciones de `dinos/` y las
+// cartas enteras de `cartas/` pesan y no cambian, así que van de caché primero.
+const esImagenDeCarta = (url) => (url.pathname.includes('/assets/dinos/')
+  || url.pathname.includes('/assets/cartas/')) && !esIndice(url);
 
 self.addEventListener('install', (e) => {
   // Que falte un fichero del precacheado no debe dejar el service worker sin
@@ -47,7 +51,7 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (esIlustracion(url)) {
+  if (esImagenDeCarta(url)) {
     e.respondWith(caches.match(request).then((hit) => hit ?? guardar(request)));
     return;
   }

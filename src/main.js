@@ -21,7 +21,7 @@ import {
   montarTutorial, empezarTutorial, terminarTutorial, tutorialHecho, tutorialActivo,
   tutorialEspera, pasoTutorial,
 } from './ui/tutorial.js';
-import { detectarFotos, vigilarFotos, calentarFotos } from './ui/art.js';
+import { detectarFotos, detectarEnteras, vigilarFotos, calentarFotos } from './ui/art.js';
 import { montarMeta, abrirColeccion, abrirSobres, abrirMazos, pintarMenu, recompensar } from './ui/meta.js';
 import { mazoActivo, cargarPerfil, actualizarPerfil } from './ui/almacen.js';
 import { montarCuenca, abrirCuenca, pintarCuenca } from './ui/cuenca.js';
@@ -939,6 +939,7 @@ function iniciar() {
   // pasan por render()—.
   vigilarFotos();
   detectarFotos().then(calentarFotos);
+  detectarEnteras();
   pintarRecord();
 
   montarMeta(() => irA(APP.MENU));

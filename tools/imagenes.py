@@ -50,6 +50,19 @@ DESTINO = RAIZ / 'assets' / 'dinos'
 LADO = 1200
 CALIDAD = 80
 
+# Las CARTAS ENTERAS son otra cosa que las ilustraciones, y por eso van por su
+# lado. Una ilustración es el dibujo pelado que el juego monta dentro de su
+# marco; una carta entera es la carta ya compuesta —marco, nombre y cifras
+# incluidos— que sólo se enseña en el visor, en el modo «Original».
+#
+# Tres diferencias que justifican el segundo montón: son verticales y no 3:2,
+# se sirven a 1100 px porque el visor las enseña casi a pantalla completa, y NO
+# se precalientan en la caché, porque pesan un cuarto de mega cada una y casi
+# nadie abre ese modo.
+ORIGEN_CARTAS = RAIZ / 'src' / 'cartas'
+DESTINO_CARTAS = RAIZ / 'assets' / 'cartas'
+LADO_CARTA = 1100
+
 
 def ids_de_cartas():
     """Ids del set, leídos de cards.js para no mantener la lista por duplicado."""
@@ -95,6 +108,62 @@ def subir_version_sw(motivo):
     sw.write_text(texto.replace(m.group(0), f"const VERSION = 'dinowar-v{n}';", 1),
                   encoding='utf-8')
     print(f'sw.js: VERSION subida a dinowar-v{n}, porque {motivo}')
+
+
+def procesar_cartas(validos):
+    """Segunda pasada: las cartas enteras de `src/cartas/` → `assets/cartas/`.
+
+    No tenerlas es el estado normal: hoy sólo hay una. Por eso la carpeta puede
+    no existir y eso no es un fallo.
+    """
+    if not ORIGEN_CARTAS.is_dir():
+        return False
+
+    DESTINO_CARTAS.mkdir(parents=True, exist_ok=True)
+    reemplazadas, kb = [], 0.0
+    for f in sorted(ORIGEN_CARTAS.iterdir()):
+        if not f.is_file() or f.name.startswith('.') or f.suffix.lower() == '.md':
+            continue
+        cid = id_de(f.stem, validos)
+        if cid is None:
+            print(f'  sin usar: {f.name} (el nombre no coincide con ninguna carta)')
+            continue
+        try:
+            im = Image.open(f)
+        except Exception as e:                      # noqa: BLE001
+            print(f'  sin usar: {f.name} ({e})')
+            continue
+
+        if im.mode in ('RGBA', 'LA', 'P'):
+            im = im.convert('RGBA')
+            fondo = Image.new('RGB', im.size, (25, 21, 16))
+            fondo.paste(im, mask=im.split()[-1])
+            im = fondo
+        else:
+            im = im.convert('RGB')
+
+        escala = LADO_CARTA / max(im.size)
+        if escala < 1:
+            im = im.resize((round(im.width * escala), round(im.height * escala)), Image.LANCZOS)
+
+        salida = DESTINO_CARTAS / f'{cid}.jpg'
+        antes = salida.read_bytes() if salida.exists() else None
+        im.save(salida, 'JPEG', quality=CALIDAD, optimize=True, progressive=True)
+        if salida.read_bytes() != antes:
+            reemplazadas.append(cid)
+        kb += salida.stat().st_size / 1024
+        print(f'  {cid:15s} {im.size[0]}x{im.size[1]}  {salida.stat().st_size / 1024:5.0f} KB')
+
+    # Igual que el otro índice: la lista sale de lo que SE SIRVE, no de lo que
+    # esta pasada haya convertido.
+    servidas = sorted(q.stem for q in DESTINO_CARTAS.glob('*.jpg'))
+    ruta = DESTINO_CARTAS / 'indice.json'
+    nuevo = json.dumps({'cartas': servidas}, ensure_ascii=False, indent=2) + '\n'
+    cambio = (not ruta.exists()) or ruta.read_text(encoding='utf-8') != nuevo or bool(reemplazadas)
+    ruta.write_text(nuevo, encoding='utf-8')
+    if servidas:
+        print(f'\n{len(servidas)} cartas enteras, {kb:.0f} KB → assets/cartas/')
+    return cambio
 
 
 def main():
@@ -180,8 +249,13 @@ def main():
               or indice_ruta.read_text(encoding='utf-8') != nuevo
               or bool(reemplazadas))
     indice_ruta.write_text(nuevo, encoding='utf-8')
-    if cambio:
-        if reemplazadas:
+    print()
+    cambio_cartas = procesar_cartas(validos)
+
+    if cambio or cambio_cartas:
+        if cambio_cartas and not cambio:
+            subir_version_sw('han cambiado cartas enteras')
+        elif reemplazadas:
             subir_version_sw('han cambiado ilustraciones ya servidas: '
                              + ', '.join(sorted(reemplazadas)))
         else:

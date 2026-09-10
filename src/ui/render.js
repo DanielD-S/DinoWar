@@ -8,7 +8,7 @@ import {
   unidadEn, unidadesDe, ataqueEfectivo, vidaMaxima, vidaActual,
   efectosDe, adheridasA,
 } from '../engine/state.js';
-import { arte, hayFoto, rutaFoto } from './art.js';
+import { arte, hayFoto, rutaFoto, hayEntera, rutaEntera } from './art.js';
 
 export const JUGADOR = 0;
 export const RIVAL = 1;
@@ -505,24 +505,45 @@ export function cartaGrandeHTML(cardId) {
 let visorCarta = null;
 
 /**
- * Ampliación de una carta. Dos modos, porque no son la misma pregunta: leer la
- * carta (cifras y rasgo) o mirar la ilustración. Sin ilustración hay un modo
- * solo y no se enseña el selector.
+ * Ampliación de una carta. Hasta tres modos, porque no son la misma pregunta:
+ * leer la carta (cifras y rasgo), mirar la ilustración, o ver la carta entera
+ * tal y como se diseñó fuera del juego.
+ *
+ * El tercero es una vista de coleccionista y no puede ser otra cosa: la carta
+ * entera trae las cifras cocidas en píxeles, y en el campo la Vida baja con las
+ * heridas y el Ataque sube con `ataqueEfectivo()`. Por eso el modo por defecto
+ * sigue siendo `carta` y este no se usa en ninguna otra pantalla.
+ *
+ * Se enseñan sólo los modos que existen para esta carta: sin ilustración no hay
+ * selector, y sin carta entera hay dos chips en vez de tres.
  * @param {string} cardId
- * @param {'carta'|'foto'} [modo]
+ * @param {'carta'|'foto'|'original'} [modo]
  */
 export function abrirVisor(cardId, modo = 'carta') {
   const c = carta(cardId);
   const foto = hayFoto(cardId);
-  const m = foto ? modo : 'carta';
+  const entera = hayEntera(cardId);
+
+  // Un modo que no existe para esta carta cae a `carta`, que existe siempre.
+  const disponible = { carta: true, foto, original: entera };
+  const m = disponible[modo] ? modo : 'carta';
   visorCarta = cardId;
 
-  el.visorLienzo.innerHTML = m === 'foto'
-    ? `<img class="visor-foto" src="${rutaFoto(cardId)}" alt="Ilustración de ${c.binomial}">`
-    : cartaGrandeHTML(cardId);
+  if (m === 'foto') {
+    el.visorLienzo.innerHTML =
+      `<img class="visor-foto" src="${rutaFoto(cardId)}" alt="Ilustración de ${c.binomial}">`;
+  } else if (m === 'original') {
+    el.visorLienzo.innerHTML =
+      `<img class="visor-entera" src="${rutaEntera(cardId)}" alt="Carta completa de ${c.binomial}">`;
+  } else {
+    el.visorLienzo.innerHTML = cartaGrandeHTML(cardId);
+  }
 
-  el.visorModos.innerHTML = foto
-    ? [['carta', 'Carta'], ['foto', 'Ilustración']]
+  const modos = [['carta', 'Carta']];
+  if (foto) modos.push(['foto', 'Ilustración']);
+  if (entera) modos.push(['original', 'Original']);
+  el.visorModos.innerHTML = modos.length > 1
+    ? modos
       .map(([k, n]) => `<button class="chip ${k === m ? 'on' : ''}" data-modo="${k}">${n}</button>`)
       .join('')
     : '';
@@ -530,6 +551,7 @@ export function abrirVisor(cardId, modo = 'carta') {
   el.visor.classList.remove('oculta');
 }
 
+/** @param {'carta'|'foto'|'original'} modo */
 export function cambiarModoVisor(modo) {
   if (visorCarta) abrirVisor(visorCarta, modo);
 }

@@ -76,3 +76,21 @@ por el id de la carta (`allosaurus.png`); lo que no reconozca lo dice y sigue.
 
 Vale para cualquier carta, no sólo para los dinosaurios: si algún día hay arte
 de un clima o de un evento, se deja ahí con el id de la carta y aparece.
+
+## Cartas enteras: `assets/cartas/`
+
+Una **carta entera** es la carta ya compuesta —marco, nombre y cifras
+incluidos— tal y como se diseñó fuera del juego. No es una ilustración y no se
+puede usar como tal: en el campo la Vida baja con las heridas y el Ataque sube
+con `ataqueEfectivo()`, y unas cifras cocidas en píxeles no se enteran de
+ninguna de las dos.
+
+Vive sólo en el modo **«Original»** del visor, que es una vista de
+coleccionista: estática, grande y sin partida detrás. Sin carta entera, el
+visor enseña dos chips en vez de tres y no pasa nada.
+
+Se preparan igual que las ilustraciones —originales en `src/cartas/`, un
+`python tools/imagenes.py` y salen en `assets/cartas/` con su índice—, con dos
+diferencias: van a **1100 px de lado mayor** porque el visor las enseña casi a
+pantalla completa, y **no se precalientan** en la caché, porque pesan un cuarto
+de mega cada una y casi nadie abre ese modo.
