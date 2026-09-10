@@ -163,3 +163,41 @@ cosas que sólo aplican a los animales:
 3. Subir `VERSION` en `sw.js`, o las cachés viejas siguen sirviendo lo anterior.
 4. Si el animal queda descentrado, no rehacer el recorte: ponerle un foco en
    `assets/dinos/indice.json`.
+
+## El marco de la carta, que no es una ilustración
+
+Un marco generado como imagen completa **no sirve**, y el motivo no es la
+calidad: es que trae la maquetación dentro. Si el PNG dibuja la banda del
+nombre, la caja de habilidad y las barras de las cifras, esas cajas quedan
+congeladas en píxeles y la carta ya no puede estirarlas — y como la proporción
+del PNG nunca coincide al milímetro con 82:112, se deforma entero.
+
+Un marco tiene que traer **sólo el borde**, con el centro vacío. Así se sirve
+como `border-image` en nueve tajadas: las cuatro esquinas se pintan a tamaño
+fijo y nunca se estiran, los cuatro lados se reparten lo que sobra, y el centro
+transparente deja ver la ilustración. El mismo fichero vale para la carta de la
+ranura y para la de la ficha.
+
+> Marco de carta de juego de cartas coleccionables, vertical, proporción 82:112.
+> SOLO EL BORDE: el centro completamente vacío y transparente, sin ninguna caja,
+> banda ni panel dentro. Banda de roca oscura de grosor uniforme en los cuatro
+> lados, con vetas minerales y filigrana dorada fina recorriéndola. En cada una
+> de las cuatro esquinas un fósil grabado en bajorrelieve —amonites, vértebras,
+> una huella tridáctila—, contenido dentro del cuadrado de la esquina y sin
+> invadir los lados. Los tramos rectos entre esquina y esquina, uniformes y
+> repetibles, sin ningún motivo que se reconozca como único. Paleta: negro, gris
+> piedra, oro viejo. Iluminación lateral que marque el relieve. Fondo
+> transparente. Sin texto, sin números, sin iconos, sin marca de agua.
+
+Tres cosas que decide este prompt y conviene entender:
+
+- **Las esquinas llevan el adorno y los lados no.** Al estirarse, un motivo
+  reconocible en mitad de un lado se deforma y se nota; la roca uniforme no.
+- **El centro vacío no es un descuido.** Es lo que permite que el arte vaya a
+  sangre por debajo y que el texto siga siendo CSS.
+- **Exportar a 512 px de ancho**, PNG con alfa. El original de 2 MB no cabe: se
+  descarga en cada partida y el service worker lo cachea.
+
+Y el aviso que ya mordió dos veces en la capa visual: `box-shadow` lo ocupa el
+aro de rareza y `transform` las animaciones del tablero. Un marco que pida
+resplandor propio choca ahí.
