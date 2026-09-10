@@ -143,19 +143,29 @@ def main():
         hechas.append(cid)
         print(f'  {cid:15s} {ancho}x{alto} → {im.size[0]}x{im.size[1]}  {kb:5.0f} KB')
 
-    # El índice conserva los puntos focales ya escritos a mano: regenerar las
-    # imágenes no puede borrar el trabajo de encuadre de nadie.
+    # El índice dice qué ilustraciones SE SIRVEN, y eso es lo que hay en
+    # assets/dinos/ — no lo que esta pasada haya convertido.
+    #
+    # Es la diferencia que importa: `src/dinos/` está en .gitignore porque los
+    # originales pesan 29 MB y no viajan, así que en un clon recién hecho está
+    # vacío. Construir la lista con lo convertido significaba que añadir UNA
+    # ilustración borraba del índice las otras cincuenta y dos, que seguían en
+    # disco. Y el fallo es mudo: el juego dibuja siluetas y no se queja.
+    servidas = sorted(p.stem for p in DESTINO.glob('*.jpg'))
+
+    # Los puntos focales escritos a mano sobreviven a cualquier regeneración,
+    # mientras la ilustración a la que apuntan siga sirviéndose.
     indice_ruta = DESTINO / 'indice.json'
     foco = {}
     if indice_ruta.exists():
         try:
             previo = json.loads(indice_ruta.read_text(encoding='utf-8'))
             if isinstance(previo, dict):
-                foco = {k: v for k, v in previo.get('foco', {}).items() if k in hechas}
+                foco = {k: v for k, v in previo.get('foco', {}).items() if k in servidas}
         except json.JSONDecodeError:
             pass
 
-    nuevo = json.dumps({'cartas': sorted(hechas), 'foco': foco},
+    nuevo = json.dumps({'cartas': servidas, 'foco': foco},
                        ensure_ascii=False, indent=2) + '\n'
     cambio = (not indice_ruta.exists()) or indice_ruta.read_text(encoding='utf-8') != nuevo
     indice_ruta.write_text(nuevo, encoding='utf-8')
@@ -170,7 +180,7 @@ def main():
         print('\nRenómbralas con el binomio o con el id de la carta. Los ids son:')
         print('  ' + ', '.join(sorted(validos)))
 
-    faltan = sorted(validos - set(hechas))
+    faltan = sorted(validos - set(servidas))
     if faltan and len(faltan) < len(validos):
         print(f'\nSin ilustración, se dibujan con su silueta SVG:\n  {", ".join(faltan)}')
 
