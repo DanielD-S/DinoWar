@@ -1,5 +1,7 @@
 # Ilustraciones
 
+Cómo pedirlas a un generador: [PROMPTS.md](PROMPTS.md).
+
 `assets/dinos/` guarda las ilustraciones de las cartas en JPEG, con un
 `indice.json` que dice cuáles hay y, si hace falta, por dónde recortarlas.
 
