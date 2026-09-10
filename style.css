@@ -582,8 +582,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Tres líneas y sólo tres cifras por bando. El mazo y el descarte se han ido a
    la mesa, y con eso la fila cabe sin apreturas y sin solapes. */
 #hud {
-  display: flex; flex-direction: column; gap: 6px;
-  padding: 9px 14px 8px;
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 6px 14px 5px;
   border-bottom: 1px solid var(--linea);
   background: rgba(15,11,8,.55);
   font-size: 12px;
@@ -646,38 +646,45 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* ----------------------------------------------------------------- campo */
 
+/* El relleno y los huecos van apretados a propósito. En 360×640 la pantalla
+   son 640 px y entre el relleno y los huecos de #campo, #hud y #pie se iban
+   116: el 18 % del alto en aire. Bajarlos es lo que le da a la fila de ranuras
+   los 40 px que la carta necesita para crecer. Medido: la carta pasa de 64×87
+   a 83×114, un 69 % más de superficie. */
 #campo {
   flex: 1; min-height: 0;
   display: flex; flex-direction: column; justify-content: center;
-  gap: 8px; padding: 10px;
+  gap: 5px; padding: 6px;
   overflow: hidden;
 }
 
 /* Hábitat: canal fino con la cifra «actual/máximo» y, al final, la pila del
    mazo. El contador de cartas vive aquí y no en el marcador porque es un objeto
    de la mesa, no una estadística. */
-.habitat { display: flex; align-items: center; gap: 9px; font-size: 12px; }
+.habitat { display: flex; align-items: center; gap: 9px; font-size: 11px; }
 .habitat-et { display: none; }
 .habitat-barra {
-  flex: 1; height: 6px; border-radius: 3px; overflow: hidden;
+  flex: 1; height: 8px; border-radius: 4px; overflow: hidden;
   background: rgba(244,236,224,.07);
 }
 .habitat-barra i { display: block; height: 100%; width: 100%; border-radius: 3px; transition: width .45s ease-out; }
 .habitat.rival .habitat-barra i { background: linear-gradient(90deg, #8a3f2a, var(--rival)); }
 .habitat.propio .habitat-barra i { background: linear-gradient(90deg, var(--borde-fuerte), var(--bio)); }
-.habitat-num { flex: 0 0 auto; font-size: 12px; color: var(--texto); }
+.habitat-num { flex: 0 0 auto; font-size: 11px; color: var(--texto); }
 .habitat-num .tope { color: var(--tenue-2); }
 .habitat.golpe .habitat-num { animation: latido .45s ease-out; }
 @keyframes latido { 0%,100% { transform: none; } 40% { transform: scale(1.4); } }
 
 /* Pila de mazo: dos capas para que se lea como un montón de cartas. */
-.pila { position: relative; width: 36px; height: 26px; flex: 0 0 auto; }
+/* La pila fija el alto de la barra de hábitat, así que su tamaño sale del
+   presupuesto vertical del campo y no sólo de la estética. */
+.pila { position: relative; width: 32px; height: 22px; flex: 0 0 auto; }
 .pila::before {
-  content: ''; position: absolute; left: 3px; top: 2px; width: 30px; height: 22px;
+  content: ''; position: absolute; left: 3px; top: 2px; width: 26px; height: 18px;
   border-radius: 4px; background: #241b11; box-shadow: 0 0 0 1px #45372a;
 }
 .pila b {
-  position: absolute; left: 0; top: 0; width: 30px; height: 22px; border-radius: 4px;
+  position: absolute; left: 0; top: 0; width: 26px; height: 18px; border-radius: 4px;
   background: #1c1610; display: grid; place-items: center;
   font-size: 10px; font-weight: 500; color: var(--texto-2);
 }
@@ -687,7 +694,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* Descarte: una ficha plana al lado del mazo, y se puede abrir. */
 .descarte-ficha {
-  flex: 0 0 auto; min-width: 30px; height: 22px; padding: 0 6px; border-radius: 4px;
+  flex: 0 0 auto; min-width: 26px; height: 18px; padding: 0 5px; border-radius: 4px;
   background: rgba(244,236,224,.04); box-shadow: 0 0 0 1px var(--linea);
   color: var(--tenue); font-size: 10px;
   display: grid; place-items: center;
@@ -697,7 +704,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Las filas se reparten el hueco que queda: fijar su alto en vh desbordaba la
    pantalla en 360×640, que es la más pequeña que el juego declara soportar. */
 .fila-ranuras {
-  display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;
   flex: 1 1 0; min-height: 92px; max-height: 172px;
 }
 
@@ -722,10 +729,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Franja de campo activo. */
 .franja {
   display: flex; align-items: center; gap: 8px;
-  padding: 7px 10px; border-radius: 8px;
+  padding: 4px 10px; border-radius: 8px;
   border: 1px solid var(--linea);
   background: linear-gradient(90deg, rgba(217,164,65,.07), rgba(217,164,65,.02));
-  font-size: 12px; min-height: 32px;
+  font-size: 12px; min-height: 26px;
 }
 /* Se llama Clima porque es lo único que admite. Cuando ponía «Campo» se leía
    como «el sitio donde se juegan las cartas al campo» y ahí se soltaba de
@@ -1218,13 +1225,17 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 #pie {
   background: rgba(15,11,8,.6); border-top: 1px solid var(--linea);
-  padding: 9px 14px calc(10px + var(--seguro-abajo));
-  display: flex; flex-direction: column; gap: 8px;
+  padding: 6px 14px calc(8px + var(--seguro-abajo));
+  display: flex; flex-direction: column; gap: 6px;
 }
 
 .mensaje {
   font-size: 11px; line-height: 1.4; color: var(--acento-claro);
-  min-height: 28px;
+  /* Flota sobre el campo en vez de ocupar fila propia en el pie. Eran 28 px
+     más su hueco, y en 360×640 ese renglón salía del tamaño de la carta. Sin
+     ratón encima, para que no estorbe al arrastrar. */
+  position: absolute; left: 14px; right: 14px; bottom: 100%; margin-bottom: 4px;
+  z-index: 5; pointer-events: none; min-height: 0;
   display: flex; align-items: center; overflow: hidden;
 }
 .mensaje.aviso { color: var(--peligro); }
