@@ -449,43 +449,43 @@ export const CARTAS = Object.freeze({
   // --------------------------------------------------------------- clima
 
   llanura: clima({
-    id: 'llanura', coste: 1, rareza: RAREZA.EPICO, binomial: 'Llanura de inundación',
-    rasgo: RASGO.CAMPO_LLANURA, rasgoNombre: 'Llanura de inundación',
+    id: 'llanura', coste: 1, rareza: RAREZA.EPICO, binomial: 'Crecida estacional',
+    rasgo: RASGO.CAMPO_LLANURA, rasgoNombre: 'Crecida estacional',
     rasgoTexto: 'Mientras esté en el campo, cada jugador puede cambiar una carta de su mano por otra del mazo, una vez por turno.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
-    nota_cientifica: 'Las llanuras de inundación de la Morrison concentran la mayor productividad vegetal estacional de la formación.',
+    nota_cientifica: 'La riada estacional desborda el cauce y revuelve el paisaje: lo que había en un sitio aparece en otro.',
   }),
 
   canal: clima({
-    id: 'canal', coste: 1, rareza: RAREZA.LEGENDARIO, binomial: 'Canal fluvial trenzado',
-    rasgo: RASGO.CAMPO_CANAL, rasgoNombre: 'Canal fluvial trenzado',
-    rasgoTexto: 'Agua permanente: +1 de Vida a todos los dinosaurios del campo, y los ribereños pelean a gusto.',
+    id: 'canal', coste: 1, rareza: RAREZA.LEGENDARIO, binomial: 'Bruma de valle',
+    rasgo: RASGO.CAMPO_CANAL, rasgoNombre: 'Bruma de valle',
+    rasgoTexto: '+1 de Vida a todos los dinosaurios del campo, mientras siga en el campo.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
-    nota_cientifica: 'Los sistemas fluviales trenzados de la formación mantienen agua durante la estación seca, con vegetación ribereña estrecha a ambos lados.',
+    nota_cientifica: 'Niebla de radiación en los fondos de valle al amanecer. Baja el estrés térmico de todo lo que respira, y en un clima estacionalmente seco eso es aguante.',
   }),
 
   bosque: clima({
-    id: 'bosque', coste: 1, rareza: RAREZA.LEGENDARIO, binomial: 'Bosque de coníferas ribereño',
-    rasgo: RASGO.CAMPO_BOSQUE, rasgoNombre: 'Bosque de coníferas ribereño',
+    id: 'bosque', coste: 1, rareza: RAREZA.LEGENDARIO, binomial: 'Estación de lluvias',
+    rasgo: RASGO.CAMPO_BOSQUE, rasgoNombre: 'Estación de lluvias',
     rasgoTexto: 'Los saurópodos curan 1 herida al final de cada turno.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
-    nota_cientifica: 'Los bosques de coníferas ribereños ofrecen ramoneo alto sostenido, el estrato del que dependen los saurópodos de cuello elevado.',
+    nota_cientifica: 'La estación húmeda rebrota el dosel de coníferas de ribera, al que sólo llegan los cuellos largos: es comida que los demás no alcanzan.',
   }),
 
   aridez: clima({
-    id: 'aridez', coste: 1, rareza: RAREZA.LEGENDARIO, binomial: 'Deriva árida',
-    rasgo: RASGO.CAMPO_ARIDEZ, rasgoNombre: 'Deriva árida',
-    rasgoTexto: 'Ambos jugadores pierden 5 cartas del mazo',
+    id: 'aridez', coste: 1, rareza: RAREZA.LEGENDARIO, binomial: 'Sequía prolongada',
+    rasgo: RASGO.CAMPO_ARIDEZ, rasgoNombre: 'Sequía prolongada',
+    rasgoTexto: 'Ambos jugadores pierden 5 cartas del mazo cada turno.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
-    nota_cientifica: 'Los paleosuelos calcáreos, las evaporitas y los depósitos eólicos de la Morrison documentan un clima semiárido y muy estacional que se acentúa hacia el techo de la formación. Que esa deriva mermara las poblaciones es una inferencia razonable, no una medida.',
+    nota_cientifica: 'Las secas del Kimmeridgiense dejaron paleosuelos con nódulos de caliche y acumulaciones de huesos en las charcas que se iban quedando sin agua.',
   }),
 
   sabana: clima({
-    id: 'sabana', coste: 1, rareza: RAREZA.COMUN, binomial: 'Sabana de helechos',
-    rasgo: RASGO.CAMPO_SABANA, rasgoNombre: 'Sabana de helechos',
+    id: 'sabana', coste: 1, rareza: RAREZA.COMUN, binomial: 'Monzón de verano',
+    rasgo: RASGO.CAMPO_SABANA, rasgoNombre: 'Monzón de verano',
     rasgoTexto: '+1 de Biomasa cada turno para los dos jugadores, mientras siga en el campo.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
-    nota_cientifica: 'Extensiones abiertas de helechos sobre suelos semiáridos, sin dosel que rompa la línea de visión ni frene un avance.',
+    nota_cientifica: 'La Morrison estaba bajo circulación monzónica: lluvias de verano concentradas que disparaban la productividad vegetal y dejaban el resto del año seco.',
   }),
 
   // --------------------------------------------------- fauna por estrenar
@@ -918,6 +918,9 @@ export const CARTAS_DE_JEFE = Object.freeze({
     binomial: 'Saurophaganax maximus',
     coste: 4, ataque: 7, vida: 8,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Dueño de la llanura',
+    rasgoTexto: 'Mientras esté en juego, tus terópodos ganan +1 de Ataque.',
+    mecanica: Object.freeze({ aura: { clado: CLADO.TEROPODO, ataque: 1 } }),
     evidencia: 'DEBATIDO',
     nota: 'El mayor terópodo conocido de la Formación Morrison, y también el más '
       + 'discutido: parte de los autores lo consideran un Allosaurus de gran talla '
@@ -930,6 +933,9 @@ export const CARTAS_DE_JEFE = Object.freeze({
     binomial: 'Barosaurus lentus',
     coste: 4, ataque: 3, vida: 13,
     rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Cortina de cuellos',
+    rasgoTexto: 'Mientras esté en juego, tu hábitat recibe 1 punto menos de daño de cada dinosaurio rival.',
+    mecanica: Object.freeze({ guardia: { habitat: 1 } }),
     evidencia: 'ESTABLECIDO',
     nota: 'Diplodócido de cuello desmesurado incluso para su familia: vértebras '
       + 'cervicales alargadas que lo hacían capaz de ramonear donde ningún otro '

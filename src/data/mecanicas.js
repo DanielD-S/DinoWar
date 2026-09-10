@@ -26,6 +26,7 @@
 //   inmune      INMUNE.CLIMA | INMUNE.EVENTO
 //   regenera    { propia, aliados }             curación al final del turno
 //   espinas     n                               daño devuelto a quien la hiere
+//   guardia     { habitat }                     resta a cada golpe a TU hábitat
 //   costeExtra  { descartar }                   lo que hay que pagar además
 //   busca       QUE.EVENTO | QUE.CLIMA | QUE.MISMA | <CLADO>
 //   entrada     { ... }                         ver src/engine/entradas.js

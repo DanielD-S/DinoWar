@@ -5,7 +5,7 @@
 - Partidas: **2000** · semilla base **1** · perfiles **heuristica vs heuristica**
 - Ranuras: **5** · Habitat: **70** · Trofeos para ganar: **10**
 - Renta: **2/turno hasta 12**, acumula · Mazo: **50**
-- Tiempo: 228.1 s
+- Tiempo: 137.0 s
 
 ## Objetivos (PLAN_V2.md §8)
 
@@ -67,7 +67,7 @@ Unidades vivas medias por bando: **2.13** de 5 ranuras.
 | Crecimiento acelerado | Campo | 1 | 54.9 % | 1.08 | 96 % | ✅ |
 | Rebrote tras incendio | Campo | 0 | 92.5 % | 1.08 | 92 % | ✅ |
 | *Lokiceratops rangiformis* | Marginocéfalo | 3 | 54.0 % | 1.06 | 90 % | ✅ |
-| Sabana de helechos | Campo | 1 | 59.3 % | 1.03 | 85 % | ✅ |
+| Monzón de verano | Campo | 1 | 59.3 % | 1.03 | 85 % | ✅ |
 | *Nodosaurus textilis* | Tireóforo | 3 | 76.0 % | 1.02 | 86 % | ✅ |
 | *Apatosaurus louisae* | Saurópodo | 3 | 51.4 % | 1.00 | 87 % | ✅ |
 | *Brachylophosaurus canadensis* | Ornitópodo | 2 | 88.7 % | 1.00 | 88 % | ✅ |
@@ -78,8 +78,8 @@ Unidades vivas medias por bando: **2.13** de 5 ranuras.
 | Mortandad estacional | Campo | 1 | 44.8 % | 0.85 | 74 % | ✅ |
 | *Camarasaurus grandis* | Saurópodo | 3 | 67.9 % | 0.84 | 73 % | ✅ |
 | *Torvosaurus tanneri* | Terópodo | 4 | 44.3 % | 0.82 | 71 % | ✅ |
-| Deriva árida | Campo | 1 | 36.9 % | 0.61 | 53 % | ❌ |
-| Canal fluvial trenzado | Campo | 1 | 0.0 % | 0.00 | 0 % | ❌ |
+| Sequía prolongada | Campo | 1 | 36.9 % | 0.61 | 53 % | ❌ |
+| Bruma de valle | Campo | 1 | 0.0 % | 0.00 | 0 % | ❌ |
 | Competencia trófica | Campo | 3 | 0.0 % | 0.00 | 0 % | ❌ |
 
 ## Diagnóstico
@@ -87,7 +87,7 @@ Unidades vivas medias por bando: **2.13** de 5 ranuras.
 - **Victorias del jugador inicial**: 46.1 % (objetivo 48 – 55 %).
 - **Cartas mal calibradas**: 3 (objetivo 0).
 
-  - Canal fluvial trenzado — índice 0.00, uso 0 % (coste 1)
+  - Bruma de valle — índice 0.00, uso 0 % (coste 1)
   - Competencia trófica — índice 0.00, uso 0 % (coste 3)
-  - Deriva árida — índice 0.61, uso 53 % (coste 1)
+  - Sequía prolongada — índice 0.61, uso 53 % (coste 1)
 

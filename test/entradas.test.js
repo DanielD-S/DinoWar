@@ -23,12 +23,18 @@ import {
 import { reduce, validar, legales, ACCION } from '../src/engine/actions.js';
 import { EFECTOS, esEntrada, valorDeEntrada, HAY_ENTRADAS } from '../src/engine/entradas.js';
 import { CON_ENTRADA } from '../sim/entradas.js';
+import { mazoCon } from '../sim/carta.mjs';
 import { tablero, poner, enMano, ejecutar, vivo } from './helpers.js';
 
-const CRIATURAS = Object.values(CARTAS).filter((c) => c.tipo === TIPO.DINOSAURIO);
+// Las DOS de jefe entran en la cuenta a propósito. Viven en CARTAS_DE_JEFE, no
+// en CARTAS, y por eso se quedaron planas y sin texto cuando se aplanó el set:
+// no salían en ninguna lista, ni en la del Excel ni en la de este test. Son las
+// únicas dos recompensas del juego cooperativo.
+const CRIATURAS = Object.values({ ...CARTAS, ...CARTAS_DE_JEFE })
+  .filter((c) => c.tipo === TIPO.DINOSAURIO);
 const CAMPOS = new Set([
   'cuenta', 'aura', 'si', 'trio', 'inmune', 'regenera', 'espinas', 'costeExtra',
-  'busca', 'entrada',
+  'busca', 'entrada', 'guardia',
 ]);
 
 // ----------------------------------------------- el vocabulario y los datos
@@ -39,7 +45,7 @@ test('Toda criatura tiene habilidad, y toda habilidad tiene nombre y texto', () 
     assert.ok(c.rasgoNombre, `${c.id} no tiene nombre de rasgo`);
     assert.ok(c.rasgoTexto, `${c.id} no tiene texto`);
   }
-  assert.equal(CRIATURAS.length, 50);
+  assert.equal(CRIATURAS.length, 52, '50 del set y las 2 de jefe');
 });
 
 test('Ninguna mecánica usa un campo que el motor no mire', () => {
@@ -104,9 +110,27 @@ test('La fase de revelación sigue llamando a la habilidad de entrada', () => {
 });
 
 test('El medidor descubre del set las cartas que disparan al entrar', () => {
-  const esperadas = CRIATURAS.filter((c) => c.mecanica.entrada).map((c) => c.id);
+  // Sólo las del set: las de jefe no se pueden llevar en un mazo cualquiera.
+  const esperadas = Object.values(CARTAS)
+    .filter((c) => c.tipo === TIPO.DINOSAURIO && c.mecanica.entrada).map((c) => c.id);
   assert.deepEqual([...CON_ENTRADA].sort(), esperadas.sort());
   assert.ok(CON_ENTRADA.length >= 10);
+});
+
+test('El medidor de una carta arma un mazo legal', () => {
+  // `sim/entradas.js` devolvía un mazo de 53 cartas cuando lo que medía no
+  // cabía en 50: se rendía con un `break` y medía igual, sin decirlo. Un
+  // medidor que miente es peor que no tenerlo, así que éste va vigilado.
+  for (const id of ['jefe_saurophaganax', 'spinosaurus', 'dryosaurus', 'aridez']) {
+    const mazo = mazoCon(id);
+    const total = mazo.reduce((n, [, c]) => n + c, 0);
+    assert.equal(total, BALANCE.tamanoMazo, `${id}: el mazo suma ${total}`);
+    for (const [cid, copias] of mazo) {
+      assert.ok(copias <= BALANCE.copiasPorRareza[carta(cid).rareza],
+        `${id}: ${cid} lleva ${copias} y su rareza no lo permite`);
+    }
+    assert.ok(mazo.some(([cid]) => cid === id), `${id} no está en su propio mazo`);
+  }
 });
 
 // --------------------------------------------------------------- contadores
@@ -250,6 +274,51 @@ test('Un aura de inmunidad protege a todo el bando', () => {
   assert.equal(inmuneA(s, compi, INMUNE.CLIMA), true);
   assert.equal(vidaMaxima(s, compi), carta('allosaurus').vida, 'el clima no le llega');
   assert.equal(vidaMaxima(s, ajeno), carta('allosaurus').vida + BALANCE.efectosCampo.canalVida);
+});
+
+test('La guardia resta a cada golpe al hábitat, no al total del turno', () => {
+  const s = tablero();
+  s.turno = BALANCE.turnoPrimerCombate;
+  // Tres rivales sueltos contra ranuras vacías: pegarían su Ataque entero.
+  const uno = poner(s, 'ceratosaurus', 1, 0);
+  const dos = poner(s, 'ceratosaurus', 1, 1);
+  poner(s, 'ceratosaurus', 1, 2);
+  const pega = ataqueEfectivo(s, uno) + ataqueEfectivo(s, dos) + ataqueEfectivo(s, uno);
+
+  const sinGuardia = ejecutar(s, FASE.COMBATE);
+  assert.equal(sinGuardia.jugadores[0].habitat, BALANCE.vidaHabitat - pega);
+
+  // Con el Barosaurus puesto en una ranura que no está enfrente de nadie.
+  poner(s, 'jefe_barosaurus', 0, 4);
+  const conGuardia = ejecutar(s, FASE.COMBATE);
+  assert.equal(conGuardia.jugadores[0].habitat, BALANCE.vidaHabitat - (pega - 3),
+    'un punto menos por CADA uno de los tres, no uno al total');
+});
+
+test('La guardia no puede dejar un golpe en negativo ni curar', () => {
+  const s = tablero();
+  s.turno = BALANCE.turnoPrimerCombate;
+  poner(s, 'jefe_barosaurus', 0, 4);
+  const flojo = poner(s, 'dryosaurus', 1, 0);
+  s.instancias[flojo].modAtaque = -ataqueEfectivo(s, flojo);   // Ataque 0
+  const r = ejecutar(s, FASE.COMBATE);
+  assert.equal(r.jugadores[0].habitat, BALANCE.vidaHabitat, 'ni sube ni baja');
+});
+
+test('El aura del Saurophaganax alcanza a tus terópodos y no a los del rival', () => {
+  const s = tablero();
+  const jefe = poner(s, 'jefe_saurophaganax', 0, 0);
+  const mio = poner(s, 'allosaurus', 0, 1);
+  const suyo = poner(s, 'allosaurus', 1, 1);
+  const herbivoro = poner(s, 'stegosaurus', 0, 2);
+
+  assert.equal(ataqueEfectivo(s, mio), carta('allosaurus').ataque + 1);
+  assert.equal(ataqueEfectivo(s, suyo), carta('allosaurus').ataque);
+  assert.equal(ataqueEfectivo(s, jefe), carta('jefe_saurophaganax').ataque + 1);
+  // El tireóforo cuenta a los suyos, así que su Ataque no es el impreso; lo
+  // que importa es que el aura de terópodos no le sume nada.
+  assert.equal(ataqueEfectivo(s, herbivoro), carta('stegosaurus').ataque + 1,
+    'sólo su propio contador, sin el aura');
 });
 
 // ----------------------------------------------- curación, espinas, búsqueda

@@ -10,7 +10,7 @@
 
 El set tiene **66 cartas distintas**. Un mazo son **50 cartas exactas**, así que no caben todas: el de referencia lleva 30 dinosaurios, 14 eventos, 3 de recurso y 3 de clima.
 
-Fuera del mazo de referencia, y por tanto sin medir aquí: Carroña abundante, Lago efímero, Llanura de inundación, Bosque de coníferas ribereño, Plesiopleurodon wellesi, Ojoraptorsaurus boerei, Dromaeosaurus albertensis, Athenar bermani, Sanjuansaurus gordilloi, Suchomimus tenerensis, Eosinopteryx brevipenna, Troodon formosus, Carnotaurus sastrei, Spinosaurus aegyptiacus, Mosasaurus hoffmannii, Halszkaraptor escuilliei, Tongtianlong limosus, Scanisaurus nazarowi, Monolophosaurus jiangi, Invictarx zephyri, Medusaceratops lokii, Platyceratops tatarinovi, Loricatosaurus priscus, Therizinosaurus cheloniformis, Alaskacephale gangloffi, Titanoceratops ouranos, Atlasaurus imelakei, Stegoceras validum, Maiasaura peeblesorum, Edmontosaurus annectens, Plateosauravus cullingworthi, Gargoyleosaurus parkpinorum, Wendiceratops pinhornensis, Antarctosaurus wichmannianus, Liaoceratops yanzigouensis, Rhinorex condrupus, Bienosaurus lufengensis, Shuangmiaosaurus gilmorei, Chasmosaurus belli. Se juegan igual, pero su calibración no está comprobada.
+Fuera del mazo de referencia, y por tanto sin medir aquí: Carroña abundante, Lago efímero, Crecida estacional, Estación de lluvias, Plesiopleurodon wellesi, Ojoraptorsaurus boerei, Dromaeosaurus albertensis, Athenar bermani, Sanjuansaurus gordilloi, Suchomimus tenerensis, Eosinopteryx brevipenna, Troodon formosus, Carnotaurus sastrei, Spinosaurus aegyptiacus, Mosasaurus hoffmannii, Halszkaraptor escuilliei, Tongtianlong limosus, Scanisaurus nazarowi, Monolophosaurus jiangi, Invictarx zephyri, Medusaceratops lokii, Platyceratops tatarinovi, Loricatosaurus priscus, Therizinosaurus cheloniformis, Alaskacephale gangloffi, Titanoceratops ouranos, Atlasaurus imelakei, Stegoceras validum, Maiasaura peeblesorum, Edmontosaurus annectens, Plateosauravus cullingworthi, Gargoyleosaurus parkpinorum, Wendiceratops pinhornensis, Antarctosaurus wichmannianus, Liaoceratops yanzigouensis, Rhinorex condrupus, Bienosaurus lufengensis, Shuangmiaosaurus gilmorei, Chasmosaurus belli. Se juegan igual, pero su calibración no está comprobada.
 
 **Qué revisar sobre todo:** los eventos de presión y las cartas de recurso.
 Son lo único del set que no describe un animal sino una presión sobre él, y
@@ -660,35 +660,35 @@ ve venir, y eso es parte de su precio. Cuestan 0 y todos traen inconveniente.
 Los cuatro paleoambientes de la Formación Morrison. **Una activa a la vez**;
 cualquiera de los dos bandos puede reemplazarla, y su efecto alcanza a los dos.
 
-### Llanura de inundación · Épica · coste 1
+### Crecida estacional · Épica · coste 1
 
 Mientras esté en el campo, cada jugador puede cambiar una carta de su mano por otra del mazo, una vez por turno.
 
-`ESTABLECIDO` · Las llanuras de inundación de la Morrison concentran la mayor productividad vegetal estacional de la formación.
+`ESTABLECIDO` · La riada estacional desborda el cauce y revuelve el paisaje: lo que había en un sitio aparece en otro.
 
-### Canal fluvial trenzado · Legendaria · coste 1
+### Bruma de valle · Legendaria · coste 1
 
-Agua permanente: +1 de Vida a todos los dinosaurios del campo, y los ribereños pelean a gusto.
++1 de Vida a todos los dinosaurios del campo, mientras siga en el campo.
 
-`ESTABLECIDO` · Los sistemas fluviales trenzados de la formación mantienen agua durante la estación seca, con vegetación ribereña estrecha a ambos lados.
+`ESTABLECIDO` · Niebla de radiación en los fondos de valle al amanecer. Baja el estrés térmico de todo lo que respira, y en un clima estacionalmente seco eso es aguante.
 
-### Bosque de coníferas ribereño · Legendaria · coste 1
+### Estación de lluvias · Legendaria · coste 1
 
 Los saurópodos curan 1 herida al final de cada turno.
 
-`ESTABLECIDO` · Los bosques de coníferas ribereños ofrecen ramoneo alto sostenido, el estrato del que dependen los saurópodos de cuello elevado.
+`ESTABLECIDO` · La estación húmeda rebrota el dosel de coníferas de ribera, al que sólo llegan los cuellos largos: es comida que los demás no alcanzan.
 
-### Deriva árida · Legendaria · coste 1
+### Sequía prolongada · Legendaria · coste 1
 
-Ambos jugadores pierden 5 cartas del mazo
+Ambos jugadores pierden 5 cartas del mazo cada turno.
 
-`INFERIDO` · Los paleosuelos calcáreos, las evaporitas y los depósitos eólicos de la Morrison documentan un clima semiárido y muy estacional que se acentúa hacia el techo de la formación. Que esa deriva mermara las poblaciones es una inferencia razonable, no una medida.
+`INFERIDO` · Las secas del Kimmeridgiense dejaron paleosuelos con nódulos de caliche y acumulaciones de huesos en las charcas que se iban quedando sin agua.
 
-### Sabana de helechos · Común · coste 1
+### Monzón de verano · Común · coste 1
 
 +1 de Biomasa cada turno para los dos jugadores, mientras siga en el campo.
 
-`ESTABLECIDO` · Extensiones abiertas de helechos sobre suelos semiáridos, sin dosel que rompa la línea de visión ni frene un avance.
+`ESTABLECIDO` · La Morrison estaba bajo circulación monzónica: lluvias de verano concentradas que disparaban la productividad vegetal y dejaban el resto del año seco.
 
 ---
 

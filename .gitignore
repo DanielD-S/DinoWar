@@ -19,3 +19,4 @@ node_modules/
 # Originales de las ilustraciones: pesan 29 MB y no hacen falta para jugar.
 # Lo que se sirve es assets/dinos/, que sí va en el repositorio.
 src/dinos/
+__pycache__/

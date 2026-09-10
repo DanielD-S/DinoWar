@@ -898,7 +898,70 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .carta.rareza-RARO, .carta.rareza-EPICO { box-shadow: 0 0 0 1px var(--borde-fuerte); }
 .carta.rareza-LEGENDARIO { box-shadow: 0 0 0 1px var(--bio); }
 .col-carta.rareza-RARO, .col-carta.rareza-EPICO { box-shadow: 0 0 0 1px var(--borde-fuerte); }
-.col-carta.rareza-LEGENDARIO { box-shadow: 0 0 0 1px var(--bio), 0 0 18px rgba(217,164,65,.12); }
+/* ------------------------------------------------ las legendarias se ven
+
+   Doce de las sesenta y seis, y hasta ahora se distinguían por un borde de 1 px
+   que en un móvil no se ve. Dos tratamientos y ninguno toca el layout —todo va
+   en pseudoelementos y en `box-shadow`— porque estas cartas se pintan dentro de
+   rejillas y de una animación de volteo que no admite que nada cambie de
+   tamaño a media reproducción.
+
+   En la COLECCIÓN, un brillo que barre el arte cada seis segundos. Lento a
+   propósito: una rejilla de cuarenta cartas con algo parpadeando es una
+   pantalla que no se puede leer.
+
+   AL JUGARSE, un destello de oro que sale del borde y se apaga. Se engancha a
+   `.aterriza`, que ya existe y que sólo dura lo que dura la entrada. */
+
+/* El sobre reutiliza `.col-arte` para su cara, así que un solo par de
+   selectores cubre la colección y la apertura. */
+.col-carta.rareza-LEGENDARIO .col-arte,
+.sobre-carta.rareza-LEGENDARIO .col-arte { position: relative; overflow: hidden; }
+
+.col-carta.rareza-LEGENDARIO .col-arte::after,
+.sobre-carta.rareza-LEGENDARIO .col-arte::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(105deg,
+    transparent 38%, rgba(244,217,155,.34) 50%, transparent 62%);
+  background-size: 260% 100%;
+  animation: brillo-legendario 6s ease-in-out infinite;
+}
+
+@keyframes brillo-legendario {
+  0%, 72% { background-position: 160% 0; }
+  100%    { background-position: -60% 0; }
+}
+
+/* El aro de la colección, algo más presente que el de antes. */
+.col-carta.rareza-LEGENDARIO {
+  box-shadow: 0 0 0 1px var(--bio), 0 0 18px rgba(217,164,65,.18);
+}
+
+/* Al caer en su ranura. Va como box-shadow del propio elemento y no como
+   pseudoelemento: `.carta` lleva `overflow: hidden` y recortaría un `::after`
+   desbordado, que es justo lo que un halo necesita hacer.
+
+   Se re-declara `aterrizar` al lado porque las dos animaciones comparten
+   propiedad y la segunda declaración habría borrado la primera. Y sin `both` en
+   el destello: si se quedara en su último fotograma la carta arrastraría el
+   halo el resto de la partida. */
+.carta--ranura.rareza-LEGENDARIO.aterriza {
+  animation: aterrizar .26s ease-out both, destello-legendario .62s ease-out;
+}
+
+@keyframes destello-legendario {
+  0%   { box-shadow: 0 0 0 0 rgba(244,217,155,.75), 0 0 22px 6px rgba(217,164,65,.5); }
+  100% { box-shadow: 0 0 0 14px rgba(244,217,155,0), 0 0 0 0 rgba(217,164,65,0); }
+}
+
+/* Quien pide menos movimiento se queda con el oro y sin el barrido: el aro
+   sigue diciendo que es legendaria sin que nada se mueva en bucle. */
+@media (prefers-reduced-motion: reduce) {
+  .col-carta.rareza-LEGENDARIO .col-arte::after,
+  .sobre-carta.rareza-LEGENDARIO .col-arte::after { animation: none; }
+  .carta--ranura.rareza-LEGENDARIO.aterriza { animation: aterrizar .26s ease-out both; }
+}
+
 /* El bando y la marca de paso mandan sobre la rareza: en el tablero importa
    más de quién es la carta y por dónde entra el daño. */
 .carta--ranura.propio { box-shadow: 0 0 0 1px var(--propio-tenue); }

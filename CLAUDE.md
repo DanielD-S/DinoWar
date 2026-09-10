@@ -7,9 +7,10 @@ que se aprende chocándose.
 ## Verificar un cambio
 
 ```bash
-npm test              # 172 tests. Es la verificación canónica.
+npm test              # 176 tests. Es la verificación canónica.
 npm run sim           # 2.000 partidas IA vs IA → BALANCE.md
 node sim/set.js       # regenera SET_DE_CARTAS.md desde el código
+node sim/carta.mjs X  # ¿está rota la carta X? 50 % da igual, 70 % rota
 python -m http.server 8000
 ```
 
@@ -59,7 +60,7 @@ ficheros— así que añadir un import extiende la vigilancia solo.
 Y después de re-anclar hay que **volver a desplegar**: el anclaje en el
 repositorio no mueve nada por sí solo.
 
-## Los cuatro simuladores, y qué NO ve cada uno
+## Los cinco simuladores, y qué NO ve cada uno
 
 Es el error que más veces se ha repetido: cambiar una carta, correr `npm run sim`,
 ver los seis números idénticos y creer que el cambio no hace nada.
@@ -67,9 +68,21 @@ ver los seis números idénticos y creer que el cambio no hace nada.
 | herramienta | qué juega | punto ciego |
 |---|---|---|
 | `npm run sim` | el mazo de REFERENCIA, 27 entradas | las 39 cartas que no están en él. La Llanura se rediseñó dos veces y `BALANCE.md` no se movió un decimal |
+| `node sim/carta.mjs <id>` | el mazo de referencia CON esa carta contra el mismo SIN ella | una carta sola: no dice nada de sinergias entre dos nuevas |
 | `node sim/cobertura.mjs` | mazos aleatorios de todo el set | su ajuste filtra a CRIATURAS: ningún clima ni evento aparece |
 | `node sim/climas.js` | fuerza cada clima al campo | no dice si la carta es buena, sólo qué le hace al juego mientras está puesta |
-| `node sim/entradas.js` | un mazo con las seis de habilidad de entrada | sólo esas seis |
+| `node sim/entradas.js` | un mazo cargado de disparos al entrar | es la COTA, no el balance: el mazo está sesgado a propósito |
+
+**`sim/carta.mjs` es el que responde a «¿esta carta está rota?»**, que es la única
+pregunta que se hace al escribir una carta y la que ninguno de los otros cuatro
+contestaba. Juega el mazo de referencia con la carta contra el mismo mazo sin
+ella, mismas semillas y bandos alternados —el primer jugador gana el 46 %, así
+que sin alternar media diferencia se le cuelga a la carta—. Se lee solo: 50 % da
+igual, 55 % buena, 60 % fuerte, 70 % rota.
+
+Un 50,0 % clavado quiere decir que la carta YA estaba en el mazo de referencia al
+máximo de copias, así que comparó un mazo consigo mismo. No es un empate: es que
+no has medido nada.
 
 Y el aviso que se ganó a pulso: **el ajuste de `cobertura.mjs` mide DESPLIEGUES,
 no victorias.** La IA valora cada unidad multiplicando por los turnos que espera
@@ -119,6 +132,12 @@ valida re-jugándolas. Por lo mismo **ninguno pregunta nada**: el objetivo de
 Tijera sale de una regla fija —el de más Ataque entre los que caben— y no de una
 elección, que en una fase simultánea habría que resolver a ciegas.
 
+La **guardia** —`guardia: { habitat: n }`, hoy sólo el Barosaurus— resta a CADA
+golpe que llegue a tu hábitat, no al total del turno. Está aplicada en las tres
+ramas del combate: la ranura vacía, el sobrevuelo y el sobrante de matar. Son las
+tres formas que tiene un dinosaurio de llegar al hábitat, y cada uno usa una sola
+por turno, así que restar en las tres es restar una vez por atacante.
+
 Tres decisiones que conviene conocer antes de discutirlas:
 
 - **Un contador se cuenta a sí mismo.** Un Troodon solo ya está «en juego», así
@@ -130,6 +149,18 @@ Tres decisiones que conviene conocer antes de discutirlas:
   a ciegas; parar la revelación para preguntar le diría al rival que has buscado
   algo.
 
+## Las dos cartas de jefe viven fuera del set
+
+`CARTAS_DE_JEFE` no está en `CARTAS`, y eso las ha dejado fuera de todas las
+listas por las que ha pasado el proyecto: no salen en `RECOSTE.md` ni en el Excel
+—así que el autor no pudo diseñarlas cuando diseñó las otras cincuenta—, no las
+recorría `test/entradas.test.js`, y sus ilustraciones llevaban meses en la carpeta
+de originales sin publicarse porque se llamaban `Saurophaganax.PNG` en vez de
+`jefe_saurophaganax`. Se quedaron planas y sin texto todo el aplanado.
+
+Son las **únicas dos recompensas del juego cooperativo**. Al tocar cualquier cosa
+que recorra el set, comprobar si hay que sumarles `CARTAS_DE_JEFE`.
+
 ## Las cartas mienten si nadie las vigila
 
 Cuatro veces en dos días el texto de una carta y lo que el motor hace se
@@ -140,6 +171,16 @@ jefe no tenían texto ninguno.
 `test/textos.test.js` lo vigila: si un rasgo lleva número, el texto tiene que
 citarlo, y toda carta con rasgo necesita nombre y texto. No prueba que el texto
 sea CIERTO, pero sí que no se quedó atrás cuando el número cambió.
+
+Y sigue sin poder probar lo que un test no puede probar. Dos que se han cazado a
+mano después:
+
+- **La Deriva árida decía «Ambos jugadores pierden 5 cartas del mazo»** y se lee
+  como una vez. Es CADA TURNO, en la fase de robo, mientras siga en el campo: por
+  eso ganaba el 100 % de las partidas en que se ponía y la extinción llegaba en
+  6,4 turnos. El número era correcto y la frase mentía igual.
+- **El Canal prometía que «los ribereños pelean a gusto»** cuando ya no queda
+  ninguna carta con el rasgo Ribereño: se fue con el aplanado.
 
 ## Windows
 
@@ -156,6 +197,26 @@ Dos cosas que sólo fallan aquí, ya arregladas, por si reaparecen:
   ``import.meta.url === `file://${process.argv[1]}` `` no se cumple nunca,
   porque argv llega con barras invertidas: las herramientas corrían, no escribían
   nada y no se quejaban. Va con `pathToFileURL`.
+
+## Los climas son fenómenos, no paisajes
+
+Las cinco cartas de clima se llamaban «Sabana de helechos», «Llanura de
+inundación», «Canal fluvial trenzado», «Bosque de coníferas ribereño» y «Deriva
+árida»: cuatro paisajes y una tendencia climática, en una ranura que se llama
+clima y que dura unos turnos. Ahora son **Monzón de verano**, **Crecida
+estacional**, **Bruma de valle**, **Estación de lluvias** y **Sequía prolongada**,
+todos fenómenos documentados de la Morrison.
+
+**Los `id` NO cambiaron** —siguen siendo `sabana`, `llanura`, `canal`, `bosque`,
+`aridez`— y tampoco los `RASGO.CAMPO_*` ni las constantes de
+`BALANCE.efectosCampo`. El id es la llave con la que la colección de cada cuenta
+dice qué cartas tiene: renombrarlo obliga a reescribir `coleccion`,
+`catalogo_inicial` y el jsonb de los mazos guardados de todos los jugadores, y no
+cambia nada de lo que se ve. Si algún día se hace, es una migración de datos, no
+un renombrado.
+
+Los cinco nombres viejos quedan libres. Son buenos nombres de bioma y el autor
+quiere reciclarlos como cartas de evento.
 
 ## Una carta son DOS cifras: Ataque y Vida
 
