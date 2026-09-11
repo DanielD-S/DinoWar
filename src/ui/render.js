@@ -2,7 +2,7 @@
 
 import { BALANCE } from '../data/balance.js';
 import {
-  CARTAS, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, RAREZA_NOMBRE, RASGO, ES_DINOSAURIO, carta,
+  CARTAS, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, RAREZA_NOMBRE, RASGO, ES_DINOSAURIO, carta, CARTAS_DE_JEFE,
 } from '../data/cards.js';
 import {
   unidadEn, unidadesDe, ataqueEfectivo, vidaMaxima, vidaActual,
@@ -135,21 +135,42 @@ function marcoCarta(estado, cardId, {
 
   const coste = `<span class="c-coste">${c.coste}</span>`;
   const rareza = `<span class="c-rareza rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span>`;
+  // Dos dígitos en una chapa de 10 px no caben al mismo cuerpo que uno: la
+  // cifra se sale del canto. `ancho` la baja un punto. Sólo cuenta lo que se
+  // ve: el máximo entre <em> va aparte.
+  const ancho = (v) => (String(v).replace(/<em>.*<\/em>/, '').length > 1 ? ' ancho' : '');
+  const stats = dino ? `<div class="c-stats">
+        ${statHTML('a', 'Ataque', atq, clasePoder + ancho(atq))}
+        ${statHTML('v', 'Vida', `${va}${herido ? `<em>/${vm}</em>` : ''}`, (herido ? ' herido' : '') + ancho(va))}
+      </div>` : '';
+
+  // La placa mide lo que mide y el binomial no: «Antarctosaurus wichmannianus»
+  // pide 86 px donde hay 63. `--pal` es la palabra más larga, y carta.css saca
+  // de ahí el cuerpo de letra justo para que entre. La medida vive en el CSS
+  // —unidades de contenedor— porque la placa cambia con el ancho de la carta.
+  const pal = Math.max(...c.binomial.split(/\s+/).map((w) => w.length));
+
+  // La carta con marco dibujado (tablero y mano) lleva tres capas más: el marco
+  // por encima del arte, y las chapas donde caen las cifras y el coste. Y las
+  // cifras salen FUERA de `.c-cuerpo`: van ancladas a la carta, porque las
+  // chapas están en coordenadas de la carta y no de la placa. carta.css
+  // explica la medida. El visor grande sigue con su composición de siempre.
+  const chapas = grande ? '' : `<span class="c-marco"></span><span class="c-chapa c-chapa-b"></span>`
+    + (dino ? '<span class="c-chapa c-chapa-a"></span><span class="c-chapa c-chapa-v"></span>' : '');
 
   return `
+    ${chapas}
     ${grande ? `<div class="c-cab">${coste}${rareza}</div>` : ''}
     <div class="c-arte">${arte(cardId)}</div>
     ${grande ? '' : coste}
     <div class="c-cuerpo">
-      <div class="c-nombre">${c.binomial}</div>
+      <div class="c-nombre" style="--pal:${pal}">${c.binomial}</div>
       ${grande ? `<div class="c-clado">${dino ? CLADO_NOMBRE[c.clado] : TIPO_NOMBRE[c.tipo]}</div>` : ''}
-      ${dino ? `<div class="c-stats">
-        ${statHTML('a', 'Ataque', atq, clasePoder)}
-        ${statHTML('v', 'Vida', `${va}${herido ? `<em>/${vm}</em>` : ''}`, herido ? ' herido' : '')}
-      </div>` : ''}
+      ${grande ? stats : ''}
       ${!dino && !grande ? `<div class="c-tipo">${TIPO_NOMBRE[c.tipo]}</div>` : ''}
       ${grande ? `<div class="c-rasgo"><b>${c.rasgoNombre}</b><p>${c.rasgoTexto}</p></div>` : ''}
     </div>
+    ${grande ? '' : stats}
     ${adaptada ? '<span class="c-adap"></span>' : ''}
     ${mermada ? '<span class="c-merma" title="Bajo una presión rival"></span>' : ''}`;
 }
@@ -162,9 +183,27 @@ function claseFamilia(cardId) {
   return '';
 }
 
-function nodoCarta(estado, cardId, { variante, dueno = null, iid = null, clases = [], datos = {} }) {
+/**
+ * Qué marco dibujado le toca a una carta: familia por tipo, variante por
+ * rareza. RECURSO no tiene familia propia todavía y toma prestada la de
+ * evento; la carta sale marcada con `prestado` para que se vea que es un
+ * préstamo y no un diseño. Las dos de jefe llevan el suyo.
+ */
+const FAMILIA_MARCO = { DINOSAURIO: 'dino', CLIMA: 'clima', EVENTO: 'evento', RECURSO: 'evento' };
+const RAREZA_MARCO = { COMUN: 'comun', RARO: 'rara', EPICO: 'epica', LEGENDARIO: 'legendaria' };
+function claseMarco(cardId) {
+  const c = carta(cardId);
+  if (CARTAS_DE_JEFE[cardId]) return ' m-dino_jefe jefe';
+  const prestado = c.tipo === TIPO.RECURSO ? ' prestado' : '';
+  return ` m-${FAMILIA_MARCO[c.tipo] ?? 'dino'}_${RAREZA_MARCO[c.rareza] ?? 'comun'}${prestado}`;
+}
+
+export function nodoCarta(estado, cardId, { variante, dueno = null, iid = null, clases = [], datos = {} }) {
   const n = document.createElement('div');
-  n.className = `carta carta--${variante}${claseFamilia(cardId)} rareza-${carta(cardId).rareza}`
+  // `con-marco` sólo en tablero y mano: carta.css acota ahí el marco dibujado y
+  // el visor grande conserva su composición.
+  const conMarco = variante === 'ranura' || variante === 'mano' ? ` con-marco${claseMarco(cardId)}` : '';
+  n.className = `carta carta--${variante}${claseFamilia(cardId)} rareza-${carta(cardId).rareza}${conMarco}`
     + `${clases.length ? ' ' + clases.join(' ') : ''}`;
   if (dueno !== null) n.classList.add(dueno === JUGADOR ? 'propio' : 'rival');
   if (iid !== null) n.dataset.iid = iid;

@@ -27,3 +27,7 @@ src/cartas/
 # Originales de las piezas del tablero: 26 MB de PNG de los que se sirven los
 # WebP de assets/piel/. Igual que src/dinos/ con las ilustraciones.
 assets/piel/tablero_componentes/
+
+# Originales de los marcos y chapas de carta: PNG de 26 MB; se sirven los WebP.
+assets/marcos/*.png
+assets/marcos/chapas/*.png
