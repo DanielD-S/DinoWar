@@ -85,7 +85,12 @@
   height: 8px; border-radius: 0;
 }
 .habitat-barra i {
-  background: url('assets/piel/habitat_relleno.webp') left center / auto 100% no-repeat !important;
+  /* `100% 100%`, no `auto 100%`: la pieza es 1000×85 y con `auto` pintaba 94 px
+     fijos a 8 px de alto, así que a 70/70 la barra salía como un muñón al 30 %.
+     El relleno tiene que estirarse al ancho del <i>, que es lo que render.js
+     escribe en porcentaje y style.css anima con `transition: width`: así parte
+     llena y baja poco a poco con cada golpe. */
+  background: url('assets/piel/habitat_relleno.webp') left center / 100% 100% no-repeat !important;
   border-radius: 0;
 }
 /* El rival en frío: la misma pieza girada de tono, para no pedir otra. */
