@@ -1275,6 +1275,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .boton-icono:active { border-color: var(--borde-fuerte); }
 .boton-icono.off { color: var(--tenue-2); }
 
+/* El ancho y alto de aquí son sólo el valor de reserva: `empezarArrastre` los
+   pisa con la medida real de una ranura, que sale del `1fr` de la fila y cambia
+   con la pantalla —83×114 en un 360 px, 100×137 con la app a 430—. Fijos, el
+   fantasma se quedaba pequeño frente al destino encendido. */
 .arrastre {
   position: fixed; z-index: 60; width: 82px; height: 112px; pointer-events: none;
   transform: translate(-50%, -60%) scale(1.06);

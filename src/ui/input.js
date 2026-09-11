@@ -78,6 +78,17 @@ function empezarArrastre(e) {
   gesto.nodo.classList.add('arrastrando');
   el.arrastre.innerHTML = gesto.nodo.innerHTML;
   el.arrastre.className = `arrastre carta ${gesto.nodo.className.replace(/carta--mano|alzada|arrastrando|carta/g, '')}`.trim();
+  // El fantasma mide lo que mide LA RANURA, no la carta de la mano. La ranura
+  // sale del `1fr` de la fila con proporción 82:112, así que en un 360 px es
+  // 83×114 y en la app a 430 px llega a 100×137; con el tamaño fijo del CSS el
+  // fantasma se quedaba pequeño frente al destino encendido y parecía que iba
+  // a caer en otro sitio. Se mide una vez por arrastre, no por píxel.
+  const ranura = el.filas[0]?.querySelector('.ranura');
+  if (ranura) {
+    const r = ranura.getBoundingClientRect();
+    el.arrastre.style.width = `${r.width}px`;
+    el.arrastre.style.height = `${r.height}px`;
+  }
   el.arrastre.classList.remove('oculta');
   moverFantasma(e);
 }
