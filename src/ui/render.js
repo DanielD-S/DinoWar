@@ -120,7 +120,7 @@ export function statHTML(k, nombre, valor, clase = '') {
  */
 function marcoCarta(estado, cardId, {
   poder = null, vidaAct = null, vidaMax = null,
-  adaptada = false, mermada = false, grande = false,
+  adaptada = false, mermada = false, grande = false, marco = false,
 } = {}) {
   const c = carta(cardId);
   const dino = c.tipo === TIPO.DINOSAURIO;
@@ -148,7 +148,20 @@ function marcoCarta(estado, cardId, {
   // pide 86 px donde hay 63. `--pal` es la palabra más larga, y carta.css saca
   // de ahí el cuerpo de letra justo para que entre. La medida vive en el CSS
   // —unidades de contenedor— porque la placa cambia con el ancho de la carta.
-  const pal = Math.max(...c.binomial.split(/\s+/).map((w) => w.length));
+  const palabraMasLarga = (texto) => Math.max(...texto.split(/\s+/).map((w) => w.length));
+  const pal = palabraMasLarga(c.binomial);
+
+  // Con marco dibujado, una criatura reparte su cara como una carta de TCG: el
+  // GÉNERO en la banda de arriba y el nombre de la HABILIDAD en la caja. El
+  // binomial entero no cabe en la banda —son 28 letras en 58 px— y se queda
+  // para el visor, que es donde se lee. Las cartas de soporte no llevan banda:
+  // su nombre y su habilidad son el mismo, así que la caja lleva el nombre.
+  const genero = c.binomial.split(/\s+/)[0];
+  const bandaGenero = marco && dino
+    ? `<div class="c-banda"><span class="c-genero" style="--gen:${genero.length}">${genero}</span></div>` : '';
+  const cuerpoNombre = marco && dino
+    ? `<div class="c-hab" style="--pal:${palabraMasLarga(c.rasgoNombre)}">${c.rasgoNombre}</div>`
+    : `<div class="c-nombre" style="--pal:${pal}">${c.binomial}</div>`;
 
   // La carta con marco dibujado (tablero y mano) lleva tres capas más: el marco
   // por encima del arte, y las chapas donde caen las cifras y el coste. Y las
@@ -163,8 +176,9 @@ function marcoCarta(estado, cardId, {
     ${grande ? `<div class="c-cab">${coste}${rareza}</div>` : ''}
     <div class="c-arte">${arte(cardId)}</div>
     ${grande ? '' : coste}
+    ${bandaGenero}
     <div class="c-cuerpo">
-      <div class="c-nombre" style="--pal:${pal}">${c.binomial}</div>
+      ${cuerpoNombre}
       ${grande ? `<div class="c-clado">${dino ? CLADO_NOMBRE[c.clado] : TIPO_NOMBRE[c.tipo]}</div>` : ''}
       ${grande ? stats : ''}
       ${!dino && !grande ? `<div class="c-tipo">${TIPO_NOMBRE[c.tipo]}</div>` : ''}
@@ -184,18 +198,18 @@ function claseFamilia(cardId) {
 }
 
 /**
- * Qué marco dibujado le toca a una carta: familia por tipo, variante por
- * rareza. RECURSO no tiene familia propia todavía y toma prestada la de
- * evento; la carta sale marcada con `prestado` para que se vea que es un
- * préstamo y no un diseño. Las dos de jefe llevan el suyo.
+ * Qué marco dibujado le toca a una carta. Las criaturas llevan uno por rareza
+ * —lo que cambia es el material, la geometría es la misma— y las dos de jefe
+ * el suyo. Las tres familias de soporte llevan UN marco cada una, sin rareza:
+ * son 16 cartas, y a 83 px la rareza la cuenta mejor la colección.
  */
-const FAMILIA_MARCO = { DINOSAURIO: 'dino', CLIMA: 'clima', EVENTO: 'evento', RECURSO: 'evento' };
 const RAREZA_MARCO = { COMUN: 'comun', RARO: 'rara', EPICO: 'epica', LEGENDARIO: 'legendaria' };
+const FAMILIA_MARCO = { CLIMA: 'clima', EVENTO: 'evento', RECURSO: 'recurso' };
 function claseMarco(cardId) {
   const c = carta(cardId);
   if (CARTAS_DE_JEFE[cardId]) return ' m-dino_jefe jefe';
-  const prestado = c.tipo === TIPO.RECURSO ? ' prestado' : '';
-  return ` m-${FAMILIA_MARCO[c.tipo] ?? 'dino'}_${RAREZA_MARCO[c.rareza] ?? 'comun'}${prestado}`;
+  if (c.tipo === TIPO.DINOSAURIO) return ` m-dino_${RAREZA_MARCO[c.rareza] ?? 'comun'}`;
+  return ` m-${FAMILIA_MARCO[c.tipo] ?? 'evento'}`;
 }
 
 export function nodoCarta(estado, cardId, { variante, dueno = null, iid = null, clases = [], datos = {} }) {
@@ -208,7 +222,7 @@ export function nodoCarta(estado, cardId, { variante, dueno = null, iid = null, 
   if (dueno !== null) n.classList.add(dueno === JUGADOR ? 'propio' : 'rival');
   if (iid !== null) n.dataset.iid = iid;
   n.dataset.card = cardId;
-  n.innerHTML = marcoCarta(estado, cardId, datos);
+  n.innerHTML = marcoCarta(estado, cardId, { ...datos, marco: conMarco !== '' });
   return n;
 }
 
