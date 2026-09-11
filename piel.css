@@ -32,7 +32,22 @@
   content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
   background: radial-gradient(120% 75% at 50% 50%, rgba(25,20,16,.12), rgba(20,16,12,.72) 80%);
 }
-#campo > * { position: relative; z-index: 1; }
+/* Y las piezas del campo por encima del velo. Las cinco ESTRUCTURALES por su
+   nombre, no `#campo > *`: un selector con id gana por especificidad a
+   cualquier `.clase { position: absolute }`, así que `#campo > *` le quitaba
+   el `absolute` al anuncio —el cartel que `animate.js` cuelga del campo para
+   la Mortandad o el clima que se impone— y lo convertía en un hijo flex más.
+   Las dos filas de ranuras reparten lo que sobra, así que encogían para
+   hacerle sitio: el tablero daba un salto hacia arriba, y como el anuncio
+   termina su animación invisible, lo que quedaba era un hueco muerto abajo
+   durante el segundo y pico que tarda en quitarse.
+
+   Nombrarlas una a una deja que cualquier capa que se cuelgue del campo
+   conserve el posicionamiento que ella declare. Un `absolute` con `z-index`
+   ya pinta por encima del velo sin ayuda de esta regla. */
+#campo > .habitat,
+#campo > .fila-ranuras,
+#campo > .franja { position: relative; z-index: 1; }
 
 /* ----------------------------------------------------------------- ranuras
    Piezas dibujadas, no un `border: dashed`. Las tres —vacía, destino y

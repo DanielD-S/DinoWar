@@ -1,3 +1,7 @@
+// Guardianes de lo que sólo se ve en pantalla: el juego funciona, las cifras
+// son correctas, los tests de motor pasan, y lo que está mal es el dibujo.
+//
+// ── 1 ─────────────────────────────────────────────────────────────────────
 // Las clases de PANTALLA no pueden aterrizar en un trozo de texto.
 //
 // `.meta` es la clase de las pantallas de colección, sobres y mazos, y lleva
@@ -46,5 +50,43 @@ test('Los dos topes de cifra usan la misma clase', () => {
   assert.equal(topes.length, 4, 'dos topes de trofeos y dos de hábitat');
   for (const t of topes) {
     assert.ok(t.clases.includes('tope'), `«${t.tag}» debería llevar \`tope\``);
+  }
+});
+
+// ── 2 ─────────────────────────────────────────────────────────────────────
+// Un selector con id gana a cualquier clase, así que `#campo > *` no puede
+// fijar `position`.
+//
+// piel.css levantaba las piezas del campo por encima del velo con
+// `#campo > * { position: relative }`. Esa regla vale (1,0,0) y le ganaba a
+// `.anuncio { position: absolute }`, que vale (0,1,0): el cartel que
+// `animate.js` cuelga del campo —la Mortandad, el clima que se impone— dejaba
+// de estar fuera del flujo y pasaba a ser un hijo flex más. Las dos filas de
+// ranuras reparten lo que sobra, así que encogían para hacerle sitio y el
+// tablero entero daba un salto hacia arriba; y como el anuncio acaba su
+// animación invisible, lo que quedaba a la vista era un hueco muerto abajo
+// durante el segundo y pico que tarda en quitarse.
+//
+// La regla no se puede «desactivar» desde la clase: en CSS no hay forma de
+// pedir que un selector no se aplique. Por eso el arreglo es nombrar las
+// piezas estructurales una a una, y por eso esto es un guardián y no un
+// comentario: la tentación de volver a escribir `> *` es evidente.
+
+const HOJAS = ['style.css', 'piel.css'];
+
+test('Ninguna regla `#id > *` fija `position`, que se la quitaría a las capas', () => {
+  for (const hoja of HOJAS) {
+    // SIN comentarios: la primera versión de este guardián se mordió a sí
+    // misma, porque el comentario que explica el arreglo cita `#campo > *` y
+    // el escaneo lo leyó como si fuera un selector.
+    const css = readFileSync(hoja, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+    // Selector y cuerpo de cada regla de primer nivel.
+    for (const m of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      const selector = m[1].trim();
+      if (!/#[\w-]+\s*>\s*\*/.test(selector)) continue;
+      assert.ok(!/(^|[;\s])position\s*:/.test(m[2]),
+        `«${selector}» fija \`position\` y gana por especificidad a toda clase. `
+        + 'Nombra las piezas que lo necesitan en vez de usar `> *`.');
+    }
   }
 });
