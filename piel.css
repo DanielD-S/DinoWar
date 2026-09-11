@@ -1,0 +1,184 @@
+/* La piel del tablero. Va ENCIMA de style.css y no sustituye nada: sólo pinta.
+
+   La regla que gobierna este fichero: **ninguna de estas reglas puede costar
+   altura**. El presupuesto vertical de una pantalla de 360×640 está medido y
+   repartido —hud 86, campo 377, pie 177— y la carta en juego sale de ahí. Todo
+   lo decorativo va de fondo, de borde o en posición absoluta; nada abre fila.
+
+   Y no se adoptan dos cosas de la maqueta, las dos porque cuestan sitio:
+   - Mazo y descarte como columnas de la fila de ranuras. En el juego ya viven
+     dentro de las barras de hábitat, y ahí se llevarían el 21 % del ancho: la
+     ranura bajaría de 83 a 60 px.
+   - El medallón como banda propia entre los dos bandos: 187 px de 640. Aquí va
+     de fondo del campo, detrás de las ranuras, y sale gratis. */
+
+/* ------------------------------------------------------------------ el campo
+   Piedra repetida y medallón, los dos de fondo. La piedra se apaga EN EL
+   FICHERO: venía con luminancia media 107 y el fondo del juego es 20, así que
+   el tablero salía beige. Se usa en cuatro sitios y apagarla en cada uno con
+   `background-blend-mode` era pedir que algún día se olvide en uno. */
+#campo {
+  background-image:
+    url('assets/piel/simbolo_huella.webp'),
+    url('assets/piel/piedra.webp');
+  background-repeat: no-repeat, repeat;
+  background-position: center center, top left;
+  background-size: auto 58%, 170px auto;
+  position: relative;
+}
+/* El velo va en un pseudoelemento y no en `background-color` porque tiene que
+   quedar POR ENCIMA de las capas de imagen. */
+#campo::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(120% 75% at 50% 50%, rgba(25,20,16,.12), rgba(20,16,12,.72) 80%);
+}
+#campo > * { position: relative; z-index: 1; }
+
+/* ----------------------------------------------------------------- ranuras
+   Piezas dibujadas, no un `border: dashed`. Las tres —vacía, destino y
+   abierta— salen del mismo dibujo y llevan la PROPORCIÓN DE LA CARTA, 0,732.
+
+   Que la lleven costó una tanda entera: la primera vez se pidieron a 83×137,
+   que era el alto de la ranura ANTES de arreglarla, y el modelo además centró
+   el dibujo dejando un 47 % de lienzo transparente. Salió en 0,931.
+
+   Y la ranura necesita el `aspect-ratio` por lo mismo: la fila reparte el alto
+   que sobra, la ranura se lo quedaba entero —83×146— y `.carta--ranura` es
+   `inset: 0`, así que la carta se estiraba a esa caja. Un 29 % de estirón que
+   con un borde punteado no se veía y con un marco dibujado sí. */
+.fila-ranuras { counter-reset: zona; align-items: center; }
+.ranura {
+  counter-increment: zona;
+  /* Sin `margin: auto`: en una rejilla eso encoge el item al contenido y la
+     ranura se quedaba en 36×50. El ancho lo da el `1fr` de la fila, el alto
+     sale de la proporción, y `align-items: center` la centra en lo que sobre. */
+  height: auto; aspect-ratio: 82 / 112; max-height: 100%;
+  border: 0;
+  background: url('assets/piel/ranura_vacia.webp') center / 100% 100% no-repeat;
+}
+/* El carril abierto: enfrente no hay nadie y por aquí entra el daño. Es el
+   único estado encendido del tablero y el que más se mira. */
+.ranura.abierta { background-image: url('assets/piel/ranura_abierta.webp'); }
+/* Y el destino al arrastrar, que significa lo contrario: aquí caería tu carta.
+   Por eso una lleva los cantos laterales al rojo y un canal, y la otra luz
+   uniforme alrededor: a 83 px hay que poder distinguirlas sin pensar. */
+.ranura.destino { background-image: url('assets/piel/ranura_destino.webp'); }
+
+/* El rótulo «ZONA n» sale de un contador de CSS y no del marcado: `render.js`
+   sólo escribe el número en las tuyas, y así no hace falta tocarlo. Es también
+   la razón de que haga falta UNA pieza y no cuatro. */
+.ranura:not(.ocupada) { font-size: 0; flex-direction: column; }
+.ranura:not(.ocupada)::before {
+  content: 'ZONA ' counter(zona);
+  font-size: 8px; letter-spacing: .13em; color: rgba(217,164,65,.5); font-weight: 500;
+}
+.ranura:not(.ocupada)::after {
+  content: ''; width: 14px; height: 1px; margin-top: 4px; background: rgba(217,164,65,.28);
+}
+
+/* -------------------------------------------------------------- el hábitat
+   Canal y relleno, dos piezas que repiten en horizontal porque la barra crece
+   con la pantalla. El relleno se recorta con el ancho, que es lo que ya hace
+   `render.js` moviendo `width`. */
+.habitat-barra {
+  background: url('assets/piel/habitat_canal.webp') center / 100% 100% no-repeat;
+  height: 8px; border-radius: 0;
+}
+.habitat-barra i {
+  background: url('assets/piel/habitat_relleno.webp') left center / auto 100% no-repeat !important;
+  border-radius: 0;
+}
+/* El rival en frío: la misma pieza girada de tono, para no pedir otra. */
+.habitat.rival .habitat-barra i { filter: hue-rotate(-28deg) saturate(1.25); }
+
+/* La pila de mazo. Es el objeto MÁS animado del tablero —`enMazo` es el gesto
+   que más usa el guión, seis veces: moler, buscar, reciclar, quedarse sin
+   robar— y hasta ahora eran dos rectángulos de CSS. */
+.pila::before { display: none; }
+.pila b {
+  width: 100%; height: 100%; left: 0; top: 0;
+  background: url('assets/piel/mazo.webp') center / contain no-repeat;
+  box-shadow: none !important; color: var(--texto);
+  text-shadow: 0 1px 2px #000, 0 0 4px #000;
+  font-size: 9px;
+}
+
+/* -------------------------------------------------------------------- clima
+   La tira dibujada a 12,5:1 —la franja es 348×26, 13:1—, sin texto. La primera
+   pieza era 3:1 y llegaba aplastada 4,5 veces con el rótulo chafado; a 26 px
+   de alto no cabe ningún texto dibujado, así que «Clima» lo sigue escribiendo
+   el CSS en una línea, y el nombre de la carta puesta también. */
+.franja {
+  border: 0; box-shadow: none;
+  background: url('assets/piel/clima.webp') center / 100% 100% no-repeat;
+}
+.franja-campo:empty { border: 0; min-height: 18px; flex: 1; }
+
+/* ------------------------------------------------------------- hud y pie */
+#hud, #pie {
+  background:
+    linear-gradient(180deg, rgba(28,21,14,.92), rgba(15,11,8,.92)),
+    url('assets/piel/piedra.webp') top left / 170px auto repeat;
+  border-color: rgba(217,164,65,.3);
+}
+#hud { box-shadow: inset 0 -1px 0 rgba(217,164,65,.14); }
+#pie { box-shadow: inset 0 1px 0 rgba(217,164,65,.14); }
+
+/* Las dos cintas de bando. La pieza trae el medallón del avatar a la izquierda
+   y la placa vacía a la derecha, SIN texto: el nombre y la FASE los escribe el
+   juego, y la fase —Despliegue, Combate, Descarte— no cabría en un rótulo
+   dibujado. Ésa es la razón de pedirla sin rotular. */
+.hud-bando {
+  background: url('assets/piel/cinta_bando.webp') left center / auto 100% no-repeat;
+  /* Sin `min-height`: con 24 px el HUD crecía 11 y la mano bajaba de 112 a 94.
+     La cinta se escala al alto natural de la fila, 18 px, y no cuesta nada. */
+  padding-left: 26px;
+}
+
+/* ----------------------------------------------------------- los iconos
+   Los cuatro del panel de estadísticas, sacados con alfa. El panel entero no
+   sirve: es 5:1 y la fila del HUD mide 18 px, así que sus cajas quedarían en
+   ~11 px y ningún número cabría. Los iconos sí caben a 14 px, y sustituyen al
+   rótulo de texto de cada recurso. Van por orden en el marcado —trof, bio,
+   mano— porque los <i> no llevan clase. */
+/* 12 px y `vertical-align: middle`: con 14 y un desplazamiento negativo la
+   caja de línea crecía y el HUD pasaba de 86 a 105 px. La fila mide 18 y el
+   icono tiene que vivir dentro. */
+.rec i {
+  display: inline-block; width: 12px; height: 12px; font-size: 0;
+  vertical-align: middle; margin: -2px 0 0 2px;
+  background: center / contain no-repeat;
+}
+.hud-recs, .rec { line-height: 18px; }
+.rec:nth-child(1) i { background-image: url('assets/piel/ico_trofeo.webp'); }
+.rec:nth-child(2) i { background-image: url('assets/piel/ico_biomasa.webp'); }
+.rec:nth-child(3) i { background-image: url('assets/piel/ico_mano.webp'); }
+/* El corazón, junto a la cifra de hábitat, que vive en la barra del campo. */
+.habitat-num::before {
+  content: ''; display: inline-block; width: 12px; height: 12px;
+  vertical-align: middle; margin: -2px 3px 0 0;
+  background: url('assets/piel/ico_vida.webp') center / contain no-repeat;
+}
+
+/* --------------------------------------------------------------- la mano
+   Recuadro con `outline` y no con `border`: un borde sumaría 2 px al alto de
+   la fila, y esos 2 px salen de la carta. */
+#mano { outline: 1px dashed rgba(217,164,65,.22); outline-offset: 2px; border-radius: 6px; }
+
+/* -------------------------------------------------------------- el botón
+   Mantiene los 44 px de alto: es el mínimo táctil y no se negocia. */
+#btn-listo {
+  background: linear-gradient(180deg, #d9a441, #a4761f);
+  color: #241a08; font-weight: 600; letter-spacing: .06em;
+  box-shadow: inset 0 1px 0 rgba(255,240,200,.5), 0 1px 3px rgba(0,0,0,.6);
+  border-radius: 7px;
+}
+#btn-listo:disabled {
+  background: linear-gradient(180deg, #3a2f22, #241c15);
+  color: var(--tenue); box-shadow: none;
+}
+
+/* Aquí iba un «canto» de oro arriba y abajo. Se quitó: lo que se había
+   recortado de la maqueta era su BARRA DE ESTADO —con el texto «RIVAL» y las
+   fichas de biomasa y trofeos— aplastada a 14 px encima del HUD, que por eso
+   dejaba de verse. Si algún día se quiere un canto, hay que dibujarlo aparte. */

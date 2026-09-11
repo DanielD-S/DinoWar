@@ -23,3 +23,7 @@ __pycache__/
 
 # Originales de las cartas enteras: mismo motivo que src/dinos/.
 src/cartas/
+
+# Originales de las piezas del tablero: 26 MB de PNG de los que se sirven los
+# WebP de assets/piel/. Igual que src/dinos/ con las ilustraciones.
+assets/piel/tablero_componentes/
