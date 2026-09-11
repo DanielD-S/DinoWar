@@ -598,7 +598,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hud-recs { display: flex; gap: 12px; }
 .rec { display: flex; align-items: baseline; gap: 3px; white-space: nowrap; }
 .rec b { font-size: 13px; font-weight: 500; }
-.rec .meta { font-size: 10px; color: var(--tenue-2); margin-left: -2px; }
+/* `tope` y no `meta`: `.meta` es la clase de las pantallas de colección,
+   sobres y mazos, y lleva `background: var(--fondo)`. Puesta en este trocito
+   de texto pintaba un rectángulo opaco detrás del «/10», justo encima del
+   cuero de la cinta. Es la misma clase que el tope del hábitat, que hace lo
+   mismo con el «/70». */
+.rec .tope { font-size: 10px; color: var(--tenue-2); margin-left: -2px; }
 .rec i { font-style: normal; font-size: 11px; color: var(--tenue); }
 
 /* El turno y los dos relojes, centrados entre las dos filas y con su propio
