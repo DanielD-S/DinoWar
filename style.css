@@ -601,27 +601,44 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .rec .meta { font-size: 10px; color: var(--tenue-2); margin-left: -2px; }
 .rec i { font-style: normal; font-size: 11px; color: var(--tenue); }
 
-/* El turno y el reloj, centrados entre las dos filas y con su propio filete:
-   es la línea que separa un bando del otro. */
+/* El turno y los dos relojes, centrados entre las dos filas y con su propio
+   filete: es la línea que separa un bando del otro. Los relojes FLANQUEAN el
+   turno —el del rival a la izquierda, el tuyo a la derecha— en vez de ir cada
+   uno en su cinta: dentro de la cinta competían con el medallón, el nombre y
+   las tres cifras de recursos, y lo que hay que comparar de un vistazo son los
+   dos relojes entre sí, no cada reloj con su propia biomasa. Puestos a los
+   lados del mismo rótulo, se leen como el marcador de un ajedrez. */
+/* Rejilla de tres columnas y no un flex centrado: las dos de los lados son
+   `1fr`, así que miden lo mismo pase lo que pase y el turno queda clavado en
+   el centro de la fila. Con `justify-content: center` no lo estaba: los
+   minutos no llevan cero delante, y en cuanto un bando bajaba de diez minutos
+   su reloj perdía un carácter y el rótulo se corría 4 px. Cada reloj se pega
+   al centro dentro de su columna, así que el hueco hasta el turno tampoco
+   cambia; lo que baila es el borde de fuera, que no lo mira nadie. */
 .hud-centro {
-  display: flex; align-items: center; justify-content: center; gap: 9px;
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 9px;
   padding: 5px 0; border-top: 1px solid var(--superficie-2); border-bottom: 1px solid var(--superficie-2);
 }
+.reloj-rival { justify-self: end; }
+.reloj-propio { justify-self: start; }
 #turno { font-size: 12px; color: var(--texto-2); white-space: nowrap; }
 
-/* Un reloj por bando, en su propia fila del marcador. Cifra tabular para que
-   no baile al pasar de 10:00 a 9:59, y apagado mientras no le toca: casi toda
-   la partida es información de fondo. */
+/* Un reloj por bando. Cifra tabular para que no baile al pasar de 10:00 a
+   9:59, y apagado mientras no le toca: casi toda la partida es información de
+   fondo. Que el turno siga centrado cuando los dos relojes miden distinto lo
+   resuelve la rejilla de arriba, no un ancho fijo aquí. */
 .reloj {
   font-variant-numeric: tabular-nums; font-size: 11.5px; letter-spacing: .02em;
   color: var(--tenue-2); padding: 1px 7px; border-radius: 10px;
-  box-shadow: 0 0 0 1px var(--linea); margin-right: auto; margin-left: 10px;
+  box-shadow: 0 0 0 1px var(--linea);
 }
 /* El que corre es el que hay que mirar: se enciende y marca de quién es el
-   tiempo. Sin esto, dos cifras iguales no dicen quién está pensando. */
+   tiempo. Sin esto, dos cifras iguales no dicen quién está pensando. El bando
+   sale de una clase del propio reloj y no del ancestro: ya no cuelgan de
+   `.hud-bando`. */
 .reloj.corre { color: var(--texto); box-shadow: 0 0 0 1px var(--borde-fuerte); }
-.hud-bando.rival .reloj.corre { color: var(--rival); box-shadow: 0 0 0 1px var(--rival); }
-.hud-bando.propio .reloj.corre { color: var(--acento-claro); box-shadow: 0 0 0 1px var(--bio); }
+.reloj-rival.corre { color: var(--rival); box-shadow: 0 0 0 1px var(--rival); }
+.reloj-propio.corre { color: var(--acento-claro); box-shadow: 0 0 0 1px var(--bio); }
 .reloj.apremia {
   color: var(--peligro); box-shadow: 0 0 0 1px var(--peligro);
 }
