@@ -176,7 +176,7 @@
    `.rec` es flex, así que basta con `order`. Y el «/10» del tope recupera su
    hueco: con el rótulo de texto detrás, el margen negativo lo pegaba al 0. */
 .rec i { order: -1; margin: -2px 3px 0 0; }
-.rec .meta { margin-left: 0; }
+.rec .tope { margin-left: 0; }
 .rec:nth-child(1) i { background-image: url('assets/piel/ico_trofeo.webp'); }
 .rec:nth-child(2) i { background-image: url('assets/piel/ico_biomasa.webp'); }
 .rec:nth-child(3) i { background-image: url('assets/piel/ico_mano.webp'); }
