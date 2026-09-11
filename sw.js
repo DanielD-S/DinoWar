@@ -17,9 +17,9 @@
 //
 // Al cambiar cualquier fichero servido hay que subir VERSION: activa la limpieza
 // de las cachés anteriores.
-const VERSION = 'dinowar-v31';
+const VERSION = 'dinowar-v32';
 const ESENCIALES = [
-  './', './index.html', './style.css', './manifest.json', './src/main.js',
+  './', './index.html', './style.css', './piel.css', './manifest.json', './src/main.js',
   './assets/fuentes/inter-latin.woff2',
 ];
 
