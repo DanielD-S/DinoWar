@@ -12,22 +12,17 @@
 @font-face { font-family: 'Libre Baskerville'; font-weight: 400; font-display: swap;
   src: url('assets/fuentes/libre-baskerville-400-latin.woff2') format('woff2'); }
 
-/* Un marco por tipo y rareza. RECURSO no tiene familia propia todavía y usa la
-   de evento: `nodoCarta()` marca esas cartas con `prestado`. */
-.m-clima_comun { --marco: url('assets/marcos/clima_comun.webp'); }
-.m-clima_epica { --marco: url('assets/marcos/clima_epica.webp'); }
-.m-clima_legendaria { --marco: url('assets/marcos/clima_legendaria.webp'); }
-.m-clima_rara { --marco: url('assets/marcos/clima_rara.webp'); }
+/* Un marco por familia y, en las criaturas, por rareza. Las tres familias de
+   soporte llevan uno solo cada una: son 16 cartas y a 83 px la rareza la cuenta
+   mejor la colección. Las clases las emite `claseMarco()` en render.js. */
 .m-dino_comun { --marco: url('assets/marcos/dino_comun.webp'); }
-.m-dino_epica { --marco: url('assets/marcos/dino_epica.webp'); }
-.m-dino_fullart { --marco: url('assets/marcos/dino_fullart.webp'); }
-.m-dino_jefe { --marco: url('assets/marcos/dino_jefe.webp'); }
-.m-dino_legendaria { --marco: url('assets/marcos/dino_legendaria.webp'); }
 .m-dino_rara { --marco: url('assets/marcos/dino_rara.webp'); }
-.m-evento_comun { --marco: url('assets/marcos/evento_comun.webp'); }
-.m-evento_epica { --marco: url('assets/marcos/evento_epica.webp'); }
-.m-evento_legendaria { --marco: url('assets/marcos/evento_legendaria.webp'); }
-.m-evento_rara { --marco: url('assets/marcos/evento_rara.webp'); }
+.m-dino_epica { --marco: url('assets/marcos/dino_epica.webp'); }
+.m-dino_legendaria { --marco: url('assets/marcos/dino_legendaria.webp'); }
+.m-dino_jefe { --marco: url('assets/marcos/dino_jefe.webp'); }
+.m-clima { --marco: url('assets/marcos/clima.webp'); }
+.m-evento { --marco: url('assets/marcos/evento.webp'); }
+.m-recurso { --marco: url('assets/marcos/recurso.webp'); }
 
 :root {
   --chapa-ataque: url('assets/marcos/chapas/ataque.webp');
@@ -40,30 +35,33 @@
 
 /* La carta con marco dibujado.
 
-   La geometría NO la decide esta hoja: la decide el PNG. Cada familia de marcos
-   trae la suya, medida con `marcos.py` sobre los ficheros de verdad, nunca
-   estimada. Las cuatro rarezas de una misma familia coinciden entre sí dentro
-   de tres décimas —son ediciones de la misma pieza— así que basta un juego de
-   números por familia y no uno por marco.
+   La geometría NO la decide esta hoja: la decide el PNG. Se mide con
+   `python tools/marcos.py` sobre los ficheros de verdad, nunca se estima, y los
+   números se copian aquí. Las cinco de dinosaurio —cuatro rarezas y el jefe—
+   coinciden entre sí dentro de cuatro décimas, así que basta un juego de
+   números para la familia; las tres de soporte comparten otro.
 
-   Si se regenera un marco, se vuelve a medir y se copian los números aquí. No
-   hay más acoplamiento que ese.
+   Una criatura reparte su cara en cinco huecos: el anillo del coste arriba a la
+   izquierda, la BANDA del nombre a su derecha, la VENTANA de la ilustración, la
+   CAJA de la habilidad y las dos chapas del pie. Es la anatomía de una carta de
+   TCG, y se llegó a ella después de medir que el binomial entero no cabe en
+   ninguna banda de una línea: 28 letras en 58 px. Por eso la banda lleva sólo
+   el GÉNERO y el binomial se lee en el visor.
 
-   Las proporciones del dibujo (0,656 a 0,681) no son la de la carta (0,732), y
-   el marco se estira a lo ancho entre un 7 y un 12 %. Se nota sólo en las
-   piezas redondas y sólo en el visor: en el tablero el disco de coste mide
-   9 px y el estirón es medio píxel. */
+   Las de soporte no llevan banda ni chapas: su nombre y su habilidad son el
+   mismo, así que la caja lleva el nombre, y la ventana sube hasta el borde con
+   el anillo del coste montado en la esquina. */
 
 .carta.con-marco {
-  /* --- familia DINOSAURIO, que es también la de reserva --- */
-  --ven-x0: 7.2%;  --ven-x1: 7.0%;  --ven-y0: 6.0%;  --ven-alto: 49.4%;
-  --pla-x0: 7.2%;  --pla-x1: 6.8%;  --pla-y0: 63.2%; --pla-y1: 5.6%;
-  --cos-cx: 12.95%; --cos-cy: 9.15%;
-  --bio-an: 24.49%; --bio-al: 16.56%; --bio-x: 12.63%; --bio-y: 9.41%;
+  /* --- familia DINOSAURIO --- */
+  --ban-x0: 23.2%; --ban-x1: 7.8%;  --ban-y0: 7.0%;  --ban-al: 6.8%;
+  --ven-x0: 10.0%; --ven-x1: 10.1%; --ven-y0: 16.7%; --ven-alto: 37.7%;
+  --pla-x0: 10.2%; --pla-x1: 10.2%; --pla-y0: 57.9%; --pla-y1: 19.3%;
+  --cos-cx: 13.87%; --cos-cy: 10.03%;
   /* Las dos chapas de cifras: círculo a la izquierda, triángulo a la derecha.
-     El `lleno` medido lo confirma —0,78 es un círculo (π/4) y 0,65 un triángulo—
+     El `lleno` medido lo confirma —0,78 es un círculo (π/4) y 0,64 un triángulo—
      y por eso se distinguen de un vistazo sin necesidad de símbolo dentro. */
-  --atq-x: 35.65%; --atq-y: 92.70%;  --vid-x: 64.45%; --vid-y: 92.35%;
+  --atq-x: 34.96%; --atq-y: 87.11%;  --vid-x: 65.04%; --vid-y: 87.4%;
 
   background: #14100c;
   /* Sin aro de CSS: el canto lo trae dibujado el marco, y la rareza también. */
@@ -73,30 +71,10 @@
 /* El especular ya viene pintado en el PNG; el de CSS encima lo emborronaba. */
 .carta.con-marco::before { background: none; }
 
-/* Clima y evento no tienen Ataque ni Vida, así que sus marcos no traen chapas.
-   Su ventana es bastante más pequeña que la de dinosaurio —la de clima se queda
-   en 79 % de ancho contra 86 %— pero son 13 cartas de 66 y ninguna lleva
-   ilustración todavía: hoy salen con la silueta SVG. */
-.carta.con-marco.clima {
-  --ven-x0: 10.6%; --ven-x1: 10.5%; --ven-y0: 10.4%; --ven-alto: 40.9%;
-  --pla-x0: 6.0%;  --pla-x1: 6.0%;  --pla-y0: 60.1%; --pla-y1: 8.7%;
-  --cos-cx: 13.20%; --cos-cy: 9.40%;
-  --bio-an: 31.85%; --bio-al: 20.74%; --bio-x: 12.79%; --bio-y: 9.73%;
-}
-.carta.con-marco.evento, .carta.recurso {
-  --ven-x0: 8.6%;  --ven-x1: 8.3%;  --ven-y0: 9.7%;  --ven-alto: 45.9%;
-  --pla-x0: 7.1%;  --pla-x1: 7.0%;  --pla-y0: 62.7%; --pla-y1: 8.5%;
-  --cos-cx: 14.80%; --cos-cy: 9.30%;
-  --bio-an: 31.85%; --bio-al: 20.74%; --bio-x: 14.39%; --bio-y: 9.63%;
-}
-/* El full art: la ventana se come tres cuartos de la carta y la placa se queda
-   en una banda de 14 % al pie. */
-.carta.con-marco.fullart {
-  --ven-x0: 3.7%;  --ven-x1: 3.1%;  --ven-y0: 4.8%;  --ven-alto: 74.2%;
-  --pla-x0: 7.2%;  --pla-x1: 7.2%;  --pla-y0: 80.5%; --pla-y1: 5.3%;
-  --cos-cx: 12.35%; --cos-cy: 8.55%;
-  --bio-an: 25.86%; --bio-al: 16.89%; --bio-x: 12.01%; --bio-y: 8.82%;
-  --atq-x: 35.00%; --atq-y: 93.70%;  --vid-x: 63.80%; --vid-y: 93.50%;
+/* --- familia SOPORTE: clima, evento y recurso --- */
+.carta.con-marco.no-dino {
+  --ven-x0: 10.3%; --ven-x1: 9.9%;  --ven-y0: 7.0%;  --ven-alto: 47.4%;
+  --pla-x0: 10.2%; --pla-x1: 10.2%; --pla-y0: 57.2%; --pla-y1: 16.7%;
 }
 
 .con-marco .c-marco {
@@ -123,45 +101,48 @@
   width: auto; height: auto; z-index: 4; border: none; background: none;
   color: #f4d99b; font-weight: 600; font-size: 8px;
 }
-.carta--mano .c-coste, .tira.grande .c-coste { font-size: 11px; }
+.carta--mano .c-coste { font-size: 11px; }
 
-/* ---------------------------------------------------------------- la placa
-   Sólo el nombre y, en las cartas que no son criatura, el tipo. Las cifras ya
-   no viven aquí: tienen sus dos chapas al pie. */
+/* ---------------------------------------------------------------- la banda
+   El género, en una línea. La banda mide el 6,8 % del alto de la carta —7,7 px
+   en el tablero, 7 en la mano— y el cuerpo de letra sale de ahí: la banda es un
+   contenedor y su alto es siempre el 13,5 % de su ancho, porque los dos son
+   proporciones fijas del marco. 11 cqi es el 82 % de ese alto. El segundo
+   término baja el cuerpo si el género es largo y no entra: Cinzel en
+   versalitas gasta hasta 0,68 em por letra —Antarctosaurus, de mayúsculas anchas,
+   es el que lo marca— y los dos géneros más largos se quedan en 6 px. */
+.con-marco .c-banda {
+  position: absolute; z-index: 4; pointer-events: none;
+  left: var(--ban-x0); right: var(--ban-x1); top: var(--ban-y0); height: var(--ban-al);
+  display: flex; align-items: center; justify-content: center;
+  container-type: inline-size;
+}
+.con-marco .c-genero {
+  color: #f4ece0; white-space: nowrap; line-height: 1;
+  font-size: min(11cqi, calc(100cqi / (0.68 * var(--gen, 10))));
+}
+
+/* ---------------------------------------------------------------- la caja
+   En una criatura, el nombre de la habilidad; en una carta de soporte, el
+   nombre de la carta, que es la misma cosa. Las cifras no viven aquí: tienen
+   sus dos chapas al pie. */
 .con-marco .c-cuerpo {
   position: absolute; left: var(--pla-x0); right: var(--pla-x1);
   top: var(--pla-y0); bottom: var(--pla-y1);
   z-index: 3; padding: 3% 5% 0;
   container-type: inline-size;
+  display: flex; flex-direction: column; justify-content: center;
 }
-/* El cuerpo del nombre sale de la palabra más larga (`--pal`, la pone
-   `marcoCarta()`): Cinzel en versalitas gasta unos 0,69 em por letra con su
-   espaciado, y el nombre dispone del 90 % de la placa (el resto es el relleno).
-   Así «Allosaurus» sigue a 9,2 px y «Therizinosaurus» baja hasta lo que quepa,
-   en vez de salirse por la derecha. Medido en el banco: 15 letras pedían 87 px
-   en 57. */
-.con-marco .c-nombre {
-  color: #f4ece0;
+.con-marco .c-nombre { color: #f4ece0; }
+.con-marco .c-hab {
+  color: #f4d99b; text-align: center;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
 }
-/* (la regla del cuerpo de letra está más abajo, con las demás de tipografía:
-   una anterior a ésa la pisaría) */
-
-/* --------------------------------------------------- la opción A ya no aplica
-   Se decidió esconder el nombre en el tablero porque no cabía: la placa daba
-   55×27 px y el binomial en dos líneas se salía, porque compartía sitio con las
-   cifras. Al mudarse las cifras a sus chapas, la placa se quedó entera para el
-   nombre, y ahora entra: 20,7 px de las 27 que hay. Medido, no supuesto.
-
-   Así que el nombre vuelve al tablero. Si algún día estorba, esconderlo otra
-   vez es una línea:
-       .carta--ranura .c-nombre { display: none; } */
 
 /* ------------------------------------------------------- cifras en su chapa
    Van sobre las chapas, en coordenadas de la CARTA. Y para eso `.c-stats` tiene
    que colgar de `.carta`, NO de `.c-cuerpo`: un `inset: 0` dentro de la placa
-   se resuelve contra la placa, y las cifras salían tres puntos adentro. Es un
-   cambio de una línea en `marcoCarta()` — sacar `.c-stats` fuera del cuerpo—
-   y evita rehacer la aritmética en cada familia de marcos. */
+   se resuelve contra la placa, y las cifras salían tres puntos adentro. */
 .con-marco .c-stats {
   position: absolute; inset: 0; margin: 0; display: block; gap: 0;
   z-index: 4; pointer-events: none;
@@ -176,12 +157,6 @@
    —círculo contra triángulo— ya distingue una cifra de la otra mejor de lo que
    lo haría un glifo de 4 px. */
 .con-marco .c-stats .st i { display: none; }
-/* Un rebaje oscuro bajo la cifra, apagado antes del borde para que el canto de
-   latón de la chapa siga viéndose entero. */
-.con-marco .c-stats .st::before {
-  content: ''; position: absolute; inset: -55% -70%; border-radius: 50%;
-  background: radial-gradient(circle, rgba(8,6,3,.9) 44%, rgba(8,6,3,0) 76%);
-}
 .con-marco .c-stats .st b { position: relative; font-variant-numeric: tabular-nums; }
 .con-marco .c-stats .st.ancho b { font-size: 82%; letter-spacing: -.04em; }
 .con-marco .st-a b { color: #f7e9c8; }
@@ -195,21 +170,19 @@
    donde hay sitio, se queda. */
 .carta--ranura .st-v b em { display: none; }
 
-/* La rareza ya no la pone el CSS: la trae el material del marco, un fichero por
-   rareza y familia. La medalla teñida que había aquí sobraba y se quitó. */
-
 /* =============================================================== las chapas
    Piezas sueltas que se posan sobre los huecos que el marco dejó. Van encima
    del marco y debajo de la cifra: z-index 3 contra el 4 del número.
 
    El encaje no se ajustó a ojo. De cada chapa se midió su CAMPO interior —el
    hueco oscuro que el aro encierra— y se calculó el tamaño que hace que ese
-   campo caiga justo en el hueco del marco:
+   campo caiga justo en el hueco del marco. Con el juego de marcos actual los
+   huecos son algo mayores que con el primero y la chapa se escala con ellos:
 
-       chapa     campo         hueco del marco   chapa completa
-       Ataque    73,5 × 75,1   9,3 × 6,4         12,65 × 8,52
-       Vida      72,2 × 65,4  10,5 × 6,1         14,53 × 9,33
-       Biomasa   58,4 × 59,8  14,3 × 9,9         24,50 × 16,55
+       chapa     campo (% de la chapa)   hueco del marco   chapa completa
+       Ataque    73,5 × 75,1             12,1 × 8,1        16,5 × 10,7
+       Vida      72,2 × 65,4             12,9 × 7,3        17,8 × 11,2
+       Biomasa   58,4 × 59,8             11,3 × 7,6        19,4 × 12,6
 
    El centro de masa del campo, no el de su rectángulo: en el triángulo de la
    Vida cae al 59,8 % de alto, y una cifra centrada en la caja se vería
@@ -219,9 +192,9 @@
    distinto en cada eje, y una chapa circular sobre un hueco ya elíptico se
    notaría. */
 .carta.con-marco {
-  --ataque-an: 12.65%; --ataque-al: 8.52%; --ataque-x: 35.71%; --ataque-y: 92.95%;
-  --vida-an: 14.53%;   --vida-al: 9.33%;   --vida-x: 64.49%;   --vida-y: 91.43%;
-  --bio-an: 24.50%;    --bio-al: 16.55%;   --bio-x: 12.64%;    --bio-y: 9.42%;
+  --ataque-an: 16.5%; --ataque-al: 10.7%; --ataque-x: 34.96%; --ataque-y: 87.11%;
+  --vida-an: 17.8%;   --vida-al: 11.2%;   --vida-x: 65.04%;   --vida-y: 85.7%;
+  --bio-an: 19.4%;    --bio-al: 12.6%;    --bio-x: 13.87%;    --bio-y: 10.03%;
 }
 
 .con-marco .c-chapa {
@@ -251,11 +224,6 @@
 .carta.con-marco.atq-bajo .c-chapa-a { background-image: var(--chapa-ataque_mermado); }
 .carta.con-marco.vid-herida .c-chapa-v { background-image: var(--chapa-vida_herida); }
 
-/* Con chapa propia, el rebaje oscuro de debajo de la cifra sobra: el campo de
-   la chapa ya es oscuro y plano, que es justo para lo que se pidió. */
-.con-marco .c-stats .st { z-index: 4; }
-.con-marco .c-stats .st::before { display: none; }
-
 /* Las cartas que no son criatura no tienen chapas de cifras, pero sí la de
    Biomasa: todas cuestan. */
 .carta.con-marco.no-dino .c-chapa-a, .carta.no-dino .c-chapa-v { display: none; }
@@ -264,27 +232,13 @@
    10,12 px por línea: la caja de dos líneas redondea a 20 y el contenido a 21,
    y esa diferencia de un píxel se ve como un trazo comido abajo. Con un entero
    la caja y el contenido caen en el mismo sitio. */
-.con-marco .c-nombre { line-height: 10px; }
+.con-marco .c-nombre, .con-marco .c-hab { line-height: 10px; }
 
 /* El rótulo de tipo sobra en la cara de la carta. Ocupaba un renglón de la
    placa y dejaba al nombre sin sitio —«Mortandad estacional» pedía 22 px y
    tenía 16—, y lo que decía ya lo dice el material del marco: cada familia
    tiene el suyo. Sigue estando en la ficha y en el visor, donde hay espacio. */
 .carta.con-marco.no-dino .c-tipo { display: none; }
-
-/* El full art deja una placa de 14 % —unos 16 px en el tablero— y el binomial
-   a dos líneas pide 22. Aquí va a una sola línea y algo menor: es la carta
-   donde manda la ilustración, y el nombre completo está en el visor.
-
-   Cabe entero a 7 px, pero es pequeño y está al límite. **Si el full art va a
-   quedarse, ese marco pide regenerarse con la banda del pie más alta** — un
-   20 % en vez de un 14 % daría sitio de sobra. Eso no se arregla desde el CSS. */
-.carta.con-marco.fullart .c-nombre { font-size: 7px; }
-.con-marco .tira.grande .fullart .c-nombre { font-size: 7px; }
-
-/* Y el píxel de más de las caras de ojo grande —Alegreya, Vollkorn—: su caja de
-   línea redondea hacia arriba y se comía el trazo inferior. */
-.con-marco .t-alegreya .c-nombre, .t-vollkorn .c-nombre { line-height: 10px; }
 
 /* ========================================================== la tipografía
    Elegida: Cinzel para todo lo que es rótulo o cifra, Libre Baskerville para
@@ -305,10 +259,10 @@
    Son DOS ficheros nuevos en `assets/fuentes/`. Cinzel sólo necesita los pesos
    600 y 700, y Libre Baskerville el 400: subsetear a latín básico más las
    acentuadas del castellano deja los dos en torno a 30 KB cada uno. */
-.con-marco .c-nombre, .c-coste, .st b, .c-rasgo b {
+.con-marco .c-nombre, .con-marco .c-genero, .con-marco .c-hab, .c-coste, .st b, .c-rasgo b {
   font-family: 'Cinzel', Georgia, serif;
 }
-.con-marco .c-nombre {
+.con-marco .c-nombre, .con-marco .c-genero, .con-marco .c-hab {
   font-style: normal; font-weight: 700; letter-spacing: .02em;
 }
 .con-marco .c-tipo, .c-clado, .c-rareza {
@@ -331,15 +285,16 @@
    así que 9,2 con margen. La misma cifra sirve para las dos pantallas porque
    la placa crece con la carta. */
 .con-marco .c-nombre, .carta--mano .c-nombre { font-size: min(9.2px, calc(90cqi / (0.69 * var(--pal, 9)))); }
-.con-marco .tira.grande .c-nombre { font-size: 21px; line-height: 23px; }
-
-/* El full art es la excepción y no se arregla aquí: su placa mide 14 % de la
-   carta —unos 16 px— y el binomial en Cinzel no entra en dos líneas ni a 6 px.
-   Va a una sola, recortada. **Ese marco pide regenerarse con la banda del pie
-   al 20 %**; mientras tanto el nombre entero está en el visor. */
-.carta.con-marco.fullart .c-nombre { font-size: 8px; line-height: 9px; -webkit-line-clamp: 1; }
 
 /* Las cartas que no son criatura tienen nombres de dos palabras largas
    —«Rebrote tras incendio» pedía tres líneas— y a cambio su placa es más alta,
    porque no comparte sitio con las chapas de cifras. Así que ahí caben tres. */
 .carta.con-marco.no-dino .c-nombre { -webkit-line-clamp: 3; }
+/* Y su caja es un 8 % más estrecha que la del primer juego de marcos: a 9,2 px
+   «Monzón de verano» se partía en tres líneas en la mano. A 8,4 vuelve a dos. */
+.carta.con-marco.no-dino .c-nombre { font-size: min(8.4px, calc(90cqi / (0.69 * var(--pal, 9)))); }
+
+/* El nombre de la habilidad, medio punto menor: a 8,4 «Zarpazo por sorpresa»
+   partía en tres líneas y la tercera se recortaba. Mismo freno por la palabra
+   más larga: «reconocimiento» son 14 letras. */
+.con-marco .c-hab { font-size: min(7.8px, calc(90cqi / (0.69 * var(--pal, 9)))); }

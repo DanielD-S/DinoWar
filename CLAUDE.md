@@ -198,6 +198,28 @@ uno sin decidir. Y ningún compás puede pasar de 600 ms: con el campo lleno se
 disparan diez habilidades, y a medio segundo cada una eso deja de ser ritmo y
 pasa a ser una espera.
 
+## Los marcos de carta: la geometría la decide el PNG
+
+Ocho marcos en `assets/marcos/`: cinco de criatura —cuatro rarezas y el jefe,
+misma geometría, distinto material— y uno por familia de soporte, sin rareza.
+Los originales son PNG de 1024×1536 con los huecos en magenta `#FF00FF`, fuera
+del repositorio; `python tools/marcos.py escribir` los keyea a WebP y **mide
+los huecos**, y esos números son los que van en `carta.css`. No se estiman.
+
+Una criatura lleva el GÉNERO en la banda de arriba y el nombre de la HABILIDAD
+en la caja; el binomial entero se lee en el visor. Se llegó ahí midiendo: el
+binomial en una línea son 28 letras en 58 px, y no cabe en ninguna banda de
+ningún marco a 83 px de carta. Las de soporte no llevan banda porque su nombre
+y su habilidad son el mismo, así que la caja lleva el nombre.
+
+Al pedir un marco nuevo al generador, dos cosas que costaron cuatro intentos:
+pide los huecos en porcentaje del alto y aun así entrega la mitad —una banda
+del 11 % salió del 5 %, luego del 7 %—, y cada edición mueve alguna otra pieza
+medio punto. Se genera el común, se mide, y sólo cuando convence se hacen las
+rarezas con ese PNG como referencia y el material como único cambio.
+`test/marcos.test.js` vigila que cada clase que emite `claseMarco()` tenga
+fichero y que ningún WebP sobre.
+
 ## `transform` es una sola propiedad, y quien la escribe último gana
 
 Es la trampa de toda la capa visual y ya ha mordido dos veces.
