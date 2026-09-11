@@ -20,3 +20,7 @@ node_modules/
 # Lo que se sirve es assets/dinos/, que sí va en el repositorio.
 src/dinos/
 __pycache__/
+
+# Originales de las piezas del tablero: 26 MB de PNG de los que se sirven los
+# WebP de assets/piel/. Igual que src/dinos/ con las ilustraciones.
+assets/piel/tablero_componentes/
