@@ -85,7 +85,12 @@
   height: 8px; border-radius: 0;
 }
 .habitat-barra i {
-  background: url('assets/piel/habitat_relleno.webp') left center / auto 100% no-repeat !important;
+  /* `100% 100%`, no `auto 100%`: la pieza es 1000×85 y con `auto` pintaba 94 px
+     fijos a 8 px de alto, así que a 70/70 la barra salía como un muñón al 30 %.
+     El relleno tiene que estirarse al ancho del <i>, que es lo que render.js
+     escribe en porcentaje y style.css anima con `transition: width`: así parte
+     llena y baja poco a poco con cada golpe. */
+  background: url('assets/piel/habitat_relleno.webp') left center / 100% 100% no-repeat !important;
   border-radius: 0;
 }
 /* El rival en frío: la misma pieza girada de tono, para no pedir otra. */
@@ -128,11 +133,19 @@
    y la placa vacía a la derecha, SIN texto: el nombre y la FASE los escribe el
    juego, y la fase —Despliegue, Combate, Descarte— no cabría en un rótulo
    dibujado. Ésa es la razón de pedirla sin rotular. */
+/* En tres cortes con `border-image`, no como imagen de fondo de ancho fijo. A
+   18 px de alto la pieza entera medía 88 px, y el reloj —que va detrás de la
+   etiqueta— caía justo sobre su canto derecho de latón: dos aros pisándose. Con
+   los cortes, el medallón queda a la izquierda a su tamaño, el canto de latón
+   a la derecha, y la placa del medio se estira bajo todo lo que haya en la
+   fila. Los cortes son píxeles de la pieza de 1328×273: el medallón ocupa los
+   ~300 primeros, el canto los ~40 últimos. */
 .hud-bando {
-  background: url('assets/piel/cinta_bando.webp') left center / auto 100% no-repeat;
+  border-style: solid; border-width: 0 3px 0 20px;
+  border-image: url('assets/piel/cinta_bando.webp') 0 40 0 300 fill / 0 3px 0 20px / 0 stretch;
   /* Sin `min-height`: con 24 px el HUD crecía 11 y la mano bajaba de 112 a 94.
      La cinta se escala al alto natural de la fila, 18 px, y no cuesta nada. */
-  padding-left: 26px;
+  padding-left: 8px; padding-right: 8px;
 }
 
 /* ----------------------------------------------------------- los iconos

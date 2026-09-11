@@ -1231,11 +1231,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .mensaje {
   font-size: 11px; line-height: 1.4; color: var(--acento-claro);
-  /* Flota sobre el campo en vez de ocupar fila propia en el pie. Eran 28 px
-     más su hueco, y en 360×640 ese renglón salía del tamaño de la carta. Sin
-     ratón encima, para que no estorbe al arrastrar. */
-  position: absolute; left: 14px; right: 14px; bottom: 100%; margin-bottom: 4px;
-  z-index: 5; pointer-events: none; min-height: 0;
+  /* En el flujo del pie, con su fila. Estuvo flotando con `bottom: 100%` para
+     ahorrar 28 px, y caía justo encima de la barra de hábitat del jugador, que
+     es lo que hay sobre el pie. Y el ahorro era falso: la fila de ranuras mide
+     146 px y la carta sólo usa 114 —manda el ancho—, así que estos 28 salen del
+     aire sobrante y la carta no se mueve. */
+  min-height: 28px;
   display: flex; align-items: center; overflow: hidden;
 }
 .mensaje.aviso { color: var(--peligro); }
