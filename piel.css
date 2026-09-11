@@ -140,8 +140,8 @@
    juego, y la fase —Despliegue, Combate, Descarte— no cabría en un rótulo
    dibujado. Ésa es la razón de pedirla sin rotular. */
 /* En tres cortes con `border-image`, no como imagen de fondo de ancho fijo. A
-   18 px de alto la pieza entera medía 88 px, y el reloj —que va detrás de la
-   etiqueta— caía justo sobre su canto derecho de latón: dos aros pisándose. Con
+   18 px de alto la pieza entera medía 88 px, y lo que hubiera al principio de
+   la fila caía justo sobre su canto derecho de latón: dos aros pisándose. Con
    los cortes, el medallón queda a la izquierda a su tamaño, el canto de latón
    a la derecha, y la placa del medio se estira bajo todo lo que haya en la
    fila. Los cortes son píxeles de la pieza de 1328×273: el medallón ocupa los
@@ -153,10 +153,9 @@
      La cinta se escala al alto natural de la fila, 18 px, y no cuesta nada. */
   padding-left: 8px; padding-right: 8px;
 }
-/* El reloj, al final de la placa y pegado a las cifras, no detrás de la
-   etiqueta: ahí la placa está vacía y el reloj deja de competir con el
-   medallón y el nombre. */
-.hud-bando .reloj { margin-left: auto; margin-right: 10px; }
+/* El reloj ya no vive en la cinta: se fue a la fila del turno, flanqueándolo
+   con el del otro bando. La placa queda con el nombre a un lado y las tres
+   cifras al otro, que es todo lo que cabe a 18 px de alto. */
 
 /* ----------------------------------------------------------- los iconos
    Los cuatro del panel de estadísticas, sacados con alfa. El panel entero no
