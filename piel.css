@@ -58,11 +58,17 @@
 }
 /* El carril abierto: enfrente no hay nadie y por aquí entra el daño. Es el
    único estado encendido del tablero y el que más se mira. */
-.ranura.abierta { background-image: url('assets/piel/ranura_abierta.webp'); }
+/* Los dos estados van con el shorthand ENTERO, no sólo `background-image`.
+   style.css tiene `.ranura.destino { background: rgba(…) }`, y un shorthand
+   resetea `background-size` a `auto` y `background-repeat` a `repeat`: la pieza
+   de 332×455 se pintaba a tamaño natural y repetida —el destino gigante al
+   arrastrar—. Con el shorthand aquí, que va después, mandan el 100 % y el
+   `no-repeat`. */
+.ranura.abierta { background: url('assets/piel/ranura_abierta.webp') center / 100% 100% no-repeat; }
 /* Y el destino al arrastrar, que significa lo contrario: aquí caería tu carta.
    Por eso una lleva los cantos laterales al rojo y un canal, y la otra luz
    uniforme alrededor: a 83 px hay que poder distinguirlas sin pensar. */
-.ranura.destino { background-image: url('assets/piel/ranura_destino.webp'); }
+.ranura.destino { background: url('assets/piel/ranura_destino.webp') center / 100% 100% no-repeat; }
 
 /* El rótulo «ZONA n» sale de un contador de CSS y no del marcado: `render.js`
    sólo escribe el número en las tuyas, y así no hace falta tocarlo. Es también
@@ -147,6 +153,10 @@
      La cinta se escala al alto natural de la fila, 18 px, y no cuesta nada. */
   padding-left: 8px; padding-right: 8px;
 }
+/* El reloj, al final de la placa y pegado a las cifras, no detrás de la
+   etiqueta: ahí la placa está vacía y el reloj deja de competir con el
+   medallón y el nombre. */
+.hud-bando .reloj { margin-left: auto; margin-right: 10px; }
 
 /* ----------------------------------------------------------- los iconos
    Los cuatro del panel de estadísticas, sacados con alfa. El panel entero no
@@ -163,6 +173,11 @@
   background: center / contain no-repeat;
 }
 .hud-recs, .rec { line-height: 18px; }
+/* El icono va DELANTE del número, como en la maqueta: «🏆 0/10», no «0/10 🏆».
+   `.rec` es flex, así que basta con `order`. Y el «/10» del tope recupera su
+   hueco: con el rótulo de texto detrás, el margen negativo lo pegaba al 0. */
+.rec i { order: -1; margin: -2px 3px 0 0; }
+.rec .meta { margin-left: 0; }
 .rec:nth-child(1) i { background-image: url('assets/piel/ico_trofeo.webp'); }
 .rec:nth-child(2) i { background-image: url('assets/piel/ico_biomasa.webp'); }
 .rec:nth-child(3) i { background-image: url('assets/piel/ico_mano.webp'); }
