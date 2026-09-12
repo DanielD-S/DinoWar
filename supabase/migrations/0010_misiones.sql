@@ -65,6 +65,11 @@ begin
 end;
 $$;
 
+-- Revocar ANTES de conceder: una función creada por `postgres` nace con el
+-- grant por defecto a PUBLIC, del que anon es miembro. No filtraba nada —sin
+-- `auth.uid()` la función lanza— pero el resto de lecturas del jugador van
+-- revocadas a anon, y una excepción sin motivo es una que un día alguien copia.
+revoke all on function public.mis_misiones() from public, anon;
 grant execute on function public.mis_misiones() to authenticated;
 
 -- --------------------------------------------- la partida, con sus misiones
