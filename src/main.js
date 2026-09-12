@@ -37,6 +37,7 @@ import {
   animarCombate, animarRevelacion, animarEventos, cancelarAnimaciones, esperar, lineasDeLog,
 } from './ui/animate.js';
 import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio } from './ui/audio.js';
+import { montarTacto } from './ui/tacto.js';
 
 const APP = Object.freeze({
   BOOT: 'BOOT', MENU: 'MENU', PLAYING: 'PLAYING', RESOLVING: 'RESOLVING', GAME_OVER: 'GAME_OVER',
@@ -943,6 +944,7 @@ function iniciar() {
   pintarRecord();
 
   montarMeta(() => irA(APP.MENU));
+  montarTacto(el.menu);
   montarCuenca(() => irA(APP.MENU), asaltoAlJefe);
   montarCuenta(() => irA(APP.MENU), pintarCuentaEnMenu,
     () => { abrirEntrada('Sesión cerrada.'); irA(APP.ENTRADA); });
@@ -991,6 +993,9 @@ function iniciar() {
     if (!b) return;
     actualizarPerfil({ dificultad: b.dataset.ia });
     pintarDificultad();
+    // El chip recién elegido da un salto. Sólo al elegirlo: `pintarDificultad`
+    // también repinta al arrancar y ahí no hay nada que celebrar.
+    el.dificultad.querySelector('.chip.on')?.classList.add('recien');
   });
 
   // Marcha atrás del despliegue. Sin esto, soltar una carta en la ranura

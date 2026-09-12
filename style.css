@@ -687,7 +687,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
    va encima en Cinzel, como en las cartas: las placas traen la mitad de abajo
    de roca vacía justo para eso. */
 .boton-piedra {
-  border: 0; background: url('assets/piel/boton_ancho.webp') center / 100% 100% no-repeat;
+  --placa: url('assets/piel/boton_ancho.webp');
+  border: 0; background: var(--placa) center / 100% 100% no-repeat;
   box-shadow: none; min-height: 0; padding: 0 18%;
   aspect-ratio: 1086 / 245;
   justify-content: center;
@@ -696,7 +697,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   filter: drop-shadow(0 6px 10px rgba(0,0,0,.5));
   transition: transform .12s ease-out, filter .12s ease-out;
 }
-.boton-piedra:active { background-color: transparent; transform: scale(.985); filter: brightness(1.15) drop-shadow(0 3px 6px rgba(0,0,0,.5)); }
+/* Se repite la imagen: el `:active` de `.boton-grande` escribe el shorthand
+   `background`, que la borraba, y la barra pulsada se quedaba sin latón. */
+.boton-piedra:active {
+  background: var(--placa) center / 100% 100% no-repeat;
+  transform: scale(.985); filter: brightness(1.15) drop-shadow(0 3px 6px rgba(0,0,0,.5));
+}
 .boton-piedra[disabled] { filter: grayscale(.5) brightness(.7); box-shadow: none; }
 
 .menu-placas { gap: 6px; }
@@ -729,6 +735,124 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
    los enlaces, para que la piedra de arriba y la web de abajo no den un salto. */
 .menu-dificultad .chip { border-color: rgba(217,164,65,.4); font-family: 'Cinzel', Georgia, serif; font-weight: 600; font-size: 11px; }
 .menu-dificultad .chip.on { background: linear-gradient(180deg, #e2b95a, #b8862e); border-color: #f4d99b; color: #1a1208; }
+
+/* ------------------------------------------- el menú respira y contesta
+   Las piezas son dibujadas y sin esto el menú era una lámina: se tocaba y no
+   pasaba nada. Tres cosas, todas baratas:
+
+   1. ENTRAR. Cada vez que el menú se enseña, el título y las piezas suben por
+      orden. No hace falta JS: una animación en un elemento que pasa de
+      `display: none` a pintado arranca sola, y vuelve a arrancar cada vez que
+      se vuelve al menú. Va con `backwards` y NO con `both`: `forwards` dejaría
+      `transform: none` pegado al final y taparía el `:active` para siempre —
+      es la trampa de `transform` de siempre, por otra puerta.
+   2. PULSAR. Al bajar el dedo, la pieza se hunde rápido (`:active`) y al
+      soltar vuelve con un rebote pequeño: la transición de ida y la de vuelta
+      son distintas a propósito. Y `tacto.js` le pone `.pulsada`, que hace
+      pasar un destello de luz por el latón. El destello es un pseudoelemento
+      ENMASCARADO con el propio PNG de la pieza: sin la máscara pintaría un
+      rectángulo sobre el aire que la placa tiene alrededor.
+   3. VIVIR. La portada respira con un zoom de medio minuto que no se ve pero
+      se nota, y el punto de las dinomonedas late despacio. */
+
+@keyframes menu-alza {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+#menu .menu-epigrafe, #menu .menu-caja h1, #menu .menu-lema,
+#menu .menu-acciones > :not(.menu-placas), #menu .menu-placas .placa {
+  animation: menu-alza .5s cubic-bezier(.2,.8,.2,1) backwards;
+  animation-delay: calc(var(--paso, 0) * 55ms);
+}
+#menu .menu-caja h1 { --paso: 1; }
+#menu .menu-lema { --paso: 2; }
+#menu .menu-acciones > :nth-child(1) { --paso: 3; }
+#menu .menu-placas .placa:nth-child(1) { --paso: 4; }
+#menu .menu-placas .placa:nth-child(2) { --paso: 5; }
+#menu .menu-placas .placa:nth-child(3) { --paso: 6; }
+#menu .menu-placas .placa:nth-child(4) { --paso: 7; }
+#menu .menu-placas .placa:nth-child(5) { --paso: 8; }
+#menu .menu-acciones > :nth-child(3) { --paso: 9; }
+#menu .menu-acciones > :nth-child(4) { --paso: 10; }
+#menu .menu-acciones > :nth-child(n + 5) { --paso: 11; }
+
+@keyframes menu-brisa { from { transform: scale(1); } to { transform: scale(1.06); } }
+.menu-heroe { transform-origin: 50% 30%; animation: menu-brisa 28s ease-in-out infinite alternate; }
+
+@keyframes menu-fulgor {
+  0%, 100% { box-shadow: 0 0 8px rgba(232,192,121,.6); }
+  50%      { box-shadow: 0 0 14px rgba(232,192,121,.95); }
+}
+.menu-monedas .punto { animation: menu-fulgor 3.2s ease-in-out infinite; }
+
+/* La ida es seca y la vuelta rebota: el ease de la vuelta pasa de 1 y vuelve. */
+.boton-piedra, .menu-placas .placa {
+  position: relative;
+  transition: transform .32s cubic-bezier(.2,1.7,.4,1), filter .25s ease-out;
+}
+.boton-piedra:active, .menu-placas .placa:active { transition-duration: .08s, .08s; }
+.menu-placas .placa:active { transform: scale(.93) translateY(1px); }
+
+/* El destello: una banda de luz que cruza el latón de izquierda a derecha. Con
+   `background-size` al 300 %, la posición 100 % → 0 % es lo que mueve la banda
+   de izquierda a derecha, aunque leído parezca al revés. */
+@keyframes menu-brillo {
+  from { opacity: 0; background-position: 100% 0; }
+  25%  { opacity: 1; }
+  to   { opacity: 0; background-position: 0 0; }
+}
+.boton-piedra::after, .menu-placas .placa i::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  /* Los topes van sobre el 300 %: del 45 al 55 es una banda de un tercio de
+     la pieza, no más, o en vez de un reflejo es una lavada. */
+  background: linear-gradient(105deg, transparent 45%, rgba(255,236,190,.28) 48%,
+              rgba(255,244,214,.6) 50%, rgba(255,236,190,.28) 52%, transparent 55%)
+              0 0 / 300% 100% no-repeat;
+  mix-blend-mode: screen;
+  /* Dos máscaras cruzadas: el PNG de la pieza, para que el destello sólo
+     pinte latón y piedra, y un rectángulo interior, porque las piezas traen
+     un halo casi transparente alrededor y por él la banda se veía flotar
+     sobre el aire por encima del medallón. */
+  -webkit-mask: var(--placa) center / 100% 100% no-repeat,
+                linear-gradient(#000, #000) center / var(--recorte, 90% 88%) no-repeat;
+  -webkit-mask-composite: source-in;
+  mask: var(--placa) center / 100% 100% no-repeat,
+        linear-gradient(#000, #000) center / var(--recorte, 90% 88%) no-repeat;
+  mask-composite: intersect;
+}
+.boton-piedra { --recorte: 92% 76%; }
+.menu-placas .placa i { position: relative; }
+.boton-piedra.pulsada::after, .menu-placas .placa.pulsada i::after {
+  animation: menu-brillo .55s ease-out;
+}
+
+/* Con ratón, la placa se levanta un poco al pasar; con dedo no hay «pasar». */
+@media (hover: hover) {
+  .menu-placas .placa:hover { transform: translateY(-3px); filter: brightness(1.08); }
+  .boton-piedra:hover { filter: brightness(1.06) drop-shadow(0 8px 12px rgba(0,0,0,.5)); }
+}
+.boton-piedra:focus-visible, .menu-placas .placa:focus-visible {
+  outline: 2px solid var(--acento-claro); outline-offset: 4px; border-radius: 6px;
+}
+
+/* Los chips y los enlaces de texto contestan igual, sin latón. */
+.menu-dificultad .chip {
+  transition: background .18s ease-out, border-color .18s ease-out, color .18s ease-out,
+              transform .25s cubic-bezier(.2,1.7,.4,1);
+}
+.menu-dificultad .chip:active { transform: scale(.93); transition-duration: .08s; }
+@keyframes menu-pop { 0% { transform: scale(.88); } 55% { transform: scale(1.08); } 100% { transform: none; } }
+.menu-dificultad .chip.recien { animation: menu-pop .32s cubic-bezier(.2,.8,.2,1); }
+.boton-fantasma { transition: color .15s ease-out, border-color .15s ease-out, transform .25s cubic-bezier(.2,1.7,.4,1); }
+.boton-fantasma:active { transform: scale(.96); transition-duration: .08s; }
+
+@media (prefers-reduced-motion: reduce) {
+  #menu .menu-epigrafe, #menu .menu-caja h1, #menu .menu-lema,
+  #menu .menu-acciones > :not(.menu-placas), #menu .menu-placas .placa,
+  .menu-heroe, .menu-monedas .punto, .menu-dificultad .chip.recien,
+  .boton-piedra.pulsada::after, .menu-placas .placa.pulsada i::after { animation: none; }
+  .boton-piedra, .menu-placas .placa, .menu-dificultad .chip, .boton-fantasma { transition: none; }
+}
 
 /* ------------------------------------------------------------------- hud */
 

@@ -92,6 +92,9 @@ export function sonido(tipo) {
     case 'trofeo':
       [523, 659, 880].forEach((f, i) => tono(f, f, 0.14, 'triangle', 0.06, i * 0.06));
       break;
+    // El del menú: un toque corto y bajo, de pieza que encaja. Suena al soltar,
+    // que es cuando el navegador cuenta el gesto como tal.
+    case 'toque': tono(720, 480, 0.05, 'triangle', 0.035); break;
 
     default: break;
   }
