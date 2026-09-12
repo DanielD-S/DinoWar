@@ -82,10 +82,13 @@
   100% { opacity: 0; transform: translate(var(--x0), var(--y0)) scale(1.04); }
 }
 
+/* El polvo NO va en `multiply`: una nube clara sobre piedra oscura no
+   oscurece nada y no se veía. Lleva alfa de verdad, que le pone la
+   herramienta según lo lejos que está cada píxel del blanco, y se pinta
+   encima sin mezcla. */
 .fx-polvo {
   width: var(--tam); height: var(--tam);
   background: url('assets/piel/efectos/polvo.webp') center / contain no-repeat;
-  mix-blend-mode: multiply;
   animation: fx-polvo .75s ease-out both;
 }
 @keyframes fx-polvo {

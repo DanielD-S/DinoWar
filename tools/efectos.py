@@ -72,6 +72,12 @@ MOSAICOS = {
     'agua': (NEGRO, 1024, 'x'),
 }
 
+# Las que van con transparencia DE VERDAD. El polvo llega sobre blanco, pero
+# en `multiply` un polvo claro sobre piedra oscura no oscurece nada y no se ve.
+# Una nube de polvo delante de algo oscuro es más CLARA que el fondo: se le da
+# alfa según lo lejos que esté del blanco y se pinta encima sin mezcla.
+CON_ALFA = {'polvo'}
+
 # El original puede llamarse distinto: el choque llegó como «flipbook» y los
 # climas con el id de su carta, que es como se piden en PROMPTS.md.
 ALIAS = {
@@ -166,6 +172,14 @@ def cerrar_mosaico(im, ejes):
     return Image.fromarray(a.round().clip(0, 255).astype(np.uint8), 'RGB'), antes, despues
 
 
+def dar_alfa(im):
+    """Blanco a transparente, gradualmente: alfa = lo que le falta al blanco."""
+    a = np.asarray(im.convert('RGB')).astype(np.float64)
+    falta = 255 - a.min(axis=2)
+    alfa = np.clip(falta * 1.6, 0, 255)
+    return Image.fromarray(np.dstack([a, alfa]).round().astype(np.uint8), 'RGBA')
+
+
 def guardar(im, nombre, ancho, calidad=85):
     alto = round(ancho * im.size[1] / im.size[0])
     DESTINO.mkdir(parents=True, exist_ok=True)
@@ -200,7 +214,11 @@ def main(escribir):
             continue
         im = Image.open(p)
         im, cuanto = apretar_fondo(im, fondo)
-        print(f'{p.name} {im.size[0]}×{im.size[1]}  suelta sobre {fondo}  '
+        alfa = ''
+        if nombre in CON_ALFA:
+            im = dar_alfa(im)
+            alfa = ', con alfa'
+        print(f'{p.name} {im.size[0]}×{im.size[1]}  suelta sobre {fondo}{alfa}  '
               f'fondo apretado {cuanto * 100:4.1f} %  -> {nombre}.webp @{ancho}')
         if escribir:
             alto = guardar(im, nombre, ancho)
