@@ -44,6 +44,16 @@ SALIDA = {
     'marco_carta_recurso': 'recurso',
 }
 
+# Las piezas del sobre salen del mismo generador y con el mismo material, y
+# viven con las del tablero en assets/piel/. El sobre va keyeado —el magenta
+# es lo que le da forma de bolsa—; el dorso llena la carta entera y no lleva
+# magenta que quitar.
+PIEZAS_ORIGEN = RAIZ / 'assets' / 'piel' / 'tablero_componentes'
+PIEZAS = {
+    'sobre_cerrado': (RAIZ / 'assets' / 'piel' / 'sobre.webp', True),
+    'dorso_carta': (RAIZ / 'assets' / 'piel' / 'dorso.webp', False),
+}
+
 
 def distancia_a_magenta(rgb):
     r, g, b = (rgb[..., i].astype(int) for i in range(3))
@@ -112,6 +122,20 @@ def main(escribir):
         if escribir and nombre:
             alto = round(ANCHO_WEBP * im.size[1] / im.size[0])
             keyear(im).resize((ANCHO_WEBP, alto), Image.LANCZOS).save(CARPETA / f'{nombre}.webp', 'WEBP', quality=88)
+
+    for stem, (destino, con_key) in PIEZAS.items():
+        original = PIEZAS_ORIGEN / f'{stem}.png'
+        if not original.exists():
+            continue
+        im = Image.open(original)
+        print(f'{original.name} {im.size[0]}x{im.size[1]} -> {destino.relative_to(RAIZ)}' + (' (keyeado)' if con_key else ''))
+        if con_key:
+            for h in medir(im):
+                print(f"  silueta x {h['x0']:5.1f}-{h['x1']:5.1f}  y {h['y0']:5.1f}-{h['y1']:5.1f}")
+        if escribir:
+            alto = round(ANCHO_WEBP * im.size[1] / im.size[0])
+            salida = keyear(im) if con_key else im.convert('RGB')
+            salida.resize((ANCHO_WEBP, alto), Image.LANCZOS).save(destino, 'WEBP', quality=88)
 
 
 if __name__ == '__main__':
