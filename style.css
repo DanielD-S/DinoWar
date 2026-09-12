@@ -581,6 +581,100 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .sobre-estado.sobra { color: var(--peligro); }
 .sobre-carta.mejor .sobre-estado { margin-top: 10px; }
 
+
+/* ------------------------------------------------------- sobre: ceremonia
+   Dos gestos: rasgar la bolsa y deslizar cada carta. `apertura.js` pone las
+   clases y las variables; aquí sólo se dice qué hace cada una. Ninguna cambia
+   el tamaño de nada: todo es `transform`, `clip-path` y `opacity`. */
+.sobre-tirada.ceremonia { display: block; min-height: 0; }
+/* Mientras dura, el aviso y la tabla no pintan nada: la ceremonia es lo único. */
+.sobre-tirada.ceremonia ~ * { visibility: hidden; }
+
+.apertura {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 8px 0 4px; touch-action: none; user-select: none; -webkit-user-select: none;
+}
+.apertura-escena { position: relative; width: min(250px, 68vw); aspect-ratio: 2 / 3; }
+
+/* El sobre son dos capas con la misma imagen, recortadas por el mismo zigzag:
+   la tira de arriba y el cuerpo. `--p` es cuánto se ha rasgado, de 0 a 1, y
+   levanta la tira desde su esquina izquierda como si se despegara. */
+.apertura-sobre { position: absolute; inset: 0; cursor: grab; }
+.apertura-cuerpo, .apertura-tira {
+  position: absolute; inset: 0;
+  background: url('assets/piel/sobre.webp') center / contain no-repeat;
+}
+.apertura-cuerpo { filter: drop-shadow(0 10px 14px rgba(0,0,0,.55)); }
+.apertura-tira {
+  transform-origin: 0% 100%;
+  transform: translate(calc(var(--p) * -5%), calc(var(--p) * -8%)) rotate(calc(var(--p) * -6deg));
+  filter: drop-shadow(0 calc(var(--p) * 8px) calc(var(--p) * 10px) rgba(0,0,0,.6));
+}
+.apertura-sobre.suelto .apertura-tira { transition: transform .28s ease-out, filter .28s ease-out; }
+.apertura-sobre.rasgado .apertura-tira { animation: tira-vuela .55s ease-in forwards; }
+.apertura-sobre.rasgado .apertura-cuerpo { animation: sobre-cae .5s ease-in .12s forwards; }
+@keyframes tira-vuela {
+  to { transform: translate(-28%, -150%) rotate(-30deg); opacity: 0; }
+}
+@keyframes sobre-cae {
+  to { transform: translateY(45%) scale(.9); opacity: 0; }
+}
+
+/* La pila: cinco cartas, la primera encima. `--i` es el puesto contando desde
+   arriba, y da el escalón y el encogimiento; `--dx`/`--dy`/`--giro` los pone
+   el dedo mientras arrastra la de arriba. */
+.apertura-pila { position: absolute; inset: 0; display: none; }
+.apertura.fase-pila .apertura-pila { display: block; }
+.apertura.fase-pila .apertura-sobre { display: none; }
+.apertura-carta {
+  position: absolute; inset: 0; z-index: calc(20 - var(--i));
+  transform: translate(var(--dx, 0px), calc(var(--dy, 0px) + var(--i) * 7px))
+             rotate(calc(var(--giro, 0) * 1deg)) scale(calc(1 - var(--i) * .035));
+  transition: transform .26s cubic-bezier(.3,.8,.3,1.05);
+  animation: pila-sube .5s ease-out both; animation-delay: calc(var(--i) * 55ms);
+}
+@keyframes pila-sube { from { opacity: 0; } to { opacity: 1; } }
+.apertura-carta.arrastrando { transition: none; cursor: grabbing; }
+.apertura-carta .carta { width: 100%; aspect-ratio: 82 / 112; border-radius: 12px; box-shadow: 0 10px 26px rgba(0,0,0,.6); }
+/* Sólo la de arriba tiene sitio para el texto; las de debajo lo enseñan al subir. */
+.apertura-carta.fuera { pointer-events: none; transition: none; }
+.apertura-carta.fuera-der { animation: carta-fuera-der .42s ease-in forwards; }
+.apertura-carta.fuera-izq { animation: carta-fuera-izq .42s ease-in forwards; }
+.apertura-carta.fuera-arriba { animation: carta-fuera-arriba .42s ease-in forwards; }
+@keyframes carta-fuera-der { to { transform: translate(140%, -10%) rotate(24deg); opacity: 0; } }
+@keyframes carta-fuera-izq { to { transform: translate(-140%, -10%) rotate(-24deg); opacity: 0; } }
+@keyframes carta-fuera-arriba { to { transform: translate(0, -130%) rotate(4deg); opacity: 0; } }
+
+/* Lo que pasa al descubrir cada carta, por rareza: común nada, rara y épica un
+   aro, legendaria el destello que ya tiene en la rejilla. */
+.apertura-carta.revelada.rareza-RARO .carta,
+.apertura-carta.revelada.rareza-EPICO .carta { box-shadow: 0 0 0 1px var(--bio), 0 0 30px rgba(217,164,65,.35), 0 10px 26px rgba(0,0,0,.6); }
+.apertura-carta.revelada.rareza-LEGENDARIO .carta {
+  box-shadow: 0 0 0 1px var(--bio), 0 10px 26px rgba(0,0,0,.6);
+  animation: destello 1s ease-out .15s 2;
+}
+
+.apertura-leyenda { text-align: center; min-height: 40px; }
+.apertura-binomial { font-size: 16px; font-style: italic; color: var(--texto); }
+.apertura-binomial.recto { font-style: normal; }
+.apertura-estado { font-size: 12px; color: var(--tenue-2); margin-top: 2px; }
+.apertura-estado.nueva { color: var(--acento-claro); }
+.apertura-estado.sobra { color: var(--peligro); }
+.apertura-pie {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 8px 14px; font-size: 12px; color: var(--tenue); max-width: 300px;
+}
+/* La pista va sola en su línea: a 250 px de escena no cabe con lo demás. */
+.apertura-pista { width: 100%; text-align: center; }
+.apertura-contador { font-variant-numeric: tabular-nums; color: var(--tenue-2); }
+.apertura-saltar {
+  border: 1px solid var(--borde); border-radius: 20px; padding: 5px 12px; color: var(--tenue); font-size: 12px;
+}
+.apertura-saltar:active { border-color: var(--borde-fuerte); }
+@media (prefers-reduced-motion: reduce) {
+  .apertura-carta, .apertura-tira, .apertura-cuerpo { animation: none !important; transition: none !important; }
+}
+
 /* ------------------------------------------------------------------- hud */
 
 /* Tres líneas y sólo tres cifras por bando. El mazo y el descarte se han ido a
