@@ -136,7 +136,16 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   display: flex; flex-direction: column;
   padding: calc(var(--seguro-arriba) + 48px) 24px calc(var(--seguro-abajo) + 22px);
   text-align: left;
+  /* El menú cabía justo a 360×640 y las misiones lo pasaron por 58 px: la
+     línea de la cuenta quedaba fuera de la pantalla, sin manera de llegar a
+     ella. Con esto, en un móvil alto no cambia nada —no hay desbordamiento y
+     no aparece barra— y en uno corto se puede bajar. Se desplaza SÓLO esta
+     caja: la portada va detrás, en su propia capa, y se queda quieta, que es
+     lo que la hacía una portada y no una cabecera. */
+  overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: none;
 }
+.menu-caja::-webkit-scrollbar { display: none; }
 .menu-epigrafe {
   display: flex; align-items: center; gap: 9px;
   font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--acento-claro);
@@ -208,6 +217,63 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .menu-record {
   text-align: center; color: var(--tenue-2); font-size: 11px; min-height: 14px;
 }
+
+/* ---------------------------------------------------- misiones del día
+   Tres renglones bajo las dinomonedas. Es información, no un botón: no se toca,
+   no se abre y no se cierra, así que va a la vista y no detrás de una placa
+   —una placa más habría pedido su PNG, y el rótulo de las cinco que hay ya va
+   por debajo de la piedra porque no cabía dentro—.
+
+   La barra de progreso se pinta con un hijo al que el JS le escribe el `width`,
+   y no con un degradado sobre el fondo: el porcentaje es continuo y cuarenta
+   clases de anchura no son una hoja de estilos. */
+.menu-misiones { margin-top: 2px; }
+.menu-misiones-titulo {
+  text-align: center; font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--tenue-2); margin-bottom: 5px;
+}
+.menu-misiones ul { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+
+/* Rejilla de tres filas: nombre y cifra, texto y premio, y la barra cruzando
+   por debajo como una base. A 360 px el texto de una misión son cinco palabras
+   y no cabe en la misma línea que el nombre. */
+.mision {
+  display: grid; grid-template-columns: 1fr auto; gap: 1px 8px;
+  padding: 5px 9px 6px;
+  border: 1px solid rgba(217,164,65,.22); border-radius: var(--radio);
+  background: rgba(244,236,224,.03);
+}
+.mision-nombre {
+  font-family: 'Cinzel', Georgia, serif; font-weight: 600; font-size: 11.5px;
+  color: var(--acento-claro); letter-spacing: .01em;
+}
+.mision-cifra {
+  font-size: 11px; color: var(--texto-2); font-variant-numeric: tabular-nums;
+  justify-self: end; align-self: center;
+}
+.mision-texto { font-size: 10.5px; color: var(--tenue); line-height: 1.3; }
+.mision-premio {
+  font-size: 10px; color: var(--tenue-2); justify-self: end; align-self: center;
+  font-variant-numeric: tabular-nums;
+}
+.mision-barra {
+  grid-column: 1 / -1; margin-top: 5px;
+  height: 3px; border-radius: 2px; background: rgba(244,236,224,.09); overflow: hidden;
+}
+.mision-barra i {
+  display: block; height: 100%; border-radius: 2px;
+  background: linear-gradient(90deg, #b8862e, var(--acento-claro));
+  transition: width .45s cubic-bezier(.2,.8,.2,1);
+}
+
+/* Cumplida: el filete se enciende y la cifra se cambia por un visto. No se
+   tacha ni se apaga — cumplirla es el premio, y una misión hecha que se ve gris
+   se lee como una que se ha perdido. */
+.mision.hecha { border-color: rgba(217,164,65,.5); background: rgba(217,164,65,.08); }
+.mision.hecha .mision-cifra { color: var(--acento-vivo); }
+.mision.hecha .mision-barra i { background: linear-gradient(90deg, var(--acento-claro), var(--acento-vivo)); }
+
+@media (prefers-reduced-motion: reduce) { .mision-barra i { transition: none; } }
 /* Quién eres. Va debajo del récord y en el mismo tono: es información, no un
    aviso — jugar sin cuenta es una forma legítima de jugar. */
 .menu-cuenta {
@@ -775,6 +841,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 #menu .menu-acciones > :nth-child(3) { --paso: 9; }
 #menu .menu-acciones > :nth-child(4) { --paso: 10; }
 #menu .menu-acciones > :nth-child(n + 5) { --paso: 11; }
+/* El bloque de misiones llega DESPUÉS del primer pintado —lo trae el servidor—
+   así que entra por su cuenta y no con el escalón del menú: con `menu-alza` se
+   quedaría invisible, porque su animación ya se habría gastado. */
+#menu .menu-misiones:not(.oculta) { animation: menu-alza .45s cubic-bezier(.2,.8,.2,1) backwards; }
 
 @keyframes menu-brisa { from { transform: scale(1); } to { transform: scale(1.06); } }
 .menu-heroe { transform-origin: 50% 30%; animation: menu-brisa 28s ease-in-out infinite alternate; }
@@ -849,7 +919,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 @media (prefers-reduced-motion: reduce) {
   #menu .menu-epigrafe, #menu .menu-caja h1, #menu .menu-lema,
   #menu .menu-acciones > :not(.menu-placas), #menu .menu-placas .placa,
-  .menu-heroe, .menu-monedas .punto, .menu-dificultad .chip.recien,
+  .menu-heroe, .menu-monedas .punto, .menu-dificultad .chip.recien, #menu .menu-misiones,
   .boton-piedra.pulsada::after, .menu-placas .placa.pulsada i::after { animation: none; }
   .boton-piedra, .menu-placas .placa, .menu-dificultad .chip, .boton-fantasma { transition: none; }
 }

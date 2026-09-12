@@ -22,7 +22,9 @@ import {
 import { cargarPerfil, perfilInicial } from './almacen.js';
 import {
   PRUEBAS, comprarSobre as pedirSobre, fundir, guardarMazo, usarMazo, cobrarPartida,
+  traerMisiones, misionesDeHoy,
 } from './perfil.js';
+import { misionesDelDia } from '../data/misiones.js';
 import { arte } from './art.js';
 import { fichaHTML, abrirFicha, cartaHTML } from './render.js';
 import { ceremoniaDeSobre } from './apertura.js';
@@ -49,6 +51,7 @@ export function montarMeta(alVolver) {
     btnAbrir: id('btn-abrir'),
     mazosTitulo: id('mazos-titulo'), mazosCuerpo: id('mazos-cuerpo'), mazosPie: id('mazos-pie'),
     menuMoneda: id('menu-moneda'), menuMazo: id('menu-mazo'),
+    menuMisiones: id('menu-misiones'),
   };
 
   for (const b of document.querySelectorAll('[data-volver]')) {
@@ -109,6 +112,55 @@ export function pintarMenu() {
   const v = validarMazo(m?.cartas ?? {}, p.cartas);
   dom.menuMoneda.textContent = MONEDAS();
   dom.menuMazo.textContent = v.valido ? m.nombre : `${m?.nombre ?? '—'} (no válido)`;
+  pintarMisiones();
+}
+
+// -------------------------------------------------------------- misiones
+//
+// Tres renglones: nombre, lo que pide y cuánto llevas. El catálogo lo calcula
+// el navegador a partir del DÍA que dijo el servidor —la misma función que usa
+// la Edge Function para acreditar— así que los dos hablan de las mismas tres
+// sin tener que guardarlas en ninguna parte.
+
+const escapar = (t) => String(t).replace(/[&<>"]/g, (c) => (
+  { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/**
+ * Pinta el bloque de misiones con lo último que dijo el servidor. Si no ha
+ * dicho nada —no hay servidor, o la llamada falló— el bloque se queda oculto:
+ * un progreso inventado en el navegador es una promesa que nadie va a pagar.
+ */
+export function pintarMisiones() {
+  const caja = dom?.menuMisiones;
+  if (!caja) return;
+  const hoy = misionesDeHoy();
+  if (!hoy?.dia) { caja.classList.add('oculta'); return; }
+
+  const filas = misionesDelDia(hoy.dia).map((m) => {
+    const estado = hoy.progreso[m.id] ?? { progreso: 0, cobrada: false };
+    const llevo = Math.min(estado.progreso ?? 0, m.meta);
+    const hecha = estado.cobrada || llevo >= m.meta;
+    // El ancho va en un `style` en vez de una clase porque es un número
+    // continuo: cuarenta clases de porcentaje no son una hoja de estilos.
+    // El orden importa: la rejilla coloca por orden de aparición, así que el
+    // nombre va con su cifra en la primera línea, el texto con su premio en la
+    // segunda y la barra cruzando por debajo, como una base.
+    return `<li class="mision ${hecha ? 'hecha' : ''}">
+      <span class="mision-nombre">${escapar(m.nombre)}</span>
+      <span class="mision-cifra">${hecha ? `${m.meta}/${m.meta} ✓` : `${llevo}/${m.meta}`}</span>
+      <span class="mision-texto">${escapar(m.texto)}</span>
+      <span class="mision-premio">${hecha ? 'cobrada' : `+${m.premio}`}</span>
+      <span class="mision-barra"><i style="width:${Math.round((llevo / m.meta) * 100)}%"></i></span>
+    </li>`;
+  }).join('');
+
+  caja.innerHTML = `<p class="menu-misiones-titulo">Misiones de hoy</p><ul>${filas}</ul>`;
+  caja.classList.remove('oculta');
+}
+
+/** Pide las misiones al servidor y repinta cuando lleguen. No bloquea el menú. */
+export function refrescarMisiones() {
+  return traerMisiones().then(pintarMisiones).catch(() => {});
 }
 
 // -------------------------------------------------------------- colección
@@ -578,9 +630,12 @@ function autocompletar() {
  * @param {boolean} gano lo que cree el navegador, para el modo local
  */
 export async function recompensar(partida, gano) {
-  const premio = await cobrarPartida(partida, gano);
+  const cobro = await cobrarPartida(partida, gano);
+  // El progreso lo acaba de mover el servidor, así que se vuelve a pedir: sin
+  // esto el menú enseñaría el de antes de la partida hasta la siguiente recarga.
+  await refrescarMisiones();
   pintarMenu();
-  return premio;
+  return cobro;
 }
 
 export { perfilInicial, mazoPorDefecto };

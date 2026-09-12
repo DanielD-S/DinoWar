@@ -219,28 +219,74 @@ export async function fundir() {
  * regala. Mover la colección al servidor y dejar esto en el navegador habría
  * sido cerrar una puerta y dejar abierta la de al lado.
  *
+ * Desde las misiones diarias también se manda la partida PERDIDA. Antes no: una
+ * derrota valía cero y mandarla era hacer trabajar al servidor para que lo
+ * confirmara. Ahora una derrota puede avanzar «juega 3 partidas» o «despliega 12
+ * criaturas», y no mandarla sería quitarle al jugador un progreso que se ganó —
+ * que es justo la mitad del sentido de las misiones: que un día malo pague algo.
+ * El tope diario ya cubría las dos, ganadas y perdidas.
+ *
  * @param {{semilla:number, mazo:Array, acciones:object[], perfil:string}} partida
  * @param {boolean} gane lo que cree el navegador, sólo para el modo local
- * @returns {Promise<number>} las dinomonedas cobradas
+ * @returns {Promise<{premio:number, misiones:number, cumplidas:string[]}>}
  */
 export async function cobrarPartida(partida, gane) {
   const premio = gane ? ECONOMIA.monedasVictoria : ECONOMIA.monedasDerrota;
+  const nada = { premio: 0, misiones: 0, cumplidas: [] };
 
   if (modo === MODO.LOCAL) {
+    // Sin servidor no hay misiones: el progreso lo lleva quien paga, y aquí no
+    // paga nadie. Inventarlo en local sería enseñar un avance que mañana, con
+    // servidor, no existe.
     if (premio !== 0) actualizarPerfil({ monedas: cargarPerfil().monedas + premio });
-    return premio;
+    return { ...nada, premio };
   }
-  // Sin nada que cobrar no se molesta al servidor: una derrota vale 0 y no hay
-  // por qué mandarle una partida entera para que lo confirme.
-  if (premio === 0) return 0;
-  // Y una victoria sin grabación no se paga: no es que no se pueda comprobar,
-  // es que pagarla sería volver justo a lo que esto viene a cerrar. Pasa cuando
+  // Una partida sin grabación no se manda: no es que no se pueda comprobar, es
+  // que pagarla sería volver justo a lo que esto viene a cerrar. Pasa cuando
   // ganas por tiempo o por retirada del rival, que no son jugadas del motor.
-  if (!partida) return 0;
+  if (!partida) return nada;
 
   const r = await funcion(CONFIG.supabase.funcionAsalto, { tipo: 'victoria', ...partida });
+  misionesEnCache = null;   // el progreso que acaba de cambiar lo dice el servidor
   await sincronizar();
-  return Number(r?.premio ?? 0);
+  return {
+    premio: Number(r?.premio ?? 0),
+    misiones: Number(r?.misiones ?? 0),
+    cumplidas: Array.isArray(r?.cumplidas) ? r.cumplidas : [],
+  };
+}
+
+// -------------------------------------------------------------- misiones
+
+// Las misiones se leen del servidor y se guardan aquí, en memoria y no en
+// `localStorage`. La diferencia importa: la colección se cachea en disco porque
+// hay que pintarla sin conexión y sigue siendo verdad; el progreso de hoy sólo
+// vale mientras dure la sesión, y un progreso viejo pintado como actual sería
+// exactamente la clase de mentira que el resto de este fichero evita.
+let misionesEnCache = null;
+
+/** Lo último que dijo el servidor, o null si todavía no ha dicho nada. */
+export const misionesDeHoy = () => misionesEnCache;
+
+/**
+ * Trae las misiones del día. El DÍA lo pone el servidor: con la fecha local del
+ * navegador, alguien en Auckland vería las de mañana y le acreditarían las de
+ * hoy.
+ *
+ * No lanza si falla. Un menú sin el bloque de misiones es un menú; un menú que
+ * no se pinta porque las misiones no llegaron es un juego roto por un adorno.
+ *
+ * @returns {Promise<{dia:string, progreso:object}|null>}
+ */
+export async function traerMisiones() {
+  if (modo === MODO.LOCAL) return null;
+  try {
+    const d = await rpc('mis_misiones');
+    misionesEnCache = { dia: d?.dia ?? null, progreso: d?.progreso ?? {} };
+    return misionesEnCache;
+  } catch {
+    return misionesEnCache;
+  }
 }
 
 /**

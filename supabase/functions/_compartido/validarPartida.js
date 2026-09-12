@@ -18,6 +18,7 @@ import { decidir, PERFIL } from '../../../src/engine/ai.js';
 import { semilla } from '../../../src/engine/rng.js';
 import { BALANCE } from '../../../src/data/balance.js';
 import { existeCarta, carta } from '../../../src/data/cards.js';
+import { parteVacio, anotarEventos, nuevosEventos, cerrarParte } from '../../../src/data/misiones.js';
 
 /** Topes de gasto. Un cliente hostil manda listas enormes para quemar CPU. */
 export const LIMITES = Object.freeze({
@@ -85,7 +86,7 @@ export function perfilValido(nombre, porDefecto = PERFIL.HEURISTICA) {
  * @param {number|null} [opciones.habitatRival]  null = el de siempre
  * @param {string} [opciones.perfil]  con qué IA juega el rival
  * @returns {{turnos:number, ganada:boolean, trofeos:number,
- *            danoAlHabitat:number, motivoFin:string}}
+ *            danoAlHabitat:number, motivoFin:string, parte:object}}
  */
 export function validarPartida(envio, opciones = {}) {
   if (!envio || typeof envio !== 'object') throw new PartidaInvalida('envío vacío');
@@ -111,6 +112,20 @@ export function validarPartida(envio, opciones = {}) {
   let rngIA = semilla(seed ^ 0x5bf03635);
 
   const pendientes = acciones.slice();
+
+  // El PARTE de la partida: lo que deja escrito para las misiones diarias. Se
+  // saca de los eventos que el motor ya emitía, así que el motor no se entera
+  // de que las misiones existen. Y se saca AQUÍ, re-jugando, por lo mismo que
+  // el premio: el progreso compra monedas y las monedas compran sobres, así que
+  // un progreso que dijera el navegador sería una carta regalada.
+  const parte = parteVacio();
+  /** Un reduce, anotando en el parte lo que emita. */
+  const aplicar = (estado, accion) => {
+    const desde = estado.eventos.length;
+    const siguiente = reduce(estado, accion);
+    anotarEventos(parte, nuevosEventos(siguiente, desde));
+    return siguiente;
+  };
 
   /**
    * La siguiente jugada del jugador. Si la lista se acaba, sólo vale seguir si
@@ -145,7 +160,7 @@ export function validarPartida(envio, opciones = {}) {
           const a = { ...siguienteDelJugador(s), jugador: 0 };
           const motivo = validar(s, a);
           if (motivo) throw new PartidaInvalida('jugada ilegal', { accion: a.tipo, motivo });
-          s = reduce(s, a);
+          s = aplicar(s, a);
           actuo = true;
           if (a.tipo === ACCION.PASAR || a.tipo === ACCION.DESCARTAR) break;
           if (++tuyas > LIMITES.pasosPorFase) throw new PartidaInvalida('la fase no converge');
@@ -157,7 +172,7 @@ export function validarPartida(envio, opciones = {}) {
           const d = decidir(vistaDe(s, 1), 1, rngIA, perfil);
           rngIA = d.rng;
           if (!d.accion) break;
-          s = reduce(s, d.accion);
+          s = aplicar(s, d.accion);
           actuo = true;
           if (d.accion.tipo === ACCION.PASAR || d.accion.tipo === ACCION.DESCARTAR) break;
           if (++suyas > LIMITES.pasosPorFase) throw new PartidaInvalida('la fase no converge');
@@ -169,10 +184,15 @@ export function validarPartida(envio, opciones = {}) {
       if (s.fase === faseInicial) throw new PartidaInvalida('la fase se quedó bloqueada');
       continue;
     }
-    s = reduce(s, { tipo: ACCION.AVANZAR });
+    s = aplicar(s, { tipo: ACCION.AVANZAR });
   }
 
+  cerrarParte(parte, {
+    ganada: s.ganador === 0, turnos: s.turno, trofeos: s.jugadores[0].trofeos,
+  });
+
   return {
+    parte,
     ganada: s.ganador === 0,
     danoAlHabitat: habitatInicial - Math.max(0, s.jugadores[1].habitat),
     trofeos: s.jugadores[0].trofeos,

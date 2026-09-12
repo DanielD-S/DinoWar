@@ -66,6 +66,11 @@
         </div>
         <p class="menu-monedas"><span class="punto"></span><b id="menu-moneda">0</b> dinomonedas
           <span class="sep"></span> mazo <b id="menu-mazo">—</b></p>
+        <!-- Las tres misiones del día. Las elige el calendario y el progreso lo
+             lleva el servidor: el navegador sólo las pinta. Nace vacío y se
+             rellena cuando `mis_misiones` contesta; si no contesta, no se
+             enseña nada en vez de enseñar ceros que no son. -->
+        <div class="menu-misiones oculta" id="menu-misiones"></div>
         <p class="menu-record" id="menu-record"></p>
         <!-- Quién eres, dicho sin que haya que ir a buscarlo. Jugar sin cuenta
              es legítimo, pero que la colección viva sólo en este navegador es

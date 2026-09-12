@@ -15,14 +15,9 @@ import { generar, SALIDA, coleccionables } from '../tools/generar-cartas.mjs';
 import { validarSolitario } from '../supabase/functions/_compartido/validarSolitario.js';
 import { perfilValido, PartidaInvalida } from '../supabase/functions/_compartido/validarPartida.js';
 import { ECONOMIA, coleccionInicial } from '../src/data/coleccion.js';
-import { BALANCE, MAZO } from '../src/data/balance.js';
+import { BALANCE } from '../src/data/balance.js';
 import { PERFIL } from '../src/engine/ai.js';
-import { crearPartida, FASE, vistaDe } from '../src/engine/state.js';
-import { reduce, ACCION, legales } from '../src/engine/actions.js';
-import { decidir } from '../src/engine/ai.js';
-import { semilla } from '../src/engine/rng.js';
-
-const MAZO_OK = MAZO.map((e) => [...e]);
+import { jugarSolo, MAZO_OK } from './helpers.js';
 
 // -------------------------------------------------------------- el catálogo
 
@@ -82,52 +77,6 @@ test('Los precios del SQL son los de ECONOMIA, no unos copiados a mano', () => {
 });
 
 // ------------------------------------------------- la partida en solitario
-
-/**
- * Juega una partida entera contra la IA y devuelve la grabación, igual que la
- * hace el navegador: sólo TUS jugadas, en el orden en que las haces.
- */
-function jugarSolo(seed, perfil = PERFIL.HEURISTICA) {
-  let s = crearPartida(seed, [MAZO_OK, null]);
-  let rngIA = semilla(seed ^ 0x5bf03635);
-  const acciones = [];
-
-  while (s.fase !== FASE.FIN) {
-    if (s.fase === FASE.DESPLIEGUE || s.fase === FASE.DESCARTE) {
-      const faseInicial = s.fase;
-      let pasos = 0;
-      while (s.fase === faseInicial) {
-        let actuo = false;
-        let rngYo = semilla(seed ^ 0x1234abcd);
-        while (s.fase === faseInicial && legales(s, 0).length > 0) {
-          const d = decidir(vistaDe(s, 0), 0, rngYo, perfil);
-          rngYo = d.rng;
-          if (!d.accion) break;
-          acciones.push(d.accion);
-          s = reduce(s, d.accion);
-          actuo = true;
-          if (d.accion.tipo === ACCION.PASAR || d.accion.tipo === ACCION.DESCARTAR) break;
-        }
-        let suyas = 0;
-        while (s.fase === faseInicial && legales(s, 1).length > 0) {
-          const d = decidir(vistaDe(s, 1), 1, rngIA, perfil);
-          rngIA = d.rng;
-          if (!d.accion) break;
-          s = reduce(s, d.accion);
-          actuo = true;
-          if (d.accion.tipo === ACCION.PASAR || d.accion.tipo === ACCION.DESCARTAR) break;
-          if (++suyas > 200) break;
-        }
-        if (!actuo) break;
-        if (++pasos > 200) break;
-      }
-      if (s.fase === faseInicial) break;
-      continue;
-    }
-    s = reduce(s, { tipo: ACCION.AVANZAR });
-  }
-  return { semilla: seed, mazo: MAZO_OK, acciones, perfil, ganada: s.ganador === 0 };
-}
 
 const PARTIDA = jugarSolo(20260909);
 

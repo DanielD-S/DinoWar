@@ -22,7 +22,10 @@ import {
   tutorialEspera, pasoTutorial,
 } from './ui/tutorial.js';
 import { detectarFotos, detectarEnteras, vigilarFotos, calentarFotos } from './ui/art.js';
-import { montarMeta, abrirColeccion, abrirSobres, abrirMazos, pintarMenu, recompensar } from './ui/meta.js';
+import {
+  montarMeta, abrirColeccion, abrirSobres, abrirMazos, pintarMenu, recompensar,
+  refrescarMisiones,
+} from './ui/meta.js';
 import { mazoActivo, cargarPerfil, actualizarPerfil } from './ui/almacen.js';
 import { montarCuenca, abrirCuenca, pintarCuenca } from './ui/cuenca.js';
 import { montarCuenta, abrirCuenta, resumenDeCuenta } from './ui/cuenta.js';
@@ -91,6 +94,9 @@ async function presentarse(nombre) {
   pintarCuentaEnMenu();
   pintarRecord();
   irA(APP.MENU);
+  // Las misiones del día llegan por su cuenta y repintan cuando lleguen: el
+  // menú no espera por ellas, que es un adorno delante de la puerta.
+  refrescarMisiones();
   return p;
 }
 
@@ -679,8 +685,20 @@ function rendirse() {
  * La línea de premio del final. Perder no paga, y «+0 dinomonedas» se lee como
  * un fallo de cuentas antes que como la regla: cuando no hay premio, se dice
  * que no lo hay y por qué.
+ *
+ * Las misiones se dicen APARTE y no sumadas al premio. Sumadas, una derrota que
+ * cumpliera una misión enseñaría «+40 dinomonedas» y contradiría a la propia
+ * frase de al lado, que explica que perder no paga. Son dos cosas distintas y
+ * se leen como dos.
  */
-const premioTexto = (n) => (n > 0 ? `+${n} dinomonedas` : 'Sin dinomonedas: sólo las da ganar');
+function premioTexto(n, cobro = null) {
+  const base = n > 0 ? `+${n} dinomonedas` : 'Sin dinomonedas: sólo las da ganar';
+  const porMisiones = Number(cobro?.misiones ?? 0);
+  if (porMisiones <= 0) return base;
+  const cuantas = cobro.cumplidas?.length ?? 0;
+  return `${base} · ${cuantas === 1 ? 'misión cumplida' : `${cuantas} misiones cumplidas`}`
+    + `: +${porMisiones}`;
+}
 
 /**
  * Pantalla de fin: la vía de victoria arriba en versales, el titular, la frase
@@ -760,11 +778,15 @@ function finPartida() {
  * jugada del motor.
  */
 function cobrar(gane, reproducible = true) {
-  const partida = gane && reproducible ? grabacion : null;
+  // La PERDIDA también se manda desde que hay misiones: puede avanzar «juega 3
+  // partidas» o «despliega 12 criaturas», y no mandarla sería quitarle al
+  // jugador un progreso que se ganó. Sigue sin pagar premio — eso lo decide el
+  // servidor re-jugándola, como siempre.
+  const partida = reproducible ? grabacion : null;
   grabacion = null;
-  el.finPremio.textContent = gane ? 'Contando dinomonedas…' : premioTexto(0);
+  el.finPremio.textContent = gane ? 'Contando dinomonedas…' : 'Anotando la partida…';
   recompensar(partida, gane)
-    .then((n) => { el.finPremio.textContent = premioTexto(n); })
+    .then((cobro) => { el.finPremio.textContent = premioTexto(cobro.premio, cobro); })
     .catch((e) => {
       // Igual que con un asalto: dar por buenas unas monedas que nadie apuntó
       // sería enseñar un saldo que no existe.
