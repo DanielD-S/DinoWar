@@ -248,6 +248,52 @@ conectado con el borde. Lo de dentro del marco de latón nunca se toca. Con
 fondo oscuro la tolerancia va corta: con 28 la inundación se colaba por el
 hueco entre los dos filetes y vaciaba el centro de la barra.
 
+### Lo primero que se ve: la marca, y luego la carga
+
+Dos pantallas antes del juego, en `src/ui/carga.js`, y cada una tapa un hueco
+distinto.
+
+**La marca de la casa** (`#marca`) es la única sección que NO nace en
+`oculta`. Tiene que pintarse antes de que llegue el JavaScript, que es un
+módulo y viene después; con todo oculto lo que había era un rectángulo negro
+la primera fracción de segundo. Dura segundo y medio y se va con un fundido;
+con `prefers-reduced-motion`, menos y sin fundido.
+
+**La carga** (`#carga`) va mientras el servidor contesta. Antes, con la sesión
+guardada, el arranque no enseñaba nada: todas las pantallas nacen ocultas y el
+menú aparecía cuando terminaban las dos llamadas. Tres cosas que decidir antes
+de discutirlas:
+
+- **La barra avanza por HITOS reales, no con un temporizador.** Son tres: las
+  piezas del menú descargadas, la cuenta presentada, el perfil traído. Una
+  barra que sube sola mientras nada pasa es la clase de mentira que el resto
+  del juego evita. Lo único que no es un hito es el medio segundo final, que es
+  lo que tarda el oro en llegar al extremo.
+- **El trabajo arranca enseguida y la carga se enseña cuando la marca se va.**
+  Si se esperase a la marca para empezar, serían dos esperas puestas en fila.
+  El `trabajo.catch(() => {})` de `presentarse` no traga el error: evita el
+  aviso de rechazo sin dueño mientras la marca sigue en pantalla; el `await` de
+  después lo recoge y vuelve a la puerta antes de relanzarlo.
+- **El oro no crece: se DESPLAZA.** Un `width` que crece deja un corte vertical
+  en la punta; desplazando el dibujo entero, la punta redondeada es siempre lo
+  que avanza. `--p` va de 0 a 1 y lo escribe `carga.js` por cada hito.
+
+La barra son tres dibujos sobre el mismo lienzo de 2172×724 —el marco con la
+ranura vacía, el canal suelto y el relleno de oro al 62 %— y `tools/placas.py`
+los compone en DOS (`componer_barra`): el marco con la textura del canal dentro
+de la ranura, y el oro a la escala de la ranura y **tejido** en espejo hasta
+cubrirla entera, que estirado 1,7× se le notan las grietas. La geometría de la
+ranura la mide y la imprime; los cuatro porcentajes de `.carga-barra` son
+esos, como los huecos de los marcos de carta.
+
+Y una trampa de la limpieza de motas: **quedarse con la mancha mayor mutila un
+texto.** Cada letra es una mancha, y del logo salió la «D» sola. Lo que separa
+el dibujo de la basura no es ser el mayor, es no ser diminuto (`MOTA`, 64 px).
+
+El escenario de la carga es el Cretácico —un mosasaurio, «82–66 Ma»— y no la
+Morrison. Fue elección del autor con los assets que entregó; si el juego sigue
+sin salir del Jurásico, es un anacronismo que conviene saber que está ahí.
+
 ### El menú manda a una pantalla de jugar, y esa pantalla tiene las misiones
 
 El botón grande decía «Empezar partida» y empezaba una contra la IA. Ahora dice

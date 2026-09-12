@@ -28,6 +28,43 @@
   <!-- ---------------------------------------------------------- ENTRADA -->
   <!-- La puerta. Es lo primero que se pinta y no se pasa de aqu&iacute; sin sesi&oacute;n
        de una cuenta con correo: el juego no se ense&ntilde;a a quien no ha entrado. -->
+  <!-- ------------------------------------------------------------ MARCA -->
+  <!-- La casa que hace el juego, lo primero que se ve. NO nace oculta, y es
+       la única: tiene que pintarse antes de que llegue el JavaScript, que es
+       un módulo y viene después. Con todo en `oculta`, lo que había era un
+       rectángulo negro la primera fracción de segundo, y dos segundos enteros
+       si la sesión estaba guardada. -->
+  <section id="marca" class="pantalla">
+    <img class="marca-logo" src="assets/piel/marca_chihui.webp" alt="ChihuiGames">
+  </section>
+
+  <!-- ------------------------------------------------------------ CARGA -->
+  <!-- Mientras el servidor contesta. La barra avanza por HITOS REALES —las
+       piezas del menú, la cuenta, el perfil— y no con un temporizador: una
+       barra que sube sola mientras nada pasa es la clase de mentira que este
+       juego evita. Los textos y el logo son imágenes a petición del autor,
+       dibujadas con el mismo latón; por eso llevan `alt`. -->
+  <section id="carga" class="pantalla oculta">
+    <img class="menu-heroe carga-heroe" src="assets/piel/fondo_carga.webp" alt="">
+    <div class="carga-velo"></div>
+    <div class="carga-caja">
+      <div class="carga-cabecera">
+        <img class="carga-epigrafe" src="assets/piel/carga_epigrafe.webp" alt="Cretácico tardío · 82–66 Ma">
+        <img class="carga-logo" src="assets/piel/carga_logo.webp" alt="DinoWar">
+        <img class="carga-lema" src="assets/piel/carga_lema.webp" alt="Mares antiguos. Un coloso acecha bajo la superficie.">
+      </div>
+      <div class="carga-pie">
+        <img class="carga-medallon" src="assets/piel/carga_medallon.webp" alt="">
+        <div class="carga-barra" id="carga-barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <img class="carga-marco" src="assets/piel/carga_marco.webp" alt="">
+          <div class="carga-ranura"><img class="carga-relleno" src="assets/piel/carga_relleno.webp" alt=""></div>
+        </div>
+        <img class="carga-cargando" src="assets/piel/carga_cargando.webp" alt="Cargando…">
+        <p class="carga-nota" id="carga-nota"></p>
+      </div>
+    </div>
+  </section>
+
   <section id="entrada" class="pantalla oculta">
     <div class="ent-caja">
       <div id="entrada-cuerpo"></div>

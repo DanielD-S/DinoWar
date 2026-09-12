@@ -17,9 +17,16 @@
 //
 // Al cambiar cualquier fichero servido hay que subir VERSION: activa la limpieza
 // de las cachés anteriores.
-const VERSION = 'dinowar-v57';
+const VERSION = 'dinowar-v58';
 const ESENCIALES = [
   './', './index.html', './style.css', './piel.css', './carta.css', './manifest.json', './src/main.js',
+  // Lo primero que se ve. La marca y la pantalla de carga tienen que estar
+  // en caché o la segunda visita empieza igual que la primera: esperando a
+  // que baje lo que se enseña mientras se espera.
+  './assets/piel/marca_chihui.webp', './assets/piel/fondo_carga.webp',
+  './assets/piel/carga_logo.webp', './assets/piel/carga_medallon.webp',
+  './assets/piel/carga_marco.webp', './assets/piel/carga_relleno.webp',
+  './assets/piel/carga_epigrafe.webp', './assets/piel/carga_lema.webp', './assets/piel/carga_cargando.webp',
   './assets/piel/portada.webp', './assets/piel/boton_ancho.webp',
   './assets/piel/fondo_jugar.webp',
   './assets/piel/placa_solitario.webp', './assets/piel/placa_duelo.webp',

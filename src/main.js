@@ -41,9 +41,11 @@ import {
 } from './ui/animate.js';
 import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio } from './ui/audio.js';
 import { montarTacto } from './ui/tacto.js';
+import { mostrarMarca, empezarCarga, precargarPiezas } from './ui/carga.js';
 
 const APP = Object.freeze({
-  BOOT: 'BOOT', MENU: 'MENU', JUGAR: 'JUGAR', PLAYING: 'PLAYING', RESOLVING: 'RESOLVING',
+  BOOT: 'BOOT', MARCA: 'MARCA', CARGA: 'CARGA',
+  MENU: 'MENU', JUGAR: 'JUGAR', PLAYING: 'PLAYING', RESOLVING: 'RESOLVING',
   GAME_OVER: 'GAME_OVER',
   COLECCION: 'COLECCION', SOBRES: 'SOBRES', MAZOS: 'MAZOS', CUENCA: 'CUENCA',
   CUENTA: 'CUENTA', ENTRADA: 'ENTRADA',
@@ -85,12 +87,57 @@ function guardarRecord(r) {
  * con el motivo. Un menú que enseña 0 dinomonedas porque el perfil no llegó es
  * peor que una pantalla que dice qué ha pasado.
  */
-async function presentarse(nombre) {
-  await entrarEnLaCuenca(nombre);
-  const p = await sincronizar();
-  if (!p || modoPerfil() !== MODO_PERFIL.REMOTO) {
-    throw new Error('no se pudo traer tu perfil del servidor');
+/** Lo que la pantalla de carga descarga antes de enseñar el menú. */
+const PIEZAS_DEL_MENU = [
+  'assets/piel/portada.webp', 'assets/piel/boton_ancho.webp',
+  'assets/piel/placa_coleccion.webp', 'assets/piel/placa_sobres.webp', 'assets/piel/placa_mazos.webp',
+  'assets/piel/placa_cuenca.webp', 'assets/piel/placa_cuenta.webp',
+];
+
+/**
+ * Entra en la cuenta y trae el perfil, con la pantalla de carga delante.
+ *
+ * El trabajo arranca ENSEGUIDA y la pantalla se enseña cuando la marca se va:
+ * si se esperase a la marca para empezar, serían dos esperas puestas en fila.
+ * Así, cuando la carga aparece, la barra ya lleva lo que se haya hecho.
+ *
+ * Si algo falla se vuelve a la puerta ANTES de relanzar: quien llamó —el
+ * arranque o el formulario de entrada— pinta el motivo en ella, y para eso
+ * tiene que estar a la vista.
+ *
+ * @param {string|null} nombre  el nombre elegido al crear la cuenta
+ * @param {Promise|null} marca  la marca en pantalla, si hay que esperarla
+ */
+async function presentarse(nombre, marca = null) {
+  const carga = empezarCarga(3);
+  const trabajo = (async () => {
+    await precargarPiezas(PIEZAS_DEL_MENU);
+    carga.avanzar();
+    await entrarEnLaCuenca(nombre);
+    carga.avanzar();
+    const p = await sincronizar();
+    if (!p || modoPerfil() !== MODO_PERFIL.REMOTO) {
+      throw new Error('no se pudo traer tu perfil del servidor');
+    }
+    carga.avanzar();
+    return p;
+  })();
+  // Si falla mientras la marca sigue en pantalla, nadie lo ha esperado aún y
+  // el navegador lo apunta como rechazo sin dueño. El `await` de abajo sí lo
+  // recoge; esto sólo evita el aviso.
+  trabajo.catch(() => {});
+
+  if (marca) await marca;
+  irA(APP.CARGA);
+  let p;
+  try {
+    p = await trabajo;
+  } catch (e) {
+    carga.cancelar();
+    irA(APP.ENTRADA);
+    throw e;
   }
+  await carga.terminar();
   pintarMenu();
   pintarCuentaEnMenu();
   pintarRecord();
@@ -145,6 +192,8 @@ function enseñarMisiones(abierto) {
 
 function irA(nuevo) {
   app = nuevo;
+  el.marca.classList.toggle('oculta', nuevo !== APP.MARCA);
+  el.carga.classList.toggle('oculta', nuevo !== APP.CARGA);
   el.menu.classList.toggle('oculta', nuevo !== APP.MENU);
   el.jugar.classList.toggle('oculta', nuevo !== APP.JUGAR);
   el.partida.classList.toggle('oculta', nuevo !== APP.PLAYING && nuevo !== APP.RESOLVING);
@@ -998,11 +1047,14 @@ function iniciar() {
   // LA PUERTA. Sin sesión de una cuenta con correo no se pasa de aquí: el menú,
   // la colección y el tablero no se pintan. Las sesiones anónimas que quedaran
   // de la versión anterior no cuentan como haber entrado.
+  //
+  // La marca ya está en pantalla desde el HTML. Lo que se decide aquí es qué
+  // viene después de ella: la carga y el menú si hay sesión, la puerta si no.
+  const marca = mostrarMarca();
   if (estaDentro()) {
-    presentarse(null).catch((e) => { irA(APP.ENTRADA); abrirEntrada(e.message); });
+    presentarse(null, marca).catch((e) => { abrirEntrada(e.message); irA(APP.ENTRADA); });
   } else {
-    abrirEntrada();
-    irA(APP.ENTRADA);
+    marca.then(() => { abrirEntrada(); irA(APP.ENTRADA); });
   }
 
   // El botón del menú ya no empieza una partida: abre la pantalla donde se
