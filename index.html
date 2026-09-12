@@ -48,7 +48,7 @@
       <div class="menu-acciones">
         <!-- La barra y las cinco placas son piezas dibujadas, del mismo latón
              y la misma piedra que los marcos. El texto lo pone el CSS encima. -->
-        <button id="btn-jugar" class="boton-grande boton-piedra">Empezar partida</button>
+        <button id="btn-jugar" class="boton-grande boton-piedra">Ir a jugar</button>
         <div class="menu-fila menu-placas">
           <button id="btn-coleccion" class="placa placa-coleccion"><i aria-hidden="true"></i>Colección</button>
           <button id="btn-sobres" class="placa placa-sobres"><i aria-hidden="true"></i>Sobres</button>
@@ -60,22 +60,49 @@
           <button id="btn-ayuda-menu" class="boton-fantasma">Cómo se juega</button>
           <button id="btn-tutorial" class="boton-fantasma">Tutorial</button>
         </div>
-        <div class="menu-dificultad">
-          <span>Rival</span>
-          <div id="dificultad" class="menu-chips"></div>
-        </div>
         <p class="menu-monedas"><span class="punto"></span><b id="menu-moneda">0</b> dinomonedas
           <span class="sep"></span> mazo <b id="menu-mazo">—</b></p>
-        <!-- Las tres misiones del día. Las elige el calendario y el progreso lo
-             lleva el servidor: el navegador sólo las pinta. Nace vacío y se
-             rellena cuando `mis_misiones` contesta; si no contesta, no se
-             enseña nada en vez de enseñar ceros que no son. -->
-        <div class="menu-misiones oculta" id="menu-misiones"></div>
         <p class="menu-record" id="menu-record"></p>
         <!-- Quién eres, dicho sin que haya que ir a buscarlo. Jugar sin cuenta
              es legítimo, pero que la colección viva sólo en este navegador es
              algo que conviene saber ANTES de perderla. -->
         <p class="menu-cuenta" id="menu-cuenta"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------ JUGAR -->
+  <!-- Qué se juega, que ya no es una sola cosa. El menú tenía un botón que
+       empezaba una partida contra la IA y punto; con las misiones dentro se
+       quedó amontonado y sin sitio para lo que venga. Aquí caben las tres y
+       cada una tiene su placa, del mismo latón y la misma piedra. -->
+  <section id="jugar" class="pantalla oculta">
+    <img class="menu-heroe" src="assets/piel/fondo_jugar.webp" alt="">
+    <div class="menu-velo"></div>
+    <div class="menu-caja">
+      <p class="menu-epigrafe"><span class="filete"></span>Formación Morrison</p>
+      <h1>A jugar</h1>
+      <p class="menu-lema">Elige contra qué te mides.</p>
+      <div class="menu-acciones">
+        <div class="menu-fila jugar-placas">
+          <button id="btn-solitario" class="placa placa-solitario"><i aria-hidden="true"></i>En solitario</button>
+          <!-- El duelo no existe todavía: la columna de ELO está en la base y
+               las partidas se registran, pero no hay PvP. La placa se enseña
+               apagada y lo dice, que es mejor que esconderla y mejor que
+               fingir que hace algo. -->
+          <button id="btn-duelo" class="placa placa-duelo" disabled><i aria-hidden="true"></i>Duelo<small>Pronto</small></button>
+          <button id="btn-misiones" class="placa placa-misiones" aria-expanded="false"><i aria-hidden="true"></i>Misiones</button>
+        </div>
+        <div class="menu-dificultad">
+          <span>Rival</span>
+          <div id="dificultad" class="menu-chips"></div>
+        </div>
+        <!-- Las tres misiones del día. Las elige el calendario y el progreso lo
+             lleva el servidor: el navegador sólo las pinta. Nace vacío y se
+             rellena cuando `mis_misiones` contesta; si no contesta, no se
+             enseña nada en vez de enseñar ceros que no son. -->
+        <div class="menu-misiones oculta" id="menu-misiones"></div>
+        <button id="btn-jugar-volver" class="boton-fantasma jugar-volver">Volver</button>
       </div>
     </div>
   </section>
