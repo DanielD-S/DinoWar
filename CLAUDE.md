@@ -227,6 +227,21 @@ rarezas con ese PNG como referencia y el material como único cambio.
 `test/marcos.test.js` vigila que cada clase que emite `claseMarco()` tenga
 fichero y que ningún WebP sobre.
 
+## El sobre se abre con dos gestos
+
+[`src/ui/apertura.js`](src/ui/apertura.js) es la ceremonia: rasgar la bolsa
+arrastrando el dedo por la franja de arriba y deslizar cada carta para
+descubrir la siguiente. Sólo mueve DOM —las cinco cartas vienen sorteadas por
+el servidor y pintadas por `cartaHTML()`— y devuelve una promesa que
+`comprarSobre()` espera antes de pintar la rejilla de resumen. Un toque también
+rasga y también pasa carta, porque el ratón no rasga bien; «ver las cinco» la
+salta; y con `prefers-reduced-motion` no se enseña.
+
+El sobre son dos capas con la misma imagen recortadas por el mismo zigzag, y
+`--p` es cuánto se ha rasgado. La pila usa `--i` para el escalón y
+`--dx`/`--dy`/`--giro` para seguir al dedo. Nada cambia de tamaño: todo es
+`transform`, `clip-path` y `opacity`, por lo mismo que en el tablero.
+
 ## `transform` es una sola propiedad, y quien la escribe último gana
 
 Es la trampa de toda la capa visual y ya ha mordido dos veces.

@@ -60,6 +60,9 @@ export function sonido(tipo) {
   switch (tipo) {
     case 'carta': tono(520, 320, 0.07, 'square', 0.05); break;
     case 'revelar': tono(300, 620, 0.14, 'triangle', 0.06); break;
+    // Los dos del sobre: rasgar la bolsa, y el tintineo de una carta rara.
+    case 'rasgar': tono(190, 80, 0.2, 'sawtooth', 0.05); break;
+    case 'joya': tono(660, 990, 0.22, 'sine', 0.05); break;
     case 'muerte': tono(200, 70, 0.24, 'sawtooth', 0.05); break;
     case 'zona': tono(440, 660, 0.1, 'sine', 0.05); break;
     case 'error': tono(160, 120, 0.12, 'square', 0.045); break;

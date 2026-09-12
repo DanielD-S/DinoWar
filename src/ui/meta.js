@@ -25,6 +25,7 @@ import {
 } from './perfil.js';
 import { arte } from './art.js';
 import { fichaHTML, abrirFicha, cartaHTML } from './render.js';
+import { ceremoniaDeSobre } from './apertura.js';
 
 const id = (s) => document.getElementById(s);
 
@@ -331,12 +332,30 @@ async function comprarSobre() {
     dom.aviso.textContent = `No se pudo abrir el sobre: ${e.message}`;
     return;
   }
-  dom.btnAbrir.disabled = false;
-
-  const nuevas = new Set(tirada.filter((cid) => (antesDeAbrir[cid] ?? 0) === 0));
-  pintarSobres(tirada, nuevas, antesDeAbrir);
   pintarMenu();
 
+  const nuevas = new Set(tirada.filter((cid) => (antesDeAbrir[cid] ?? 0) === 0));
+
+  // La ceremonia: rasgar el sobre y descubrir las cinco una a una. Las cartas
+  // van a tamaño de visor, con el texto de la habilidad, porque es el momento
+  // en que se leen. El botón sigue apagado hasta el final, que un segundo
+  // sobre a media ceremonia pisaría al primero.
+  const cuenta = {};
+  const ceremonia = tirada.map((cid) => {
+    const c = carta(cid);
+    cuenta[cid] = (cuenta[cid] ?? 0) + 1;
+    return {
+      html: cartaHTML(cid, { variante: 'visor', datos: { texto: true } }),
+      rareza: c.rareza, binomial: c.binomial, dino: esDino(c),
+      estado: estadoDeCopia(cid, antesDeAbrir[cid] ?? 0, cuenta[cid]),
+    };
+  });
+  dom.tirada.className = 'sobre-tirada ceremonia';
+  await ceremoniaDeSobre(dom.tirada, ceremonia);
+  dom.btnAbrir.disabled = false;
+
+  // Y la rejilla de las cinco como resumen, que es lo que se queda en pantalla.
+  pintarSobres(tirada, nuevas, antesDeAbrir);
   // El volteo se dispara en el fotograma siguiente al pintado, para que el
   // navegador tenga el estado inicial con el que interpolar.
   requestAnimationFrame(() => {
