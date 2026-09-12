@@ -212,6 +212,12 @@ binomial en una línea son 28 letras en 58 px, y no cabe en ninguna banda de
 ningún marco a 83 px de carta. Las de soporte no llevan banda porque su nombre
 y su habilidad son el mismo, así que la caja lleva el nombre.
 
+La misma carta se pinta en cinco tamaños —tablero, mano, colección, sobre y
+visor— y todas pasan por `cartaHTML()` o `nodoCarta()`. No hay otra
+composición: la colección y el sobre pintan el binomial entero en un pie
+debajo de la carta, y el visor mete el texto de la habilidad en la caja, que a
+268 px es el único sitio donde cabe.
+
 Al pedir un marco nuevo al generador, dos cosas que costaron cuatro intentos:
 pide los huecos en porcentaje del alto y aun así entrega la mitad —una banda
 del 11 % salió del 5 %, luego del 7 %—, y cada edición mueve alguna otra pieza

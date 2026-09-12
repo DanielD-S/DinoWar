@@ -107,20 +107,27 @@ export function statHTML(k, nombre, valor, clase = '') {
 }
 
 /**
- * La cara de una carta. Misma estructura en la ranura, en la mano y en el
- * visor: cambia el tamaño, no la composición.
+ * La cara de una carta: la misma composición en el tablero, la mano, la
+ * colección, el sobre y el visor. Cambia el tamaño, no el orden.
  *
- * Las tres cifras llevan glifo y color fijos —A ámbar, D acero, V arcilla—
- * porque sin eso eran tres números iguales en fila y nadie sabía cuál era cuál.
+ * Es la anatomía de una carta de TCG sobre el marco dibujado: el anillo del
+ * coste, la BANDA del nombre, la VENTANA de la ilustración, la CAJA de la
+ * habilidad y las dos chapas de cifras. Una criatura lleva el GÉNERO en la
+ * banda y el nombre de la HABILIDAD en la caja: el binomial entero no cabe en
+ * la banda —son 28 letras en 58 px— y se lee en el visor y en la colección,
+ * que lo ponen debajo de la carta. Las de soporte no llevan banda ni chapas:
+ * su nombre y su habilidad son el mismo, así que la caja lleva el nombre.
+ *
+ * `texto` añade a la caja el texto de la habilidad. Sólo cabe en el visor,
+ * donde la caja mide 84 px de alto; en el tablero no entra ni a 5 px.
+ *
+ * Las dos cifras llevan chapa y color fijos —Ataque ámbar, Vida arcilla—
+ * porque sin eso eran dos números iguales en fila y nadie sabía cuál era cuál.
  * La Vida sólo enseña el máximo cuando hay heridas: «5» de sano, «2/6» herido.
- *
- * El coste y la rareza sólo se superponen al arte en las cartas de jugar, donde
- * no cabe otra cosa. En la carta a tamaño de lectura la ilustración es el
- * contenido, así que los dos se van a una cinta encima y no tapan nada.
  */
 function marcoCarta(estado, cardId, {
   poder = null, vidaAct = null, vidaMax = null,
-  adaptada = false, mermada = false, grande = false, marco = false,
+  adaptada = false, mermada = false, texto = false,
 } = {}) {
   const c = carta(cardId);
   const dino = c.tipo === TIPO.DINOSAURIO;
@@ -133,58 +140,44 @@ function marcoCarta(estado, cardId, {
   if (dino && atq > c.ataque) clasePoder = ' mejorado';
   if (dino && atq < c.ataque) clasePoder = ' mermado';
 
-  const coste = `<span class="c-coste">${c.coste}</span>`;
-  const rareza = `<span class="c-rareza rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span>`;
   // Dos dígitos en una chapa de 10 px no caben al mismo cuerpo que uno: la
   // cifra se sale del canto. `ancho` la baja un punto. Sólo cuenta lo que se
   // ve: el máximo entre <em> va aparte.
   const ancho = (v) => (String(v).replace(/<em>.*<\/em>/, '').length > 1 ? ' ancho' : '');
+  // Las cifras salen FUERA de `.c-cuerpo`: van ancladas a la carta, porque las
+  // chapas están en coordenadas de la carta y no de la caja.
   const stats = dino ? `<div class="c-stats">
         ${statHTML('a', 'Ataque', atq, clasePoder + ancho(atq))}
         ${statHTML('v', 'Vida', `${va}${herido ? `<em>/${vm}</em>` : ''}`, (herido ? ' herido' : '') + ancho(va))}
       </div>` : '';
 
-  // La placa mide lo que mide y el binomial no: «Antarctosaurus wichmannianus»
+  // La caja mide lo que mide y el texto no: «Antarctosaurus wichmannianus»
   // pide 86 px donde hay 63. `--pal` es la palabra más larga, y carta.css saca
   // de ahí el cuerpo de letra justo para que entre. La medida vive en el CSS
-  // —unidades de contenedor— porque la placa cambia con el ancho de la carta.
-  const palabraMasLarga = (texto) => Math.max(...texto.split(/\s+/).map((w) => w.length));
-  const pal = palabraMasLarga(c.binomial);
-
-  // Con marco dibujado, una criatura reparte su cara como una carta de TCG: el
-  // GÉNERO en la banda de arriba y el nombre de la HABILIDAD en la caja. El
-  // binomial entero no cabe en la banda —son 28 letras en 58 px— y se queda
-  // para el visor, que es donde se lee. Las cartas de soporte no llevan banda:
-  // su nombre y su habilidad son el mismo, así que la caja lleva el nombre.
+  // —unidades de contenedor— porque la caja cambia con el ancho de la carta.
+  const palabraMasLarga = (t) => Math.max(...t.split(/\s+/).map((w) => w.length));
   const genero = c.binomial.split(/\s+/)[0];
-  const bandaGenero = marco && dino
+  const banda = dino
     ? `<div class="c-banda"><span class="c-genero" style="--gen:${genero.length}">${genero}</span></div>` : '';
-  const cuerpoNombre = marco && dino
+  const titulo = dino
     ? `<div class="c-hab" style="--pal:${palabraMasLarga(c.rasgoNombre)}">${c.rasgoNombre}</div>`
-    : `<div class="c-nombre" style="--pal:${pal}">${c.binomial}</div>`;
+    : `<div class="c-nombre" style="--pal:${palabraMasLarga(c.binomial)}">${c.binomial}</div>`;
 
-  // La carta con marco dibujado (tablero y mano) lleva tres capas más: el marco
-  // por encima del arte, y las chapas donde caen las cifras y el coste. Y las
-  // cifras salen FUERA de `.c-cuerpo`: van ancladas a la carta, porque las
-  // chapas están en coordenadas de la carta y no de la placa. carta.css
-  // explica la medida. El visor grande sigue con su composición de siempre.
-  const chapas = grande ? '' : `<span class="c-marco"></span><span class="c-chapa c-chapa-b"></span>`
+  // Tres capas más: el marco por encima del arte, y las chapas donde caen las
+  // cifras y el coste. carta.css explica la medida.
+  const chapas = '<span class="c-marco"></span><span class="c-chapa c-chapa-b"></span>'
     + (dino ? '<span class="c-chapa c-chapa-a"></span><span class="c-chapa c-chapa-v"></span>' : '');
 
   return `
     ${chapas}
-    ${grande ? `<div class="c-cab">${coste}${rareza}</div>` : ''}
     <div class="c-arte">${arte(cardId)}</div>
-    ${grande ? '' : coste}
-    ${bandaGenero}
+    <span class="c-coste">${c.coste}</span>
+    ${banda}
     <div class="c-cuerpo">
-      ${cuerpoNombre}
-      ${grande ? `<div class="c-clado">${dino ? CLADO_NOMBRE[c.clado] : TIPO_NOMBRE[c.tipo]}</div>` : ''}
-      ${grande ? stats : ''}
-      ${!dino && !grande ? `<div class="c-tipo">${TIPO_NOMBRE[c.tipo]}</div>` : ''}
-      ${grande ? `<div class="c-rasgo"><b>${c.rasgoNombre}</b><p>${c.rasgoTexto}</p></div>` : ''}
+      ${titulo}
+      ${texto ? `<p class="c-texto">${c.rasgoTexto}</p>` : ''}
     </div>
-    ${grande ? '' : stats}
+    ${stats}
     ${adaptada ? '<span class="c-adap"></span>' : ''}
     ${mermada ? '<span class="c-merma" title="Bajo una presión rival"></span>' : ''}`;
 }
@@ -212,17 +205,31 @@ function claseMarco(cardId) {
   return ` m-${FAMILIA_MARCO[c.tipo] ?? 'evento'}`;
 }
 
+/**
+ * Las clases de una carta: variante, familia, rareza y marco. `con-marco` va
+ * en todas: desde que la colección, el sobre y el visor enseñan el marco
+ * dibujado, no queda ninguna pantalla con la composición vieja.
+ */
+function clasesCarta(cardId, variante, clases = []) {
+  return `carta carta--${variante}${claseFamilia(cardId)} rareza-${carta(cardId).rareza} con-marco${claseMarco(cardId)}`
+    + `${clases.length ? ' ' + clases.join(' ') : ''}`;
+}
+
+/**
+ * La carta como cadena, para las pantallas que pintan por `innerHTML`: la
+ * colección, el sobre y el visor. `datos` es lo mismo que en `nodoCarta()`.
+ */
+export function cartaHTML(cardId, { variante, clases = [], datos = {} }) {
+  return `<div class="${clasesCarta(cardId, variante, clases)}" data-card="${cardId}">${marcoCarta(null, cardId, datos)}</div>`;
+}
+
 export function nodoCarta(estado, cardId, { variante, dueno = null, iid = null, clases = [], datos = {} }) {
   const n = document.createElement('div');
-  // `con-marco` sólo en tablero y mano: carta.css acota ahí el marco dibujado y
-  // el visor grande conserva su composición.
-  const conMarco = variante === 'ranura' || variante === 'mano' ? ` con-marco${claseMarco(cardId)}` : '';
-  n.className = `carta carta--${variante}${claseFamilia(cardId)} rareza-${carta(cardId).rareza}${conMarco}`
-    + `${clases.length ? ' ' + clases.join(' ') : ''}`;
+  n.className = clasesCarta(cardId, variante, clases);
   if (dueno !== null) n.classList.add(dueno === JUGADOR ? 'propio' : 'rival');
   if (iid !== null) n.dataset.iid = iid;
   n.dataset.card = cardId;
-  n.innerHTML = marcoCarta(estado, cardId, { ...datos, marco: conMarco !== '' });
+  n.innerHTML = marcoCarta(estado, cardId, datos);
   return n;
 }
 
@@ -545,13 +552,21 @@ export function abrirFicha(html) {
 }
 
 /**
- * La carta como se ve en el tablero, pero legible. No se recalculan tamaños:
- * se escala el marco entero, así que lo que se amplía es exactamente la carta
- * que se juega, con su proporción y su composición.
+ * La carta como se ve en el tablero, pero legible: el mismo marco a 268 px,
+ * con el texto de la habilidad dentro de la caja, que aquí sí cabe. El
+ * binomial entero y el clado van debajo, que es donde se aprende el nombre
+ * que la banda abrevia al género.
  */
 export function cartaGrandeHTML(cardId) {
+  const c = carta(cardId);
+  const dino = c.tipo === TIPO.DINOSAURIO;
   return `<div class="visor-marco">
-    <div class="carta carta--visor${claseFamilia(cardId)}">${marcoCarta(null, cardId, { grande: true })}</div>
+    ${cartaHTML(cardId, { variante: 'visor', datos: { texto: true } })}
+    <div class="visor-leyenda">
+      <span class="visor-binomial${dino ? '' : ' recto'}">${c.binomial}</span>
+      <span class="visor-clado">${dino ? CLADO_NOMBRE[c.clado] : TIPO_NOMBRE[c.tipo]}
+        · <span class="rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span></span>
+    </div>
   </div>`;
 }
 
@@ -676,9 +691,6 @@ export function ayudaHTML() {
   // cambia la cuenta que se enseña.
   const a = carta('allosaurus');
   const d = carta('stegosaurus');
-  const n = document.createElement('div');
-  n.className = 'carta carta--ranura';
-  n.innerHTML = marcoCarta(null, ejemplo);
 
   return `
     <div class="ayuda-h">Las tres formas de ganar</div>
@@ -712,9 +724,9 @@ export function ayudaHTML() {
 
     <div class="ayuda-h">Qué significa cada número</div>
     <div class="anatomia">
-      <div class="anatomia-carta">${n.outerHTML}</div>
+      <div class="anatomia-carta">${cartaHTML(ejemplo, { variante: 'ranura' })}</div>
       <div class="anatomia-notas">
-        <div><span class="n c">${c.coste}</span><span><b>Coste</b> en Biomasa. Va en el círculo, sobre el arte.</span></div>
+        <div><span class="n c">${c.coste}</span><span><b>Coste</b> en Biomasa, en el anillo de arriba. A su lado, el género; en la caja, lo que hace.</span></div>
         <div><span class="n st-a">${glifo('a')}</span><span><b>Ataque</b>: daño que reparte, una vez por turno.</span></div>
         <div><span class="n st-v">${glifo('v')}</span><span><b>Vida</b>: heridas que aguanta antes de morir. Herida enseña <b>actual/máximo</b>, y <b>no se cura</b> salvo carta que lo diga.</span></div>
       </div>

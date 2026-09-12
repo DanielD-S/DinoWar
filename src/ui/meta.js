@@ -24,7 +24,7 @@ import {
   PRUEBAS, comprarSobre as pedirSobre, fundir, guardarMazo, usarMazo, cobrarPartida,
 } from './perfil.js';
 import { arte } from './art.js';
-import { fichaHTML, abrirFicha, statHTML } from './render.js';
+import { fichaHTML, abrirFicha, cartaHTML } from './render.js';
 
 const id = (s) => document.getElementById(s);
 
@@ -141,17 +141,17 @@ function pintarColeccion() {
         </div>
       </div>`;
     }
+    // La carta con su marco, y debajo lo que el marco abrevia: el binomial
+    // entero —la banda lleva sólo el género—, la rareza y la familia. El
+    // contador de copias va en el pie y no encima de la carta: arriba a la
+    // derecha ahora acaba la banda del nombre.
     return `<div class="col-carta rareza-${c.rareza} ${esDino(c) ? 'dino' : ''}"
                  role="button" tabindex="0" data-card="${c.id}">
-      <div class="col-arte">${arte(c.id)}</div>
-      <span class="col-copias${extra ? ' sobra' : ''}">${n}/${limiteDe(c.id)}</span>
+      ${cartaHTML(c.id, { variante: 'col' })}
       <div class="col-pie">
         <div class="col-nombre">${nombreHTML(c)}</div>
-        <div class="col-meta"><span class="col-rar rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span> · ${familia(c)}</div>
-        ${esDino(c) ? `<div class="c-stats">
-          ${statHTML('a', 'Ataque', c.ataque)}
-          ${statHTML('v', 'Vida', c.vida)}
-        </div>` : ''}
+        <div class="col-meta"><span class="col-copias${extra ? ' sobra' : ''}">${n}/${limiteDe(c.id)}</span>
+          <span class="col-rar rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span> · ${familia(c)}</div>
       </div>
     </div>`;
   }).join('');
@@ -287,7 +287,7 @@ function pintarSobres(tirada = null, nuevas = new Set(), antesDeAbrir = {}) {
         <div class="sobre-giro">
           <div class="sobre-dorso"></div>
           <div class="sobre-frente">
-            <div class="col-arte">${arte(cid)}</div>
+            ${cartaHTML(cid, { variante: 'sobre' })}
             <div class="col-pie">
               <div class="col-nombre">${nombreHTML(c)}</div>
               <div class="col-rar rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</div>

@@ -295,16 +295,21 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
   align-content: start; grid-auto-rows: max-content;
 }
+/* La carta con su marco dibujado y, debajo, un pie de texto con lo que el
+   marco abrevia. La caja de alrededor ya no dibuja nada: el borde y la rareza
+   los trae el marco. */
 .col-carta {
   position: relative;
   /* Flex en columna, no bloque: un <button> no crece con su contenido y la
      rejilla lo aplasta a la altura de una línea. */
-  display: flex; flex-direction: column; align-items: stretch;
-  border-radius: 9px; box-shadow: 0 0 0 1px var(--borde);
-  background: linear-gradient(180deg, var(--superficie-2), var(--panel-alto) 40%, var(--panel));
-  overflow: hidden; text-align: left; padding: 0;
+  display: flex; flex-direction: column; align-items: stretch; gap: 5px;
+  border-radius: 9px; text-align: left; padding: 0;
+  /* `min-width: 0`: el pie lleva `white-space: nowrap`, y sin esto su anchura
+     mínima estira la columna y las tres dejan de medir lo mismo. */
+  min-width: 0;
 }
-.col-carta:active { box-shadow: 0 0 0 1px var(--borde-fuerte); }
+.col-carta:active .carta { filter: brightness(1.12); }
+.col-carta .carta--col { width: 100%; aspect-ratio: 82 / 112; border-radius: 6px; }
 
 /* Altura en píxeles, no aspect-ratio: dentro de una rejilla, un aspect-ratio
    sobre anchura indefinida aporta cero a la altura intrínseca y la fila se
@@ -317,14 +322,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .col-arte .foto { filter: saturate(.9) brightness(.85); }
 
 .col-copias {
-  position: absolute; top: 5px; right: 5px;
-  padding: 2px 6px; border-radius: 3px; font-size: 9.5px;
+  display: inline-block; padding: 1px 5px; margin-right: 2px; border-radius: 3px; font-size: 9px;
   background: rgba(20,15,11,.85); box-shadow: 0 0 0 1px var(--borde); color: var(--texto-2);
 }
 /* Ámbar macizo = te sobran copias, y eso es justo lo que se puede fundir. */
 .col-copias.sobra { background: var(--bio); box-shadow: none; color: #191410; }
 
-.col-pie { flex: 1 1 auto; padding: 7px 8px 8px; display: flex; flex-direction: column; gap: 4px; }
+.col-pie { flex: 1 1 auto; min-width: 0; padding: 0 2px; display: flex; flex-direction: column; gap: 3px; }
 .col-nombre {
   font-size: 11px; line-height: 1.15; color: var(--texto);
   overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
@@ -333,7 +337,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .col-meta { font-size: 9px; color: var(--tenue); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Una especie que no tienes es un hueco, no una carta apagada. */
-.col-carta.ninguna { background: #1a1410; box-shadow: 0 0 0 1px #2e2519; }
+.col-carta.ninguna { background: #1a1410; box-shadow: 0 0 0 1px #2e2519; overflow: hidden; }
 .col-hueco {
   height: 96px; display: grid; place-items: center;
   color: #3a2f22; font-size: 20px;
@@ -540,32 +544,32 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   background-position: 0 0, 8px 5.5px;
   border-color: var(--borde-fuerte);
 }
-.sobre-frente .col-arte { height: auto; aspect-ratio: 3 / 2; }
+/* La cara es la carta con su marco, y el nombre entero debajo a cuerpo de
+   pie: a 62 px la banda sólo puede con el género. */
+.sobre-frente { border: 0; background: none; border-radius: 0; overflow: visible; }
+.sobre-frente .carta--sobre { width: 100%; aspect-ratio: 82 / 112; border-radius: 4px; }
+.sobre-frente .col-pie { padding: 3px 1px 0; gap: 1px; }
 .sobre-frente .col-nombre { font-size: 8px; height: 2.3em; }
+.sobre-frente .col-rar { font-size: 8px; }
 
 /* El brillo se reserva a lo que de verdad es raro: si todo destella, nada lo es. */
 /* La rareza se lee en el borde, en la misma escala ámbar del resto: común
    apagado, rara y épica firmes, legendaria encendida. */
-.sobre-carta.rareza-RARO .sobre-frente,
-.sobre-carta.rareza-EPICO .sobre-frente { border-color: var(--borde-fuerte); }
-.sobre-carta.rareza-LEGENDARIO .sobre-frente { border-color: var(--bio); }
-.sobre-carta.rareza-LEGENDARIO.gira .sobre-frente {
+.sobre-carta.rareza-LEGENDARIO.gira .carta {
   animation: destello 1s ease-out calc(var(--retardo, 0ms) + 700ms) 2;
 }
 @keyframes destello {
   0%, 100% { box-shadow: 0 0 0 0 rgba(217,164,65,0); }
   40%      { box-shadow: 0 0 26px 2px rgba(217,164,65,.5); }
 }
-.sobre-carta.nueva .sobre-frente { box-shadow: 0 0 0 1px var(--bio) inset; }
+.sobre-carta.nueva .carta { box-shadow: 0 0 0 1px var(--bio); }
 
 /* La mejor de la tirada sale la última, más grande y elevada: abrir un sobre
    tiene que tener un momento, y ese es. */
 .sobre-carta.mejor { z-index: 2; }
 .sobre-carta.mejor .sobre-giro { transform: rotateY(180deg) scale(1.16) translateY(-8px); }
 .sobre-carta.mejor.gira .sobre-giro { transform: scale(1.16) translateY(-8px); }
-.sobre-carta.mejor .sobre-frente {
-  border-color: var(--bio); box-shadow: 0 0 26px rgba(217,164,65,.3);
-}
+.sobre-carta.mejor .carta { box-shadow: 0 0 26px rgba(217,164,65,.3); }
 
 /* Qué es esta carta para tu colección. Sin esto, la cuarta copia de algo que
    ya no cabe se ve igual que la primera. */
@@ -598,52 +602,30 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hud-recs { display: flex; gap: 12px; }
 .rec { display: flex; align-items: baseline; gap: 3px; white-space: nowrap; }
 .rec b { font-size: 13px; font-weight: 500; }
-/* `tope` y no `meta`: `.meta` es la clase de las pantallas de colección,
-   sobres y mazos, y lleva `background: var(--fondo)`. Puesta en este trocito
-   de texto pintaba un rectángulo opaco detrás del «/10», justo encima del
-   cuero de la cinta. Es la misma clase que el tope del hábitat, que hace lo
-   mismo con el «/70». */
-.rec .tope { font-size: 10px; color: var(--tenue-2); margin-left: -2px; }
+.rec .meta { font-size: 10px; color: var(--tenue-2); margin-left: -2px; }
 .rec i { font-style: normal; font-size: 11px; color: var(--tenue); }
 
-/* El turno y los dos relojes, centrados entre las dos filas y con su propio
-   filete: es la línea que separa un bando del otro. Los relojes FLANQUEAN el
-   turno —el del rival a la izquierda, el tuyo a la derecha— en vez de ir cada
-   uno en su cinta: dentro de la cinta competían con el medallón, el nombre y
-   las tres cifras de recursos, y lo que hay que comparar de un vistazo son los
-   dos relojes entre sí, no cada reloj con su propia biomasa. Puestos a los
-   lados del mismo rótulo, se leen como el marcador de un ajedrez. */
-/* Rejilla de tres columnas y no un flex centrado: las dos de los lados son
-   `1fr`, así que miden lo mismo pase lo que pase y el turno queda clavado en
-   el centro de la fila. Con `justify-content: center` no lo estaba: los
-   minutos no llevan cero delante, y en cuanto un bando bajaba de diez minutos
-   su reloj perdía un carácter y el rótulo se corría 4 px. Cada reloj se pega
-   al centro dentro de su columna, así que el hueco hasta el turno tampoco
-   cambia; lo que baila es el borde de fuera, que no lo mira nadie. */
+/* El turno y el reloj, centrados entre las dos filas y con su propio filete:
+   es la línea que separa un bando del otro. */
 .hud-centro {
-  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 9px;
+  display: flex; align-items: center; justify-content: center; gap: 9px;
   padding: 5px 0; border-top: 1px solid var(--superficie-2); border-bottom: 1px solid var(--superficie-2);
 }
-.reloj-rival { justify-self: end; }
-.reloj-propio { justify-self: start; }
 #turno { font-size: 12px; color: var(--texto-2); white-space: nowrap; }
 
-/* Un reloj por bando. Cifra tabular para que no baile al pasar de 10:00 a
-   9:59, y apagado mientras no le toca: casi toda la partida es información de
-   fondo. Que el turno siga centrado cuando los dos relojes miden distinto lo
-   resuelve la rejilla de arriba, no un ancho fijo aquí. */
+/* Un reloj por bando, en su propia fila del marcador. Cifra tabular para que
+   no baile al pasar de 10:00 a 9:59, y apagado mientras no le toca: casi toda
+   la partida es información de fondo. */
 .reloj {
   font-variant-numeric: tabular-nums; font-size: 11.5px; letter-spacing: .02em;
   color: var(--tenue-2); padding: 1px 7px; border-radius: 10px;
-  box-shadow: 0 0 0 1px var(--linea);
+  box-shadow: 0 0 0 1px var(--linea); margin-right: auto; margin-left: 10px;
 }
 /* El que corre es el que hay que mirar: se enciende y marca de quién es el
-   tiempo. Sin esto, dos cifras iguales no dicen quién está pensando. El bando
-   sale de una clase del propio reloj y no del ancestro: ya no cuelgan de
-   `.hud-bando`. */
+   tiempo. Sin esto, dos cifras iguales no dicen quién está pensando. */
 .reloj.corre { color: var(--texto); box-shadow: 0 0 0 1px var(--borde-fuerte); }
-.reloj-rival.corre { color: var(--rival); box-shadow: 0 0 0 1px var(--rival); }
-.reloj-propio.corre { color: var(--acento-claro); box-shadow: 0 0 0 1px var(--bio); }
+.hud-bando.rival .reloj.corre { color: var(--rival); box-shadow: 0 0 0 1px var(--rival); }
+.hud-bando.propio .reloj.corre { color: var(--acento-claro); box-shadow: 0 0 0 1px var(--bio); }
 .reloj.apremia {
   color: var(--peligro); box-shadow: 0 0 0 1px var(--peligro);
 }
@@ -878,12 +860,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .st-d i { color: var(--agua); }
 .st-v i { color: var(--vida); }
 /* El recuadro sólo donde hay sitio para él. */
-.col-carta .st, .ficha-cifras .st, .carta--visor .st {
+.ficha-cifras .st {
   padding: 1px 4px 1px 3px; border-radius: 3px; background: rgba(255, 255, 255, .045);
 }
-.col-carta .st-a, .ficha-cifras .st-a, .carta--visor .st-a { background: rgba(217, 164, 65, .1); }
-.col-carta .st-d, .ficha-cifras .st-d, .carta--visor .st-d { background: rgba(126, 158, 176, .1); }
-.col-carta .st-v, .ficha-cifras .st-v, .carta--visor .st-v { background: rgba(214, 122, 90, .1); }
+.ficha-cifras .st-a { background: rgba(217, 164, 65, .1); }
+.ficha-cifras .st-d { background: rgba(126, 158, 176, .1); }
+.ficha-cifras .st-v { background: rgba(214, 122, 90, .1); }
 .st-a.mejorado b { color: var(--bio); }
 .st-a.mermado b { color: var(--peligro); }
 .st-v.herido b { color: var(--vida); }
@@ -926,7 +908,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
    épica firmes, legendaria encendida. */
 .carta.rareza-RARO, .carta.rareza-EPICO { box-shadow: 0 0 0 1px var(--borde-fuerte); }
 .carta.rareza-LEGENDARIO { box-shadow: 0 0 0 1px var(--bio); }
-.col-carta.rareza-RARO, .col-carta.rareza-EPICO { box-shadow: 0 0 0 1px var(--borde-fuerte); }
 
 /* ==================================================== el guión de eventos
 
@@ -1098,13 +1079,14 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
    AL JUGARSE, un destello de oro que sale del borde y se apaga. Se engancha a
    `.aterriza`, que ya existe y que sólo dura lo que dura la entrada. */
 
-/* El sobre reutiliza `.col-arte` para su cara, así que un solo par de
-   selectores cubre la colección y la apertura. */
-.col-carta.rareza-LEGENDARIO .col-arte,
-.sobre-carta.rareza-LEGENDARIO .col-arte { position: relative; overflow: hidden; }
+/* Sobre la ventana del marco, en la colección y en el sobre. Tres clases
+   para ganar al `background: none` que carta.css le pone al velo de la
+   ventana en toda carta con marco. */
+.col-carta.rareza-LEGENDARIO .c-arte,
+.sobre-carta.rareza-LEGENDARIO .c-arte { overflow: hidden; }
 
-.col-carta.rareza-LEGENDARIO .col-arte::after,
-.sobre-carta.rareza-LEGENDARIO .col-arte::after {
+.col-carta.rareza-LEGENDARIO .c-arte::after,
+.sobre-carta.rareza-LEGENDARIO .c-arte::after {
   content: ''; position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(105deg,
     transparent 38%, rgba(244,217,155,.34) 50%, transparent 62%);
@@ -1117,10 +1099,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   100%    { background-position: -60% 0; }
 }
 
-/* El aro de la colección, algo más presente que el de antes. */
-.col-carta.rareza-LEGENDARIO {
-  box-shadow: 0 0 0 1px var(--bio), 0 0 18px rgba(217,164,65,.18);
-}
+/* El aro de la colección: el marco de oro ya dice legendaria, esto es el halo. */
+.col-carta.rareza-LEGENDARIO .carta { box-shadow: 0 0 18px rgba(217,164,65,.22); }
 
 /* Al caer en su ranura. Va como box-shadow del propio elemento y no como
    pseudoelemento: `.carta` lleva `overflow: hidden` y recortaría un `::after`
@@ -1142,8 +1122,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Quien pide menos movimiento se queda con el oro y sin el barrido: el aro
    sigue diciendo que es legendaria sin que nada se mueva en bucle. */
 @media (prefers-reduced-motion: reduce) {
-  .col-carta.rareza-LEGENDARIO .col-arte::after,
-  .sobre-carta.rareza-LEGENDARIO .col-arte::after { animation: none; }
+  .col-carta.rareza-LEGENDARIO .c-arte::after,
+  .sobre-carta.rareza-LEGENDARIO .c-arte::after { animation: none; }
   .carta--ranura.rareza-LEGENDARIO.aterriza { animation: aterrizar .26s ease-out both; }
 }
 
@@ -1522,59 +1502,18 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   flex: 1; min-height: 0; width: 100%;
   display: flex; align-items: center; justify-content: center;
 }
-/* La carta a tamaño de lectura no es la pequeña ampliada: es la misma
-   composición con sus propias medidas, porque escalar deja las cifras
-   gigantes y el texto ilegible por recorte. */
+/* La carta a tamaño de lectura es la misma que se juega, con su marco, a
+   268 px: ahí la caja mide 84 px de alto y le cabe el texto de la habilidad.
+   Debajo, el binomial entero y el clado, que la banda abrevia al género. */
 .visor-marco { width: min(268px, 78vw); }
-.carta--visor { width: 100%; border-radius: 12px; }
-.carta--visor .c-arte { height: 168px; }
-/* Coste y rareza en su propia cinta: encima del arte, no sobre él. A este
-   tamaño la ilustración es el contenido de la carta y taparle la cabeza al
-   animal con el círculo del coste era el defecto más visible del visor. */
-.c-cab {
-  flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between;
-  gap: 8px; padding: 9px 11px 8px; background: var(--panel-alto);
-  box-shadow: inset 0 -1px 0 var(--borde);
+.carta--visor { width: 100%; aspect-ratio: 82 / 112; border-radius: 12px; }
+.visor-leyenda {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  margin-top: 12px; text-align: center;
 }
-.carta--visor .c-cab .c-coste {
-  position: static; width: 30px; height: 30px; font-size: 14px;
-  border-color: var(--bio);
-}
-.c-rareza {
-  padding: 3px 8px; border-radius: 3px; font-size: 9.5px;
-  letter-spacing: .08em; text-transform: uppercase;
-  background: rgba(20,15,11,.85); box-shadow: 0 0 0 1px currentColor;
-}
-.carta--visor .c-cuerpo { padding: 11px 12px 13px; gap: 7px; }
-.carta--visor .c-nombre { font-size: 19px; line-height: 1.15; -webkit-line-clamp: 2; }
-.carta--visor .c-clado {
-  font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--tenue);
-}
-/* Tres columnas iguales con el nombre encima de la cifra: en una sola fila
-   «ATAQUE 4 DEFENSA 1 VIDA 3» no cabe en 268 px y la Vida se caía sola abajo. */
-.carta--visor .c-stats {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 6px;
-}
-.carta--visor .st {
-  flex-direction: column; gap: 1px; padding: 6px 2px 5px; border-radius: 5px;
-}
-.carta--visor .st u {
-  display: flex; align-items: center; gap: 3px;
-  font-size: 9px; letter-spacing: .06em; text-transform: uppercase; color: var(--tenue);
-}
-.carta--visor .st i { width: 11px; height: 11px; }
-.carta--visor .st b { font-size: 17px; line-height: 1.1; }
-.carta--visor .st b em { font-size: 12px; }
-.carta--visor .c-rasgo {
-  margin-top: 4px; padding: 8px 10px; border-left: 2px solid var(--bio);
-  background: rgba(217,164,65,.06); border-radius: 0 6px 6px 0;
-}
-.carta--visor .c-rasgo b {
-  display: block; font-size: 10px; font-weight: 500; letter-spacing: .1em;
-  text-transform: uppercase; color: var(--acento-claro); margin-bottom: 3px;
-}
-.carta--visor .c-rasgo p { font-size: 12.5px; line-height: 1.45; color: var(--texto-2); }
-.carta--visor.no-dino .c-tipo { margin-top: 0; }
+.visor-binomial { font-size: 17px; font-style: italic; color: var(--texto); }
+.visor-binomial.recto { font-style: normal; }
+.visor-clado { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--tenue); }
 .visor-foto {
   max-width: 100%; max-height: 100%; object-fit: contain;
   border-radius: var(--radio); border: 1px solid var(--borde);
