@@ -113,9 +113,9 @@ function pintarEntrada() {
 
   dom.cuerpo.innerHTML = `
     <div class="ent-marca">
-      <p class="menu-epigrafe"><span class="filete"></span>Jurásico Superior · 155–146 Ma</p>
+      <p class="menu-epigrafe"><span class="filete"></span>Era Mesozoica · 252–66 Ma</p>
       <h1>Dino<span>War</span></h1>
-      <p class="menu-lema">Formación Morrison. Dos poblaciones, un campo, tres formas de ganar.</p>
+      <p class="menu-lema">Colecciona las bestias, arma tu mazo y sobrevive a la extinción.</p>
     </div>
 
     <div class="cu-pestanas ent-pestanas">
