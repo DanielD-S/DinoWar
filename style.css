@@ -355,6 +355,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .sobre-tirada {
   display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;
   min-height: 118px; align-content: start; grid-auto-rows: max-content; margin-bottom: 12px;
+  /* `flex: none`: es hijo de una columna flex con altura fija, y sin esto el
+     flex la encogía para hacer sitio al aviso y a la tabla de probabilidades.
+     Con las cartas de antes cabía de sobra; con el marco, dos filas de cartas
+     desbordaban por debajo y se pintaban encima de la tabla. */
+  flex: none;
 }
 .sobre-vacio {
   grid-column: 1 / -1; color: var(--tenue); font-size: 13px; text-align: center;
