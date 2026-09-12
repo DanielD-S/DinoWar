@@ -321,3 +321,182 @@ Un reverso de cartas físicas debe ser simétrico a 180°, o el dorso delata la
 orientación y las cartas quedan marcadas. **En DinoWar no aplica**: el reverso no
 se gira nunca en pantalla. Pero si algún día se imprime, la huella hay que
 duplicarla en espejo o cambiarla por un motivo que gire sobre sí mismo.
+
+## Los efectos del tablero: lo que se dibuja y lo que se mueve
+
+Para que el combate pese y el clima toque el tablero hacen falta **quince
+imágenes**, y ninguna es una ilustración: son texturas y destellos que el
+juego mueve por CSS. Antes de pedir la primera, tres decisiones que cambian
+cómo se piden todas.
+
+**Pokémon TCG Live lo hace con lo mismo, sólo que en Unity.** Sus impactos son
+*flipbooks* —una rejilla de fotogramas prerrenderizados que se pasan a 24 por
+segundo— más *partículas*: una textura diminuta de chispa o humo que el motor
+copia cien veces y mueve. No hay vídeo ni modelos 3D en los golpes. Aquí el
+flipbook se pasa con `animation-timing-function: steps()` sobre
+`background-position`, y las partículas son nodos con `transform`. Es la misma
+técnica sin el motor.
+
+**Nada de fondo transparente.** Los generadores entregan el alfa mal —halo
+gris, bordes sucios— y con las placas ya costó una herramienta de inundación.
+Los efectos no lo necesitan, porque el tablero se pinta con dos mezclas:
+
+| lo que es | se pide sobre | se pinta con |
+|---|---|---|
+| luz: destellos, chispas, lluvia, bruma, agua, aura | **negro puro** | `mix-blend-mode: screen` — el negro desaparece solo |
+| sombra: grietas, polvo, calima | **blanco puro** | `mix-blend-mode: multiply` — el blanco desaparece solo |
+
+Así se salta el keyeado entero. El precio es que una chispa pintada con
+`screen` nunca es más oscura que lo que hay debajo, y eso es exactamente lo que
+tiene que hacer una chispa.
+
+**Un flipbook es una apuesta; un fotograma es seguro.** Los generadores no
+saben hacer secuencias coherentes: la rejilla llega con fotogramas de distinto
+tamaño, en distinto orden o con dos explosiones distintas. Se pide UNO —el
+choque grande— y se acepta que cueste varios intentos. Todo lo demás es un
+fotograma único que el CSS escala, gira y apaga, que es lo que hacen las
+partículas de verdad.
+
+### El bloque de ESTILO de los efectos (copiar literal)
+
+> Efecto visual de videojuego (VFX) para un juego de cartas de dinosaurios,
+> estilo pintado semirrealista, sin viñeta cómic ni trazo de dibujo animado.
+> Paleta del juego: ámbar `#d9a441`, oro viejo, naranja de brasa, blanco
+> cálido; nada de azul eléctrico, magenta ni verde neón. Iluminación propia
+> del efecto, sin ninguna luz externa ni sombra proyectada. Sin fondo, sin
+> paisaje, sin objeto, sin personaje: sólo el efecto, centrado. Sin texto, sin
+> letras, sin marca de agua, sin marco.
+
+Donde abajo pone `[ESTILO]`, va ese bloque entero.
+
+### 1 · El choque, el único flipbook
+
+Suena cuando dos criaturas se pegan y cuando un golpe llega al hábitat. Es el
+que más se ve y el único que merece la apuesta.
+
+> [ESTILO] Hoja de sprites de una explosión de impacto vista de frente, en una
+> **rejilla exacta de 4 columnas por 4 filas, 16 fotogramas del mismo tamaño**,
+> sin separación entre celdas y sin bordes dibujados, leída de izquierda a
+> derecha y de arriba abajo. Fotograma 1: un punto de luz blanca. Fotogramas
+> 2 a 5: un destello radial que crece, con un anillo de choque fino
+> expandiéndose. Fotogramas 6 a 11: el anillo sigue abriéndose mientras el
+> centro se apaga a ámbar y a naranja y salen chispas radiales. Fotogramas 12 a
+> 16: sólo quedan brasas y un humo tenue que se disipa hasta casi nada. Cada
+> fotograma centrado en su celda, el efecto **nunca toca el borde de la celda**.
+> Fondo negro puro uniforme en toda la hoja, también entre fotogramas.
+
+Comprobar antes de aceptarlo: recortar las 16 celdas en un editor y verlas
+seguidas. Si el centro salta de sitio entre dos fotogramas, la hoja no vale y
+no se arregla a mano. Exportar **2048×2048 en PNG**; se sirve a 1024, o sea
+celdas de 256, y a densidad 2x un choque ocupa 128 px de pantalla.
+
+### 2 · Fotogramas únicos de impacto (fondo negro)
+
+Cinco imágenes cuadradas de 1024×1024, cada una centrada, sin tocar el borde.
+Se sirven a 512 salvo las dos partículas.
+
+- **`garra`** — el golpe de un terópodo. «[ESTILO] Tres tajos de garra en
+  diagonal, paralelos y de longitud desigual, con el filo blanco incandescente
+  y el borde ámbar desvaneciéndose a naranja, salpicadura fina de chispas en
+  el extremo de cada tajo.»
+- **`pisoton`** — el golpe de un saurópodo y el aterrizaje de una carta.
+  «[ESTILO] Onda de choque circular vista desde arriba, un anillo ámbar
+  luminoso con el interior oscuro y polvo iluminado saliendo hacia fuera en
+  todas direcciones, más denso en el anillo y disperso en el borde.»
+- **`chispa`** — la partícula. «[ESTILO] Una sola chispa incandescente, un
+  punto blanco con cola corta de brasa ámbar, ligeramente alargada en
+  vertical, aislada.» Se sirve a **64×64**: se copian veinte por golpe.
+- **`brasa`** — la partícula lenta. «[ESTILO] Una sola brasa flotante, un
+  punto naranja suave con halo difuso, sin cola, ligeramente irregular.»
+  A **64×64**.
+- **`destello`** — el flash de un fotograma. «[ESTILO] Destello de lente de
+  cuatro puntas, blanco cálido en el centro y ámbar en las puntas, con un halo
+  circular tenue, simétrico.» Es lo que tapa el corte en el *hit-stop*: la
+  pantalla se congela 80 ms y esto se pone encima para que la congelación se
+  lea como golpe y no como tirón.
+
+### 3 · Lo que ensucia (fondo blanco)
+
+Dos imágenes que van con `multiply`, por eso se piden sobre blanco. La tercera
+de esta familia es la `calima` de la Sequía, más abajo.
+
+- **`grietas`** — el hábitat encajando un golpe. «[ESTILO, pero sobre fondo
+  blanco puro] Grietas de roca partida vistas de frente, saliendo de un punto
+  de impacto descentrado, en negro y gris carbón, finas en las puntas y
+  anchas en el centro, sin relleno, sólo las líneas de fractura.» Apaisada,
+  **1792×1024**, servida a 1024: se pone sobre la barra de hábitat y se apaga.
+- **`polvo`** — la muerte y el aterrizaje pesado. «[ESTILO, pero sobre fondo
+  blanco puro] Una nube de polvo terroso, ocre y gris, redondeada y suave, más
+  densa en el centro y deshecha en los bordes, vista de lado.» Cuadrada,
+  1024, servida a 256: es una partícula grande.
+
+### 4 · El momento de invocación (fondo negro)
+
+Dos imágenes grandes para cuando entra una legendaria: la pantalla se oscurece,
+la carta crece al centro y detrás pasan estas dos.
+
+- **`rayos`** — «[ESTILO] Rayos de luz radiales saliendo de un centro, de
+  distinta longitud y grosor, blanco cálido cerca del centro y ámbar
+  transparente en las puntas, ocupando todo el cuadrado, sin objeto en el
+  centro: el centro es un hueco oscuro donde irá otra cosa.» **2048×2048**,
+  servida a 1024. Gira despacio detrás de la carta.
+- **`aura`** — «[ESTILO] Anillo de luz dorada visto de frente, grueso y
+  difuso, con un segundo anillo más fino y más tenue por fuera, el interior
+  completamente negro.» 1024 servida a 512. Se expande y se apaga al terminar
+  la invocación.
+
+### 5 · El clima sobre el tablero
+
+Cinco climas, cinco capas. Cuatro se **mueven**, y para moverse sin fin tienen
+que ser mosaico sin costuras, con la misma regla que el reverso: **iluminación
+plana, ningún centro de atención, ningún elemento único**. Se piden cuadradas
+de 1024 y se sirven a 512. La quinta es fija y es apaisada.
+
+Lo que ya hace CSS sin imagen y no hay que pedir: oscurecer el tablero para el
+Monzón, teñir de verde para la Estación de lluvias, calentar el tono para la
+Sequía. Las imágenes sólo ponen lo que un filtro no sabe hacer.
+
+- **`sabana` — Monzón de verano: `lluvia`.** Fondo negro. «[ESTILO] Textura
+  sin costuras de lluvia intensa, trazos finos blancos y gris claro
+  inclinados unos 15 grados, de longitud y brillo variados, densidad media,
+  sin gotas redondas ni salpicaduras.» Se desplaza hacia abajo en bucle.
+- **`bosque` — Estación de lluvias: `llovizna`.** Fondo negro. «[ESTILO]
+  Textura sin costuras de llovizna fina, trazos muy cortos y casi verticales,
+  gris claro tenue, densidad alta y uniforme, más suave que una lluvia.» Se
+  desplaza hacia abajo más despacio que la lluvia, y el tablero va teñido de
+  verde.
+- **`canal` — Bruma de valle: `bruma`.** Fondo negro. «[ESTILO] Textura sin
+  costuras de niebla, volutas blandas de blanco cálido y gris muy claro sobre
+  negro, contraste bajo, sin forma reconocible, sin zona más densa que otra.»
+  Se desplaza en horizontal muy despacio, con dos copias a distinta velocidad
+  para que no se vea el bucle.
+- **`llanura` — Crecida estacional: `agua`.** Fondo negro. «[ESTILO] Textura
+  sin costuras de reflejos sobre agua turbia en movimiento, destellos
+  alargados en horizontal, ámbar y blanco cálido sobre negro, como sol
+  reflejado en un río, sin orilla ni objeto.» Va sólo en el tercio de abajo
+  del tablero, desplazándose en horizontal, con el borde de arriba fundido
+  por CSS.
+- **`aridez` — Sequía prolongada: `calima`.** Fondo blanco, `multiply`, fija.
+  «[ESTILO, pero sobre fondo blanco puro] Velo de calor y polvo apaisado: los
+  cuatro bordes con polvo ocre y tierra agrietada muy tenue, el centro
+  completamente blanco y limpio, transición gradual y sin forma marcada.»
+  **1792×1024**, servida a 1024. Es una viñeta: se queda quieta y respira con
+  la opacidad, y el temblor de calor lo hace CSS con un filtro.
+
+### Después de generar
+
+1. Dejar los originales en **`src/piel/efectos/`** con el nombre exacto de la
+   lista: `choque`, `garra`, `pisoton`, `chispa`, `brasa`, `destello`,
+   `grietas`, `polvo`, `rayos`, `aura`, `lluvia`, `llovizna`, `bruma`, `agua`,
+   `calima`. Es la misma regla que las ilustraciones: un nombre que no se
+   reconoce se salta en silencio.
+2. La herramienta que los pasa a WebP a su tamaño servido **no existe todavía**:
+   se escribe cuando lleguen los primeros, junto con las animaciones. No hay
+   que keyear nada, sólo escalar, así que será corta.
+3. Subir `VERSION` en `sw.js`, como siempre.
+
+**Lo que este encargo NO cubre** y no hay que pedir: retratos de rivales, el
+sprite de una criatura atacando, o una ilustración por golpe. El impacto es el
+mismo para las 52 criaturas y lo que cambia es el color y el tamaño, por CSS.
+Un juego con 52 impactos distintos tendría 52 cosas que mantener y ninguna se
+vería más de un segundo.
