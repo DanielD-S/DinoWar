@@ -54,6 +54,25 @@ PIEZAS_CON_ALFA = {
     'placa_solitario': ('placa_solitario.webp', 256),
     'placa_duelo': ('placa_duelo.webp', 256),
     'placa_misiones': ('placa_misiones.webp', 256),
+    # La pantalla de carga. El logo y los tres textos son imágenes a petición
+    # del autor: llegaron dibujados con el mismo latón que el resto, y a 900 px
+    # de ancho van nítidos a densidad 3x en una franja de 300.
+    'carga_logo': ('carga_logo.webp', 1000),
+    'carga_medallon': ('carga_medallon.webp', 512),
+    'carga_epigrafe': ('carga_epigrafe.webp', 900),
+    'carga_lema': ('carga_lema.webp', 900),
+    'carga_cargando': ('carga_cargando.webp', 700),
+}
+
+# La BARRA de carga son tres dibujos sobre el mismo lienzo de 2172×724: el
+# marco con su ranura vacía, el canal suelto y el relleno de oro. No se sirven
+# tal cual: se componen en DOS y la geometría de la ranura se mide y se imprime
+# para el CSS, que es la regla de los marcos de carta — los números no se
+# estiman. Ver `componer_barra()`.
+BARRA = {
+    'marco': 'carga_marco', 'canal': 'carga_canal', 'relleno': 'carga_relleno',
+    'salida_marco': 'carga_marco.webp', 'salida_relleno': 'carga_relleno.webp',
+    'ancho': 1086,
 }
 
 # Un fondo a sangre no es una placa: no se keyea ni se recorta, sólo se escala.
@@ -61,6 +80,10 @@ PIEZAS_CON_ALFA = {
 # ancho de un móvil a densidad 3x.
 FONDOS = {
     'fondo_jugar': ('fondo_jugar.webp', 1080),
+    'fondo_carga': ('fondo_carga.webp', 1080),
+    # La marca de la casa, que se enseña al arrancar. Es un cuadrado con el
+    # fondo pintado —no es una placa— y se ve a unos 280 px: 800 sobra.
+    'marca_chihui': ('marca_chihui.webp', 800),
 }
 
 
@@ -109,33 +132,58 @@ def inundar_desde_el_borde(mascara):
     return fondo
 
 
-def mancha_mayor(solido):
-    """La mancha conectada más grande de una máscara. Etiquetado a 4 vecinos.
+def etiquetar(mascara):
+    """Etiqueta las manchas conectadas de una máscara, a 4 vecinos.
 
-    Es lo que separa la placa de las motas del canto sin decidir un margen a
-    ojo: un margen fijo o se come el borde bueno de una o deja la mota de otra,
-    porque las tres traen la basura en sitios distintos."""
-    H, W = solido.shape
-    visto = np.zeros((H, W), bool)
-    mejor, mejor_n = None, 0
+    Devuelve (etiquetas, tamaños): un entero por píxel —0 es fondo— y el
+    número de píxeles de cada etiqueta, en orden de aparición."""
+    H, W = mascara.shape
+    etiquetas = np.zeros((H, W), np.int32)
+    tamanos = [0]
     for y0 in range(H):
         for x0 in range(W):
-            if not solido[y0, x0] or visto[y0, x0]:
+            if not mascara[y0, x0] or etiquetas[y0, x0]:
                 continue
-            grupo = np.zeros((H, W), bool)
+            k = len(tamanos)
+            tamanos.append(0)
             cola = deque([(y0, x0)])
-            visto[y0, x0] = grupo[y0, x0] = True
-            n = 0
+            etiquetas[y0, x0] = k
             while cola:
                 y, x = cola.popleft()
-                n += 1
+                tamanos[k] += 1
                 for ny, nx in ((y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)):
-                    if 0 <= ny < H and 0 <= nx < W and solido[ny, nx] and not visto[ny, nx]:
-                        visto[ny, nx] = grupo[ny, nx] = True
+                    if 0 <= ny < H and 0 <= nx < W and mascara[ny, nx] and not etiquetas[ny, nx]:
+                        etiquetas[ny, nx] = k
                         cola.append((ny, nx))
-            if n > mejor_n:
-                mejor, mejor_n = grupo, n
-    return mejor, mejor_n
+    return etiquetas, tamanos
+
+
+def mancha_mayor(mascara):
+    """La mancha conectada más grande. Para la ranura del marco, que es una."""
+    etiquetas, tamanos = etiquetar(mascara)
+    if len(tamanos) < 2:
+        return None, 0
+    k = int(np.argmax(tamanos[1:])) + 1
+    return etiquetas == k, tamanos[k]
+
+
+# Por debajo de esto una mancha sólida es una mota, no un dibujo. A 2000 px de
+# lienzo, el punto de una «i» o los tres puntos de «Cargando…» pasan de mil
+# píxeles; una mota del render son unas decenas.
+MOTA = 64
+
+
+def sin_motas(solido):
+    """La máscara sin las manchas diminutas. Se queda con TODAS las demás.
+
+    La primera versión se quedaba sólo con la mancha mayor, que para una placa
+    es lo mismo y para un texto no: cada letra es una mancha, y del logo salió
+    la «D» sola. Lo que separa el dibujo de la basura no es ser el mayor, es
+    no ser diminuto."""
+    etiquetas, tamanos = etiquetar(solido)
+    buenas = np.array([n >= MOTA for n in tamanos])
+    buenas[0] = False
+    return buenas[etiquetas], int(sum(n for n in tamanos[1:] if n < MOTA))
 
 
 def limpiar_canto(im):
@@ -143,8 +191,8 @@ def limpiar_canto(im):
     rgba = im.convert('RGBA')
     alfa = np.asarray(rgba.getchannel('A'))
     solido = alfa > 200
-    placa, n = mancha_mayor(solido)
-    if placa is None:
+    placa, motas = sin_motas(solido)
+    if not placa.any():
         return rgba, 0
     # La mancha sólida se queda corta del borde real: el canto de la placa está
     # suavizado y ahí el alfa baja de 200. Se ensancha unos píxeles para
@@ -156,7 +204,6 @@ def limpiar_canto(im):
     # sobrevive al WebP, y un alfa de 1 vuelve a subir en cuanto algo reescala.
     # Un rojo puro asomando por el borde de una placa de latón se ve enseguida.
     nuevo = np.where(nuevo < 8, 0, nuevo)
-    motas = int(solido.sum() - n)
     rgba.putalpha(Image.fromarray(nuevo.astype(np.uint8)))
     return rgba, motas
 
@@ -209,7 +256,121 @@ def sangrar_color(im, pasos=10):
                            .round().clip(0, 255).astype(np.uint8), 'RGBA')
 
 
+def caja(alfa, umbral):
+    return Image.fromarray((alfa > umbral).astype(np.uint8) * 255).getbbox()
+
+
+def componer_barra(escribir):
+    """El marco con el canal dentro de la ranura, y el relleno alargado al 100 %.
+
+    Lo que llegó: un marco con la ranura VACÍA (transparente), un canal suelto
+    —la versión sin adornos, más ancha que la ranura— y el relleno de oro
+    dibujado a la escala del canal, no de la ranura, y sólo hasta el 62 %.
+
+    Lo que sale, en el mismo lienzo y recortado por la misma caja:
+      carga_marco.webp    el marco, con la ranura ya rellena con la textura
+                          oscura del canal. Opaco donde antes había hueco.
+      carga_relleno.webp  el oro, a la escala de la ranura y alargado hasta
+                          cubrirla entera, puesto en su sitio.
+
+    El CSS coloca el relleno ENCIMA del marco, lo recorta a la ranura y lo
+    desplaza a la izquierda según el progreso: así la punta redondeada del oro
+    es siempre el borde que avanza, cosa que un `width` recortado no da.
+
+    Por qué se alarga tejiendo y no estirando: el oro es una textura agrietada
+    y un estirado de 1,7× se nota. Se corta por los casquetes, y el tramo del
+    medio se repite en espejo hasta llegar, que no deja costura."""
+    marco = Image.open(ORIGEN / f"{BARRA['marco']}.png").convert('RGBA')
+    canal = Image.open(ORIGEN / f"{BARRA['canal']}.png").convert('RGBA')
+    rell = Image.open(ORIGEN / f"{BARRA['relleno']}.png").convert('RGBA')
+    if marco.size != canal.size or marco.size != rell.size:
+        raise SystemExit('la barra de carga: las tres piezas tienen que venir en el mismo lienzo')
+
+    # 1. La ranura: lo transparente que NO toca el borde. Es el único hueco
+    #    encerrado que tiene el marco; las motas se van con la mancha mayor.
+    am = np.asarray(marco.getchannel('A'))
+    transparente = am < 30
+    encerrado = transparente & ~inundar_desde_el_borde(transparente)
+    ranura, _ = mancha_mayor(encerrado)
+    ys, xs = np.where(ranura)
+    rx0, rx1, ry0, ry1 = int(xs.min()), int(xs.max()) + 1, int(ys.min()), int(ys.max()) + 1
+    print(f'  ranura del marco: x {rx0}..{rx1} y {ry0}..{ry1}  ({rx1 - rx0}×{ry1 - ry0})')
+
+    # 2. La textura del canal, dentro de la ranura. Del canal se toma sólo el
+    #    interior —sin su filete de latón, que la ranura ya trae el suyo— y se
+    #    pega con la propia ranura de máscara, para respetar sus extremos.
+    cb = caja(np.asarray(canal.getchannel('A')), 200)
+    m = round((cb[3] - cb[1]) * 0.09)
+    interior = canal.crop((cb[0] + 2 * m, cb[1] + m, cb[2] - 2 * m, cb[3] - m))
+    textura = interior.resize((rx1 - rx0, ry1 - ry0), Image.LANCZOS)
+    base = Image.new('RGBA', marco.size, (0, 0, 0, 0))
+    mascara = Image.fromarray((ranura * 255).astype(np.uint8)).crop((rx0, ry0, rx1, ry1))
+    base.paste(textura, (rx0, ry0), mascara)
+    marco_lleno = Image.alpha_composite(base, marco)
+
+    # 3. El relleno: a la escala de la ranura, alargado hasta cubrirla entera.
+    ar = np.asarray(rell.getchannel('A'))
+    rb = caja(ar, 200)                 # el oro sólido
+    hb = caja(ar, 24)                  # el oro con su halo
+    escala = (ry1 - ry0) / (rb[3] - rb[1])
+    tira = rell.crop(hb)
+    sx0, sx1 = rb[0] - hb[0], rb[2] - hb[0]
+    radio = (rb[3] - rb[1]) // 2
+    izq = tira.crop((0, 0, sx0 + radio, tira.height))
+    der = tira.crop((sx1 - radio, 0, tira.width, tira.height))
+    medio = tira.crop((sx0 + radio, 0, sx1 - radio, tira.height))
+    falta = round((rx1 - rx0) / escala) - 2 * radio
+    tejido = Image.new('RGBA', (max(falta, medio.width) + medio.width, tira.height), (0, 0, 0, 0))
+    x, espejo = 0, False
+    while x < falta:
+        tejido.paste(medio.transpose(Image.FLIP_LEFT_RIGHT) if espejo else medio, (x, 0))
+        x += medio.width
+        espejo = not espejo
+    tejido = tejido.crop((0, 0, falta, tira.height))
+    largo = Image.new('RGBA', (izq.width + falta + der.width, tira.height), (0, 0, 0, 0))
+    largo.paste(izq, (0, 0))
+    largo.paste(tejido, (izq.width, 0))
+    largo.paste(der, (izq.width + falta, 0))
+    largo = sangrar_color(largo)
+    chico = largo.resize((round(largo.width * escala), round(largo.height * escala)), Image.LANCZOS)
+    lienzo = Image.new('RGBA', marco.size, (0, 0, 0, 0))
+    lienzo.paste(chico, (rx0 - round(sx0 * escala), ry0 - round((rb[1] - hb[1]) * escala)), chico)
+    print(f'  relleno: {rb[2] - rb[0]} px de oro a escala {escala:.3f}, tejido hasta {rx1 - rx0} px')
+
+    # 4. Los dos por la MISMA caja: la del marco con su sombra. Y la geometría
+    #    de la ranura, en porcentaje de esa caja, que es lo que va al CSS.
+    cm = caja(am, 24)
+    marco_lleno = marco_lleno.crop(cm)
+    lienzo = lienzo.crop(cm)
+    W, H = marco_lleno.size
+    css = {
+        'izq': (rx0 - cm[0]) / W, 'arriba': (ry0 - cm[1]) / H,
+        'ancho': (rx1 - rx0) / W, 'alto': (ry1 - ry0) / H,
+        'proporcion': f'{W} / {H}',
+    }
+    print('  para carta.css / style.css (medido, no estimado):')
+    print(f"    aspect-ratio: {css['proporcion']};")
+    print(f"    --ranura-izq: {css['izq'] * 100:.2f}%; --ranura-arriba: {css['arriba'] * 100:.2f}%;")
+    print(f"    --ranura-ancho: {css['ancho'] * 100:.2f}%; --ranura-alto: {css['alto'] * 100:.2f}%;")
+    if escribir:
+        a1 = guardar(marco_lleno, BARRA['salida_marco'], BARRA['ancho'])
+        a2 = guardar(lienzo, BARRA['salida_relleno'], BARRA['ancho'])
+        print(f"  -> {BARRA['salida_marco']} y {BARRA['salida_relleno']} @{BARRA['ancho']}×{a1} (y {a2})")
+    return css
+
+
+# Calidad por fichero, cuando la de serie pesa de más. La escena submarina de
+# la carga tiene ondas en cada píxel y a 82 salía en 270 KB; el medallón, a
+# 512 px de una textura agrietada, en 124. Son lo primero que se descarga.
+CALIDAD = {
+    'fondo_carga.webp': 72,
+    'carga_medallon.webp': 80,
+    'carga_marco.webp': 82,
+}
+
+
 def guardar(im, nombre, ancho, calidad=88):
+    calidad = CALIDAD.get(nombre, calidad)
     alto = round(ancho * im.size[1] / im.size[0])
     if im.mode == 'RGBA':
         im = sangrar_color(im)
@@ -261,6 +422,12 @@ def main(escribir):
         if escribir:
             alto = guardar(limpia, nombre, ancho)
             print(f'   {limpia.size[0]}x{limpia.size[1]} recortado -> {ancho}x{alto}')
+
+    if all((ORIGEN / f'{BARRA[k]}.png').exists() for k in ('marco', 'canal', 'relleno')):
+        print('barra de carga: marco + canal + relleno')
+        componer_barra(escribir)
+    else:
+        print('barra de carga: faltan piezas en', ORIGEN.relative_to(RAIZ))
 
     for stem, (nombre, ancho) in FONDOS.items():
         original = ORIGEN / f'{stem}.png'
