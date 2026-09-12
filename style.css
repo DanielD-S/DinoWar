@@ -480,32 +480,30 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 14px; min-height: 190px;
 }
-/* El sobre lleva el reverso del juego: escamas y emblema. Es el mismo objeto
-   que la pila del mazo y la ranura oculta. */
+/* El sobre cerrado es una pieza dibujada, keyeada: la bolsa con sus sellos en
+   zigzag arriba y abajo y el medallón de la huella. El halo va en `filter` y
+   no en `box-shadow` porque la silueta no es un rectángulo. */
 .sobre-paquete {
-  position: relative; width: 116px; height: 162px; border-radius: 9px;
-  background-color: #1c1610;
-  background-image: var(--escamas);
-  background-size: 22px 16px, 22px 16px;
-  background-position: 0 0, 11px 8px;
-  box-shadow: 0 0 0 1px var(--bio), 0 0 34px rgba(217,164,65,.26); overflow: hidden;
+  position: relative; width: 132px; height: 198px;
+  background: url('assets/piel/sobre.webp') center / contain no-repeat;
+  filter: drop-shadow(0 0 18px rgba(217,164,65,.28)) drop-shadow(0 8px 10px rgba(0,0,0,.5));
   animation: respirar 2.8s ease-in-out infinite;
 }
 @keyframes respirar {
   0%, 100% { transform: translateY(0) rotate(-1.5deg); }
   50%      { transform: translateY(-6px) rotate(1.5deg); }
 }
+/* Un brillo de lámina que cruza el sobre cada tanto: es lo que dice que es
+   metal y no cartón, y lo único que se mueve además de la respiración. */
 .sobre-solapa {
-  position: absolute; inset: 0;
-  background: radial-gradient(72% 52% at 46% 40%, rgba(217,164,65,.12), rgba(23,17,12,.4) 66%, rgba(23,17,12,.9) 100%);
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(115deg, transparent 40%, rgba(255,240,200,.28) 50%, transparent 60%);
+  background-size: 250% 100%;
+  animation: brillo-legendario 5s ease-in-out infinite;
+  mask: url('assets/piel/sobre.webp') center / contain no-repeat;
+  -webkit-mask: url('assets/piel/sobre.webp') center / contain no-repeat;
 }
-.sobre-sello {
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  width: 52px; height: 52px; border-radius: 50%;
-  border: 1px solid var(--borde-fuerte); color: var(--acento-claro);
-  background: rgba(23,17,12,.7);
-  display: grid; place-items: center; font-size: 20px;
-}
+.sobre-sello { display: none; }
 .sobre-tirada.cerrado .sobre-vacio { border: 0; padding: 0; }
 
 /* ---------------------------------------------------------- sobre abierto */
@@ -543,11 +541,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .sobre-dorso {
   position: absolute; inset: 0; transform: rotateY(180deg);
-  background-color: #1c1610;
-  background-image: var(--escamas);
-  background-size: 16px 11px, 16px 11px;
-  background-position: 0 0, 8px 5.5px;
-  border-color: var(--borde-fuerte);
+  border: 0; border-radius: 4px;
+  background: #1c1610 url('assets/piel/dorso.webp') center / 100% 100% no-repeat;
 }
 /* La cara es la carta con su marco, y el nombre entero debajo a cuerpo de
    pie: a 62 px la banda sólo puede con el género. */
@@ -1183,23 +1178,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .c-merma { position: absolute; right: 3px; top: 13px; width: 7px; height: 7px;
            background: var(--peligro); box-shadow: 0 0 0 1px #17120e; }
 
-/* Reverso: el motivo de escamas y el emblema. Lo comparten la ranura oculta,
-   la pila de mazo y el sobre sin abrir, que es lo que hace que se lean como el
-   mismo objeto. */
+/* Reverso: el dorso dibujado, el mismo que enseña el sobre al girar. */
 .carta-dorso {
   position: absolute; inset: 0; border-radius: 6px;
-  background-color: #1c1610;
-  background-image: var(--escamas);
-  background-size: 16px 11px, 16px 11px;
-  background-position: 0 0, 8px 5.5px;
-  display: grid; place-items: center;
-}
-.carta-dorso::after {
-  content: '◆';
-  width: 26px; height: 26px; border-radius: 50%;
-  border: 1px solid var(--borde-fuerte); background: rgba(23,17,12,.7);
-  color: var(--acento-claro); font-size: 11px;
-  display: grid; place-items: center;
+  background: #1c1610 url('assets/piel/dorso.webp') center / 100% 100% no-repeat;
 }
 
 @keyframes voltear {
