@@ -31,7 +31,7 @@ export function montar() {
     cuenta: id('cuenta'),
     entrada: id('entrada'),
     marca: id('marca'), carga: id('carga'),
-    cargaBarra: id('carga-barra'), cargaNota: id('carga-nota'),
+    cargaBarra: id('carga-barra'), cargaRelleno: id('carga-relleno'), cargaNota: id('carga-nota'),
     btnColeccion: id('btn-coleccion'), btnSobres: id('btn-sobres'), btnMazos: id('btn-mazos'),
     btnCuenca: id('btn-cuenca'),
     btnCuenta: id('btn-cuenta'),

@@ -129,6 +129,7 @@ async function presentarse(nombre, marca = null) {
 
   if (marca) await marca;
   irA(APP.CARGA);
+  carga.enPantalla();
   let p;
   try {
     p = await trabajo;

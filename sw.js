@@ -17,7 +17,7 @@
 //
 // Al cambiar cualquier fichero servido hay que subir VERSION: activa la limpieza
 // de las cachés anteriores.
-const VERSION = 'dinowar-v58';
+const VERSION = 'dinowar-v59';
 const ESENCIALES = [
   './', './index.html', './style.css', './piel.css', './carta.css', './manifest.json', './src/main.js',
   // Lo primero que se ve. La marca y la pantalla de carga tienen que estar
