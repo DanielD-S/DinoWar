@@ -17,10 +17,12 @@
 //
 // Al cambiar cualquier fichero servido hay que subir VERSION: activa la limpieza
 // de las cachés anteriores.
-const VERSION = 'dinowar-v53';
+const VERSION = 'dinowar-v54';
 const ESENCIALES = [
   './', './index.html', './style.css', './piel.css', './carta.css', './manifest.json', './src/main.js',
-  './assets/piel/portada.webp',
+  './assets/piel/portada.webp', './assets/piel/boton_ancho.webp',
+  './assets/piel/placa_coleccion.webp', './assets/piel/placa_sobres.webp', './assets/piel/placa_mazos.webp',
+  './assets/piel/placa_cuenca.webp', './assets/piel/placa_cuenta.webp',
   './assets/fuentes/inter-latin.woff2',
   './assets/fuentes/cinzel-latin.woff2', './assets/fuentes/libre-baskerville-400-latin.woff2',
   './assets/fuentes/terralis.woff2',

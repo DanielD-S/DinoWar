@@ -680,6 +680,56 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .apertura-carta, .apertura-tira, .apertura-cuerpo { animation: none !important; transition: none !important; }
 }
 
+
+/* ------------------------------------------------- el menú de piedra
+   La barra de «Empezar partida» y las cinco placas son piezas dibujadas, con
+   el latón y la piedra de los marcos, keyeadas por `tools/placas.py`. El texto
+   va encima en Cinzel, como en las cartas: las placas traen la mitad de abajo
+   de roca vacía justo para eso. */
+.boton-piedra {
+  border: 0; background: url('assets/piel/boton_ancho.webp') center / 100% 100% no-repeat;
+  box-shadow: none; min-height: 0; padding: 0 18%;
+  aspect-ratio: 1086 / 245;
+  justify-content: center;
+  font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 17px; letter-spacing: .04em;
+  color: #f4ece0; text-shadow: 0 1px 2px rgba(0,0,0,.9), 0 0 12px rgba(0,0,0,.6);
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,.5));
+  transition: transform .12s ease-out, filter .12s ease-out;
+}
+.boton-piedra:active { background-color: transparent; transform: scale(.985); filter: brightness(1.15) drop-shadow(0 3px 6px rgba(0,0,0,.5)); }
+.boton-piedra[disabled] { filter: grayscale(.5) brightness(.7); box-shadow: none; }
+
+.menu-placas { gap: 6px; }
+/* A 64 px la roca vacía de la placa no da para el rótulo sin montarse sobre
+   el emblema, así que el rótulo va debajo, fuera de la piedra. */
+.menu-placas .placa {
+  flex: 1; min-width: 0; padding: 0; border: 0; background: none; border-radius: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  container-type: inline-size;
+  font-family: 'Cinzel', Georgia, serif; font-weight: 700; letter-spacing: .01em;
+  /* «Colección» y «La Cuenca» son las largas: nueve letras a 0,62 em en el
+     84 % del ancho. */
+  font-size: min(9.5px, 15cqi); line-height: 1; white-space: nowrap;
+  color: #e9d9b5; text-shadow: 0 1px 2px rgba(0,0,0,.9);
+  transition: transform .12s ease-out, filter .12s ease-out;
+}
+.menu-placas .placa i {
+  display: block; width: 100%; aspect-ratio: 1122 / 1402;
+  background: var(--placa) center / 100% 100% no-repeat;
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,.5));
+}
+.menu-placas .placa:active { transform: scale(.95); filter: brightness(1.18); }
+.placa-coleccion { --placa: url('assets/piel/placa_coleccion.webp'); }
+.placa-sobres { --placa: url('assets/piel/placa_sobres.webp'); }
+.placa-mazos { --placa: url('assets/piel/placa_mazos.webp'); }
+.placa-cuenca { --placa: url('assets/piel/placa_cuenca.webp'); }
+.placa-cuenta { --placa: url('assets/piel/placa_cuenta.webp'); }
+
+/* Lo que queda debajo va a juego sin imagen: filete de latón en los chips y
+   los enlaces, para que la piedra de arriba y la web de abajo no den un salto. */
+.menu-dificultad .chip { border-color: rgba(217,164,65,.4); font-family: 'Cinzel', Georgia, serif; font-weight: 600; font-size: 11px; }
+.menu-dificultad .chip.on { background: linear-gradient(180deg, #e2b95a, #b8862e); border-color: #f4d99b; color: #1a1208; }
+
 /* ------------------------------------------------------------------- hud */
 
 /* Tres líneas y sólo tres cifras por bando. El mazo y el descarte se han ido a
