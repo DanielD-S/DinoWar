@@ -17,11 +17,12 @@
 //
 // Al cambiar cualquier fichero servido hay que subir VERSION: activa la limpieza
 // de las cachés anteriores.
-const VERSION = 'dinowar-v44';
+const VERSION = 'dinowar-v45';
 const ESENCIALES = [
   './', './index.html', './style.css', './piel.css', './carta.css', './manifest.json', './src/main.js',
   './assets/fuentes/inter-latin.woff2',
   './assets/fuentes/cinzel-latin.woff2', './assets/fuentes/libre-baskerville-400-latin.woff2',
+  './assets/fuentes/terralis.woff2',
 ];
 
 // Los índices van aparte: son la lista de lo que hay, no una de las cosas que

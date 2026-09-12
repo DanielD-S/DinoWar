@@ -11,6 +11,18 @@
   src: url('assets/fuentes/cinzel-latin.woff2') format('woff2'); }
 @font-face { font-family: 'Libre Baskerville'; font-weight: 400; font-display: swap;
   src: url('assets/fuentes/libre-baskerville-400-latin.woff2') format('woff2'); }
+/* Terralis es la letra del juego: cifras, mayúsculas, minúsculas y las
+   acentuadas del castellano, trazadas de seis tiras generadas por IA con
+   `python tools/terralis.py`. Lleva las métricas de Cinzel (mismo cuerpo de
+   mayúscula, misma ascendente) para que el cambio no mueva nada, y el
+   `unicode-range` la limita a lo que tiene: cualquier otro carácter —una
+   coma, un paréntesis— sigue saliendo de Cinzel, que va detrás en la pila.
+   Un solo peso, declarado 400-900 para que el navegador no le invente una
+   negrita. */
+@font-face { font-family: 'Terralis'; font-weight: 400 900; font-display: swap;
+  unicode-range: U+30-39, U+2F, U+41-5A, U+61-7A,
+    U+C1, U+C9, U+CD, U+D1, U+D3, U+DA, U+DC, U+E1, U+E9, U+ED, U+F1, U+F3, U+FA, U+FC;
+  src: url('assets/fuentes/terralis.woff2') format('woff2'); }
 
 /* Un marco por familia y, en las criaturas, por rareza. Las tres familias de
    soporte llevan uno solo cada una: son 16 cartas y a 83 px la rareza la cuenta
@@ -277,14 +289,14 @@
    Son DOS ficheros nuevos en `assets/fuentes/`. Cinzel sólo necesita los pesos
    600 y 700, y Libre Baskerville el 400: subsetear a latín básico más las
    acentuadas del castellano deja los dos en torno a 30 KB cada uno. */
-.con-marco .c-nombre, .con-marco .c-genero, .con-marco .c-hab, .c-coste, .st b, .c-rasgo b {
-  font-family: 'Cinzel', Georgia, serif;
+.con-marco .c-nombre, .con-marco .c-genero, .con-marco .c-hab, .c-rasgo b, .c-coste, .st b {
+  font-family: 'Terralis', 'Cinzel', Georgia, serif;
 }
 .con-marco .c-nombre, .con-marco .c-genero, .con-marco .c-hab {
   font-style: normal; font-weight: 700; letter-spacing: .02em;
 }
 .con-marco .c-tipo, .c-clado, .c-rareza {
-  font-family: 'Cinzel', Georgia, serif;
+  font-family: 'Terralis', 'Cinzel', Georgia, serif;
   font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
 }
 .con-marco .c-rasgo p {

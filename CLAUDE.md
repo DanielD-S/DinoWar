@@ -46,6 +46,7 @@ hay que hacer caso cuando el test lo dice.
 | `BALANCE.md` de la variante | `node sim/cuerpos.js` | — |
 | `RECOSTE.md` y `RECOSTE.xlsx` | `node tools/tabla.mjs escribir`, `python tools/excel.py escribir` | `test/cuentas.test.js` |
 | `tools/mecanicas.json` | `node tools/mecanicas.mjs` | — |
+| `assets/fuentes/terralis.woff2` | `python tools/terralis.py` | — |
 | El commit anclado en `desde-url.ts` | `node tools/anclar-desde-url.mjs` | `test/anclaje.test.js` |
 
 **El anclaje hay que rehacerlo cuando cambia el MOTOR, no sólo los validadores.**
