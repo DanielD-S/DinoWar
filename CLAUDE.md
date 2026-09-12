@@ -235,6 +235,27 @@ conectado con el borde. Lo de dentro del marco de latón nunca se toca. Con
 fondo oscuro la tolerancia va corta: con 28 la inundación se colaba por el
 hueco entre los dos filetes y vaciaba el centro de la barra.
 
+El menú **contesta al tacto** desde `src/ui/tacto.js` y el bloque «el menú
+respira y contesta» de `style.css`: entrada escalonada cada vez que se enseña,
+hundido seco al bajar el dedo y rebote al soltar, un destello que cruza el
+latón, toque de sonido y vibración corta. Tres cosas que costaron:
+
+- **La entrada va con `animation-fill-mode: backwards`, nunca `both`.** Las
+  piezas ya usan `transform` para el `:active`; con `forwards` el `transform:
+  none` del último fotograma se queda pegado y el botón deja de hundirse para
+  siempre. Es la trampa de `transform` de siempre, por otra puerta.
+- **El destello es un pseudoelemento enmascarado con el PNG de la pieza, y
+  además con un rectángulo interior** (`mask-composite: intersect`). Sólo con
+  el PNG la banda se veía flotar por encima del medallón: las piezas traen un
+  halo casi transparente alrededor y la máscara por alfa lo deja pasar.
+- **El sonido va en `click`, no en `pointerdown`.** Bajar el dedo no cuenta
+  como gesto para el navegador; un AudioContext creado ahí nace suspendido y
+  el toque suena tarde, cuando el siguiente gesto lo despierta.
+
+Y un fallo que estaba antes: el `:active` de `.boton-grande` escribe el
+shorthand `background`, que borraba la imagen de la barra al pulsarla. Ahora
+`.boton-piedra:active` la repite.
+
 ## El sobre se abre con dos gestos
 
 [`src/ui/apertura.js`](src/ui/apertura.js) es la ceremonia: rasgar la bolsa
