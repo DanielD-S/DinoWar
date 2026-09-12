@@ -1105,7 +1105,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .carga-relleno {
   transform: translateX(calc((var(--p) - 1) * var(--ranura-ancho)));
-  transition: transform .55s cubic-bezier(.2,.8,.2,1);
+  /* La duración la escribe `carga.js` por cada hito: es lo que le queda
+     hasta su momento debido dentro del mínimo de la pantalla. Aquí sólo la
+     curva, y un tope por si nadie la escribe. */
+  /* Casi lineal con el final suave: en un recorrido de tres segundos, una
+     curva de salida rápida lo tenía al 60 % al medio segundo y luego arrastrando. */
+  transition: transform .55s cubic-bezier(.45,.05,.55,.95);
 }
 
 @media (prefers-reduced-motion: reduce) {

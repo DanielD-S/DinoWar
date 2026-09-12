@@ -14,32 +14,56 @@
 // las piezas del menú descargadas, la cuenta presentada, el perfil traído. Una
 // barra que sube sola mientras nada pasa es exactamente la clase de mentira
 // que el resto del juego evita —el mismo motivo por el que la Cuenca dice en
-// pantalla cuando no hay tribu—. Lo único que no es un hito es el medio
-// segundo final: el oro tarda eso en llegar al extremo, y se espera a que
-// llegue en vez de cortarlo.
+// pantalla cuando no hay tribu—.
+//
+// Y sin embargo la pantalla tiene un MÍNIMO de permanencia. Con el servidor
+// rápido los tres hitos caían en un segundo y la carga era un parpadeo: el
+// autor la pidió más larga. La forma honesta de dárselo no es inventar hitos,
+// es RETRASAR el dibujo: cada hito tiene su momento «debido» dentro del
+// mínimo, y el oro se desliza hasta él en vez de saltar. Lo dibujado nunca va
+// por delante de lo hecho; sólo por detrás. Y si el servidor tarda de verdad,
+// el mínimo no manda: el oro se mueve cuando llega el hito, como antes.
 
 import { el } from './render.js';
 
 const reducido = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/** Cuánto se enseña la marca, y cuánto tarda en irse. */
-const MARCA = Object.freeze({ dura: 1500, salida: 350, reducida: 700 });
+/** Cuánto se enseña la marca, cuánto tarda en irse, y cuánto se espera a que
+ *  su imagen baje antes de empezar a contar. */
+const MARCA = Object.freeze({ dura: 2600, salida: 400, reducida: 900, esperaImagen: 2500 });
 /** A partir de aquí la carga dice que el servidor tarda. No es un error. */
 const LENTO_MS = 6000;
-/** Lo que tarda el oro en recorrer la ranura (la transición del CSS). */
-const ORO_MS = 650;
+/** La carga: cuánto se queda como poco, y lo que tarda el oro en un salto. */
+const CARGA = Object.freeze({ minimo: 3600, reducida: 900, oro: 550 });
+
+const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /**
  * Deja la marca en pantalla su tiempo y la desvanece. Resuelve cuando ya se
  * puede enseñar lo siguiente. Con `prefers-reduced-motion`, menos tiempo y
  * sin fundido: la marca se ve, pero no se hace esperar.
  */
-export function mostrarMarca() {
+export async function mostrarMarca() {
+  // El reloj arranca cuando la imagen SE VE, no cuando la página empieza a
+  // pedirla. En la primera visita el logo baja por la red y, contando desde
+  // el arranque, la mitad del tiempo se iba en pantalla vacía: «apenas dura».
+  // Con tope, para que una imagen que no llega no deje la marca colgada.
+  await imagenLista(el.marca.querySelector('img'), MARCA.esperaImagen);
   const dura = reducido() ? MARCA.reducida : MARCA.dura;
-  return new Promise((listo) => setTimeout(() => {
-    el.marca.classList.add('se-va');
-    setTimeout(listo, reducido() ? 0 : MARCA.salida);
-  }, dura));
+  await espera(dura);
+  el.marca.classList.add('se-va');
+  await espera(reducido() ? 0 : MARCA.salida);
+}
+
+/** Resuelve cuando la imagen está descargada, o al pasar `tope` ms. */
+function imagenLista(img, tope) {
+  if (!img || img.complete) return Promise.resolve();
+  return new Promise((listo) => {
+    const t = setTimeout(listo, tope);
+    const fin = () => { clearTimeout(t); listo(); };
+    img.addEventListener('load', fin, { once: true });
+    img.addEventListener('error', fin, { once: true });
+  });
 }
 
 /**
@@ -51,11 +75,24 @@ export function mostrarMarca() {
  * terminar o cancelar: es información, no un error, y no bloquea nada.
  */
 export function empezarCarga(pasos) {
+  const minimo = reducido() ? CARGA.reducida : CARGA.minimo;
   let hechos = 0;
-  const pintar = (p) => {
+  // El reloj del mínimo arranca cuando la pantalla SE VE, no cuando empieza
+  // el trabajo. El trabajo empieza durante la marca, y contando desde ahí el
+  // mínimo se comía la marca entera: la carga duraba 2,4 s de 3,6. Hasta que
+  // `enPantalla()` lo ponga en marcha, no se pinta nada — una transición en
+  // una sección oculta no corre, y el oro aparecería ya avanzado, de golpe.
+  let t0 = null;
+
+  /** Pinta el progreso `p`, y que el oro tarde `ms` en llegar. */
+  const pintar = (p, ms = 0) => {
+    el.cargaRelleno.style.transitionDuration = `${reducido() ? 0 : ms}ms`;
     el.cargaBarra.style.setProperty('--p', String(p));
     el.cargaBarra.setAttribute('aria-valuenow', String(Math.round(p * 100)));
   };
+  /** Cuánto falta para el momento debido de la fracción `p` del mínimo. */
+  const hastaDebido = (p) => Math.max(CARGA.oro, t0 + minimo * p - Date.now());
+
   el.cargaNota.textContent = '';
   pintar(0);
   const lento = setTimeout(() => {
@@ -63,15 +100,36 @@ export function empezarCarga(pasos) {
   }, LENTO_MS);
 
   return {
+    /**
+     * La pantalla acaba de enseñarse: arranca el reloj y pone en camino el
+     * oro hacia lo que ya se hubiera hecho a oscuras. El reflujo forzado entre
+     * el cero y el destino es lo que separa las dos escrituras; sin él el
+     * navegador ve sólo la última y no hay nada que deslizar.
+     */
+    enPantalla() {
+      t0 = Date.now();
+      pintar(0, 0);
+      void el.cargaRelleno.offsetWidth;
+      if (hechos) {
+        const p = hechos / pasos;
+        pintar(p, hastaDebido(p));
+      }
+    },
     avanzar() {
       hechos = Math.min(pasos, hechos + 1);
-      pintar(hechos / pasos);
+      if (t0 === null) return;
+      const p = hechos / pasos;
+      pintar(p, hastaDebido(p));
     },
     async terminar() {
       clearTimeout(lento);
       el.cargaNota.textContent = '';
-      pintar(1);
-      await new Promise((r) => setTimeout(r, reducido() ? 40 : ORO_MS));
+      if (t0 === null) this.enPantalla();
+      const ms = hastaDebido(1);
+      pintar(1, ms);
+      // Se espera a que el oro LLEGUE, no a que se le mande: cortarlo a medio
+      // camino es lo que hacía que la pantalla pareciera un parpadeo.
+      await espera(reducido() ? 40 : ms);
     },
     cancelar() {
       clearTimeout(lento);

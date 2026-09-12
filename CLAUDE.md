@@ -256,8 +256,12 @@ distinto.
 **La marca de la casa** (`#marca`) es la única sección que NO nace en
 `oculta`. Tiene que pintarse antes de que llegue el JavaScript, que es un
 módulo y viene después; con todo oculto lo que había era un rectángulo negro
-la primera fracción de segundo. Dura segundo y medio y se va con un fundido;
-con `prefers-reduced-motion`, menos y sin fundido.
+la primera fracción de segundo. Dura dos segundos y medio y se va con un
+fundido; con `prefers-reduced-motion`, menos y sin fundido. **El reloj arranca
+cuando la imagen está descargada**, no cuando la página empieza a pedirla: en
+la primera visita el logo baja por la red y, contando desde el arranque, la
+mitad del tiempo se iba en pantalla vacía. Con tope, para que una imagen que
+no llega no deje la marca colgada.
 
 **La carga** (`#carga`) va mientras el servidor contesta. Antes, con la sesión
 guardada, el arranque no enseñaba nada: todas las pantallas nacen ocultas y el
@@ -267,8 +271,13 @@ de discutirlas:
 - **La barra avanza por HITOS reales, no con un temporizador.** Son tres: las
   piezas del menú descargadas, la cuenta presentada, el perfil traído. Una
   barra que sube sola mientras nada pasa es la clase de mentira que el resto
-  del juego evita. Lo único que no es un hito es el medio segundo final, que es
-  lo que tarda el oro en llegar al extremo.
+  del juego evita.
+- **Y tiene un MÍNIMO de permanencia** (`CARGA.minimo`, 3,6 s). Con el servidor
+  rápido los tres hitos caían en un segundo y la carga era un parpadeo. La
+  forma honesta de alargarla no es inventar hitos, es RETRASAR el dibujo: cada
+  hito tiene su momento debido dentro del mínimo y el oro se desliza hasta él.
+  Lo dibujado nunca va por delante de lo hecho; sólo por detrás. Si el servidor
+  tarda de verdad, el mínimo no manda.
 - **El trabajo arranca enseguida y la carga se enseña cuando la marca se va.**
   Si se esperase a la marca para empezar, serían dos esperas puestas en fila.
   El `trabajo.catch(() => {})` de `presentarse` no traga el error: evita el
