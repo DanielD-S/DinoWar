@@ -24,17 +24,20 @@
 // la función arranca y muere con «Module not found» AUNQUE LA URL CONTESTE 200.
 // Costó verlo porque todo lo demás —el commit, la URL, el contenido— estaba bien.
 //
-// Motor anclado en: 52c6ed543998fcf1876b8cf2db7d6058c6a1f978
+// Motor anclado en: bc4ae725b341505bc2043350abf13fab6ee1e68e
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import {
   validarAsalto, jefeDelEvento, AsaltoInvalido,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@52c6ed543998fcf1876b8cf2db7d6058c6a1f978/supabase/functions/_compartido/validarAsalto.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@bc4ae725b341505bc2043350abf13fab6ee1e68e/supabase/functions/_compartido/validarAsalto.js';
 import {
   validarSolitario,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@52c6ed543998fcf1876b8cf2db7d6058c6a1f978/supabase/functions/_compartido/validarSolitario.js';
-import { CUENCA } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@52c6ed543998fcf1876b8cf2db7d6058c6a1f978/src/data/tribu.js';
-import { ECONOMIA, abrirSobre } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@52c6ed543998fcf1876b8cf2db7d6058c6a1f978/src/data/coleccion.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@bc4ae725b341505bc2043350abf13fab6ee1e68e/supabase/functions/_compartido/validarSolitario.js';
+import { CUENCA } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@bc4ae725b341505bc2043350abf13fab6ee1e68e/src/data/tribu.js';
+import { ECONOMIA, abrirSobre } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@bc4ae725b341505bc2043350abf13fab6ee1e68e/src/data/coleccion.js';
+import {
+  avancesDelParte, diaUTC, POR_ID,
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@bc4ae725b341505bc2043350abf13fab6ee1e68e/src/data/misiones.js';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -174,12 +177,29 @@ async function hacerVictoria(servicio, jugadorId: string, envio: Record<string, 
     return json({ error: 'ya has cobrado tus partidas de hoy' }, 429);
   }
 
+  // Las misiones del día salen del PARTE que dejó la re-jugada, nunca de lo que
+  // diga el navegador: el progreso paga monedas y las monedas compran sobres.
+  // El día lo pone el servidor —`diaUTC()`— porque con la fecha del cliente
+  // alguien en Auckland avanzaría las misiones de mañana.
+  //
+  // La meta y el premio VIAJAN en la llamada. El catálogo de misiones vive sólo
+  // en `misiones.js`: una copia en SQL traería la trampa de siempre —regenerar
+  // no es aplicar— y aquí no hace falta, porque lo único que el SQL hace con
+  // una misión es sumarle progreso y pagarle el premio.
+  const dia = diaUTC();
+  const avances = avancesDelParte(dia, resultado.parte).map((a) => {
+    const m = POR_ID[a.id];
+    return { id: a.id, avance: a.avance, meta: m.meta, premio: m.premio };
+  });
+
   const { data, error } = await servicio.rpc('aplicar_partida', {
     p_jugador: jugadorId,
     p_semilla: envio.semilla,
     p_turnos: resultado.turnos,
     p_ganada: resultado.ganada,
     p_monedas: resultado.premio,
+    p_dia: dia,
+    p_avances: avances,
   });
 
   if (error) {
@@ -193,6 +213,11 @@ async function hacerVictoria(servicio, jugadorId: string, envio: Record<string, 
     turnos: resultado.turnos,
     premio: data?.premio ?? 0,
     monedas: data?.monedas ?? null,
+    // Lo que las misiones aportaron, para que la pantalla de fin lo diga en vez
+    // de que aparezcan monedas de la nada.
+    misiones: data?.misiones ?? 0,
+    cumplidas: data?.cumplidas ?? [],
+    dia: data?.dia ?? dia,
   });
 }
 

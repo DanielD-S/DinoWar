@@ -12,9 +12,9 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: d155bee241139bc5
+// huella: f716097aa082525d
 //
-// Lleva dentro estos 18 ficheros del repositorio. La lista la da
+// Lleva dentro estos 19 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
 // aparece aquí solo. Un test recalcula la huella sobre esta misma lista y falla
 // si el paquete se ha quedado atrás del código.
@@ -31,6 +31,7 @@
 // fuente: src/engine/ai.js
 // fuente: src/data/tribu.js
 // fuente: src/data/eventos.js
+// fuente: src/data/misiones.js
 // fuente: supabase/functions/_compartido/validarPartida.js
 // fuente: supabase/functions/_compartido/validarAsalto.js
 // fuente: src/data/coleccion.js
@@ -3330,6 +3331,166 @@ var CALENDARIO = Object.freeze([
 ]);
 var CICLO = CALENDARIO.reduce((n, e) => Math.max(n, e.dia + e.dura), 0);
 
+// src/data/misiones.js
+var MISIONES = Object.freeze({
+  porDia: 3,
+  // Una victoria por debajo de esto es una partida que fue a por el rival desde
+  // el principio. La media ronda los 15 turnos (`BALANCE.md`), así que 11 pide
+  // intención sin pedir suerte.
+  turnosRelampago: 11
+});
+var porClado = (clado) => `clado:${clado}`;
+var VOCABULARIO = Object.freeze([
+  "partidas",
+  // jugadas, se ganen o no
+  "victorias",
+  "relampago",
+  // victorias en MISIONES.turnosRelampago turnos o menos
+  "bajas",
+  // criaturas rivales derribadas
+  "desplegados",
+  // tus criaturas que llegaron al campo
+  "climas",
+  // climas tuyos que se impusieron
+  "danoHabitat",
+  // daño que le hiciste al hábitat rival
+  "trofeos",
+  ...Object.values(CLADO).map(porClado)
+]);
+var ES_VOCABULARIO = new Set(VOCABULARIO);
+function parteVacio() {
+  const p = {};
+  for (const clave of VOCABULARIO) p[clave] = 0;
+  return p;
+}
+function anotarEventos(parte, eventos, bando = 0) {
+  const rival2 = bando === 0 ? 1 : 0;
+  for (const e of eventos) {
+    switch (e.tipo) {
+      // Una criatura rival que se cae es una baja tuya. `dueno` es de quién ERA,
+      // no quién la mató: matarte una propia con tu Mortandad no cuenta.
+      case "MUERTE":
+        if (e.dueno === rival2) parte.bajas += 1;
+        break;
+      // El daño al hábitat se cuenta por el bando que lo RECIBE.
+      case "HABITAT":
+        if (e.bando === rival2) parte.danoHabitat += e.cantidad ?? 0;
+        break;
+      // REVELADA y no la acción de desplegar: lo que cuenta es la criatura que
+      // LLEGÓ al campo. Una carta comprometida y luego rechazada se pagó igual,
+      // pero no se desplegó, y una misión que la contara mentiría.
+      case "REVELADA": {
+        if (e.jugador !== bando || !existeCarta(e.cardId)) break;
+        const c = carta(e.cardId);
+        if (c.tipo !== TIPO.DINOSAURIO) break;
+        parte.desplegados += 1;
+        const clave = porClado(c.clado);
+        if (clave in parte) parte[clave] += 1;
+        break;
+      }
+      // El clima es del campo, no de un bando, pero lo pone alguien: cuenta
+      // para quien lo jugó.
+      case "CAMPO":
+        if (e.jugador === bando && existeCarta(e.cardId) && carta(e.cardId).tipo === TIPO.CLIMA) parte.climas += 1;
+        break;
+      default:
+        break;
+    }
+  }
+  return parte;
+}
+function nuevosEventos(estado, desde) {
+  return estado.eventos.length >= desde ? estado.eventos.slice(desde) : estado.eventos.slice(0);
+}
+function cerrarParte(parte, { ganada, turnos, trofeos }) {
+  parte.partidas += 1;
+  parte.trofeos += trofeos ?? 0;
+  if (ganada) {
+    parte.victorias += 1;
+    if (turnos <= MISIONES.turnosRelampago) parte.relampago += 1;
+  }
+  return parte;
+}
+var M = (id, nombre, texto, mide, meta, premio) => Object.freeze({
+  id,
+  nombre,
+  texto,
+  mide,
+  meta,
+  premio
+});
+var CATALOGO = Object.freeze([
+  // Las de jugar: se cumplen solas si juegas, y están para que un día malo
+  // pague algo. Son las baratas a propósito.
+  M("jugar_tres", "Trabajo de campo", "Juega 3 partidas", "partidas", 3, 25),
+  M("ganar_una", "Una buena jornada", "Gana 1 partida", "victorias", 1, 25),
+  M("ganar_dos", "Racha", "Gana 2 partidas", "victorias", 2, 45),
+  // Las de jugar de una MANERA: piden armar el mazo pensando en ellas, que es
+  // lo que las hace valer la pena. Los números salen de una partida normal de
+  // 15 turnos, donde se despliegan entre 8 y 12 criaturas.
+  M("bajas_seis", "Depredaci\xF3n", "Derriba 6 criaturas rivales", "bajas", 6, 40),
+  M("habitat_diez", "Asedio", "Hazle 10 de da\xF1o al h\xE1bitat rival", "danoHabitat", 10, 40),
+  M("trofeos_seis", "Registro f\xF3sil", "Consigue 6 trofeos", "trofeos", 6, 40),
+  M("desplegar_doce", "Ecosistema", "Despliega 12 criaturas", "desplegados", 12, 35),
+  M("climas_tres", "Meteorolog\xEDa", "Imp\xF3n 3 climas", "climas", 3, 35),
+  // Las de clado: una por familia. Empujan a probar cartas que no están en el
+  // mazo de siempre, que es el otro problema del set —39 de 66 cartas fuera del
+  // mazo de referencia—. Los pterosaurios y los marinos piden menos: hay muchas
+  // menos cartas suyas y no caben cinco en cualquier mazo.
+  M("teropodos", "Caza mayor", "Despliega 5 ter\xF3podos", porClado(CLADO.TEROPODO), 5, 40),
+  M("sauropodos", "Manada", "Despliega 5 saur\xF3podos", porClado(CLADO.SAUROPODO), 5, 40),
+  M("tireoforos", "Coraza", "Despliega 4 tire\xF3foros", porClado(CLADO.TIREOFORO), 4, 40),
+  M("ornitopodos", "Ramoneo", "Despliega 5 ornit\xF3podos", porClado(CLADO.ORNITOPODO), 5, 40),
+  M("marginocefalos", "Testarazo", "Despliega 4 marginoc\xE9falos", porClado(CLADO.MARGINOCEFALO), 4, 40),
+  M("pterosaurios", "Sombra en el cielo", "Despliega 3 pterosaurios", porClado(CLADO.PTEROSAURIO), 3, 45),
+  M("marinos", "Mar de Sundance", "Despliega 3 reptiles marinos", porClado(CLADO.MARINO), 3, 45),
+  // La difícil del día. Una sola, y paga como tal.
+  // El texto dice «1 partida» y no «una» a propósito: el guardián de
+  // `misiones.test.js` pide que el texto cite la meta, igual que el de las
+  // cartas pide que cite su número, y con la letra no lo encuentra.
+  M(
+    "relampago",
+    "Golpe seco",
+    `Gana 1 partida en ${MISIONES.turnosRelampago} turnos o menos`,
+    "relampago",
+    1,
+    60
+  )
+]);
+var POR_ID = Object.freeze(Object.fromEntries(CATALOGO.map((m) => [m.id, m])));
+function semillaDelDia(dia) {
+  let h = 2166136261;
+  for (let i = 0; i < dia.length; i++) {
+    h ^= dia.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h || 1;
+}
+function siguiente2(r) {
+  let t = r + 1831565813 >>> 0;
+  let x = Math.imul(t ^ t >>> 15, 1 | t);
+  x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x;
+  return { r: t, valor: ((x ^ x >>> 14) >>> 0) / 4294967296 };
+}
+function misionesDelDia(dia) {
+  const lista = CATALOGO.slice();
+  let r = semillaDelDia(String(dia));
+  const cuantas = Math.min(MISIONES.porDia, lista.length);
+  for (let i = 0; i < cuantas; i++) {
+    const s = siguiente2(r);
+    r = s.r;
+    const j = i + Math.floor(s.valor * (lista.length - i));
+    const tmp = lista[i];
+    lista[i] = lista[j];
+    lista[j] = tmp;
+  }
+  return Object.freeze(lista.slice(0, cuantas));
+}
+var diaUTC = (ahora = /* @__PURE__ */ new Date()) => ahora.toISOString().slice(0, 10);
+function avancesDelParte(dia, parte) {
+  return misionesDelDia(dia).map((m) => ({ id: m.id, avance: parte[m.mide] ?? 0 })).filter((a) => a.avance > 0);
+}
+
 // supabase/functions/_compartido/validarPartida.js
 var LIMITES = Object.freeze({
   acciones: 4e3,
@@ -3384,6 +3545,13 @@ function validarPartida(envio, opciones = {}) {
   s.jugadores[1].habitat = habitatInicial;
   let rngIA = semilla(seed ^ 1542469173);
   const pendientes = acciones.slice();
+  const parte = parteVacio();
+  const aplicar = (estado, accion) => {
+    const desde = estado.eventos.length;
+    const siguiente3 = reduce(estado, accion);
+    anotarEventos(parte, nuevosEventos(siguiente3, desde));
+    return siguiente3;
+  };
   const siguienteDelJugador = (estado) => {
     if (pendientes.length) return pendientes.shift();
     if (estado.fase === FASE.DESCARTE) {
@@ -3402,7 +3570,7 @@ function validarPartida(envio, opciones = {}) {
           const a = { ...siguienteDelJugador(s), jugador: 0 };
           const motivo = validar(s, a);
           if (motivo) throw new PartidaInvalida("jugada ilegal", { accion: a.tipo, motivo });
-          s = reduce(s, a);
+          s = aplicar(s, a);
           actuo = true;
           if (a.tipo === ACCION.PASAR || a.tipo === ACCION.DESCARTAR) break;
           if (++tuyas > LIMITES.pasosPorFase) throw new PartidaInvalida("la fase no converge");
@@ -3412,7 +3580,7 @@ function validarPartida(envio, opciones = {}) {
           const d = decidir(vistaDe(s, 1), 1, rngIA, perfil);
           rngIA = d.rng;
           if (!d.accion) break;
-          s = reduce(s, d.accion);
+          s = aplicar(s, d.accion);
           actuo = true;
           if (d.accion.tipo === ACCION.PASAR || d.accion.tipo === ACCION.DESCARTAR) break;
           if (++suyas > LIMITES.pasosPorFase) throw new PartidaInvalida("la fase no converge");
@@ -3423,9 +3591,15 @@ function validarPartida(envio, opciones = {}) {
       if (s.fase === faseInicial) throw new PartidaInvalida("la fase se qued\xF3 bloqueada");
       continue;
     }
-    s = reduce(s, { tipo: ACCION.AVANZAR });
+    s = aplicar(s, { tipo: ACCION.AVANZAR });
   }
+  cerrarParte(parte, {
+    ganada: s.ganador === 0,
+    turnos: s.turno,
+    trofeos: s.jugadores[0].trofeos
+  });
   return {
+    parte,
     ganada: s.ganador === 0,
     danoAlHabitat: habitatInicial - Math.max(0, s.jugadores[1].habitat),
     trofeos: s.jugadores[0].trofeos,
@@ -3658,12 +3832,19 @@ async function hacerVictoria(servicio, jugadorId, envio) {
   if (await enUnDia(servicio, "partidas", jugadorId, "jugado_en") >= ECONOMIA.victoriasPorDia) {
     return json({ error: "ya has cobrado tus partidas de hoy" }, 429);
   }
+  const dia = diaUTC();
+  const avances = avancesDelParte(dia, resultado.parte).map((a) => {
+    const m = POR_ID[a.id];
+    return { id: a.id, avance: a.avance, meta: m.meta, premio: m.premio };
+  });
   const { data, error } = await servicio.rpc("aplicar_partida", {
     p_jugador: jugadorId,
     p_semilla: envio.semilla,
     p_turnos: resultado.turnos,
     p_ganada: resultado.ganada,
-    p_monedas: resultado.premio
+    p_monedas: resultado.premio,
+    p_dia: dia,
+    p_avances: avances
   });
   if (error) {
     const yaCobrada = error.code === "23505";
@@ -3676,7 +3857,12 @@ async function hacerVictoria(servicio, jugadorId, envio) {
     ganada: resultado.ganada,
     turnos: resultado.turnos,
     premio: data?.premio ?? 0,
-    monedas: data?.monedas ?? null
+    monedas: data?.monedas ?? null,
+    // Lo que las misiones aportaron, para que la pantalla de fin lo diga en vez
+    // de que aparezcan monedas de la nada.
+    misiones: data?.misiones ?? 0,
+    cumplidas: data?.cumplidas ?? [],
+    dia: data?.dia ?? dia
   });
 }
 async function hacerSobre(servicio, jugadorId) {

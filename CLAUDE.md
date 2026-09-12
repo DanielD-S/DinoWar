@@ -49,6 +49,9 @@ hay que hacer caso cuando el test lo dice.
 | `assets/fuentes/terralis.woff2` | `python tools/terralis.py` | — |
 | El commit anclado en `desde-url.ts` | `node tools/anclar-desde-url.mjs` | `test/anclaje.test.js` |
 
+Y las migraciones **no las aplica nadie solo**: `supabase/migrations/` es el
+registro de lo que la base de datos DEBERÍA tener, no de lo que tiene.
+
 **El anclaje hay que rehacerlo cuando cambia el MOTOR, no sólo los validadores.**
 La función re-juega tus partidas con el código del commit anclado; si el
 navegador estrena reglas y el anclaje se queda atrás, el servidor reproduce otra
@@ -60,6 +63,16 @@ ficheros— así que añadir un import extiende la vigilancia solo.
 
 Y después de re-anclar hay que **volver a desplegar**: el anclaje en el
 repositorio no mueve nada por sí solo.
+
+**Y no se despliega anclado a un commit de RAMA.** jsDelivr sirve cualquier
+commit del repositorio, también uno que sólo existe en una rama, así que anclar
+a mitad de trabajo funciona y parece correcto. Lo que pasa después es que la
+rama se mergea con squash y se borra: el commit se queda sin nada que lo
+referencie, GitHub acaba recogiéndolo, la URL empieza a dar 404 y caen las tres
+cosas A LA VEZ —victorias, asaltos y sobres— porque la función muere al
+importar, antes de mirar el `tipo`. El orden es: mergear, volver a anclar sobre
+main, y desplegar entonces. `node tools/anclar-desde-url.mjs` lo avisa por
+pantalla cuando el commit no está en main.
 
 ## Los cinco simuladores, y qué NO ve cada uno
 
@@ -474,6 +487,46 @@ El alta son DOS pasos —crear el usuario de auth y crear su fila de jugador— 
 el segundo falla el primero ya está hecho. Por eso un «User already registered»
 en la pestaña de crear cuenta NO es el final: se entra con ese correo y se sigue.
 Pasó de verdad y dejaba la cuenta inservible.
+
+### Misiones diarias
+
+Tres al día, elegidas por el calendario. El diseño entero cabe en cuatro
+frases y cada una cierra una puerta:
+
+- **La misión es un DATO**, como las mecánicas de las criaturas: mide UN
+  contador y pide una cantidad. Lo compuesto se resuelve en el parte —ahí está
+  `relampago`, que es una victoria Y un número de turnos— porque una misión con
+  dos condiciones es una que el jugador no sabe si está cumpliendo.
+- **El PARTE lo saca el servidor re-jugando**, de los eventos que el motor ya
+  emitía. El motor no sabe que las misiones existen y no debe saberlo. Un
+  progreso que dijera el navegador sería una carta regalada, por el mismo
+  camino de siempre: progreso → monedas → sobre → cartas legítimas.
+- **Qué misiones tocan hoy se CALCULA, no se guarda.** `misionesDelDia(dia)` es
+  determinista y la usan los dos lados. Lo que sí viene del servidor es qué día
+  es: con la fecha local del navegador, alguien en Auckland vería las de mañana
+  y le acreditarían las de hoy.
+- **El catálogo NO está en SQL.** La meta y el premio viajan en la llamada a
+  `aplicar_partida`. Una copia en la base de datos traería la trampa de aquí
+  abajo —regenerar no es aplicar— y no hace falta: lo único que el SQL hace con
+  una misión es sumarle progreso y pagarle el premio. Es seguro porque esa
+  función está revocada a todo el mundo y sólo la alcanza la clave de servicio.
+
+Dos cosas que cambiaron de sitio al añadirlas:
+
+- **Las partidas PERDIDAS ahora también se mandan al servidor.** Antes una
+  derrota valía cero y no se mandaba. Ahora puede avanzar «juega 3 partidas», y
+  no mandarla sería quitarle al jugador un progreso que se ganó. El tope diario
+  ya contaba las dos.
+- **El menú se desplaza si no cabe.** Cabía justo a 360×640 y el bloque de
+  misiones lo pasó por 58 px: la línea de la cuenta quedaba fuera de la pantalla
+  sin manera de llegar a ella. Se desplaza sólo `.menu-caja`; la portada va
+  detrás, en su capa, y se queda quieta.
+
+Y el vocabulario tiene guardián, como las mecánicas: una misión que mida
+`bajass` no es un error de sintaxis, es una que nunca avanza. Lo caza
+`test/misiones.test.js`, que además vigila el techo del premio diario — un
+catálogo que se infla no falla en ningún sitio, sólo se nota meses después en la
+economía.
 
 ### Regenerar el catálogo no es aplicarlo
 
