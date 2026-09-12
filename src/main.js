@@ -2,7 +2,7 @@
 // La interfaz sólo LEE el estado; toda mutación pasa por reduce().
 
 import { BALANCE } from './data/balance.js';
-import { TIPO, OBJETIVO, CLADO, CLADO_NOMBRE, carta } from './data/cards.js';
+import { TIPO, OBJETIVO, CLADO, CLADO_NOMBRE, RAREZA, carta } from './data/cards.js';
 import {
   crearPartida, vistaDe, FASE, MOTIVO_FIN, unidadesDe, buscablesDe, buscaEnElMazo,
   vidaActual, puedeReciclar, mecanicaDe,
@@ -13,7 +13,7 @@ import { semilla } from './engine/rng.js';
 import {
   montar, render, mensaje, el, JUGADOR, RIVAL,
   fichaHTML, ayudaHTML, abrirFicha, abrirDescarte, cerrarHojas,
-  abrirVisor, cambiarModoVisor, cerrarVisor, abrirComprometidas,
+  abrirVisor, cambiarModoVisor, cerrarVisor, abrirComprometidas, cartaHTML,
 } from './ui/render.js';
 import { tomarEntrada, soltarEntrada } from './ui/input.js';
 import * as reloj from './ui/reloj.js';
@@ -38,7 +38,9 @@ import { JEFES, jefeActivo } from './data/eventos.js';
 import { aListaDeMazo } from './data/coleccion.js';
 import {
   animarCombate, animarRevelacion, animarEventos, cancelarAnimaciones, esperar, lineasDeLog,
+  revelarRetenida,
 } from './ui/animate.js';
+import { invocar } from './ui/efectos.js';
 import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio } from './ui/audio.js';
 import { montarTacto } from './ui/tacto.js';
 import { mostrarMarca, empezarCarga, precargarPiezas } from './ui/carga.js';
@@ -595,6 +597,22 @@ function presionesRivales(nuevos) {
 }
 
 /**
+ * La ceremonia de una legendaria: la carta grande al centro, con los rayos y
+ * el aura detrás, y al final encogiéndose hacia la ranura donde va a abrirse.
+ * Vale para las dos: la tuya se invoca y la del rival también, que verla
+ * llegar a lo grande es la mitad del miedo.
+ */
+function animarInvocacion(cardId, bando, iid) {
+  const c = carta(cardId);
+  return invocar({
+    html: cartaHTML(cardId, { variante: 'visor' }),
+    titulo: bando === JUGADOR ? 'Invocas' : 'El rival invoca',
+    subtitulo: c.binomial,
+    destino: document.querySelector(`.carta--ranura[data-iid="${iid}"]`),
+  });
+}
+
+/**
  * Para el bucle mientras el jugador lee un cartel del tutorial. El combate se
  * explica justo cuando ocurre, y si sigue corriendo por debajo se explica solo
  * lo que ya no está en pantalla.
@@ -637,8 +655,17 @@ async function bucle() {
       sonido('revelar');
       // Se espera a que terminen los volteos, no un tiempo fijo: con el campo
       // lleno son diez cartas y 700 ms las cortaba por la mitad.
-      const volteadas = animarRevelacion(antes, estado);
-      await esperar(volteadas > 0 ? 480 + volteadas * 90 : 500);
+      // Una legendaria no entra: se invoca. Se queda invisible en su ranura
+      // mientras la ceremonia la enseña a lo grande, y se abre al terminar.
+      const legendarias = estado.eventos.slice(desdeRev)
+        .filter((e) => e.tipo === 'REVELADA' && carta(e.cardId).rareza === RAREZA.LEGENDARIO);
+      const espera = animarRevelacion(antes, estado, legendarias.map((e) => e.iid));
+      for (const e of legendarias) {
+        sonido('joya');
+        await animarInvocacion(e.cardId, e.jugador, e.iid);
+        await esperar(revelarRetenida(e.iid));
+      }
+      await esperar(espera);
       // Y AHORA lo que pasó al revelar: las habilidades al entrar, los eventos
       // que caen encima, el clima que se impone, el trío que se completa. Todo
       // esto ya ocurría —el tablero salía cambiado— pero sólo se leía en el

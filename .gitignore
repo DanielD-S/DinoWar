@@ -36,3 +36,7 @@ assets/marcos/chapas/*.png
 # que sólo hacen falta para regenerar la fuente con tools/terralis.py.
 assets/fuentes/terralis-*.png
 tools/terralis-muestra.png
+
+# Originales de los efectos del tablero: PNG de 1,2 MB cada uno; se sirven los
+# WebP de assets/piel/efectos/, que salen de tools/efectos.py.
+src/piel/

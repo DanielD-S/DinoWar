@@ -9,9 +9,18 @@ import {
   efectosDe, adheridasA,
 } from '../engine/state.js';
 import { arte, hayFoto, rutaFoto, hayEntera, rutaEntera } from './art.js';
+import { volar } from './efectos.js';
 
 export const JUGADOR = 0;
 export const RIVAL = 1;
+
+/**
+ * De dónde sale cada carta que llega a la mano en este repintado. Las ranuras
+ * se pintan antes que la mano: si una carta deja una ranura —una retirada—
+ * se apunta aquí de dónde se fue, y la mano la hace volar desde ahí en vez
+ * de desde el mazo. Se vacía al final de cada `render()`.
+ */
+const salidas = new Map();
 
 export const el = {};
 
@@ -266,6 +275,8 @@ function pintarRanuras(estado) {
         continue;
       }
 
+      const seVa = nodo.querySelector('.carta--ranura[data-iid]');
+      if (seVa) salidas.set(seVa.dataset.iid, seVa.getBoundingClientRect());
       nodo.dataset.clave = clave ?? '';
       nodo.innerHTML = clave === null ? (propias ? String(r + 1) : '') : '';
       nodo.classList.toggle('ocupada', clave !== null);
@@ -410,9 +421,18 @@ function pintarMano(estado) {
   for (const nodo of [...el.mano.children]) {
     if (!quiero.has(nodo.dataset.iid)) nodo.remove();
   }
+  // Las que llegan VIAJAN: desde el mazo si se roban, desde su ranura si se
+  // retiran. Varias a la vez —la mano inicial, el cambio de mano— salen en
+  // cadena, no de golpe.
+  let nuevas = 0;
   for (const iid of mano) {
     if (el.mano.querySelector(`[data-iid="${iid}"]`)) continue;
-    el.mano.appendChild(nodoCarta(estado, estado.instancias[iid].cardId, { variante: 'mano', iid }));
+    const nodo = nodoCarta(estado, estado.instancias[iid].cardId, { variante: 'mano', iid });
+    el.mano.appendChild(nodo);
+    volar(nodo, salidas.get(String(iid)) ?? el.pPila?.getBoundingClientRect(), {
+      retardo: nuevas * 70, dorso: !salidas.has(String(iid)),
+    });
+    nuevas += 1;
   }
 
   // Sin abanico: la mano es una fila y el orden es el del mazo. Lo único que
@@ -450,6 +470,7 @@ export function render(estado) {
   pintarRanuras(estado);
   pintarFranja(estado);
   pintarMano(estado);
+  salidas.clear();
 }
 
 export function mensaje(texto, aviso = false) {

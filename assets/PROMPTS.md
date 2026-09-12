@@ -483,6 +483,18 @@ Sequía. Las imágenes sólo ponen lo que un filtro no sabe hacer.
   **1792×1024**, servida a 1024. Es una viñeta: se queda quieta y respira con
   la opacidad, y el temblor de calor lo hace CSS con un filtro.
 
+### Lo que llegó, y en qué cambia el encargo
+
+La primera tanda —septiembre de 2026— trajo NUEVE de las quince, y los seis
+«fotogramas únicos» llegaron también como hojas de 4×4. Mejor: una hoja se
+pasa igual que un fotograma y cada golpe tiene su propia secuencia. Así que
+**pedir hojas de 4×4 para todo lo que sea un golpe o un destello**, y dejar
+como fotograma único sólo lo que se queda quieto: las grietas, el polvo, los
+rayos y la calima. `tools/efectos.py` las mide y avisa si alguna celda se sale
+de su centro.
+
+Faltan las cinco del clima: `lluvia`, `llovizna`, `bruma`, `agua` y `calima`.
+
 ### Después de generar
 
 1. Dejar los originales en **`src/piel/efectos/`** con el nombre exacto de la
@@ -490,9 +502,8 @@ Sequía. Las imágenes sólo ponen lo que un filtro no sabe hacer.
    `grietas`, `polvo`, `rayos`, `aura`, `lluvia`, `llovizna`, `bruma`, `agua`,
    `calima`. Es la misma regla que las ilustraciones: un nombre que no se
    reconoce se salta en silencio.
-2. La herramienta que los pasa a WebP a su tamaño servido **no existe todavía**:
-   se escribe cuando lleguen los primeros, junto con las animaciones. No hay
-   que keyear nada, sólo escalar, así que será corta.
+2. `python tools/efectos.py escribir`. No keyea nada: aprieta el fondo al
+   negro o al blanco exactos, mide las hojas y escala.
 3. Subir `VERSION` en `sw.js`, como siempre.
 
 **Lo que este encargo NO cubre** y no hay que pedir: retratos de rivales, el

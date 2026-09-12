@@ -48,6 +48,7 @@ hay que hacer caso cuando el test lo dice.
 | `tools/mecanicas.json` | `node tools/mecanicas.mjs` | — |
 | `assets/fuentes/terralis.woff2` | `python tools/terralis.py` | — |
 | El commit anclado en `desde-url.ts` | `node tools/anclar-desde-url.mjs` | `test/anclaje.test.js` |
+| `assets/piel/efectos/*.webp` | `python tools/efectos.py escribir` | `test/efectos.test.js` |
 
 Y las migraciones **no las aplica nadie solo**: `supabase/migrations/` es el
 registro de lo que la base de datos DEBERÍA tener, no de lo que tiene.
@@ -393,6 +394,47 @@ El sobre son dos capas con la misma imagen recortadas por el mismo zigzag, y
 `--p` es cuánto se ha rasgado. La pila usa `--i` para el escalón y
 `--dx`/`--dy`/`--giro` para seguir al dedo. Nada cambia de tamaño: todo es
 `transform`, `clip-path` y `opacity`, por lo mismo que en el tablero.
+
+## Los efectos del tablero: hojas, mezclas y fantasmas
+
+[`src/ui/efectos.js`](src/ui/efectos.js) es la caja de herramientas del peso:
+el hit-stop, la mesa que tiembla, los flipbooks, las chispas, los vuelos y la
+invocación de las legendarias. `animate.js` la usa desde `animarCombate` y
+`animarRevelacion`; `render.js` sólo para hacer volar las cartas que llegan a
+la mano. La hoja es `efectos.css`, aparte de `piel.css` porque la piel pinta y
+esto se mueve.
+
+Tres decisiones que conviene conocer antes de tocarlo:
+
+- **Los efectos no se keyean.** Los de luz llegan sobre negro y se pintan con
+  `mix-blend-mode: screen`; los que ensucian —grietas, polvo— sobre blanco y
+  con `multiply`. Y por eso **cuelgan del campo directamente, no de una capa**:
+  una capa con `z-index` es un contexto de apilamiento, la mezcla se haría
+  contra su fondo transparente y cada chispa saldría con su cuadrado negro. Se
+  comprobó en el banco: con `normal` en vez de `screen` el choque es un
+  cuadrado negro con una explosión dentro.
+- **Los flipbooks son hojas de 4×4** que el CSS recorre con `steps()` en dos
+  ejes: columnas cuatro veces, filas una. Se pidió una y el generador entregó
+  siete, todas alineadas: `tools/efectos.py` mide la deriva del centro de masa
+  de cada celda y avisa por encima del 8 %. La chispa pasa y da igual: es una
+  partícula y viaja mientras cambia de fotograma.
+- **Una carta que viaja no se mueve: se clona.** El fantasma vuela por encima
+  de todo con su propio `transform` y la de verdad espera invisible en su
+  sitio. Así el vuelo no compone con `aterrizar`, `voltear` ni la inclinación
+  de la mano, y no lo recorta el `overflow` de la mano. Las del rival llegan
+  boca abajo desde su pila y se voltean al aterrizar; las robadas salen de tu
+  mazo; una retirada vuelve desde su ranura, porque `render.js` apunta de dónde
+  se fue antes de vaciar la ranura.
+
+El hit-stop son 80 ms con `animation-play-state: paused` en toda la partida y
+el destello como única excepción: la sacudida y el flipbook arrancan al soltar.
+Y la invocación **retiene** la carta en su ranura —`.retenida`— mientras dura la
+ceremonia, y `revelarRetenida()` la voltea al terminar rearmando `.entra`, que
+corrió mientras estaba invisible.
+
+Para verlo sin jugar: `_banco_efectos.html` en la raíz —fuera del repositorio—
+enseña el tablero con los botones de cada efecto. Con `prefers-reduced-motion`
+no se crea nada de lo que se mueve; las hojas sí.
 
 ## `transform` es una sola propiedad, y quien la escribe último gana
 
