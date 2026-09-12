@@ -48,7 +48,10 @@ DESTINO = RAIZ / 'assets' / 'dinos'
 # Si eso pesa demasiado, bajar a 1000 deja la ficha con un 18 % de ampliacion,
 # que a esta densidad ya no se distingue.
 LADO = 1200
-CALIDAD = 80
+# 86 y no 80: los originales de septiembre de 2026 son PNG limpios de 1536 px y
+# a 80 el JPEG les metía anillos en los cielos y la neblina, que es la mitad de
+# cada ilustración. Medido sobre las 57: 12,6 MB a 80, 15,1 a 86, 17,8 a 90.
+CALIDAD = 86
 
 # Las CARTAS ENTERAS son otra cosa que las ilustraciones, y por eso van por su
 # lado. Una ilustración es el dibujo pelado que el juego monta dentro de su
