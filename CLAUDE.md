@@ -522,6 +522,14 @@ Dos cosas que cambiaron de sitio al añadirlas:
   sin manera de llegar a ella. Se desplaza sólo `.menu-caja`; la portada va
   detrás, en su capa, y se queda quieta.
 
+**Al crear una función de lectura, revocar a PUBLIC antes de conceder.** Una
+función creada por `postgres` nace con `execute` para PUBLIC, y anon es miembro:
+`grant … to authenticated` no quita ese permiso, lo duplica. Pasó con
+`mis_misiones` y no filtraba nada —sin `auth.uid()` la función lanza— pero el
+resto de lecturas del jugador van revocadas y una excepción sin motivo es una
+que un día alguien copia. Se comprueba con
+`has_function_privilege('anon', 'public.<fn>()', 'execute')`.
+
 Y el vocabulario tiene guardián, como las mecánicas: una misión que mida
 `bajass` no es un error de sintaxis, es una que nunca avanza. Lo caza
 `test/misiones.test.js`, que además vigila el techo del premio diario — un
