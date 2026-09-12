@@ -227,6 +227,14 @@ rarezas con ese PNG como referencia y el material como único cambio.
 `test/marcos.test.js` vigila que cada clase que emite `claseMarco()` tenga
 fichero y que ningún WebP sobre.
 
+Las piezas del menú —la barra de «Empezar partida» y las cinco placas— y el
+sobre y el dorso son del mismo generador y el mismo material, pero no llegaron
+en magenta: `python tools/placas.py escribir` las keyea por inundación desde el
+borde, tomando como fondo lo que se parece al color de las esquinas y está
+conectado con el borde. Lo de dentro del marco de latón nunca se toca. Con
+fondo oscuro la tolerancia va corta: con 28 la inundación se colaba por el
+hueco entre los dos filetes y vaciaba el centro de la barra.
+
 ## El sobre se abre con dos gestos
 
 [`src/ui/apertura.js`](src/ui/apertura.js) es la ceremonia: rasgar la bolsa

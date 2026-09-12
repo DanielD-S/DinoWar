@@ -46,13 +46,15 @@
       <h1>Dino<span>War</span></h1>
       <p class="menu-lema">Colecciona las bestias, arma tu mazo y sobrevive a la extinción.</p>
       <div class="menu-acciones">
-        <button id="btn-jugar" class="boton-grande">Empezar partida <span aria-hidden="true">→</span></button>
-        <div class="menu-fila">
-          <button id="btn-coleccion" class="boton-secundario">Colección</button>
-          <button id="btn-sobres" class="boton-secundario">Sobres</button>
-          <button id="btn-mazos" class="boton-secundario">Mazos</button>
-          <button id="btn-cuenca" class="boton-secundario">La Cuenca</button>
-          <button id="btn-cuenta" class="boton-secundario">Cuenta</button>
+        <!-- La barra y las cinco placas son piezas dibujadas, del mismo latón
+             y la misma piedra que los marcos. El texto lo pone el CSS encima. -->
+        <button id="btn-jugar" class="boton-grande boton-piedra">Empezar partida</button>
+        <div class="menu-fila menu-placas">
+          <button id="btn-coleccion" class="placa placa-coleccion"><i aria-hidden="true"></i>Colección</button>
+          <button id="btn-sobres" class="placa placa-sobres"><i aria-hidden="true"></i>Sobres</button>
+          <button id="btn-mazos" class="placa placa-mazos"><i aria-hidden="true"></i>Mazos</button>
+          <button id="btn-cuenca" class="placa placa-cuenca"><i aria-hidden="true"></i>La Cuenca</button>
+          <button id="btn-cuenta" class="placa placa-cuenta"><i aria-hidden="true"></i>Cuenta</button>
         </div>
         <div class="menu-fila">
           <button id="btn-ayuda-menu" class="boton-fantasma">Cómo se juega</button>
