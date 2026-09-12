@@ -248,6 +248,61 @@ conectado con el borde. Lo de dentro del marco de latón nunca se toca. Con
 fondo oscuro la tolerancia va corta: con 28 la inundación se colaba por el
 hueco entre los dos filetes y vaciaba el centro de la barra.
 
+### El menú manda a una pantalla de jugar, y esa pantalla tiene las misiones
+
+El botón grande decía «Empezar partida» y empezaba una contra la IA. Ahora dice
+**«Ir a jugar»** y abre `#jugar`, con su propia portada y tres placas: **En
+solitario**, **Duelo** y **Misiones**.
+
+Por qué se hizo: las misiones diarias nacieron dentro del menú, debajo de las
+dinomonedas, y lo dejaron amontonado. El menú ya iba justo a 360×640 y tres
+renglones más lo pasaron por 58 px — la línea de la cuenta se salía de la
+pantalla. Sacarlas a su propia pantalla devuelve el menú a lo que era y deja
+sitio para lo que venga.
+
+- **El Duelo se enseña apagado y dice «Pronto».** No hay PvP: la columna de ELO
+  está en la base y las partidas se registran, pero nadie las enfrenta.
+  Esconderlo habría sido más limpio y menos honesto; que hiciera algo, peor.
+- **La dificultad del rival se fue con «En solitario».** Es el rival de ESA
+  partida y en el menú estaba suelta, sin decir de qué.
+- **El panel de misiones se abre y se cierra con su placa**, y nace cerrado cada
+  visita: dejarlo abierto de la anterior hacía que la pantalla cambiara de alto
+  sola entre una entrada y la siguiente.
+- **El bloque va anclado abajo, no centrado.** Se probó centrarlo para repartir
+  la banda oscura entre los pies del animal y la primera placa; abrió un
+  socavón de 500 px debajo de «Volver». Esa banda es donde el velo se funde con
+  el fondo, y las tres placas la llenan casi exactamente.
+- **`montarTacto()` va en las DOS pantallas.** Estaba sólo en el menú y las tres
+  placas nuevas nacieron mudas: sin toque, sin vibración y sin destello.
+
+Las tres placas nuevas son **cuadradas** —las cinco del menú son verticales—
+porque aquí son tres en la misma fila y les sobra ancho. Heredan del menú el
+rótulo debajo de la piedra, el hundido y el destello: es la misma pieza con
+otra proporción.
+
+### Las piezas con alfa no se keyean
+
+`tools/placas.py` tiene ahora tres caminos y la diferencia importa:
+
+| grupo | qué llega | qué se le hace |
+|---|---|---|
+| `PIEZAS` | con fondo (damero, negro, marrón) | inundación desde el borde |
+| `PIEZAS_CON_ALFA` | ya recortadas | quitarles las motas del canto |
+| `FONDOS` | una foto a sangre | escalar y ya |
+
+Pasarle una pieza con alfa al keyeado no da error: el primer píxel del borde ya
+es transparente, la inundación no arranca y sale igual que entró.
+
+Y una trampa que costó tres intentos: **`Image.resize` mezcla los canales de
+color SIN mirar el alfa.** Las tres placas nuevas traen un filete ROJO pegado al
+canto, invisible en el original porque su alfa es 0, y al escalarlas reaparecía
+en píxeles que antes no existían — rojo puro asomando por el borde de una placa
+de latón. Premultiplicar **no** lo arregla: al deshacerlo hay que dividir por el
+alfa, y en un píxel de alfa 1 eso devuelve el rojo entero y amplificado (se
+midió: 199 píxeles rojos donde había 20). Lo que sirve es **sangrar el color**
+del canto hacia fuera antes de escalar, para que debajo de lo transparente esté
+el color de al lado y no el rojo.
+
 El menú **contesta al tacto** desde `src/ui/tacto.js` y el bloque «el menú
 respira y contesta» de `style.css`: entrada escalonada cada vez que se enseña,
 hundido seco al bajar el dedo y rebote al soltar, un destello que cruza el
@@ -625,6 +680,8 @@ pasos. CI corre los tests en cada push y necesita `fetch-depth: 0`, porque
 
 Dicho para que nadie lo descubra tarde:
 
+- **El Duelo (PvP) no existe.** La placa está en la pantalla de jugar, apagada
+  y con su «Pronto». El ELO sigue sin moverlo nadie.
 - **CAPTCHA en el alta anónima.** El límite es de 30 por hora y por IP. Antes de
   abrirlo a desconocidos hay que activar Turnstile, o la tabla de usuarios es un
   blanco fácil.

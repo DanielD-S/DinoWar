@@ -24,7 +24,7 @@ import {
 import { detectarFotos, detectarEnteras, vigilarFotos, calentarFotos } from './ui/art.js';
 import {
   montarMeta, abrirColeccion, abrirSobres, abrirMazos, pintarMenu, recompensar,
-  refrescarMisiones,
+  refrescarMisiones, pintarMisiones,
 } from './ui/meta.js';
 import { mazoActivo, cargarPerfil, actualizarPerfil } from './ui/almacen.js';
 import { montarCuenca, abrirCuenca, pintarCuenca } from './ui/cuenca.js';
@@ -43,7 +43,8 @@ import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio } from '
 import { montarTacto } from './ui/tacto.js';
 
 const APP = Object.freeze({
-  BOOT: 'BOOT', MENU: 'MENU', PLAYING: 'PLAYING', RESOLVING: 'RESOLVING', GAME_OVER: 'GAME_OVER',
+  BOOT: 'BOOT', MENU: 'MENU', JUGAR: 'JUGAR', PLAYING: 'PLAYING', RESOLVING: 'RESOLVING',
+  GAME_OVER: 'GAME_OVER',
   COLECCION: 'COLECCION', SOBRES: 'SOBRES', MAZOS: 'MAZOS', CUENCA: 'CUENCA',
   CUENTA: 'CUENTA', ENTRADA: 'ENTRADA',
 });
@@ -94,9 +95,6 @@ async function presentarse(nombre) {
   pintarCuentaEnMenu();
   pintarRecord();
   irA(APP.MENU);
-  // Las misiones del día llegan por su cuenta y repintan cuando lleguen: el
-  // menú no espera por ellas, que es un adorno delante de la puerta.
-  refrescarMisiones();
   return p;
 }
 
@@ -124,9 +122,31 @@ function anotarResultado(gane, turnos) {
 
 // ------------------------------------------------------------------ máquina
 
+/**
+ * Abre la pantalla de jugar. Las misiones se piden AQUÍ y no al arrancar: es
+ * donde se ven, y pedirlas en el arranque era una llamada más delante de la
+ * puerta para pintar algo que estaba tres pantallas más allá.
+ *
+ * El panel nace cerrado cada vez. Dejarlo abierto de la visita anterior haría
+ * que la pantalla cambiara de alto sola entre una entrada y la siguiente.
+ */
+function abrirJugar() {
+  el.btnMisiones.setAttribute('aria-expanded', 'false');
+  enseñarMisiones(false);
+  refrescarMisiones();
+  irA(APP.JUGAR);
+}
+
+/** Despliega o pliega el panel de misiones de la pantalla de jugar. */
+function enseñarMisiones(abierto) {
+  el.jugar.classList.toggle('misiones-abiertas', abierto);
+  pintarMisiones(abierto);
+}
+
 function irA(nuevo) {
   app = nuevo;
   el.menu.classList.toggle('oculta', nuevo !== APP.MENU);
+  el.jugar.classList.toggle('oculta', nuevo !== APP.JUGAR);
   el.partida.classList.toggle('oculta', nuevo !== APP.PLAYING && nuevo !== APP.RESOLVING);
   el.fin.classList.toggle('oculta', nuevo !== APP.GAME_OVER);
   el.coleccion.classList.toggle('oculta', nuevo !== APP.COLECCION);
@@ -966,7 +986,10 @@ function iniciar() {
   pintarRecord();
 
   montarMeta(() => irA(APP.MENU));
+  // Las dos pantallas de piedra contestan igual al tacto. Montarlo sólo en el
+  // menú dejaba las tres placas de jugar mudas y sin destello.
   montarTacto(el.menu);
+  montarTacto(el.jugar);
   montarCuenca(() => irA(APP.MENU), asaltoAlJefe);
   montarCuenta(() => irA(APP.MENU), pintarCuentaEnMenu,
     () => { abrirEntrada('Sesión cerrada.'); irA(APP.ENTRADA); });
@@ -982,7 +1005,20 @@ function iniciar() {
     irA(APP.ENTRADA);
   }
 
-  el.btnJugar.addEventListener('click', () => { desbloquear(); nuevaPartida(); });
+  // El botón del menú ya no empieza una partida: abre la pantalla donde se
+  // elige qué se juega. `desbloquear()` sigue aquí porque es el primer gesto
+  // real del usuario y es lo que despierta el audio.
+  el.btnJugar.addEventListener('click', () => { desbloquear(); abrirJugar(); });
+  el.btnSolitario.addEventListener('click', () => { desbloquear(); nuevaPartida(); });
+  // El duelo no existe todavía. La placa está `disabled`, así que esto no llega
+  // a dispararse; queda escrito para que se vea dónde entra cuando exista.
+  el.btnDuelo.addEventListener('click', () => {});
+  el.btnMisiones.addEventListener('click', () => {
+    const abierto = el.btnMisiones.getAttribute('aria-expanded') === 'true';
+    el.btnMisiones.setAttribute('aria-expanded', String(!abierto));
+    enseñarMisiones(!abierto);
+  });
+  el.btnJugarVolver.addEventListener('click', () => { pintarMenu(); irA(APP.MENU); });
   el.btnColeccion.addEventListener('click', () => { abrirColeccion(); irA(APP.COLECCION); });
   el.btnSobres.addEventListener('click', () => { abrirSobres(); irA(APP.SOBRES); });
   el.btnMazos.addEventListener('click', () => { abrirMazos(); irA(APP.MAZOS); });

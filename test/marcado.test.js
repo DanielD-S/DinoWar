@@ -19,7 +19,7 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 
 const html = readFileSync('index.html', 'utf8');
 
@@ -88,5 +88,55 @@ test('Ninguna regla `#id > *` fija `position`, que se la quitaría a las capas',
         `«${selector}» fija \`position\` y gana por especificidad a toda clase. `
         + 'Nombra las piezas que lo necesitan en vez de usar `> *`.');
     }
+  }
+});
+
+// ── 3 ─────────────────────────────────────────────────────────────────────
+// Las PLACAS del menú y de la pantalla de jugar son imágenes, y el CSS las
+// nombra por fichero. Una placa cuyo WebP no existe no rompe nada: el botón
+// sigue ahí, se pulsa, suena y navega — sólo que sin dibujo, con el rótulo
+// flotando sobre un hueco. Y al revés, un WebP que ya no usa nadie se queda
+// pesando en la precarga del service worker para siempre.
+//
+// Es el mismo guardián que `marcos.test.js` hace con los marcos de carta, un
+// piso más arriba.
+
+const PLACAS = 'assets/piel';
+
+test('Cada placa que declara el CSS tiene su fichero', () => {
+  const css = readFileSync('style.css', 'utf8');
+  const pedidas = [...css.matchAll(/--placa:\s*url\('([^']+)'\)/g)].map((m) => m[1]);
+  assert.ok(pedidas.length >= 8, `sólo ${pedidas.length} placas declaradas, ¿se perdió alguna?`);
+  for (const ruta of new Set(pedidas)) {
+    assert.ok(existsSync(ruta), `el CSS pide «${ruta}» y no está en el repositorio`);
+  }
+});
+
+test('No sobra ninguna placa: lo que está servido, se usa', () => {
+  const css = readFileSync('style.css', 'utf8');
+  const enCss = new Set([...css.matchAll(/--placa:\s*url\('([^']+)'\)/g)]
+    .map((m) => m[1].split('/').pop()));
+  for (const f of readdirSync(PLACAS).filter((n) => n.startsWith('placa_') && n.endsWith('.webp'))) {
+    assert.ok(enCss.has(f), `«${f}» está servido y no lo usa ninguna regla`);
+  }
+});
+
+test('Todo lo que la pantalla pide por `src` está en el repositorio', () => {
+  // Las dos portadas van por `src` y no por CSS, así que el guardián de arriba
+  // no las ve. Una portada que falta deja la pantalla en degradado y nadie se
+  // entera hasta que alguien la abre.
+  for (const m of html.matchAll(/<img[^>]+src="(assets\/[^"]+)"/g)) {
+    assert.ok(existsSync(m[1]), `el marcado pide «${m[1]}» y no está`);
+  }
+});
+
+test('Lo que el service worker precarga existe', () => {
+  // La precarga es `Promise.allSettled`, así que un fichero que no está NO
+  // rompe la instalación: se pide en la primera visita y ya. Lo que pasa es
+  // que deja de estar disponible sin conexión, que es justo para lo que está.
+  const sw = readFileSync('sw.js', 'utf8');
+  const bloque = sw.slice(sw.indexOf('const ESENCIALES'), sw.indexOf('];', sw.indexOf('const ESENCIALES')));
+  for (const m of bloque.matchAll(/'\.\/(assets\/[^']+)'/g)) {
+    assert.ok(existsSync(m[1]), `sw.js precarga «${m[1]}» y no está en el repositorio`);
   }
 });

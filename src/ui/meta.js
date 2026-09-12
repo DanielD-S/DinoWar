@@ -112,7 +112,6 @@ export function pintarMenu() {
   const v = validarMazo(m?.cartas ?? {}, p.cartas);
   dom.menuMoneda.textContent = MONEDAS();
   dom.menuMazo.textContent = v.valido ? m.nombre : `${m?.nombre ?? '—'} (no válido)`;
-  pintarMisiones();
 }
 
 // -------------------------------------------------------------- misiones
@@ -121,6 +120,15 @@ export function pintarMenu() {
 // el navegador a partir del DÍA que dijo el servidor —la misma función que usa
 // la Edge Function para acreditar— así que los dos hablan de las mismas tres
 // sin tener que guardarlas en ninguna parte.
+//
+// Viven en la pantalla de JUGAR, detrás de su placa. Estuvieron un rato en el
+// menú, debajo de las dinomonedas, y lo dejaron amontonado: el menú ya iba
+// justo a 360×640 y tres renglones más lo pasaron por 58 px.
+
+// Si el panel está desplegado. Lo guarda este módulo porque `refrescar()`
+// repinta cuando contesta el servidor y tiene que respetar lo que el jugador
+// dejó abierto o cerrado, sin que quien llama tenga que acordarse.
+let panelAbierto = false;
 
 const escapar = (t) => String(t).replace(/[&<>"]/g, (c) => (
   { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -129,12 +137,16 @@ const escapar = (t) => String(t).replace(/[&<>"]/g, (c) => (
  * Pinta el bloque de misiones con lo último que dijo el servidor. Si no ha
  * dicho nada —no hay servidor, o la llamada falló— el bloque se queda oculto:
  * un progreso inventado en el navegador es una promesa que nadie va a pagar.
+ *
+ * @param {boolean} [abierto] desplegar o plegar. Si no se dice, se respeta
+ *   como estaba: es lo que llama `refrescar()` cuando contesta el servidor.
  */
-export function pintarMisiones() {
+export function pintarMisiones(abierto) {
+  if (abierto !== undefined) panelAbierto = abierto;
   const caja = dom?.menuMisiones;
   if (!caja) return;
   const hoy = misionesDeHoy();
-  if (!hoy?.dia) { caja.classList.add('oculta'); return; }
+  if (!panelAbierto || !hoy?.dia) { caja.classList.add('oculta'); return; }
 
   const filas = misionesDelDia(hoy.dia).map((m) => {
     const estado = hoy.progreso[m.id] ?? { progreso: 0, cobrada: false };
@@ -158,9 +170,12 @@ export function pintarMisiones() {
   caja.classList.remove('oculta');
 }
 
-/** Pide las misiones al servidor y repinta cuando lleguen. No bloquea el menú. */
+/**
+ * Pide las misiones al servidor y repinta cuando lleguen. No bloquea la
+ * pantalla: se abre con lo que hubiera y se corrige sola.
+ */
 export function refrescarMisiones() {
-  return traerMisiones().then(pintarMisiones).catch(() => {});
+  return traerMisiones().then(() => pintarMisiones()).catch(() => {});
 }
 
 // -------------------------------------------------------------- colección
