@@ -1,5 +1,9 @@
-// Audio sintetizado: sin binarios, sin descargas. El AudioContext no se crea
+// Audio: efectos sintetizados y música en bucle. El AudioContext no se crea
 // hasta el primer gesto del usuario (política de autoplay de los navegadores).
+//
+// Los efectos siguen siendo osciladores —sin binarios, sin descargas— hasta
+// que lleguen generados. La música sí es fichero: los M4A de assets/sonidos/,
+// que salen de tools/sonidos.py y ya vienen cosidos para cerrar el bucle.
 
 let ctx = null;
 let maestro = null;
@@ -20,12 +24,7 @@ export function alternarMute() {
   return silenciado;
 }
 
-/** Se llama desde el primer gesto real del usuario. */
-export function desbloquear() {
-  if (ctx) {
-    if (ctx.state === 'suspended') ctx.resume();
-    return;
-  }
+function crearContexto() {
   const AC = window.AudioContext || window.webkitAudioContext;
   if (!AC) return;
   ctx = new AC();
@@ -34,10 +33,130 @@ export function desbloquear() {
   maestro.connect(ctx.destination);
 }
 
+/** Se llama desde el primer gesto real del usuario. */
+export function desbloquear() {
+  if (ctx) {
+    if (ctx.state === 'suspended') ctx.resume();
+    return;
+  }
+  crearContexto();
+  // La pantalla ya pidió su música antes de que hubiera contexto.
+  acompasar();
+}
+
 export function cerrarAudio() {
   if (ctx && ctx.state !== 'closed') ctx.close();
   ctx = null;
   maestro = null;
+  pista = null;
+  decodificadas.clear();
+}
+
+/** Con la pestaña escondida la música se calla; al volver, sigue. */
+export function enSegundoPlano(escondida) {
+  if (!ctx || ctx.state === 'closed') return;
+  if (escondida) ctx.suspend();
+  else ctx.resume();
+}
+
+// --------------------------------------------------------------- música
+//
+// Una pista por pantalla, la que pone `irA()` en cada cambio. Hubo una capa
+// más —un interludio para el sobre mientras duraba la ceremonia— y se quitó
+// porque al autor no le gustó cómo sonaba; si vuelve a hacer falta, es una
+// variable encima de `fondo` y un `?? fondo` en `acompasar()`.
+//
+// Las pistas van como AudioBufferSourceNode con `loop`, no como <audio>: el
+// elemento deja un hueco audible en cada vuelta y el buffer no. El precio es
+// decodificar: son 4 bytes por muestra y canal, así que 28 s de estéreo son
+// 11 MB en memoria y los dos minutos del menú, 45 MB. Por eso se decodifica
+// al pedirla y no todas al arrancar, y por eso una pista no debería pasar de
+// esos dos minutos.
+
+const RUTA_PISTA = (nombre) => `assets/sonidos/${nombre}.m4a`;
+const FUNDIDO = 0.9;
+/** Las pistas van normalizadas a −16 LUFS; esto las deja debajo de los efectos. */
+const VOLUMEN_MUSICA = 0.45;
+
+let fondo = null;
+let pista = null;          // { nombre, fuente, ganancia } sonando ahora
+let generacion = 0;
+const decodificadas = new Map();
+
+/** Qué pista suena ahora mismo, o `null`. Para mirar desde fuera, no para decidir. */
+export const pistaSonando = () => pista?.nombre ?? null;
+/** Si el navegador ya deja sonar. Falso antes del primer gesto en un sitio nuevo. */
+export const audioActivo = () => ctx?.state === 'running';
+
+/**
+ * La pista de la pantalla; `null` para silencio.
+ *
+ * La primera pantalla con música llega sin ningún gesto —la carga, con sesión
+ * guardada; la puerta, sin ella— y sin gesto el navegador puede negarse a
+ * sonar. Se crea el contexto igual: si lo permite, que Chrome lo hace en los
+ * sitios donde ya has oído audio otras veces, la música arranca aquí; si no,
+ * el contexto nace suspendido con la pista ya puesta y el primer clic o tecla
+ * lo despierta con ella sonando.
+ */
+export function musica(nombre) {
+  fondo = nombre;
+  if (!ctx && nombre) crearContexto();
+  acompasar();
+}
+
+/**
+ * Descarga y decodifica una pista antes de que haga falta. La del menú se
+ * pide durante la marca: son 1,6 MB y un cuarto de segundo de decodificar,
+ * y sin esto la música llegaba cuando el logo ya casi se había ido.
+ */
+export function precargarMusica(nombre) {
+  if (!ctx) crearContexto();
+  if (ctx) cargarPista(nombre).catch(() => {});
+}
+
+function cargarPista(nombre) {
+  if (!decodificadas.has(nombre)) {
+    const carga = fetch(RUTA_PISTA(nombre))
+      .then((r) => { if (!r.ok) throw new Error(`${r.status} al pedir ${nombre}`); return r.arrayBuffer(); })
+      .then((bytes) => ctx.decodeAudioData(bytes));
+    // Si falla se olvida, para volver a intentarlo la próxima vez que se pida.
+    carga.catch(() => decodificadas.delete(nombre));
+    decodificadas.set(nombre, carga);
+  }
+  return decodificadas.get(nombre);
+}
+
+function apagar(p) {
+  const t = ctx.currentTime;
+  p.ganancia.gain.cancelScheduledValues(t);
+  p.ganancia.gain.setValueAtTime(Math.max(0.0001, p.ganancia.gain.value), t);
+  p.ganancia.gain.exponentialRampToValueAtTime(0.0001, t + FUNDIDO);
+  p.fuente.stop(t + FUNDIDO + 0.05);
+}
+
+async function acompasar() {
+  if (!ctx) return;          // arrancará en desbloquear()
+  const nombre = fondo;
+  if (pista?.nombre === nombre) return;
+  const mia = ++generacion;
+  if (pista) { apagar(pista); pista = null; }
+  if (!nombre) return;
+
+  let buffer;
+  try { buffer = await cargarPista(nombre); } catch { return; }
+  // Mientras se decodificaba pudo pedirse otra, o cerrarse el audio.
+  if (mia !== generacion || !ctx || ctx.state === 'closed') return;
+
+  const fuente = ctx.createBufferSource();
+  fuente.buffer = buffer;
+  fuente.loop = true;
+  const ganancia = ctx.createGain();
+  const t = ctx.currentTime;
+  ganancia.gain.setValueAtTime(0.0001, t);
+  ganancia.gain.exponentialRampToValueAtTime(VOLUMEN_MUSICA, t + FUNDIDO);
+  fuente.connect(ganancia).connect(maestro);
+  fuente.start(t);
+  pista = { nombre, fuente, ganancia };
 }
 
 function tono(f0, f1, dur, tipo = 'triangle', vol = 0.07, retraso = 0) {

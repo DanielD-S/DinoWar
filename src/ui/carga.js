@@ -42,8 +42,13 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
  * Deja la marca en pantalla su tiempo y la desvanece. Resuelve cuando ya se
  * puede enseñar lo siguiente. Con `prefers-reduced-motion`, menos tiempo y
  * sin fundido: la marca se ve, pero no se hace esperar.
+ *
+ * `alIrse` se llama en el instante en que la marca EMPIEZA a desvanecerse,
+ * no cuando ha terminado: es donde arranca la música del menú, para que
+ * suba mientras el logo se disuelve y no después, sobre la carga ya puesta.
+ * @param {() => void} [alIrse]
  */
-export async function mostrarMarca() {
+export async function mostrarMarca(alIrse) {
   // El reloj arranca cuando la imagen SE VE, no cuando la página empieza a
   // pedirla. En la primera visita el logo baja por la red y, contando desde
   // el arranque, la mitad del tiempo se iba en pantalla vacía: «apenas dura».
@@ -52,6 +57,7 @@ export async function mostrarMarca() {
   const dura = reducido() ? MARCA.reducida : MARCA.dura;
   await espera(dura);
   el.marca.classList.add('se-va');
+  alIrse?.();
   await espera(reducido() ? 0 : MARCA.salida);
 }
 

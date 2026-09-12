@@ -47,6 +47,7 @@ hay que hacer caso cuando el test lo dice.
 | `RECOSTE.md` y `RECOSTE.xlsx` | `node tools/tabla.mjs escribir`, `python tools/excel.py escribir` | `test/cuentas.test.js` |
 | `tools/mecanicas.json` | `node tools/mecanicas.mjs` | — |
 | `assets/fuentes/terralis.woff2` | `python tools/terralis.py` | — |
+| `assets/sonidos/*.m4a` | `python tools/sonidos.py escribir` | — |
 | El commit anclado en `desde-url.ts` | `node tools/anclar-desde-url.mjs` | `test/anclaje.test.js` |
 | `assets/piel/efectos/*.webp` | `python tools/efectos.py escribir` | `test/efectos.test.js` |
 
@@ -379,6 +380,69 @@ latón, toque de sonido y vibración corta. Tres cosas que costaron:
 Y un fallo que estaba antes: el `:active` de `.boton-grande` escribe el
 shorthand `background`, que borraba la imagen de la barra al pulsarla. Ahora
 `.boton-piedra:active` la repite.
+
+## La música: cuatro pistas y dos capas
+
+Los originales llegan en WAV a `src/sonidos/` —fuera del repositorio, como los
+PNG— y `python tools/sonidos.py escribir` los deja en `assets/sonidos/` como
+AAC en M4A. **No es Opus porque Safari en iPhone no lo decodifica por Web
+Audio**, y la música se sirve por `decodeAudioData` y no por `<audio>`: el
+elemento deja un hueco audible en cada vuelta del bucle y el buffer no. Hace
+falta ffmpeg en el PATH (`scoop install ffmpeg`).
+
+**Reemplazar una pista con el mismo nombre pide subir `VERSION` en `sw.js`.**
+`assets/sonidos/` va de caché primero, como las ilustraciones, y ahí la regla
+es que lo nuevo trae nombre nuevo. La segunda música del menú se regeneró,
+se recargó y el navegador siguió tocando la primera: 28 s en vez de 118.
+
+La herramienta decodifica lo que le llegue —la segunda música del menú vino
+como M4A con extensión `.wav`— y no mira la extensión.
+
+**Tres de las cuatro primeras pistas llegaron con corte en el bucle** aunque
+se pidieron «seamless loop». La herramienta lo mide —el salto de la costura
+contra el salto típico entre muestras: ×1 o ×2 limpio, ×20 o más corte— y lo
+arregla fundiendo los tres últimos segundos sobre los tres primeros. Y antes
+de coser **quita los fundidos de entrada y salida** que el generador mete
+aunque se le prohíban: la segunda música del menú traía 4 s de subida y 10 de
+bajada, y el bucle pasaba seis segundos casi en silencio en cada vuelta. Se
+corta lo que queda por debajo del 60 % de la sonoridad típica en cada
+extremo, y la herramienta imprime cuánto quitó y cuánto se hunde el volumen
+en la costura: ×1 no se nota, ×0,5 es un respiro, ×0,1 es un agujero. La
+pista servida queda más corta que el original; contar con ello.
+
+En `audio.js` hay una pista por pantalla, la que pone `irA()` desde la tabla
+`MUSICA_DE` de `main.js`. Las pantallas de colección, sobres, mazos y cuenta
+llevan la del menú: cambiar de pista a cada placa sonaría a zapping. El final
+de partida va en silencio, que ahí suena el remate. **El sobre tuvo música
+propia y se quitó**: al autor no le gustó. Y la primera versión tenía un fallo
+que conviene recordar si vuelve: la pista se quitaba al terminar la ceremonia,
+y salir con «‹ Menú» a medias dejaba la promesa sin resolver y la música del
+sobre puesta para siempre.
+
+**La música del menú empieza cuando la marca EMPIEZA a irse**, no cuando ya
+se fue: `mostrarMarca()` recibe un `alIrse` que se dispara al poner `se-va`,
+y la pista sube mientras el logo se disuelve. Para que llegue a tiempo se
+precarga durante la marca (`precargarMusica`): son 1,6 MB y un cuarto de
+segundo de decodificar, y sin eso entraba cuando el logo casi había
+desaparecido. Medido: 20 ms después del fundido con precarga, 270 sin ella.
+La carga o la puerta piden después la misma pista y `musica()` no la
+reinicia. Todo esto llega sin ningún gesto, y sin gesto el navegador puede
+negarse: el contexto se crea igual y, si nace suspendido, la pista queda
+puesta y el primer `click` o `keydown` —dos escuchas de un solo uso sobre
+`document`— lo despierta con ella sonando. Chrome lo deja sonar sin gesto en los sitios donde
+ya has oído audio otras veces, así que a quien juega a menudo le suena desde
+la carga y a quien entra por primera vez, desde el primer toque. `pointerdown`
+no vale como gesto, por lo mismo que el toque de las placas suena en `click`.
+Y con la pestaña escondida el contexto se suspende: `visibilitychange` llama
+a `enSegundoPlano()`.
+
+**El botón de silencio está en las cuatro pantallas donde suena algo**: la
+puerta, el menú, la de jugar y la partida, todos con `data-mute` y la misma
+preferencia. Estaba sólo en la partida, y con la música arrancando en la
+carga eso obligaba a empezar una partida para callarla.
+
+Los efectos siguen sintetizados con osciladores. El catálogo de lo que falta y
+los prompts están en [assets/PROMPTS_SONIDO.md](assets/PROMPTS_SONIDO.md).
 
 ## El sobre se abre con dos gestos
 

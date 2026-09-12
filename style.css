@@ -1802,6 +1802,23 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .boton-icono:active { border-color: var(--borde-fuerte); }
 .boton-icono.off { color: var(--tenue-2); }
+/* Silenciado se ve, no sólo se atenúa: una raya cruzada sobre la nota. */
+.boton-icono { position: relative; }
+.boton-icono.off::after {
+  content: ''; position: absolute; width: 22px; height: 2px;
+  background: currentColor; transform: rotate(-45deg); border-radius: 1px;
+}
+
+/* El mismo botón en la puerta, el menú y la pantalla de jugar, en la esquina
+   de arriba a la derecha, por encima de la portada. La música arranca antes
+   de que el jugador toque nada, así que tiene que poder callarla desde la
+   primera pantalla que ve y no desde dentro de una partida. */
+.boton-sonido {
+  position: absolute; top: calc(var(--seguro-arriba) + 12px); right: 14px; z-index: 3;
+  background: rgba(25, 20, 16, .55); backdrop-filter: blur(4px);
+  border-color: rgba(255, 255, 255, .14); color: var(--texto);
+}
+.boton-sonido.off { color: var(--tenue); }
 
 /* El ancho y alto de aquí son sólo el valor de reserva: `empezarArrastre` los
    pisa con la medida real de una ranura, que sale del `1fr` de la fila y cambia
