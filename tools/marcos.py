@@ -61,11 +61,24 @@ def distancia_a_magenta(rgb):
 
 
 def keyear(im):
-    """RGBA con el magenta hecho transparente y un borde suave."""
-    rgb = np.asarray(im.convert('RGB'))
+    """RGBA con el magenta hecho transparente y un borde suave.
+
+    El borde del dibujo viene antialiasado CONTRA el magenta: un píxel medio
+    transparente es mitad latón, mitad #FF00FF, y si se deja tal cual se ve un
+    filete rosa alrededor de toda la pieza. Se deshace la mezcla: si el píxel
+    es `alfa · color + (1 − alfa) · magenta`, el color es lo que queda al
+    restar el magenta y dividir por alfa. Es exacto donde el fondo era magenta
+    puro, que es todo el borde.
+    """
+    rgb = np.asarray(im.convert('RGB')).astype(float)
     d = distancia_a_magenta(rgb)
-    alfa = np.clip((d - 40) / 60, 0, 1) * 255
-    return Image.fromarray(np.dstack([rgb, alfa]).astype(np.uint8), 'RGBA')
+    alfa = np.clip((d - 40) / 60, 0, 1)
+    magenta = np.array([255.0, 0.0, 255.0])
+    a = alfa[..., None]
+    con_alfa = np.where(a > 0.02, a, 1.0)
+    color = np.clip((rgb - (1 - a) * magenta) / con_alfa, 0, 255)
+    color = np.where(a > 0.02, color, rgb)
+    return Image.fromarray(np.dstack([color, alfa * 255]).astype(np.uint8), 'RGBA')
 
 
 def regiones(mascara):
