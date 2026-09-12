@@ -312,13 +312,19 @@ export function refrescarFotos() {
   for (const svg of document.querySelectorAll('svg[data-carta]')) {
     const cardId = svg.dataset.carta;
     if (!hayFoto(cardId)) continue;
-    const boton = svg.closest('.ficha-arte');
+    const ficha = svg.closest('.ficha-cab');
     svg.replaceWith(document.createRange().createContextualFragment(arte(cardId)));
     // La ficha ofrece «ver la ilustración» sólo si la hay: si acaba de
-    // aparecer, el botón tiene que enterarse.
-    if (boton) {
-      boton.dataset.modo = 'foto';
-      boton.setAttribute('aria-label', 'Ver la ilustración en grande');
+    // aparecer, el chip tiene que aparecer con ella.
+    if (ficha && !ficha.querySelector('[data-modo="foto"]')) {
+      let acciones = ficha.querySelector('.ficha-acciones');
+      if (!acciones) {
+        acciones = document.createElement('div');
+        acciones.className = 'ficha-acciones';
+        ficha.appendChild(acciones);
+      }
+      acciones.insertAdjacentHTML('afterbegin',
+        `<button class="ficha-ampliar" data-zoom="${cardId}" data-modo="foto">Ver la ilustración</button>`);
     }
   }
 }
