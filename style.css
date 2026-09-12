@@ -117,14 +117,19 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   background: var(--fondo);
 }
 .menu-heroe {
-  position: absolute; inset: 0; width: 100%; height: 70%;
-  object-fit: cover; object-position: 44% 42%;
-  filter: saturate(.85) contrast(1.05) brightness(.72) sepia(.18);
+  position: absolute; inset: 0; width: 100%; height: 74%;
+  object-fit: cover; object-position: 50% 18%;
+  /* La portada ya viene cálida y oscura por abajo: se baja poco. Con la
+     lámina apaisada de antes hacía falta el 72 % y el sepia. */
+  filter: saturate(.92) contrast(1.04) brightness(.86);
 }
 .menu-velo {
   position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(25,20,16,.55) 0%, rgba(25,20,16,.1) 24%,
-              rgba(25,20,16,.86) 50%, var(--fondo) 64%);
+  /* Arriba, lo justo para que el título se lea sobre el cielo naranja; el
+     animal, entre el 25 % y el 55 %, queda casi limpio; y del 55 % abajo se
+     funde con el fondo, que es donde viven los botones. */
+  background: linear-gradient(180deg, rgba(25,20,16,.5) 0%, rgba(25,20,16,.08) 26%,
+              rgba(25,20,16,.05) 44%, rgba(25,20,16,.84) 60%, var(--fondo) 72%);
 }
 .menu-caja {
   position: absolute; inset: 0;
