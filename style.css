@@ -1372,26 +1372,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hoja-accion:active { border-color: var(--vida); }
 
 .ficha-cab { margin-bottom: 10px; }
-/* Apaisada y de ancho completo: las ilustraciones tienen proporción 1,5 a 1,8
-   y en el cuadrado de antes se les recortaba medio animal. La silueta SVG, que
-   no se recorta, va en una franja más baja porque no gana nada con la altura. */
-.ficha-arte {
-  position: relative; width: 100%; aspect-ratio: 21 / 9;
-  background: var(--panel-alto); border-radius: var(--radio); padding: 6px;
-  overflow: hidden; display: block; cursor: pointer; margin-bottom: 11px;
-}
-.ficha-arte svg { width: 100%; height: 100%; }
-.ficha-arte .foto { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; display: block; }
-.ficha-arte:has(.foto) { padding: 0; aspect-ratio: 16 / 9; }
-/* La miniatura no se lee: hay que decir que se puede abrir. */
-.ficha-lupa {
-  position: absolute; right: 6px; bottom: 6px; width: 18px; height: 18px;
-  border-radius: 5px; background: rgba(12,10,7,.78); border: 1px solid var(--borde);
-  color: var(--texto); font-size: 11px; line-height: 16px; text-align: center;
-}
-.ficha-arte:active { border: 1px solid var(--bio); }
+/* La carta con su marco, centrada y al mismo tamaño que en el visor: es la
+   misma pieza, y aquí la ficha sólo añade lo que la carta no lleva impreso. */
+.ficha-carta { width: min(268px, 78vw); margin: 0 auto 12px; }
+.ficha-carta .carta { border-radius: 12px; }
+.ficha-acciones { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
 .ficha-ampliar {
-  margin-top: 10px; font-size: 11.5px; color: var(--acento-claro);
+  font-size: 11.5px; color: var(--acento-claro);
   border: 1px solid var(--borde); border-radius: 20px; padding: 5px 12px;
 }
 .ficha-ampliar:active { border-color: var(--borde-fuerte); }
@@ -1403,10 +1390,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .ficha-rareza { padding: 2px 7px; border-radius: 3px; box-shadow: 0 0 0 1px currentColor; }
 
-/* La clave de estadísticas también aquí: el cuadro de color es lo que une la
-   ficha con lo que se ve en el tablero. */
-/* Las mismas fichas de estadística que la carta, para que el jugador no tenga
-   que traducir entre dos claves distintas. */
+/* Las cifras del estado en partida, con la misma clave de color que la carta
+   para que el jugador no tenga que traducir entre dos claves distintas. */
 .ficha-cifras {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 10px;
 }

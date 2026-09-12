@@ -158,9 +158,15 @@
 .con-marco .c-texto { display: none; }
 .carta--visor .c-texto {
   display: block; margin: 0; color: #e8dcc8; text-align: left;
-  font: 400 11.5px/15px 'Libre Baskerville', Georgia, serif;
+  font: 400 11.5px/14px 'Libre Baskerville', Georgia, serif;
+  flex: 1 1 auto; min-height: 0; overflow: hidden;
 }
-.carta--visor .c-cuerpo { padding: 3.5% 5% 3%; justify-content: flex-start; gap: 5px; }
+/* Bajo el título quedan 44 px: tres líneas de 14. A 11,5 px entran unas 30
+   letras por línea, así que hasta 80 letras cabe; las siete que pasan de ahí
+   bajan a 10,5 sobre 13, que mete 89 letras en tres líneas y las 112 de la
+   Crecida en cuatro, en la caja más alta de soporte. Medido sobre las 68. */
+.carta--visor .c-texto.largo { font-size: 10.5px; line-height: 13px; }
+.carta--visor .c-cuerpo { padding: 3% 5% 2.5%; justify-content: flex-start; gap: 5px; }
 
 /* ------------------------------------------------------- cifras en su chapa
    Van sobre las chapas, en coordenadas de la CARTA. Y para eso `.c-stats` tiene
@@ -262,7 +268,7 @@
 .con-marco .c-nombre, .con-marco .c-hab { line-height: 10px; }
 .carta--col .c-nombre, .carta--col .c-hab { line-height: 11px; }
 .carta--sobre .c-nombre, .carta--sobre .c-hab { line-height: 8px; }
-.carta--visor .c-nombre, .carta--visor .c-hab { line-height: 19px; }
+.carta--visor .c-nombre, .carta--visor .c-hab { line-height: 21px; }
 
 /* El rótulo de tipo sobra en la cara de la carta. Ocupaba un renglón de la
    placa y dejaba al nombre sin sitio —«Mortandad estacional» pedía 22 px y
@@ -335,4 +341,11 @@
    tres clases y sin eso le ganaba al visor. */
 .con-marco.carta--col .c-nombre, .carta--col .c-hab { font-size: min(9.4px, calc(90cqi / (0.69 * var(--pal, 9)))); }
 .con-marco.carta--sobre .c-nombre, .carta--sobre .c-hab { font-size: min(6.4px, calc(90cqi / (0.69 * var(--pal, 9)))); }
-.con-marco.carta--visor .c-nombre, .carta--visor .c-hab { font-size: min(16px, calc(90cqi / (0.69 * var(--pal, 9)))); }
+/* En el visor el título va a UNA línea y no encoge nunca: si el flex tuviera
+   que elegir, encogía el título hasta 1 px y dejaba el texto. Con `--hn`, el
+   largo del título, el cuerpo baja hasta que quepa: 16 px hasta 13 letras y
+   12 px con «Vuelo de reconocimiento». */
+.carta.con-marco.carta--visor .c-nombre, .carta--visor .c-hab {
+  flex: none; -webkit-line-clamp: 1;
+  font-size: min(16px, calc(100cqi / (0.7 * var(--hn, 12))));
+}

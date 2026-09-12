@@ -159,9 +159,14 @@ function marcoCarta(estado, cardId, {
   const genero = c.binomial.split(/\s+/)[0];
   const banda = dino
     ? `<div class="c-banda"><span class="c-genero" style="--gen:${genero.length}">${genero}</span></div>` : '';
+  // `--hn` es el largo del título entero: en el visor va a una sola línea y
+  // el cuerpo baja hasta que quepa, como el género en la banda.
   const titulo = dino
-    ? `<div class="c-hab" style="--pal:${palabraMasLarga(c.rasgoNombre)}">${c.rasgoNombre}</div>`
-    : `<div class="c-nombre" style="--pal:${palabraMasLarga(c.binomial)}">${c.binomial}</div>`;
+    ? `<div class="c-hab" style="--pal:${palabraMasLarga(c.rasgoNombre)};--hn:${c.rasgoNombre.length}">${c.rasgoNombre}</div>`
+    : `<div class="c-nombre" style="--pal:${palabraMasLarga(c.binomial)};--hn:${c.binomial.length}">${c.binomial}</div>`;
+  // Y el texto, cuando lo hay, baja un punto a partir de 80 letras: hasta ahí
+  // entra en las tres líneas que deja el título; siete cartas pasan.
+  const textoHTML = `<p class="c-texto${c.rasgoTexto.length > 80 ? ' largo' : ''}">${c.rasgoTexto}</p>`;
 
   // Tres capas más: el marco por encima del arte, y las chapas donde caen las
   // cifras y el coste. carta.css explica la medida.
@@ -175,7 +180,7 @@ function marcoCarta(estado, cardId, {
     ${banda}
     <div class="c-cuerpo">
       ${titulo}
-      ${texto ? `<p class="c-texto">${c.rasgoTexto}</p>` : ''}
+      ${texto ? textoHTML : ''}
     </div>
     ${stats}
     ${adaptada ? '<span class="c-adap"></span>' : ''}
@@ -509,6 +514,16 @@ function estadoEnJuegoHTML(estado, iid) {
     </div>`;
 }
 
+/**
+ * La ficha de una carta: la carta misma, con su marco y a tamaño de lectura,
+ * y debajo lo que la carta no lleva impreso. En partida, la carta enseña las
+ * cifras de ESTA copia —el Ataque efectivo y la Vida que le queda— y el bloque
+ * de estado explica de dónde salen.
+ *
+ * El rasgo se repite debajo de la carta a propósito: la caja del marco lo
+ * lleva a 11,5 px y recortado a lo que cabe; aquí va entero, con su nivel de
+ * evidencia, que es lo que la ficha viene a contar.
+ */
 export function fichaHTML(cardId, iid = null, estado = null) {
   const c = carta(cardId);
   const dino = c.tipo === TIPO.DINOSAURIO;
@@ -518,23 +533,28 @@ export function fichaHTML(cardId, iid = null, estado = null) {
     : ES_DINOSAURIO[c.clado] ? `Dinosaurio · ${CLADO_NOMBRE[c.clado]}`
       : CLADO_NOMBRE[c.clado];
 
-  // La ilustración va de ancho completo y no en un cuadrado al lado del texto:
-  // las fotos son apaisadas (proporción 1,5 a 1,8) y en un cuadro 1:1 se les
-  // recortaba medio animal, que es justo lo que esta pantalla viene a enseñar.
+  const inst = iid !== null ? estado?.instancias?.[iid] : null;
+  const enJuego = inst && inst.ranura !== null && dino;
+  const datos = enJuego ? {
+    texto: true,
+    poder: ataqueEfectivo(estado, iid),
+    vidaAct: vidaActual(estado, iid),
+    vidaMax: vidaMaxima(estado, iid),
+    adaptada: inst.adherencias.length > 0,
+    mermada: ataqueEfectivo(estado, iid) < c.ataque,
+  } : { texto: true };
+
+  const acciones = [
+    hayFoto(cardId) ? `<button class="ficha-ampliar" data-zoom="${cardId}" data-modo="foto">Ver la ilustración</button>` : '',
+    hayEntera(cardId) ? `<button class="ficha-ampliar" data-zoom="${cardId}" data-modo="original">Ver la carta original</button>` : '',
+  ].filter(Boolean).join('');
+
   return `
     <div class="ficha-cab">
-      <button class="ficha-arte" data-zoom="${cardId}" data-modo="${hayFoto(cardId) ? 'foto' : 'original'}"
-              aria-label="${hayFoto(cardId) ? 'Ver la ilustración en grande' : 'Ver la carta en grande'}">
-        ${arte(cardId)}<span class="ficha-lupa" aria-hidden="true">⤢</span>
-      </button>
+      <div class="ficha-carta">${cartaHTML(cardId, { variante: 'visor', datos })}</div>
       <div class="ficha-binomial${dino ? '' : ' recto'}">${c.binomial}</div>
       <div class="ficha-clado">${familia} <span class="ficha-rareza rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span></div>
-      <div class="ficha-cifras">
-        <span class="st st-c"><i aria-hidden="true">◆</i><u>Coste</u><b>${c.coste}</b></span>
-        ${dino ? statHTML('a', 'Ataque', c.ataque) : ''}
-        ${dino ? statHTML('v', 'Vida', c.vida) : ''}
-      </div>
-      <button class="ficha-ampliar" data-zoom="${cardId}" data-modo="original">Ver la carta en grande</button>
+      ${acciones ? `<div class="ficha-acciones">${acciones}</div>` : ''}
     </div>
     ${iid === null ? '' : estadoEnJuegoHTML(estado, iid)}
     <div class="ficha-rasgo">
