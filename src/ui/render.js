@@ -350,6 +350,9 @@ function pintarHabitat(estado) {
 }
 
 function pintarFranja(estado) {
+  // El clima pinta el tablero entero, no sólo su franja: `efectos.css` lee
+  // este atributo y pone la lluvia, la bruma o la calima en las dos capas.
+  el.campo.dataset.clima = estado.campo ?? '';
   if (estado.campo) {
     const c = carta(estado.campo);
     el.franjaCampo.textContent = c.binomial;

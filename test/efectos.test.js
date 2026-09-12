@@ -15,7 +15,7 @@ const CARPETA = 'assets/piel/efectos';
 /** Los que la herramienta sabe generar, leídos de su código. */
 function generables() {
   const py = readFileSync('tools/efectos.py', 'utf8');
-  return new Set([...py.matchAll(/^\s+'([a-z]+)': \((?:NEGRO|BLANCO), \d+\),/gm)].map((m) => m[1]));
+  return new Set([...py.matchAll(/^\s+'([a-z]+)': \((?:NEGRO|BLANCO), \d+(?:, '[xy]+')?\),/gm)].map((m) => m[1]));
 }
 
 /**

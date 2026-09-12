@@ -432,6 +432,14 @@ Y la invocación **retiene** la carta en su ranura —`.retenida`— mientras du
 ceremonia, y `revelarRetenida()` la voltea al terminar rearmando `.entra`, que
 corrió mientras estaba invisible.
 
+**El clima pinta el tablero** con dos capas fijas dentro del campo —`.clima-capa
+a` y `b`— y `render.js` escribe `data-clima` con el id de la carta puesta;
+`efectos.css` decide qué va en cada capa por clima. Las texturas son mosaicos
+que `tools/efectos.py` cierra en bucle: llegaron con costura aunque se
+pidieron sin ella, y el cierre por desplazamiento y fundido vale para lo
+estocástico —lluvia, niebla, agua— y no valdría para un dibujo. El agua sólo se
+cierra en horizontal porque trae el horizonte arriba.
+
 Para verlo sin jugar: `_banco_efectos.html` en la raíz —fuera del repositorio—
 enseña el tablero con los botones de cada efecto. Con `prefers-reduced-motion`
 no se crea nada de lo que se mueve; las hojas sí.

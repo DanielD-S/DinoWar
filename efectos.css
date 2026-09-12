@@ -187,11 +187,77 @@
   84%     { opacity: 0; }
 }
 
+/* ------------------------------------------------------ el clima, puesto
+   Dos capas fijas dentro del campo, `render.js` escribe `data-clima` con el
+   id de la carta puesta, y cada clima dice qué va en cada capa. Las texturas
+   son mosaicos cerrados por `tools/efectos.py`, en `screen` las de luz y en
+   `multiply` la calima; el tinte de color va en la segunda capa sin mezcla.
+   Nada de esto cambia el tamaño de nada: las dos capas son absolutas. */
+.clima-capa {
+  position: absolute; inset: 0; z-index: 5; pointer-events: none;
+  display: none; will-change: background-position, opacity;
+}
+#campo[data-clima]:not([data-clima=""]) > .clima-capa { display: block; }
+
+/* Monzón de verano: lluvia gruesa cayendo en diagonal y el cielo cerrado. */
+#campo[data-clima="sabana"] > .clima-capa.a {
+  background: url('assets/piel/efectos/lluvia.webp') 0 0 / 224px 224px repeat;
+  mix-blend-mode: screen; opacity: .55;
+  animation: clima-lluvia .7s linear infinite;
+}
+#campo[data-clima="sabana"] > .clima-capa.b { background: rgba(12, 18, 30, .28); }
+@keyframes clima-lluvia { to { background-position: -60px 224px; } }
+
+/* Estación de lluvias: llovizna fina, casi vertical, y el verde saturado. */
+#campo[data-clima="bosque"] > .clima-capa.a {
+  background: url('assets/piel/efectos/llovizna.webp') 0 0 / 256px auto repeat;
+  mix-blend-mode: screen; opacity: .5;
+  animation: clima-llovizna 1.1s linear infinite;
+}
+#campo[data-clima="bosque"] > .clima-capa.b { background: rgba(72, 128, 64, .22); mix-blend-mode: multiply; }
+@keyframes clima-llovizna { to { background-position: -8px 171px; } }
+
+/* Bruma de valle: dos capas de niebla a distinta velocidad, para que el
+   bucle no se vea. */
+#campo[data-clima="canal"] > .clima-capa.a {
+  background: url('assets/piel/efectos/bruma.webp') 0 0 / 560px auto repeat;
+  mix-blend-mode: screen; opacity: .42;
+  animation: clima-bruma-a 46s linear infinite;
+}
+#campo[data-clima="canal"] > .clima-capa.b {
+  background: url('assets/piel/efectos/bruma.webp') 0 40% / 420px auto repeat;
+  mix-blend-mode: screen; opacity: .3;
+  animation: clima-bruma-b 31s linear infinite;
+}
+@keyframes clima-bruma-a { to { background-position: 560px 0; } }
+@keyframes clima-bruma-b { to { background-position: -420px 40%; } }
+
+/* Crecida estacional: el agua sube por el tercio de abajo, con su horizonte
+   negro fundiéndose en la piedra. */
+#campo[data-clima="llanura"] > .clima-capa.a {
+  top: auto; height: 44%;
+  background: url('assets/piel/efectos/agua.webp') 0 100% / auto 100% repeat-x;
+  mix-blend-mode: screen; opacity: .7;
+  animation: clima-agua 28s linear infinite;
+}
+#campo[data-clima="llanura"] > .clima-capa.b { background: rgba(40, 60, 70, .16); }
+@keyframes clima-agua { to { background-position: 660px 100%; } }
+
+/* Sequía prolongada: la calima en los bordes, respirando, y el aire caliente. */
+#campo[data-clima="aridez"] > .clima-capa.a {
+  background: url('assets/piel/efectos/calima.webp') center / 100% 100% no-repeat;
+  mix-blend-mode: multiply; opacity: .85;
+  animation: clima-calima 5.5s ease-in-out infinite;
+}
+#campo[data-clima="aridez"] > .clima-capa.b { background: rgba(214, 150, 60, .12); }
+@keyframes clima-calima { 0%, 100% { opacity: .78; } 50% { opacity: .95; } }
+
 /* Quien pide menos movimiento se queda sin mesa que tiembla, sin chispas y
    sin vuelos; `efectos.js` ya no los crea, y esto es el cinturón por si
-   alguno se cuela. */
+   alguno se cuela. El clima se queda puesto, quieto. */
 @media (prefers-reduced-motion: reduce) {
   #campo.sacude { animation: none; }
   .fx-particula, .fx-fantasma { display: none; }
   .en-vuelo { visibility: visible !important; }
+  .clima-capa { animation: none !important; }
 }

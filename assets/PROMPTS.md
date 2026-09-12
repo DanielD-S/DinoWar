@@ -493,7 +493,13 @@ como fotograma único sólo lo que se queda quieto: las grietas, el polvo, los
 rayos y la calima. `tools/efectos.py` las mide y avisa si alguna celda se sale
 de su centro.
 
-Faltan las cinco del clima: `lluvia`, `llovizna`, `bruma`, `agua` y `calima`.
+La segunda tanda trajo las cinco del clima, con el **id de su carta** de
+nombre —`sabana.png`, `bosque.png`…— y la herramienta las reconoce así. Las
+tres que se mueven en bucle llegaron **con costura** aunque se pidieron sin
+ella: el borde derecho no casaba con el izquierdo por 9 y 12 veces el salto
+entre columnas vecinas. La herramienta las cierra sola —desplaza la imagen
+media vuelta y funde— y lo mide antes y después, así que no hace falta
+insistirle al generador: con lluvia, niebla y agua el cierre no se nota.
 
 ### Después de generar
 

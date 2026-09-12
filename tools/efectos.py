@@ -20,6 +20,16 @@ pasar de una a otra. Se mide y se imprime: por debajo del 8 % de la celda no
 se ve a los 128 px a los que se pinta un choque; por encima, la hoja tiembla y
 no se arregla a mano. La chispa pasa de ahí y da igual: es una partícula, y
 viaja mientras cambia de fotograma.
+
+Los MOSAICOS del clima se repiten en bucle y tienen que cerrar sin costura.
+Se pidieron «sin costuras» y llegaron con ella —el salto entre el borde
+derecho y el izquierdo es de 2 a 12 veces el salto entre dos columnas
+vecinas—, así que se cierran aquí: la imagen desplazada media vuelta se funde
+con la original con una máscara que vale 1 en los bordes y 0 en el centro. En
+los bordes manda la copia desplazada, cuyo centro es continuo al enrollarse;
+en el centro manda la original, y la costura de la copia cae justo donde la
+máscara es 0. Vale para lo estocástico —lluvia, niebla, agua— y no valdría
+para nada con un dibujo reconocible. Se mide antes y después.
 """
 import sys
 from pathlib import Path
@@ -44,7 +54,7 @@ HOJAS = {
     'brasa': (NEGRO, 512),
 }
 
-# nombre servido -> (fondo, ancho servido). Un solo fotograma.
+# nombre servido -> (fondo, ancho servido). Un solo fotograma, no se repite.
 SUELTAS = {
     'grietas': (BLANCO, 1024),
     'polvo': (BLANCO, 512),
@@ -52,16 +62,26 @@ SUELTAS = {
     'calima': (BLANCO, 1024),
 }
 
-# Mosaicos sin costuras del clima: cuadrados y se repiten.
+# nombre servido -> (fondo, ancho servido, ejes que se repiten). El agua sólo
+# se repite en horizontal: arriba trae el horizonte negro y abajo la orilla,
+# y enrollarla en vertical pondría agua sobre el cielo.
 MOSAICOS = {
-    'lluvia': (NEGRO, 512),
-    'llovizna': (NEGRO, 512),
-    'bruma': (NEGRO, 512),
-    'agua': (NEGRO, 512),
+    'lluvia': (NEGRO, 512, 'xy'),
+    'llovizna': (NEGRO, 512, 'xy'),
+    'bruma': (NEGRO, 512, 'xy'),
+    'agua': (NEGRO, 1024, 'x'),
 }
 
-# El original puede llamarse distinto: el choque llegó como «flipbook».
-ALIAS = {'choque': ('choque', 'flipbook')}
+# El original puede llamarse distinto: el choque llegó como «flipbook» y los
+# climas con el id de su carta, que es como se piden en PROMPTS.md.
+ALIAS = {
+    'choque': ('choque', 'flipbook'),
+    'lluvia': ('lluvia', 'sabana'),
+    'llovizna': ('llovizna', 'bosque'),
+    'bruma': ('bruma', 'canal'),
+    'agua': ('agua', 'llanura'),
+    'calima': ('calima', 'aridez'),
+}
 
 # Un fotograma cuyo centro se desvía más que esto de su celda tiembla.
 DERIVA_MAXIMA = 0.08
@@ -113,6 +133,39 @@ def medir_hoja(im, fondo):
     return derivas
 
 
+def costura(a, eje):
+    """Cuánto salta el borde contra el opuesto, en múltiplos del salto entre
+    vecinos. 1 es sin costura; 3 ya se ve en una textura lisa."""
+    if eje == 'x':
+        borde = np.abs(a[:, 0] - a[:, -1]).mean()
+        vecinos = np.abs(a[:, 1:] - a[:, :-1]).mean()
+    else:
+        borde = np.abs(a[0] - a[-1]).mean()
+        vecinos = np.abs(a[1:] - a[:-1]).mean()
+    return borde / max(vecinos, 1e-6)
+
+
+def cerrar_mosaico(im, ejes):
+    """Cierra la textura en bucle por los ejes pedidos. Ver la cabecera."""
+    a = np.asarray(im.convert('RGB')).astype(np.float64)
+    H, W, _ = a.shape
+    antes = {e: costura(a, e) for e in ejes}
+    for eje in ejes:
+        # Un eje que ya cierra se deja: fundirlo sólo rebaja el contraste.
+        if antes[eje] <= 1.5:
+            continue
+        n = W if eje == 'x' else H
+        # 1 en los bordes, 0 en el centro, suave: medio coseno por lado.
+        t = np.arange(n) / (n - 1)
+        peso = 0.5 + 0.5 * np.cos(2 * np.pi * t)
+        rodada = np.roll(a, n // 2, axis=1 if eje == 'x' else 0)
+        forma = (1, n, 1) if eje == 'x' else (n, 1, 1)
+        peso = peso.reshape(forma)
+        a = a * (1 - peso) + rodada * peso
+    despues = {e: costura(a, e) for e in ejes}
+    return Image.fromarray(a.round().clip(0, 255).astype(np.uint8), 'RGB'), antes, despues
+
+
 def guardar(im, nombre, ancho, calidad=85):
     alto = round(ancho * im.size[1] / im.size[0])
     DESTINO.mkdir(parents=True, exist_ok=True)
@@ -140,20 +193,33 @@ def main(escribir):
         if escribir:
             guardar(im, nombre, lado)
 
-    for grupo in (SUELTAS, MOSAICOS):
-        for nombre, (fondo, ancho) in grupo.items():
-            p = original(nombre)
-            if not p:
-                faltan.append(nombre)
-                continue
-            im = Image.open(p)
-            im, cuanto = apretar_fondo(im, fondo)
-            que = 'mosaico' if grupo is MOSAICOS else 'suelta'
-            print(f'{p.name} {im.size[0]}×{im.size[1]}  {que} sobre {fondo}  '
-                  f'fondo apretado {cuanto * 100:4.1f} %  -> {nombre}.webp @{ancho}')
-            if escribir:
-                alto = guardar(im, nombre, ancho)
-                print(f'   -> {ancho}×{alto}')
+    for nombre, (fondo, ancho) in SUELTAS.items():
+        p = original(nombre)
+        if not p:
+            faltan.append(nombre)
+            continue
+        im = Image.open(p)
+        im, cuanto = apretar_fondo(im, fondo)
+        print(f'{p.name} {im.size[0]}×{im.size[1]}  suelta sobre {fondo}  '
+              f'fondo apretado {cuanto * 100:4.1f} %  -> {nombre}.webp @{ancho}')
+        if escribir:
+            alto = guardar(im, nombre, ancho)
+            print(f'   -> {ancho}×{alto}')
+
+    for nombre, (fondo, ancho, ejes) in MOSAICOS.items():
+        p = original(nombre)
+        if not p:
+            faltan.append(nombre)
+            continue
+        im = Image.open(p)
+        im, cuanto = apretar_fondo(im, fondo)
+        im, antes, despues = cerrar_mosaico(im, ejes)
+        medida = '  '.join(f'{e}: ×{antes[e]:.1f} -> ×{despues[e]:.1f}' for e in ejes)
+        print(f'{p.name} {im.size[0]}×{im.size[1]}  mosaico sobre {fondo}  '
+              f'costura {medida}  -> {nombre}.webp @{ancho}')
+        if escribir:
+            alto = guardar(im, nombre, ancho)
+            print(f'   -> {ancho}×{alto}')
 
     if faltan:
         print(f'\nsin original en {ORIGEN.relative_to(RAIZ)}: {", ".join(faltan)}')
