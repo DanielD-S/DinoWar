@@ -41,7 +41,7 @@ import {
   revelarRetenida,
 } from './ui/animate.js';
 import { invocar } from './ui/efectos.js';
-import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio } from './ui/audio.js';
+import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio, musica, precargarMusica, enSegundoPlano } from './ui/audio.js';
 import { montarTacto } from './ui/tacto.js';
 import { mostrarMarca, empezarCarga, precargarPiezas } from './ui/carga.js';
 
@@ -193,8 +193,26 @@ function enseñarMisiones(abierto) {
   pintarMisiones(abierto);
 }
 
+/**
+ * Qué música lleva cada pantalla. Las de la colección, los sobres y los mazos
+ * son el menú: se entra y se sale de ellas sin que el fondo cambie, que
+ * cambiarlo a cada placa sonaría a zapping. El final de partida va en silencio
+ * porque ahí suena el remate de victoria o derrota. La marca también: la
+ * música empieza con la CARGA, en cuanto se va la marca, y sigue por la
+ * puerta y el menú sin cortarse.
+ */
+const MUSICA_DE = {
+  [APP.CARGA]: 'musica-menu', [APP.ENTRADA]: 'musica-menu',
+  [APP.MENU]: 'musica-menu', [APP.JUGAR]: 'musica-menu',
+  [APP.COLECCION]: 'musica-menu', [APP.SOBRES]: 'musica-menu',
+  [APP.MAZOS]: 'musica-menu', [APP.CUENTA]: 'musica-menu',
+  [APP.CUENCA]: 'musica-cuenca',
+  [APP.PLAYING]: 'musica-partida', [APP.RESOLVING]: 'musica-partida',
+};
+
 function irA(nuevo) {
   app = nuevo;
+  musica(MUSICA_DE[nuevo] ?? null);
   el.marca.classList.toggle('oculta', nuevo !== APP.MARCA);
   el.carga.classList.toggle('oculta', nuevo !== APP.CARGA);
   el.menu.classList.toggle('oculta', nuevo !== APP.MENU);
@@ -1078,7 +1096,11 @@ function iniciar() {
   //
   // La marca ya está en pantalla desde el HTML. Lo que se decide aquí es qué
   // viene después de ella: la carga y el menú si hay sesión, la puerta si no.
-  const marca = mostrarMarca();
+  // La música del menú arranca cuando la marca EMPIEZA a irse, para que suba
+  // mientras el logo se disuelve. La carga o la puerta piden después la misma
+  // pista y eso no la reinicia: `musica()` no hace nada si ya suena ésa.
+  precargarMusica(MUSICA_DE[APP.CARGA]);
+  const marca = mostrarMarca(() => musica(MUSICA_DE[APP.CARGA]));
   if (estaDentro()) {
     presentarse(null, marca).catch((e) => { abrirEntrada(e.message); irA(APP.ENTRADA); });
   } else {
@@ -1197,13 +1219,38 @@ function iniciar() {
     nuevaPartida();
   });
 
-  el.btnMute.classList.toggle('off', estaSilenciado());
-  el.btnMute.addEventListener('click', () => {
-    desbloquear();
-    el.btnMute.classList.toggle('off', alternarMute());
-  });
+  // Un botón de sonido por pantalla —puerta, menú, jugar y partida—, todos
+  // la misma preferencia: pulsar uno los pinta todos. Tiene que estar en la
+  // primera pantalla que se ve porque la música arranca antes de ningún gesto.
+  const botonesDeSonido = document.querySelectorAll('[data-mute]');
+  const pintarSonido = () => {
+    const off = estaSilenciado();
+    for (const b of botonesDeSonido) {
+      b.classList.toggle('off', off);
+      b.setAttribute('aria-pressed', String(off));
+      b.setAttribute('aria-label', off ? 'Activar sonido' : 'Silenciar');
+    }
+  };
+  pintarSonido();
+  for (const b of botonesDeSonido) {
+    b.addEventListener('click', () => {
+      desbloquear();
+      alternarMute();
+      pintarSonido();
+    });
+  }
+
+  // La música del menú ya está puesta desde la carga, pero si el navegador no
+  // dejó sonar sin gesto hay que despertarla con el PRIMERO, que es entrar con
+  // la cuenta y no pasa por `desbloquear()`. Un `click` o una tecla cualquiera
+  // valen como gesto; `pointerdown` no, que por eso el toque de las placas
+  // suena en `click`.
+  for (const gesto of ['click', 'keydown']) {
+    document.addEventListener(gesto, desbloquear, { once: true, capture: true });
+  }
 
   document.addEventListener('visibilitychange', () => {
+    enSegundoPlano(document.hidden);
     if (document.hidden) {
       cancelarAnimaciones();
       if (estado && app === APP.RESOLVING) render(estado);
