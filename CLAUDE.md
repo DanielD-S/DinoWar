@@ -64,6 +64,16 @@ ficheros— así que añadir un import extiende la vigilancia solo.
 Y después de re-anclar hay que **volver a desplegar**: el anclaje en el
 repositorio no mueve nada por sí solo.
 
+**Y no se despliega anclado a un commit de RAMA.** jsDelivr sirve cualquier
+commit del repositorio, también uno que sólo existe en una rama, así que anclar
+a mitad de trabajo funciona y parece correcto. Lo que pasa después es que la
+rama se mergea con squash y se borra: el commit se queda sin nada que lo
+referencie, GitHub acaba recogiéndolo, la URL empieza a dar 404 y caen las tres
+cosas A LA VEZ —victorias, asaltos y sobres— porque la función muere al
+importar, antes de mirar el `tipo`. El orden es: mergear, volver a anclar sobre
+main, y desplegar entonces. `node tools/anclar-desde-url.mjs` lo avisa por
+pantalla cuando el commit no está en main.
+
 ## Los cinco simuladores, y qué NO ve cada uno
 
 Es el error que más veces se ha repetido: cambiar una carta, correr `npm run sim`,

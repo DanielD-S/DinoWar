@@ -51,6 +51,36 @@ export const shaAnclado = () => (readFileSync(SALIDA, 'utf8').match(/@([0-9a-f]{
  */
 export const APARICIONES_MINIMAS = 3;
 
+/**
+ * ¿Ese commit está en `main`? Porque ahí vive el peligro que no se ve.
+ *
+ * jsDelivr sirve CUALQUIER commit del repositorio, también uno que sólo existe
+ * en una rama, así que anclar a mitad de trabajo funciona y parece correcto.
+ * Lo que pasa después es que la rama se mergea con squash y se borra: el commit
+ * anclado se queda sin nada que lo referencie, GitHub acaba recogiéndolo y la
+ * URL empieza a contestar 404. Y entonces caen las tres cosas a la vez —las
+ * victorias, los asaltos y los sobres— porque la función muere al importar,
+ * antes de mirar el `tipo`.
+ *
+ * No falla al anclar: anclar a un commit de rama es lo normal mientras se
+ * trabaja. Falla al DESPLEGAR, y como eso lo hace una persona, lo que hay aquí
+ * es el aviso que esa persona necesita leer antes.
+ *
+ * @returns {boolean|null} null si no se puede saber (sin `origin/main` local)
+ */
+export function estaEnMain(sha) {
+  for (const ref of ['origin/main', 'main']) {
+    try {
+      execFileSync('git', ['merge-base', '--is-ancestor', sha, ref], { stdio: 'ignore' });
+      return true;
+    } catch (e) {
+      // Código 1 es «no es ancestro»; cualquier otro es que la ref no está.
+      if (e.status === 1) return false;
+    }
+  }
+  return null;
+}
+
 /** Cómo era un fichero en un commit. Null si ese commit no lo tenía. */
 export function enElCommit(sha, fichero) {
   try {
@@ -76,5 +106,19 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   for (const f of VIGILADOS) {
     const igual = enElCommit(sha, f) === readFileSync(f, 'utf8');
     process.stdout.write(`  ${igual ? 'ok  ' : 'MAL '} ${f}\n`);
+  }
+
+  const enMain = estaEnMain(sha);
+  if (enMain === false) {
+    process.stdout.write(
+      '\nNO DESPLIEGUES TODAVÍA: ese commit no está en main.\n'
+      + 'jsDelivr lo sirve hoy, pero al mergear con squash y borrar la rama se\n'
+      + 'queda sin referencia, y cuando GitHub lo recoja la URL dará 404. Ahí\n'
+      + 'caen las tres cosas a la vez —victorias, asaltos y sobres— porque la\n'
+      + 'función muere al importar, antes de mirar el `tipo`.\n'
+      + 'Mergea, vuelve a anclar sobre main y despliega entonces.\n',
+    );
+  } else if (enMain === null) {
+    process.stdout.write('\n(no hay `origin/main` aquí: no se ha podido comprobar si el commit sobrevive)\n');
   }
 }

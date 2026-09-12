@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 
 import { readFileSync as leer } from 'node:fs';
 import {
-  shaAnclado, enElCommit, VIGILADOS, SALIDA, APARICIONES_MINIMAS,
+  shaAnclado, enElCommit, VIGILADOS, SALIDA, APARICIONES_MINIMAS, estaEnMain,
 } from '../tools/anclar-desde-url.mjs';
 
 test('La versión corta apunta a un commit de verdad', () => {
@@ -63,4 +63,21 @@ test('La vigilancia cubre el MOTOR, no sólo los validadores', () => {
     assert.ok(VIGILADOS.includes(imprescindible),
       `${imprescindible} decide el resultado de una partida y nadie vigila que viaje al día`);
   }
+});
+
+test('Se sabe decir si el commit anclado sobrevive al borrado de su rama', () => {
+  // No se exige que el anclaje esté YA en main: mientras se trabaja en una rama
+  // lo normal es que no lo esté, y anclar ahí es correcto. Lo que se exige es
+  // que la comprobación funcione, porque es el aviso que separa un despliegue
+  // bueno de uno que dará 404 cuando GitHub recoja el commit huérfano — y ahí
+  // caen victorias, asaltos y sobres a la vez, que la función muere al importar.
+  const sha = shaAnclado();
+  assert.ok(sha, 'no hay commit anclado');
+
+  const respuesta = estaEnMain(sha);
+  assert.ok(respuesta === true || respuesta === false || respuesta === null,
+    'estaEnMain tiene que contestar sí, no, o «no lo sé»');
+
+  // Y que sepa decir que no a algo que seguro no está: el árbol de trabajo.
+  assert.notEqual(estaEnMain('0000000000000000000000000000000000000000'), true);
 });
