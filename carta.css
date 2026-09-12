@@ -1,6 +1,6 @@
-/* Marcos de carta. Va DESPUÉS de style.css y piel.css y sólo aplica a las cartas
-   con la clase `con-marco`, que `nodoCarta()` pone en el tablero y en la mano.
-   El visor grande conserva su composición hasta que se decida cómo entra ahí.
+/* Marcos de carta. Va DESPUÉS de style.css y piel.css y aplica a las cartas
+   con la clase `con-marco`, que hoy son todas: tablero, mano, colección, sobre
+   y visor pintan la misma carta a cinco tamaños.
 
    Las fuentes van vendorizadas, como Inter: el juego no pide nada a terceros.
    Cinzel sólo en 600 y 700, Libre Baskerville en 400, subconjunto latino. */
@@ -102,6 +102,9 @@
   color: #f4d99b; font-weight: 600; font-size: 8px;
 }
 .carta--mano .c-coste { font-size: 11px; }
+.carta--col .c-coste { font-size: 10px; }
+.carta--sobre .c-coste { font-size: 7px; }
+.carta--visor .c-coste { font-size: 22px; }
 
 /* ---------------------------------------------------------------- la banda
    El género, en una línea. La banda mide el 6,8 % del alto de la carta —7,7 px
@@ -133,11 +136,19 @@
   container-type: inline-size;
   display: flex; flex-direction: column; justify-content: center;
 }
-.con-marco .c-nombre { color: #f4ece0; }
+.con-marco .c-nombre { color: #f4ece0; text-align: center; }
 .con-marco .c-hab {
   color: #f4d99b; text-align: center;
   overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
 }
+/* El texto de la habilidad sólo se pinta en el visor: `marcoCarta()` lo emite
+   sólo ahí, y esta regla es el cinturón por si alguien lo pide en otra parte. */
+.con-marco .c-texto { display: none; }
+.carta--visor .c-texto {
+  display: block; margin: 0; color: #e8dcc8; text-align: left;
+  font: 400 11.5px/15px 'Libre Baskerville', Georgia, serif;
+}
+.carta--visor .c-cuerpo { padding: 3.5% 5% 3%; justify-content: flex-start; gap: 5px; }
 
 /* ------------------------------------------------------- cifras en su chapa
    Van sobre las chapas, en coordenadas de la CARTA. Y para eso `.c-stats` tiene
@@ -158,6 +169,10 @@
    lo haría un glifo de 4 px. */
 .con-marco .c-stats .st i { display: none; }
 .con-marco .c-stats .st b { position: relative; font-variant-numeric: tabular-nums; }
+/* Las cifras crecen con la chapa: 9 px en el tablero, 20 en el visor. */
+.carta--col .c-stats { font-size: 11px; }
+.carta--sobre .c-stats { font-size: 7px; }
+.carta--visor .c-stats { font-size: 20px; }
 .con-marco .c-stats .st.ancho b { font-size: 82%; letter-spacing: -.04em; }
 .con-marco .st-a b { color: #f7e9c8; }
 .con-marco .st-v b { color: #f5ded2; }
@@ -233,6 +248,9 @@
    y esa diferencia de un píxel se ve como un trazo comido abajo. Con un entero
    la caja y el contenido caen en el mismo sitio. */
 .con-marco .c-nombre, .con-marco .c-hab { line-height: 10px; }
+.carta--col .c-nombre, .carta--col .c-hab { line-height: 11px; }
+.carta--sobre .c-nombre, .carta--sobre .c-hab { line-height: 8px; }
+.carta--visor .c-nombre, .carta--visor .c-hab { line-height: 19px; }
 
 /* El rótulo de tipo sobra en la cara de la carta. Ocupaba un renglón de la
    placa y dejaba al nombre sin sitio —«Mortandad estacional» pedía 22 px y
@@ -292,9 +310,17 @@
 .carta.con-marco.no-dino .c-nombre { -webkit-line-clamp: 3; }
 /* Y su caja es un 8 % más estrecha que la del primer juego de marcos: a 9,2 px
    «Monzón de verano» se partía en tres líneas en la mano. A 8,4 vuelve a dos. */
-.carta.con-marco.no-dino .c-nombre { font-size: min(8.4px, calc(90cqi / (0.69 * var(--pal, 9)))); }
+.con-marco.no-dino .c-nombre { font-size: min(8.4px, calc(90cqi / (0.69 * var(--pal, 9)))); }
 
 /* El nombre de la habilidad, medio punto menor: a 8,4 «Zarpazo por sorpresa»
    partía en tres líneas y la tercera se recortaba. Mismo freno por la palabra
    más larga: «reconocimiento» son 14 letras. */
 .con-marco .c-hab { font-size: min(7.8px, calc(90cqi / (0.69 * var(--pal, 9)))); }
+
+/* Y el tope sube con la carta: la colección la pinta a 105 px, el visor a 268.
+   El sobre, a 62, baja. La fórmula de anchura es la misma en todos. Con
+   `.con-marco` delante para el nombre: la regla de soporte de arriba lleva
+   tres clases y sin eso le ganaba al visor. */
+.con-marco.carta--col .c-nombre, .carta--col .c-hab { font-size: min(9.4px, calc(90cqi / (0.69 * var(--pal, 9)))); }
+.con-marco.carta--sobre .c-nombre, .carta--sobre .c-hab { font-size: min(6.4px, calc(90cqi / (0.69 * var(--pal, 9)))); }
+.con-marco.carta--visor .c-nombre, .carta--visor .c-hab { font-size: min(16px, calc(90cqi / (0.69 * var(--pal, 9)))); }
