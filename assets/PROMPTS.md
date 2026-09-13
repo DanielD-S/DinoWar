@@ -632,6 +632,13 @@ Exportar a lo más vertical que dé el generador y recortar a 9:16. Se sirve
 a **1080 px de ancho** por `tools/placas.py`, en `FONDOS`, como los otros
 dos.
 
+### Lo que llegó
+
+Las trece, la misma noche, todas en magenta limpio y con el nombre pedido
+salvo la placa, que vino como `placa_de_mazo.png` y la herramienta la conoce
+así. Los diez medallones pasan la prueba de los 20 px: encogidos a ese tamaño
+se distinguen todos entre sí. Se sirven a 192 px y pesan 14 KB cada uno.
+
 ### Lo que NO se pide
 
 - Ni la curva de coste ni el medidor de 50/50: son CSS y ya están.

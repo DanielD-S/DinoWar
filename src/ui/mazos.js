@@ -1,0 +1,414 @@
+// DinoWar — la lista de mazos y el editor.
+//
+// Salió de meta.js cuando dejó de ser dos listas de texto. Igual que allí: LEE
+// de la caché local de forma síncrona —se repinta entero a cada toque— y
+// ESCRIBE contra perfil.js, que es quien sabe si el mazo vive aquí o en el
+// servidor. La comprobación que manda es la del servidor; validarMazo() es la
+// cortesía que dice POR QUÉ antes de mandarlo.
+//
+// Tres decisiones que conviene conocer:
+//
+// - La PORTADA de un mazo se calcula, no se elige: la criatura de más rareza
+//   que lleve, y a igual rareza la más cara. Elegirla a mano pediría guardar
+//   un id más por mazo, y `guardar_mazo` sólo acepta el mapa de cartas: el
+//   servidor lo valida clave a clave y una clave que no sea carta lo rechaza.
+//   El día que se quiera, es una columna en `mazos`, no un truco en el jsonb.
+// - El EMBLEMA es el clado dominante, contado sobre las criaturas; un mazo
+//   sin criaturas lleva el tipo de soporte que más repite.
+// - El editor es una REJILLA de cartas con su marco, la misma de la colección,
+//   y no filas: un mazo se arma mirando las cartas. Tocar la ilustración mete
+//   una copia; el nombre abre la ficha. La curva de coste FILTRA al tocarla.
+
+import {
+  CARTAS, CARTAS_DE_JEFE, RAREZA, RAREZA_NOMBRE, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, carta,
+} from '../data/cards.js';
+import { TAM_MAZO, limiteDe, validarMazo } from '../data/coleccion.js';
+import { cargarPerfil } from './almacen.js';
+import { guardarMazo, usarMazo, borrarMazo } from './perfil.js';
+import { fichaHTML, abrirFicha, cartaHTML } from './render.js';
+import { arte } from './art.js';
+
+const ORDEN = [RAREZA.LEGENDARIO, RAREZA.EPICO, RAREZA.RARO, RAREZA.COMUN];
+
+/** Los diez grupos por los que se filtra: siete clados y tres familias. */
+const GRUPOS = [
+  ...['TEROPODO', 'SAUROPODO', 'TIREOFORO', 'ORNITOPODO', 'MARGINOCEFALO', 'PTEROSAURIO', 'MARINO']
+    .map((c) => ({ clave: `clado_${c.toLowerCase()}`, nombre: CLADO_NOMBRE[c], filtra: (x) => x.clado === c })),
+  ...['CLIMA', 'EVENTO', 'RECURSO']
+    .map((t) => ({ clave: `tipo_${t.toLowerCase()}`, nombre: TIPO_NOMBRE[t], filtra: (x) => x.tipo === t })),
+];
+
+let dom = null;
+let pintarMenu = () => {};
+let editando = null;        // { indice, nombre, cartas, pestana, filtro } mientras se edita
+let confirmando = null;     // índice del mazo con el «¿borrar?» abierto
+
+const esDino = (c) => c.tipo === TIPO.DINOSAURIO;
+const nombreHTML = (c) => (esDino(c) ? `<i>${c.binomial}</i>` : c.binomial);
+const escapar = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+const totalDe = (mazo) => Object.values(mazo).reduce((a, b) => a + b, 0);
+const emblemaHTML = (clave) => `<i class="emblema emb-${clave}" aria-hidden="true"></i>`;
+
+export function montarMazos({ titulo, cuerpo, pie, alPintarMenu }) {
+  dom = { titulo, cuerpo, pie };
+  pintarMenu = alPintarMenu;
+}
+
+export function abrirMazos() {
+  editando = null;
+  confirmando = null;
+  pintarMazos();
+}
+
+/** El set, más las cartas de jefe que ya tengas: como en la colección. */
+function catalogo(p) {
+  const deJefe = Object.values(CARTAS_DE_JEFE).filter((c) => (p.cartas[c.id] ?? 0) > 0);
+  return [...Object.values(CARTAS), ...deJefe]
+    .sort((a, b) => ORDEN.indexOf(a.rareza) - ORDEN.indexOf(b.rareza)
+      || a.coste - b.coste || a.binomial.localeCompare(b.binomial));
+}
+
+/** Las cartas del mazo, resueltas, con sus copias. */
+const cartasDe = (mazo) => Object.entries(mazo)
+  .filter(([id, n]) => n > 0 && (CARTAS[id] || CARTAS_DE_JEFE[id]))
+  .map(([id, n]) => ({ c: carta(id), n }));
+
+/** La criatura de más rareza; a igual rareza la más cara. Null si no hay nada. */
+function portadaDe(mazo) {
+  const lista = cartasDe(mazo);
+  const dinos = lista.filter((x) => esDino(x.c));
+  const de = dinos.length ? dinos : lista;
+  if (!de.length) return null;
+  return de.sort((a, b) => ORDEN.indexOf(a.c.rareza) - ORDEN.indexOf(b.c.rareza) || b.c.coste - a.c.coste)[0].c.id;
+}
+
+/** El grupo que más pesa en el mazo, o null si está vacío. */
+function emblemaDe(mazo) {
+  const lista = cartasDe(mazo);
+  const cuenta = new Map();
+  for (const { c, n } of lista) {
+    const g = GRUPOS.find((x) => x.filtra(c));
+    if (g) cuenta.set(g, (cuenta.get(g) ?? 0) + n);
+  }
+  // Las criaturas mandan: un mazo con 30 saurópodos y 20 eventos es de saurópodos.
+  const orden = [...cuenta.entries()].sort((a, b) => {
+    const da = a[0].clave.startsWith('clado_') ? 1 : 0;
+    const db = b[0].clave.startsWith('clado_') ? 1 : 0;
+    return db - da || b[1] - a[1];
+  });
+  return orden[0]?.[0] ?? null;
+}
+
+function resumenDe(mazo) {
+  const lista = cartasDe(mazo);
+  const suma = (f) => lista.filter(f).reduce((a, x) => a + x.n, 0);
+  return {
+    criaturas: suma((x) => esDino(x.c)),
+    soporte: suma((x) => !esDino(x.c)),
+    legendarias: suma((x) => x.c.rareza === RAREZA.LEGENDARIO),
+    distintas: lista.length,
+  };
+}
+
+// ------------------------------------------------------------------ lista
+
+function pintarMazos() {
+  if (editando) return pintarEditor();
+  const p = cargarPerfil();
+  dom.titulo.textContent = 'Mazos';
+
+  dom.cuerpo.innerHTML = p.mazos.map((m, i) => {
+    const v = validarMazo(m.cartas, p.cartas);
+    const activo = i === p.activo;
+    const portada = portadaDe(m.cartas);
+    const emb = emblemaDe(m.cartas);
+    const r = resumenDe(m.cartas);
+    const acciones = confirmando === i
+      ? `<span class="mazo-pregunta">¿Borrar «${escapar(m.nombre)}»?</span>
+         <button class="accion mal" data-borrar-si="${i}">Sí, borrar</button>
+         <button class="accion" data-borrar-no>No</button>`
+      : `<button class="accion" data-usar="${i}" ${activo || !v.valido ? 'disabled' : ''}>${activo ? 'En uso' : 'Usar'}</button>
+         <button class="accion" data-editar="${i}">Editar</button>
+         <button class="accion" data-duplicar="${i}">Duplicar</button>
+         <button class="accion" data-borrar="${i}" ${p.mazos.length <= 1 ? 'disabled' : ''}>Borrar</button>`;
+    return `<article class="mazo ${activo ? 'activo' : ''}">
+      <div class="mazo-placa">
+        <div class="mazo-ventana">${portada ? arte(portada) : '<span class="mazo-vacia">◆</span>'}</div>
+        <div class="mazo-banda">
+          <span class="mazo-nom">${escapar(m.nombre)}</span>
+          <span class="mazo-sub">${emb ? `${emblemaHTML(emb.clave)}${emb.nombre}` : 'Vacío'}
+            <span class="sep">·</span> <b class="${v.valido ? '' : 'mal'}">${v.total}/${TAM_MAZO}</b>
+            ${r.legendarias ? `<span class="sep">·</span> ${r.legendarias} legendaria${r.legendarias === 1 ? '' : 's'}` : ''}
+          </span>
+        </div>
+        ${activo ? '<i class="mazo-sello" title="En uso"></i>' : ''}
+      </div>
+      <div class="mazo-acciones">${acciones}</div>
+    </article>`;
+  }).join('');
+
+  dom.pie.innerHTML = `<p class="meta-nota">El mazo en uso es el que llevas a la partida.
+    Son ${TAM_MAZO} cartas exactas, y de cada carta caben tantas copias como diga su rareza.</p>
+    <button class="boton-grande" data-nuevo>Mazo nuevo</button>`;
+
+  dom.cuerpo.onclick = (e) => {
+    const b = (k) => e.target.closest(`[data-${k}]`);
+    const usar = b('usar');
+    const editar = b('editar');
+    const duplicar = b('duplicar');
+    const borrar = b('borrar');
+    const si = b('borrar-si');
+    if (usar && !usar.disabled) {
+      usar.disabled = true;
+      usarMazo(Number(usar.dataset.usar))
+        .catch((err) => { dom.pie.innerHTML += `<p class="meta-nota mal">${escapar(err.message)}</p>`; })
+        .finally(() => { pintarMazos(); pintarMenu(); });
+    } else if (editar) {
+      const i = Number(editar.dataset.editar);
+      editando = { indice: i, nombre: p.mazos[i].nombre, cartas: { ...p.mazos[i].cartas } };
+      pintarEditor();
+    } else if (duplicar) {
+      const i = Number(duplicar.dataset.duplicar);
+      // Un mazo nuevo con las mismas cartas: se edita y se guarda como otro.
+      editando = { indice: -1, nombre: `${p.mazos[i].nombre} (copia)`.slice(0, 24), cartas: { ...p.mazos[i].cartas } };
+      pintarEditor();
+    } else if (borrar && !borrar.disabled) {
+      confirmando = Number(borrar.dataset.borrar);
+      pintarMazos();
+    } else if (b('borrar-no')) {
+      confirmando = null;
+      pintarMazos();
+    } else if (si) {
+      const i = Number(si.dataset.borrarSi);
+      si.disabled = true;
+      borrarMazo(i)
+        .catch((err) => { dom.pie.innerHTML += `<p class="meta-nota mal">${escapar(err.message)}</p>`; })
+        .finally(() => { confirmando = null; pintarMazos(); pintarMenu(); });
+    }
+  };
+  dom.pie.onclick = (e) => {
+    if (!e.target.closest('[data-nuevo]')) return;
+    editando = { indice: -1, nombre: `Mazo ${p.mazos.length + 1}`, cartas: {} };
+    pintarEditor();
+  };
+}
+
+// ----------------------------------------------------------------- editor
+
+/** Reparto de costes del mazo, en cubos de 0 a 7+. */
+function curvaDeCoste(mazo) {
+  const cubos = Array.from({ length: 8 }, () => 0);
+  for (const { c, n } of cartasDe(mazo)) cubos[Math.min(7, c.coste)] += n;
+  return cubos;
+}
+
+/** La curva, y cada barra es un filtro: tocar el 3 enseña las cartas de coste 3. */
+function curvaHTML(mazo, filtroCoste) {
+  const cubos = curvaDeCoste(mazo);
+  const alto = Math.max(1, ...cubos);
+  return `<div class="mazo-curva" role="group" aria-label="Curva de coste">${cubos.map((n, i) => {
+    const pct = Math.round((100 * n) / alto);
+    const nivel = n === 0 ? 0 : Math.min(3, Math.floor((4 * n) / (alto + 0.01)));
+    return `<button class="cb ${filtroCoste === i ? 'on' : ''}" data-coste="${i}"
+      title="${n} cartas de coste ${i === 7 ? '7 o más' : i}">
+      <i class="n${nivel}" style="height:${pct}%"></i><em>${i === 7 ? '7+' : i}</em><small>${n || ''}</small>
+    </button>`;
+  }).join('')}</div>`;
+}
+
+const filtroVacio = () => ({ grupo: null, rareza: null, coste: null, texto: '' });
+
+function pasaFiltro(c, f) {
+  if (f.grupo && !GRUPOS.find((g) => g.clave === f.grupo).filtra(c)) return false;
+  if (f.rareza && c.rareza !== f.rareza) return false;
+  if (f.coste !== null && Math.min(7, c.coste) !== f.coste) return false;
+  if (f.texto) {
+    const t = f.texto.toLowerCase();
+    if (!c.binomial.toLowerCase().includes(t) && !(c.rasgoNombre ?? '').toLowerCase().includes(t)) return false;
+  }
+  return true;
+}
+
+/**
+ * Una celda del editor: la carta con su marco, el contador y el paso. `mal`
+ * es una copia de más —por rareza o porque no la tienes— y se ve en la propia
+ * carta, no sólo en el aviso de abajo.
+ */
+function celda(c, n, p) {
+  const tengo = p.cartas[c.id] ?? 0;
+  const tope = Math.min(limiteDe(c.id), tengo);
+  const mal = n > tope;
+  const llena = n >= tope && !mal;
+  return `<div class="col-carta mazo-celda rareza-${c.rareza} ${n > 0 ? 'puesta' : ''} ${mal ? 'mal' : ''} ${llena ? 'llena' : ''}"
+               data-card="${c.id}">
+    <div class="mazo-arte" data-mas="${c.id}" role="button" aria-label="Meter una copia">
+      ${cartaHTML(c.id, { variante: 'col' })}
+      ${n > 0 ? `<span class="mazo-n">${n}</span>` : ''}
+    </div>
+    <div class="mazo-paso">
+      <button data-menos="${c.id}" ${n === 0 ? 'disabled' : ''} aria-label="Quitar una copia">−</button>
+      <span class="mazo-cuenta ${mal ? 'mal' : ''}">${n}/${tope}</span>
+      <button data-mas="${c.id}" ${n >= tope ? 'disabled' : ''} aria-label="Meter una copia">+</button>
+    </div>
+    <div class="col-nombre" data-ficha="${c.id}">${nombreHTML(c)}</div>
+  </div>`;
+}
+
+function pintarEditor() {
+  const p = cargarPerfil();
+  const v = validarMazo(editando.cartas, p.cartas);
+  editando.filtro ??= filtroVacio();
+  const f = editando.filtro;
+  const pestana = editando.pestana ?? (v.total === 0 ? 'anadir' : 'mazo');
+  dom.titulo.textContent = editando.indice < 0 ? 'Mazo nuevo' : 'Editar mazo';
+
+  // Sólo lo que tienes: un editor que enseña lo que no puedes poner es un
+  // catálogo, y para eso está la colección.
+  const tuyas = catalogo(p).filter((c) => (p.cartas[c.id] ?? 0) > 0);
+  const enMazo = tuyas.filter((c) => (editando.cartas[c.id] ?? 0) > 0);
+  const base = pestana === 'mazo' ? enMazo : tuyas;
+  const lista = base.filter((c) => pasaFiltro(c, f));
+  const r = resumenDe(editando.cartas);
+  const portada = portadaDe(editando.cartas);
+  const emb = emblemaDe(editando.cartas);
+  const filtrando = f.grupo || f.rareza || f.coste !== null || f.texto;
+
+  dom.cuerpo.innerHTML = `
+    <div class="mazo-cabecera">
+      <div class="mazo-ventana grande">${portada ? arte(portada) : '<span class="mazo-vacia">◆</span>'}</div>
+      <div class="mazo-cabecera-datos">
+        <input class="mazo-nombre" id="mazo-nombre" maxlength="24" value="${escapar(editando.nombre)}" aria-label="Nombre del mazo">
+        <div class="mazo-marcador">
+          <b class="${v.total === TAM_MAZO ? 'bien' : 'mal'}">${v.total}</b><span>/${TAM_MAZO}</span>
+          <span class="mazo-barra"><i style="width:${Math.min(100, (100 * v.total) / TAM_MAZO).toFixed(0)}%"
+                class="${v.total === TAM_MAZO ? 'bien' : ''}"></i></span>
+        </div>
+        <div class="mazo-resumen">${emb ? `${emblemaHTML(emb.clave)}${emb.nombre}<span class="sep">·</span>` : ''}
+          ${r.criaturas} criaturas<span class="sep">·</span>${r.soporte} soporte<span class="sep">·</span>${r.distintas} distintas
+        </div>
+      </div>
+    </div>
+    ${curvaHTML(editando.cartas, f.coste)}
+    <div class="mazo-pestanas">
+      <button class="chip ${pestana === 'mazo' ? 'on' : ''}" data-pestana="mazo">En el mazo · ${v.total}</button>
+      <button class="chip ${pestana === 'anadir' ? 'on' : ''}" data-pestana="anadir">Tu colección · ${tuyas.length}</button>
+    </div>
+    <div class="mazo-filtros">
+      <input type="search" class="mazo-busca" id="mazo-busca" placeholder="Buscar" value="${escapar(f.texto)}" aria-label="Buscar carta">
+      <div class="mazo-emblemas">${GRUPOS.map((g) => `<button class="${f.grupo === g.clave ? 'on' : ''}" data-grupo="${g.clave}"
+          title="${g.nombre}" aria-label="${g.nombre}" aria-pressed="${f.grupo === g.clave}">${emblemaHTML(g.clave)}</button>`).join('')}</div>
+    </div>
+    <div class="mazo-rarezas">${ORDEN.map((x) => `<button class="chip ${f.rareza === x ? 'on' : ''}" data-rareza="${x}">${RAREZA_NOMBRE[x]}</button>`).join('')}
+      ${filtrando ? '<button class="chip quitar" data-limpiar>× filtros</button>' : ''}</div>
+    ${lista.length === 0
+    ? `<p class="desc-vacio">${base.length === 0
+      ? 'El mazo está vacío. Toca una carta de «Tu colección» para meterla.'
+      : 'Ninguna carta pasa el filtro.'}</p>`
+    : `<div class="col-rejilla mazo-rejilla">${lista.map((c) => celda(c, editando.cartas[c.id] ?? 0, p)).join('')}</div>`}`;
+
+  dom.pie.innerHTML = `
+    ${v.problemas.length ? `<p class="meta-nota mal">${escapar(v.problemas[0])}</p>` : '<p class="meta-nota">Listo para jugar.</p>'}
+    <div class="fila">
+      <button class="boton-secundario" data-rellenar ${v.total >= TAM_MAZO ? 'disabled' : ''}>Autocompletar</button>
+      <button class="boton-secundario" data-vaciar ${v.total === 0 ? 'disabled' : ''}>Vaciar</button>
+      <button class="boton-secundario" data-cancelar>Cancelar</button>
+    </div>
+    <button class="boton-grande" data-guardar ${v.valido ? '' : 'disabled'}>Guardar y usar</button>`;
+
+  const nombre = document.getElementById('mazo-nombre');
+  nombre.oninput = () => { editando.nombre = nombre.value; };
+  const busca = document.getElementById('mazo-busca');
+  // Se repinta al escribir, y el foco se devuelve al campo con el cursor al
+  // final: sin esto cada letra cerraba el teclado del móvil.
+  busca.oninput = () => {
+    f.texto = busca.value;
+    pintarEditor();
+    const b = document.getElementById('mazo-busca');
+    b.focus();
+    b.setSelectionRange(b.value.length, b.value.length);
+  };
+
+  dom.cuerpo.onclick = (e) => {
+    const b = (k) => e.target.closest(`[data-${k}]`);
+    const tab = b('pestana');
+    const grupo = b('grupo');
+    const rareza = b('rareza');
+    const coste = b('coste');
+    const mas = b('mas');
+    const menos = b('menos');
+    const ficha = b('ficha');
+    if (tab) { editando.pestana = tab.dataset.pestana; pintarEditor(); return; }
+    if (grupo) { f.grupo = f.grupo === grupo.dataset.grupo ? null : grupo.dataset.grupo; pintarEditor(); return; }
+    if (rareza) { f.rareza = f.rareza === rareza.dataset.rareza ? null : rareza.dataset.rareza; pintarEditor(); return; }
+    if (coste) { const n = Number(coste.dataset.coste); f.coste = f.coste === n ? null : n; pintarEditor(); return; }
+    if (b('limpiar')) { editando.filtro = filtroVacio(); pintarEditor(); return; }
+    if (ficha) { abrirFicha(fichaHTML(ficha.dataset.ficha)); return; }
+    if (menos && !menos.disabled) {
+      const c = menos.dataset.menos;
+      editando.cartas[c] = Math.max(0, (editando.cartas[c] ?? 0) - 1);
+      if (editando.cartas[c] === 0) delete editando.cartas[c];
+      pintarEditor();
+      return;
+    }
+    if (mas) {
+      const c = mas.dataset.mas;
+      const tope = Math.min(limiteDe(c), p.cartas[c] ?? 0);
+      if ((editando.cartas[c] ?? 0) >= tope) return;
+      editando.cartas[c] = (editando.cartas[c] ?? 0) + 1;
+      pintarEditor();
+    }
+  };
+
+  dom.pie.onclick = (e) => {
+    if (e.target.closest('[data-cancelar]')) { editando = null; pintarMazos(); return; }
+    if (e.target.closest('[data-rellenar]')) { autocompletar(p); return; }
+    if (e.target.closest('[data-vaciar]')) { editando.cartas = {}; pintarEditor(); return; }
+    const g = e.target.closest('[data-guardar]');
+    if (!g || g.disabled) return;
+    // Guardar y USAR: guardarlo y dejarlo sin activar obligaba a un segundo
+    // viaje a la lista para hacer lo único que se quería hacer.
+    g.disabled = true;
+    g.textContent = 'Guardando…';
+    guardarMazo(editando.indice, editando.nombre.trim() || 'Sin nombre', editando.cartas)
+      .then(() => { editando = null; pintarMazos(); pintarMenu(); })
+      .catch((err) => {
+        // El servidor comprueba que el mazo sea TUYO, no sólo que sea legal.
+        // Si dice que no, se enseña su motivo tal cual: es el único que ha
+        // mirado la colección de verdad.
+        pintarEditor();
+        dom.pie.innerHTML += `<p class="meta-nota mal">No se pudo guardar: ${escapar(err.message)}</p>`;
+      });
+  };
+}
+
+/**
+ * Completa el mazo hasta 50 con lo que haya. No busca el mejor mazo: busca uno
+ * legal y COHERENTE: primero las criaturas del clado que ya domina, luego el
+ * resto de criaturas, luego el soporte, y dentro de cada tramo de más barato
+ * a más caro, que es lo que una curva sana pide. Nadie se queda a tres cartas
+ * del final contando copias a mano.
+ */
+function autocompletar(p) {
+  const emb = emblemaDe(editando.cartas);
+  const tramo = (c) => (emb && emb.filtra(c) && esDino(c) ? 0 : esDino(c) ? 1 : 2);
+  const disponible = catalogo(p)
+    .map((c) => ({ id: c.id, c, tope: Math.min(limiteDe(c.id), p.cartas[c.id] ?? 0) }))
+    .filter((x) => x.tope > 0)
+    .sort((a, b) => tramo(a.c) - tramo(b.c) || a.c.coste - b.c.coste);
+
+  let total = totalDe(editando.cartas);
+  let movio = true;
+  while (total < TAM_MAZO && movio) {
+    movio = false;
+    for (const x of disponible) {
+      if (total >= TAM_MAZO) break;
+      const n = editando.cartas[x.id] ?? 0;
+      if (n >= x.tope) continue;
+      editando.cartas[x.id] = n + 1;
+      total += 1;
+      movio = true;
+    }
+  }
+  editando.pestana = 'mazo';
+  pintarEditor();
+}
