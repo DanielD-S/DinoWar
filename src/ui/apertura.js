@@ -171,6 +171,23 @@ export function ceremoniaDeSobre(contenedor, cartas) {
       capa.className = 'apertura-video';
       const marco = document.createElement('div');
       marco.className = 'apertura-video-marco';
+      // En vertical el plano apaisado no llena la pantalla: se enseña entero
+      // como banda y, detrás, el mismo vídeo ampliado, desenfocado y oscuro
+      // rellena arriba y abajo, como hacen los reproductores. En apaisado no
+      // hace falta —el plano cubre— y la copia no se crea, que son dos
+      // decodificaciones a la vez y en un móvil viejo se notan.
+      const vertical = window.matchMedia?.('(orientation: portrait)').matches;
+      let fondo = null;
+      if (vertical) {
+        fondo = document.createElement('video');
+        fondo.className = 'apertura-video-fondo';
+        fondo.muted = true;
+        fondo.playsInline = true;
+        fondo.disablePictureInPicture = true;
+        fondo.src = v.src;
+        marco.appendChild(fondo);
+      }
+      v.className = 'apertura-video-principal';
       marco.appendChild(v);
       const pie = document.createElement('div');
       pie.className = 'apertura-video-pie';
@@ -204,6 +221,14 @@ export function ceremoniaDeSobre(contenedor, cartas) {
         capa.classList.add('visible');
         sonido('joya');
         try { await v.play(); } catch { reproduce = false; }
+        if (reproduce && fondo) {
+          // A la par que el principal. Si no arranca se queda como fotograma
+          // quieto detrás, que sigue siendo mejor fondo que el negro: Chrome
+          // corta el `play()` de un vídeo sin audio en cuanto la pestaña pasa
+          // a segundo plano, y quitarlo por eso dejaba las bandas negras.
+          fondo.currentTime = v.currentTime;
+          fondo.play().catch(() => {});
+        }
       }
       if (reproduce) {
         // La carta sale cuando el jugador CIERRA el vídeo, no cuando acaba:
@@ -214,6 +239,7 @@ export function ceremoniaDeSobre(contenedor, cartas) {
           capa.addEventListener('pointerdown', fin, { once: true });
         });
         v.pause();
+        fondo?.pause();
         capa.classList.add('cierra');
         capa.classList.remove('visible');
         await esperar(SALIDA_VIDEO);
