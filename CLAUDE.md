@@ -52,6 +52,7 @@ hay que hacer caso cuando el test lo dice.
 | El commit anclado en `desde-url.ts` | `node tools/anclar-desde-url.mjs` | `test/anclaje.test.js` |
 | `assets/piel/efectos/*.webp` | `python tools/efectos.py escribir` | `test/efectos.test.js` |
 | `assets/piel/mazos/*.webp` y la ventana de `.mazo-ventana` | `python tools/mazos.py escribir` | — |
+| `assets/piel/cuenca/*.webp` y los huecos de `.cu-vitrina` | `python tools/cuenca.py escribir` | — |
 
 Y las migraciones **no las aplica nadie solo**: `supabase/migrations/` es el
 registro de lo que la base de datos DEBERÍA tener, no de lo que tiene.
@@ -590,6 +591,34 @@ En el editor la curva de coste es un filtro —cada barra un botón— y la
 búsqueda repinta al escribir devolviendo el foco con el cursor al final, que
 sin eso cada letra cerraba el teclado del móvil. Para verlo sin cuenta:
 `_banco_mazos.html`, fuera del repositorio, siembra un perfil en la caché.
+
+## La Cuenca: vitrina, yacimiento y bandeja
+
+[`src/ui/cuenca.js`](src/ui/cuenca.js) pinta la capa cooperativa con piezas
+que salen de `python tools/cuenca.py escribir` desde `src/piel/cuenca/`: el
+jefe en una **vitrina** cuya ventana y cartela mide la herramienta —los números
+de `.cu-vitrina-ventana` y `.cu-vitrina-cartela` son suyos—, el yacimiento en
+**cuatro escenas** (una por cada dos niveles de los ocho), la **bandeja** de
+fósiles que se destapa con `clip-path` según el depósito, y la Vida del jefe
+con el canal y el relleno del hábitat, que ya existían.
+
+Lo que cambia de flujo y no sólo de piel:
+
+- **El asalto termina en un informe**, no en un renglón: `informeDeAsalto()`
+  en `main.js` pinta la vitrina con la Vida que tenía el jefe al empezar y,
+  cuando el servidor contesta, baja la barra hasta lo que queda. La
+  transición es literalmente lo que le has quitado. `pintarFin()` lo vacía en
+  las partidas normales.
+- **Reclamar la carta de jefe la invoca** como a una legendaria: `invocar()`
+  acepta ahora `raiz`, porque su raíz por defecto es la partida y la Cuenca
+  es otra pantalla.
+- **El código de la tribu se comparte** con `navigator.share` y cae al
+  portapapeles; antes había que dictarlo.
+- **Un evento de clima lleva de fondo la textura de ese clima**, la misma
+  que pone en el tablero.
+
+Para verlo sin cuenta: `_banco_cuenca.html`, fuera del repositorio, que cae a
+la cuenca local con compañeros simulados.
 
 ## `transform` es una sola propiedad, y quien la escribe último gana
 

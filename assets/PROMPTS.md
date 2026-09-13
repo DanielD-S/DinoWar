@@ -775,8 +775,16 @@ barra de arriba junto a la cifra, como el trofeo y la biomasa en el HUD.
 
 Exportar a **256×256**. Se sirve a 96, como los del HUD.
 
+### Lo que llegó
+
+Las diez, en una tarde. El marco del jefe trajo la ventana y la cartela en
+magenta como se pidió y la herramienta las midió: ventana al 7,9 % del
+borde con el 84,5 % del ancho, cartela al 25,8 % con el 48,4 %. La bandeja
+llegó llena y se destapa por CSS. Los yacimientos, los cuatro con el mismo
+encuadre, que era lo difícil.
+
 ### Después de generar
 
 Dejar los originales en **`src/piel/cuenca/`** con esos nombres. La
-herramienta será `tools/cuenca.py`, hermana de `tools/mazos.py`: keyea el
+herramienta es `tools/cuenca.py`, hermana de `tools/mazos.py`: keyea el
 magenta, escala, y mide la ventana y la cartela del marco del jefe.

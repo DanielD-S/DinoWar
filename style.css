@@ -2374,44 +2374,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .cu-botones { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 .cu-botones .boton-secundario { flex: 1 1 auto; min-width: 46%; }
 
-/* El jefe */
-.cu-jefe { text-align: center; }
-.cu-jefe.caido { opacity: .82; }
-.cu-jefe-arte {
-  width: 100%; max-width: 260px; margin: 0 auto 10px; aspect-ratio: 1.6;
-  border-radius: 10px; overflow: hidden; background: rgba(255, 255, 255, .05);
-}
-.cu-jefe-arte img, .cu-jefe-arte svg { width: 100%; height: 100%; object-fit: cover; }
-.cu-caido { margin: 10px 0; font-weight: 600; color: var(--acento-claro, #e0b872); }
-
-.cu-aportes { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: .82rem; }
-.cu-aportes th { text-align: left; font-weight: 500; opacity: .8; padding: 4px 0; }
-.cu-aportes td { padding: 4px 0 4px 10px; text-align: right; font-variant-numeric: tabular-nums; }
-.cu-aportes tr.yo th, .cu-aportes tr.yo td { color: var(--acento-claro, #e0b872); font-weight: 600; }
-.cu-cuota { width: 34%; }
-.cu-cuota i {
-  display: block; height: 6px; border-radius: 3px;
-  background: var(--acento, #c9a227); opacity: .55; margin-left: auto;
-}
-
-/* Eventos */
-.cu-evento { padding: 10px 0; border-top: 1px solid rgba(255, 255, 255, .07); }
-.cu-evento:first-of-type { border-top: 0; padding-top: 2px; }
-.cu-evento b { display: block; font-size: .95rem; }
-.cu-evento p { margin: 4px 0; font-size: .84rem; opacity: .72; line-height: 1.45; }
-.cu-evento small { font-size: .76rem; opacity: .5; }
-.cu-evento.jefe b { color: var(--rival, #d98b7a); }
-.cu-evento.clima b { color: var(--acento-claro, #e0b872); }
-
-/* Premios ya reclamados */
-.cu-premios { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
-.cu-premio { width: 104px; font-size: .78rem; text-align: center; }
-.cu-premio .col-arte {
-  aspect-ratio: 1.6; border-radius: 8px; overflow: hidden;
-  background: rgba(255, 255, 255, .05); margin-bottom: 5px;
-}
-.cu-premio .col-arte img, .cu-premio .col-arte svg { width: 100%; height: 100%; object-fit: cover; }
-
 /* El aviso de que esto todavía no es multijugador. Va al final y en voz baja,
    pero va: descubrirlo jugando sería peor. */
 .cu-aviso {
@@ -2426,11 +2388,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   margin: 0; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
   opacity: .55;
 }
-.cu-anuncio-arte {
-  width: 100%; max-width: 300px; margin: 12px auto; aspect-ratio: 1.6;
-  border-radius: 12px; overflow: hidden; background: rgba(255, 255, 255, .05);
-}
-.cu-anuncio-arte img, .cu-anuncio-arte svg { width: 100%; height: 100%; object-fit: cover; }
 .cu-anuncio h2 { margin: 0 0 8px; font-size: 1.3rem; }
 .cu-anuncio-nota { margin: 0 0 8px; font-size: .86rem; opacity: .78; line-height: 1.5; }
 
@@ -2461,3 +2418,174 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .meta-fosil b { color: var(--acento-claro, #e0b872); font-size: 15px; }
 .meta-fosil::after { content: ' fósiles'; opacity: .6; font-size: 11px; }
 .cu-tribu .cu-codigo { font-size: 1.05rem; }
+
+/* --- la piel de la Cuenca ----------------------------------------------
+   Las piezas salen de `tools/cuenca.py`. La ventana y la cartela de la
+   vitrina están MEDIDAS por esa herramienta sobre el PNG, no estimadas. */
+
+#cuenca .meta-fondo {
+  position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0;
+  object-fit: cover; object-position: 50% 40%;
+  filter: brightness(.48) saturate(.85);
+}
+#cuenca .meta-barra, #cuenca .meta-cuerpo, #cuenca .meta-pie { position: relative; z-index: 1; }
+#cuenca .meta-barra { background: rgba(15,11,8,.72); }
+#cuenca .meta-pie { background: rgba(15,11,8,.82); }
+#cuenca .cu-bloque { background: rgba(15,11,8,.66); border-color: rgba(217,164,65,.22); }
+
+/* El fósil como icono, junto a la cifra de la barra y a la del almacén. */
+.meta-fosil::before, .cu-ico-fosil {
+  content: ''; display: inline-block; width: 14px; height: 14px; vertical-align: middle;
+  margin: -2px 4px 0 0; background: url('assets/piel/cuenca/ico_fosil.webp') center / contain no-repeat;
+}
+.cu-ico-fosil { width: 22px; height: 22px; margin-right: 6px; }
+
+/* --- la vitrina del jefe ------------------------------------------------ */
+.cu-vitrina {
+  position: relative; width: 100%; max-width: 330px; margin: 0 auto 8px;
+  aspect-ratio: 1406 / 934;
+  background: url('assets/piel/cuenca/marco_jefe.webp') center / 100% 100% no-repeat;
+  filter: drop-shadow(0 5px 8px rgba(0,0,0,.55));
+}
+.cu-vitrina-ventana {
+  position: absolute; left: 7.89%; top: 12.31%; width: 84.5%; height: 68.09%;
+  background: #14100c; overflow: hidden;
+}
+.cu-vitrina-ventana img, .cu-vitrina-ventana svg { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cu-vitrina.caida .cu-vitrina-ventana img { filter: grayscale(.7) brightness(.7); }
+.cu-vitrina-cartela {
+  position: absolute; left: 25.82%; top: 87.26%; width: 48.36%; height: 6.85%;
+  display: grid; place-items: center; overflow: hidden;
+  font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 9px; letter-spacing: .08em;
+  text-transform: uppercase; color: #1a1206; white-space: nowrap;
+  /* Grabado en el latón: una luz por debajo de cada letra. */
+  text-shadow: 0 1px 0 rgba(255,232,180,.45);
+}
+.cu-vitrina-cartela i { font-style: italic; font-weight: 600; }
+.cu-sello-caido {
+  position: absolute; right: -2%; top: -6%; width: 18%; aspect-ratio: 1;
+  background: url('assets/piel/cuenca/sello_caido.webp') center / contain no-repeat;
+  transform: rotate(12deg); filter: drop-shadow(0 2px 3px rgba(0,0,0,.6));
+}
+.cu-jefe { text-align: center; }
+.cu-jefe.caido .cu-subtitulo { opacity: .5; }
+
+/* La Vida del jefe con el canal y el relleno del hábitat, que ya existen. */
+.cu-vida {
+  position: relative; height: 22px; margin: 6px 0 8px;
+  background: url('assets/piel/habitat_canal.webp') center / 100% 100% no-repeat;
+}
+.cu-vida i {
+  position: absolute; left: 3%; top: 27%; height: 46%; max-width: 94%;
+  background: url('assets/piel/habitat_relleno.webp') left center / 100% 100% no-repeat;
+  filter: hue-rotate(-28deg) saturate(1.25); transition: width .6s ease;
+}
+.cu-vida b {
+  position: relative; display: block; line-height: 22px; font-size: 12px; font-weight: 600;
+  color: #f2e4c4; text-shadow: 0 1px 2px #000, 0 0 4px #000; font-variant-numeric: tabular-nums;
+}
+.cu-vida small { font-weight: 400; opacity: .75; }
+
+/* Tres cifras en fila: ventana, asaltos de hoy y daño acumulado. */
+.cu-datos { display: flex; gap: 6px; margin: 4px 0 6px; }
+.cu-datos span {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px;
+  padding: 6px 4px; border-radius: 6px; background: rgba(0,0,0,.28); border: 1px solid rgba(217,164,65,.16);
+}
+.cu-datos b { font-size: 15px; color: var(--acento-claro); font-variant-numeric: tabular-nums; }
+.cu-datos b em { font-style: normal; font-size: 11px; color: var(--tenue); }
+.cu-datos small { font-size: 9.5px; color: var(--tenue); }
+
+/* El ranking de la tribu, con medallones. */
+.cu-medallon {
+  display: inline-block; width: 22px; height: 22px; flex: 0 0 auto; vertical-align: middle;
+  background: url('assets/piel/cuenca/medallon_excavador.webp') center / contain no-repeat;
+}
+.cu-ranking { list-style: none; margin: 10px 0 0; padding: 0; text-align: left; }
+.cu-ranking li {
+  display: flex; align-items: center; gap: 7px; padding: 5px 0;
+  border-top: 1px solid rgba(217,164,65,.1); font-size: 12px;
+}
+.cu-ranking li:first-child { border-top: 0; }
+.cu-ranking li.yo .cu-quien, .cu-ranking li.yo .cu-dano { color: var(--acento-claro); font-weight: 600; }
+.cu-puesto {
+  width: 16px; text-align: center; font-size: 10px; color: var(--tenue-2);
+  font-family: 'Cinzel', Georgia, serif; font-weight: 700;
+}
+.cu-ranking li:first-child .cu-puesto { color: var(--bio); }
+.cu-quien { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cu-dano { font-variant-numeric: tabular-nums; }
+.cu-cuota { width: 26%; height: 6px; border-radius: 3px; background: rgba(0,0,0,.35); overflow: hidden; }
+.cu-cuota i { display: block; height: 100%; background: linear-gradient(90deg, #a4761f, var(--bio)); }
+
+/* --- el yacimiento ------------------------------------------------------ */
+.cu-yac { padding-top: 0; overflow: hidden; }
+.cu-yac-escena {
+  position: relative; margin: 0 -16px 10px; aspect-ratio: 2 / 1;
+  background: var(--escena) center / cover no-repeat;
+  display: flex; align-items: flex-end; justify-content: space-between; padding: 8px 12px;
+  box-shadow: inset 0 -40px 40px -20px rgba(15,11,8,.9);
+}
+.cu-yac-nivel, .cu-yac-ritmo {
+  font-size: 11px; color: #e9d9b5; text-shadow: 0 1px 2px #000, 0 0 6px #000;
+}
+.cu-yac-nivel b { font-family: 'Cinzel', Georgia, serif; font-weight: 700; color: var(--acento-claro); }
+.cu-yac-ritmo b { color: var(--acento-claro); }
+/* La bandeja llena se destapa de izquierda a derecha según el depósito: lo
+   que falta va tapado por un velo recortado con `clip-path`. Una imagen. */
+.cu-bandeja {
+  position: relative; width: 100%; aspect-ratio: 2508 / 519; margin: 4px 0;
+  background: url('assets/piel/cuenca/bandeja_fosiles.webp') center / 100% 100% no-repeat;
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,.5));
+}
+.cu-bandeja .falta {
+  position: absolute; inset: 0; background: rgba(10,7,4,.74); pointer-events: none;
+  clip-path: inset(0 0 0 var(--pct, 0%)); transition: clip-path .5s ease;
+}
+.cu-bandeja b {
+  position: absolute; right: 6%; top: 50%; transform: translateY(-50%); z-index: 2;
+  font-size: 13px; font-weight: 700; color: #f2e4c4; text-shadow: 0 1px 2px #000, 0 0 5px #000;
+  font-variant-numeric: tabular-nums;
+}
+.cu-bandeja b small { font-weight: 400; opacity: .8; }
+
+/* --- la tribu ----------------------------------------------------------- */
+.cu-compartir {
+  margin-left: 8px; padding: 4px 10px; border-radius: 12px; font-size: 11px;
+  color: var(--acento-claro); border: 1px solid rgba(217,164,65,.4);
+}
+.cu-compartir:active { background: rgba(217,164,65,.18); }
+.cu-miembros { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 10px; }
+.cu-miembros li { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--texto-2); }
+.cu-miembros li.yo { color: var(--acento-claro); font-weight: 600; }
+
+/* --- eventos ------------------------------------------------------------ */
+.cu-evento { position: relative; padding: 10px 12px; border-radius: 8px; margin-top: 8px; overflow: hidden; background: rgba(0,0,0,.28); }
+.cu-evento:first-of-type { margin-top: 4px; }
+.cu-evento b { display: block; font-size: .95rem; position: relative; }
+.cu-evento p { margin: 4px 0; font-size: .84rem; opacity: .8; line-height: 1.45; position: relative; }
+.cu-evento small { font-size: .76rem; opacity: .55; position: relative; }
+.cu-evento.jefe b { color: var(--rival, #d98b7a); }
+.cu-evento.clima b { color: var(--acento-claro, #e0b872); }
+/* El clima de cuenca lleva de fondo la textura que ese clima pone en el tablero. */
+.cu-evento.clima::before { content: ''; position: absolute; inset: 0; opacity: .5; pointer-events: none; }
+.cu-evento.clima-aridez::before { background: url('assets/piel/efectos/calima.webp') center / cover; mix-blend-mode: multiply; opacity: .9; }
+.cu-evento.clima-canal::before { background: url('assets/piel/efectos/bruma.webp') center / 300px; mix-blend-mode: screen; opacity: .35; }
+.cu-evento.clima-sabana::before { background: url('assets/piel/efectos/lluvia.webp') center / 200px; mix-blend-mode: screen; opacity: .45; }
+.cu-evento.clima-llanura::before { background: url('assets/piel/efectos/agua.webp') bottom / cover; mix-blend-mode: screen; opacity: .5; }
+.cu-evento.clima-bosque::before { background: url('assets/piel/efectos/llovizna.webp') center / 220px; mix-blend-mode: screen; opacity: .4; }
+
+/* --- cartas de jefe ----------------------------------------------------- */
+.cu-premios { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.cu-premio { width: 96px; font-size: .74rem; text-align: center; }
+.cu-premio .carta--col { width: 100%; aspect-ratio: 82 / 112; border-radius: 6px; margin-bottom: 5px; }
+.cu-anuncio-carta { width: min(60vw, 240px); margin: 12px auto; }
+.cu-anuncio-carta .carta--visor { width: 100%; }
+
+/* --- el informe del asalto, en la pantalla de fin ------------------------- */
+.fin-informe:empty { display: none; }
+.fin-informe { width: 100%; margin: 4px 0 10px; }
+.fin-informe .cu-vitrina { max-width: 220px; }
+.fin-informe .cu-vida { max-width: 300px; margin: 8px auto; }
+.fin-informe .cu-vida i { transition: width 1.2s cubic-bezier(.2,.8,.2,1); }
+.fin-informe .cu-datos { max-width: 300px; margin: 0 auto; }

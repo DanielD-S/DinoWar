@@ -72,7 +72,7 @@ export function montar() {
     eleccionTexto: id('eleccion-texto'), eleccionCuerpo: id('eleccion-cuerpo'),
     eleccionCerrar: id('eleccion-cerrar'),
     finTitulo: id('fin-titulo'), finDetalle: id('fin-detalle'),
-    finVia: id('fin-via'), finResumen: id('fin-resumen'), finPremio: id('fin-premio'),
+    finVia: id('fin-via'), finResumen: id('fin-resumen'), finPremio: id('fin-premio'), finInforme: id('fin-informe'),
     debug: id('debug'), record: id('menu-record'),
   });
 

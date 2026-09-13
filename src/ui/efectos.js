@@ -172,9 +172,8 @@ export function volar(nodo, desde, { retardo = 0, dura = VUELO, dorso = false } 
  * `destino` la ranura donde va a aparecer, para que la carta se encoja hacia
  * ella al final. Resuelve cuando se ha quitado todo.
  */
-export function invocar({ html, titulo, subtitulo, destino }) {
+export function invocar({ html, titulo, subtitulo, destino, raiz = partida() }) {
   if (reducido()) return Promise.resolve();
-  const raiz = partida();
   const v = document.createElement('div');
   v.className = 'invocacion';
   v.style.setProperty('--ceremonia', `${CEREMONIA}ms`);
