@@ -147,9 +147,14 @@ export function ceremoniaDeSobre(contenedor, cartas) {
     // al empezar la ceremonia, que rasgar el sobre y pasar cartas da tiempo de
     // sobra para bajar un megabyte; y una legendaria sin vídeo no falla: el
     // `error` la saca del mapa y la carta se voltea como cualquier otra.
+    //
+    // Sólo se pide para las legendarias CON CRIATURA. Las de soporte —climas,
+    // eventos, recursos, Biomasa— no llevan vídeo a propósito, que no hay
+    // animal que enseñar, y pedirlo igual dejaba un 404 en la consola por cada
+    // Mortandad o Manantial que salía en un sobre.
     const videos = new Map();
     for (const c of cartas) {
-      if (c.rareza !== 'LEGENDARIO' || !c.id || videos.has(c.id)) continue;
+      if (c.rareza !== 'LEGENDARIO' || !c.dino || !c.id || videos.has(c.id)) continue;
       const v = document.createElement('video');
       v.muted = true;
       v.playsInline = true;

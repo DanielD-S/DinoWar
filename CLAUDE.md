@@ -489,9 +489,11 @@ sobre de verdad, que una copia para pruebas se queda atrás sin que nadie lo
 note.
 
 No hay lista de qué legendarias tienen vídeo: la ceremonia pide el fichero por
-el `id` y, si da error, voltea la carta como cualquier otra. Sólo las seis
-legendarias con criatura lo tienen; las de soporte —climas, eventos,
-recursos— no llevan vídeo a propósito, que no hay animal que enseñar. Hubo un
+el `id` y, si da error, voltea la carta como cualquier otra. Pero sólo lo pide
+para las legendarias CON CRIATURA (`c.dino`): las de soporte —climas, eventos,
+recursos, Biomasa— no llevan vídeo a propósito, que no hay animal que enseñar,
+y pedirlo igual dejaba un 404 en la consola por cada Mortandad o Manantial que
+salía en un sobre. Las seis legendarias con criatura lo tienen todas. Hubo un
 vídeo de relleno para las que no tenían el suyo y se quitó: el autor prefiere
 que una legendaria sin vídeo salga sin vídeo.
 
