@@ -24,6 +24,14 @@ const UMBRAL = 0.85;
 const SUELTA_X = 70;
 const SUELTA_Y = 90;
 const TOQUE = 6;
+// El vídeo de una legendaria: cuánto espera a que se vaya la carta anterior
+// antes de oscurecer, y cuánto tarda en irse al cerrarlo. Van con las
+// transiciones de `.apertura-video` en style.css.
+const ENTRADA_VIDEO = 380;
+const SALIDA_VIDEO = 480;
+// Mientras no todas las legendarias tengan el suyo, las que no lo tienen
+// enseñan éste. Hoy es el del mosasaurio copiado con otro nombre.
+const VIDEO_DE_RELLENO = 'legendaria';
 
 function zigzag() {
   const pts = [];
@@ -136,6 +144,91 @@ export function ceremoniaDeSobre(contenedor, cartas) {
     sobre.addEventListener('pointerup', soltarSobre);
     sobre.addEventListener('pointercancel', soltarSobre);
 
+    // ------------------------------------------------------------- vídeo
+    // Una legendaria puede traer un vídeo corto del animal —assets/video/<id>—
+    // que se enseña a pantalla entera antes de voltear la carta. Se precargan
+    // al empezar la ceremonia, que rasgar el sobre y pasar cartas da tiempo de
+    // sobra para bajar un megabyte; y una legendaria sin vídeo no falla: el
+    // `error` la saca del mapa y la carta se voltea como cualquier otra.
+    const videos = new Map();
+    for (const c of cartas) {
+      if (c.rareza !== 'LEGENDARIO' || !c.id || videos.has(c.id)) continue;
+      const v = document.createElement('video');
+      v.muted = true;
+      v.playsInline = true;
+      v.preload = 'auto';
+      v.disablePictureInPicture = true;
+      v.disableRemotePlayback = true;
+      v.controls = false;
+      v.src = `assets/video/${c.id}.mp4`;
+      // Sin vídeo propio, el de relleno; sin ése, ninguno.
+      v.addEventListener('error', () => {
+        v.addEventListener('error', () => videos.delete(c.id), { once: true });
+        v.src = `assets/video/${VIDEO_DE_RELLENO}.mp4`;
+      }, { once: true });
+      videos.set(c.id, v);
+    }
+    let presentando = false;
+
+    async function presentar(c) {
+      const v = videos.get(c.id);
+      if (!v) return;
+      presentando = true;
+      const capa = document.createElement('div');
+      capa.className = 'apertura-video';
+      const marco = document.createElement('div');
+      marco.className = 'apertura-video-marco';
+      marco.appendChild(v);
+      const pie = document.createElement('div');
+      pie.className = 'apertura-video-pie';
+      const nombre = document.createElement('div');
+      nombre.className = `apertura-video-nombre${c.dino ? '' : ' recto'}`;
+      nombre.textContent = c.binomial;
+      const cerrar = document.createElement('button');
+      cerrar.type = 'button';
+      cerrar.className = 'apertura-video-cerrar';
+      cerrar.textContent = 'Ver la carta';
+      pie.append(nombre, cerrar);
+      capa.append(marco, pie);
+      raiz.appendChild(capa);
+
+      // Con tope: un vídeo que no llega no para la ceremonia.
+      await new Promise((listo) => {
+        if (v.readyState >= 3) { listo(); return; }
+        v.addEventListener('canplay', listo, { once: true });
+        v.addEventListener('error', listo, { once: true });
+        setTimeout(listo, 2500);
+      });
+      // Que la carta anterior termine de irse antes de que el fondo oscurezca:
+      // si no, el vídeo aparecía de golpe encima de una carta a medio vuelo.
+      await esperar(ENTRADA_VIDEO);
+      let reproduce = !acabado && !v.error && v.readyState >= 3;
+      if (reproduce) {
+        // Reflujo forzado y no requestAnimationFrame: con la pestaña en segundo
+        // plano el fotograma no llega y la capa se quedaba invisible con el
+        // vídeo ya corriendo debajo.
+        capa.getBoundingClientRect();
+        capa.classList.add('visible');
+        sonido('joya');
+        try { await v.play(); } catch { reproduce = false; }
+      }
+      if (reproduce) {
+        // La carta sale cuando el jugador CIERRA el vídeo, no cuando acaba:
+        // al terminar se queda en el último fotograma —las fauces— y espera
+        // un toque, en la capa o en el botón. Quien no quiera verlo entero
+        // toca antes.
+        await new Promise((fin) => {
+          capa.addEventListener('pointerdown', fin, { once: true });
+        });
+        v.pause();
+        capa.classList.add('cierra');
+        capa.classList.remove('visible');
+        await esperar(SALIDA_VIDEO);
+      }
+      capa.remove();
+      presentando = false;
+    }
+
     // -------------------------------------------------------------- pila
     // La carta de arriba sigue al dedo; si se suelta lejos, se va por donde
     // iba; si no, vuelve. Un toque la manda a la derecha. Cada carta que se va
@@ -143,10 +236,12 @@ export function ceremoniaDeSobre(contenedor, cartas) {
     let indice = 0;
     const cimaActual = () => pila.querySelector(`.apertura-carta[data-i="${indice}"]`);
 
-    function revelar() {
+    async function revelar() {
       const c = cartas[indice];
       const nodo = cimaActual();
       if (!c || !nodo) { acabar(); return; }
+      if (c.rareza === 'LEGENDARIO') await presentar(c);
+      if (acabado) return;
       nodo.classList.add('revelada');
       leyenda.binomial.textContent = c.binomial;
       leyenda.binomial.classList.toggle('recto', !c.dino);
@@ -159,6 +254,7 @@ export function ceremoniaDeSobre(contenedor, cartas) {
 
     let arrastre = null;
     pila.addEventListener('pointerdown', (e) => {
+      if (presentando) return;
       const nodo = cimaActual();
       if (!nodo || !nodo.contains(e.target) || nodo.classList.contains('fuera')) return;
       arrastre = { x: e.clientX, y: e.clientY, nodo };

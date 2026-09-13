@@ -17,7 +17,7 @@
 //
 // Al cambiar cualquier fichero servido hay que subir VERSION: activa la limpieza
 // de las cachés anteriores.
-const VERSION = 'dinowar-v62';
+const VERSION = 'dinowar-v63';
 const ESENCIALES = [
   './', './index.html', './style.css', './piel.css', './carta.css', './efectos.css', './manifest.json', './src/main.js',
   // Lo primero que se ve. La marca y la pantalla de carga tienen que estar
@@ -43,12 +43,14 @@ const ESENCIALES = [
 const esIndice = (url) => url.pathname.endsWith('/indice.json');
 // Cinco carpetas, misma regla de caché: las ilustraciones de `dinos/`, las
 // cartas enteras de `cartas/`, las piezas del tablero de `piel/`, los marcos y
-// las músicas de `sonidos/` pesan y no cambian, así que van de caché primero.
+// las músicas de `sonidos/` y los vídeos de `video/` pesan y no cambian, así
+// que van de caché primero.
 const esImagenDeCarta = (url) => (url.pathname.includes('/assets/dinos/')
   || url.pathname.includes('/assets/cartas/')
   || url.pathname.includes('/assets/piel/')
   || url.pathname.includes('/assets/marcos/')
-  || url.pathname.includes('/assets/sonidos/')) && !esIndice(url);
+  || url.pathname.includes('/assets/sonidos/')
+  || url.pathname.includes('/assets/video/')) && !esIndice(url);
 
 self.addEventListener('install', (e) => {
   // Que falte un fichero del precacheado no debe dejar el service worker sin
@@ -69,6 +71,12 @@ self.addEventListener('fetch', (e) => {
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+  // Un <video> pide por tramos (`Range`), y el servidor contesta 206. Una 206
+  // no se puede guardar en la caché —`cache.put` lanza— y la promesa rota
+  // dejaba la petición en ERR_FAILED: el vídeo de la legendaria no salía y
+  // la ceremonia lo saltaba en silencio, como si no existiera. Los tramos
+  // van al navegador tal cual; el fichero entero sí pasa por aquí.
+  if (request.headers.has('range')) return;
 
   if (esImagenDeCarta(url)) {
     e.respondWith(caches.match(request).then((hit) => hit ?? guardar(request)));
@@ -94,7 +102,8 @@ async function guardar(request, revalidar = false) {
   // El coste es una petición condicional que casi siempre contesta 304 sin
   // cuerpo. Barato, y es lo único que hace que publicar signifique algo.
   const respuesta = await fetch(request, revalidar ? { cache: 'no-cache' } : undefined);
-  if (respuesta.ok && respuesta.type === 'basic') {
+  // 200 y no `ok`: una 206 también es `ok` y la caché no la admite.
+  if (respuesta.status === 200 && respuesta.type === 'basic') {
     const copia = respuesta.clone();
     const cache = await caches.open(VERSION);
     await cache.put(request, copia);

@@ -44,3 +44,7 @@ src/piel/
 # Originales de los sonidos: WAV de 5,7 MB cada uno; se sirven los M4A de
 # assets/sonidos/, que salen de tools/sonidos.py.
 src/sonidos/
+
+# Originales de los vídeos de las legendarias: MP4 de 14 MB cada uno; se
+# sirven los de assets/video/, que salen de tools/videos.py.
+src/video/

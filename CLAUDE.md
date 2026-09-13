@@ -48,6 +48,7 @@ hay que hacer caso cuando el test lo dice.
 | `tools/mecanicas.json` | `node tools/mecanicas.mjs` | — |
 | `assets/fuentes/terralis.woff2` | `python tools/terralis.py` | — |
 | `assets/sonidos/*.m4a` | `python tools/sonidos.py escribir` | — |
+| `assets/video/*.mp4` | `python tools/videos.py escribir` | — |
 | El commit anclado en `desde-url.ts` | `node tools/anclar-desde-url.mjs` | `test/anclaje.test.js` |
 | `assets/piel/efectos/*.webp` | `python tools/efectos.py escribir` | `test/efectos.test.js` |
 
@@ -443,6 +444,51 @@ carga eso obligaba a empezar una partida para callarla.
 
 Los efectos siguen sintetizados con osciladores. El catálogo de lo que falta y
 los prompts están en [assets/PROMPTS_SONIDO.md](assets/PROMPTS_SONIDO.md).
+
+## Las legendarias traen vídeo
+
+Una legendaria puede llevar un vídeo corto del animal, `assets/video/<id>.mp4`,
+que la apertura del sobre enseña a pantalla entera antes de voltear la carta.
+El original va a `src/video/` —fuera del repositorio— y `python tools/videos.py
+escribir` lo deja en H.264 a 960 de ancho, sin audio y con `faststart`: el de
+Kling llegó a 14 MB y se sirve en 1,2. Si dura más de diez segundos se corta
+por el PRINCIPIO, que el último fotograma es sobre el que aparece la carta.
+
+**Para verlo sin esperar al servidor: `?ensayo=mosasaurus`.** Al entrar en
+Sobres corre una ceremonia de mentira con esa carta en segundo lugar: no
+cobra, no guarda y no toca la colección. Pasa por el mismo `celebrar()` que un
+sobre de verdad, que una copia para pruebas se queda atrás sin que nadie lo
+note.
+
+No hay lista de qué legendarias tienen vídeo: la ceremonia pide el fichero por
+el `id` y, si da error, cae a `assets/video/legendaria.mp4`, el de RELLENO,
+que hoy es el del mosasaurio copiado con otro nombre para que toda legendaria
+tenga algo mientras llegan los suyos. Si tampoco está, voltea la carta como
+cualquier otra. Cuando los ocho tengan el suyo, el relleno sobra. Los precarga al
+empezar la ceremonia —rasgar y pasar cartas dan tiempo de sobra—. **La carta
+sale cuando el jugador CIERRA el vídeo**, con un toque o con «Ver la carta»:
+al acabar se queda en el último fotograma esperando, y quien no quiera verlo
+entero toca antes. Mientras está puesto, la pila no acepta arrastres.
+
+**El plano llena la pantalla entera, también en vertical**, recortando los
+lados: enseñado como banda apaisada dejaba dos tercios del móvil en negro.
+El precio es que en un móvil se pierde lo que el animal haga por los
+costados; la solución de verdad es generar los vídeos en 9:16 para el móvil,
+y `object-fit: cover` seguiría valiendo. Entra en tres tiempos —fondo, plano
+acercándose, nombre— tras esperar `ENTRADA_VIDEO` a que la carta anterior
+termine de irse, que si no aparecía de golpe sobre una carta a medio vuelo.
+
+**Las cartas de la pila esperan boca abajo.** Iban con la cara a la vista y la
+legendaria asomaba detrás de la primera carta: el vídeo llegaba después de
+que ya se hubiera visto. El dorso es un `::after` sobre cada carta que se
+retira al revelarla.
+
+**La capa se enseña con un reflujo forzado, no con `requestAnimationFrame`**:
+con la pestaña en segundo plano el fotograma no llega y la capa se quedaba
+invisible con el vídeo corriendo debajo. Y los prompts del vídeo, con la
+anatomía que separa a cada animal de su pariente moderno —sin nombre, un
+mosasaurio se vuelve tiburón a mitad de plano—, están en
+[assets/PROMPTS_VIDEO.md](assets/PROMPTS_VIDEO.md).
 
 ## El sobre se abre con dos gestos
 
