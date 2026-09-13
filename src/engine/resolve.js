@@ -4,7 +4,7 @@
 
 import { BALANCE } from '../data/balance.js';
 import { RASGO, carta } from '../data/cards.js';
-import { barajar } from './rng.js';
+import { barajar, entero } from './rng.js';
 import { MODO, modoActual as economiaModo, rentaTipada, ingresar } from './economia.js';
 import {
   FASE, MOTIVO_FIN, CAUSA, rival,
@@ -366,7 +366,64 @@ function aplicarPresion(s, p) {
       herir(s, inst.iid, BALANCE.rasgos.mortandadDano, CAUSA.MORTANDAD, p.jugador);
     }
     ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  // Los seis de la ronda de las cien cartas. Mueven cartas, no cifras, así que
+  // no hay a quién marcar: se anuncian sobre el tablero como la Trampa.
+  } else if (r === RASGO.SABANA_HELECHOS) {
+    robar(s, p.jugador, BALANCE.rasgos.sabanaHelechosRoba);
+    descartarAlAzar(s, p.jugador, BALANCE.rasgos.sabanaHelechosDescarta);
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  } else if (r === RASGO.INUNDACION) {
+    perderDelMazo(s, contrario, BALANCE.rasgos.inundacionMazo);
+    perderDelMazo(s, p.jugador, BALANCE.rasgos.inundacionMazo);
+    robar(s, p.jugador, BALANCE.rasgos.inundacionRoba);
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  } else if (r === RASGO.CANAL_TRENZADO) {
+    for (const inst of unidadesDe(s, p.jugador)) {
+      inst.heridas = Math.max(0, inst.heridas - BALANCE.rasgos.canalTrenzadoCura);
+    }
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  } else if (r === RASGO.BOSQUE_RIBERENO) {
+    descartarAlAzar(s, contrario, BALANCE.rasgos.bosqueRiberenoMano);
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  } else if (r === RASGO.DERIVA_ARIDA) {
+    // Los dos sueltan la mano y roban otras tantas: el que la tenía peor sale
+    // ganando. Se resuelve primero el rival y luego quien la juega, en orden
+    // fijo, que el robo consume el mazo y el mazo es lo que se re-juega.
+    for (const j of [contrario, p.jugador]) {
+      const jug = s.jugadores[j];
+      const n = jug.mano.length;
+      jug.descarte.push(...jug.mano);
+      jug.mano = [];
+      robar(s, j, n);
+    }
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  } else if (r === RASGO.NIDO) {
+    robar(s, p.jugador, BALANCE.rasgos.nidoRoba);
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
   }
+}
+
+/**
+ * Descarta de la mano AL AZAR, con el rng del estado y no con Math.random: la
+ * partida tiene que poder re-jugarse igual en el servidor. Es lo mismo que
+ * hace la entrada `manoRival`, sacado a función para que lo usen los eventos.
+ */
+export function descartarAlAzar(s, j, n) {
+  const jug = s.jugadores[j];
+  let quitadas = 0;
+  for (let k = 0; k < n && jug.mano.length > 0; k++) {
+    const d = entero(s.rng, jug.mano.length);
+    s.rng = d.rng;
+    jug.descarte.push(jug.mano.splice(d.valor, 1)[0]);
+    quitadas += 1;
+  }
+  return quitadas;
 }
 
 /**

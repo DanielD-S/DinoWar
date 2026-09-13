@@ -284,6 +284,28 @@ function valorDeAccion(vista, j, a) {
         const mueren = (bando) => unidadesDe(vista, bando)
           .filter((u) => vidaActual(vista, u.iid) <= BALANCE.rasgos.mortandadDano).length;
         delta = (mueren(contrario) - mueren(j)) * IA.pesoTrofeo / IA.pesoDano;
+
+      // Los seis de la ronda de las cien cartas mueven cartas, y una carta en
+      // la mano se tasa como en `valorEntrada.roba`: algo más que un punto.
+      } else if (r === RASGO.SABANA_HELECHOS) {
+        delta = BALANCE.rasgos.sabanaHelechosRoba * 0.7 - BALANCE.rasgos.sabanaHelechosDescarta * 0.5;
+      } else if (r === RASGO.NIDO) {
+        delta = BALANCE.rasgos.nidoRoba * 0.7;
+      } else if (r === RASGO.INUNDACION) {
+        const acerca = BALANCE.rasgos.inundacionMazo / Math.max(1, mazoDe(vista, contrario));
+        const arriesga = BALANCE.rasgos.inundacionMazo / Math.max(1, mazoDe(vista, j));
+        delta = (acerca - arriesga) * IA.pesoTrofeo / IA.pesoDano * 3 + BALANCE.rasgos.inundacionRoba * 0.7;
+      } else if (r === RASGO.CANAL_TRENZADO) {
+        delta = unidadesDe(vista, j)
+          .reduce((n, u) => n + Math.min(u.heridas, BALANCE.rasgos.canalTrenzadoCura), 0) * 0.5;
+      } else if (r === RASGO.BOSQUE_RIBERENO) {
+        delta = Math.min(BALANCE.rasgos.bosqueRiberenoMano, vista.jugadores[contrario].mano.length) * 0.6;
+      } else if (r === RASGO.DERIVA_ARIDA) {
+        // Vale cuando el rival tiene más mano que tú, o la tuya no se puede
+        // pagar: lo que se suelta no se pierde, se cambia.
+        const mia = vista.jugadores[j].mano.filter((iid) => iid !== a.iid);
+        const impagables = mia.filter((iid) => carta(vista.instancias[iid].cardId).coste > vista.jugadores[j].biomasa + 2).length;
+        delta = (vista.jugadores[contrario].mano.length - mia.length) * 0.4 + impagables * 0.4;
       }
 
       return delta * IA.pesoDano * 2 - c.coste * IA.pesoCoste;
@@ -299,6 +321,9 @@ function valorDeAccion(vista, j, a) {
       if (r === RASGO.REBROTE) { gana = P.rebroteBiomasa; cuesta = unidadesDe(vista, j).length * P.rebroteHeridas * IA.pesoDano; }
       if (r === RASGO.CARRONA) { gana = P.carronaBiomasa; cuesta = P.carronaBiomasaRival * 0.6; }
       if (r === RASGO.LAGO) { gana = P.lagoBiomasa; cuesta = P.lagoHabitat * IA.pesoHabitat; }
+      if (r === RASGO.INSECTOS) { gana = P.insectosBiomasa; cuesta = -P.insectosRoba * 0.7; }
+      if (r === RASGO.MANADA_PASO) { gana = P.manadaPasoBiomasa; cuesta = P.manadaPasoMazo * 0.15; }
+      if (r === RASGO.FRUTOS) { gana = P.frutosBiomasa; cuesta = P.frutosRobaRival * 0.8; }
 
       const biomasa = vista.jugadores[j].biomasa;
       const desbloquea = vista.jugadores[j].mano

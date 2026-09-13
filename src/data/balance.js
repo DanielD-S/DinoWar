@@ -169,6 +169,15 @@ export const BALANCE = Object.freeze({
     manadaVida: 1,
     trampaMazoRival: 5,
     trampaMazoPropio: 3,
+    // La ronda de las cien cartas: los cinco biomas que fueron clima, como
+    // eventos, y un nido. Ninguno señala a nadie: caen sobre la mesa entera.
+    sabanaHelechosRoba: 2,
+    sabanaHelechosDescarta: 1,
+    inundacionMazo: 3,        // cartas que pierden LOS DOS
+    inundacionRoba: 1,
+    canalTrenzadoCura: 2,
+    bosqueRiberenoMano: 2,    // cartas que el rival descarta de la mano
+    nidoRoba: 2,
   }),
 
   // Cartas de recurso: Biomasa inmediata con inconveniente. Atacan el atasco de mano,
@@ -180,6 +189,12 @@ export const BALANCE = Object.freeze({
     carronaBiomasaRival: 1,
     lagoBiomasa: 2,
     lagoHabitat: 2,
+    insectosBiomasa: 1,
+    insectosRoba: 1,
+    manadaPasoBiomasa: 2,
+    manadaPasoMazo: 3,
+    frutosBiomasa: 3,
+    frutosRobaRival: 1,
   }),
 
   efectosCampo: Object.freeze({

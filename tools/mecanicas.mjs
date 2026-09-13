@@ -46,6 +46,14 @@ const NUMERO_DE = {
   [RASGO.CAMPO_BOSQUE]: ['efectosCampo.bosqueCura', 'heridas que curan los saurópodos'],
   [RASGO.CAMPO_SABANA]: ['efectosCampo.sabanaBiomasa', 'Biomasa por turno a los DOS'],
   [RASGO.CAMPO_ARIDEZ]: ['efectosCampo.aridezMazo', 'cartas de mazo que pierden los DOS'],
+  [RASGO.SABANA_HELECHOS]: ['rasgos.sabanaHelechosRoba', 'cartas que robas (y descartas 1)'],
+  [RASGO.INUNDACION]: ['rasgos.inundacionMazo', 'cartas de mazo que pierden los DOS'],
+  [RASGO.CANAL_TRENZADO]: ['rasgos.canalTrenzadoCura', 'Vida que recuperan todos los tuyos'],
+  [RASGO.BOSQUE_RIBERENO]: ['rasgos.bosqueRiberenoMano', 'cartas que el rival descarta de la mano'],
+  [RASGO.NIDO]: ['rasgos.nidoRoba', 'cartas que robas'],
+  [RASGO.INSECTOS]: ['recursos.insectosBiomasa', 'Biomasa, y además robas 1'],
+  [RASGO.MANADA_PASO]: ['recursos.manadaPasoBiomasa', 'Biomasa, a cambio de 3 cartas del mazo'],
+  [RASGO.FRUTOS]: ['recursos.frutosBiomasa', 'Biomasa, y el rival roba 1'],
 };
 
 const valorDe = (ruta) => ruta.split('.').reduce((o, k) => (o === undefined ? o : o[k]), BALANCE);
@@ -98,6 +106,7 @@ export function formas() {
     costeExtra: () => 'Coste añadido',
     busca: () => 'Busca en el mazo',
     entrada: (c) => `Al entrar · ${Object.keys(c.mecanica.entrada).join(' + ')}`,
+    guardia: () => 'Guardia del hábitat',
   };
 
   const por = new Map();

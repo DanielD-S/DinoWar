@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: 3292945da11d93ec
+// huella: 700069fea07da828
 //
 // Lleva dentro estos 19 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -193,10 +193,20 @@ var RASGO = Object.freeze({
   FRACTURA: "FRACTURA",
   COMPETENCIA: "COMPETENCIA",
   MORTANDAD: "MORTANDAD",
+  // Los cinco biomas que fueron clima, ya como eventos, y un nido.
+  SABANA_HELECHOS: "SABANA_HELECHOS",
+  INUNDACION: "INUNDACION",
+  CANAL_TRENZADO: "CANAL_TRENZADO",
+  BOSQUE_RIBERENO: "BOSQUE_RIBERENO",
+  DERIVA_ARIDA: "DERIVA_ARIDA",
+  NIDO: "NIDO",
   // pulsos
   REBROTE: "REBROTE",
   CARRONA: "CARRONA",
   LAGO: "LAGO",
+  INSECTOS: "INSECTOS",
+  MANADA_PASO: "MANADA_PASO",
+  FRUTOS: "FRUTOS",
   // biomasa
   BIOMASA: "BIOMASA",
   // campo
@@ -537,6 +547,79 @@ var CARTAS = Object.freeze({
     nivel_evidencia: EVIDENCIA.DEBATIDO,
     nota_cientifica: "Algunas acumulaciones \xF3seas de la Morrison se han interpretado como mortandades masivas asociadas a sequ\xEDa o a eventos de crecida. La causa concreta de cada yacimiento sigue discuti\xE9ndose."
   }),
+  // ------------------------- eventos: los biomas que fueron clima, y un nido
+  sabana_helechos: evento({
+    id: "sabana_helechos",
+    rareza: RAREZA.COMUN,
+    binomial: "Sabana de helechos",
+    coste: 0,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.SABANA_HELECHOS,
+    rasgoNombre: "Sabana de helechos",
+    rasgoTexto: "Robas 2 cartas. Luego descartas 1 carta de tu mano al azar.",
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: "Las llanuras abiertas de la Morrison estaban dominadas por helechos y no por hierba, que no exist\xEDa. Una pradera de helecho es pasto abundante y de poca calidad: se come mucho y aprovecha poco."
+  }),
+  inundacion: evento({
+    id: "inundacion",
+    rareza: RAREZA.RARO,
+    binomial: "Llanura de inundaci\xF3n",
+    coste: 2,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.INUNDACION,
+    rasgoNombre: "Llanura de inundaci\xF3n",
+    rasgoTexto: "Ambos jugadores pierden 3 cartas del mazo. T\xFA robas 1.",
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Las llanuras de inundaci\xF3n de la Morrison se construyeron crecida a crecida: limo de desbordamiento sobre paleosuelos. Una crecida arrasa a los dos lados del r\xEDo, pero deja el suelo nuevo a quien vuelve primero."
+  }),
+  canal_trenzado: evento({
+    id: "canal_trenzado",
+    rareza: RAREZA.RARO,
+    binomial: "Canal fluvial trenzado",
+    coste: 1,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.CANAL_TRENZADO,
+    rasgoNombre: "Canal fluvial trenzado",
+    rasgoTexto: "Todos tus dinosaurios recuperan 2 de Vida.",
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Los r\xEDos de la Morrison eran trenzados: canales someros y cambiantes entre barras de arena, con agua todo el a\xF1o en los tramos principales. Donde hay agua permanente hay descanso, bebida y sombra."
+  }),
+  bosque_ribereno: evento({
+    id: "bosque_ribereno",
+    rareza: RAREZA.EPICO,
+    binomial: "Bosque de con\xEDferas ribere\xF1o",
+    coste: 2,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.BOSQUE_RIBERENO,
+    rasgoNombre: "Bosque de con\xEDferas ribere\xF1o",
+    rasgoTexto: "Tu rival descarta 2 cartas de su mano al azar.",
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: "Los bosques de galer\xEDa pegados a los r\xEDos son el \xFAnico sitio de la Morrison donde la vegetaci\xF3n cierra la vista. Una manada que se mete en ellos deja de ver venir y pierde el rastro de lo que persegu\xEDa: se infiere de la etolog\xEDa de los grandes herb\xEDvoros actuales."
+  }),
+  deriva_arida: evento({
+    id: "deriva_arida",
+    rareza: RAREZA.EPICO,
+    binomial: "Deriva \xE1rida",
+    coste: 2,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.DERIVA_ARIDA,
+    rasgoNombre: "Deriva \xE1rida",
+    rasgoTexto: "Ambos jugadores descartan la mano entera y roban otras tantas cartas.",
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "El clima de la Morrison se fue secando a lo largo del Kimmeridgiense y el Titoniense: paleosuelos con caliche, dunas al norte de la cuenca. Cuando el paisaje cambia, lo que cada uno ten\xEDa planeado deja de valer y hay que volver a empezar."
+  }),
+  nido: evento({
+    id: "nido",
+    rareza: RAREZA.COMUN,
+    binomial: "Nido con huevos",
+    coste: 1,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.NIDO,
+    rasgoNombre: "Nido con huevos",
+    rasgoTexto: "Robas 2 cartas.",
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "La Morrison conserva nidos y huevos de saur\xF3podo y de ter\xF3podo peque\xF1o, y c\xE1scaras dispersas en muchos yacimientos. Un nido es la promesa de lo que viene despu\xE9s."
+  }),
   // ------------------------------------------------------------- recursos
   rebrote: recurso({
     id: "rebrote",
@@ -567,6 +650,36 @@ var CARTAS = Object.freeze({
     rasgoTexto: "+2 Biomasa ahora mismo. Tu h\xE1bitat pierde 2 puntos.",
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "La Morrison conserva dep\xF3sitos de lagos alcalinos ef\xEDmeros de gran extensi\xF3n, como el llamado lago T\u2019oo\u2019dichi\u2019. Concentran recursos mientras duran; al secarse dejan salinas que el paisaje tarda en recuperar."
+  }),
+  insectos: recurso({
+    id: "insectos",
+    rareza: RAREZA.COMUN,
+    binomial: "Nube de insectos",
+    rasgo: RASGO.INSECTOS,
+    rasgoNombre: "Nube de insectos",
+    rasgoTexto: "+1 Biomasa ahora mismo. Robas 1 carta.",
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: "Los humedales de la Morrison sosten\xEDan nubes de insectos: hay coprolitos y \xE1mbar con restos, y los peque\xF1os ter\xF3podos y pterosaurios viv\xEDan de ellos. Comida f\xE1cil, y donde hay insectos hay m\xE1s cosas que encontrar."
+  }),
+  manada_paso: recurso({
+    id: "manada_paso",
+    rareza: RAREZA.RARO,
+    binomial: "Manada de paso",
+    rasgo: RASGO.MANADA_PASO,
+    rasgoNombre: "Manada de paso",
+    rasgoTexto: "+2 Biomasa ahora mismo. Pierdes 3 cartas de tu mazo.",
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: "Los rastros de la Morrison muestran grupos de saur\xF3podos movi\xE9ndose juntos en la misma direcci\xF3n. Una manada que cruza tu territorio deja mucho detr\xE1s, y se lleva por delante lo que hab\xEDa."
+  }),
+  frutos: recurso({
+    id: "frutos",
+    rareza: RAREZA.RARO,
+    binomial: "Frutos de c\xEDcada",
+    rasgo: RASGO.FRUTOS,
+    rasgoNombre: "Frutos de c\xEDcada",
+    rasgoTexto: "+3 Biomasa ahora mismo. Tu rival roba 1 carta.",
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: "Las c\xEDcadas y bennettitales producen semillas carnosas y arom\xE1ticas que atraen a quien las dispersa. Una cosecha as\xED no se guarda: la huele todo el mundo."
   }),
   // --------------------------------------------------------------- clima
   llanura: clima({
@@ -1158,6 +1271,247 @@ var CARTAS = Object.freeze({
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Cerat\xF3psido casmosaurino de la Formaci\xF3n Dinosaur Park, Alberta, Campaniense. Gola muy grande con dos aberturas amplias."
   }),
+  // ------------------------------------------ la ronda de las cien cartas
+  tyrannosaurus: dino({
+    id: "tyrannosaurus",
+    rareza: RAREZA.LEGENDARIO,
+    clado: CLADO.TEROPODO,
+    binomial: "Tyrannosaurus rex",
+    coste: 4,
+    ataque: 11,
+    vida: 9,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Rugido",
+    rasgoTexto: "Cuando entra en juego tu rival descarta 2 cartas de su mano al azar.",
+    mecanica: Object.freeze({ entrada: { manoRival: 2 } }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: "Tiranos\xE1urido de la Formaci\xF3n Hell Creek, Maastrichtiense. El o\xEDdo interno y la caja craneal sugieren sensibilidad a frecuencias bajas; el rugido es una licencia, los animales actuales de ese tama\xF1o no rugen."
+  }),
+  velociraptor: dino({
+    id: "velociraptor",
+    rareza: RAREZA.COMUN,
+    clado: CLADO.TEROPODO,
+    binomial: "Velociraptor mongoliensis",
+    coste: 0,
+    ataque: 3,
+    vida: 2,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Garra impaciente",
+    rasgoTexto: "Para jugarlo tienes que descartar 1 carta de tu mano.",
+    mecanica: Object.freeze({ costeExtra: { descartar: 1 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Dromeos\xE1urido de la Formaci\xF3n Djadokhta, Mongolia, Campaniense. Del tama\xF1o de un pavo y con plumas: los c\xFAbitos llevan las inserciones de las r\xE9miges."
+  }),
+  brachiosaurus: dino({
+    id: "brachiosaurus",
+    rareza: RAREZA.LEGENDARIO,
+    clado: CLADO.SAUROPODO,
+    binomial: "Brachiosaurus altithorax",
+    coste: 4,
+    ataque: 3,
+    vida: 13,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Sombra del gigante",
+    rasgoTexto: "Mientras est\xE9 en juego, todos tus dinosaurios ganan +1 de Vida.",
+    mecanica: Object.freeze({ aura: { clado: TODOS, vida: 1 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Saur\xF3podo de la Morrison, raro en el registro. Patas delanteras m\xE1s largas que las traseras y cuello alzado: com\xEDa donde ning\xFAn otro llegaba."
+  }),
+  argentinosaurus: dino({
+    id: "argentinosaurus",
+    rareza: RAREZA.EPICO,
+    clado: CLADO.SAUROPODO,
+    binomial: "Argentinosaurus huinculensis",
+    coste: 4,
+    ataque: 4,
+    vida: 14,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Peso muerto",
+    rasgoTexto: "Para jugarlo tienes que descartar 2 cartas de tu mano.",
+    mecanica: Object.freeze({ costeExtra: { descartar: 2 } }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: "Titanosaurio de la Formaci\xF3n Huincul, Argentina, Cenomaniense. Se conoce por unas pocas v\xE9rtebras y una tibia; la masa estimada, de 65 a 75 toneladas, es de las mayores de cualquier animal terrestre."
+  }),
+  mamenchisaurus: dino({
+    id: "mamenchisaurus",
+    rareza: RAREZA.RARO,
+    clado: CLADO.SAUROPODO,
+    binomial: "Mamenchisaurus hochuanensis",
+    coste: 4,
+    ataque: 1,
+    vida: 11,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Cuello sin fin",
+    rasgoTexto: "Al final de tu turno recupera 1 de Vida.",
+    mecanica: Object.freeze({ regenera: { propia: 1 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Saur\xF3podo de la Formaci\xF3n Shaximiao, China, Jur\xE1sico Superior. Diecinueve v\xE9rtebras cervicales: el cuello m\xE1s largo en proporci\xF3n al cuerpo de cualquier saur\xF3podo conocido."
+  }),
+  amargasaurus: dino({
+    id: "amargasaurus",
+    rareza: RAREZA.RARO,
+    clado: CLADO.SAUROPODO,
+    binomial: "Amargasaurus cazadorensis",
+    coste: 2,
+    ataque: 2,
+    vida: 5,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Reba\xF1o de cuellos",
+    rasgoTexto: "Gana +1 de Vida por cada saur\xF3podo que tengas en juego, este incluido.",
+    mecanica: Object.freeze({ cuenta: { que: QUE.CLADO, ambos: false, vida: 1 } }),
+    nivel_evidencia: EVIDENCIA.DEBATIDO,
+    nota_cientifica: "Dicreos\xE1urido de la Formaci\xF3n La Amarga, Argentina, Barremiense. Las espinas neurales b\xEDfidas del cuello se han interpretado como vela, como defensa y como estructura de exhibici\xF3n; no hay consenso."
+  }),
+  ankylosaurus: dino({
+    id: "ankylosaurus",
+    rareza: RAREZA.LEGENDARIO,
+    clado: CLADO.TIREOFORO,
+    binomial: "Ankylosaurus magniventris",
+    coste: 4,
+    ataque: 2,
+    vida: 12,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Maza de cola",
+    rasgoTexto: "Devuelve 4 de da\xF1o a quien lo hiera en combate.",
+    mecanica: Object.freeze({ espinas: 4 }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Anquilos\xE1urido de Hell Creek, Maastrichtiense. La maza caudal est\xE1 formada por osteodermos fusionados sobre v\xE9rtebras r\xEDgidas; los modelos biomec\xE1nicos le dan fuerza para romper hueso."
+  }),
+  kentrosaurus: dino({
+    id: "kentrosaurus",
+    rareza: RAREZA.COMUN,
+    clado: CLADO.TIREOFORO,
+    binomial: "Kentrosaurus aethiopicus",
+    coste: 1,
+    ataque: 1,
+    vida: 3,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "P\xFAas de hombro",
+    rasgoTexto: "Devuelve 1 de da\xF1o a quien lo hiera en combate.",
+    mecanica: Object.freeze({ espinas: 1 }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Estegos\xE1urido de la Formaci\xF3n Tendaguru, Tanzania, Kimmeridgiense: contempor\xE1neo de la Morrison al otro lado del mundo. P\xFAas largas en la cola y una par en los hombros o la cadera."
+  }),
+  euoplocephalus: dino({
+    id: "euoplocephalus",
+    rareza: RAREZA.RARO,
+    clado: CLADO.TIREOFORO,
+    binomial: "Euoplocephalus tutus",
+    coste: 3,
+    ataque: 2,
+    vida: 8,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "P\xE1rpados de hueso",
+    rasgoTexto: "No le afectan las cartas de evento de tu rival.",
+    mecanica: Object.freeze({ inmune: INMUNE.EVENTO }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Anquilos\xE1urido de la Formaci\xF3n Dinosaur Park, Alberta, Campaniense. Ten\xEDa p\xE1rpados \xF3seos: un osteodermo articulado que cerraba sobre el ojo."
+  }),
+  triceratops: dino({
+    id: "triceratops",
+    rareza: RAREZA.EPICO,
+    clado: CLADO.MARGINOCEFALO,
+    binomial: "Triceratops horridus",
+    coste: 4,
+    ataque: 5,
+    vida: 8,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Tres cuernos",
+    rasgoTexto: "Cuando entra en juego manda al descarte 1 dinosaurio rival de hasta 3 de Vida.",
+    mecanica: Object.freeze({ entrada: { fulmina: 3 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Cerat\xF3psido de Hell Creek y Lance, Maastrichtiense. Las lesiones cicatrizadas en golas y cuernos de otros Triceratops indican combates entre ellos con los cuernos."
+  }),
+  pachycephalosaurus: dino({
+    id: "pachycephalosaurus",
+    rareza: RAREZA.RARO,
+    clado: CLADO.MARGINOCEFALO,
+    binomial: "Pachycephalosaurus wyomingensis",
+    coste: 2,
+    ataque: 3,
+    vida: 4,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Cabezazo",
+    rasgoTexto: "Cuando entra en juego hiere en 3 al dinosaurio de enfrente.",
+    mecanica: Object.freeze({ entrada: { emboscada: 3 } }),
+    nivel_evidencia: EVIDENCIA.DEBATIDO,
+    nota_cientifica: "Paquicefalos\xE1urido de Hell Creek y Lance, Maastrichtiense. La c\xFApula de 25 cm de hueso macizo se ha interpretado como arma de topetazo; las lesiones en c\xFApulas de varios ejemplares lo apoyan, la estructura interna lo discute."
+  }),
+  iguanodon: dino({
+    id: "iguanodon",
+    rareza: RAREZA.RARO,
+    clado: CLADO.ORNITOPODO,
+    binomial: "Iguanodon bernissartensis",
+    coste: 2,
+    ataque: 3,
+    vida: 5,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Manada de Bernissart",
+    rasgoTexto: "Gana +1 de Ataque por cada Iguanodon en juego, sea de quien sea y este incluido.",
+    mecanica: Object.freeze({ cuenta: { que: QUE.MISMA, ambos: true, ataque: 1 } }),
+    nivel_evidencia: EVIDENCIA.DEBATIDO,
+    nota_cientifica: "Ornit\xF3podo del Barremiense de B\xE9lgica. Los m\xE1s de treinta esqueletos de la mina de Bernissart se interpretaron como una manada muerta a la vez; hoy se cree que se acumularon en varios episodios."
+  }),
+  parasaurolophus: dino({
+    id: "parasaurolophus",
+    rareza: RAREZA.RARO,
+    clado: CLADO.ORNITOPODO,
+    binomial: "Parasaurolophus walkeri",
+    coste: 3,
+    ataque: 2,
+    vida: 8,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Llamada resonante",
+    rasgoTexto: "Cuando entra en juego robas 1 carta y tu h\xE1bitat recupera 1 punto.",
+    mecanica: Object.freeze({ entrada: { roba: 1, curaHabitat: 1 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Hadros\xE1urido de la Formaci\xF3n Dinosaur Park, Alberta, Campaniense. La cresta tubular es un resonador: los modelos ac\xFAsticos le dan una nota grave, en torno a los 30 Hz."
+  }),
+  pteranodon: dino({
+    id: "pteranodon",
+    rareza: RAREZA.COMUN,
+    clado: CLADO.PTEROSAURIO,
+    binomial: "Pteranodon longiceps",
+    coste: 0,
+    ataque: 2,
+    vida: 2,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Planeo",
+    rasgoTexto: "Cuando entra en juego pierdes 1 carta de tu mazo y robas 1.",
+    mecanica: Object.freeze({ entrada: { muelePropio: 1, roba: 1 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Pterosaurio de la Niobrara, Kansas, Santoniense, con m\xE1s de mil ejemplares conocidos. Envergadura de hasta seis metros y sin dientes: pescaba en un mar interior."
+  }),
+  quetzalcoatlus: dino({
+    id: "quetzalcoatlus",
+    rareza: RAREZA.EPICO,
+    clado: CLADO.PTEROSAURIO,
+    binomial: "Quetzalcoatlus northropi",
+    coste: 3,
+    ataque: 5,
+    vida: 4,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Sombra en la llanura",
+    rasgoTexto: "Cuando entra en juego tu rival pierde 3 cartas del mazo.",
+    mecanica: Object.freeze({ entrada: { mueleRival: 3 } }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: "Azd\xE1rquido de la Formaci\xF3n Javelina, Texas, Maastrichtiense. Envergadura de diez metros y patas largas: se le reconstruye cazando a pie por la llanura, como una cig\xFCe\xF1a gigante."
+  }),
+  elasmosaurus: dino({
+    id: "elasmosaurus",
+    rareza: RAREZA.RARO,
+    clado: CLADO.MARINO,
+    binomial: "Elasmosaurus platyurus",
+    coste: 3,
+    ataque: 2,
+    vida: 9,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Cuello de vig\xEDa",
+    rasgoTexto: "Resta 1 a cada golpe que llegue a tu h\xE1bitat.",
+    mecanica: Object.freeze({ guardia: { habitat: 1 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Plesiosaurio de la Niobrara, Kansas, Campaniense. Setenta y dos v\xE9rtebras cervicales, m\xE1s que ning\xFAn otro animal conocido; el cuello era poco flexible y probablemente serv\xEDa para acercarse a los bancos de peces desde abajo."
+  }),
   // ------------------------------------------------------------- biomasa
   // La única carta que no se juega para HACER algo, sino para poder hacerlo:
   // da Biomasa y te cuesta una carta de tu propio mazo. Es la decisión que la
@@ -1520,7 +1874,18 @@ var BALANCE = Object.freeze({
     golaVida: 2,
     manadaVida: 1,
     trampaMazoRival: 5,
-    trampaMazoPropio: 3
+    trampaMazoPropio: 3,
+    // La ronda de las cien cartas: los cinco biomas que fueron clima, como
+    // eventos, y un nido. Ninguno señala a nadie: caen sobre la mesa entera.
+    sabanaHelechosRoba: 2,
+    sabanaHelechosDescarta: 1,
+    inundacionMazo: 3,
+    // cartas que pierden LOS DOS
+    inundacionRoba: 1,
+    canalTrenzadoCura: 2,
+    bosqueRiberenoMano: 2,
+    // cartas que el rival descarta de la mano
+    nidoRoba: 2
   }),
   // Cartas de recurso: Biomasa inmediata con inconveniente. Atacan el atasco de mano,
   // que venía de robar 2 por turno con una renta de 1 acumulativo.
@@ -1530,7 +1895,13 @@ var BALANCE = Object.freeze({
     carronaBiomasa: 3,
     carronaBiomasaRival: 1,
     lagoBiomasa: 2,
-    lagoHabitat: 2
+    lagoHabitat: 2,
+    insectosBiomasa: 1,
+    insectosRoba: 1,
+    manadaPasoBiomasa: 2,
+    manadaPasoMazo: 3,
+    frutosBiomasa: 3,
+    frutosRobaRival: 1
   }),
   efectosCampo: Object.freeze({
     // La Sequía dura TRES turnos y muele UNA carta a cada jugador por turno.
@@ -2520,7 +2891,47 @@ function aplicarPresion(s, p) {
       herir(s, inst.iid, BALANCE.rasgos.mortandadDano, CAUSA.MORTANDAD, p.jugador);
     }
     ev(s, "PRESION", { jugador: p.jugador, cardId });
+  } else if (r === RASGO.SABANA_HELECHOS) {
+    robar(s, p.jugador, BALANCE.rasgos.sabanaHelechosRoba);
+    descartarAlAzar(s, p.jugador, BALANCE.rasgos.sabanaHelechosDescarta);
+    ev(s, "PRESION", { jugador: p.jugador, cardId });
+  } else if (r === RASGO.INUNDACION) {
+    perderDelMazo(s, contrario, BALANCE.rasgos.inundacionMazo);
+    perderDelMazo(s, p.jugador, BALANCE.rasgos.inundacionMazo);
+    robar(s, p.jugador, BALANCE.rasgos.inundacionRoba);
+    ev(s, "PRESION", { jugador: p.jugador, cardId });
+  } else if (r === RASGO.CANAL_TRENZADO) {
+    for (const inst of unidadesDe(s, p.jugador)) {
+      inst.heridas = Math.max(0, inst.heridas - BALANCE.rasgos.canalTrenzadoCura);
+    }
+    ev(s, "PRESION", { jugador: p.jugador, cardId });
+  } else if (r === RASGO.BOSQUE_RIBERENO) {
+    descartarAlAzar(s, contrario, BALANCE.rasgos.bosqueRiberenoMano);
+    ev(s, "PRESION", { jugador: p.jugador, cardId });
+  } else if (r === RASGO.DERIVA_ARIDA) {
+    for (const j of [contrario, p.jugador]) {
+      const jug = s.jugadores[j];
+      const n = jug.mano.length;
+      jug.descarte.push(...jug.mano);
+      jug.mano = [];
+      robar(s, j, n);
+    }
+    ev(s, "PRESION", { jugador: p.jugador, cardId });
+  } else if (r === RASGO.NIDO) {
+    robar(s, p.jugador, BALANCE.rasgos.nidoRoba);
+    ev(s, "PRESION", { jugador: p.jugador, cardId });
   }
+}
+function descartarAlAzar(s, j, n) {
+  const jug = s.jugadores[j];
+  let quitadas = 0;
+  for (let k = 0; k < n && jug.mano.length > 0; k++) {
+    const d = entero(s.rng, jug.mano.length);
+    s.rng = d.rng;
+    jug.descarte.push(jug.mano.splice(d.valor, 1)[0]);
+    quitadas += 1;
+  }
+  return quitadas;
 }
 function faseCombate(s) {
   if (s.turno < BALANCE.turnoPrimerCombate) {
@@ -2837,6 +3248,15 @@ function aplicarRecurso(s, j, iid) {
   } else if (r === RASGO.LAGO) {
     jug.biomasa += P.lagoBiomasa;
     jug.habitat -= P.lagoHabitat;
+  } else if (r === RASGO.INSECTOS) {
+    jug.biomasa += P.insectosBiomasa;
+    robar(s, j, P.insectosRoba);
+  } else if (r === RASGO.MANADA_PASO) {
+    jug.biomasa += P.manadaPasoBiomasa;
+    perderDelMazo(s, j, P.manadaPasoMazo);
+  } else if (r === RASGO.FRUTOS) {
+    jug.biomasa += P.frutosBiomasa;
+    robar(s, rival(j), P.frutosRobaRival);
   }
   ev(s, "RECURSO", { jugador: j, cardId, biomasa: jug.biomasa });
 }
@@ -3260,6 +3680,22 @@ function valorDeAccion(vista, j, a) {
       } else if (r === RASGO.MORTANDAD) {
         const mueren = (bando) => unidadesDe(vista, bando).filter((u) => vidaActual(vista, u.iid) <= BALANCE.rasgos.mortandadDano).length;
         delta = (mueren(contrario) - mueren(j)) * IA.pesoTrofeo / IA.pesoDano;
+      } else if (r === RASGO.SABANA_HELECHOS) {
+        delta = BALANCE.rasgos.sabanaHelechosRoba * 0.7 - BALANCE.rasgos.sabanaHelechosDescarta * 0.5;
+      } else if (r === RASGO.NIDO) {
+        delta = BALANCE.rasgos.nidoRoba * 0.7;
+      } else if (r === RASGO.INUNDACION) {
+        const acerca = BALANCE.rasgos.inundacionMazo / Math.max(1, mazoDe(vista, contrario));
+        const arriesga = BALANCE.rasgos.inundacionMazo / Math.max(1, mazoDe(vista, j));
+        delta = (acerca - arriesga) * IA.pesoTrofeo / IA.pesoDano * 3 + BALANCE.rasgos.inundacionRoba * 0.7;
+      } else if (r === RASGO.CANAL_TRENZADO) {
+        delta = unidadesDe(vista, j).reduce((n, u) => n + Math.min(u.heridas, BALANCE.rasgos.canalTrenzadoCura), 0) * 0.5;
+      } else if (r === RASGO.BOSQUE_RIBERENO) {
+        delta = Math.min(BALANCE.rasgos.bosqueRiberenoMano, vista.jugadores[contrario].mano.length) * 0.6;
+      } else if (r === RASGO.DERIVA_ARIDA) {
+        const mia = vista.jugadores[j].mano.filter((iid) => iid !== a.iid);
+        const impagables = mia.filter((iid) => carta(vista.instancias[iid].cardId).coste > vista.jugadores[j].biomasa + 2).length;
+        delta = (vista.jugadores[contrario].mano.length - mia.length) * 0.4 + impagables * 0.4;
       }
       return delta * IA.pesoDano * 2 - c.coste * IA.pesoCoste;
     }
@@ -3280,6 +3716,18 @@ function valorDeAccion(vista, j, a) {
       if (r === RASGO.LAGO) {
         gana = P.lagoBiomasa;
         cuesta = P.lagoHabitat * IA.pesoHabitat;
+      }
+      if (r === RASGO.INSECTOS) {
+        gana = P.insectosBiomasa;
+        cuesta = -P.insectosRoba * 0.7;
+      }
+      if (r === RASGO.MANADA_PASO) {
+        gana = P.manadaPasoBiomasa;
+        cuesta = P.manadaPasoMazo * 0.15;
+      }
+      if (r === RASGO.FRUTOS) {
+        gana = P.frutosBiomasa;
+        cuesta = P.frutosRobaRival * 0.8;
       }
       const biomasa2 = vista.jugadores[j].biomasa;
       const desbloquea = vista.jugadores[j].mano.filter((iid) => {

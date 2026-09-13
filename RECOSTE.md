@@ -90,9 +90,18 @@ revisión viene a arreglar.
 | competencia | Competencia trófica | Evento | Épica | 3 | 3 |  |  | Competencia trófica | −2 de Vida a dos dinosaurios rivales que elijas. |  |
 | trampa | Trampa de depredadores | Evento | Rara | 1 | 1 |  |  | Trampa de depredadores | El rival pierde 5 cartas de su mazo. Tú pierdes 3: el fango no distingue. |  |
 | mortandad | Mortandad estacional | Evento | Legendaria | 1 | 1 |  |  | Mortandad estacional | 3 de daño a TODOS los dinosaurios del campo, incluidos los tuyos. |  |
+| sabana_helechos | Sabana de helechos | Evento | Común | 0 | 0 |  |  | Sabana de helechos | Robas 2 cartas. Luego descartas 1 carta de tu mano al azar. |  |
+| inundacion | Llanura de inundación | Evento | Rara | 2 | 2 |  |  | Llanura de inundación | Ambos jugadores pierden 3 cartas del mazo. Tú robas 1. |  |
+| canal_trenzado | Canal fluvial trenzado | Evento | Rara | 1 | 1 |  |  | Canal fluvial trenzado | Todos tus dinosaurios recuperan 2 de Vida. |  |
+| bosque_ribereno | Bosque de coníferas ribereño | Evento | Épica | 2 | 2 |  |  | Bosque de coníferas ribereño | Tu rival descarta 2 cartas de su mano al azar. |  |
+| deriva_arida | Deriva árida | Evento | Épica | 2 | 2 |  |  | Deriva árida | Ambos jugadores descartan la mano entera y roban otras tantas cartas. |  |
+| nido | Nido con huevos | Evento | Común | 1 | 1 |  |  | Nido con huevos | Robas 2 cartas. |  |
 | rebrote | Rebrote tras incendio | Recurso | Rara | 0 | 0 |  |  | Rebrote tras incendio | +2 Biomasa ahora mismo. Todos tus dinosaurios reciben 1 herida. |  |
 | carrona | Carroña abundante | Recurso | Legendaria | 0 | 0 |  |  | Carroña abundante | +3 Biomasa ahora mismo. El rival gana 1 Biomasa. |  |
 | lago | Lago efímero | Recurso | Épica | 0 | 0 |  |  | Lago efímero | +2 Biomasa ahora mismo. Tu hábitat pierde 2 puntos. |  |
+| insectos | Nube de insectos | Recurso | Común | 0 | 0 |  |  | Nube de insectos | +1 Biomasa ahora mismo. Robas 1 carta. |  |
+| manada_paso | Manada de paso | Recurso | Rara | 0 | 0 |  |  | Manada de paso | +2 Biomasa ahora mismo. Pierdes 3 cartas de tu mazo. |  |
+| frutos | Frutos de cícada | Recurso | Rara | 0 | 0 |  |  | Frutos de cícada | +3 Biomasa ahora mismo. Tu rival roba 1 carta. |  |
 | llanura | Crecida estacional | Clima | Épica | 1 | 1 |  |  | Crecida estacional | Mientras esté en el campo, cada jugador puede cambiar una carta de su mano por otra del mazo, una vez por turno. |  |
 | canal | Bruma de valle | Clima | Legendaria | 1 | 1 |  |  | Bruma de valle | +1 de Vida a todos los dinosaurios del campo, mientras siga en el campo. |  |
 | bosque | Estación de lluvias | Clima | Legendaria | 1 | 1 |  |  | Estación de lluvias | Los saurópodos curan 1 herida al final de cada turno. |  |
@@ -133,6 +142,22 @@ revisión viene a arreglar.
 | bienosaurus | Bienosaurus lufengensis | Tireóforo | Común | 1 | 1 | 1 | 3 | Cría acorazada | Gana +1 de Vida por cada tireóforo que tengas en juego, este incluido. |  |
 | shuangmiaosaurus | Shuangmiaosaurus gilmorei | Ornitópodo | Común | 2 | 2 | 2 | 4 | Ramoneo de orilla | Cuando entra en juego tu hábitat recupera 1 punto. |  |
 | chasmosaurus | Chasmosaurus belli | Marginocéfalo | Común | 2 | 2 | 2 | 4 | Vigía de la gola | Cuando entra en juego robas 1 carta. |  |
+| tyrannosaurus | Tyrannosaurus rex | Terópodo | Legendaria | 4 | 4 | 11 | 9 | Rugido | Cuando entra en juego tu rival descarta 2 cartas de su mano al azar. |  |
+| velociraptor | Velociraptor mongoliensis | Terópodo | Común | 0 | 0 | 3 | 2 | Garra impaciente | Para jugarlo tienes que descartar 1 carta de tu mano. |  |
+| brachiosaurus | Brachiosaurus altithorax | Saurópodo | Legendaria | 4 | 4 | 3 | 13 | Sombra del gigante | Mientras esté en juego, todos tus dinosaurios ganan +1 de Vida. |  |
+| argentinosaurus | Argentinosaurus huinculensis | Saurópodo | Épica | 4 | 4 | 4 | 14 | Peso muerto | Para jugarlo tienes que descartar 2 cartas de tu mano. |  |
+| mamenchisaurus | Mamenchisaurus hochuanensis | Saurópodo | Rara | 4 | 4 | 1 | 11 | Cuello sin fin | Al final de tu turno recupera 1 de Vida. |  |
+| amargasaurus | Amargasaurus cazadorensis | Saurópodo | Rara | 2 | 2 | 2 | 5 | Rebaño de cuellos | Gana +1 de Vida por cada saurópodo que tengas en juego, este incluido. |  |
+| ankylosaurus | Ankylosaurus magniventris | Tireóforo | Legendaria | 4 | 4 | 2 | 12 | Maza de cola | Devuelve 4 de daño a quien lo hiera en combate. |  |
+| kentrosaurus | Kentrosaurus aethiopicus | Tireóforo | Común | 1 | 1 | 1 | 3 | Púas de hombro | Devuelve 1 de daño a quien lo hiera en combate. |  |
+| euoplocephalus | Euoplocephalus tutus | Tireóforo | Rara | 3 | 3 | 2 | 8 | Párpados de hueso | No le afectan las cartas de evento de tu rival. |  |
+| triceratops | Triceratops horridus | Marginocéfalo | Épica | 4 | 4 | 5 | 8 | Tres cuernos | Cuando entra en juego manda al descarte 1 dinosaurio rival de hasta 3 de Vida. |  |
+| pachycephalosaurus | Pachycephalosaurus wyomingensis | Marginocéfalo | Rara | 2 | 2 | 3 | 4 | Cabezazo | Cuando entra en juego hiere en 3 al dinosaurio de enfrente. |  |
+| iguanodon | Iguanodon bernissartensis | Ornitópodo | Rara | 2 | 2 | 3 | 5 | Manada de Bernissart | Gana +1 de Ataque por cada Iguanodon en juego, sea de quien sea y este incluido. |  |
+| parasaurolophus | Parasaurolophus walkeri | Ornitópodo | Rara | 3 | 3 | 2 | 8 | Llamada resonante | Cuando entra en juego robas 1 carta y tu hábitat recupera 1 punto. |  |
+| pteranodon | Pteranodon longiceps | Pterosaurio | Común | 0 | 0 | 2 | 2 | Planeo | Cuando entra en juego pierdes 1 carta de tu mazo y robas 1. |  |
+| quetzalcoatlus | Quetzalcoatlus northropi | Pterosaurio | Épica | 3 | 3 | 5 | 4 | Sombra en la llanura | Cuando entra en juego tu rival pierde 3 cartas del mazo. |  |
+| elasmosaurus | Elasmosaurus platyurus | Reptil marino | Rara | 3 | 3 | 2 | 9 | Cuello de vigía | Resta 1 a cada golpe que llegue a tu hábitat. |  |
 | biomasa | Pradera de helechos | Biomasa | Común | 0 | 0 |  |  | Pradera de helechos | +1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno. |  |
 | araucarias | Bosque de araucarias | Biomasa | Común | 0 | 0 |  |  | Bosque de araucarias | +1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno. |  |
 | ginkgos | Arboleda de ginkgos | Biomasa | Común | 0 | 0 |  |  | Arboleda de ginkgos | +1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno. |  |
