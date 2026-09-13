@@ -644,3 +644,147 @@ se distinguen todos entre sí. Se sirven a 192 px y pesan 14 KB cada uno.
 - Ni la curva de coste ni el medidor de 50/50: son CSS y ya están.
 - Ni las cartas del editor: salen de `cartaHTML()` con su marco.
 - Ni botones: los del pie usan `boton_ancho.webp` y las chapas del menú.
+
+## Las piezas de la Cuenca
+
+La Cuenca es la pantalla con más juego dentro —un jefe con miles de Vida, un
+yacimiento que produce solo, una tribu con almacén— y la que menos lo enseña:
+seis recuadros de texto en columna. El marco del diseño es un **equipo de
+excavación** trabajando una cuenca sedimentaria, y eso es lo que las piezas
+tienen que contar. Son **nueve**: un fondo, un marco para el jefe, cuatro
+estados del yacimiento, la bandeja de fósiles, el medallón de excavador y el
+sello del jefe caído. El icono del fósil es el décimo y es pequeño.
+
+Lo que NO se pide: la barra de Vida del jefe reutiliza el canal y el relleno
+del hábitat, que ya existen; los medallones de clado de los mazos valen para
+decir de qué es cada compañero; las cartas de jefe se pintan con su marco.
+
+### El bloque de MATERIAL (copiar literal)
+
+El mismo de las placas del menú y de los mazos. Adjuntar `placa_de_mazo.png`
+como referencia y pedir «mismo material, misma luz».
+
+> Pieza de interfaz de videojuego, vista de frente, sin perspectiva. Roca
+> oscura pulida con vetas minerales y filete de latón viejo con el canto
+> biselado, iluminación lateral suave que marque el relieve, sin brillos
+> especulares fuertes. Paleta: negro, gris piedra, latón `#d9a441` y oro
+> viejo. Sin texto, sin letras, sin números, sin marca de agua. Fondo
+> **magenta puro `#FF00FF`** fuera de la pieza, sin sombra proyectada.
+
+### 1 · El fondo: el yacimiento a cielo abierto
+
+> Paleoarte fotorrealista, render 3D cinematográfico, calidad de documental
+> de historia natural. Una excavación paleontológica a cielo abierto vista
+> desde arriba y de frente, a última hora de la tarde: una ladera de roca
+> sedimentaria en capas ocres y rojizas con un lecho de huesos de dinosaurio
+> medio expuestos, cuadrícula de cuerdas y estacas, andamio de madera, dos
+> tiendas de lona y cajas de embalaje, herramientas apoyadas. Luz cálida y
+> rasante, sombras largas, polvo en el aire. Sin personas, sin texto, sin
+> marca de agua. Composición vertical 9:16, con el tercio central tranquilo
+> para leer texto encima.
+
+Exportar a lo más vertical que dé el generador; se sirve a **1080 de ancho**
+como `fondo_mazos`.
+
+### 2 · El marco del jefe
+
+La ilustración del jefe ya existe —es la de su carta— y va dentro de un
+marco de museo, apaisado, con una cartela debajo donde el juego escribe el
+nombre. Como la placa de mazo: **la ventana y la cartela son huecos vacíos**
+que el CSS rellena, y la herramienta mide dónde caen.
+
+> [MATERIAL] Marco de vitrina de museo de historia natural, horizontal, de
+> proporción 3:2 en la ventana. Un hueco rectangular apaisado de 3:2 que
+> ocupa casi todo el marco, **relleno de magenta puro**, con un filete de
+> latón alrededor y remaches en las esquinas. Debajo del hueco, pegada al
+> marco, una cartela rectangular estrecha de latón mate, lisa, **también
+> rellena de magenta**, para grabar un nombre. Los bordes del marco en roca
+> oscura con vetas.
+
+Exportar a **1024 px de ancho**. Se sirve a 768.
+
+### 3 · El yacimiento en cuatro estados
+
+El yacimiento sube del nivel 1 al 8 y hoy es una cifra. Que se VEA crecer es
+lo que Tribal Wars hace bien y lo único que se le coge: cuatro imágenes,
+una por cada dos niveles, del mismo sitio cada vez más excavado. Se piden
+las cuatro en una conversación, con la misma frase, y sólo cambia el estado.
+La primera manda: las otras tres son ediciones de ella.
+
+> Paleoarte fotorrealista, render 3D cinematográfico, calidad de documental
+> de historia natural. Vista frontal ligeramente elevada de un mismo
+> afloramiento de roca sedimentaria ocre, encuadre fijo, luz cálida de tarde,
+> cielo naranja pálido. Composición apaisada 2:1. Sin personas, sin texto,
+> sin marca de agua. {ESTADO}
+
+| fichero | {ESTADO} |
+|---|---|
+| `yacimiento_1` | Estado inicial: la roca intacta, una sola pala y un pico apoyados, una cuerda de cuadrícula clavada, ningún hueso a la vista. |
+| `yacimiento_2` | Primera zanja abierta en la roca con dos huesos grandes asomando, cuadrícula de cuerdas completa, una tienda pequeña al fondo. |
+| `yacimiento_3` | Zanja ancha y profunda con un esqueleto parcial expuesto y protegido con yeso, andamio de madera, dos tiendas y cajas de embalaje. |
+| `yacimiento_4` | Excavación grande en terrazas con varios esqueletos expuestos, andamios, un cobertizo de madera, cajas apiladas y un pequeño raíl con vagoneta. |
+
+Exportar a **1536×768** o lo más cercano; se sirven a 768 de ancho y se
+pintan a 342 en el bloque del yacimiento.
+
+### 4 · La bandeja de fósiles
+
+El depósito que se llena. Se pide LLENA y el CSS la va destapando de
+izquierda a derecha con `clip-path` según el porcentaje: una sola imagen.
+
+> [MATERIAL] Bandeja de madera rectangular apaisada de proporción 4:1, vista
+> de frente y un poco desde arriba, llena hasta el borde de fósiles pequeños
+> ordenados: vértebras, dientes, fragmentos de hueso y un amonites,
+> etiquetados con etiquetas blancas en blanco. Bordes de la bandeja con
+> cantoneras de latón. Nada fuera de la bandeja.
+
+Exportar a **1024 px de ancho**. Se sirve a 768.
+
+### 5 · El medallón de excavador
+
+Para los compañeros de tribu en la tabla de daño: un medallón como los de
+clado, con el mismo borde, y el símbolo del oficio.
+
+> [MATERIAL] Emblema circular, un medallón de latón viejo con el borde
+> biselado, y en el centro la silueta maciza, en relieve, de un pico y un
+> pincel de paleontólogo cruzados en aspa, reconocible a tamaño de icono,
+> sin detalle interior. Formas gruesas. Nada fuera del círculo.
+
+Exportar a **256×256**. Se pinta a 22 px.
+
+### 6 · El sello del jefe caído
+
+Cuando el jefe cae, su marco lleva un sello encima, como el lacre de «en
+uso» pero de otro material: cayó, es historia, va al museo.
+
+> [MATERIAL] Sello circular de cera roja oscura con la impronta de un cráneo
+> de terópodo de perfil en el centro, el borde de la cera irregular como cera
+> de verdad, ligeramente en relieve, con una grieta atravesándolo. Sin texto.
+> Nada fuera del círculo.
+
+Exportar a **256×256**. Se pinta a 40 px, girado.
+
+### 7 · El icono del fósil
+
+El recurso de la Cuenca no tiene icono: «1240 fósiles» es texto. Va en la
+barra de arriba junto a la cifra, como el trofeo y la biomasa en el HUD.
+
+> [MATERIAL] Icono pequeño y macizo de un amonites fósil visto de frente, en
+> latón viejo con el espiral marcado en relieve, formas gruesas, legible a
+> 12 px. Nada alrededor.
+
+Exportar a **256×256**. Se sirve a 96, como los del HUD.
+
+### Lo que llegó
+
+Las diez, en una tarde. El marco del jefe trajo la ventana y la cartela en
+magenta como se pidió y la herramienta las midió: ventana al 7,9 % del
+borde con el 84,5 % del ancho, cartela al 25,8 % con el 48,4 %. La bandeja
+llegó llena y se destapa por CSS. Los yacimientos, los cuatro con el mismo
+encuadre, que era lo difícil.
+
+### Después de generar
+
+Dejar los originales en **`src/piel/cuenca/`** con esos nombres. La
+herramienta es `tools/cuenca.py`, hermana de `tools/mazos.py`: keyea el
+magenta, escala, y mide la ventana y la cartela del marco del jefe.

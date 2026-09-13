@@ -43,6 +43,7 @@ import {
 import { invocar } from './ui/efectos.js';
 import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio, musica, precargarMusica, enSegundoPlano } from './ui/audio.js';
 import { montarTacto } from './ui/tacto.js';
+import { arte } from './ui/art.js';
 import { mostrarMarca, empezarCarga, precargarPiezas } from './ui/carga.js';
 
 const APP = Object.freeze({
@@ -822,6 +823,7 @@ function premioTexto(n, cobro = null) {
  */
 function pintarFin({ via, gane, titular, frase }) {
   const [p, r] = estado.jugadores;
+  el.finInforme.innerHTML = '';
   el.finVia.textContent = via;
   el.finTitulo.textContent = titular;
   el.finTitulo.style.color = gane ? 'var(--acento-claro)' : 'var(--rival)';
@@ -935,12 +937,16 @@ function cerrarAsalto(gane) {
   });
   el.finPremio.textContent = `${estimado} de daño a ${jefe.nombre}…`;
   sonido(gane ? 'gana' : 'pierde');
+  // El informe: la vitrina del jefe con su Vida tal como estaba al empezar.
+  // Cuando el servidor conteste, la barra baja hasta lo que quede.
+  informeDeAsalto(jefe, jefe.vida, estimado, false);
 
   asaltar({ ...(partida ?? {}), dano: estimado })
     .then((r) => {
       el.finPremio.textContent = r.cayo
         ? `${jefe.nombre} ha caído. Reclama su carta en la Cuenca.`
         : `${r.dano} de daño a ${jefe.nombre}. No paga dinomonedas: esto es para la tribu.`;
+      informeDeAsalto(jefe, r.vida, r.dano, r.cayo);
       return pintarCuenca();
     })
     .catch((e) => {
@@ -949,6 +955,34 @@ function cerrarAsalto(gane) {
       el.finPremio.textContent = `No se pudo registrar el asalto: ${e.message}`;
     });
   return true;
+}
+
+/**
+ * El informe del asalto en la pantalla de fin: la vitrina del jefe y su barra
+ * de Vida bajando con tu daño. Se pinta dos veces: primero con la Vida que
+ * tenía al empezar, y al contestar el servidor con la que queda, así que la
+ * transición de la barra es literalmente lo que acabas de quitarle.
+ */
+function informeDeAsalto(jefe, vidaQueQueda, dano, cayo) {
+  const vida = Math.max(0, Number.isFinite(vidaQueQueda) ? vidaQueQueda : jefe.vida);
+  const pct = jefe.vidaMaxima > 0 ? (100 * vida) / jefe.vidaMaxima : 0;
+  const barra = el.finInforme.querySelector('.cu-vida i');
+  if (barra) {
+    // Ya está pintado: sólo baja la barra y cambia las cifras.
+    barra.style.width = `${pct.toFixed(1)}%`;
+    el.finInforme.querySelector('.cu-vida b').innerHTML = `${Math.round(vida).toLocaleString('es')} <small>/ ${jefe.vidaMaxima.toLocaleString('es')}</small>`;
+    el.finInforme.querySelector('.cu-datos b').textContent = Math.round(dano).toLocaleString('es');
+    if (cayo) el.finInforme.querySelector('.cu-vitrina')?.insertAdjacentHTML('beforeend', '<i class="cu-sello-caido" title="Ha caído"></i>');
+    return;
+  }
+  el.finInforme.innerHTML = `
+    <div class="cu-vitrina">
+      <div class="cu-vitrina-ventana">${arte(jefe.recompensa)}</div>
+      <div class="cu-vitrina-cartela"><i>${jefe.nombre}</i></div>
+    </div>
+    <div class="cu-vida"><i style="width:${pct.toFixed(1)}%"></i>
+      <b>${Math.round(vida).toLocaleString('es')} <small>/ ${jefe.vidaMaxima.toLocaleString('es')}</small></b></div>
+    <div class="cu-datos"><span><b>${Math.round(dano).toLocaleString('es')}</b><small>de daño en este asalto</small></span></div>`;
 }
 
 // ------------------------------------------------------------------ arranque
