@@ -19,6 +19,7 @@ import { pathToFileURL } from 'node:url';
 import { CARTAS, CARTAS_DE_JEFE } from '../src/data/cards.js';
 import { BALANCE } from '../src/data/balance.js';
 import { ECONOMIA, coleccionInicial } from '../src/data/coleccion.js';
+import { limiteDe } from '../src/data/coleccion.js';
 
 export const SALIDA = 'supabase/migrations/0006_catalogo_cartas.sql';
 
@@ -102,7 +103,7 @@ export function generar() {
   const cartas = coleccionables();
   L.push('insert into public.catalogo_cartas (card_id, tipo, rareza, copias_max, valor_fusion, es_jefe) values');
   L.push(`${cartas.map((c) => `  (${sql(c.id)}, ${sql(c.tipo)}, ${sql(c.rareza)}, `
-    + `${BALANCE.copiasPorRareza[c.rareza]}, ${ECONOMIA.fusion[c.rareza]}, ${c.jefe})`).join(',\n')}`);
+    + `${limiteDe(c.id)}, ${ECONOMIA.fusion[c.rareza]}, ${c.jefe})`).join(',\n')}`);
   L.push('on conflict (card_id) do update set');
   L.push('  tipo = excluded.tipo, rareza = excluded.rareza,');
   L.push('  copias_max = excluded.copias_max, valor_fusion = excluded.valor_fusion,');

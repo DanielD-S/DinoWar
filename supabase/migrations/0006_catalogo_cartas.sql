@@ -106,6 +106,7 @@ insert into public.catalogo_cartas (card_id, tipo, rareza, copias_max, valor_fus
   ('bienosaurus', 'DINOSAURIO', 'COMUN', 3, 4, false),
   ('shuangmiaosaurus', 'DINOSAURIO', 'COMUN', 3, 4, false),
   ('chasmosaurus', 'DINOSAURIO', 'COMUN', 3, 4, false),
+  ('biomasa', 'BIOMASA', 'COMUN', 7, 4, false),
   ('jefe_saurophaganax', 'DINOSAURIO', 'LEGENDARIO', 1, 100, true),
   ('jefe_barosaurus', 'DINOSAURIO', 'LEGENDARIO', 1, 100, true)
 on conflict (card_id) do update set
@@ -116,14 +117,14 @@ on conflict (card_id) do update set
 insert into public.catalogo_inicial (card_id, copias) values
   ('dryosaurus', 3),
   ('ornitholestes', 3),
-  ('ceratosaurus', 3),
+  ('ceratosaurus', 2),
   ('nodosaurus', 2),
   ('stegosaurus', 3),
   ('allosaurus', 2),
   ('camarasaurus', 2),
   ('riparovenator', 2),
   ('lokiceratops', 1),
-  ('brachylophosaurus', 3),
+  ('brachylophosaurus', 2),
   ('huaxiadraco', 2),
   ('diplodocus', 1),
   ('apatosaurus', 1),
@@ -140,7 +141,8 @@ insert into public.catalogo_inicial (card_id, copias) values
   ('mortandad', 1),
   ('crecimiento_acelerado', 1),
   ('neumaticidad', 1),
-  ('competencia', 1)
+  ('competencia', 1),
+  ('biomasa', 7)
 on conflict (card_id) do update set copias = excluded.copias;
 
 delete from public.catalogo_inicial where card_id not in (
@@ -170,7 +172,8 @@ delete from public.catalogo_inicial where card_id not in (
   'mortandad',
   'crecimiento_acelerado',
   'neumaticidad',
-  'competencia'
+  'competencia',
+  'biomasa'
 );
 
 delete from public.catalogo_cartas where card_id not in (
@@ -240,6 +243,7 @@ delete from public.catalogo_cartas where card_id not in (
   'bienosaurus',
   'shuangmiaosaurus',
   'chasmosaurus',
+  'biomasa',
   'jefe_saurophaganax',
   'jefe_barosaurus'
 );
@@ -247,7 +251,7 @@ delete from public.catalogo_cartas where card_id not in (
 insert into public.catalogo_economia
   (id, precio_sobre, cartas_por_sobre, monedas_inicio, monedas_victoria,
    monedas_derrota, tamano_mazo, mazos_maximo)
-values (1, 100, 5, 240, 50, 0, 50, 12)
+values (1, 100, 5, 240, 50, 0, 55, 12)
 on conflict (id) do update set
   precio_sobre = excluded.precio_sobre,
   cartas_por_sobre = excluded.cartas_por_sobre,

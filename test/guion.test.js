@@ -49,9 +49,6 @@ const CALLADOS = {
   SIN_COMBATE: 'el primer turno no pelea y el mensaje ya lo dice',
   ADAPTACION_PERDIDA: 'el objetivo ya no está; no hay a quién señalar',
 
-  // Sólo existe en la variante de economía por CARTAS, que no se publica: el
-  // juego corre siempre en FIJA. Si algún día se publica, necesita compás.
-  BIOMASA: 'sólo en la economía por cartas, que no se juega',
 };
 
 /** Los tipos que el motor emite de verdad, leídos del código. */

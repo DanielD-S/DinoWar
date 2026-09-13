@@ -25,6 +25,7 @@ import { EFECTOS, esEntrada, valorDeEntrada, HAY_ENTRADAS } from '../src/engine/
 import { CON_ENTRADA } from '../sim/entradas.js';
 import { mazoCon } from '../sim/carta.mjs';
 import { tablero, poner, enMano, ejecutar, vivo } from './helpers.js';
+import { limiteDe } from '../src/data/coleccion.js';
 
 // Las DOS de jefe entran en la cuenta a propósito. Viven en CARTAS_DE_JEFE, no
 // en CARTAS, y por eso se quedaron planas y sin texto cuando se aplanó el set:
@@ -93,8 +94,11 @@ test('Las etiquetas de las mecánicas son las del vocabulario', () => {
 });
 
 test('El soporte conserva su rasgo: sin él no sería una carta', () => {
+  // 17 desde que existe la Pradera de helechos: clima, evento, recurso y ahora
+  // biomasa. Vale para ella igual que para las otras — lleva rasgo, nombre y
+  // texto, y no lleva `mecanica`, que es de criaturas.
   const soporte = Object.values(CARTAS).filter((c) => c.tipo !== TIPO.DINOSAURIO);
-  assert.equal(soporte.length, 16);
+  assert.equal(soporte.length, 17);
   for (const c of soporte) {
     assert.notEqual(c.rasgo, 'NINGUNO', `${c.id} se quedó sin mecánica`);
     assert.ok(c.rasgoNombre && c.rasgoTexto, `${c.id} no tiene nombre o texto`);
@@ -126,8 +130,8 @@ test('El medidor de una carta arma un mazo legal', () => {
     const total = mazo.reduce((n, [, c]) => n + c, 0);
     assert.equal(total, BALANCE.tamanoMazo, `${id}: el mazo suma ${total}`);
     for (const [cid, copias] of mazo) {
-      assert.ok(copias <= BALANCE.copiasPorRareza[carta(cid).rareza],
-        `${id}: ${cid} lleva ${copias} y su rareza no lo permite`);
+      assert.ok(copias <= limiteDe(cid),
+        `${id}: ${cid} lleva ${copias} y su tope es ${limiteDe(cid)}`);
     }
     assert.ok(mazo.some(([cid]) => cid === id), `${id} no está en su propio mazo`);
   }

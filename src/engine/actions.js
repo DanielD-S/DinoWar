@@ -17,9 +17,18 @@ import {
   esCartaDeBiomasa, dietaDeCarta,
 } from './economia.js';
 import {
-  ev, descartarDeMano,
+  ev, descartarDeMano, perderDelMazo,
   faseRenta, faseRobo, faseRevelacion, faseCombate, faseChequeo,
 } from './resolve.js';
+
+/**
+ * Cuántas cartas de Biomasa caben en un turno. Depende de la economía activa
+ * porque cada una trae las suyas, y tenerlo en un sitio evita que validar y
+ * aplicar acaben discrepando.
+ */
+const topeDeBiomasa = () => (modoEconomia() === MODO.CARTAS
+  ? BALANCE.economia.cartas.porTurno
+  : BALANCE.biomasa.porTurno);
 
 export const ACCION = Object.freeze({
   DESPLEGAR: 'DESPLEGAR',
@@ -146,10 +155,13 @@ export function validar(s, a) {
   }
 
   if (a.tipo === ACCION.BIOMASA) {
-    if (modoEconomia() !== MODO.CARTAS) return 'aquí la Biomasa no se juega, se cobra';
     if (!esCartaDeBiomasa(inst.cardId)) return 'esa carta no da Biomasa';
-    if (jug.biomasaJugadaEsteTurno >= BALANCE.economia.cartas.porTurno) {
-      return 'ya has bajado tu recurso de este turno';
+    // Dos economías bajan cartas de Biomasa y cada una tiene su tope. En CARTAS
+    // es el mazo de tierras de la variante; en FIJA —la que se publica— es la
+    // Pradera de helechos, y su «una por turno» es lo que impide que una mano
+    // cargada de ellas se convierta en un turno de cuatro despliegues.
+    if (jug.biomasaJugadaEsteTurno >= topeDeBiomasa()) {
+      return 'ya has bajado tu Biomasa de este turno';
     }
     return null;
   }
@@ -303,12 +315,18 @@ export function reduce(state, action) {
     // cartas de recurso del set: la Biomasa que da se gasta este mismo turno.
     case ACCION.BIOMASA: {
       const cardId = s.instancias[action.iid].cardId;
-      const t = BALANCE.economia.cartas;
+      const enCartas = modoEconomia() === MODO.CARTAS;
+      const da = enCartas ? BALANCE.economia.cartas.valor : BALANCE.biomasa.da;
+      const muele = enCartas ? 0 : BALANCE.biomasa.muele;
       jug.mano = jug.mano.filter((x) => x !== action.iid);
       jug.descarte.push(action.iid);
       jug.biomasaJugadaEsteTurno += 1;
-      ingresar(jug, t.valor, dietaDeCarta(cardId) ?? DIETA.HERBIVORO);
-      ev(s, 'BIOMASA', { jugador: action.jugador, cardId, biomasa: jug.biomasa });
+      ingresar(jug, da, dietaDeCarta(cardId) ?? DIETA.HERBIVORO);
+      ev(s, 'BIOMASA', { jugador: action.jugador, cardId, biomasa: jug.biomasa, muele });
+      // El precio, DESPUÉS de cobrar: sin esto la carta sería renta regalada, y
+      // lo medido dice que regalar Biomasa dispara la bola de nieve. Lo que la
+      // hace una decisión es que acelerar hoy te acorte el mazo.
+      if (muele > 0) perderDelMazo(s, action.jugador, muele);
       break;
     }
 

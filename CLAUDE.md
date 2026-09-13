@@ -733,6 +733,57 @@ Y sigue sin poderse medir con `sim/carta.mjs`: está en el mazo de referencia
 con su única copia y devuelve el 50,0 % de comparar un mazo consigo mismo.
 Lo que dice algo es `sim/climas.js`.
 
+## La Biomasa también es una carta
+
+La **Pradera de helechos** es la única carta que no se juega para HACER algo,
+sino para poder hacerlo: da 1 de Biomasa y te cuesta 1 carta de tu propio mazo.
+Máximo 7 copias, una por turno, y el mazo pasó de 50 a **55 cartas** para
+hacerle sitio.
+
+**Por qué una carta y no subir la renta**, que era lo barato y lo primero que se
+midió. Regalar Biomasa da los mismos números y dispara la bola de nieve: con
+renta +3 sube al 71,4 %, por encima del techo, y con arranque de 5 al 70,9 %.
+La carta no, porque ocupa sitio en tu mazo y en tu mano y te cuesta otra carta.
+Es Biomasa que elegiste y pagaste, no que cayó del cielo, así que no infla a
+quien va ganando.
+
+Medido sobre 4.000 partidas y dos semillas, con 7 copias en un mazo de 55: los
+trofeos bajan del 60 al 36 % de las victorias y el jugador inicial sube de 45,9
+a 48,3 %. **Ojo con ese último número**: `BALANCE.md` corre 2.000 partidas y ahí
+sale 47,5 %, o sea fallando el objetivo por medio punto. No es que una medición
+mienta, es que el valor real está justo en la raya del 48 % y el resultado
+cambia de signo con el tamaño de la muestra. Si alguien lo da por cumplido,
+que mire cuántas partidas midió.
+
+Lo que NO arregla: la extinción sigue en 0 % y el reparto de vías sigue fuera de
+objetivo. Molerte a ti mismo te acerca a TI a perder, no al rival, así que esa
+vía necesita cartas que muerdan el mazo de enfrente —como ya hace la Trampa de
+depredadores— y no ésta.
+
+Tres cosas del código que conviene saber antes de tocarlo:
+
+- **El tope de copias sale de `limiteDe()`, no de la rareza.** Esta carta es
+  común y admite 7, y es la primera del set con `copiasMax` propio. Había SEIS
+  sitios leyendo `BALANCE.copiasPorRareza` a mano, uno de ellos el validador del
+  servidor: con ese sin tocar, el navegador te deja guardar el mazo y el
+  servidor lo rechaza, la partida se juega y no se cobra. Ahora todos pasan por
+  la misma función.
+- **La IA tiene una reserva de mazo** (`BALANCE.ia.mazoDeReserva`). Sin ella
+  cambia su última carta por un punto de Biomasa y pierde por extinción, que es
+  el peor rival posible: uno que se suicida. Con las partidas acabando a 12
+  turnos y treinta y pico cartas en el mazo, ese freno no se toca nunca en juego
+  normal; está para el caso raro.
+- **Los mazos de los dos jefes también son de 55** y también llevan Biomasa,
+  cinco cada uno. Se les sumaron en vez de recortarles copias: esas dos listas
+  son temáticas y están escritas a mano, y quitarles cartas cambiaría qué mazo
+  es cada uno.
+
+Y la factura, dicha para que no sorprenda: al aplicar `0011_biomasa.sql`, **todo
+jugador con un mazo guardado tiene que reeditarlo**, porque sumaba 50 y ahora un
+mazo son 55. La migración le regala las 7 Praderas para que pueda, pero no le
+completa el mazo: elegir qué lleva es suya. Con ocho jugadores y cinco mazos es
+un rato; con ochocientos no se haría, y por eso el cambio se hizo con ocho.
+
 ## Una carta son DOS cifras: Ataque y Vida
 
 La Defensa existió y se quitó. Era una **resta plana e invisible** contra un

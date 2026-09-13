@@ -14,7 +14,7 @@ import {
 import { QUE, CUANDO, TODOS } from '../data/mecanicas.js';
 import { ACCION, legales } from './actions.js';
 import { DIETA } from '../data/dietas.js';
-import { puedePagar, dietaDeCarta } from './economia.js';
+import { puedePagar, dietaDeCarta, MODO, modoActual as modoEconomia } from './economia.js';
 import { elegir } from './rng.js';
 
 export const PERFIL = Object.freeze({
@@ -188,11 +188,18 @@ function valorDeAccion(vista, j, a) {
   const contrario = rival(j);
 
   switch (a.tipo) {
-    // Bajar el recurso del turno es como jugar la tierra en Magic: casi nunca
+    // Bajar la Biomasa del turno es como jugar la tierra en Magic: casi nunca
     // hay nada mejor que hacer con esa acción, porque no compite con jugar
     // cartas — compite con no poder jugarlas el turno que viene.
-    case ACCION.BIOMASA:
+    //
+    // Con el mazo en las últimas deja de compensar, y por un margen enorme: la
+    // Pradera muerde tu propio mazo, así que la última copia se cambia por un
+    // punto de Biomasa y la derrota por extinción.
+    case ACCION.BIOMASA: {
+      const muele = modoEconomia() === MODO.CARTAS ? 0 : BALANCE.biomasa.muele;
+      if (muele > 0 && vista.jugadores[j].mazo.length <= IA.mazoDeReserva) return -Infinity;
       return 100;
+    }
 
     // Declarar producción no cuesta nada, así que la pregunta no es «¿vale la
     // pena?» sino «¿de cuál me falta?». Se mira la mano: qué tipo desbloquea

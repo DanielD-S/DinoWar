@@ -18,6 +18,7 @@ import { decidir, PERFIL } from '../../../src/engine/ai.js';
 import { semilla } from '../../../src/engine/rng.js';
 import { BALANCE } from '../../../src/data/balance.js';
 import { existeCarta, carta } from '../../../src/data/cards.js';
+import { limiteDe } from '../../../src/data/coleccion.js';
 import { parteVacio, anotarEventos, nuevosEventos, cerrarParte } from '../../../src/data/misiones.js';
 
 /** Topes de gasto. Un cliente hostil manda listas enormes para quemar CPU. */
@@ -51,8 +52,12 @@ export function validarMazoLegal(mazo) {
       throw new PartidaInvalida('carta desconocida', cardId);
     }
     if (!Number.isInteger(copias) || copias <= 0) throw new PartidaInvalida('copias inválidas', cardId);
-    const tope = BALANCE.copiasPorRareza[carta(cardId).rareza];
-    if (copias > tope) throw new PartidaInvalida('copias por encima de la rareza', cardId);
+    // `limiteDe` y no la rareza a pelo: hay cartas con tope propio —hoy la
+    // Pradera de helechos, con 7— y un servidor que mire sólo la rareza
+    // rechaza un mazo que el navegador dejó guardar. La partida se juega y no
+    // se cobra, y nadie se entera hasta que alguien mira los logs.
+    const tope = limiteDe(cardId);
+    if (copias > tope) throw new PartidaInvalida('copias por encima del tope de la carta', cardId);
     total += copias;
   }
   if (total !== BALANCE.tamanoMazo) {

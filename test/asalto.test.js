@@ -175,7 +175,7 @@ test('No se puede quemar CPU con una lista enorme', () => {
 
 test('El mazo tiene que ser legal', () => {
   assert.ok(validarMazoDeAsalto(MAZO_OK));
-  falla({ ...ENVIO, mazo: [['allosaurus', 50]] }, /rareza/);
+  falla({ ...ENVIO, mazo: [['allosaurus', 50]] }, /tope/);
   falla({ ...ENVIO, mazo: [['no_existe_este_bicho', 50]] }, /desconocida/);
   falla({ ...ENVIO, mazo: [['allosaurus', 2]] }, /cartas exactas/);
   falla({ ...ENVIO, mazo: [] }, /ausente/);

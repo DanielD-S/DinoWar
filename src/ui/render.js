@@ -204,7 +204,7 @@ function claseFamilia(cardId) {
   const t = carta(cardId).tipo;
   if (t === TIPO.EVENTO) return ' evento no-dino';
   if (t === TIPO.CLIMA) return ' clima no-dino';
-  if (t === TIPO.RECURSO) return ' recurso no-dino';
+  if (t === TIPO.RECURSO || t === TIPO.BIOMASA) return ' recurso no-dino';
   return '';
 }
 
@@ -215,7 +215,12 @@ function claseFamilia(cardId) {
  * son 16 cartas, y a 83 px la rareza la cuenta mejor la colección.
  */
 const RAREZA_MARCO = { COMUN: 'comun', RARO: 'rara', EPICO: 'epica', LEGENDARIO: 'legendaria' };
-const FAMILIA_MARCO = { CLIMA: 'clima', EVENTO: 'evento', RECURSO: 'recurso' };
+// La Biomasa comparte el marco de los recursos y no estrena uno: es lo que es,
+// una carta que se baja, da y se va. Un marco propio para una sola carta sería
+// un fichero más que mantener a cambio de nada.
+export const FAMILIA_MARCO = Object.freeze({
+  CLIMA: 'clima', EVENTO: 'evento', RECURSO: 'recurso', BIOMASA: 'recurso',
+});
 function claseMarco(cardId) {
   const c = carta(cardId);
   if (CARTAS_DE_JEFE[cardId]) return ' m-dino_jefe jefe';
