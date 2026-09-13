@@ -17,6 +17,16 @@ en 1,2 MB; a 23 en 2,3 y no se le nota en un móvil. Se recorta a TOPE
 segundos por el principio, que el final es el que importa: es sobre el
 último fotograma donde se pinta la carta.
 
+Y se le quita la marca de agua. Kling la pone en la esquina de abajo a la
+derecha —«KlingAI 3.0», logo incluido— y no escala con el cuadro: medida
+sobre los nueve originales, en los de 1176×784 ocupa 138×26 píxeles a 28 del
+borde derecho y 23 del de abajo, y en los de 1108×828 146×28 a 28 y 21. Por
+eso MARCA va en píxeles desde la esquina y no en porcentaje. El filtro
+`delogo` de ffmpeg no recorta imagen: rellena el rectángulo con lo que hay
+alrededor. A tamaño real no se nota; a tres aumentos, sobre cielo liso, se
+intuye el contorno. Va ANTES de escalar, que a más resolución el relleno se
+difumina mejor y luego se comprime una sola vez.
+
 El nombre es el `id` de la carta, igual que en las ilustraciones: la apertura
 busca `assets/video/<id>.mp4` y, si no existe, voltea la carta sin más.
 Hace falta ffmpeg en el PATH (`scoop install ffmpeg`).
@@ -34,6 +44,9 @@ DESTINO = RAIZ / 'assets' / 'video'
 ANCHO = 960
 CRF = 27
 TOPE = 10.0
+# La marca de agua, en píxeles desde la esquina de abajo a la derecha, con
+# margen sobre lo medido. `delogo` exige que el rectángulo no toque el borde.
+MARCA = {'derecha': 24, 'abajo': 17, 'ancho': 154, 'alto': 36}
 EXTENSIONES = {'.mp4', '.mov', '.webm', '.mkv', '.m4v'}
 
 
@@ -57,7 +70,14 @@ def medir(ruta):
     }
 
 
-def convertir(entrada, salida, dura):
+def sin_marca(ancho, alto):
+    x = ancho - MARCA['derecha'] - MARCA['ancho']
+    y = alto - MARCA['abajo'] - MARCA['alto']
+    return f"delogo=x={x}:y={y}:w={MARCA['ancho']}:h={MARCA['alto']}"
+
+
+def convertir(entrada, salida, m):
+    dura = m['dura']
     orden = ['ffmpeg', '-y', '-loglevel', 'error']
     if dura > TOPE:
         # Se quita el principio, no el final: el último fotograma es el que
@@ -65,7 +85,7 @@ def convertir(entrada, salida, dura):
         orden += ['-ss', f'{dura - TOPE:.3f}']
     orden += [
         '-i', str(entrada),
-        '-vf', f'scale={ANCHO}:-2', '-r', '24',
+        '-vf', f"{sin_marca(m['ancho'], m['alto'])},scale={ANCHO}:-2", '-r', '24',
         '-c:v', 'libx264', '-crf', str(CRF), '-preset', 'slow', '-profile:v', 'main',
         '-pix_fmt', 'yuv420p', '-an', '-movflags', '+faststart',
         str(salida),
@@ -95,7 +115,7 @@ def main(escribir):
         m = medir(f)
         origen = f"{m['ancho']}×{m['alto']}, {m['dura']:.1f} s, {m['kb'] // 1024}.{m['kb'] % 1024 * 10 // 1024} MB"
         if escribir:
-            convertir(f, destino, m['dura'])
+            convertir(f, destino, m)
             s = medir(destino)
             print(f"{f.name}: {origen} -> {destino.relative_to(RAIZ)} "
                   f"{s['ancho']}×{s['alto']}, {s['dura']:.1f} s, {s['kb']} KB")
