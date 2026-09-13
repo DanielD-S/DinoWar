@@ -51,6 +51,7 @@ hay que hacer caso cuando el test lo dice.
 | `assets/video/*.mp4` | `python tools/videos.py escribir` | — |
 | El commit anclado en `desde-url.ts` | `node tools/anclar-desde-url.mjs` | `test/anclaje.test.js` |
 | `assets/piel/efectos/*.webp` | `python tools/efectos.py escribir` | `test/efectos.test.js` |
+| `assets/piel/mazos/*.webp` y la ventana de `.mazo-ventana` | `python tools/mazos.py escribir` | — |
 
 Y las migraciones **no las aplica nadie solo**: `supabase/migrations/` es el
 registro de lo que la base de datos DEBERÍA tener, no de lo que tiene.
@@ -558,6 +559,37 @@ cierra en horizontal porque trae el horizonte arriba.
 Para verlo sin jugar: `_banco_efectos.html` en la raíz —fuera del repositorio—
 enseña el tablero con los botones de cada efecto. Con `prefers-reduced-motion`
 no se crea nada de lo que se mueve; las hojas sí.
+
+## Los mazos: placas, rejilla y una portada que se calcula
+
+[`src/ui/mazos.js`](src/ui/mazos.js) es la lista y el editor, fuera de
+`meta.js` desde que tienen piel. Las trece piezas —placa, sello, siete
+medallones de clado, tres de tipo y el fondo— llegan en magenta a
+`src/piel/mazos/` y `python tools/mazos.py escribir` las keyea con la función
+de los marcos y **mide la ventana de la portada** en porcentaje de la placa:
+esos números son los de `.mazo-ventana` en `style.css`. La placa se pinta a
+`100% 100%` sobre una caja con su misma proporción y no en nueve tajadas,
+porque un `border-image` estiraría la ventana con la banda.
+
+Tres decisiones que no se ven en el código a la primera:
+
+- **La portada se calcula**: la criatura de más rareza del mazo, y a igual
+  rareza la más cara. Elegirla a mano pide guardar un id más por mazo, y
+  `guardar_mazo` sólo acepta el mapa de cartas —el servidor lo valida clave a
+  clave—. El día que se quiera es una columna en `mazos`, no un truco en el
+  jsonb.
+- **El emblema es el clado dominante** contado sobre las criaturas; un mazo
+  sin criaturas lleva el tipo de soporte que más repite. `autocompletar()`
+  rellena por ese clado primero, luego el resto de criaturas y luego el
+  soporte, de barato a caro.
+- **Borrar pide confirmación en la propia fila** y no se puede borrar el
+  último mazo: un jugador sin mazo no puede jugar. `borrarMazo()` existía en
+  `perfil.js` desde las cuentas y no tenía botón.
+
+En el editor la curva de coste es un filtro —cada barra un botón— y la
+búsqueda repinta al escribir devolviendo el foco con el cursor al final, que
+sin eso cada letra cerraba el teclado del móvil. Para verlo sin cuenta:
+`_banco_mazos.html`, fuera del repositorio, siembra un perfil en la caché.
 
 ## `transform` es una sola propiedad, y quien la escribe último gana
 

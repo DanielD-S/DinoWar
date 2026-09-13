@@ -21,13 +21,13 @@ import {
 } from '../data/coleccion.js';
 import { cargarPerfil, perfilInicial } from './almacen.js';
 import {
-  PRUEBAS, comprarSobre as pedirSobre, fundir, guardarMazo, usarMazo, cobrarPartida,
+  PRUEBAS, comprarSobre as pedirSobre, fundir, cobrarPartida,
   traerMisiones, misionesDeHoy,
 } from './perfil.js';
 import { misionesDelDia } from '../data/misiones.js';
-import { arte } from './art.js';
 import { fichaHTML, abrirFicha, cartaHTML } from './render.js';
 import { ceremoniaDeSobre } from './apertura.js';
+import { montarMazos } from './mazos.js';
 
 const id = (s) => document.getElementById(s);
 
@@ -39,7 +39,6 @@ const ORDEN = [RAREZA.LEGENDARIO, RAREZA.EPICO, RAREZA.RARO, RAREZA.COMUN];
 let dom = null;
 let volverAlMenu = () => {};
 let filtro = null;          // rareza mostrada en la colección, null = todas
-let editando = null;        // { indice, nombre, cartas } mientras se edita
 
 export function montarMeta(alVolver) {
   volverAlMenu = alVolver;
@@ -55,7 +54,7 @@ export function montarMeta(alVolver) {
   };
 
   for (const b of document.querySelectorAll('[data-volver]')) {
-    b.addEventListener('click', () => { editando = null; volverAlMenu(); });
+    b.addEventListener('click', () => volverAlMenu());
   }
 
   dom.filtros.addEventListener('click', (e) => {
@@ -77,6 +76,7 @@ export function montarMeta(alVolver) {
 
   dom.btnFundir.addEventListener('click', fundirSobrantes);
   dom.btnAbrir.addEventListener('click', comprarSobre);
+  montarMazos({ titulo: dom.mazosTitulo, cuerpo: dom.mazosCuerpo, pie: dom.mazosPie, alPintarMenu: pintarMenu });
 
   pintarMenu();
 }
@@ -457,205 +457,9 @@ async function celebrar(tirada, antesDeAbrir) {
 
 // ------------------------------------------------------------------ mazos
 
-export function abrirMazos() {
-  editando = null;
-  pintarMazos();
-  return dom.mazos;
-}
-
-function pintarMazos() {
-  if (editando) return pintarEditor();
-
-  const p = cargarPerfil();
-  dom.mazosTitulo.textContent = 'Mazos';
-  dom.mazosCuerpo.innerHTML = p.mazos.map((m, i) => {
-    const v = validarMazo(m.cartas, p.cartas);
-    return `<div class="mazo-ficha ${i === p.activo ? 'activo' : ''}">
-      <span class="nom">${m.nombre}</span>
-      <span class="n ${v.valido ? '' : 'mal'}">${v.total}/${TAM_MAZO}</span>
-      <button class="accion" data-usar="${i}" ${v.valido ? '' : 'disabled'}>${i === p.activo ? 'en uso' : 'usar'}</button>
-      <button class="accion" data-editar="${i}">editar</button>
-    </div>`;
-  }).join('');
-
-  dom.mazosPie.innerHTML = `<p class="meta-nota">El mazo en uso es el que llevas a la partida.
-    Son ${TAM_MAZO} cartas exactas, y de cada carta caben tantas copias como diga su rareza.</p>
-    <button class="boton-grande" data-nuevo>Mazo nuevo</button>`;
-
-  dom.mazosCuerpo.onclick = (e) => {
-    const usar = e.target.closest('[data-usar]');
-    const editar = e.target.closest('[data-editar]');
-    if (usar && !usar.disabled) {
-      usar.disabled = true;
-      usarMazo(Number(usar.dataset.usar))
-        .catch((err) => { dom.mazosPie.innerHTML += `<p class="meta-nota mal">${err.message}</p>`; })
-        .finally(() => { pintarMazos(); pintarMenu(); });
-    }
-    if (editar) {
-      const i = Number(editar.dataset.editar);
-      editando = { indice: i, nombre: p.mazos[i].nombre, cartas: { ...p.mazos[i].cartas } };
-      pintarEditor();
-    }
-  };
-  dom.mazosPie.onclick = (e) => {
-    if (!e.target.closest('[data-nuevo]')) return;
-    editando = { indice: -1, nombre: `Mazo ${p.mazos.length + 1}`, cartas: {} };
-    pintarEditor();
-  };
-}
-
-/** Reparto de costes del mazo, en cubos de 0 a 7+. */
-function curvaDeCoste(mazo) {
-  const cubos = Array.from({ length: 8 }, () => 0);
-  for (const [cardId, copias] of Object.entries(mazo)) {
-    if (!CARTAS[cardId] || copias <= 0) continue;
-    cubos[Math.min(7, carta(cardId).coste)] += copias;
-  }
-  return cubos;
-}
-
-function curvaHTML(mazo) {
-  const cubos = curvaDeCoste(mazo);
-  const alto = Math.max(1, ...cubos);
-  return `<div class="mazo-curva">${cubos.map((n, i) => {
-    const pct = Math.round((100 * n) / alto);
-    // El color sube con la barra: dice de un vistazo dónde se acumula el mazo.
-    const nivel = n === 0 ? 0 : Math.min(3, Math.floor((4 * n) / (alto + 0.01)));
-    return `<span class="cb" title="${n} cartas de coste ${i === 7 ? '7 o más' : i}">
-      <i class="n${nivel}" style="height:${pct}%"></i>
-      <em>${i === 7 ? '7+' : i}</em>
-    </span>`;
-  }).join('')}</div>`;
-}
-
-/**
- * Una fila del editor. `libres` = copias que aún caben. El apagado de las que
- * están al máximo sólo tiene sentido mirando la colección —ahí dice «de esta ya
- * no puedes meter más»—; en la lista del mazo apagaría casi todo.
- */
-function filaEditor(c, n, tope, p, apagarLlenas) {
-  const libres = tope - n;
-  return `<div class="mazo-fila ${apagarLlenas && n >= tope ? 'lleno' : ''}">
-    <span class="coste">${c.coste}</span>
-    <span class="mini" data-card="${c.id}">${arte(c.id)}</span>
-    <span class="nom ${esDino(c) ? 'dino' : ''}">${c.binomial}
-      <span class="sub"><span class="col-rar rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span> · ${familia(c)}
-        · tienes ${p.cartas[c.id]}</span></span>
-    <span class="mazo-chip ${n > 0 ? 'puestas' : ''}">${n > 0 ? `${n} en mazo` : `${libres} libre${libres === 1 ? '' : 's'}`}</span>
-    <span class="mazo-paso">
-      <button data-menos="${c.id}" ${n === 0 ? 'disabled' : ''} aria-label="Quitar una copia">−</button>
-      <button data-mas="${c.id}" ${n >= tope ? 'disabled' : ''} aria-label="Añadir una copia">+</button>
-    </span>
-  </div>`;
-}
-
-function pintarEditor() {
-  const p = cargarPerfil();
-  const v = validarMazo(editando.cartas, p.cartas);
-  dom.mazosTitulo.textContent = 'Editar mazo';
-  const pestana = editando.pestana ?? 'mazo';
-
-  // Sólo se listan las cartas que tienes: un editor que enseña lo que no
-  // puedes poner es un catálogo, y para eso está la colección.
-  const tuyas = catalogo().filter((c) => (p.cartas[c.id] ?? 0) > 0);
-  const topeDe = (c) => Math.min(limiteDe(c.id), p.cartas[c.id] ?? 0);
-  const enMazo = tuyas.filter((c) => (editando.cartas[c.id] ?? 0) > 0)
-    .sort((a, b) => a.coste - b.coste || a.binomial.localeCompare(b.binomial));
-  const lista = pestana === 'mazo' ? enMazo : tuyas;
-  const distintas = enMazo.length;
-
-  dom.mazosCuerpo.innerHTML = `
-    <input class="mazo-nombre" id="mazo-nombre" maxlength="24" value="${editando.nombre.replace(/"/g, '&quot;')}">
-    <div class="mazo-marcador">
-      <b class="${v.total === TAM_MAZO ? 'bien' : 'mal'}">${v.total}</b><span>/${TAM_MAZO}</span>
-      <span class="mazo-barra"><i style="width:${Math.min(100, (100 * v.total) / TAM_MAZO).toFixed(0)}%"
-            class="${v.total === TAM_MAZO ? 'bien' : ''}"></i></span>
-      <span class="mazo-distintas">${distintas} distintas</span>
-    </div>
-    ${curvaHTML(editando.cartas)}
-    <div class="mazo-pestanas">
-      <button class="chip ${pestana === 'mazo' ? 'on' : ''}" data-pestana="mazo">En el mazo · ${v.total}</button>
-      <button class="chip ${pestana === 'anadir' ? 'on' : ''}" data-pestana="anadir">Tu colección · ${tuyas.length}</button>
-    </div>
-    ${lista.length === 0
-    ? '<p class="desc-vacio">El mazo está vacío. Cambia a «Tu colección» para ir metiendo cartas.</p>'
-    : lista.map((c) => filaEditor(c, editando.cartas[c.id] ?? 0, topeDe(c), p, pestana === 'anadir')).join('')}`;
-
-  dom.mazosPie.innerHTML = `
-    ${v.problemas.length ? `<p class="meta-nota mal">${v.problemas[0]}</p>` : '<p class="meta-nota">Listo para jugar.</p>'}
-    <div class="fila">
-      <button class="boton-secundario" data-rellenar>Autocompletar</button>
-      <button class="boton-secundario" data-vaciar ${v.total === 0 ? 'disabled' : ''}>Vaciar</button>
-      <button class="boton-secundario" data-cancelar>Cancelar</button>
-    </div>
-    <button class="boton-grande" data-guardar ${v.valido ? '' : 'disabled'}>Guardar y usar</button>`;
-
-  const nombre = id('mazo-nombre');
-  nombre.oninput = () => { editando.nombre = nombre.value; };
-
-  dom.mazosCuerpo.onclick = (e) => {
-    const tab = e.target.closest('[data-pestana]');
-    const mas = e.target.closest('[data-mas]');
-    const menos = e.target.closest('[data-menos]');
-    const mini = e.target.closest('.mini[data-card]');
-    if (tab) { editando.pestana = tab.dataset.pestana; pintarEditor(); }
-    else if (mas) { const c = mas.dataset.mas; editando.cartas[c] = (editando.cartas[c] ?? 0) + 1; pintarEditor(); }
-    else if (menos) {
-      const c = menos.dataset.menos;
-      editando.cartas[c] = Math.max(0, (editando.cartas[c] ?? 0) - 1);
-      if (editando.cartas[c] === 0) delete editando.cartas[c];
-      pintarEditor();
-    } else if (mini) abrirFicha(fichaHTML(mini.dataset.card));
-  };
-
-  dom.mazosPie.onclick = (e) => {
-    if (e.target.closest('[data-cancelar]')) { editando = null; pintarMazos(); return; }
-    if (e.target.closest('[data-rellenar]')) { autocompletar(); return; }
-    if (e.target.closest('[data-vaciar]')) { editando.cartas = {}; pintarEditor(); return; }
-    const g = e.target.closest('[data-guardar]');
-    if (!g || g.disabled) return;
-    // Guardar y USAR: guardarlo y dejarlo sin activar obligaba a un segundo
-    // viaje a la lista para hacer lo único que se quería hacer.
-    g.disabled = true;
-    g.textContent = 'Guardando…';
-    guardarMazo(editando.indice, editando.nombre.trim() || 'Sin nombre', editando.cartas)
-      .then(() => { editando = null; pintarMazos(); pintarMenu(); })
-      .catch((err) => {
-        // El servidor comprueba que el mazo sea TUYO, no sólo que sea legal.
-        // Si dice que no, se enseña su motivo tal cual: es el único que ha
-        // mirado la colección de verdad.
-        pintarEditor();
-        dom.mazosPie.innerHTML += `<p class="meta-nota mal">No se pudo guardar: ${err.message}</p>`;
-      });
-  };
-}
-
-/**
- * Completa el mazo hasta 50 con lo que haya, empezando por lo que menos tienes
- * repartido. No busca el mejor mazo: busca uno legal, para que nadie se quede
- * atascado a tres cartas del final contando copias a mano.
- */
-function autocompletar() {
-  const p = cargarPerfil();
-  const disponible = catalogo()
-    .map((c) => ({ id: c.id, tope: Math.min(limiteDe(c.id), p.cartas[c.id] ?? 0) }))
-    .filter((c) => c.tope > 0);
-
-  let total = totalDe(editando.cartas);
-  let movio = true;
-  while (total < TAM_MAZO && movio) {
-    movio = false;
-    for (const c of disponible) {
-      if (total >= TAM_MAZO) break;
-      const n = editando.cartas[c.id] ?? 0;
-      if (n >= c.tope) continue;
-      editando.cartas[c.id] = n + 1;
-      total += 1;
-      movio = true;
-    }
-  }
-  pintarEditor();
-}
+// Los mazos viven en mazos.js desde que la lista y el editor tienen piel y
+// rejilla; aquí sólo se montan y se re-exportan.
+export { abrirMazos } from './mazos.js';
 
 // --------------------------------------------------------------- recompensa
 
