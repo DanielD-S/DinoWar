@@ -461,10 +461,15 @@ sobre de verdad, que una copia para pruebas se queda atrás sin que nadie lo
 note.
 
 No hay lista de qué legendarias tienen vídeo: la ceremonia pide el fichero por
-el `id` y, si da error, cae a `assets/video/legendaria.mp4`, el de RELLENO,
-que hoy es el del mosasaurio copiado con otro nombre para que toda legendaria
-tenga algo mientras llegan los suyos. Si tampoco está, voltea la carta como
-cualquier otra. Cuando los ocho tengan el suyo, el relleno sobra. Los precarga al
+el `id` y, si da error, voltea la carta como cualquier otra. Sólo las seis
+legendarias con criatura lo tienen; las de soporte —climas, eventos,
+recursos— no llevan vídeo a propósito, que no hay animal que enseñar. Hubo un
+vídeo de relleno para las que no tenían el suyo y se quitó: el autor prefiere
+que una legendaria sin vídeo salga sin vídeo.
+
+`tools/videos.py` pasa el nombre a minúsculas y avisa si no es el `id` de
+ninguna carta: los dos primeros lotes llegaron con `Tyrannotitan.mp4` y
+`maiasaurua.mp4`, y un vídeo mal nombrado no falla, sólo no sale nunca. Los precarga al
 empezar la ceremonia —rasgar y pasar cartas dan tiempo de sobra—. **La carta
 sale cuando el jugador CIERRA el vídeo**, con un toque o con «Ver la carta»:
 al acabar se queda en el último fotograma esperando, y quien no quiera verlo

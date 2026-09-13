@@ -27,11 +27,10 @@ usando la ilustración como referencia. El generador inventa lo de en medio.
 
 Original a `src/video/<id>.mp4` con el `id` de la carta (`mosasaurus`,
 `spinosaurus`, `antarctosaurus`…). `python tools/videos.py escribir` lo sirve
-en `assets/video/`. La apertura del sobre lo busca por el id y no hay lista.
-
-Mientras una legendaria no tenga el suyo enseña `legendaria.mp4`, el de
-relleno, que hoy es el del mosasaurio con otro nombre. Cada vídeo nuevo que
-llegue con su id sustituye al relleno para esa carta sin tocar nada más.
+en `assets/video/`. La apertura del sobre lo busca por el id y no hay lista:
+una legendaria sin vídeo sale sin vídeo. La herramienta pasa el nombre a
+minúsculas y avisa si no coincide con ninguna carta, que `Tyrannotitan.mp4`
+y `maiasaurua.mp4` no fallan, sólo no salen nunca.
 
 ## Bloque de ESTILO (copiar literal, al final del sujeto)
 

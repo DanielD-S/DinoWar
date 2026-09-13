@@ -22,6 +22,7 @@ busca `assets/video/<id>.mp4` y, si no existe, voltea la carta sin más.
 Hace falta ffmpeg en el PATH (`scoop install ffmpeg`).
 """
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -34,6 +35,13 @@ ANCHO = 960
 CRF = 27
 TOPE = 10.0
 EXTENSIONES = {'.mp4', '.mov', '.webm', '.mkv', '.m4v'}
+
+
+def ids_de_cartas():
+    """Los `id` de cards.js, leídos con una expresión regular: es Python y el
+    set es JavaScript, y para comprobar un nombre no hace falta más."""
+    fuente = (RAIZ / 'src' / 'data' / 'cards.js').read_text(encoding='utf-8')
+    return set(re.findall(r"\bid:\s*'([a-z0-9_]+)'", fuente))
 
 
 def medir(ruta):
@@ -74,8 +82,16 @@ def main(escribir):
     if escribir:
         DESTINO.mkdir(exist_ok=True)
 
+    ids = ids_de_cartas()
     for f in fuentes:
-        destino = DESTINO / f'{f.stem}.mp4'
+        # En minúsculas: la apertura pide `<id>.mp4` y el id va en minúsculas.
+        # Y contra la lista de cartas, que un vídeo con el nombre mal escrito
+        # no falla en ningún sitio: sencillamente no sale nunca. Llegaron
+        # `Tyrannotitan.mp4` y `maiasaurua.mp4` en el primer lote.
+        nombre = f.stem.lower()
+        if nombre not in ids:
+            print(f'{f.name}: ¡«{nombre}» no es el id de ninguna carta! No se enseñará. Se convierte igual.')
+        destino = DESTINO / f'{nombre}.mp4'
         m = medir(f)
         origen = f"{m['ancho']}×{m['alto']}, {m['dura']:.1f} s, {m['kb'] // 1024}.{m['kb'] % 1024 * 10 // 1024} MB"
         if escribir:

@@ -29,9 +29,6 @@ const TOQUE = 6;
 // transiciones de `.apertura-video` en style.css.
 const ENTRADA_VIDEO = 380;
 const SALIDA_VIDEO = 480;
-// Mientras no todas las legendarias tengan el suyo, las que no lo tienen
-// enseñan éste. Hoy es el del mosasaurio copiado con otro nombre.
-const VIDEO_DE_RELLENO = 'legendaria';
 
 function zigzag() {
   const pts = [];
@@ -161,11 +158,7 @@ export function ceremoniaDeSobre(contenedor, cartas) {
       v.disableRemotePlayback = true;
       v.controls = false;
       v.src = `assets/video/${c.id}.mp4`;
-      // Sin vídeo propio, el de relleno; sin ése, ninguno.
-      v.addEventListener('error', () => {
-        v.addEventListener('error', () => videos.delete(c.id), { once: true });
-        v.src = `assets/video/${VIDEO_DE_RELLENO}.mp4`;
-      }, { once: true });
+      v.addEventListener('error', () => videos.delete(c.id), { once: true });
       videos.set(c.id, v);
     }
     let presentando = false;
