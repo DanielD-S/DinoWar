@@ -478,8 +478,9 @@ los prompts están en [assets/PROMPTS_SONIDO.md](assets/PROMPTS_SONIDO.md).
 Una legendaria puede llevar un vídeo corto del animal, `assets/video/<id>.mp4`,
 que la apertura del sobre enseña a pantalla entera antes de voltear la carta.
 El original va a `src/video/` —fuera del repositorio— y `python tools/videos.py
-escribir` lo deja en H.264 a 960 de ancho, sin audio y con `faststart`: el de
-Kling llegó a 14 MB y se sirve en 1,2. Si dura más de diez segundos se corta
+escribir` lo deja en H.264 a 960 de ancho, sin audio, con `faststart` y sin
+la marca de agua de Kling, que va anclada a la esquina en píxeles y la borra
+`delogo` antes de escalar: el de Kling llegó a 14 MB y se sirve en 1,2. Si dura más de diez segundos se corta
 por el PRINCIPIO, que el último fotograma es sobre el que aparece la carta.
 
 **Para verlo sin esperar al servidor: `?ensayo=mosasaurus`.** Al entrar en
@@ -493,7 +494,7 @@ el `id` y, si da error, voltea la carta como cualquier otra. Pero sólo lo pide
 para las legendarias CON CRIATURA (`c.dino`): las de soporte —climas, eventos,
 recursos, Biomasa— no llevan vídeo a propósito, que no hay animal que enseñar,
 y pedirlo igual dejaba un 404 en la consola por cada Mortandad o Manantial que
-salía en un sobre. Las seis legendarias con criatura lo tienen todas. Hubo un
+salía en un sobre. Las nueve legendarias con criatura lo tienen todas. Hubo un
 vídeo de relleno para las que no tenían el suyo y se quitó: el autor prefiere
 que una legendaria sin vídeo salga sin vídeo.
 
