@@ -366,6 +366,9 @@ export function lineasDeLog(eventos) {
       case 'CAMPO':
         push(`<b>${bando(e.jugador)}</b> impone el clima <b>${carta(e.cardId).binomial}</b>`, e.jugador);
         break;
+      case 'CAMPO_FIN':
+        push(`El clima <b>${carta(e.cardId).binomial}</b> remite`);
+        break;
       case 'RECURSO':
         push(`<b>${bando(e.jugador)}</b> juega <b>${carta(e.cardId).binomial}</b> y sube a ${e.biomasa} de Biomasa`, e.jugador);
         break;

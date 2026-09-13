@@ -96,7 +96,7 @@ revisión viene a arreglar.
 | llanura | Crecida estacional | Clima | Épica | 1 | 1 |  |  | Crecida estacional | Mientras esté en el campo, cada jugador puede cambiar una carta de su mano por otra del mazo, una vez por turno. |  |
 | canal | Bruma de valle | Clima | Legendaria | 1 | 1 |  |  | Bruma de valle | +1 de Vida a todos los dinosaurios del campo, mientras siga en el campo. |  |
 | bosque | Estación de lluvias | Clima | Legendaria | 1 | 1 |  |  | Estación de lluvias | Los saurópodos curan 1 herida al final de cada turno. |  |
-| aridez | Sequía prolongada | Clima | Legendaria | 1 | 1 |  |  | Sequía prolongada | Ambos jugadores pierden 5 cartas del mazo cada turno. |  |
+| aridez | Sequía prolongada | Clima | Legendaria | 1 | 1 |  |  | Sequía prolongada | Durante 3 turnos, ambos jugadores pierden 1 carta del mazo al robar. |  |
 | sabana | Monzón de verano | Clima | Común | 1 | 1 |  |  | Monzón de verano | +1 de Biomasa cada turno para los dos jugadores, mientras siga en el campo. |  |
 | plesiopleurodon | Plesiopleurodon wellesi | Reptil marino | Épica | 3 | 3 | 8 | 4 | Sigue a los grandes | Gana +2 de Ataque si tienes en juego algún dinosaurio con más de 6 de Vida. |  |
 | ojoraptorsaurus | Ojoraptorsaurus boerei | Terópodo | Rara | 2 | 2 | 2 | 4 | Salto de entrada | Cuando entra en juego hiere en 2 al dinosaurio de enfrente. |  |

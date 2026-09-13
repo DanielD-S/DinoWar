@@ -680,7 +680,7 @@ Los saurópodos curan 1 herida al final de cada turno.
 
 ### Sequía prolongada · Legendaria · coste 1
 
-Ambos jugadores pierden 5 cartas del mazo cada turno.
+Durante 3 turnos, ambos jugadores pierden 1 carta del mazo al robar.
 
 `INFERIDO` · Las secas del Kimmeridgiense dejaron paleosuelos con nódulos de caliche y acumulaciones de huesos en las charcas que se iban quedando sin agua.
 

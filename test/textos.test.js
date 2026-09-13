@@ -64,8 +64,11 @@ test('Si la mecánica de una criatura lleva números, el texto los dice', () => 
   });
 
   for (const c of Object.values({ ...CARTAS, ...CARTAS_DE_JEFE })) {
-    if (!c.mecanica) continue;
-    for (const [clave, valor] of numeros(c.mecanica)) {
+    // `duracion` es el único número de un clima que vive en la carta y no en
+    // BALANCE: se comprueba con las mecánicas, que es lo que es.
+    const propios = { ...(c.mecanica ?? {}), ...(c.duracion ? { duracion: c.duracion } : {}) };
+    if (Object.keys(propios).length === 0) continue;
+    for (const [clave, valor] of numeros(propios)) {
       const cita = new RegExp(`(^|[^0-9])${valor}([^0-9]|$)`);
       if (!cita.test(c.rasgoTexto ?? '')) {
         mal.push(`${c.id}: «${c.rasgoTexto}» — pero ${clave} vale ${valor}`);

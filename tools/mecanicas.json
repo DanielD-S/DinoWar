@@ -145,9 +145,9 @@
       "nombre": "Sequía prolongada",
       "cartas": 1,
       "quienes": "Sequía prolongada",
-      "texto": "Ambos jugadores pierden 5 cartas del mazo cada turno.",
+      "texto": "Durante 3 turnos, ambos jugadores pierden 1 carta del mazo al robar.",
       "constante": "efectosCampo.aridezMazo",
-      "valor": 5,
+      "valor": 1,
       "sentido": "cartas de mazo que pierden los DOS"
     },
     {
@@ -328,7 +328,7 @@
     [
       "Tablero",
       "Ranuras enfrentadas",
-      5,
+      4,
       "Cada una pelea contra la de enfrente"
     ],
     [

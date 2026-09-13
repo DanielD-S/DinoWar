@@ -308,8 +308,14 @@ function valorDeAccion(vista, j, a) {
         valor = unidadesDe(vista, j).filter((u) => carta(u.cardId).clado === CLADO.SAUROPODO).length * 0.8;
       }
       if (r === RASGO.CAMPO_ARIDEZ) {
-        // Es una carrera: sólo la pone quien va por delante en cartas.
-        valor = (mazoDe(vista, contrario) - mazoDe(vista, j)) * 0.4;
+        // Tres turnos y una carta por turno: vale una partida sólo cuando el
+        // mazo rival está a punto de acabarse y el tuyo no; el resto del
+        // tiempo es acercar la extinción un poco a quien va por delante.
+        const { aridezMazo, aridezTurnos } = BALANCE.efectosCampo;
+        const rivalMazo = mazoDe(vista, contrario);
+        const remata = rivalMazo <= aridezTurnos * (aridezMazo + BALANCE.robo.normal)
+          && rivalMazo < mazoDe(vista, j);
+        valor = remata ? 4 : Math.max(0, rivalMazo - mazoDe(vista, j)) * 0.15;
       }
       if (r === RASGO.CAMPO_CANAL) {
         // Ya sólo vale por los ribereños que tengas en pie: sin estaciones no
@@ -317,8 +323,10 @@ function valorDeAccion(vista, j, a) {
         valor = unidadesDe(vista, j).filter((u) => carta(u.cardId).rasgo === RASGO.RIBERENO).length
           * BALANCE.rasgos.riberenoAtaque * IA.pesoDano;
       }
-      // Un campo propio se queda puesto: paga varios turnos, no uno.
-      return valor * IA.horizonte - carta(cardId).coste * IA.pesoCoste;
+      // Un campo propio se queda puesto: paga varios turnos, no uno. Si caduca,
+      // paga como mucho los que dura.
+      const turnos = Math.min(IA.horizonte, carta(cardId).duracion ?? IA.horizonte);
+      return valor * turnos - carta(cardId).coste * IA.pesoCoste;
     }
 
     // Devolver una carta al mazo (Llanura de inundación). No es una jugada
