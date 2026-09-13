@@ -113,8 +113,8 @@ Para saber lo que vale un punto hay que contar partidas ganadas.
 
 Hay dos sistemas de mecánica y la frontera no es un accidente.
 
-Las **16 cartas de soporte** llevan la suya en `rasgo`, un valor del enum de
-`cards.js`, con su constante en `BALANCE` y su caso en el motor. Son dieciséis
+Las **17 cartas de soporte** llevan la suya en `rasgo`, un valor del enum de
+`cards.js`, con su constante en `BALANCE` y su caso en el motor. Son diecisiete
 reglas y ninguna se parece a otra: un caso por carta es lo honesto.
 
 Las **50 criaturas** llevan la suya en `mecanica`, un objeto de datos descrito en
@@ -1054,7 +1054,7 @@ Dicho para que nadie lo descubra tarde:
 - **El ELO no lo mueve nadie.** La columna existe en `jugadores` y las partidas
   se registran, pero no hay PvP todavía.
 - **Tres cartas mal calibradas** sobre un objetivo de cero (`BALANCE.md`), y 39
-  de las 66 cartas del set fuera del mazo de referencia, o sea sin calibración
+  de las 67 cartas del set fuera del mazo de referencia, o sea sin calibración
   comprobada.
 - **La inmunidad al clima no muerde.** Torvosaurus y Nodosaurus dicen «no le
   afectan los efectos del clima», y hoy los dos únicos efectos del clima sobre una
