@@ -16,7 +16,7 @@ import {
   CARTAS, CARTAS_DE_JEFE, RAREZA, RAREZA_NOMBRE, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, carta,
 } from '../data/cards.js';
 import {
-  ECONOMIA, PROBABILIDAD, GARANTIA, TAM_MAZO, POR_RAREZA,
+  ECONOMIA, PROBABILIDAD, GARANTIA, TAM_MAZO, POR_RAREZA, abrirSobre,
   excedente, valorFusion, limiteDe, validarMazo, mazoPorDefecto,
 } from '../data/coleccion.js';
 import { cargarPerfil, perfilInicial } from './almacen.js';
@@ -258,9 +258,24 @@ async function fundirSobrantes() {
 
 // ----------------------------------------------------------------- sobres
 
+// `?ensayo=<id>` abre la pantalla de sobres con una ceremonia de mentira en la
+// que sale esa carta: para ver cómo queda una legendaria con su vídeo sin
+// esperar a que el servidor la saque. No cobra, no guarda y no toca la
+// colección; es una ayuda de pruebas como `?ia=` o `?debug=1`.
+const ENSAYO = new URLSearchParams(location.search).get('ensayo');
+
 export function abrirSobres() {
   pintarSobres();
+  if (ENSAYO) ensayarSobre(ENSAYO);
   return dom.sobres;
+}
+
+async function ensayarSobre(cid) {
+  const p = cargarPerfil();
+  const tirada = abrirSobre(Math.random, p.cartas);
+  if (carta(cid)) tirada[Math.min(1, tirada.length - 1)] = cid;
+  dom.aviso.textContent = 'Ensayo: este sobre no se cobra ni se guarda.';
+  await celebrar(tirada, { ...p.cartas });
 }
 
 /**
@@ -400,18 +415,28 @@ async function comprarSobre() {
     return;
   }
   pintarMenu();
+  await celebrar(tirada, antesDeAbrir);
+}
 
+/**
+ * La ceremonia y la rejilla de resumen de una tirada ya sorteada. Separado de
+ * la compra para que el ensayo (`?ensayo=`) pase por el mismo camino que un
+ * sobre de verdad y no por una copia que se quede atrás.
+ */
+async function celebrar(tirada, antesDeAbrir) {
   const nuevas = new Set(tirada.filter((cid) => (antesDeAbrir[cid] ?? 0) === 0));
 
   // La ceremonia: rasgar el sobre y descubrir las cinco una a una. Las cartas
   // van a tamaño de visor, con el texto de la habilidad, porque es el momento
   // en que se leen. El botón sigue apagado hasta el final, que un segundo
   // sobre a media ceremonia pisaría al primero.
+  dom.btnAbrir.disabled = true;
   const cuenta = {};
   const ceremonia = tirada.map((cid) => {
     const c = carta(cid);
     cuenta[cid] = (cuenta[cid] ?? 0) + 1;
     return {
+      id: cid,
       html: cartaHTML(cid, { variante: 'visor', datos: { texto: true } }),
       rareza: c.rareza, binomial: c.binomial, dino: esDino(c),
       estado: estadoDeCopia(cid, antesDeAbrir[cid] ?? 0, cuenta[cid]),
