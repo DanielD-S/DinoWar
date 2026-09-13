@@ -120,6 +120,8 @@ export function crearPartida(seedEntrada = 1, mazos = null) {
     turno: 1,
     fase: FASE.RENTA,
     campo: null,
+    // Turnos que le quedan al clima puesto; null si no caduca.
+    campoTurnos: null,
     siguienteInstId,
     instancias,
     ranuras: [

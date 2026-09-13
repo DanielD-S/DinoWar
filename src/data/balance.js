@@ -167,7 +167,13 @@ export const BALANCE = Object.freeze({
   }),
 
   efectosCampo: Object.freeze({
-    aridezMazo: 5,
+    // La Sequía dura TRES turnos y muele UNA carta a cada jugador por turno.
+    // Con 5 por turno y sin caducar, `sim/climas.js` la medía como un botón
+    // de ganar: 100 % de extinciones a 6,4 turnos, cero trofeos, cero
+    // hábitat. Bajar la cifra sola no bastaba —a 2 seguía siendo el 78 %—
+    // porque lo que rompía era que durase para siempre.
+    aridezMazo: 1,
+    aridezTurnos: 3,
     // La llanura anegada deja CAMBIAR una carta: la que sueltas va al fondo del
     // mazo y robas la de arriba. Una por turno, cada jugador elige la suya.
     //

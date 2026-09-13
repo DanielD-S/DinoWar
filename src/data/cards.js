@@ -475,7 +475,10 @@ export const CARTAS = Object.freeze({
   aridez: clima({
     id: 'aridez', coste: 1, rareza: RAREZA.LEGENDARIO, binomial: 'Sequía prolongada',
     rasgo: RASGO.CAMPO_ARIDEZ, rasgoNombre: 'Sequía prolongada',
-    rasgoTexto: 'Ambos jugadores pierden 5 cartas del mazo cada turno.',
+    rasgoTexto: 'Durante 3 turnos, ambos jugadores pierden 1 carta del mazo al robar.',
+    // Único clima que caduca: `duracion` son los turnos que se queda puesto,
+    // contados en la fase de robo de los turnos siguientes.
+    duracion: 3,
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: 'Las secas del Kimmeridgiense dejaron paleosuelos con nódulos de caliche y acumulaciones de huesos en las charcas que se iban quedando sin agua.',
   }),

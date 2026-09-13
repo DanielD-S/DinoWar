@@ -713,6 +713,26 @@ un renombrado.
 Los cinco nombres viejos quedan libres. Son buenos nombres de bioma y el autor
 quiere reciclarlos como cartas de evento.
 
+### La Sequía es el único clima que caduca
+
+Con 5 cartas por turno y sin caducar, `node sim/climas.js` la medía como un
+botón de ganar: 100 % de extinciones a 6,4 turnos, cero trofeos y cero
+hábitat. Bajar la cifra sola no bastaba —a 2 por turno seguía siendo el 78 %—
+porque lo que rompía era que durase para siempre. Decisión del autor: **dura 3
+turnos y muele 1 carta a cada jugador por turno.**
+
+La duración es un DATO de la carta, `duracion`, no una rama del motor: el
+campo lleva `campoTurnos`, que se pone al revelar el clima y baja uno en cada
+fase de robo. Puesta en el turno T, muerde en T+1, T+2 y T+3 y se va después
+del tercero con un evento `CAMPO_FIN`. Cualquier clima con `duracion` caduca
+igual; los cuatro sin ella siguen quedándose hasta que otro los sustituye. La
+franja del campo enseña los turnos que le quedan, y `test/textos.test.js`
+exige que el texto de la carta cite la duración, como cita cualquier cifra.
+
+Y sigue sin poderse medir con `sim/carta.mjs`: está en el mazo de referencia
+con su única copia y devuelve el 50,0 % de comparar un mazo consigo mismo.
+Lo que dice algo es `sim/climas.js`.
+
 ## Una carta son DOS cifras: Ataque y Vida
 
 La Defensa existió y se quitó. Era una **resta plana e invisible** contra un
@@ -991,8 +1011,5 @@ Dicho para que nadie lo descubra tarde:
   que la inmunidad es un inconveniente pequeño disfrazado de ventaja. Se arregla
   por cualquiera de los dos lados —darle al clima algo que doler, o cambiarles la
   habilidad— pero es una decisión de diseño, no un arreglo.
-- **La Deriva árida sigue ganando el 100 %** de las partidas en que se pone
-  (`node sim/climas.js`): muele 5 cartas de los dos mazos y la extinción llega en
-  6,4 turnos. Es el desajuste más grande del set y no lo toca este recoste.
 El proyecto es **de pago** (plan Pro), así que no se pausa por inactividad.
 Eso era cierto antes y ya no lo es.

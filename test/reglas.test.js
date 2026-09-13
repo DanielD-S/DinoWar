@@ -604,3 +604,72 @@ test('Todo clado dice si es de dinosaurio, y las cifras nunca son negativas', ()
     }
   }
 });
+
+// ------------------------------------------------------ el clima que caduca
+
+test('La Sequía muele 1 carta a cada uno durante 3 turnos y luego se va', () => {
+  const s = tablero();
+  s.fase = FASE.DESPLIEGUE;
+  s.jugadores[0].biomasa = 9;
+  const cl = enMano(s, 'aridez', 0);
+  let r = reduce(s, { tipo: ACCION.CLIMA, jugador: 0, iid: cl });
+  r = ejecutar(r, FASE.REVELACION);
+  assert.equal(r.campo, 'aridez');
+  assert.equal(r.campoTurnos, carta('aridez').duracion, 'nace con sus turnos contados');
+
+  const { aridezMazo, aridezTurnos } = BALANCE.efectosCampo;
+  assert.equal(carta('aridez').duracion, aridezTurnos, 'la carta y BALANCE dicen lo mismo');
+  const antes = r.jugadores.map((j) => j.mazo.length);
+  for (let t = 1; t <= aridezTurnos; t++) {
+    r = ejecutar(r, FASE.ROBO);
+    for (let j = 0; j < 2; j++) {
+      assert.equal(r.jugadores[j].mazo.length, antes[j] - t * (aridezMazo + BALANCE.robo.normal),
+        `turno ${t}: el jugador ${j} pierde ${aridezMazo} y roba ${BALANCE.robo.normal}`);
+    }
+    if (t < aridezTurnos) {
+      assert.equal(r.campo, 'aridez', `turno ${t}: sigue puesta`);
+      assert.equal(r.campoTurnos, aridezTurnos - t);
+    }
+  }
+  assert.equal(r.campo, null, 'después del último turno se va sola');
+  assert.equal(r.campoTurnos, null);
+  assert.ok(r.jugadores[0].descarte.includes(cl), 'y vuelve al descarte de quien la puso');
+  assert.ok(r.eventos.some((e) => e.tipo === 'CAMPO_FIN' && e.cardId === 'aridez'), 'y lo anuncia');
+
+  const despues = r.jugadores.map((j) => j.mazo.length);
+  r = ejecutar(r, FASE.ROBO);
+  for (let j = 0; j < 2; j++) {
+    assert.equal(r.jugadores[j].mazo.length, despues[j] - BALANCE.robo.normal, 'ya sólo se roba');
+  }
+});
+
+test('Un clima sin duración no caduca', () => {
+  const s = tablero();
+  s.fase = FASE.DESPLIEGUE;
+  s.jugadores[0].biomasa = 9;
+  const cl = enMano(s, 'sabana', 0);
+  let r = reduce(s, { tipo: ACCION.CLIMA, jugador: 0, iid: cl });
+  r = ejecutar(r, FASE.REVELACION);
+  assert.equal(r.campoTurnos, null);
+  for (let t = 0; t < 6; t++) r = ejecutar(r, FASE.ROBO);
+  assert.equal(r.campo, 'sabana', 'sigue puesta seis turnos después');
+});
+
+test('Un clima nuevo encima de la Sequía se lleva su cuenta de turnos', () => {
+  const s = tablero();
+  s.fase = FASE.DESPLIEGUE;
+  s.jugadores[0].biomasa = 9;
+  s.jugadores[1].biomasa = 9;
+  const seca = enMano(s, 'aridez', 0);
+  let r = reduce(s, { tipo: ACCION.CLIMA, jugador: 0, iid: seca });
+  r = ejecutar(r, FASE.REVELACION);
+  r = ejecutar(r, FASE.ROBO);
+  assert.equal(r.campoTurnos, carta('aridez').duracion - 1);
+
+  r.fase = FASE.DESPLIEGUE;
+  const lluvia = enMano(r, 'sabana', 1);
+  r = reduce(r, { tipo: ACCION.CLIMA, jugador: 1, iid: lluvia });
+  r = ejecutar(r, FASE.REVELACION);
+  assert.equal(r.campo, 'sabana');
+  assert.equal(r.campoTurnos, null, 'la cuenta era de la Sequía, no de la ranura');
+});

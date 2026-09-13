@@ -125,6 +125,12 @@ export const GUION = Object.freeze({
     sonido: 'clima',
     hacer: (e, api) => api.anuncio(carta(e.cardId).binomial, 'clima'),
   },
+  // Un clima que caduca se va solo; el tablero deja de pintarlo y esto lo dice.
+  CAMPO_FIN: {
+    dura: MEDIO,
+    sonido: 'clima',
+    hacer: (e, api) => api.anuncio(`${carta(e.cardId).binomial} remite`, 'clima'),
+  },
 
   // ------------------------------------------------- mazo, mano y hábitat
   MAZO_PERDIDO: {

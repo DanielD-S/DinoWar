@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: f716097aa082525d
+// huella: dff14e5fa7517831
 //
 // Lleva dentro estos 19 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -606,7 +606,10 @@ var CARTAS = Object.freeze({
     binomial: "Sequ\xEDa prolongada",
     rasgo: RASGO.CAMPO_ARIDEZ,
     rasgoNombre: "Sequ\xEDa prolongada",
-    rasgoTexto: "Ambos jugadores pierden 5 cartas del mazo cada turno.",
+    rasgoTexto: "Durante 3 turnos, ambos jugadores pierden 1 carta del mazo al robar.",
+    // Único clima que caduca: `duracion` son los turnos que se queda puesto,
+    // contados en la fase de robo de los turnos siguientes.
+    duracion: 3,
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Las secas del Kimmeridgiense dejaron paleosuelos con n\xF3dulos de caliche y acumulaciones de huesos en las charcas que se iban quedando sin agua."
   }),
@@ -1383,7 +1386,13 @@ var BALANCE = Object.freeze({
     lagoHabitat: 2
   }),
   efectosCampo: Object.freeze({
-    aridezMazo: 5,
+    // La Sequía dura TRES turnos y muele UNA carta a cada jugador por turno.
+    // Con 5 por turno y sin caducar, `sim/climas.js` la medía como un botón
+    // de ganar: 100 % de extinciones a 6,4 turnos, cero trofeos, cero
+    // hábitat. Bajar la cifra sola no bastaba —a 2 seguía siendo el 78 %—
+    // porque lo que rompía era que durase para siempre.
+    aridezMazo: 1,
+    aridezTurnos: 3,
     // La llanura anegada deja CAMBIAR una carta: la que sueltas va al fondo del
     // mazo y robas la de arriba. Una por turno, cada jugador elige la suya.
     //
@@ -1678,6 +1687,8 @@ function crearPartida(seedEntrada = 1, mazos = null) {
     turno: 1,
     fase: FASE.RENTA,
     campo: null,
+    // Turnos que le quedan al clima puesto; null si no caduca.
+    campoTurnos: null,
     siguienteInstId,
     instancias,
     ranuras: [
@@ -2209,6 +2220,18 @@ function faseRobo(s) {
   if (hayAridez(s)) {
     for (let j = 0; j < 2; j++) perderDelMazo(s, j, BALANCE.efectosCampo.aridezMazo);
   }
+  if (s.campo !== null && s.campoTurnos !== null) {
+    s.campoTurnos -= 1;
+    if (s.campoTurnos <= 0) {
+      const cardId = s.campo;
+      s.jugadores[s.campoDe].descarte.push(s.campoIid);
+      ev(s, "CAMPO_FIN", { jugador: s.campoDe, cardId });
+      s.campo = null;
+      s.campoIid = null;
+      s.campoDe = null;
+      s.campoTurnos = null;
+    }
+  }
   for (let j = 0; j < 2; j++) robar(s, j, BALANCE.robo.normal);
   if (s.jugadores.some((j) => j.sinCartas)) {
     finalizar(s, MOTIVO_FIN.EXTINCION);
@@ -2247,6 +2270,7 @@ function faseRevelacion(s) {
       s.campo = inst.cardId;
       s.campoIid = p.iid;
       s.campoDe = p.jugador;
+      s.campoTurnos = carta(inst.cardId).duracion ?? null;
       ev(s, "CAMPO", { jugador: p.jugador, cardId: inst.cardId });
     } else if (p.tipo === "ADAPTACION") {
       const objetivo = s.instancias[p.objetivo];
@@ -3101,12 +3125,16 @@ function valorDeAccion(vista, j, a) {
         valor = unidadesDe(vista, j).filter((u) => carta(u.cardId).clado === CLADO.SAUROPODO).length * 0.8;
       }
       if (r === RASGO.CAMPO_ARIDEZ) {
-        valor = (mazoDe(vista, contrario) - mazoDe(vista, j)) * 0.4;
+        const { aridezMazo, aridezTurnos } = BALANCE.efectosCampo;
+        const rivalMazo = mazoDe(vista, contrario);
+        const remata = rivalMazo <= aridezTurnos * (aridezMazo + BALANCE.robo.normal) && rivalMazo < mazoDe(vista, j);
+        valor = remata ? 4 : Math.max(0, rivalMazo - mazoDe(vista, j)) * 0.15;
       }
       if (r === RASGO.CAMPO_CANAL) {
         valor = unidadesDe(vista, j).filter((u) => carta(u.cardId).rasgo === RASGO.RIBERENO).length * BALANCE.rasgos.riberenoAtaque * IA.pesoDano;
       }
-      return valor * IA.horizonte - carta(cardId).coste * IA.pesoCoste;
+      const turnos = Math.min(IA.horizonte, carta(cardId).duracion ?? IA.horizonte);
+      return valor * turnos - carta(cardId).coste * IA.pesoCoste;
     }
     // Devolver una carta al mazo (Llanura de inundación). No es una jugada
     // ofensiva: es alargar el mazo. Vale algo sólo cuando el mazo escasea, y

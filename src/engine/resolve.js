@@ -188,6 +188,21 @@ export function faseRobo(s) {
   if (hayAridez(s)) {
     for (let j = 0; j < 2; j++) perderDelMazo(s, j, BALANCE.efectosCampo.aridezMazo);
   }
+  // Un clima con `duracion` gasta un turno por cada fase de robo que ve, y se
+  // va después de la última: puesto en el turno T, muerde en T+1, T+2 y T+3.
+  // Aquí y no en el chequeo para que el último turno sea uno entero.
+  if (s.campo !== null && s.campoTurnos !== null) {
+    s.campoTurnos -= 1;
+    if (s.campoTurnos <= 0) {
+      const cardId = s.campo;
+      s.jugadores[s.campoDe].descarte.push(s.campoIid);
+      ev(s, 'CAMPO_FIN', { jugador: s.campoDe, cardId });
+      s.campo = null;
+      s.campoIid = null;
+      s.campoDe = null;
+      s.campoTurnos = null;
+    }
+  }
   for (let j = 0; j < 2; j++) robar(s, j, BALANCE.robo.normal);
   if (s.jugadores.some((j) => j.sinCartas)) {
     finalizar(s, MOTIVO_FIN.EXTINCION);
@@ -239,6 +254,7 @@ export function faseRevelacion(s) {
       s.campo = inst.cardId;
       s.campoIid = p.iid;
       s.campoDe = p.jugador;
+      s.campoTurnos = carta(inst.cardId).duracion ?? null;
       ev(s, 'CAMPO', { jugador: p.jugador, cardId: inst.cardId });
 
     } else if (p.tipo === 'ADAPTACION') {
