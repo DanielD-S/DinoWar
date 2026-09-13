@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: cd1143ce1318aadc
+// huella: 3292945da11d93ec
 //
 // Lleva dentro estos 19 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -210,6 +210,7 @@ var dino = (o) => Object.freeze({ tipo: TIPO.DINOSAURIO, ...o });
 var evento = (o) => Object.freeze({ tipo: TIPO.EVENTO, ataque: 0, vida: 0, ...o });
 var clima = (o) => Object.freeze({ tipo: TIPO.CLIMA, ataque: 0, vida: 0, coste: 2, ...o });
 var recurso = (o) => Object.freeze({ tipo: TIPO.RECURSO, objetivo: OBJETIVO.NINGUNO, ataque: 0, vida: 0, coste: 0, ...o });
+var biomasa = (o) => Object.freeze({ tipo: TIPO.BIOMASA, dieta: "HERBIVORO", objetivo: OBJETIVO.NINGUNO, ataque: 0, vida: 0, coste: 0, rasgo: RASGO.BIOMASA, ...o });
 var CARTAS = Object.freeze({
   // ------------------------------------------------------------ dinosaurios
   dryosaurus: dino({
@@ -1163,28 +1164,127 @@ var CARTAS = Object.freeze({
   // renta fija no ofrecía —acelerar hoy o durar más— y por eso el coste es el
   // MAZO y no Biomasa: pagar con lo mismo que da no sería una decisión.
   //
-  // Va en CARTAS y no en CARTAS_ECONOMIA. Las de ahí son el mazo de tierras de
-  // una variante que no se publica; ésta sale en sobres, se funde y se lleva en
-  // el mazo como cualquier otra.
-  biomasa: Object.freeze({
+  // Van en CARTAS y no en CARTAS_ECONOMIA. Las de ahí son el mazo de tierras de
+  // una variante que no se publica; éstas salen en sobres, se funden y se llevan
+  // en el mazo como cualquier otra.
+  //
+  // Son DIEZ y no una: siete comunes que hacen lo mismo con otra ilustración
+  // —las tierras básicas de Magic—, dos épicas de +2 y una legendaria de +3.
+  // Los números van en cada carta, en `biomasa`, y no en BALANCE, porque ya
+  // no son un número: son tres. `test/textos.test.js` los compara con el texto.
+  //
+  // Medido antes de escribirlas (600 partidas, bandos alternados, contra el
+  // mazo de referencia): la épica en vez de dos Praderas gana el 50,0 %, la
+  // legendaria en vez de una el 51,3 %. La Biomasa no es el cuello de botella
+  // de este juego —lo es la mano— y moler no muerde con la extinción en el
+  // 0,3 %. Y NO hace falta un tope compartido entre las diez: meter más de
+  // siete desplaza criaturas y el mazo empeora (44,8 % con doce, 39,8 % con
+  // catorce Praderas). Se autolimitan, como las tierras.
+  biomasa: biomasa({
     id: "biomasa",
-    tipo: TIPO.BIOMASA,
-    dieta: "HERBIVORO",
-    binomial: "Pradera de helechos",
     rareza: RAREZA.COMUN,
-    objetivo: OBJETIVO.NINGUNO,
-    coste: 0,
-    ataque: 0,
-    vida: 0,
-    rasgo: RASGO.BIOMASA,
+    binomial: "Pradera de helechos",
     rasgoNombre: "Pradera de helechos",
     rasgoTexto: "+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.",
+    biomasa: Object.freeze({ da: 1, muele: 1 }),
     // El tope de copias NO sale de su rareza: es la única carta del set con uno
     // propio. Siete en un mazo de 55 es lo que se midió; con cinco el efecto se
-    // queda a una décima de cumplir el objetivo del jugador inicial.
+    // queda a una décima de cumplir el objetivo del jugador inicial. Las seis
+    // comunes gemelas van a 3 por rareza, como todo: el 7 se queda aquí porque
+    // es lo que da la colección de salida y lo que los ocho jugadores ya tienen.
     copiasMax: 7,
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Los helechos dominan el registro pol\xEDnico de la Morrison y son la base de la productividad vegetal que sosten\xEDa a los saur\xF3podos. La pradera de helecho se infiere de esa abundancia junto a la escasez de troncos en las llanuras aluviales."
+  }),
+  araucarias: biomasa({
+    id: "araucarias",
+    rareza: RAREZA.COMUN,
+    binomial: "Bosque de araucarias",
+    rasgoNombre: "Bosque de araucarias",
+    rasgoTexto: "+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.",
+    biomasa: Object.freeze({ da: 1, muele: 1 }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "La madera f\xF3sil de tipo araucari\xE1ceo y el follaje de Brachyphyllum son de lo m\xE1s abundante del registro vegetal de la Morrison: las con\xEDferas formaban el dosel donde hab\xEDa agua bastante para sostener \xE1rboles."
+  }),
+  ginkgos: biomasa({
+    id: "ginkgos",
+    rareza: RAREZA.COMUN,
+    binomial: "Arboleda de ginkgos",
+    rasgoNombre: "Arboleda de ginkgos",
+    rasgoTexto: "+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.",
+    biomasa: Object.freeze({ da: 1, muele: 1 }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: "Hojas en abanico de tipo Ginkgoites aparecen en la flora de la Morrison, aunque son mucho m\xE1s raras que las con\xEDferas. Que formasen arboledas y no \xE1rboles sueltos se infiere de floras jur\xE1sicas contempor\xE1neas mejor conservadas."
+  }),
+  cicadas: biomasa({
+    id: "cicadas",
+    rareza: RAREZA.COMUN,
+    binomial: "Matorral de c\xEDcadas",
+    rasgoNombre: "Matorral de c\xEDcadas",
+    rasgoTexto: "+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.",
+    biomasa: Object.freeze({ da: 1, muele: 1 }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "C\xEDcadas y bennettitales, como Zamites, est\xE1n bien representadas en la Morrison. Son plantas de porte bajo, tronco grueso y hoja r\xEDgida, propias de terreno seco y abierto."
+  }),
+  equisetos: biomasa({
+    id: "equisetos",
+    rareza: RAREZA.COMUN,
+    binomial: "Juncal de equisetos",
+    rasgoNombre: "Juncal de equisetos",
+    rasgoTexto: "+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.",
+    biomasa: Object.freeze({ da: 1, muele: 1 }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Los equisetos \u2014colas de caballo\u2014 se conservan en la Morrison en posici\xF3n de vida, en los dep\xF3sitos de orilla. Crecen densos y rebrotan r\xE1pido, y se les supone un papel importante en la dieta de los saur\xF3podos."
+  }),
+  galeria: biomasa({
+    id: "galeria",
+    rareza: RAREZA.COMUN,
+    binomial: "Bosque de galer\xEDa",
+    rasgoNombre: "Bosque de galer\xEDa",
+    rasgoTexto: "+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.",
+    biomasa: Object.freeze({ da: 1, muele: 1 }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: "En una cuenca semi\xE1rida los \xE1rboles se concentran donde hay agua permanente: las franjas de con\xEDferas y helechos arborescentes pegadas a los canales se infieren de la distribuci\xF3n de la madera f\xF3sil y de la sedimentolog\xEDa de los r\xEDos de la Morrison."
+  }),
+  helechal: biomasa({
+    id: "helechal",
+    rareza: RAREZA.COMUN,
+    binomial: "Helechal arborescente",
+    rasgoNombre: "Helechal arborescente",
+    rasgoTexto: "+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.",
+    biomasa: Object.freeze({ da: 1, muele: 1 }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: "Frondas de helecho de tipo Coniopteris y de otras formas afines a los helechos arborescentes actuales aparecen en la Morrison. Que formasen sotobosques cerrados y h\xFAmedos se infiere de sus parientes vivos, que no toleran el sol directo ni la sequ\xEDa."
+  }),
+  vega: biomasa({
+    id: "vega",
+    rareza: RAREZA.EPICO,
+    binomial: "Vega de aluvi\xF3n",
+    rasgoNombre: "Vega de aluvi\xF3n",
+    rasgoTexto: "+2 Biomasa al bajarla. Pierdes 2 cartas de tu mazo. Una por turno.",
+    biomasa: Object.freeze({ da: 2, muele: 2 }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: "Las llanuras de inundaci\xF3n de la Morrison est\xE1n hechas de limo de crecida, y los paleosuelos que conservan muestran ra\xEDces y bioturbaci\xF3n. Un suelo reci\xE9n cubierto por una crecida es lo m\xE1s f\xE9rtil que ofrece la cuenca, y lo primero que rebrota son los helechos."
+  }),
+  humedal: biomasa({
+    id: "humedal",
+    rareza: RAREZA.EPICO,
+    binomial: "Humedal de tierras bajas",
+    rasgoNombre: "Humedal de tierras bajas",
+    rasgoTexto: "+2 Biomasa al bajarla. Pierdes 2 cartas de tu mazo. Una por turno.",
+    biomasa: Object.freeze({ da: 2, muele: 2 }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: "El miembro Brushy Basin conserva dep\xF3sitos de charcas y marismas con carofitas, ostr\xE1codos y restos de plantas acu\xE1ticas. Un humedal en una cuenca seca concentra la vida vegetal y la animal que va detr\xE1s; el yacimiento de Mygatt-Moore se interpreta como uno de ellos."
+  }),
+  manantial: biomasa({
+    id: "manantial",
+    rareza: RAREZA.LEGENDARIO,
+    binomial: "Manantial perenne",
+    rasgoNombre: "Manantial perenne",
+    rasgoTexto: "+3 Biomasa al bajarla. Pierdes 3 cartas de tu mazo. Una por turno.",
+    biomasa: Object.freeze({ da: 3, muele: 3 }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: "El clima de la Morrison era estacional y semi\xE1rido, con largas secas. Un manantial que no se seca es el sitio m\xE1s raro y m\xE1s rico de una cuenca as\xED: alrededor crece lo que no crece en ninguna otra parte, y hacia \xE9l convergen los animales en la estaci\xF3n seca. Se infiere de los paleosuelos y de las concentraciones de fauna; ninguno est\xE1 identificado como tal."
   })
 });
 var CARTAS_ECONOMIA = Object.freeze({
@@ -1343,24 +1443,21 @@ var BALANCE = Object.freeze({
       // Biomasa que da cada una
     })
   }),
-  // La carta de Biomasa. Los números viven aquí y no en la carta, como los de
-  // las otras 16 de soporte, para que `test/textos.test.js` pueda vigilar que
-  // el texto impreso no se quede atrás cuando alguno cambie.
+  // Las cartas de Biomasa. Lo que da cada una y lo que muele van EN LA CARTA
+  // (`biomasa: { da, muele }` en cards.js), porque desde que son diez ya no es
+  // un número, y `test/textos.test.js` los compara con el texto impreso como
+  // hace con las mecánicas de las criaturas. Aquí sólo queda la regla común.
   //
-  // Medido sobre 4.000 partidas y dos semillas: con 7 copias en un mazo de 55
-  // los trofeos bajan del 60 al 36 % de las victorias y el jugador inicial
+  // Medido sobre 4.000 partidas y dos semillas: con 7 Praderas en un mazo de
+  // 55 los trofeos bajan del 60 al 36 % de las victorias y el jugador inicial
   // sube a 48,3 %, que entra en banda por primera vez desde que existe la v2.
   // Con 5 copias se queda en 47,9 % y no entra. Subir la renta en vez de poner
   // la carta NO sirve: da los mismos números y dispara la bola de nieve al
   // 71 %, porque regalar Biomasa acelera a quien va ganando y una carta que
   // ocupa sitio en tu mazo y te cuesta otra, no.
   biomasa: Object.freeze({
-    da: 1,
-    // Biomasa que entrega al bajarla
-    muele: 1,
-    // cartas que te cuesta de tu PROPIO mazo
     porTurno: 1
-    // cuántas puedes bajar en un turno
+    // cuántas puedes bajar en un turno, sean las que sean
   }),
   manoInicial: 6,
   manoMaxima: 7,
@@ -2776,8 +2873,8 @@ function reduce(state, action) {
     case ACCION.BIOMASA: {
       const cardId = s.instancias[action.iid].cardId;
       const enCartas = modoActual() === MODO.CARTAS;
-      const da = enCartas ? BALANCE.economia.cartas.valor : BALANCE.biomasa.da;
-      const muele = enCartas ? 0 : BALANCE.biomasa.muele;
+      const da = enCartas ? BALANCE.economia.cartas.valor : carta(cardId).biomasa.da;
+      const muele = enCartas ? 0 : carta(cardId).biomasa.muele;
       jug.mano = jug.mano.filter((x) => x !== action.iid);
       jug.descarte.push(action.iid);
       jug.biomasaJugadaEsteTurno += 1;
@@ -3096,10 +3193,14 @@ function valorDeAccion(vista, j, a) {
     // Con el mazo en las últimas deja de compensar, y por un margen enorme: la
     // Pradera muerde tu propio mazo, así que la última copia se cambia por un
     // punto de Biomasa y la derrota por extinción.
+    //
+    // Con varias en la mano, primero la que más da: sólo una se baja por turno
+    // y las otras esperan igual. Y la que muele tres pide tres de reserva.
     case ACCION.BIOMASA: {
-      const muele = modoActual() === MODO.CARTAS ? 0 : BALANCE.biomasa.muele;
-      if (muele > 0 && vista.jugadores[j].mazo.length <= IA.mazoDeReserva) return -Infinity;
-      return 100;
+      const { da, muele: cuesta } = carta(vista.instancias[a.iid].cardId).biomasa;
+      const muele = modoActual() === MODO.CARTAS ? 0 : cuesta;
+      if (muele > 0 && vista.jugadores[j].mazo.length <= IA.mazoDeReserva + muele - 1) return -Infinity;
+      return 100 + da;
     }
     // Declarar producción no cuesta nada, así que la pregunta no es «¿vale la
     // pena?» sino «¿de cuál me falta?». Se mira la mano: qué tipo desbloquea
@@ -3180,10 +3281,10 @@ function valorDeAccion(vista, j, a) {
         gana = P.lagoBiomasa;
         cuesta = P.lagoHabitat * IA.pesoHabitat;
       }
-      const biomasa = vista.jugadores[j].biomasa;
+      const biomasa2 = vista.jugadores[j].biomasa;
       const desbloquea = vista.jugadores[j].mano.filter((iid) => {
         const c = carta(vista.instancias[iid].cardId);
-        return c.coste > biomasa && c.coste <= biomasa + gana;
+        return c.coste > biomasa2 && c.coste <= biomasa2 + gana;
       }).length;
       return desbloquea * 1.4 + gana * 0.25 - cuesta;
     }

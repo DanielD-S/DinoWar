@@ -316,8 +316,9 @@ export function reduce(state, action) {
     case ACCION.BIOMASA: {
       const cardId = s.instancias[action.iid].cardId;
       const enCartas = modoEconomia() === MODO.CARTAS;
-      const da = enCartas ? BALANCE.economia.cartas.valor : BALANCE.biomasa.da;
-      const muele = enCartas ? 0 : BALANCE.biomasa.muele;
+      // Cada carta trae lo suyo: la Pradera da 1 y muele 1, el Manantial 3 y 3.
+      const da = enCartas ? BALANCE.economia.cartas.valor : carta(cardId).biomasa.da;
+      const muele = enCartas ? 0 : carta(cardId).biomasa.muele;
       jug.mano = jug.mano.filter((x) => x !== action.iid);
       jug.descarte.push(action.iid);
       jug.biomasaJugadaEsteTurno += 1;

@@ -195,10 +195,14 @@ function valorDeAccion(vista, j, a) {
     // Con el mazo en las últimas deja de compensar, y por un margen enorme: la
     // Pradera muerde tu propio mazo, así que la última copia se cambia por un
     // punto de Biomasa y la derrota por extinción.
+    //
+    // Con varias en la mano, primero la que más da: sólo una se baja por turno
+    // y las otras esperan igual. Y la que muele tres pide tres de reserva.
     case ACCION.BIOMASA: {
-      const muele = modoEconomia() === MODO.CARTAS ? 0 : BALANCE.biomasa.muele;
-      if (muele > 0 && vista.jugadores[j].mazo.length <= IA.mazoDeReserva) return -Infinity;
-      return 100;
+      const { da, muele: cuesta } = carta(vista.instancias[a.iid].cardId).biomasa;
+      const muele = modoEconomia() === MODO.CARTAS ? 0 : cuesta;
+      if (muele > 0 && vista.jugadores[j].mazo.length <= IA.mazoDeReserva + muele - 1) return -Infinity;
+      return 100 + da;
     }
 
     // Declarar producción no cuesta nada, así que la pregunta no es «¿vale la

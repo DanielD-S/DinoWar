@@ -159,6 +159,10 @@ const clima = (o) => Object.freeze({ tipo: TIPO.CLIMA, ataque: 0, vida: 0, coste
 // "este turno" no sirve de nada si se resuelve después del despliegue. A cambio
 // el rival los ve venir, que es parte de su precio.
 const recurso = (o) => Object.freeze({ tipo: TIPO.RECURSO, objetivo: OBJETIVO.NINGUNO, ataque: 0, vida: 0, coste: 0, ...o });
+// Las cartas de Biomasa se bajan como recurso —una por turno, gratis— y llevan
+// sus números en `biomasa`. La dieta es la vegetal porque en la economía FIJA,
+// que es la que se publica, no tiene efecto; en la TIPADA una pradera da planta.
+const biomasa = (o) => Object.freeze({ tipo: TIPO.BIOMASA, dieta: 'HERBIVORO', objetivo: OBJETIVO.NINGUNO, ataque: 0, vida: 0, coste: 0, rasgo: RASGO.BIOMASA, ...o });
 
 export const CARTAS = Object.freeze({
 
@@ -892,21 +896,107 @@ export const CARTAS = Object.freeze({
   // renta fija no ofrecía —acelerar hoy o durar más— y por eso el coste es el
   // MAZO y no Biomasa: pagar con lo mismo que da no sería una decisión.
   //
-  // Va en CARTAS y no en CARTAS_ECONOMIA. Las de ahí son el mazo de tierras de
-  // una variante que no se publica; ésta sale en sobres, se funde y se lleva en
-  // el mazo como cualquier otra.
-  biomasa: Object.freeze({
-    id: 'biomasa', tipo: TIPO.BIOMASA, dieta: 'HERBIVORO',
-    binomial: 'Pradera de helechos', rareza: RAREZA.COMUN,
-    objetivo: OBJETIVO.NINGUNO, coste: 0, ataque: 0, vida: 0,
-    rasgo: RASGO.BIOMASA, rasgoNombre: 'Pradera de helechos',
+  // Van en CARTAS y no en CARTAS_ECONOMIA. Las de ahí son el mazo de tierras de
+  // una variante que no se publica; éstas salen en sobres, se funden y se llevan
+  // en el mazo como cualquier otra.
+  //
+  // Son DIEZ y no una: siete comunes que hacen lo mismo con otra ilustración
+  // —las tierras básicas de Magic—, dos épicas de +2 y una legendaria de +3.
+  // Los números van en cada carta, en `biomasa`, y no en BALANCE, porque ya
+  // no son un número: son tres. `test/textos.test.js` los compara con el texto.
+  //
+  // Medido antes de escribirlas (600 partidas, bandos alternados, contra el
+  // mazo de referencia): la épica en vez de dos Praderas gana el 50,0 %, la
+  // legendaria en vez de una el 51,3 %. La Biomasa no es el cuello de botella
+  // de este juego —lo es la mano— y moler no muerde con la extinción en el
+  // 0,3 %. Y NO hace falta un tope compartido entre las diez: meter más de
+  // siete desplaza criaturas y el mazo empeora (44,8 % con doce, 39,8 % con
+  // catorce Praderas). Se autolimitan, como las tierras.
+  biomasa: biomasa({
+    id: 'biomasa', rareza: RAREZA.COMUN,
+    binomial: 'Pradera de helechos', rasgoNombre: 'Pradera de helechos',
     rasgoTexto: '+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.',
+    biomasa: Object.freeze({ da: 1, muele: 1 }),
     // El tope de copias NO sale de su rareza: es la única carta del set con uno
     // propio. Siete en un mazo de 55 es lo que se midió; con cinco el efecto se
-    // queda a una décima de cumplir el objetivo del jugador inicial.
+    // queda a una décima de cumplir el objetivo del jugador inicial. Las seis
+    // comunes gemelas van a 3 por rareza, como todo: el 7 se queda aquí porque
+    // es lo que da la colección de salida y lo que los ocho jugadores ya tienen.
     copiasMax: 7,
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Los helechos dominan el registro polínico de la Morrison y son la base de la productividad vegetal que sostenía a los saurópodos. La pradera de helecho se infiere de esa abundancia junto a la escasez de troncos en las llanuras aluviales.',
+  }),
+  araucarias: biomasa({
+    id: 'araucarias', rareza: RAREZA.COMUN,
+    binomial: 'Bosque de araucarias', rasgoNombre: 'Bosque de araucarias',
+    rasgoTexto: '+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.',
+    biomasa: Object.freeze({ da: 1, muele: 1 }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'La madera fósil de tipo araucariáceo y el follaje de Brachyphyllum son de lo más abundante del registro vegetal de la Morrison: las coníferas formaban el dosel donde había agua bastante para sostener árboles.',
+  }),
+  ginkgos: biomasa({
+    id: 'ginkgos', rareza: RAREZA.COMUN,
+    binomial: 'Arboleda de ginkgos', rasgoNombre: 'Arboleda de ginkgos',
+    rasgoTexto: '+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.',
+    biomasa: Object.freeze({ da: 1, muele: 1 }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: 'Hojas en abanico de tipo Ginkgoites aparecen en la flora de la Morrison, aunque son mucho más raras que las coníferas. Que formasen arboledas y no árboles sueltos se infiere de floras jurásicas contemporáneas mejor conservadas.',
+  }),
+  cicadas: biomasa({
+    id: 'cicadas', rareza: RAREZA.COMUN,
+    binomial: 'Matorral de cícadas', rasgoNombre: 'Matorral de cícadas',
+    rasgoTexto: '+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.',
+    biomasa: Object.freeze({ da: 1, muele: 1 }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Cícadas y bennettitales, como Zamites, están bien representadas en la Morrison. Son plantas de porte bajo, tronco grueso y hoja rígida, propias de terreno seco y abierto.',
+  }),
+  equisetos: biomasa({
+    id: 'equisetos', rareza: RAREZA.COMUN,
+    binomial: 'Juncal de equisetos', rasgoNombre: 'Juncal de equisetos',
+    rasgoTexto: '+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.',
+    biomasa: Object.freeze({ da: 1, muele: 1 }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Los equisetos —colas de caballo— se conservan en la Morrison en posición de vida, en los depósitos de orilla. Crecen densos y rebrotan rápido, y se les supone un papel importante en la dieta de los saurópodos.',
+  }),
+  galeria: biomasa({
+    id: 'galeria', rareza: RAREZA.COMUN,
+    binomial: 'Bosque de galería', rasgoNombre: 'Bosque de galería',
+    rasgoTexto: '+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.',
+    biomasa: Object.freeze({ da: 1, muele: 1 }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: 'En una cuenca semiárida los árboles se concentran donde hay agua permanente: las franjas de coníferas y helechos arborescentes pegadas a los canales se infieren de la distribución de la madera fósil y de la sedimentología de los ríos de la Morrison.',
+  }),
+  helechal: biomasa({
+    id: 'helechal', rareza: RAREZA.COMUN,
+    binomial: 'Helechal arborescente', rasgoNombre: 'Helechal arborescente',
+    rasgoTexto: '+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.',
+    biomasa: Object.freeze({ da: 1, muele: 1 }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: 'Frondas de helecho de tipo Coniopteris y de otras formas afines a los helechos arborescentes actuales aparecen en la Morrison. Que formasen sotobosques cerrados y húmedos se infiere de sus parientes vivos, que no toleran el sol directo ni la sequía.',
+  }),
+  vega: biomasa({
+    id: 'vega', rareza: RAREZA.EPICO,
+    binomial: 'Vega de aluvión', rasgoNombre: 'Vega de aluvión',
+    rasgoTexto: '+2 Biomasa al bajarla. Pierdes 2 cartas de tu mazo. Una por turno.',
+    biomasa: Object.freeze({ da: 2, muele: 2 }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: 'Las llanuras de inundación de la Morrison están hechas de limo de crecida, y los paleosuelos que conservan muestran raíces y bioturbación. Un suelo recién cubierto por una crecida es lo más fértil que ofrece la cuenca, y lo primero que rebrota son los helechos.',
+  }),
+  humedal: biomasa({
+    id: 'humedal', rareza: RAREZA.EPICO,
+    binomial: 'Humedal de tierras bajas', rasgoNombre: 'Humedal de tierras bajas',
+    rasgoTexto: '+2 Biomasa al bajarla. Pierdes 2 cartas de tu mazo. Una por turno.',
+    biomasa: Object.freeze({ da: 2, muele: 2 }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: 'El miembro Brushy Basin conserva depósitos de charcas y marismas con carofitas, ostrácodos y restos de plantas acuáticas. Un humedal en una cuenca seca concentra la vida vegetal y la animal que va detrás; el yacimiento de Mygatt-Moore se interpreta como uno de ellos.',
+  }),
+  manantial: biomasa({
+    id: 'manantial', rareza: RAREZA.LEGENDARIO,
+    binomial: 'Manantial perenne', rasgoNombre: 'Manantial perenne',
+    rasgoTexto: '+3 Biomasa al bajarla. Pierdes 3 cartas de tu mazo. Una por turno.',
+    biomasa: Object.freeze({ da: 3, muele: 3 }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: 'El clima de la Morrison era estacional y semiárido, con largas secas. Un manantial que no se seca es el sitio más raro y más rico de una cuenca así: alrededor crece lo que no crece en ninguna otra parte, y hacia él convergen los animales en la estación seca. Se infiere de los paleosuelos y de las concentraciones de fauna; ninguno está identificado como tal.',
   }),
 });
 

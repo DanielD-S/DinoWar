@@ -94,16 +94,22 @@ test('Las etiquetas de las mecánicas son las del vocabulario', () => {
 });
 
 test('El soporte conserva su rasgo: sin él no sería una carta', () => {
-  // 17 desde que existe la Pradera de helechos: clima, evento, recurso y ahora
-  // biomasa. Vale para ella igual que para las otras — lleva rasgo, nombre y
-  // texto, y no lleva `mecanica`, que es de criaturas.
+  // 26: clima, evento, recurso y las diez de biomasa. Vale para éstas igual
+  // que para las otras — llevan rasgo, nombre y texto, y no llevan `mecanica`,
+  // que es de criaturas. Sus números van en `biomasa`, y sin ellos la carta
+  // no se juega: el motor los lee al bajarla.
   const soporte = Object.values(CARTAS).filter((c) => c.tipo !== TIPO.DINOSAURIO);
-  assert.equal(soporte.length, 17);
+  assert.equal(soporte.length, 26);
   for (const c of soporte) {
     assert.notEqual(c.rasgo, 'NINGUNO', `${c.id} se quedó sin mecánica`);
     assert.ok(c.rasgoNombre && c.rasgoTexto, `${c.id} no tiene nombre o texto`);
     assert.equal(c.mecanica, undefined, `${c.id} lleva las dos cosas`);
+    if (c.tipo === TIPO.BIOMASA) {
+      assert.ok(Number.isInteger(c.biomasa?.da) && c.biomasa.da > 0, `${c.id} no dice cuánta Biomasa da`);
+      assert.ok(Number.isInteger(c.biomasa?.muele) && c.biomasa.muele >= 0, `${c.id} no dice cuánto muele`);
+    }
   }
+  assert.equal(soporte.filter((c) => c.tipo === TIPO.BIOMASA).length, 10);
 });
 
 test('La fase de revelación sigue llamando a la habilidad de entrada', () => {

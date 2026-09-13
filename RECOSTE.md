@@ -134,3 +134,12 @@ revisión viene a arreglar.
 | shuangmiaosaurus | Shuangmiaosaurus gilmorei | Ornitópodo | Común | 2 | 2 | 2 | 4 | Ramoneo de orilla | Cuando entra en juego tu hábitat recupera 1 punto. |  |
 | chasmosaurus | Chasmosaurus belli | Marginocéfalo | Común | 2 | 2 | 2 | 4 | Vigía de la gola | Cuando entra en juego robas 1 carta. |  |
 | biomasa | Pradera de helechos | Biomasa | Común | 0 | 0 |  |  | Pradera de helechos | +1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno. |  |
+| araucarias | Bosque de araucarias | Biomasa | Común | 0 | 0 |  |  | Bosque de araucarias | +1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno. |  |
+| ginkgos | Arboleda de ginkgos | Biomasa | Común | 0 | 0 |  |  | Arboleda de ginkgos | +1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno. |  |
+| cicadas | Matorral de cícadas | Biomasa | Común | 0 | 0 |  |  | Matorral de cícadas | +1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno. |  |
+| equisetos | Juncal de equisetos | Biomasa | Común | 0 | 0 |  |  | Juncal de equisetos | +1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno. |  |
+| galeria | Bosque de galería | Biomasa | Común | 0 | 0 |  |  | Bosque de galería | +1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno. |  |
+| helechal | Helechal arborescente | Biomasa | Común | 0 | 0 |  |  | Helechal arborescente | +1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno. |  |
+| vega | Vega de aluvión | Biomasa | Épica | 0 | 0 |  |  | Vega de aluvión | +2 Biomasa al bajarla. Pierdes 2 cartas de tu mazo. Una por turno. |  |
+| humedal | Humedal de tierras bajas | Biomasa | Épica | 0 | 0 |  |  | Humedal de tierras bajas | +2 Biomasa al bajarla. Pierdes 2 cartas de tu mazo. Una por turno. |  |
+| manantial | Manantial perenne | Biomasa | Legendaria | 0 | 0 |  |  | Manantial perenne | +3 Biomasa al bajarla. Pierdes 3 cartas de tu mazo. Una por turno. |  |

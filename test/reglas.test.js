@@ -687,8 +687,8 @@ test('La Biomasa da su punto y se cobra una carta de tu mazo', () => {
   const mazoRival = s.jugadores[1].mazo.length;
 
   const r = reduce(s, { tipo: ACCION.BIOMASA, jugador: 0, iid });
-  assert.equal(r.jugadores[0].biomasa, BALANCE.biomasa.da, 'ingresa lo que dice su constante');
-  assert.equal(r.jugadores[0].mazo.length, mazoAntes - BALANCE.biomasa.muele,
+  assert.equal(r.jugadores[0].biomasa, carta('biomasa').biomasa.da, 'ingresa lo que dice la carta');
+  assert.equal(r.jugadores[0].mazo.length, mazoAntes - carta('biomasa').biomasa.muele,
     'y se cobra del mazo de quien la baja');
   assert.equal(r.jugadores[1].mazo.length, mazoRival, 'el mazo del rival no se toca');
   assert.ok(r.jugadores[0].descarte.includes(iid), 'la carta se va al descarte');
