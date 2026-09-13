@@ -112,6 +112,23 @@ const SILUETAS = {
     <path d="M70 66 L70 38 L74 38 L74 66 Z"/>
     <path d="M72 42 C66 42 60 38 58 31 C66 31 71 35 72 42 Z" opacity=".85"/>
     <path d="M72 50 C78 50 84 46 86 39 C78 39 73 43 72 50 Z" opacity=".6"/>`,
+  // Pradera de helechos: tres frondas, la del centro más alta. Sin esta
+  // entrada la carta caía en el plan corporal de reserva y salía dibujada
+  // como un terópodo, que es lo que pasa con toda carta nueva sin mapear.
+  biomasa: `
+    <path d="M49 68 L49 26 L52 26 L52 68 Z"/>
+    <path d="M50 24 C46 28 40 30 35 29 C38 24 44 21 50 24 Z
+             M51 24 C55 28 61 30 66 29 C63 24 57 21 51 24 Z" opacity=".9"/>
+    <path d="M50 34 C45 38 38 40 32 39 C36 33 43 30 50 34 Z
+             M51 34 C56 38 63 40 69 39 C65 33 58 30 51 34 Z" opacity=".75"/>
+    <path d="M50 44 C44 48 36 50 29 49 C34 43 42 40 50 44 Z
+             M51 44 C57 48 65 50 72 49 C67 43 59 40 51 44 Z" opacity=".6"/>
+    <path d="M22 70 L22 46 L24 46 L24 70 Z M76 70 L76 50 L78 50 L78 70 Z" opacity=".5"/>
+    <path d="M23 44 C20 47 15 49 11 48 C13 44 18 42 23 44 Z
+             M24 44 C27 47 32 49 36 48 C34 44 29 42 24 44 Z
+             M77 48 C74 51 69 53 65 52 C67 48 72 46 77 48 Z
+             M78 48 C81 51 86 53 90 52 C88 48 83 46 78 48 Z" opacity=".4"/>`,
+
   // Carroña: costillar expuesto y un hueso ya desprendido.
   carrona: `
     <path d="M22 16 C18 16 16 20 18 23 L22 27 L22 58 C22 62 26 64 29 62
@@ -177,6 +194,7 @@ const PLAN = {
   bosque: 'bosque',
   sabana: 'sabana',
   rebrote: 'rebrote',
+  biomasa: 'biomasa',
   carrona: 'carrona',
   lago: 'lago',
   trampa: 'trampa',
@@ -207,6 +225,7 @@ const TONO = {
   bosque: ['#4e7a4a', 1],
   sabana: ['#a08243', 1],
   rebrote: ['#c9793a', 1],
+  biomasa: ['#5f8f52', 1],
   carrona: ['#b09a76', 1],
   lago: ['#4d8a9c', 1],
   trampa: ['#7a5f42', 1],

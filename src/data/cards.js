@@ -141,6 +141,8 @@ export const RASGO = Object.freeze({
   REBROTE: 'REBROTE',
   CARRONA: 'CARRONA',
   LAGO: 'LAGO',
+  // biomasa
+  BIOMASA: 'BIOMASA',
   // campo
   CAMPO_LLANURA: 'CAMPO_LLANURA',
   CAMPO_CANAL: 'CAMPO_CANAL',
@@ -881,6 +883,30 @@ export const CARTAS = Object.freeze({
     mecanica: Object.freeze({ entrada: { roba: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: 'Ceratópsido casmosaurino de la Formación Dinosaur Park, Alberta, Campaniense. Gola muy grande con dos aberturas amplias.',
+  }),
+
+  // ------------------------------------------------------------- biomasa
+
+  // La única carta que no se juega para HACER algo, sino para poder hacerlo:
+  // da Biomasa y te cuesta una carta de tu propio mazo. Es la decisión que la
+  // renta fija no ofrecía —acelerar hoy o durar más— y por eso el coste es el
+  // MAZO y no Biomasa: pagar con lo mismo que da no sería una decisión.
+  //
+  // Va en CARTAS y no en CARTAS_ECONOMIA. Las de ahí son el mazo de tierras de
+  // una variante que no se publica; ésta sale en sobres, se funde y se lleva en
+  // el mazo como cualquier otra.
+  biomasa: Object.freeze({
+    id: 'biomasa', tipo: TIPO.BIOMASA, dieta: 'HERBIVORO',
+    binomial: 'Pradera de helechos', rareza: RAREZA.COMUN,
+    objetivo: OBJETIVO.NINGUNO, coste: 0, ataque: 0, vida: 0,
+    rasgo: RASGO.BIOMASA, rasgoNombre: 'Pradera de helechos',
+    rasgoTexto: '+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.',
+    // El tope de copias NO sale de su rareza: es la única carta del set con uno
+    // propio. Siete en un mazo de 55 es lo que se midió; con cinco el efecto se
+    // queda a una décima de cumplir el objetivo del jugador inicial.
+    copiasMax: 7,
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Los helechos dominan el registro polínico de la Morrison y son la base de la productividad vegetal que sostenía a los saurópodos. La pradera de helecho se infiere de esa abundancia junto a la escasez de troncos en las llanuras aluviales.',
   }),
 });
 

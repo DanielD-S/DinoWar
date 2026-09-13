@@ -12,17 +12,20 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { CARTAS, CARTAS_DE_JEFE, TIPO, RAREZA } from '../src/data/cards.js';
+import { FAMILIA_MARCO } from '../src/ui/render.js';
 
 const css = readFileSync(new URL('../carta.css', import.meta.url), 'utf8');
 const REGLA = /\.m-([a-z_]+)\s*\{\s*--marco:\s*url\('assets\/marcos\/([a-z_]+\.webp)'\)/g;
 const reglas = new Map([...css.matchAll(REGLA)].map((m) => [m[1], m[2]]));
 
-// Lo mismo que hace `claseMarco()` en render.js, dicho como datos.
+// La familia de marco se IMPORTA de render.js, no se copia. Copiada estaba, y
+// falló en cuanto llegó una familia que comparte marco con otra: la Biomasa usa
+// el de recurso, y el test pedía un `.m-biomasa` que no tiene por qué existir.
 const RAREZA_MARCO = { COMUN: 'comun', RARO: 'rara', EPICO: 'epica', LEGENDARIO: 'legendaria' };
 function claseDe(c, esJefe) {
   if (esJefe) return 'dino_jefe';
   if (c.tipo === TIPO.DINOSAURIO) return `dino_${RAREZA_MARCO[c.rareza]}`;
-  return c.tipo.toLowerCase();
+  return FAMILIA_MARCO[c.tipo] ?? 'evento';
 }
 
 test('toda carta del set tiene un marco dibujado con su fichero en disco', () => {

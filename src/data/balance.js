@@ -86,6 +86,23 @@ export const BALANCE = Object.freeze({
     }),
   }),
 
+  // La carta de Biomasa. Los números viven aquí y no en la carta, como los de
+  // las otras 16 de soporte, para que `test/textos.test.js` pueda vigilar que
+  // el texto impreso no se quede atrás cuando alguno cambie.
+  //
+  // Medido sobre 4.000 partidas y dos semillas: con 7 copias en un mazo de 55
+  // los trofeos bajan del 60 al 36 % de las victorias y el jugador inicial
+  // sube a 48,3 %, que entra en banda por primera vez desde que existe la v2.
+  // Con 5 copias se queda en 47,9 % y no entra. Subir la renta en vez de poner
+  // la carta NO sirve: da los mismos números y dispara la bola de nieve al
+  // 71 %, porque regalar Biomasa acelera a quien va ganando y una carta que
+  // ocupa sitio en tu mazo y te cuesta otra, no.
+  biomasa: Object.freeze({
+    da: 1,         // Biomasa que entrega al bajarla
+    muele: 1,      // cartas que te cuesta de tu PROPIO mazo
+    porTurno: 1,   // cuántas puedes bajar en un turno
+  }),
+
   manoInicial: 6,
   manoMaxima: 7,
   robo: Object.freeze({ normal: 1 }),
@@ -199,7 +216,7 @@ export const BALANCE = Object.freeze({
   }),
 
   // ------------------------------------------------------------------- mazo
-  tamanoMazo: 50,
+  tamanoMazo: 55,
 
   // Copias que caben de una misma carta. Es a la vez el límite de construcción
   // del jugador y la escala de rareza: son la misma regla mirada desde dos
@@ -264,6 +281,13 @@ export const BALANCE = Object.freeze({
 
   // --------------------------------------------------------------------- IA
   ia: Object.freeze({
+    // Con menos mazo que esto, la IA deja de bajar Biomasa. No es afinar su
+    // juego: es que la carta muerde tu propio mazo, y sin freno la IA se
+    // molería hasta perder por extinción a cambio de un punto de Biomasa. Las
+    // partidas medidas acaban con treinta y pico cartas, así que este tope no
+    // se toca nunca en juego normal; está para el caso raro.
+    mazoDeReserva: 6,
+
     // Turnos que se espera que una unidad siga en pie aportando. Sin esto la IA
     // sólo mira el asalto siguiente y descarta a los muros: un 3/10 no mata a
     // nadie hoy, pero bloquea cinco turnos.
@@ -300,13 +324,13 @@ export const BALANCE = Object.freeze({
 // —+1 de Ataque por cada Stegosaurus propio— premia llevar la tercera.
 export const MAZO = Object.freeze([
   // dinosaurios — 30
-  ['dryosaurus', 3], ['ornitholestes', 3], ['ceratosaurus', 3],
+  ['dryosaurus', 3], ['ornitholestes', 3], ['ceratosaurus', 2],
   ['nodosaurus', 2],
   ['stegosaurus', 3], ['allosaurus', 2], ['camarasaurus', 2],
   // Lokiceratops pasó a legendaria y sólo admite una copia. La plaza que deja
   // va a Brachylophosaurus, que con la rareza nueva admite tres y es el otro
   // gregario del mazo: la lista sigue siendo la misma clase de mazo.
-  ['riparovenator', 2], ['lokiceratops', 1], ['brachylophosaurus', 3], ['huaxiadraco', 2],
+  ['riparovenator', 2], ['lokiceratops', 1], ['brachylophosaurus', 2], ['huaxiadraco', 2],
   ['diplodocus', 1], ['apatosaurus', 1], ['torvosaurus', 1], ['tyrannotitan', 1],
   // soporte — 20
   //
@@ -322,6 +346,13 @@ export const MAZO = Object.freeze([
   ['gastrolitos', 2], ['fractura', 2],
   ['sabana', 1], ['aridez', 1], ['canal', 1],
   ['mortandad', 1], ['crecimiento_acelerado', 1], ['neumaticidad', 1], ['competencia', 1],
+  // biomasa — 7
+  //
+  // No se suman a las 50 de antes: DESPLAZAN dos copias, las de las entradas
+  // más repetidas, para que el mazo pierda repeticiones y no variedad. Quitar
+  // la única copia de Torvosaurus cambiaría qué mazo es; bajar Ceratosaurus de
+  // 3 a 2 sólo lo hace más fino.
+  ['biomasa', 7],
 ].map((e) => Object.freeze(e)));
 
 export const TOTAL_MAZO = MAZO.reduce((n, [, copias]) => n + copias, 0);
@@ -358,7 +389,7 @@ export function mazoConBiomasa(economia = BALANCE.economia.cartas) {
 for (const [cardId, copias] of MAZO) {
   const c = CARTAS[cardId];
   if (!c) throw new Error(`MAZO: la carta "${cardId}" no existe`);
-  const tope = BALANCE.copiasPorRareza[c.rareza];
+  const tope = c.copiasMax ?? BALANCE.copiasPorRareza[c.rareza];
   if (copias > tope) throw new Error(`MAZO: ${cardId} lleva ${copias} copias y su rareza permite ${tope}`);
 }
 if (TOTAL_MAZO !== BALANCE.tamanoMazo) {

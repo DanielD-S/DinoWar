@@ -22,6 +22,7 @@ import { pathToFileURL } from 'node:url';
 import { MAZO, BALANCE } from '../src/data/balance.js';
 import { CARTAS } from '../src/data/cards.js';
 import { esEntrada } from '../src/engine/entradas.js';
+import { limiteDe } from '../src/data/coleccion.js';
 
 /**
  * Las criaturas con habilidad de entrada. Se DESCUBREN del set en vez de ir
@@ -47,7 +48,7 @@ export const CON_ENTRADA = Object.values(CARTAS)
 export function mazoConEntradas() {
   const cuenta = new Map(MAZO.map(([id, n]) => [id, n]));
   for (const id of CON_ENTRADA) {
-    cuenta.set(id, (cuenta.get(id) ?? 0) + BALANCE.copiasPorRareza[CARTAS[id].rareza]);
+    cuenta.set(id, (cuenta.get(id) ?? 0) + limiteDe(id));
   }
 
   const total = () => [...cuenta.values()].reduce((a, b) => a + b, 0);

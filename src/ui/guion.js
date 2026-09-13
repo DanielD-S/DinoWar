@@ -163,6 +163,15 @@ export const GUION = Object.freeze({
     hacer: (e, api) => api.anuncio(carta(e.cardId).binomial, 'bueno'),
   },
 
+  // La Biomasa se anuncia como un recurso porque es lo que parece desde fuera:
+  // alguien baja una carta y gana Biomasa. Lo que se lleva del mazo lo cuenta
+  // MAZO_PERDIDO, que ya tiene su propio compás y lo dibuja sobre la pila.
+  BIOMASA: {
+    dura: BREVE,
+    sonido: 'biomasa',
+    hacer: (e, api) => api.anuncio(carta(e.cardId).binomial, 'bueno'),
+  },
+
   // La curación llega en bloque al final del turno: se marca a todos a la vez.
   CURACION: {
     dura: BREVE,

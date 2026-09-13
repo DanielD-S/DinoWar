@@ -6,10 +6,13 @@ import assert from 'node:assert/strict';
 import { BALANCE, TOTAL_MAZO } from '../src/data/balance.js';
 import { CARTAS, CLADO, RASGO, TIPO, ES_DINOSAURIO, carta } from '../src/data/cards.js';
 import {
-  crearPartida, FASE, MOTIVO_FIN,
+  crearPartida, FASE, MOTIVO_FIN, vistaDe,
   unidadEn, unidadesDe, ataqueEfectivo, vidaActual, danoEntre,
   espinasDe, rentaDe, curacionDe, efectosDe, adheridasA, buscablesDe, vidaMaxima,
 } from '../src/engine/state.js';
+import { decidir } from '../src/engine/ai.js';
+import { semilla } from '../src/engine/rng.js';
+import { limiteDe } from '../src/data/coleccion.js';
 import { reduce, ACCION, avanzar, validar } from '../src/engine/actions.js';
 import { tablero, poner, enMano, ejecutar, vivo } from './helpers.js';
 
@@ -672,4 +675,65 @@ test('Un clima nuevo encima de la Sequía se lleva su cuenta de turnos', () => {
   r = ejecutar(r, FASE.REVELACION);
   assert.equal(r.campo, 'sabana');
   assert.equal(r.campoTurnos, null, 'la cuenta era de la Sequía, no de la ranura');
+});
+
+// -------------------------------------------------------- la carta de Biomasa
+
+test('La Biomasa da su punto y se cobra una carta de tu mazo', () => {
+  const s = tablero();
+  s.fase = FASE.DESPLIEGUE;
+  const iid = enMano(s, 'biomasa', 0);
+  const mazoAntes = s.jugadores[0].mazo.length;
+  const mazoRival = s.jugadores[1].mazo.length;
+
+  const r = reduce(s, { tipo: ACCION.BIOMASA, jugador: 0, iid });
+  assert.equal(r.jugadores[0].biomasa, BALANCE.biomasa.da, 'ingresa lo que dice su constante');
+  assert.equal(r.jugadores[0].mazo.length, mazoAntes - BALANCE.biomasa.muele,
+    'y se cobra del mazo de quien la baja');
+  assert.equal(r.jugadores[1].mazo.length, mazoRival, 'el mazo del rival no se toca');
+  assert.ok(r.jugadores[0].descarte.includes(iid), 'la carta se va al descarte');
+  assert.ok(r.eventos.some((e) => e.tipo === 'BIOMASA'), 'y lo cuenta');
+});
+
+test('Sólo una Biomasa por turno', () => {
+  const s = tablero();
+  s.fase = FASE.DESPLIEGUE;
+  const una = enMano(s, 'biomasa', 0);
+  const otra = enMano(s, 'biomasa', 0);
+
+  const r = reduce(s, { tipo: ACCION.BIOMASA, jugador: 0, iid: una });
+  assert.match(validar(r, { tipo: ACCION.BIOMASA, jugador: 0, iid: otra }), /este turno/);
+});
+
+test('La Biomasa no se despliega ni se juega como evento', () => {
+  const s = tablero();
+  s.fase = FASE.DESPLIEGUE;
+  const iid = enMano(s, 'biomasa', 0);
+  assert.ok(validar(s, { tipo: ACCION.DESPLEGAR, jugador: 0, iid, ranura: 0 }),
+    'no es una criatura: no ocupa ranura');
+  assert.ok(validar(s, { tipo: ACCION.EVENTO, jugador: 0, iid }),
+    'ni un evento: su acción es la suya');
+});
+
+test('Con el mazo en las últimas la IA deja de molerse', () => {
+  // Sin este freno la IA cambia su última carta por un punto de Biomasa y
+  // pierde por extinción, que es el peor rival posible: uno que se suicida.
+  const s = tablero();
+  s.fase = FASE.DESPLIEGUE;
+  enMano(s, 'biomasa', 0);
+  s.jugadores[0].mazo = s.jugadores[0].mazo.slice(0, BALANCE.ia.mazoDeReserva);
+
+  const jugada = decidir(vistaDe(s, 0), 0, semilla(1));
+  assert.notEqual(jugada?.tipo, ACCION.BIOMASA, 'con el mazo corto no la baja');
+});
+
+test('Una carta puede traer su propio tope de copias, por encima de su rareza', () => {
+  // La Pradera de helechos es común y admite 7. Si el tope saliera sólo de la
+  // rareza, el navegador dejaría guardar el mazo y el servidor lo rechazaría:
+  // la partida se juega y no se cobra, y nadie se entera.
+  assert.equal(carta('biomasa').rareza, 'COMUN');
+  assert.equal(limiteDe('biomasa'), 7);
+  assert.ok(limiteDe('biomasa') > BALANCE.copiasPorRareza.COMUN);
+  assert.equal(limiteDe('allosaurus'), BALANCE.copiasPorRareza[carta('allosaurus').rareza],
+    'las demás siguen saliendo de su rareza');
 });

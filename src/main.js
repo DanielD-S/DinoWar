@@ -264,6 +264,7 @@ function admite(cardId, destino) {
   if (c.tipo === TIPO.CLIMA) return destino.tipo === 'franja';
   if (destino.tipo === 'franja') return false;
   if (c.tipo === TIPO.RECURSO) return true;   // se sueltan en cualquier parte del campo
+  if (c.tipo === TIPO.BIOMASA) return true;   // igual que un recurso: da y se va
   if (c.objetivo === OBJETIVO.PROPIO) return destino.tipo === 'unidad' && destino.propia;
   if (c.objetivo === OBJETIVO.RIVAL) return destino.tipo === 'unidad' && !destino.propia;
   return true;   // los que caen sobre la mesa entera
@@ -284,7 +285,8 @@ function soltar(iid, cardId, destino) {
     const pista = c.tipo === TIPO.DINOSAURIO ? 'Suelta los dinosaurios en una de tus ranuras libres.'
       : c.tipo === TIPO.CLIMA ? 'Los climas van a la ranura de Clima, la franja del centro.'
         : destino?.tipo === 'franja' ? 'Esa franja es sólo para los climas. Suéltala en el campo.'
-          : c.tipo === TIPO.RECURSO ? 'Las cartas de recurso se sueltan en cualquier parte del campo.'
+          : c.tipo === TIPO.BIOMASA ? 'La Biomasa se suelta en el campo, fuera de la franja del clima.'
+            : c.tipo === TIPO.RECURSO ? 'Las cartas de recurso se sueltan en cualquier parte del campo.'
             : c.objetivo === OBJETIVO.PROPIO ? 'Este evento se suelta sobre un dinosaurio tuyo.'
               : c.objetivo === OBJETIVO.RIVAL ? 'Este evento se suelta sobre un dinosaurio del rival.'
                 : 'Suéltala sobre el campo, fuera de la franja del clima.';
@@ -307,6 +309,18 @@ function soltar(iid, cardId, destino) {
     const antes = estado.jugadores[JUGADOR].biomasa;
     if (aplicar({ tipo: ACCION.RECURSO, jugador: JUGADOR, iid })) {
       mensaje(`${c.binomial}: Biomasa de ${antes} a ${estado.jugadores[JUGADOR].biomasa}. El rival lo ha visto.`);
+    }
+    return;
+  }
+  if (c.tipo === TIPO.BIOMASA) {
+    // El mensaje dice las DOS cosas. La Biomasa se ve subir en el marcador,
+    // pero el mazo baja en silencio, y una carta que te cuesta algo tiene que
+    // decir qué te costó o parece gratis.
+    const antes = estado.jugadores[JUGADOR].biomasa;
+    if (aplicar({ tipo: ACCION.BIOMASA, jugador: JUGADOR, iid })) {
+      const jug = estado.jugadores[JUGADOR];
+      mensaje(`${c.binomial}: Biomasa de ${antes} a ${jug.biomasa}.`
+        + ` Tu mazo baja a ${jug.mazo.length}.`);
     }
     return;
   }

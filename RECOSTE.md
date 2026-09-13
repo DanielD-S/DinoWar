@@ -133,3 +133,4 @@ revisión viene a arreglar.
 | bienosaurus | Bienosaurus lufengensis | Tireóforo | Común | 1 | 1 | 1 | 3 | Cría acorazada | Gana +1 de Vida por cada tireóforo que tengas en juego, este incluido. |  |
 | shuangmiaosaurus | Shuangmiaosaurus gilmorei | Ornitópodo | Común | 2 | 2 | 2 | 4 | Ramoneo de orilla | Cuando entra en juego tu hábitat recupera 1 punto. |  |
 | chasmosaurus | Chasmosaurus belli | Marginocéfalo | Común | 2 | 2 | 2 | 4 | Vigía de la gola | Cuando entra en juego robas 1 carta. |  |
+| biomasa | Pradera de helechos | Biomasa | Común | 0 | 0 |  |  | Pradera de helechos | +1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno. |  |

@@ -14,6 +14,7 @@ import {
 } from '../src/data/eventos.js';
 import { CARTAS } from '../src/data/cards.js';
 import { BALANCE } from '../src/data/balance.js';
+import { limiteDe } from '../src/data/coleccion.js';
 
 const HORA = 3600_000;
 const T0 = 1_700_000_000_000;   // un instante cualquiera, fijo
@@ -144,8 +145,8 @@ test('Los mazos de los jefes son legales', () => {
     for (const [cardId, copias] of j.mazo) {
       const c = CARTAS[cardId];
       assert.ok(c, `${id}: la carta "${cardId}" no existe`);
-      assert.ok(copias <= BALANCE.copiasPorRareza[c.rareza],
-        `${id}: ${cardId} lleva ${copias} y su rareza permite ${BALANCE.copiasPorRareza[c.rareza]}`);
+      assert.ok(copias <= limiteDe(cardId),
+        `${id}: ${cardId} lleva ${copias} y su tope es ${limiteDe(cardId)}`);
     }
   }
 });

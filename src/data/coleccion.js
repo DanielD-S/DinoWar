@@ -11,10 +11,17 @@ import { CARTAS, RAREZA, carta, existeCarta } from './cards.js';
 export const TAM_MAZO = BALANCE.tamanoMazo;
 
 /**
- * Copias de una carta que caben en un mazo. Es su rareza, no un número aparte:
- * el límite de mazo y la rareza son la misma regla mirada desde dos sitios.
+ * Copias de una carta que caben en un mazo. Sale de su rareza, porque el límite
+ * de mazo y la rareza son la misma regla mirada desde dos sitios.
+ *
+ * La excepción se declara en la propia carta, con `copiasMax`, y hoy sólo la
+ * usa la Pradera de helechos: una carta de Biomasa con tres copias no llega a
+ * mover la aguja, y su tope es una decisión de diseño, no de rareza.
  */
-export const limiteDe = (cardId) => BALANCE.copiasPorRareza[carta(cardId).rareza];
+export const limiteDe = (cardId) => {
+  const c = carta(cardId);
+  return c.copiasMax ?? BALANCE.copiasPorRareza[c.rareza];
+};
 
 export const ECONOMIA = Object.freeze({
   // Un sobre son cinco cartas. El precio está por encima de lo que devuelve
@@ -58,9 +65,14 @@ export const POR_RAREZA = Object.freeze(Object.fromEntries(
   ESCALA.map((r) => [r, Object.freeze(Object.values(CARTAS).filter((c) => c.rareza === r).map((c) => c.id))]),
 ));
 
-/** Copias que aporta cada rareza a una colección completa. */
+/**
+ * Copias que aporta cada rareza a una colección completa. Se suma carta a carta
+ * y no se multiplica por el tope de la rareza: una carta con tope propio —la
+ * Pradera de helechos, con 7— haría que «colección completa» pidiera menos
+ * copias de las que de verdad caben.
+ */
 export const CUOTA = Object.freeze(Object.fromEntries(
-  ESCALA.map((r) => [r, POR_RAREZA[r].length * BALANCE.copiasPorRareza[r]]),
+  ESCALA.map((r) => [r, POR_RAREZA[r].reduce((n, id) => n + limiteDe(id), 0)]),
 ));
 
 /** Copias distintas que hay que reunir para tener el set entero. */

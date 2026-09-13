@@ -131,6 +131,16 @@
       "sentido": "Ataque permanente"
     },
     {
+      "rasgo": "BIOMASA",
+      "nombre": "Pradera de helechos",
+      "cartas": 1,
+      "quienes": "Pradera de helechos",
+      "texto": "+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.",
+      "constante": "",
+      "valor": "",
+      "sentido": "no lleva número: es una regla, no una cifra"
+    },
+    {
       "rasgo": "REBROTE",
       "nombre": "Rebrote tras incendio",
       "cartas": 1,
@@ -364,7 +374,7 @@
     [
       "Mazo",
       "Cartas del mazo",
-      50,
+      55,
       "Quedarse sin mazo pierde la partida"
     ],
     [
@@ -488,14 +498,14 @@
   "mazo": {
     "dryosaurus": 3,
     "ornitholestes": 3,
-    "ceratosaurus": 3,
+    "ceratosaurus": 2,
     "nodosaurus": 2,
     "stegosaurus": 3,
     "allosaurus": 2,
     "camarasaurus": 2,
     "riparovenator": 2,
     "lokiceratops": 1,
-    "brachylophosaurus": 3,
+    "brachylophosaurus": 2,
     "huaxiadraco": 2,
     "diplodocus": 1,
     "apatosaurus": 1,
@@ -512,6 +522,7 @@
     "mortandad": 1,
     "crecimiento_acelerado": 1,
     "neumaticidad": 1,
-    "competencia": 1
+    "competencia": 1,
+    "biomasa": 7
   }
 }

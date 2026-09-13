@@ -8,7 +8,7 @@
 > **Sed**: heridas que recibe cuando sale *Sequía estacional*. **No es un
 > segundo coste**: no se paga al jugarla, sólo cuando el clima lo cobra.
 
-El set tiene **66 cartas distintas**. Un mazo son **50 cartas exactas**, así que no caben todas: el de referencia lleva 30 dinosaurios, 14 eventos, 3 de recurso y 3 de clima.
+El set tiene **67 cartas distintas**. Un mazo son **55 cartas exactas**, así que no caben todas: el de referencia lleva 28 dinosaurios, 14 eventos, 3 de recurso y 3 de clima.
 
 Fuera del mazo de referencia, y por tanto sin medir aquí: Carroña abundante, Lago efímero, Crecida estacional, Estación de lluvias, Plesiopleurodon wellesi, Ojoraptorsaurus boerei, Dromaeosaurus albertensis, Athenar bermani, Sanjuansaurus gordilloi, Suchomimus tenerensis, Eosinopteryx brevipenna, Troodon formosus, Carnotaurus sastrei, Spinosaurus aegyptiacus, Mosasaurus hoffmannii, Halszkaraptor escuilliei, Tongtianlong limosus, Scanisaurus nazarowi, Monolophosaurus jiangi, Invictarx zephyri, Medusaceratops lokii, Platyceratops tatarinovi, Loricatosaurus priscus, Therizinosaurus cheloniformis, Alaskacephale gangloffi, Titanoceratops ouranos, Atlasaurus imelakei, Stegoceras validum, Maiasaura peeblesorum, Edmontosaurus annectens, Plateosauravus cullingworthi, Gargoyleosaurus parkpinorum, Wendiceratops pinhornensis, Antarctosaurus wichmannianus, Liaoceratops yanzigouensis, Rhinorex condrupus, Bienosaurus lufengensis, Shuangmiaosaurus gilmorei, Chasmosaurus belli. Se juegan igual, pero su calibración no está comprobada.
 
@@ -27,8 +27,8 @@ es legendario.
 
 | Rareza | Copias máximas | Cartas distintas | En el mazo de referencia |
 |---|---|---|---|
-| Común | 3 | 19 | 13 |
-| Rara | 3 | 17 | 20 |
+| Común | 3 | 20 | 19 |
+| Rara | 3 | 17 | 19 |
 | Épica | 2 | 18 | 12 |
 | Legendaria | 1 | 12 | 5 |
 
@@ -40,7 +40,7 @@ es legendario.
 |---|---|---|---|---|---|---|---|
 | *Dryosaurus altus* | Ornitópodo | Común | 3 | 0 | 1 | 2 | undefined |
 | *Ornitholestes hermanni* | Terópodo | Común | 3 | 1 | 2 | 2 | undefined |
-| *Ceratosaurus nasicornis* | Terópodo | Común | 3 | 2 | 4 | 2 | undefined |
+| *Ceratosaurus nasicornis* | Terópodo | Común | 2 | 2 | 4 | 2 | undefined |
 | *Stegosaurus stenops* | Tireóforo | Común | 3 | 2 | 1 | 5 | undefined |
 | *Allosaurus fragilis* | Terópodo | Rara | 2 | 3 | 5 | 5 | undefined |
 | *Camarasaurus grandis* | Saurópodo | Rara | 2 | 3 | 1 | 8 | undefined |
@@ -50,7 +50,7 @@ es legendario.
 | *Nodosaurus textilis* | Tireóforo | Épica | 2 | 3 | 3 | 8 | undefined |
 | *Riparovenator milnerae* | Terópodo | Épica | 2 | 3 | 3 | 3 | undefined |
 | *Lokiceratops rangiformis* | Marginocéfalo | Épica | 1 | 3 | 4 | 7 | undefined |
-| *Brachylophosaurus canadensis* | Ornitópodo | Rara | 3 | 2 | 0 | 10 | undefined |
+| *Brachylophosaurus canadensis* | Ornitópodo | Rara | 2 | 2 | 0 | 10 | undefined |
 | *Tyrannotitan chubutensis* | Terópodo | Legendaria | 1 | 4 | 10 | 7 | undefined |
 | *Huaxiadraco corollatus* | Pterosaurio | Rara | 2 | 2 | 2 | 4 | undefined |
 | *Plesiopleurodon wellesi* | Reptil marino | Épica | 0 | 3 | 8 | 4 | undefined |
@@ -111,7 +111,7 @@ es legendario.
 
 *Sin blindaje:* Terópodo de ~2 m, sin blindaje ni masa.
 
-### *Ceratosaurus nasicornis* · Terópodo · Común · 3 copias
+### *Ceratosaurus nasicornis* · Terópodo · Común · 2 copias
 
 **2 de coste · 4 de Ataque · 2 de Vida**
 
@@ -211,7 +211,7 @@ es legendario.
 
 *De sus 7 de Vida, 2 son blindaje:* La gola es hueso, pero está calada y orientada hacia arriba, no hacia el atacante.
 
-### *Brachylophosaurus canadensis* · Ornitópodo · Rara · 3 copias
+### *Brachylophosaurus canadensis* · Ornitópodo · Rara · 2 copias
 
 **2 de coste · 0 de Ataque · 10 de Vida**
 

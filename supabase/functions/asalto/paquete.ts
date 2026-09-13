@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: dff14e5fa7517831
+// huella: cd1143ce1318aadc
 //
 // Lleva dentro estos 19 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -31,10 +31,10 @@
 // fuente: src/engine/ai.js
 // fuente: src/data/tribu.js
 // fuente: src/data/eventos.js
+// fuente: src/data/coleccion.js
 // fuente: src/data/misiones.js
 // fuente: supabase/functions/_compartido/validarPartida.js
 // fuente: supabase/functions/_compartido/validarAsalto.js
-// fuente: src/data/coleccion.js
 // fuente: supabase/functions/_compartido/validarSolitario.js
 // fuente: supabase/functions/asalto/index.ts
 
@@ -197,6 +197,8 @@ var RASGO = Object.freeze({
   REBROTE: "REBROTE",
   CARRONA: "CARRONA",
   LAGO: "LAGO",
+  // biomasa
+  BIOMASA: "BIOMASA",
   // campo
   CAMPO_LLANURA: "CAMPO_LLANURA",
   CAMPO_CANAL: "CAMPO_CANAL",
@@ -1154,6 +1156,35 @@ var CARTAS = Object.freeze({
     mecanica: Object.freeze({ entrada: { roba: 1 } }),
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: "Cerat\xF3psido casmosaurino de la Formaci\xF3n Dinosaur Park, Alberta, Campaniense. Gola muy grande con dos aberturas amplias."
+  }),
+  // ------------------------------------------------------------- biomasa
+  // La única carta que no se juega para HACER algo, sino para poder hacerlo:
+  // da Biomasa y te cuesta una carta de tu propio mazo. Es la decisión que la
+  // renta fija no ofrecía —acelerar hoy o durar más— y por eso el coste es el
+  // MAZO y no Biomasa: pagar con lo mismo que da no sería una decisión.
+  //
+  // Va en CARTAS y no en CARTAS_ECONOMIA. Las de ahí son el mazo de tierras de
+  // una variante que no se publica; ésta sale en sobres, se funde y se lleva en
+  // el mazo como cualquier otra.
+  biomasa: Object.freeze({
+    id: "biomasa",
+    tipo: TIPO.BIOMASA,
+    dieta: "HERBIVORO",
+    binomial: "Pradera de helechos",
+    rareza: RAREZA.COMUN,
+    objetivo: OBJETIVO.NINGUNO,
+    coste: 0,
+    ataque: 0,
+    vida: 0,
+    rasgo: RASGO.BIOMASA,
+    rasgoNombre: "Pradera de helechos",
+    rasgoTexto: "+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.",
+    // El tope de copias NO sale de su rareza: es la única carta del set con uno
+    // propio. Siete en un mazo de 55 es lo que se midió; con cinco el efecto se
+    // queda a una décima de cumplir el objetivo del jugador inicial.
+    copiasMax: 7,
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Los helechos dominan el registro pol\xEDnico de la Morrison y son la base de la productividad vegetal que sosten\xEDa a los saur\xF3podos. La pradera de helecho se infiere de esa abundancia junto a la escasez de troncos en las llanuras aluviales."
   })
 });
 var CARTAS_ECONOMIA = Object.freeze({
@@ -1312,6 +1343,25 @@ var BALANCE = Object.freeze({
       // Biomasa que da cada una
     })
   }),
+  // La carta de Biomasa. Los números viven aquí y no en la carta, como los de
+  // las otras 16 de soporte, para que `test/textos.test.js` pueda vigilar que
+  // el texto impreso no se quede atrás cuando alguno cambie.
+  //
+  // Medido sobre 4.000 partidas y dos semillas: con 7 copias en un mazo de 55
+  // los trofeos bajan del 60 al 36 % de las victorias y el jugador inicial
+  // sube a 48,3 %, que entra en banda por primera vez desde que existe la v2.
+  // Con 5 copias se queda en 47,9 % y no entra. Subir la renta en vez de poner
+  // la carta NO sirve: da los mismos números y dispara la bola de nieve al
+  // 71 %, porque regalar Biomasa acelera a quien va ganando y una carta que
+  // ocupa sitio en tu mazo y te cuesta otra, no.
+  biomasa: Object.freeze({
+    da: 1,
+    // Biomasa que entrega al bajarla
+    muele: 1,
+    // cartas que te cuesta de tu PROPIO mazo
+    porTurno: 1
+    // cuántas puedes bajar en un turno
+  }),
   manoInicial: 6,
   manoMaxima: 7,
   robo: Object.freeze({ normal: 1 }),
@@ -1417,7 +1467,7 @@ var BALANCE = Object.freeze({
     sabanaBiomasa: 1
   }),
   // ------------------------------------------------------------------- mazo
-  tamanoMazo: 50,
+  tamanoMazo: 55,
   // Copias que caben de una misma carta. Es a la vez el límite de construcción
   // del jugador y la escala de rareza: son la misma regla mirada desde dos
   // sitios. La épica se queda en 2 y no en 3 porque con 3 el mazo se llenaría
@@ -1483,6 +1533,12 @@ var BALANCE = Object.freeze({
   }),
   // --------------------------------------------------------------------- IA
   ia: Object.freeze({
+    // Con menos mazo que esto, la IA deja de bajar Biomasa. No es afinar su
+    // juego: es que la carta muerde tu propio mazo, y sin freno la IA se
+    // molería hasta perder por extinción a cambio de un punto de Biomasa. Las
+    // partidas medidas acaban con treinta y pico cartas, así que este tope no
+    // se toca nunca en juego normal; está para el caso raro.
+    mazoDeReserva: 6,
     // Turnos que se espera que una unidad siga en pie aportando. Sin esto la IA
     // sólo mira el asalto siguiente y descarta a los muros: un 3/10 no mata a
     // nadie hoy, pero bloquea cinco turnos.
@@ -1509,7 +1565,7 @@ var MAZO = Object.freeze([
   // dinosaurios — 30
   ["dryosaurus", 3],
   ["ornitholestes", 3],
-  ["ceratosaurus", 3],
+  ["ceratosaurus", 2],
   ["nodosaurus", 2],
   ["stegosaurus", 3],
   ["allosaurus", 2],
@@ -1519,7 +1575,7 @@ var MAZO = Object.freeze([
   // gregario del mazo: la lista sigue siendo la misma clase de mazo.
   ["riparovenator", 2],
   ["lokiceratops", 1],
-  ["brachylophosaurus", 3],
+  ["brachylophosaurus", 2],
   ["huaxiadraco", 2],
   ["diplodocus", 1],
   ["apatosaurus", 1],
@@ -1546,13 +1602,20 @@ var MAZO = Object.freeze([
   ["mortandad", 1],
   ["crecimiento_acelerado", 1],
   ["neumaticidad", 1],
-  ["competencia", 1]
+  ["competencia", 1],
+  // biomasa — 7
+  //
+  // No se suman a las 50 de antes: DESPLAZAN dos copias, las de las entradas
+  // más repetidas, para que el mazo pierda repeticiones y no variedad. Quitar
+  // la única copia de Torvosaurus cambiaría qué mazo es; bajar Ceratosaurus de
+  // 3 a 2 sólo lo hace más fino.
+  ["biomasa", 7]
 ].map((e) => Object.freeze(e)));
 var TOTAL_MAZO = MAZO.reduce((n, [, copias]) => n + copias, 0);
 for (const [cardId, copias] of MAZO) {
   const c = CARTAS[cardId];
   if (!c) throw new Error(`MAZO: la carta "${cardId}" no existe`);
-  const tope = BALANCE.copiasPorRareza[c.rareza];
+  const tope = c.copiasMax ?? BALANCE.copiasPorRareza[c.rareza];
   if (copias > tope) throw new Error(`MAZO: ${cardId} lleva ${copias} copias y su rareza permite ${tope}`);
 }
 if (TOTAL_MAZO !== BALANCE.tamanoMazo) {
@@ -2489,6 +2552,7 @@ function finalizar(s, motivo) {
 }
 
 // src/engine/actions.js
+var topeDeBiomasa = () => modoActual() === MODO.CARTAS ? BALANCE.economia.cartas.porTurno : BALANCE.biomasa.porTurno;
 var ACCION = Object.freeze({
   DESPLEGAR: "DESPLEGAR",
   MOVER: "MOVER",
@@ -2578,10 +2642,9 @@ function validar(s, a) {
     return null;
   }
   if (a.tipo === ACCION.BIOMASA) {
-    if (modoActual() !== MODO.CARTAS) return "aqu\xED la Biomasa no se juega, se cobra";
     if (!esCartaDeBiomasa(inst.cardId)) return "esa carta no da Biomasa";
-    if (jug.biomasaJugadaEsteTurno >= BALANCE.economia.cartas.porTurno) {
-      return "ya has bajado tu recurso de este turno";
+    if (jug.biomasaJugadaEsteTurno >= topeDeBiomasa()) {
+      return "ya has bajado tu Biomasa de este turno";
     }
     return null;
   }
@@ -2712,12 +2775,15 @@ function reduce(state, action) {
     // cartas de recurso del set: la Biomasa que da se gasta este mismo turno.
     case ACCION.BIOMASA: {
       const cardId = s.instancias[action.iid].cardId;
-      const t = BALANCE.economia.cartas;
+      const enCartas = modoActual() === MODO.CARTAS;
+      const da = enCartas ? BALANCE.economia.cartas.valor : BALANCE.biomasa.da;
+      const muele = enCartas ? 0 : BALANCE.biomasa.muele;
       jug.mano = jug.mano.filter((x) => x !== action.iid);
       jug.descarte.push(action.iid);
       jug.biomasaJugadaEsteTurno += 1;
-      ingresar(jug, t.valor, dietaDeCarta(cardId) ?? DIETA.HERBIVORO);
-      ev(s, "BIOMASA", { jugador: action.jugador, cardId, biomasa: jug.biomasa });
+      ingresar(jug, da, dietaDeCarta(cardId) ?? DIETA.HERBIVORO);
+      ev(s, "BIOMASA", { jugador: action.jugador, cardId, biomasa: jug.biomasa, muele });
+      if (muele > 0) perderDelMazo(s, action.jugador, muele);
       break;
     }
     // Declarar qué se produce el turno que viene (modo TIPADA). No cuesta nada
@@ -3023,11 +3089,18 @@ function valorDeGuardia(vista, j, cardId) {
 function valorDeAccion(vista, j, a) {
   const contrario = rival(j);
   switch (a.tipo) {
-    // Bajar el recurso del turno es como jugar la tierra en Magic: casi nunca
+    // Bajar la Biomasa del turno es como jugar la tierra en Magic: casi nunca
     // hay nada mejor que hacer con esa acción, porque no compite con jugar
     // cartas — compite con no poder jugarlas el turno que viene.
-    case ACCION.BIOMASA:
+    //
+    // Con el mazo en las últimas deja de compensar, y por un margen enorme: la
+    // Pradera muerde tu propio mazo, así que la última copia se cambia por un
+    // punto de Biomasa y la derrota por extinción.
+    case ACCION.BIOMASA: {
+      const muele = modoActual() === MODO.CARTAS ? 0 : BALANCE.biomasa.muele;
+      if (muele > 0 && vista.jugadores[j].mazo.length <= IA.mazoDeReserva) return -Infinity;
       return 100;
+    }
     // Declarar producción no cuesta nada, así que la pregunta no es «¿vale la
     // pena?» sino «¿de cuál me falta?». Se mira la mano: qué tipo desbloquea
     // más Biomasa de cartas que ahora mismo no puedo pagar. A igualdad, vegetal,
@@ -3278,7 +3351,8 @@ var JEFES = Object.freeze({
       ["aridez", 1],
       ["crecimiento_acelerado", 1],
       ["competencia", 1],
-      ["neumaticidad", 1]
+      ["neumaticidad", 1],
+      ["biomasa", 5]
     ]),
     nota: "Cazarlo no es ganarle una partida: es desgastarlo entre todos."
   }),
@@ -3314,7 +3388,8 @@ var JEFES = Object.freeze({
       ["neumaticidad", 1],
       ["competencia", 1],
       ["crecimiento_acelerado", 1],
-      ["shuangmiaosaurus", 3]
+      ["shuangmiaosaurus", 3],
+      ["biomasa", 5]
     ]),
     nota: "No pega fuerte. Aguanta, que es peor."
   })
@@ -3358,6 +3433,94 @@ var CALENDARIO = Object.freeze([
   })
 ]);
 var CICLO = CALENDARIO.reduce((n, e) => Math.max(n, e.dia + e.dura), 0);
+
+// src/data/coleccion.js
+var TAM_MAZO = BALANCE.tamanoMazo;
+var limiteDe = (cardId) => {
+  const c = carta(cardId);
+  return c.copiasMax ?? BALANCE.copiasPorRareza[c.rareza];
+};
+var ECONOMIA = Object.freeze({
+  // Un sobre son cinco cartas. El precio está por encima de lo que devuelve
+  // fundirlo entero (unas 77 monedas, que lo comprueba un test), porque si no
+  // el bucle se alimenta solo y abrir sobres deja de ser una decisión.
+  precioSobre: 100,
+  cartasPorSobre: 5,
+  // Las monedas salen de GANAR, no de jugar y tampoco de fundir. Fundir sólo
+  // recicla lo que ya no te cabe en ningún mazo.
+  //
+  // Perder no paga: dos victorias son un sobre y una derrota no es medio paso
+  // hacia él. El precio de eso es que quien no gana nunca se queda con los dos
+  // sobres de salida y su colección inicial, que es un mazo legal y completo
+  // —jugar nunca se bloquea—, pero la colección deja de crecer sola.
+  monedasInicio: 240,
+  monedasVictoria: 50,
+  monedasDerrota: 0,
+  // Tope de victorias PAGADAS al día. No es una regla de juego —jugar no se
+  // limita— sino una cota al abuso: el servidor re-juega cada partida que cobra
+  // y eso cuesta CPU, así que un cliente hostil no puede pedir mil.
+  victoriasPorDia: 50,
+  fusion: Object.freeze({
+    [RAREZA.COMUN]: 4,
+    [RAREZA.RARO]: 12,
+    [RAREZA.EPICO]: 35,
+    [RAREZA.LEGENDARIO]: 100
+  })
+});
+var GARANTIA = RAREZA.RARO;
+var ESCALA = Object.freeze([RAREZA.COMUN, RAREZA.RARO, RAREZA.EPICO, RAREZA.LEGENDARIO]);
+var nivel = (rareza) => ESCALA.indexOf(rareza);
+var POR_RAREZA = Object.freeze(Object.fromEntries(
+  ESCALA.map((r) => [r, Object.freeze(Object.values(CARTAS).filter((c) => c.rareza === r).map((c) => c.id))])
+));
+var CUOTA = Object.freeze(Object.fromEntries(
+  ESCALA.map((r) => [r, POR_RAREZA[r].reduce((n, id) => n + limiteDe(id), 0)])
+));
+var COLECCION_COMPLETA = ESCALA.reduce((n, r) => n + CUOTA[r], 0);
+var PESO = Object.freeze({
+  [RAREZA.COMUN]: 8,
+  [RAREZA.RARO]: 4,
+  [RAREZA.EPICO]: 2,
+  [RAREZA.LEGENDARIO]: 1
+});
+var PROBABILIDAD = Object.freeze((() => {
+  const bruto = ESCALA.map((r) => POR_RAREZA[r].length * PESO[r]);
+  const total = bruto.reduce((a, b) => a + b, 0);
+  return Object.fromEntries(ESCALA.map((r, i) => [r, bruto[i] / total]));
+})());
+function rarezaAlAzar(azar, minima = RAREZA.COMUN) {
+  const desde = nivel(minima);
+  const candidatas = ESCALA.slice(desde);
+  const total = candidatas.reduce((n, r) => n + PROBABILIDAD[r], 0);
+  let t = azar() * total;
+  for (const r of candidatas) {
+    t -= PROBABILIDAD[r];
+    if (t < 0) return r;
+  }
+  return candidatas[candidatas.length - 1];
+}
+function abrirSobre(azar, tengo = null) {
+  const salida = [];
+  const cuenta = tengo ? { ...tengo } : null;
+  for (let i = 0; i < ECONOMIA.cartasPorSobre; i++) {
+    const ultima = i === ECONOMIA.cartasPorSobre - 1;
+    const cumplida = salida.some((id2) => nivel(carta(id2).rareza) >= nivel(GARANTIA));
+    const r = rarezaAlAzar(azar, ultima && !cumplida ? GARANTIA : RAREZA.COMUN);
+    let pool = POR_RAREZA[r];
+    if (cuenta) {
+      const faltan = pool.filter((id2) => (cuenta[id2] ?? 0) < limiteDe(id2));
+      if (faltan.length) pool = faltan;
+      else {
+        const sinRepetir = pool.filter((id2) => !salida.includes(id2));
+        if (sinRepetir.length) pool = sinRepetir;
+      }
+    }
+    const id = pool[Math.min(pool.length - 1, Math.floor(azar() * pool.length))];
+    if (cuenta) cuenta[id] = (cuenta[id] ?? 0) + 1;
+    salida.push(id);
+  }
+  return salida;
+}
 
 // src/data/misiones.js
 var MISIONES = Object.freeze({
@@ -3543,8 +3706,8 @@ function validarMazoLegal(mazo) {
       throw new PartidaInvalida("carta desconocida", cardId);
     }
     if (!Number.isInteger(copias) || copias <= 0) throw new PartidaInvalida("copias inv\xE1lidas", cardId);
-    const tope = BALANCE.copiasPorRareza[carta(cardId).rareza];
-    if (copias > tope) throw new PartidaInvalida("copias por encima de la rareza", cardId);
+    const tope = limiteDe(cardId);
+    if (copias > tope) throw new PartidaInvalida("copias por encima del tope de la carta", cardId);
     total += copias;
   }
   if (total !== BALANCE.tamanoMazo) {
@@ -3654,91 +3817,6 @@ function validarAsalto(envio) {
     perfil: PERFIL.HEURISTICA
   });
   return { ...r, dano: danoDeAsalto(r) };
-}
-
-// src/data/coleccion.js
-var TAM_MAZO = BALANCE.tamanoMazo;
-var limiteDe = (cardId) => BALANCE.copiasPorRareza[carta(cardId).rareza];
-var ECONOMIA = Object.freeze({
-  // Un sobre son cinco cartas. El precio está por encima de lo que devuelve
-  // fundirlo entero (unas 77 monedas, que lo comprueba un test), porque si no
-  // el bucle se alimenta solo y abrir sobres deja de ser una decisión.
-  precioSobre: 100,
-  cartasPorSobre: 5,
-  // Las monedas salen de GANAR, no de jugar y tampoco de fundir. Fundir sólo
-  // recicla lo que ya no te cabe en ningún mazo.
-  //
-  // Perder no paga: dos victorias son un sobre y una derrota no es medio paso
-  // hacia él. El precio de eso es que quien no gana nunca se queda con los dos
-  // sobres de salida y su colección inicial, que es un mazo legal y completo
-  // —jugar nunca se bloquea—, pero la colección deja de crecer sola.
-  monedasInicio: 240,
-  monedasVictoria: 50,
-  monedasDerrota: 0,
-  // Tope de victorias PAGADAS al día. No es una regla de juego —jugar no se
-  // limita— sino una cota al abuso: el servidor re-juega cada partida que cobra
-  // y eso cuesta CPU, así que un cliente hostil no puede pedir mil.
-  victoriasPorDia: 50,
-  fusion: Object.freeze({
-    [RAREZA.COMUN]: 4,
-    [RAREZA.RARO]: 12,
-    [RAREZA.EPICO]: 35,
-    [RAREZA.LEGENDARIO]: 100
-  })
-});
-var GARANTIA = RAREZA.RARO;
-var ESCALA = Object.freeze([RAREZA.COMUN, RAREZA.RARO, RAREZA.EPICO, RAREZA.LEGENDARIO]);
-var nivel = (rareza) => ESCALA.indexOf(rareza);
-var POR_RAREZA = Object.freeze(Object.fromEntries(
-  ESCALA.map((r) => [r, Object.freeze(Object.values(CARTAS).filter((c) => c.rareza === r).map((c) => c.id))])
-));
-var CUOTA = Object.freeze(Object.fromEntries(
-  ESCALA.map((r) => [r, POR_RAREZA[r].length * BALANCE.copiasPorRareza[r]])
-));
-var COLECCION_COMPLETA = ESCALA.reduce((n, r) => n + CUOTA[r], 0);
-var PESO = Object.freeze({
-  [RAREZA.COMUN]: 8,
-  [RAREZA.RARO]: 4,
-  [RAREZA.EPICO]: 2,
-  [RAREZA.LEGENDARIO]: 1
-});
-var PROBABILIDAD = Object.freeze((() => {
-  const bruto = ESCALA.map((r) => POR_RAREZA[r].length * PESO[r]);
-  const total = bruto.reduce((a, b) => a + b, 0);
-  return Object.fromEntries(ESCALA.map((r, i) => [r, bruto[i] / total]));
-})());
-function rarezaAlAzar(azar, minima = RAREZA.COMUN) {
-  const desde = nivel(minima);
-  const candidatas = ESCALA.slice(desde);
-  const total = candidatas.reduce((n, r) => n + PROBABILIDAD[r], 0);
-  let t = azar() * total;
-  for (const r of candidatas) {
-    t -= PROBABILIDAD[r];
-    if (t < 0) return r;
-  }
-  return candidatas[candidatas.length - 1];
-}
-function abrirSobre(azar, tengo = null) {
-  const salida = [];
-  const cuenta = tengo ? { ...tengo } : null;
-  for (let i = 0; i < ECONOMIA.cartasPorSobre; i++) {
-    const ultima = i === ECONOMIA.cartasPorSobre - 1;
-    const cumplida = salida.some((id2) => nivel(carta(id2).rareza) >= nivel(GARANTIA));
-    const r = rarezaAlAzar(azar, ultima && !cumplida ? GARANTIA : RAREZA.COMUN);
-    let pool = POR_RAREZA[r];
-    if (cuenta) {
-      const faltan = pool.filter((id2) => (cuenta[id2] ?? 0) < limiteDe(id2));
-      if (faltan.length) pool = faltan;
-      else {
-        const sinRepetir = pool.filter((id2) => !salida.includes(id2));
-        if (sinRepetir.length) pool = sinRepetir;
-      }
-    }
-    const id = pool[Math.min(pool.length - 1, Math.floor(azar() * pool.length))];
-    if (cuenta) cuenta[id] = (cuenta[id] ?? 0) + 1;
-    salida.push(id);
-  }
-  return salida;
 }
 
 // supabase/functions/_compartido/validarSolitario.js

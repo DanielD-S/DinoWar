@@ -31,10 +31,11 @@
 import { pathToFileURL } from 'node:url';
 import { MAZO, BALANCE } from '../src/data/balance.js';
 import { carta } from '../src/data/cards.js';
+import { limiteDe } from '../src/data/coleccion.js';
 
 /** El mazo de referencia con `cardId` dentro, sin pasarse de 50 ni de rareza. */
 export function mazoCon(cardId, copias = null) {
-  const tope = BALANCE.copiasPorRareza[carta(cardId).rareza];
+  const tope = limiteDe(cardId);
   const cuantas = Math.min(copias ?? tope, tope);
   const cuenta = new Map(MAZO.map(([id, n]) => [id, n]));
   cuenta.set(cardId, Math.min(tope, (cuenta.get(cardId) ?? 0) + cuantas));
