@@ -477,13 +477,16 @@ sale cuando el jugador CIERRA el vídeo**, con un toque o con «Ver la carta»:
 al acabar se queda en el último fotograma esperando, y quien no quiera verlo
 entero toca antes. Mientras está puesto, la pila no acepta arrastres.
 
-**El plano llena la pantalla entera, también en vertical**, recortando los
-lados: enseñado como banda apaisada dejaba dos tercios del móvil en negro.
-El precio es que en un móvil se pierde lo que el animal haga por los
-costados; la solución de verdad es generar los vídeos en 9:16 para el móvil,
-y `object-fit: cover` seguiría valiendo. Entra en tres tiempos —fondo, plano
-acercándose, nombre— tras esperar `ENTRADA_VIDEO` a que la carta anterior
-termine de irse, que si no aparecía de golpe sobre una carta a medio vuelo.
+**En apaisado el plano cubre la pantalla; en vertical se ve ENTERO como
+banda** y detrás el mismo vídeo ampliado, desenfocado y oscuro rellena arriba
+y abajo, como en los reproductores. Se probó cubrir también en vertical y se
+perdía todo lo que el animal hacía por los lados —al mosasaurio se le iba la
+cabeza del cuadro—, y la banda sobre negro dejaba dos tercios del móvil
+vacíos. El fondo es una segunda copia del vídeo que sólo se crea en vertical:
+son dos decodificaciones a la vez y en un móvil viejo se notarían. Entra en
+tres tiempos —fondo, plano acercándose, nombre— tras esperar
+`ENTRADA_VIDEO` a que la carta anterior termine de irse, que si no aparecía
+de golpe sobre una carta a medio vuelo.
 
 **Las cartas de la pila esperan boca abajo.** Iban con la cara a la vista y la
 legendaria asomaba detrás de la primera carta: el vídeo llegaba después de

@@ -826,6 +826,17 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .apertura-video.visible .apertura-video-marco { opacity: 1; transform: none; }
 .apertura-video.cierra .apertura-video-marco { transition-delay: 0s; transition-duration: .45s; opacity: 0; transform: scale(1.04); }
 .apertura-video-marco video { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+/* En vertical el plano apaisado se ve ENTERO como banda —nada del animal se
+   recorta— y detrás, el mismo vídeo ampliado, desenfocado y oscuro rellena
+   arriba y abajo. El fondo se escala más de la cuenta para que el desenfoque
+   no deje un borde claro en los cantos. En apaisado el plano cubre y el fondo
+   no existe: apertura.js no lo crea. */
+.apertura-video-marco .apertura-video-fondo { position: absolute; inset: 0; z-index: 0; filter: blur(26px) brightness(.42) saturate(1.15); transform: scale(1.18); }
+.apertura-video-marco .apertura-video-principal { position: relative; z-index: 1; }
+/* Con la misma especificidad que la regla general de arriba, o `cover` gana. */
+@media (orientation: portrait) {
+  .apertura-video-marco .apertura-video-principal { object-fit: contain; }
+}
 /* Sombra abajo para que el nombre y el botón se lean sobre el agua. */
 .apertura-video::after {
   content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 42%; pointer-events: none;
