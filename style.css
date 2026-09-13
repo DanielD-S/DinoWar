@@ -446,44 +446,125 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .sobre-odds tr.completa th::after { content: ' · completa'; color: var(--tenue-2); }
 .sobre-nota { display: inline-block; margin-top: 8px; color: var(--tenue-2); font-size: 12px; }
 
-/* Mazos */
-.mazo-ficha {
-  display: flex; align-items: center; gap: 10px; width: 100%;
-  border: 1px solid var(--linea); border-radius: var(--radio);
-  background: rgba(244,236,224,.03); padding: 12px 13px; margin-bottom: 8px; text-align: left;
-}
-.mazo-ficha.activo { border-color: var(--bio); }
-.mazo-ficha .nom { flex: 1; min-width: 0; font-size: 14px; }
-.mazo-ficha .n { font-size: 12px; color: var(--tenue); }
-.mazo-ficha .n.mal { color: var(--peligro); }
-.mazo-ficha .accion { font-size: 12px; color: var(--acento-claro); padding: 6px 8px; }
+/* ================================================================= mazos
+   La única pantalla de fuera de la partida con piel: placas de piedra y latón
+   por mazo, el sello de lacre en el que está en uso, los medallones de clado
+   como filtros y la cabaña de expedición de fondo. Las piezas salen de
+   `tools/mazos.py`, y los números de la ventana de la portada están MEDIDOS
+   por esa herramienta sobre el PNG, no estimados. */
 
+/* El fondo detrás de todo y las tres franjas por encima. */
+#mazos .meta-fondo {
+  position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0;
+  object-fit: cover; object-position: 50% 30%;
+  filter: brightness(.5) saturate(.85);
+}
+#mazos .meta-barra, #mazos .meta-cuerpo, #mazos .meta-pie { position: relative; z-index: 1; }
+#mazos .meta-barra { background: rgba(15,11,8,.72); }
+#mazos .meta-pie { background: rgba(15,11,8,.82); }
+
+/* --- la placa ------------------------------------------------------------ */
+.mazo { margin-bottom: 12px; }
+.mazo-placa {
+  position: relative; width: 100%; aspect-ratio: 2508 / 557;
+  background: url('assets/piel/mazos/placa_mazo.webp') center / 100% 100% no-repeat;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,.55));
+}
+/* La ventana de la portada: dónde el PNG dejó el hueco. Medido. */
+.mazo-ventana {
+  position: absolute; left: 4.55%; top: 12.57%; width: 10.25%; height: 60.86%;
+  background: #14100c; overflow: hidden; display: grid; place-items: center;
+}
+.mazo-ventana svg, .mazo-ventana .foto { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mazo-ventana .foto { filter: saturate(.95) brightness(.9); }
+.mazo-vacia { color: rgba(217,164,65,.35); font-size: 14px; }
+.mazo-banda {
+  position: absolute; left: 17.5%; right: 4.5%; top: 12%; bottom: 12%;
+  display: flex; flex-direction: column; justify-content: center; gap: 3px; min-width: 0;
+}
+.mazo-nom {
+  font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 14px; letter-spacing: .02em;
+  color: #e9d9b5; text-shadow: 0 1px 2px rgba(0,0,0,.9);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.mazo-sub {
+  font-size: 10.5px; color: var(--tenue); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  display: flex; align-items: center; gap: 4px;
+}
+.mazo-sub b { font-weight: 500; color: var(--acento-claro); }
+.mazo-sub b.mal, .mazo-cuenta.mal { color: var(--peligro); }
+.sep { color: var(--tenue-2); }
+/* El sello de lacre, medio salido de la esquina, como puesto encima. */
+.mazo-sello {
+  position: absolute; right: 1.5%; top: -18%; width: 13%; aspect-ratio: 1;
+  background: url('assets/piel/mazos/sello_en_uso.webp') center / contain no-repeat;
+  transform: rotate(-9deg); filter: drop-shadow(0 2px 3px rgba(0,0,0,.6));
+}
+.mazo-acciones {
+  display: flex; gap: 4px; justify-content: flex-end; align-items: center; padding: 2px 2px 0;
+  flex-wrap: wrap;
+}
+.mazo-acciones .accion {
+  font-size: 12px; color: var(--acento-claro); padding: 7px 9px; border-radius: 6px;
+  border: 1px solid transparent;
+}
+.mazo-acciones .accion:active { border-color: var(--borde-fuerte); }
+.mazo-acciones .accion[disabled] { color: var(--tenue-2); }
+.mazo-acciones .accion.mal { color: var(--peligro); border-color: rgba(200,80,60,.5); }
+.mazo-pregunta { flex: 1; font-size: 12px; color: var(--texto-2); }
+
+/* --- los medallones -------------------------------------------------------- */
+.emblema {
+  display: inline-block; width: 18px; height: 18px; vertical-align: middle;
+  background: var(--emblema) center / contain no-repeat; flex: 0 0 auto;
+}
+.emb-clado_teropodo { --emblema: url('assets/piel/mazos/clado_teropodo.webp'); }
+.emb-clado_sauropodo { --emblema: url('assets/piel/mazos/clado_sauropodo.webp'); }
+.emb-clado_tireoforo { --emblema: url('assets/piel/mazos/clado_tireoforo.webp'); }
+.emb-clado_ornitopodo { --emblema: url('assets/piel/mazos/clado_ornitopodo.webp'); }
+.emb-clado_marginocefalo { --emblema: url('assets/piel/mazos/clado_marginocefalo.webp'); }
+.emb-clado_pterosaurio { --emblema: url('assets/piel/mazos/clado_pterosaurio.webp'); }
+.emb-clado_marino { --emblema: url('assets/piel/mazos/clado_marino.webp'); }
+.emb-tipo_clima { --emblema: url('assets/piel/mazos/tipo_clima.webp'); }
+.emb-tipo_evento { --emblema: url('assets/piel/mazos/tipo_evento.webp'); }
+.emb-tipo_recurso { --emblema: url('assets/piel/mazos/tipo_recurso.webp'); }
+
+/* --- el editor -------------------------------------------------------------- */
+.mazo-cabecera { display: flex; gap: 10px; align-items: stretch; margin-bottom: 10px; }
+.mazo-ventana.grande {
+  position: static; width: 54px; height: 74px; flex: 0 0 auto; border-radius: 5px;
+  box-shadow: 0 0 0 1px var(--borde-fuerte), 0 3px 6px rgba(0,0,0,.5);
+}
+.mazo-cabecera-datos { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
 .mazo-nombre {
-  width: 100%; padding: 12px 13px; margin-bottom: 10px; font: inherit; font-size: 15px;
-  background: rgba(244,236,224,.04); color: var(--texto);
-  border: 1px solid var(--borde); border-radius: var(--radio);
+  width: 100%; padding: 8px 10px; font: inherit; font-size: 14px;
+  font-family: 'Cinzel', Georgia, serif; font-weight: 700; letter-spacing: .02em;
+  background: rgba(15,11,8,.6); color: #e9d9b5;
+  border: 1px solid var(--borde); border-radius: 6px;
   -webkit-user-select: text; user-select: text;
 }
-
-/* Marcador del mazo: la cifra manda y la barra dice cuánto falta. */
-.mazo-marcador { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 12px; }
-.mazo-marcador b { font-size: 20px; font-weight: 500; color: var(--peligro); }
+.mazo-marcador { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.mazo-marcador b { font-size: 18px; font-weight: 500; color: var(--peligro); }
 .mazo-marcador b.bien { color: var(--acento-claro); }
 .mazo-marcador span { color: var(--tenue); }
 .mazo-barra {
-  flex: 1; height: 6px; border-radius: 3px; background: rgba(244,236,224,.07); overflow: hidden;
+  flex: 1; height: 6px; border-radius: 3px; background: rgba(244,236,224,.09); overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.4);
 }
 .mazo-barra i { display: block; height: 100%; background: var(--borde-fuerte); transition: width .25s; }
-.mazo-barra i.bien { background: linear-gradient(90deg, var(--borde-fuerte), var(--bio)); }
-.mazo-distintas { flex: 0 0 auto; font-size: 10px; color: var(--tenue-2); }
+.mazo-barra i.bien { background: linear-gradient(90deg, #a4761f, var(--bio)); }
+.mazo-resumen { font-size: 10.5px; color: var(--tenue); display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
 
-/* Curva de coste: dónde se acumula el mazo, de un vistazo. */
+/* La curva es un filtro: cada barra es un botón. */
 .mazo-curva {
-  display: flex; align-items: flex-end; gap: 4px; height: 58px; margin-bottom: 12px;
-  padding: 6px 8px; border-radius: var(--radio);
-  background: rgba(244,236,224,.03); border: 1px solid var(--linea);
+  display: flex; align-items: flex-end; gap: 3px; height: 60px; margin-bottom: 10px;
+  padding: 6px 6px 4px; border-radius: var(--radio);
+  background: rgba(15,11,8,.55); border: 1px solid var(--linea);
 }
-.mazo-curva .cb { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; }
+.mazo-curva .cb {
+  flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%;
+  padding: 0; border: 0; border-radius: 4px; background: none; position: relative;
+}
 .mazo-curva .cb i {
   width: 100%; margin-top: auto; min-height: 2px; border-radius: 2px; background: #3a2f22;
   transition: height .25s;
@@ -491,40 +572,66 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .mazo-curva .cb i.n1 { background: #6b552d; }
 .mazo-curva .cb i.n2 { background: #8a6c38; }
 .mazo-curva .cb i.n3 { background: var(--bio); }
-.mazo-curva .cb em {
-  font-style: normal; font-size: 9px; color: var(--tenue-2); margin-top: 3px;
-}
+.mazo-curva .cb em { font-style: normal; font-size: 9px; color: var(--tenue-2); margin-top: 3px; }
+.mazo-curva .cb small { position: absolute; top: 0; font-size: 8px; color: var(--tenue); }
+.mazo-curva .cb.on { background: rgba(217,164,65,.14); box-shadow: 0 0 0 1px var(--bio); }
+.mazo-curva .cb.on em { color: var(--acento-claro); }
 
-.mazo-pestanas { display: flex; gap: 6px; margin-bottom: 10px; }
+.mazo-pestanas { display: flex; gap: 6px; margin-bottom: 8px; }
 .mazo-pestanas .chip { flex: 1; font-size: 11.5px; padding: 7px 4px; }
 
-.mazo-fila {
-  display: flex; align-items: center; gap: 8px;
-  border-bottom: 1px solid var(--superficie-2); padding: 8px 2px;
+.mazo-filtros { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+.mazo-busca {
+  flex: 0 0 34%; min-width: 0; padding: 7px 9px; font: inherit; font-size: 12px;
+  background: rgba(15,11,8,.6); color: var(--texto); border: 1px solid var(--borde); border-radius: 6px;
+  -webkit-user-select: text; user-select: text;
 }
-.mazo-fila.lleno { opacity: .55; }
-.mazo-fila .coste {
-  flex: 0 0 auto; width: 20px; height: 20px; border-radius: 50%;
-  border: 1px solid var(--borde); color: var(--texto-2); font-size: 10px;
-  display: grid; place-items: center;
+/* Los diez medallones en una fila que se desliza: no caben a 360 px y
+   encogerlos los deja ilegibles. */
+.mazo-emblemas {
+  flex: 1; min-width: 0; display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
-.mazo-fila .mini { width: 32px; height: 32px; flex: 0 0 auto; border-radius: 4px; overflow: hidden; background: #14100c; }
-.mazo-fila .mini svg, .mazo-fila .mini .foto { width: 100%; height: 100%; object-fit: cover; display: block; }
-.mazo-fila .nom { flex: 1; min-width: 0; font-size: 12px; line-height: 1.2; }
-.mazo-fila .nom.dino { font-style: italic; }
-.mazo-fila .sub { display: block; font-size: 9px; color: var(--tenue); font-style: normal; margin-top: 2px; }
-.mazo-chip {
-  flex: 0 0 auto; padding: 3px 7px; border-radius: 3px; font-size: 9.5px; white-space: nowrap;
-  color: var(--tenue); box-shadow: 0 0 0 1px var(--borde);
+.mazo-emblemas::-webkit-scrollbar { display: none; }
+.mazo-emblemas button {
+  flex: 0 0 auto; width: 32px; height: 32px; padding: 3px; border-radius: 50%;
+  border: 1px solid transparent; opacity: .55; transition: opacity .12s, transform .12s;
 }
-.mazo-chip.puestas { background: var(--bio); box-shadow: none; color: #191410; }
-.mazo-paso { display: flex; align-items: center; gap: 5px; flex: 0 0 auto; }
+.mazo-emblemas button .emblema { width: 100%; height: 100%; }
+.mazo-emblemas button.on { opacity: 1; border-color: var(--bio); transform: scale(1.08); box-shadow: 0 0 8px rgba(217,164,65,.45); }
+.mazo-emblemas button:active { opacity: 1; }
+.mazo-rarezas { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+.mazo-rarezas .chip { font-size: 10.5px; padding: 4px 9px; }
+.mazo-rarezas .chip.quitar { color: var(--peligro); border-color: rgba(200,80,60,.4); }
+
+/* Las celdas: la carta de la colección con su contador y su paso. */
+.mazo-rejilla { gap: 8px 6px; }
+.mazo-celda { gap: 4px; }
+.mazo-arte { position: relative; cursor: pointer; }
+.mazo-arte:active .carta { filter: brightness(1.15); }
+.mazo-celda:not(.puesta) .mazo-arte .carta { filter: saturate(.7) brightness(.78); }
+.mazo-celda.llena .mazo-arte .carta { filter: none; }
+.mazo-celda.puesta .mazo-arte .carta { box-shadow: 0 0 0 1px var(--bio), 0 0 10px rgba(217,164,65,.25); }
+.mazo-celda.mal .mazo-arte .carta { box-shadow: 0 0 0 2px var(--peligro), 0 0 10px rgba(200,80,60,.5); }
+/* El número de copias sobre la carta, en la esquina de abajo. */
+.mazo-n {
+  position: absolute; right: -3px; bottom: -3px; min-width: 22px; height: 22px; padding: 0 5px;
+  border-radius: 11px; display: grid; place-items: center;
+  background: var(--bio); color: #191410; font-size: 12px; font-weight: 700;
+  box-shadow: 0 0 0 2px #17120e, 0 2px 4px rgba(0,0,0,.6);
+}
+.mazo-celda.mal .mazo-n { background: var(--peligro); color: #fff; }
+.mazo-paso { display: flex; align-items: center; justify-content: center; gap: 4px; }
 .mazo-paso button {
-  width: 30px; height: 30px; border: 1px solid var(--borde); border-radius: 6px;
-  font-size: 17px; line-height: 1; color: var(--texto-2);
+  width: 30px; height: 28px; border: 1px solid var(--borde); border-radius: 6px;
+  font-size: 16px; line-height: 1; color: var(--texto-2); background: rgba(15,11,8,.5);
 }
 .mazo-paso button:active:not([disabled]) { border-color: var(--borde-fuerte); }
 .mazo-paso button[disabled] { opacity: .3; }
+.mazo-cuenta { min-width: 26px; text-align: center; font-size: 10.5px; color: var(--texto-2); }
+.mazo-celda .col-nombre { text-align: center; font-size: 10px; cursor: pointer; }
+.mazo-celda.mal .col-nombre { color: var(--peligro); }
+
 .meta-pie .fila { display: flex; gap: 8px; margin-bottom: 9px; }
 .meta-pie .fila .boton-secundario { flex: 1; font-size: 12px; padding: 11px 4px; min-height: 42px; }
 .meta-pie .fila .boton-grande, .meta-pie .fila .boton-secundario { margin-top: 0; }

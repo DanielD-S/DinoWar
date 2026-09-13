@@ -517,3 +517,130 @@ sprite de una criatura atacando, o una ilustración por golpe. El impacto es el
 mismo para las 52 criaturas y lo que cambia es el color y el tamaño, por CSS.
 Un juego con 52 impactos distintos tendría 52 cosas que mantener y ninguna se
 vería más de un segundo.
+
+## Las piezas de la pantalla de mazos
+
+Hoy la lista de mazos y el editor son las dos únicas pantallas del juego sin
+piel: paneles oscuros con filas de texto, mientras el menú de al lado es
+piedra y latón. Lo que sigue son las piezas para que dejen de serlo, y el
+encargo es corto: **una placa, un sello, siete emblemas, tres iconos y un
+fondo**. Todo lo demás —la rejilla de cartas del editor, la curva de coste,
+los filtros— se pinta con lo que ya hay: las cartas con su marco salen de
+`cartaHTML()` y el latón de los botones, de las placas que ya existen.
+
+### El bloque de MATERIAL (copiar literal)
+
+Es el mismo de las placas del menú. Adjuntar `placa_coleccion.png` o
+`boton_ancho.png` como referencia y pedir «mismo material, misma luz».
+
+> Pieza de interfaz de videojuego, vista de frente, sin perspectiva. Roca
+> oscura pulida con vetas minerales y filete de latón viejo con el canto
+> biselado, iluminación lateral suave que marque el relieve, sin brillos
+> especulares fuertes. Paleta: negro, gris piedra, latón `#d9a441` y oro
+> viejo. Sin texto, sin letras, sin números, sin marca de agua. Fondo
+> **magenta puro `#FF00FF`** fuera de la pieza, sin sombra proyectada.
+
+Magenta y no transparente, como los marcos: `tools/marcos.py` ya sabe
+keyearlo y las placas del menú costaron una herramienta de inundación por
+llegar sin él.
+
+### 1 · La placa de mazo
+
+Cada mazo de la lista es una placa apaisada con una ventana a la izquierda
+donde el juego pinta la carta de portada —la legendaria del mazo, o la que
+el jugador elija— y una banda a la derecha donde escribe el nombre. Va como
+`border-image` en nueve tajadas, igual que el marco de carta, así que **la
+ventana y la banda tienen que ser huecos vacíos** y no dibujos.
+
+> [MATERIAL] Placa horizontal de proporción 4:1. A la izquierda, un hueco
+> rectangular vertical de proporción 82:112 que ocupa todo el alto menos el
+> filete, con el borde de latón alrededor, **relleno de magenta puro**. A la
+> derecha, el resto de la placa como una banda lisa de roca oscura, sin
+> ningún adorno en el centro, para grabar un nombre encima. Un pequeño
+> remache de latón en cada una de las cuatro esquinas. Bordes rectos, sin
+> curvas.
+
+Exportar a **1024 px de ancho**, PNG. Se sirve a 768: mide 342 px en la
+lista, a densidad 2x.
+
+### 2 · El sello «en uso»
+
+El mazo que llevas a la partida se marca con un sello en la esquina de su
+placa, no con un botón. Es lo único de la lista que tiene que verse desde
+lejos.
+
+> [MATERIAL] Sello circular de lacre color ámbar oscuro con la impronta de
+> una huella tridáctila de terópodo en el centro, el borde del lacre
+> irregular como lacre de verdad, ligeramente en relieve. Sin texto. Nada
+> fuera del círculo.
+
+Exportar a **256×256**. Se pinta a 28 px.
+
+### 3 · Los siete emblemas de clado
+
+Sirven para tres cosas: filtrar la colección en el editor, decir de un
+vistazo de qué es cada mazo —el clado dominante se calcula y se pone en la
+placa— y, más adelante, rotular las plantillas. Son siete y tienen que
+leerse a 20 px, así que **silueta maciza, un solo trazo, nada de detalle**.
+Se piden los siete en una conversación con la misma frase y sólo cambia el
+animal.
+
+> [MATERIAL] Emblema circular, un medallón de latón viejo con el borde
+> biselado, y en el centro la silueta maciza y estilizada, en relieve, de
+> {ANIMAL}, vista de perfil, reconocible a tamaño de icono, sin detalle
+> interior. Formas gruesas. Nada fuera del círculo.
+
+| fichero | {ANIMAL} |
+|---|---|
+| `clado_teropodo` | un terópodo bípedo cazador, cabeza grande, cola recta |
+| `clado_sauropodo` | un saurópodo de cuello y cola largos, cuatro patas |
+| `clado_tireoforo` | un estegosaurio con placas en el lomo |
+| `clado_ornitopodo` | un ornitópodo bípedo de cabeza pequeña, inclinado hacia delante |
+| `clado_marginocefalo` | un ceratópsido con gola y cuernos, de perfil |
+| `clado_pterosaurio` | un pterosaurio con las alas extendidas, de perfil |
+| `clado_marino` | un mosasaurio nadando, cuerpo alargado y aletas |
+
+Exportar a **256×256** cada uno. Comprobar cada emblema encogido a 20 px:
+si no se distingue el tireóforo del saurópodo, no sirve.
+
+### 4 · Los tres iconos de tipo
+
+Los mismos medallones para las tres familias de soporte, que en el editor
+se filtran junto a los clados.
+
+| fichero | {ANIMAL} se sustituye por |
+|---|---|
+| `tipo_clima` | una nube con tres trazos de lluvia debajo |
+| `tipo_evento` | un rayo vertical quebrado |
+| `tipo_recurso` | un helecho de tres frondes |
+
+Exportar a **256×256**.
+
+### 5 · El fondo de la pantalla
+
+Como `fondo_jugar.webp`: una escena a sangre detrás de todo, oscurecida por
+CSS. Para los mazos, el sitio donde se guardan las cosas.
+
+> [ESTILO de las ilustraciones, el bloque de PROMPTS.md] El interior de una
+> cabaña de expedición paleontológica de finales del siglo XIX, vista de
+> frente: una mesa de madera con cajones de fósiles etiquetados, cuadernos
+> de campo abiertos, un candil de aceite encendido, huesos de dinosaurio
+> ordenados en bandejas. Penumbra cálida, un solo foco de luz, tonos
+> marrones y ámbar. Composición vertical 9:16. Sin personas, sin texto.
+
+Exportar a lo más vertical que dé el generador y recortar a 9:16. Se sirve
+a **1080 px de ancho** por `tools/placas.py`, en `FONDOS`, como los otros
+dos.
+
+### Lo que llegó
+
+Las trece, la misma noche, todas en magenta limpio y con el nombre pedido
+salvo la placa, que vino como `placa_de_mazo.png` y la herramienta la conoce
+así. Los diez medallones pasan la prueba de los 20 px: encogidos a ese tamaño
+se distinguen todos entre sí. Se sirven a 192 px y pesan 14 KB cada uno.
+
+### Lo que NO se pide
+
+- Ni la curva de coste ni el medidor de 50/50: son CSS y ya están.
+- Ni las cartas del editor: salen de `cartaHTML()` con su marco.
+- Ni botones: los del pie usan `boton_ancho.webp` y las chapas del menú.
