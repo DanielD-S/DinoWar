@@ -924,6 +924,22 @@ que guardases sería rechazado—.
 La factura, dicha aquí para que no sorprenda: **sin conexión no se juega**.
 Antes el juego arrancaba siempre. Fue una decisión del autor, no un descuido.
 
+**El CAPTCHA es el único script externo del juego**, y por qué no puede viajar
+en el repositorio está en `src/ui/captcha.js`: lo que vale de un CAPTCHA es que
+lo verifica un tercero. Es Turnstile, de Cloudflare, en modo gestionado —a
+casi nadie le pregunta nada—. El widget se monta en cada repintado de la
+puerta, porque la puerta se repinta entera con `innerHTML`, y el token se
+reinicia después de CADA intento, porque es de un solo uso. La clave de sitio
+va en `config.js` como la publicable de Supabase; la secreta sólo la conoce
+el panel de Supabase.
+
+**El orden de activación es cliente primero, panel después.** Con el CAPTCHA
+activado en el panel, Supabase rechaza toda alta y toda entrada por contraseña
+sin token; si se activa antes de publicar un cliente que lo mande, nadie puede
+entrar. Y al revés no pasa nada: el cliente manda el token y Supabase, con el
+panel apagado, lo ignora. Es la misma lección que el catálogo y la Edge
+Function, un piso más arriba.
+
 El nombre de jugador es único y se cambia **una sola vez**. El que se elige al
 crear la cuenta no gasta el cambio: lo pone `entrar()` en el insert de la fila,
 que no pasa por `cambiar_apodo`. Es lo que va a salir en una tabla de ELO, y un
@@ -1073,9 +1089,10 @@ Dicho para que nadie lo descubra tarde:
 
 - **El Duelo (PvP) no existe.** La placa está en la pantalla de jugar, apagada
   y con su «Pronto». El ELO sigue sin moverlo nadie.
-- **CAPTCHA en el alta anónima.** El límite es de 30 por hora y por IP. Antes de
-  abrirlo a desconocidos hay que activar Turnstile, o la tabla de usuarios es un
-  blanco fácil.
+- **El CAPTCHA está en el cliente pero no activado en el panel.** El juego ya
+  manda el token de Turnstile en el alta y en la entrada; falta pegar la clave
+  secreta en Authentication → Attack Protection y encenderlo. Hasta entonces el
+  único freno son las 30 altas por hora y por IP de Supabase.
 - **La confirmación por correo está desactivada.** Se puede crear una cuenta con
   un correo que no es tuyo. Para activarla hace falta un SMTP propio: el
   integrado de Supabase manda 2 correos a la hora y sólo a direcciones del

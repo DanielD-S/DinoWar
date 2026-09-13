@@ -11,6 +11,7 @@
 // haber entrado.
 
 import { registrar, entrarConCorreo, esAnonimo, haySesion } from './supabase.js';
+import { montarCaptcha, tokenCaptcha, reiniciarCaptcha, hayCaptcha } from './captcha.js';
 
 const id = (s) => document.getElementById(s);
 
@@ -133,7 +134,12 @@ function pintarEntrada() {
         <input id="ent-correo" type="email" autocomplete="email" inputmode="email"
                placeholder="tu@correo.com"></label>
       ${campoClave('ent-clave', crear ? 'new-password' : 'current-password')}
+      ${hayCaptcha() ? '<div id="ent-captcha" class="ent-captcha"></div><p id="ent-captcha-nota" class="cu-nota mal" hidden></p>' : ''}
     </div>`;
+
+  // El widget va DESPUÉS del innerHTML, que es quien crea su contenedor, y se
+  // vuelve a montar en cada repintado porque el repintado se lo lleva.
+  montarCaptcha(id('ent-captcha'), id('ent-captcha-nota'));
 
   const mensaje = aviso ? `<p class="cu-nota ${aviso.mal ? 'mal' : ''}">${escapar(aviso.texto)}</p>` : '';
   dom.pie.innerHTML = `${mensaje}
@@ -194,10 +200,13 @@ async function hacer(boton, accion) {
 
   boton.disabled = true;
   boton.textContent = 'Un momento…';
+  // El token se lee una vez y vale para un solo intento: si el alta cae a la
+  // entrada por «ya registrado», el segundo viaje necesita otro.
+  const captcha = tokenCaptcha();
   try {
     if (accion === 'crear') {
       try {
-        await registrar(correo, clave);
+        await registrar(correo, clave, captcha);
       } catch (e) {
         // El alta son DOS pasos —crear el usuario y crear su fila de jugador— y
         // si el segundo falla el primero ya está hecho. Reintentar daba «User
@@ -209,13 +218,14 @@ async function hacer(boton, accion) {
         // contraseña la sigue comprobando el servidor, o sea que esto no abre
         // ninguna puerta que no estuviera abierta.
         if (!/already registered|already been registered/i.test(e.message)) throw e;
-        await entrarConCorreo(correo, clave);
+        reiniciarCaptcha();
+        await entrarConCorreo(correo, clave, await tokenNuevo());
       }
       // El nombre se pone al CREAR la fila del jugador, dentro de `entrar()`, y
       // por eso no gasta el único cambio que se permite después.
       await alEntrar(nombre);
     } else {
-      await entrarConCorreo(correo, clave);
+      await entrarConCorreo(correo, clave, captcha);
       await alEntrar(null);
     }
     // Dentro: el borrador se va con la pantalla. Dejar la contraseña en una
@@ -225,5 +235,22 @@ async function hacer(boton, accion) {
   } catch (e) {
     aviso = { texto: e.message, mal: true };
   }
+  // El intento gastó el token, saliera como saliera; el repintado monta un
+  // widget nuevo que pide otro.
+  reiniciarCaptcha();
   pintarEntrada();
+}
+
+/**
+ * Espera a que el widget reiniciado tenga token. Turnstile en modo gestionado
+ * lo da en menos de un segundo cuando no pregunta nada; si pregunta, el jugador
+ * está mirando la pantalla y lo resuelve.
+ */
+async function tokenNuevo() {
+  for (let k = 0; k < 40; k++) {
+    const t = tokenCaptcha();
+    if (t) return t;
+    await new Promise((r) => setTimeout(r, 250));
+  }
+  return null;
 }

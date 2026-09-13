@@ -159,10 +159,10 @@ export const correoActual = () => usuarioActual()?.email ?? null;
  * desactivada, y este `if` es lo que impide que un día se active y el juego se
  * quede en blanco sin decir por qué.
  */
-export async function registrar(correo, clave) {
+export async function registrar(correo, clave, captcha = null) {
   const r = await pedir('/auth/v1/signup', {
     method: 'POST',
-    body: JSON.stringify({ email: correo, password: clave }),
+    body: JSON.stringify({ email: correo, password: clave, ...conCaptcha(captcha) }),
   }, false);
   if (!r?.access_token) {
     throw new ErrorDeRed('cuenta creada, pero hay que confirmar el correo antes de entrar', 200, r);
@@ -171,11 +171,19 @@ export async function registrar(correo, clave) {
   return r;
 }
 
+/**
+ * El token del CAPTCHA, en el sitio donde GoTrue lo busca. Con el CAPTCHA
+ * activado en el panel, el alta y la entrada por contraseña sin esto vuelven
+ * con «captcha verification process failed». Sin token no se manda el campo,
+ * que es lo que deja entrar mientras el panel lo tenga apagado.
+ */
+const conCaptcha = (token) => (token ? { gotrue_meta_security: { captcha_token: token } } : {});
+
 /** Entrar con una cuenta ya creada. Reemplaza la sesión que hubiera. */
-export async function entrarConCorreo(correo, clave) {
+export async function entrarConCorreo(correo, clave, captcha = null) {
   const s = await pedir('/auth/v1/token?grant_type=password', {
     method: 'POST',
-    body: JSON.stringify({ email: correo, password: clave }),
+    body: JSON.stringify({ email: correo, password: clave, ...conCaptcha(captcha) }),
   }, false);
   guardar(s);
   return s;
