@@ -1081,8 +1081,8 @@ Dicho para que nadie lo descubra tarde:
   equipo.
 - **El ELO no lo mueve nadie.** La columna existe en `jugadores` y las partidas
   se registran, pero no hay PvP todavía.
-- **Tres cartas mal calibradas** sobre un objetivo de cero (`BALANCE.md`), y 48
-  de las 76 cartas del set fuera del mazo de referencia, o sea sin calibración
+- **Tres cartas mal calibradas** sobre un objetivo de cero (`BALANCE.md`), y 73
+  de las 101 cartas del set fuera del mazo de referencia, o sea sin calibración
   comprobada.
 - **La inmunidad al clima no muerde.** Torvosaurus y Nodosaurus dicen «no le
   afectan los efectos del clima», y hoy los dos únicos efectos del clima sobre una

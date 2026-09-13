@@ -46,7 +46,7 @@ test('Toda criatura tiene habilidad, y toda habilidad tiene nombre y texto', () 
     assert.ok(c.rasgoNombre, `${c.id} no tiene nombre de rasgo`);
     assert.ok(c.rasgoTexto, `${c.id} no tiene texto`);
   }
-  assert.equal(CRIATURAS.length, 52, '50 del set y las 2 de jefe');
+  assert.equal(CRIATURAS.length, 68, '66 del set y las 2 de jefe');
 });
 
 test('Ninguna mecánica usa un campo que el motor no mire', () => {
@@ -99,7 +99,7 @@ test('El soporte conserva su rasgo: sin él no sería una carta', () => {
   // que es de criaturas. Sus números van en `biomasa`, y sin ellos la carta
   // no se juega: el motor los lee al bajarla.
   const soporte = Object.values(CARTAS).filter((c) => c.tipo !== TIPO.DINOSAURIO);
-  assert.equal(soporte.length, 26);
+  assert.equal(soporte.length, 35);
   for (const c of soporte) {
     assert.notEqual(c.rasgo, 'NINGUNO', `${c.id} se quedó sin mecánica`);
     assert.ok(c.rasgoNombre && c.rasgoTexto, `${c.id} no tiene nombre o texto`);

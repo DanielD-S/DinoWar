@@ -17,7 +17,7 @@ import {
   esCartaDeBiomasa, dietaDeCarta,
 } from './economia.js';
 import {
-  ev, descartarDeMano, perderDelMazo,
+  ev, descartarDeMano, perderDelMazo, descartarAlAzar, robar,
   faseRenta, faseRobo, faseRevelacion, faseCombate, faseChequeo,
 } from './resolve.js';
 
@@ -278,6 +278,15 @@ function aplicarRecurso(s, j, iid) {
   } else if (r === RASGO.LAGO) {
     jug.biomasa += P.lagoBiomasa;
     jug.habitat -= P.lagoHabitat;
+  } else if (r === RASGO.INSECTOS) {
+    jug.biomasa += P.insectosBiomasa;
+    robar(s, j, P.insectosRoba);
+  } else if (r === RASGO.MANADA_PASO) {
+    jug.biomasa += P.manadaPasoBiomasa;
+    perderDelMazo(s, j, P.manadaPasoMazo);
+  } else if (r === RASGO.FRUTOS) {
+    jug.biomasa += P.frutosBiomasa;
+    robar(s, rival(j), P.frutosRobaRival);
   }
 
   ev(s, 'RECURSO', { jugador: j, cardId, biomasa: jug.biomasa });

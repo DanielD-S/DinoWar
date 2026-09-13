@@ -11,6 +11,16 @@
       "sentido": "no lleva número: es una regla, no una cifra"
     },
     {
+      "rasgo": "BOSQUE_RIBERENO",
+      "nombre": "Bosque de coníferas ribereño",
+      "cartas": 1,
+      "quienes": "Bosque de coníferas ribereño",
+      "texto": "Tu rival descarta 2 cartas de su mano al azar.",
+      "constante": "rasgos.bosqueRiberenoMano",
+      "valor": 2,
+      "sentido": "cartas que el rival descarta de la mano"
+    },
+    {
       "rasgo": "CAMPO_CANAL",
       "nombre": "Bruma de valle",
       "cartas": 1,
@@ -19,6 +29,16 @@
       "constante": "efectosCampo.canalVida",
       "valor": 1,
       "sentido": "Vida a todos los del campo"
+    },
+    {
+      "rasgo": "CANAL_TRENZADO",
+      "nombre": "Canal fluvial trenzado",
+      "cartas": 1,
+      "quienes": "Canal fluvial trenzado",
+      "texto": "Todos tus dinosaurios recuperan 2 de Vida.",
+      "constante": "rasgos.canalTrenzadoCura",
+      "valor": 2,
+      "sentido": "Vida que recuperan todos los tuyos"
     },
     {
       "rasgo": "CARRONA",
@@ -61,6 +81,16 @@
       "sentido": "Ataque, y otro tanto de Vida"
     },
     {
+      "rasgo": "DERIVA_ARIDA",
+      "nombre": "Deriva árida",
+      "cartas": 1,
+      "quienes": "Deriva árida",
+      "texto": "Ambos jugadores descartan la mano entera y roban otras tantas cartas.",
+      "constante": "",
+      "valor": "",
+      "sentido": "no lleva número: es una regla, no una cifra"
+    },
+    {
       "rasgo": "CAMPO_BOSQUE",
       "nombre": "Estación de lluvias",
       "cartas": 1,
@@ -79,6 +109,16 @@
       "constante": "rasgos.fracturaAtaque",
       "valor": 2,
       "sentido": "Ataque que se quita"
+    },
+    {
+      "rasgo": "FRUTOS",
+      "nombre": "Frutos de cícada",
+      "cartas": 1,
+      "quienes": "Frutos de cícada",
+      "texto": "+3 Biomasa ahora mismo. Tu rival roba 1 carta.",
+      "constante": "recursos.frutosBiomasa",
+      "valor": 3,
+      "sentido": "Biomasa, y el rival roba 1"
     },
     {
       "rasgo": "GASTROLITOS",
@@ -111,6 +151,26 @@
       "sentido": "no lleva número: es una regla, no una cifra"
     },
     {
+      "rasgo": "INUNDACION",
+      "nombre": "Llanura de inundación",
+      "cartas": 1,
+      "quienes": "Llanura de inundación",
+      "texto": "Ambos jugadores pierden 3 cartas del mazo. Tú robas 1.",
+      "constante": "rasgos.inundacionMazo",
+      "valor": 3,
+      "sentido": "cartas de mazo que pierden los DOS"
+    },
+    {
+      "rasgo": "MANADA_PASO",
+      "nombre": "Manada de paso",
+      "cartas": 1,
+      "quienes": "Manada de paso",
+      "texto": "+2 Biomasa ahora mismo. Pierdes 3 cartas de tu mazo.",
+      "constante": "recursos.manadaPasoBiomasa",
+      "valor": 2,
+      "sentido": "Biomasa, a cambio de 3 cartas del mazo"
+    },
+    {
       "rasgo": "CAMPO_SABANA",
       "nombre": "Monzón de verano",
       "cartas": 1,
@@ -141,6 +201,26 @@
       "sentido": "Ataque permanente"
     },
     {
+      "rasgo": "NIDO",
+      "nombre": "Nido con huevos",
+      "cartas": 1,
+      "quienes": "Nido con huevos",
+      "texto": "Robas 2 cartas.",
+      "constante": "rasgos.nidoRoba",
+      "valor": 2,
+      "sentido": "cartas que robas"
+    },
+    {
+      "rasgo": "INSECTOS",
+      "nombre": "Nube de insectos",
+      "cartas": 1,
+      "quienes": "Nube de insectos",
+      "texto": "+1 Biomasa ahora mismo. Robas 1 carta.",
+      "constante": "recursos.insectosBiomasa",
+      "valor": 1,
+      "sentido": "Biomasa, y además robas 1"
+    },
+    {
       "rasgo": "REBROTE",
       "nombre": "Rebrote tras incendio",
       "cartas": 1,
@@ -149,6 +229,16 @@
       "constante": "",
       "valor": "",
       "sentido": "no lleva número: es una regla, no una cifra"
+    },
+    {
+      "rasgo": "SABANA_HELECHOS",
+      "nombre": "Sabana de helechos",
+      "cartas": 1,
+      "quienes": "Sabana de helechos",
+      "texto": "Robas 2 cartas. Luego descartas 1 carta de tu mano al azar.",
+      "constante": "rasgos.sabanaHelechosRoba",
+      "valor": 2,
+      "sentido": "cartas que robas (y descartas 1)"
     },
     {
       "rasgo": "CAMPO_ARIDEZ",
@@ -182,8 +272,8 @@
     {
       "campo": "aura",
       "forma": "Aura de todo el bando",
-      "cartas": 1,
-      "quienes": "Antarctosaurus wichmannianus",
+      "cartas": 2,
+      "quienes": "Antarctosaurus wichmannianus, Brachiosaurus altithorax",
       "ejemplo": "Mientras esté en juego, a ninguno de tus dinosaurios le afectan los efectos del clima."
     },
     {
@@ -196,22 +286,22 @@
     {
       "campo": "costeExtra",
       "forma": "Coste añadido",
-      "cartas": 1,
-      "quienes": "Carnotaurus sastrei",
+      "cartas": 3,
+      "quienes": "Carnotaurus sastrei, Velociraptor mongoliensis, Argentinosaurus huinculensis",
       "ejemplo": "Para jugarlo tienes que descartar 2 cartas de tu mano."
     },
     {
       "campo": "cuenta",
       "forma": "Contador por especie",
-      "cartas": 6,
-      "quienes": "Dryosaurus altus, Stegosaurus stenops, Dromaeosaurus albertensis, Eosinopteryx brevipenna, Troodon formosus, Plateosauravus cullingworthi",
+      "cartas": 7,
+      "quienes": "Dryosaurus altus, Stegosaurus stenops, Dromaeosaurus albertensis, Eosinopteryx brevipenna, Troodon formosus, Plateosauravus cullingworthi, Iguanodon bernissartensis",
       "ejemplo": "Gana +1 de Ataque por cada Dryosaurus en juego, sea de quien sea y este incluido."
     },
     {
       "campo": "cuenta",
       "forma": "Contador por clado",
-      "cartas": 2,
-      "quienes": "Titanoceratops ouranos, Bienosaurus lufengensis",
+      "cartas": 3,
+      "quienes": "Titanoceratops ouranos, Bienosaurus lufengensis, Amargasaurus cazadorensis",
       "ejemplo": "Gana +1 de Ataque por cada marginocéfalo que tengas en juego, este incluido."
     },
     {
@@ -224,16 +314,30 @@
     {
       "campo": "entrada",
       "forma": "Al entrar · emboscada",
-      "cartas": 3,
-      "quienes": "Ornitholestes hermanni, Ojoraptorsaurus boerei, Alaskacephale gangloffi",
+      "cartas": 4,
+      "quienes": "Ornitholestes hermanni, Ojoraptorsaurus boerei, Alaskacephale gangloffi, Pachycephalosaurus wyomingensis",
       "ejemplo": "Cuando entra en juego hiere en 2 al dinosaurio de enfrente."
     },
     {
       "campo": "entrada",
       "forma": "Al entrar · fulmina",
-      "cartas": 2,
-      "quienes": "Tyrannotitan chubutensis, Wendiceratops pinhornensis",
+      "cartas": 3,
+      "quienes": "Tyrannotitan chubutensis, Wendiceratops pinhornensis, Triceratops horridus",
       "ejemplo": "Cuando entra en juego manda al descarte 1 dinosaurio rival de hasta 4 de Vida."
+    },
+    {
+      "campo": "entrada",
+      "forma": "Al entrar · manoRival",
+      "cartas": 2,
+      "quienes": "Allosaurus fragilis, Tyrannosaurus rex",
+      "ejemplo": "Cuando entra en juego descarta 1 carta al azar de la mano de tu rival."
+    },
+    {
+      "campo": "entrada",
+      "forma": "Al entrar · mueleRival",
+      "cartas": 2,
+      "quienes": "Suchomimus tenerensis, Quetzalcoatlus northropi",
+      "ejemplo": "Cuando entra en juego descarta 1 carta del mazo de tu rival."
     },
     {
       "campo": "entrada",
@@ -251,13 +355,6 @@
     },
     {
       "campo": "entrada",
-      "forma": "Al entrar · manoRival",
-      "cartas": 1,
-      "quienes": "Allosaurus fragilis",
-      "ejemplo": "Cuando entra en juego descarta 1 carta al azar de la mano de tu rival."
-    },
-    {
-      "campo": "entrada",
       "forma": "Al entrar · muelePropio",
       "cartas": 1,
       "quienes": "Ceratosaurus nasicornis",
@@ -265,17 +362,38 @@
     },
     {
       "campo": "entrada",
-      "forma": "Al entrar · mueleRival",
+      "forma": "Al entrar · muelePropio + roba",
       "cartas": 1,
-      "quienes": "Suchomimus tenerensis",
-      "ejemplo": "Cuando entra en juego descarta 1 carta del mazo de tu rival."
+      "quienes": "Pteranodon longiceps",
+      "ejemplo": "Cuando entra en juego pierdes 1 carta de tu mazo y robas 1."
+    },
+    {
+      "campo": "entrada",
+      "forma": "Al entrar · roba + curaHabitat",
+      "cartas": 1,
+      "quienes": "Parasaurolophus walkeri",
+      "ejemplo": "Cuando entra en juego robas 1 carta y tu hábitat recupera 1 punto."
     },
     {
       "campo": "espinas",
       "forma": "Devuelve daño",
-      "cartas": 2,
-      "quienes": "Stegoceras validum, Gargoyleosaurus parkpinorum",
+      "cartas": 4,
+      "quienes": "Stegoceras validum, Gargoyleosaurus parkpinorum, Ankylosaurus magniventris, Kentrosaurus aethiopicus",
       "ejemplo": "Devuelve 2 de daño a quien lo hiera en combate."
+    },
+    {
+      "campo": "guardia",
+      "forma": "Guardia del hábitat",
+      "cartas": 1,
+      "quienes": "Elasmosaurus platyurus",
+      "ejemplo": "Resta 1 a cada golpe que llegue a tu hábitat."
+    },
+    {
+      "campo": "inmune",
+      "forma": "Inmunidad a EVENTO",
+      "cartas": 3,
+      "quienes": "Riparovenator milnerae, Lokiceratops rangiformis, Euoplocephalus tutus",
+      "ejemplo": "No le afectan las cartas de evento de tu rival."
     },
     {
       "campo": "inmune",
@@ -285,11 +403,11 @@
       "ejemplo": "No le afectan los efectos del clima."
     },
     {
-      "campo": "inmune",
-      "forma": "Inmunidad a EVENTO",
+      "campo": "regenera",
+      "forma": "Se cura sola",
       "cartas": 2,
-      "quienes": "Riparovenator milnerae, Lokiceratops rangiformis",
-      "ejemplo": "No le afectan las cartas de evento de tu rival."
+      "quienes": "Camarasaurus grandis, Mamenchisaurus hochuanensis",
+      "ejemplo": "Al final de tu turno recupera 1 de Vida."
     },
     {
       "campo": "regenera",
@@ -297,13 +415,6 @@
       "cartas": 1,
       "quienes": "Maiasaura peeblesorum",
       "ejemplo": "Al final de tu turno, todos tus dinosaurios recuperan 1 de Vida."
-    },
-    {
-      "campo": "regenera",
-      "forma": "Se cura sola",
-      "cartas": 1,
-      "quienes": "Camarasaurus grandis",
-      "ejemplo": "Al final de tu turno recupera 1 de Vida."
     },
     {
       "campo": "si",
@@ -447,51 +558,51 @@
   "clados": [
     {
       "clado": "Ornitópodo",
-      "cartas": 6,
-      "ataque": "1.8",
-      "vida": "7.3",
+      "cartas": 8,
+      "ataque": "2.0",
+      "vida": "7.1",
       "regla": "sin regla propia"
     },
     {
       "clado": "Terópodo",
-      "cartas": 18,
-      "ataque": "4.1",
-      "vida": "3.7",
+      "cartas": 20,
+      "ataque": "4.3",
+      "vida": "3.9",
       "regla": "sin regla propia"
     },
     {
       "clado": "Tireóforo",
-      "cartas": 6,
-      "ataque": "1.3",
-      "vida": "4.8",
+      "cartas": 9,
+      "ataque": "1.4",
+      "vida": "5.8",
       "regla": "sin regla propia"
     },
     {
       "clado": "Saurópodo",
-      "cartas": 7,
-      "ataque": "2.0",
-      "vida": "7.6",
+      "cartas": 11,
+      "ataque": "2.2",
+      "vida": "8.7",
       "regla": "sin regla propia"
     },
     {
       "clado": "Marginocéfalo",
-      "cartas": 9,
-      "ataque": "2.6",
+      "cartas": 11,
+      "ataque": "2.8",
       "vida": "5.9",
       "regla": "sin regla propia"
     },
     {
       "clado": "Pterosaurio",
-      "cartas": 1,
-      "ataque": "2.0",
-      "vida": "4.0",
+      "cartas": 3,
+      "ataque": "3.0",
+      "vida": "3.3",
       "regla": "sin regla propia"
     },
     {
       "clado": "Reptil marino",
-      "cartas": 3,
-      "ataque": "6.3",
-      "vida": "5.7",
+      "cartas": 4,
+      "ataque": "5.3",
+      "vida": "6.5",
       "regla": "sin regla propia"
     }
   ],

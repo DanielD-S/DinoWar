@@ -178,6 +178,103 @@ Las diez llegaron en 1536×1024 el 13-09-2026 y las rarezas se repartieron
 mirándolas: el Manantial es la única con roca, cascada y oasis, y las dos
 épicas son las dos con el suelo bajo el agua.
 
+## La ronda de las cien cartas
+
+Veinticinco huecos más, con los mismos dos bloques fijos. Los eventos y los
+recursos van con su modificador de tipo; las criaturas con el plumaje escrito
+en cada hueco, que el generador lo inventa distinto cada vez si no se le dice.
+Nueve de estas cartas descartan, y el arte tiene que enseñar la PÉRDIDA —lo
+que se va, lo que se pierde de vista— para que la mecánica se lea en el dibujo.
+
+### Eventos
+
+- **`sabana_helechos` — Sabana de helechos.** Pradera de helechos abierta y
+  seca con una manada de ornitópodos pastando dispersa, uno de ellos alejándose
+  solo hacia el borde del cuadro mientras el resto sigue comiendo, luz rasante.
+- **`inundacion` — Llanura de inundación.** Una llanura entera bajo una lámina
+  de agua parda que baja, troncos y helechos arrancados flotando, cielo
+  limpio de después de la tormenta, un saurópodo vadeando de vuelta con el agua
+  por las rodillas.
+- **`canal_trenzado` — Canal fluvial trenzado.** Río ancho y somero partido en
+  varios brazos entre barras de arena clara, agua transparente, tres
+  saurópodos parados dentro del agua bebiendo y descansando, mediodía suave.
+- **`bosque_ribereno` — Bosque de coníferas ribereño.** Interior cerrado de un
+  bosque de galería, troncos de conífera muy juntos y helechos altos que tapan
+  la vista, un ornitópodo solo mirando alrededor, desorientado, sin ver más
+  allá de los árboles.
+- **`deriva_arida` — Deriva árida.** Un frente de dunas rojizas avanzando
+  sobre una pradera de helechos que se seca, la línea entre lo verde y lo
+  árido cruzando el cuadro en diagonal, viento con arena en suspensión,
+  siluetas de animales marchándose hacia el lado verde.
+- **`nido` — Nido con huevos.** Primer plano de un nido de saurópodo excavado
+  en arena, ocho o diez huevos redondos y grandes, uno rajado con el hocico de
+  una cría asomando, la sombra del adulto desenfocada cruzando por encima.
+
+### Recursos
+
+- **`insectos` — Nube de insectos.** Una nube densa de insectos sobre una
+  charca al atardecer, contraluz que la hace brillar, pterosaurios pequeños y
+  un terópodo diminuto saltando a por ellos, comida a manos llenas.
+- **`manada_paso` — Manada de paso.** Manada de saurópodos cruzando el cuadro
+  de lado a lado, levantando polvo, y detrás de ellos el suelo pelado: helechos
+  pisoteados, ramas bajas comidas, el paisaje que dejan más pobre que el que
+  encontraron.
+- **`frutos` — Frutos de cícada.** Primer plano de un cono de cícada abierto
+  con semillas carnosas naranjas y rojas caídas alrededor, y acercándose desde
+  varios lados, desenfocados, ornitópodos pequeños que han olido lo mismo.
+
+### Criaturas
+
+- **`tyrannosaurus` — Tyrannosaurus rex.** Escamoso, sin plumas. De frente y
+  muy cerca, con las fauces abiertas en un rugido que levanta polvo, dos
+  ornitópodos huyendo desenfocados a los lados.
+- **`velociraptor` — Velociraptor mongoliensis.** Con plumaje entero y alas
+  emplumadas en los brazos, del tamaño de un pavo. Saltando desde un montículo
+  de arena con las garras en alto, fondo de dunas con cielo naranja.
+- **`brachiosaurus` — Brachiosaurus altithorax.** Escamoso. Visto desde abajo
+  con el cuello alzado hasta las copas de las araucarias, comiendo arriba del
+  todo, dinosaurios pequeños a su sombra en la parte baja.
+- **`argentinosaurus` — Argentinosaurus huinculensis.** Escamoso. Un titán de
+  espaldas cruzando una llanura seca a paso lento, cada pisada levantando una
+  nube de polvo, un terópodo a escala de perro al lado para dar la medida.
+- **`mamenchisaurus` — Mamenchisaurus hochuanensis.** Escamoso. De perfil, con
+  el cuello larguísimo en horizontal alcanzando un helecho arborescente al otro
+  lado de un arroyo, sin mover el cuerpo.
+- **`amargasaurus` — Amargasaurus cazadorensis.** Escamoso, con la doble fila
+  de espinas altas en el cuello. Tres juntos en fila pastando, los cuellos
+  espinados paralelos, contraluz que recorta las espinas.
+- **`ankylosaurus` — Ankylosaurus magniventris.** Escamoso y acorazado.
+  Girando sobre sí mismo con la maza de la cola en pleno golpe, polvo y
+  piedras saliendo despedidas, un terópodo grande retrocediendo.
+- **`kentrosaurus` — Kentrosaurus aethiopicus.** Escamoso, con placas pequeñas
+  y púas largas en cola y hombros. Encarado a la cámara con los flancos
+  erizados, plantado entre cícadas, sin retroceder.
+- **`euoplocephalus` — Euoplocephalus tutus.** Escamoso y acorazado, con los
+  párpados de hueso visibles. Primer plano corto de la cabeza con un ojo medio
+  cerrado por el párpado óseo, tormenta de arena detrás.
+- **`triceratops` — Triceratops horridus.** Escamoso. Cargando de frente con
+  los tres cuernos bajos, tierra levantada, un terópodo apartándose en el
+  último momento.
+- **`pachycephalosaurus` — Pachycephalosaurus wyomingensis.** Escamoso. Dos
+  chocando de cabeza en el instante del golpe, polvo en el punto de impacto,
+  vista lateral a ras de suelo.
+- **`iguanodon` — Iguanodon bernissartensis.** Escamoso. Manada numerosa
+  avanzando junta por una llanura húmeda, los de delante a cuatro patas, los de
+  atrás erguidos, todos en la misma dirección.
+- **`parasaurolophus` — Parasaurolophus walkeri.** Escamoso. De perfil con la
+  cabeza alzada y la cresta tubular contra el cielo, llamando, y al fondo la
+  manada volviendo la cabeza hacia él.
+- **`pteranodon` — Pteranodon longiceps.** Sin plumas, con picnofibras finas.
+  Planeando muy bajo sobre el agua con las alas abiertas de punta a punta,
+  rozando la superficie, sin batir.
+- **`quetzalcoatlus` — Quetzalcoatlus northropi.** Sin plumas, con
+  picnofibras. A pie en la llanura, alto como una jirafa, con las alas plegadas
+  y el pico bajado hacia un dinosaurio pequeño que huye; su sombra cubre el
+  suelo entero.
+- **`elasmosaurus` — Elasmosaurus platyurus.** Escamoso, marino. Sacando el
+  cuello larguísimo del agua para vigilar por encima de las olas, el cuerpo
+  sumergido apenas insinuado, orilla con saurópodos al fondo.
+
 ## Rehacer una criatura
 
 El bloque de estilo vale igual; el hueco es el binomio más una acción. Dos
