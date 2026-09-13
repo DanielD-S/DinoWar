@@ -168,6 +168,32 @@ Tres decisiones que conviene conocer antes de discutirlas:
   a ciegas; parar la revelación para preguntar le diría al rival que has buscado
   algo.
 
+## Las diez cartas de Biomasa son las tierras, y se autolimitan
+
+Siete comunes que hacen lo mismo con otra ilustración, dos épicas de +2 y una
+legendaria de +3, todas con el mismo marco y bajándose gratis una por turno.
+Tres cosas medidas antes de escribirlas, para no volver a medirlas:
+
+- **No hace falta un tope compartido entre las diez.** Se temió que sin él un
+  mazo con veinte cartas de Biomasa reventara la economía. Al revés: doce en
+  vez de siete gana el 44,8 % contra el mazo de referencia, catorce el 39,8 %.
+  Desplazan criaturas. Un tope de familia habría pedido una regla nueva en el
+  navegador Y en `private.validar_mazo`, y no la pide nadie.
+- **La épica y la legendaria valen medio punto.** En vez de dos Praderas, la
+  Vega gana el 50,0 %; en vez de una, el Manantial el 51,3 %. La Biomasa no es
+  el cuello de botella del juego —lo es la mano— y moler no muerde con la
+  extinción en el 0,3 %. Son rarezas de escasez, no de fuerza.
+- **Los números van EN LA CARTA**, en `biomasa: { da, muele }`, como la
+  `duracion` de la Sequía, porque desde que son diez ya no son una constante.
+  `test/textos.test.js` los compara con el texto y `test/entradas.test.js`
+  comprueba que ninguna se quedó sin ellos. En `BALANCE.biomasa` queda sólo
+  `porTurno`.
+
+Y la Pradera **conserva su `copiasMax: 7`** aunque sus seis gemelas vayan a 3
+por rareza: es lo que da la colección de salida y lo que los ocho jugadores ya
+tienen en producción. Bajarla a 3 dejaría a todos con cuatro copias sobrantes
+y un mazo guardado ilegal.
+
 ## Las dos cartas de jefe viven fuera del set
 
 `CARTAS_DE_JEFE` no está en `CARTAS`, y eso las ha dejado fuera de todas las
@@ -1053,8 +1079,8 @@ Dicho para que nadie lo descubra tarde:
   equipo.
 - **El ELO no lo mueve nadie.** La columna existe en `jugadores` y las partidas
   se registran, pero no hay PvP todavía.
-- **Tres cartas mal calibradas** sobre un objetivo de cero (`BALANCE.md`), y 39
-  de las 67 cartas del set fuera del mazo de referencia, o sea sin calibración
+- **Tres cartas mal calibradas** sobre un objetivo de cero (`BALANCE.md`), y 48
+  de las 76 cartas del set fuera del mazo de referencia, o sea sin calibración
   comprobada.
 - **La inmunidad al clima no muerde.** Torvosaurus y Nodosaurus dicen «no le
   afectan los efectos del clima», y hoy los dos únicos efectos del clima sobre una

@@ -86,21 +86,20 @@ export const BALANCE = Object.freeze({
     }),
   }),
 
-  // La carta de Biomasa. Los números viven aquí y no en la carta, como los de
-  // las otras 16 de soporte, para que `test/textos.test.js` pueda vigilar que
-  // el texto impreso no se quede atrás cuando alguno cambie.
+  // Las cartas de Biomasa. Lo que da cada una y lo que muele van EN LA CARTA
+  // (`biomasa: { da, muele }` en cards.js), porque desde que son diez ya no es
+  // un número, y `test/textos.test.js` los compara con el texto impreso como
+  // hace con las mecánicas de las criaturas. Aquí sólo queda la regla común.
   //
-  // Medido sobre 4.000 partidas y dos semillas: con 7 copias en un mazo de 55
-  // los trofeos bajan del 60 al 36 % de las victorias y el jugador inicial
+  // Medido sobre 4.000 partidas y dos semillas: con 7 Praderas en un mazo de
+  // 55 los trofeos bajan del 60 al 36 % de las victorias y el jugador inicial
   // sube a 48,3 %, que entra en banda por primera vez desde que existe la v2.
   // Con 5 copias se queda en 47,9 % y no entra. Subir la renta en vez de poner
   // la carta NO sirve: da los mismos números y dispara la bola de nieve al
   // 71 %, porque regalar Biomasa acelera a quien va ganando y una carta que
   // ocupa sitio en tu mazo y te cuesta otra, no.
   biomasa: Object.freeze({
-    da: 1,         // Biomasa que entrega al bajarla
-    muele: 1,      // cartas que te cuesta de tu PROPIO mazo
-    porTurno: 1,   // cuántas puedes bajar en un turno
+    porTurno: 1,   // cuántas puedes bajar en un turno, sean las que sean
   }),
 
   manoInicial: 6,

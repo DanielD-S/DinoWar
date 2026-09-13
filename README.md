@@ -53,8 +53,10 @@ acumulan y no se curan salvo que una carta lo diga, así que dos dinosaurios que
 no se atraviesan la Defensa se quedan bloqueados: ninguno muere y ninguno pega
 al hábitat.
 
-El set son **66 cartas**: 50 dinosaurios —bueno, 50 criaturas: hay un pterosaurio y
-tres marinos que no lo son y lo dicen—, 8 eventos, 5 climas y 3 de recurso. Ver
+El set son **76 cartas**: 50 dinosaurios —bueno, 50 criaturas: hay un pterosaurio y
+tres marinos que no lo son y lo dicen—, 8 eventos, 5 climas, 3 de recurso y 10 de
+Biomasa —siete comunes iguales con distinta ilustración, dos épicas y una
+legendaria; se bajan gratis, una por turno, y cuestan cartas de tu mazo—. Ver
 **[SET_DE_CARTAS.md](SET_DE_CARTAS.md)** para todas, con su referencia.
 
 La mano inicial se puede **cambiar entera en el turno 1**: el primer cambio es
@@ -63,7 +65,7 @@ de la que no puedes pagar nada no es mala suerte, es un turno perdido.
 
 ## Colección, sobres y mazos
 
-Empiezas con las 50 cartas del mazo de referencia y 240 dinomonedas. Se ganan
+Empiezas con las 55 cartas del mazo de referencia y 240 dinomonedas. Se ganan
 **ganando** —50 por victoria y nada por derrota— y se gastan en sobres de cinco
 cartas, a 100 la unidad, con la garantía de una rara o mejor. Dos victorias son
 un sobre; una derrota no es medio paso hacia él. Las copias que superan el
@@ -71,13 +73,14 @@ máximo de su rareza no caben en ningún mazo legal, así que se funden por
 monedas, y fundir un sobre entero devuelve menos de lo que cuesta: reciclar lo
 que sobra no es una forma de farmear.
 
-Un mazo son 50 cartas exactas y de cada carta caben tantas copias como diga su
-rareza: 3 común, 3 rara, 2 épica, 1 legendaria. Con 66 cartas distintas no caben
-ni de lejos todas, que es justo lo que hace que construir un mazo signifique
-algo. Tú llevas el tuyo; la IA lleva siempre el de referencia —30 dinosaurios,
-14 eventos, 3 de recurso y 3 de clima—, que es el único que mide `BALANCE.md`:
-las 39 cartas que se quedan fuera de él se juegan igual, pero su calibración no
-está comprobada.
+Un mazo son 55 cartas exactas y de cada carta caben tantas copias como diga su
+rareza: 3 común, 3 rara, 2 épica, 1 legendaria; la Pradera de helechos admite 7,
+que es lo que se midió. Con 76 cartas distintas no caben ni de lejos todas, que
+es justo lo que hace que construir un mazo signifique algo. Tú llevas el tuyo;
+la IA lleva siempre el de referencia —30 dinosaurios, 14 eventos, 3 de recurso,
+3 de clima y 7 Praderas—, que es el único que mide `BALANCE.md`: las 48 cartas
+que se quedan fuera de él se juegan igual, pero su calibración no está
+comprobada.
 
 Para probar sin esperar a juntar monedas: `?pruebas=1` en la dirección da sobres
 gratis. No toca el saldo guardado, sólo deja de cobrar.

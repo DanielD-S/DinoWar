@@ -66,6 +66,7 @@ son fenómenos y momentos. Un modificador por tipo, antes del sujeto:
 | CLIMA | plano general amplio, el cielo ocupa la mitad de arriba, sin protagonista animal — el fenómeno es el sujeto |
 | EVENTO | plano corto o medio, un momento concreto, una sola cosa pasando |
 | RECURSO | la abundancia misma en primer plano, animales secundarios o al fondo |
+| BIOMASA | la vegetación es el sujeto y ocupa el primer plano, densa, comestible, con brotes nuevos; sin protagonista animal, como mucho herbívoros pequeños o lejanos en silueta, alimentándose |
 
 Los climas son **fenómenos, no paisajes** —se renombraron a propósito— así que
 el arte tiene que enseñar el tiempo atmosférico, no el bioma. Y los cinco
@@ -127,6 +128,55 @@ gastar su imaginería aquí.
 - **`lago` — Lago efímero.** Lago somero y ancho de agua alcalina lechosa
   reflejando el cielo, orilla con costra de sal blanca, saurópodos bebiendo en
   silueta al fondo.
+
+### Biomasa
+
+Diez cartas con el mismo marco y tres efectos: siete comunes de +1, dos
+épicas de +2 y una legendaria de +3. Lo que las distingue es SÓLO la
+ilustración, así que cada una necesita una planta dominante distinta y una
+sola idea. El gradiente es de productividad: vegetación abierta y seca en las
+comunes, suelo fértil con agua en las épicas, y en la legendaria el sitio más
+raro de una cuenca semiárida. En las comunes no hay agua a la vista salvo en
+el Juncal y la Galería, que la tienen de sitio; en las tres de rareza el agua
+es lo que las hace parecer más ricas.
+
+- **`biomasa` — Pradera de helechos.** Llanura abierta cubierta de helechos
+  bajos hasta el horizonte, sin un solo árbol cerca, viento peinando las
+  frondas, dos Dryosaurus lejanos pastando en silueta.
+- **`araucarias` — Bosque de araucarias.** Troncos altos y rectos de
+  araucaria en columnata, copas en candelabro muy arriba, suelo alfombrado de
+  agujas y conos caídos, luz en haces entre los troncos.
+- **`ginkgos` — Arboleda de ginkgos.** Ginkgos de hoja en abanico en tono
+  dorado de final de estación, hojas cayendo despacio y cubriendo el suelo, un
+  ornitópodo pequeño en silueta al fondo.
+- **`cicadas` — Matorral de cícadas.** Cícadas y bennettitales macizas con
+  troncos en barril y coronas de hojas rígidas, arbustivo, seco, con un
+  Stegosaurus mordisqueando muy al fondo y desenfocado.
+- **`equisetos` — Juncal de equisetos.** Colas de caballo altas y segmentadas
+  en agua somera de orilla, verde vivo, tallos rectos como cañas, reflejos
+  rotos por el viento, sin árboles en primer término.
+- **`galeria` — Bosque de galería.** Franja de coníferas y helechos
+  arborescentes pegada a un río trenzado de aguas claras, verde saturado
+  contra la llanura seca de detrás, cuellos de saurópodo entre las copas.
+- **`helechal` — Helechal arborescente.** Sotobosque umbrío de helechos
+  arborescentes con frondas que se despliegan en cayado, humedad, luz verde
+  filtrada, el más cerrado y húmedo de los siete.
+- **`vega` — Vega de aluvión (épica).** Llanura recién retirada la crecida,
+  limo oscuro y brillante, brotes tiernos de helecho saliendo del barro en
+  filas, charcos que devuelven el cielo, manada de ornitópodos llegando al
+  fondo.
+- **`humedal` — Humedal de tierras bajas (épica).** Marisma de agua lenta
+  entre cícadas y equisetos, todo verde y espeso, alfombras de algas y musgo,
+  un saurópodo hundido hasta las rodillas alimentándose de lejos.
+- **`manantial` — Manantial perenne (legendaria).** Un manantial brotando de
+  una pared de roca roja en mitad de una llanura seca y pálida, y a su
+  alrededor un oasis de araucarias, helechos y cícadas de verde imposible; el
+  contraste entre lo seco y lo vivo es el sujeto, saurópodos en fila al fondo
+  acudiendo a beber.
+
+Las diez llegaron en 1536×1024 el 13-09-2026 y las rarezas se repartieron
+mirándolas: el Manantial es la única con roca, cascada y oasis, y las dos
+épicas son las dos con el suelo bajo el agua.
 
 ## Rehacer una criatura
 

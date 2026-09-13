@@ -8,9 +8,9 @@
 > **Sed**: heridas que recibe cuando sale *Sequía estacional*. **No es un
 > segundo coste**: no se paga al jugarla, sólo cuando el clima lo cobra.
 
-El set tiene **67 cartas distintas**. Un mazo son **55 cartas exactas**, así que no caben todas: el de referencia lleva 28 dinosaurios, 14 eventos, 3 de recurso y 3 de clima.
+El set tiene **76 cartas distintas**. Un mazo son **55 cartas exactas**, así que no caben todas: el de referencia lleva 28 dinosaurios, 14 eventos, 3 de recurso y 3 de clima.
 
-Fuera del mazo de referencia, y por tanto sin medir aquí: Carroña abundante, Lago efímero, Crecida estacional, Estación de lluvias, Plesiopleurodon wellesi, Ojoraptorsaurus boerei, Dromaeosaurus albertensis, Athenar bermani, Sanjuansaurus gordilloi, Suchomimus tenerensis, Eosinopteryx brevipenna, Troodon formosus, Carnotaurus sastrei, Spinosaurus aegyptiacus, Mosasaurus hoffmannii, Halszkaraptor escuilliei, Tongtianlong limosus, Scanisaurus nazarowi, Monolophosaurus jiangi, Invictarx zephyri, Medusaceratops lokii, Platyceratops tatarinovi, Loricatosaurus priscus, Therizinosaurus cheloniformis, Alaskacephale gangloffi, Titanoceratops ouranos, Atlasaurus imelakei, Stegoceras validum, Maiasaura peeblesorum, Edmontosaurus annectens, Plateosauravus cullingworthi, Gargoyleosaurus parkpinorum, Wendiceratops pinhornensis, Antarctosaurus wichmannianus, Liaoceratops yanzigouensis, Rhinorex condrupus, Bienosaurus lufengensis, Shuangmiaosaurus gilmorei, Chasmosaurus belli. Se juegan igual, pero su calibración no está comprobada.
+Fuera del mazo de referencia, y por tanto sin medir aquí: Carroña abundante, Lago efímero, Crecida estacional, Estación de lluvias, Plesiopleurodon wellesi, Ojoraptorsaurus boerei, Dromaeosaurus albertensis, Athenar bermani, Sanjuansaurus gordilloi, Suchomimus tenerensis, Eosinopteryx brevipenna, Troodon formosus, Carnotaurus sastrei, Spinosaurus aegyptiacus, Mosasaurus hoffmannii, Halszkaraptor escuilliei, Tongtianlong limosus, Scanisaurus nazarowi, Monolophosaurus jiangi, Invictarx zephyri, Medusaceratops lokii, Platyceratops tatarinovi, Loricatosaurus priscus, Therizinosaurus cheloniformis, Alaskacephale gangloffi, Titanoceratops ouranos, Atlasaurus imelakei, Stegoceras validum, Maiasaura peeblesorum, Edmontosaurus annectens, Plateosauravus cullingworthi, Gargoyleosaurus parkpinorum, Wendiceratops pinhornensis, Antarctosaurus wichmannianus, Liaoceratops yanzigouensis, Rhinorex condrupus, Bienosaurus lufengensis, Shuangmiaosaurus gilmorei, Chasmosaurus belli, Bosque de araucarias, Arboleda de ginkgos, Matorral de cícadas, Juncal de equisetos, Bosque de galería, Helechal arborescente, Vega de aluvión, Humedal de tierras bajas, Manantial perenne. Se juegan igual, pero su calibración no está comprobada.
 
 **Qué revisar sobre todo:** los eventos de presión y las cartas de recurso.
 Son lo único del set que no describe un animal sino una presión sobre él, y
@@ -27,10 +27,10 @@ es legendario.
 
 | Rareza | Copias máximas | Cartas distintas | En el mazo de referencia |
 |---|---|---|---|
-| Común | 3 | 20 | 19 |
+| Común | 3 | 26 | 19 |
 | Rara | 3 | 17 | 19 |
-| Épica | 2 | 18 | 12 |
-| Legendaria | 1 | 12 | 5 |
+| Épica | 2 | 20 | 12 |
+| Legendaria | 1 | 13 | 5 |
 
 ---
 

@@ -107,6 +107,15 @@ insert into public.catalogo_cartas (card_id, tipo, rareza, copias_max, valor_fus
   ('shuangmiaosaurus', 'DINOSAURIO', 'COMUN', 3, 4, false),
   ('chasmosaurus', 'DINOSAURIO', 'COMUN', 3, 4, false),
   ('biomasa', 'BIOMASA', 'COMUN', 7, 4, false),
+  ('araucarias', 'BIOMASA', 'COMUN', 3, 4, false),
+  ('ginkgos', 'BIOMASA', 'COMUN', 3, 4, false),
+  ('cicadas', 'BIOMASA', 'COMUN', 3, 4, false),
+  ('equisetos', 'BIOMASA', 'COMUN', 3, 4, false),
+  ('galeria', 'BIOMASA', 'COMUN', 3, 4, false),
+  ('helechal', 'BIOMASA', 'COMUN', 3, 4, false),
+  ('vega', 'BIOMASA', 'EPICO', 2, 35, false),
+  ('humedal', 'BIOMASA', 'EPICO', 2, 35, false),
+  ('manantial', 'BIOMASA', 'LEGENDARIO', 1, 100, false),
   ('jefe_saurophaganax', 'DINOSAURIO', 'LEGENDARIO', 1, 100, true),
   ('jefe_barosaurus', 'DINOSAURIO', 'LEGENDARIO', 1, 100, true)
 on conflict (card_id) do update set
@@ -244,6 +253,15 @@ delete from public.catalogo_cartas where card_id not in (
   'shuangmiaosaurus',
   'chasmosaurus',
   'biomasa',
+  'araucarias',
+  'ginkgos',
+  'cicadas',
+  'equisetos',
+  'galeria',
+  'helechal',
+  'vega',
+  'humedal',
+  'manantial',
   'jefe_saurophaganax',
   'jefe_barosaurus'
 );

@@ -1,6 +1,16 @@
 {
   "mecanicas": [
     {
+      "rasgo": "BIOMASA",
+      "nombre": "Pradera de helechos",
+      "cartas": 10,
+      "quienes": "Pradera de helechos, Bosque de araucarias, Arboleda de ginkgos, Matorral de cícadas, Juncal de equisetos, Bosque de galería, Helechal arborescente, Vega de aluvión, Humedal de tierras bajas, Manantial perenne",
+      "texto": "+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.",
+      "constante": "",
+      "valor": "",
+      "sentido": "no lleva número: es una regla, no una cifra"
+    },
+    {
       "rasgo": "CAMPO_CANAL",
       "nombre": "Bruma de valle",
       "cartas": 1,
@@ -129,16 +139,6 @@
       "constante": "rasgos.neumaticidadAtaque",
       "valor": 2,
       "sentido": "Ataque permanente"
-    },
-    {
-      "rasgo": "BIOMASA",
-      "nombre": "Pradera de helechos",
-      "cartas": 1,
-      "quienes": "Pradera de helechos",
-      "texto": "+1 Biomasa al bajarla. Pierdes 1 carta de tu mazo. Una por turno.",
-      "constante": "",
-      "valor": "",
-      "sentido": "no lleva número: es una regla, no una cifra"
     },
     {
       "rasgo": "REBROTE",
