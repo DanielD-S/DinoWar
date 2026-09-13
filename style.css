@@ -662,7 +662,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
    no en `box-shadow` porque la silueta no es un rectángulo. */
 .sobre-paquete {
   position: relative; width: 132px; height: 198px;
-  background: url('assets/piel/sobre.webp') center / contain no-repeat;
+  background: url('assets/piel/sobre.webp') center / 100% 100% no-repeat;
   filter: drop-shadow(0 0 18px rgba(217,164,65,.28)) drop-shadow(0 8px 10px rgba(0,0,0,.5));
   animation: respirar 2.8s ease-in-out infinite;
 }
@@ -771,7 +771,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   display: flex; flex-direction: column; align-items: center; gap: 10px;
   padding: 8px 0 4px; touch-action: none; user-select: none; -webkit-user-select: none;
 }
-.apertura-escena { position: relative; width: min(250px, 68vw); aspect-ratio: 2 / 3; }
+/* La escena tiene la proporción de la CARTA, 82/112, no la del PNG del sobre
+   (2/3). Cada carta de la pila ocupa la escena entera y su dorso también, así
+   que con la escena a 2/3 la carta —que es 82/112— dejaba libre el 9 % de
+   abajo, y por ahí asomaba el dorso de la siguiente como una banda de latón
+   bajo la carta descubierta. El sobre se estira ese mismo 9 %, igual que los
+   marcos y el dorso, que son 2/3 y se pintan a 82/112 en todo el juego. */
+.apertura-escena { position: relative; width: min(250px, 68vw); aspect-ratio: 82 / 112; }
 
 /* El sobre son dos capas con la misma imagen, recortadas por el mismo zigzag:
    la tira de arriba y el cuerpo. `--p` es cuánto se ha rasgado, de 0 a 1, y
@@ -779,7 +785,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .apertura-sobre { position: absolute; inset: 0; cursor: grab; }
 .apertura-cuerpo, .apertura-tira {
   position: absolute; inset: 0;
-  background: url('assets/piel/sobre.webp') center / contain no-repeat;
+  background: url('assets/piel/sobre.webp') center / 100% 100% no-repeat;
 }
 .apertura-cuerpo { filter: drop-shadow(0 10px 14px rgba(0,0,0,.55)); }
 .apertura-tira {
