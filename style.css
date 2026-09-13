@@ -2361,6 +2361,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .ent-marca h1 { margin: 6px 0 4px; }
 .ent-pestanas { justify-content: center; }
 .ent-pie { display: flex; flex-direction: column; gap: 10px; }
+/* El widget de Turnstile mide 65 px de alto y se ensancha al contenedor; el
+   hueco se reserva desde el principio para que el formulario no salte cuando
+   llega. Si el script no viene, el hueco lo ocupa la nota de abajo. */
+.ent-captcha { min-height: 65px; display: flex; justify-content: center; margin-top: 4px; }
+.ent-captcha iframe { max-width: 100%; }
 
 /* El ojito. Va dentro del campo y no al lado: al lado empuja el input y en un
    móvil de 360 px la contraseña se queda sin sitio. */

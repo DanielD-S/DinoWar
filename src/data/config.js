@@ -15,4 +15,12 @@ export const CONFIG = Object.freeze({
     // El nombre de la Edge Function que valida los asaltos.
     funcionAsalto: 'asalto',
   }),
+
+  // El CAPTCHA de la puerta (ver src/ui/captcha.js). La clave de sitio es
+  // pública, como la de Supabase: identifica el widget, no lo protege. La
+  // secreta NO está en ningún fichero: vive sólo en el panel de Supabase, que
+  // es quien verifica el token. Sin clave de sitio no se pinta widget alguno.
+  turnstile: Object.freeze({
+    siteKey: '0x4AAAAAAEzGYnx8JmT4C1Z1',
+  }),
 });
