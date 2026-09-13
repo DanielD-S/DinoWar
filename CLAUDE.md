@@ -515,6 +515,13 @@ El sobre son dos capas con la misma imagen recortadas por el mismo zigzag, y
 `--dx`/`--dy`/`--giro` para seguir al dedo. Nada cambia de tamaño: todo es
 `transform`, `clip-path` y `opacity`, por lo mismo que en el tablero.
 
+**La escena de la pila mide 82/112, la proporción de la CARTA, no 2/3.** Cada
+carta de la pila ocupa la escena entera y su dorso también; con la escena a
+2/3 —la del PNG del sobre— la carta dejaba libre el 9 % de abajo y por ahí
+asomaba el dorso de la siguiente como una banda de latón bajo la carta ya
+descubierta. El sobre se pinta a `100% 100%` y se estira ese mismo 9 %, igual
+que los marcos y el dorso en el resto del juego.
+
 ## Los efectos del tablero: hojas, mezclas y fantasmas
 
 [`src/ui/efectos.js`](src/ui/efectos.js) es la caja de herramientas del peso:
