@@ -158,7 +158,7 @@ export function resumir(m, mazo = MAZO) {
   };
 }
 
-function veredicto(r) {
+export function veredicto(r) {
   const vias = [r.trofeos, r.habitat, r.extincion];
   const filas = [
     ['Duración media', `${r.duracion.toFixed(2)} turnos`, '10 – 14',

@@ -77,8 +77,8 @@ Un mazo son 55 cartas exactas y de cada carta caben tantas copias como diga su
 rareza: 3 común, 3 rara, 2 épica, 1 legendaria; la Pradera de helechos admite 7,
 que es lo que se midió. Con 101 cartas distintas no caben ni de lejos todas, que
 es justo lo que hace que construir un mazo signifique algo. Tú llevas el tuyo;
-la IA lleva siempre el de referencia —30 dinosaurios, 14 eventos, 3 de recurso,
-3 de clima y 7 Praderas—, que es el único que mide `BALANCE.md`: las 73 cartas
+la IA lleva siempre el de referencia —28 criaturas, 13 eventos, 4 de recurso,
+1 clima y 9 de Biomasa—, que es el único que mide `BALANCE.md`: las 69 cartas
 que se quedan fuera de él se juegan igual, pero su calibración no está
 comprobada.
 

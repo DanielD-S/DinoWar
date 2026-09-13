@@ -8,9 +8,9 @@
 > **Sed**: heridas que recibe cuando sale *Sequía estacional*. **No es un
 > segundo coste**: no se paga al jugarla, sólo cuando el clima lo cobra.
 
-El set tiene **101 cartas distintas**. Un mazo son **55 cartas exactas**, así que no caben todas: el de referencia lleva 28 dinosaurios, 14 eventos, 3 de recurso y 3 de clima.
+El set tiene **101 cartas distintas**. Un mazo son **55 cartas exactas**, así que no caben todas: el de referencia lleva 28 dinosaurios, 13 eventos, 4 de recurso y 1 de clima.
 
-Fuera del mazo de referencia, y por tanto sin medir aquí: Sabana de helechos, Llanura de inundación, Canal fluvial trenzado, Bosque de coníferas ribereño, Deriva árida, Nido con huevos, Carroña abundante, Lago efímero, Nube de insectos, Manada de paso, Frutos de cícada, Crecida estacional, Estación de lluvias, Plesiopleurodon wellesi, Ojoraptorsaurus boerei, Dromaeosaurus albertensis, Athenar bermani, Sanjuansaurus gordilloi, Suchomimus tenerensis, Eosinopteryx brevipenna, Troodon formosus, Carnotaurus sastrei, Spinosaurus aegyptiacus, Mosasaurus hoffmannii, Halszkaraptor escuilliei, Tongtianlong limosus, Scanisaurus nazarowi, Monolophosaurus jiangi, Invictarx zephyri, Medusaceratops lokii, Platyceratops tatarinovi, Loricatosaurus priscus, Therizinosaurus cheloniformis, Alaskacephale gangloffi, Titanoceratops ouranos, Atlasaurus imelakei, Stegoceras validum, Maiasaura peeblesorum, Edmontosaurus annectens, Plateosauravus cullingworthi, Gargoyleosaurus parkpinorum, Wendiceratops pinhornensis, Antarctosaurus wichmannianus, Liaoceratops yanzigouensis, Rhinorex condrupus, Bienosaurus lufengensis, Shuangmiaosaurus gilmorei, Chasmosaurus belli, Tyrannosaurus rex, Velociraptor mongoliensis, Brachiosaurus altithorax, Argentinosaurus huinculensis, Mamenchisaurus hochuanensis, Amargasaurus cazadorensis, Ankylosaurus magniventris, Kentrosaurus aethiopicus, Euoplocephalus tutus, Triceratops horridus, Pachycephalosaurus wyomingensis, Iguanodon bernissartensis, Parasaurolophus walkeri, Pteranodon longiceps, Quetzalcoatlus northropi, Elasmosaurus platyurus, Bosque de araucarias, Arboleda de ginkgos, Matorral de cícadas, Juncal de equisetos, Bosque de galería, Helechal arborescente, Vega de aluvión, Humedal de tierras bajas, Manantial perenne. Se juegan igual, pero su calibración no está comprobada.
+Fuera del mazo de referencia, y por tanto sin medir aquí: Torvosaurus tanneri, Nodosaurus textilis, Neumaticidad ósea, Competencia trófica, Mortandad estacional, Llanura de inundación, Bosque de coníferas ribereño, Deriva árida, Carroña abundante, Lago efímero, Manada de paso, Frutos de cícada, Crecida estacional, Bruma de valle, Estación de lluvias, Sequía prolongada, Plesiopleurodon wellesi, Ojoraptorsaurus boerei, Dromaeosaurus albertensis, Athenar bermani, Sanjuansaurus gordilloi, Suchomimus tenerensis, Eosinopteryx brevipenna, Troodon formosus, Carnotaurus sastrei, Spinosaurus aegyptiacus, Mosasaurus hoffmannii, Halszkaraptor escuilliei, Tongtianlong limosus, Scanisaurus nazarowi, Monolophosaurus jiangi, Invictarx zephyri, Medusaceratops lokii, Platyceratops tatarinovi, Loricatosaurus priscus, Therizinosaurus cheloniformis, Alaskacephale gangloffi, Titanoceratops ouranos, Atlasaurus imelakei, Stegoceras validum, Maiasaura peeblesorum, Edmontosaurus annectens, Plateosauravus cullingworthi, Gargoyleosaurus parkpinorum, Wendiceratops pinhornensis, Antarctosaurus wichmannianus, Liaoceratops yanzigouensis, Rhinorex condrupus, Bienosaurus lufengensis, Shuangmiaosaurus gilmorei, Chasmosaurus belli, Tyrannosaurus rex, Brachiosaurus altithorax, Argentinosaurus huinculensis, Mamenchisaurus hochuanensis, Ankylosaurus magniventris, Euoplocephalus tutus, Triceratops horridus, Parasaurolophus walkeri, Pteranodon longiceps, Quetzalcoatlus northropi, Elasmosaurus platyurus, Arboleda de ginkgos, Juncal de equisetos, Bosque de galería, Helechal arborescente, Vega de aluvión, Humedal de tierras bajas, Manantial perenne. Se juegan igual, pero su calibración no está comprobada.
 
 **Qué revisar sobre todo:** los eventos de presión y las cartas de recurso.
 Son lo único del set que no describe un animal sino una presión sobre él, y
@@ -27,10 +27,10 @@ es legendario.
 
 | Rareza | Copias máximas | Cartas distintas | En el mazo de referencia |
 |---|---|---|---|
-| Común | 3 | 32 | 19 |
-| Rara | 3 | 28 | 19 |
-| Épica | 2 | 25 | 12 |
-| Legendaria | 1 | 16 | 5 |
+| Común | 3 | 32 | 28 |
+| Rara | 3 | 28 | 20 |
+| Épica | 2 | 25 | 5 |
+| Legendaria | 1 | 16 | 2 |
 
 ---
 
@@ -39,20 +39,20 @@ es legendario.
 | Taxón | Clado | Rareza | Copias | Coste | Ataque | Vida | Sed |
 |---|---|---|---|---|---|---|---|
 | *Dryosaurus altus* | Ornitópodo | Común | 3 | 0 | 1 | 2 | undefined |
-| *Ornitholestes hermanni* | Terópodo | Común | 3 | 1 | 2 | 2 | undefined |
+| *Ornitholestes hermanni* | Terópodo | Común | 2 | 1 | 2 | 2 | undefined |
 | *Ceratosaurus nasicornis* | Terópodo | Común | 2 | 2 | 4 | 2 | undefined |
-| *Stegosaurus stenops* | Tireóforo | Común | 3 | 2 | 1 | 5 | undefined |
+| *Stegosaurus stenops* | Tireóforo | Común | 1 | 2 | 1 | 5 | undefined |
 | *Allosaurus fragilis* | Terópodo | Rara | 2 | 3 | 5 | 5 | undefined |
-| *Camarasaurus grandis* | Saurópodo | Rara | 2 | 3 | 1 | 8 | undefined |
+| *Camarasaurus grandis* | Saurópodo | Rara | 1 | 3 | 1 | 8 | undefined |
 | *Diplodocus carnegii* | Saurópodo | Rara | 1 | 2 | 3 | 8 | undefined |
 | *Apatosaurus louisae* | Saurópodo | Rara | 1 | 3 | 2 | 10 | undefined |
-| *Torvosaurus tanneri* | Terópodo | Épica | 1 | 4 | 8 | 5 | undefined |
-| *Nodosaurus textilis* | Tireóforo | Épica | 2 | 3 | 3 | 8 | undefined |
-| *Riparovenator milnerae* | Terópodo | Épica | 2 | 3 | 3 | 3 | undefined |
+| *Torvosaurus tanneri* | Terópodo | Épica | 0 | 4 | 8 | 5 | undefined |
+| *Nodosaurus textilis* | Tireóforo | Épica | 0 | 3 | 3 | 8 | undefined |
+| *Riparovenator milnerae* | Terópodo | Épica | 1 | 3 | 3 | 3 | undefined |
 | *Lokiceratops rangiformis* | Marginocéfalo | Épica | 1 | 3 | 4 | 7 | undefined |
-| *Brachylophosaurus canadensis* | Ornitópodo | Rara | 2 | 2 | 0 | 10 | undefined |
+| *Brachylophosaurus canadensis* | Ornitópodo | Rara | 1 | 2 | 0 | 10 | undefined |
 | *Tyrannotitan chubutensis* | Terópodo | Legendaria | 1 | 4 | 10 | 7 | undefined |
-| *Huaxiadraco corollatus* | Pterosaurio | Rara | 2 | 2 | 2 | 4 | undefined |
+| *Huaxiadraco corollatus* | Pterosaurio | Rara | 1 | 2 | 2 | 4 | undefined |
 | *Plesiopleurodon wellesi* | Reptil marino | Épica | 0 | 3 | 8 | 4 | undefined |
 | *Ojoraptorsaurus boerei* | Terópodo | Rara | 0 | 2 | 2 | 4 | undefined |
 | *Dromaeosaurus albertensis* | Terópodo | Común | 0 | 2 | 3 | 3 | undefined |
@@ -89,17 +89,17 @@ es legendario.
 | *Shuangmiaosaurus gilmorei* | Ornitópodo | Común | 0 | 2 | 2 | 4 | undefined |
 | *Chasmosaurus belli* | Marginocéfalo | Común | 0 | 2 | 2 | 4 | undefined |
 | *Tyrannosaurus rex* | Terópodo | Legendaria | 0 | 4 | 11 | 9 | undefined |
-| *Velociraptor mongoliensis* | Terópodo | Común | 0 | 0 | 3 | 2 | undefined |
+| *Velociraptor mongoliensis* | Terópodo | Común | 2 | 0 | 3 | 2 | undefined |
 | *Brachiosaurus altithorax* | Saurópodo | Legendaria | 0 | 4 | 3 | 13 | undefined |
 | *Argentinosaurus huinculensis* | Saurópodo | Épica | 0 | 4 | 4 | 14 | undefined |
 | *Mamenchisaurus hochuanensis* | Saurópodo | Rara | 0 | 4 | 1 | 11 | undefined |
-| *Amargasaurus cazadorensis* | Saurópodo | Rara | 0 | 2 | 2 | 5 | undefined |
+| *Amargasaurus cazadorensis* | Saurópodo | Rara | 2 | 2 | 2 | 5 | undefined |
 | *Ankylosaurus magniventris* | Tireóforo | Legendaria | 0 | 4 | 2 | 12 | undefined |
-| *Kentrosaurus aethiopicus* | Tireóforo | Común | 0 | 1 | 1 | 3 | undefined |
+| *Kentrosaurus aethiopicus* | Tireóforo | Común | 2 | 1 | 1 | 3 | undefined |
 | *Euoplocephalus tutus* | Tireóforo | Rara | 0 | 3 | 2 | 8 | undefined |
 | *Triceratops horridus* | Marginocéfalo | Épica | 0 | 4 | 5 | 8 | undefined |
-| *Pachycephalosaurus wyomingensis* | Marginocéfalo | Rara | 0 | 2 | 3 | 4 | undefined |
-| *Iguanodon bernissartensis* | Ornitópodo | Rara | 0 | 2 | 3 | 5 | undefined |
+| *Pachycephalosaurus wyomingensis* | Marginocéfalo | Rara | 2 | 2 | 3 | 4 | undefined |
+| *Iguanodon bernissartensis* | Ornitópodo | Rara | 2 | 2 | 3 | 5 | undefined |
 | *Parasaurolophus walkeri* | Ornitópodo | Rara | 0 | 3 | 2 | 8 | undefined |
 | *Pteranodon longiceps* | Pterosaurio | Común | 0 | 0 | 2 | 2 | undefined |
 | *Quetzalcoatlus northropi* | Pterosaurio | Épica | 0 | 3 | 5 | 4 | undefined |
@@ -117,7 +117,7 @@ es legendario.
 
 *Sin blindaje:* Cursorial y grácil: su defensa es correr, no aguantar.
 
-### *Ornitholestes hermanni* · Terópodo · Común · 3 copias
+### *Ornitholestes hermanni* · Terópodo · Común · 2 copias
 
 **1 de coste · 2 de Ataque · 2 de Vida**
 
@@ -137,7 +137,7 @@ es legendario.
 
 *De sus 2 de Vida, 1 son blindaje:* Osificaciones dérmicas dorsales descritas en el holotipo.
 
-### *Stegosaurus stenops* · Tireóforo · Común · 3 copias
+### *Stegosaurus stenops* · Tireóforo · Común · 1 copia
 
 **2 de coste · 1 de Ataque · 5 de Vida**
 
@@ -157,7 +157,7 @@ es legendario.
 
 *De sus 5 de Vida, 1 son blindaje:* Cráneo y esqueleto robustos, sin armadura dérmica.
 
-### *Camarasaurus grandis* · Saurópodo · Rara · 2 copias
+### *Camarasaurus grandis* · Saurópodo · Rara · 1 copia
 
 **3 de coste · 1 de Ataque · 8 de Vida**
 
@@ -187,7 +187,7 @@ es legendario.
 
 *De sus 10 de Vida, 3 son blindaje:* La mayor masa del set; la talla ES la defensa.
 
-### *Torvosaurus tanneri* · Terópodo · Épica · 1 copia
+### *Torvosaurus tanneri* · Terópodo · Épica · fuera del mazo de referencia
 
 **4 de coste · 8 de Ataque · 5 de Vida**
 
@@ -197,7 +197,7 @@ es legendario.
 
 *De sus 5 de Vida, 1 son blindaje:* El mayor terópodo, pero sin blindaje.
 
-### *Nodosaurus textilis* · Tireóforo · Épica · 2 copias
+### *Nodosaurus textilis* · Tireóforo · Épica · fuera del mazo de referencia
 
 **3 de coste · 3 de Ataque · 8 de Vida**
 
@@ -207,7 +207,7 @@ es legendario.
 
 *De sus 8 de Vida, 4 son blindaje:* Osteodermos en bandas sobre todo el dorso: coraza en el sentido literal.
 
-### *Riparovenator milnerae* · Terópodo · Épica · 2 copias
+### *Riparovenator milnerae* · Terópodo · Épica · 1 copia
 
 **3 de coste · 3 de Ataque · 3 de Vida**
 
@@ -227,7 +227,7 @@ es legendario.
 
 *De sus 7 de Vida, 2 son blindaje:* La gola es hueso, pero está calada y orientada hacia arriba, no hacia el atacante.
 
-### *Brachylophosaurus canadensis* · Ornitópodo · Rara · 2 copias
+### *Brachylophosaurus canadensis* · Ornitópodo · Rara · 1 copia
 
 **2 de coste · 0 de Ataque · 10 de Vida**
 
@@ -247,7 +247,7 @@ es legendario.
 
 *De sus 7 de Vida, 1 son blindaje:* Doce metros de depredador sin una sola placa dérmica.
 
-### *Huaxiadraco corollatus* · Pterosaurio · Rara · 2 copias
+### *Huaxiadraco corollatus* · Pterosaurio · Rara · 1 copia
 
 **2 de coste · 2 de Ataque · 4 de Vida**
 
@@ -545,7 +545,7 @@ es legendario.
 
 `INFERIDO` · Tiranosáurido de la Formación Hell Creek, Maastrichtiense. El oído interno y la caja craneal sugieren sensibilidad a frecuencias bajas; el rugido es una licencia, los animales actuales de ese tamaño no rugen.
 
-### *Velociraptor mongoliensis* · Terópodo · Común · fuera del mazo de referencia
+### *Velociraptor mongoliensis* · Terópodo · Común · 2 copias
 
 **0 de coste · 3 de Ataque · 2 de Vida**
 
@@ -577,7 +577,7 @@ es legendario.
 
 `ESTABLECIDO` · Saurópodo de la Formación Shaximiao, China, Jurásico Superior. Diecinueve vértebras cervicales: el cuello más largo en proporción al cuerpo de cualquier saurópodo conocido.
 
-### *Amargasaurus cazadorensis* · Saurópodo · Rara · fuera del mazo de referencia
+### *Amargasaurus cazadorensis* · Saurópodo · Rara · 2 copias
 
 **2 de coste · 2 de Ataque · 5 de Vida**
 
@@ -593,7 +593,7 @@ es legendario.
 
 `ESTABLECIDO` · Anquilosáurido de Hell Creek, Maastrichtiense. La maza caudal está formada por osteodermos fusionados sobre vértebras rígidas; los modelos biomecánicos le dan fuerza para romper hueso.
 
-### *Kentrosaurus aethiopicus* · Tireóforo · Común · fuera del mazo de referencia
+### *Kentrosaurus aethiopicus* · Tireóforo · Común · 2 copias
 
 **1 de coste · 1 de Ataque · 3 de Vida**
 
@@ -617,7 +617,7 @@ es legendario.
 
 `ESTABLECIDO` · Ceratópsido de Hell Creek y Lance, Maastrichtiense. Las lesiones cicatrizadas en golas y cuernos de otros Triceratops indican combates entre ellos con los cuernos.
 
-### *Pachycephalosaurus wyomingensis* · Marginocéfalo · Rara · fuera del mazo de referencia
+### *Pachycephalosaurus wyomingensis* · Marginocéfalo · Rara · 2 copias
 
 **2 de coste · 3 de Ataque · 4 de Vida**
 
@@ -625,7 +625,7 @@ es legendario.
 
 `DEBATIDO` · Paquicefalosáurido de Hell Creek y Lance, Maastrichtiense. La cúpula de 25 cm de hueso macizo se ha interpretado como arma de topetazo; las lesiones en cúpulas de varios ejemplares lo apoyan, la estructura interna lo discute.
 
-### *Iguanodon bernissartensis* · Ornitópodo · Rara · fuera del mazo de referencia
+### *Iguanodon bernissartensis* · Ornitópodo · Rara · 2 copias
 
 **2 de coste · 3 de Ataque · 5 de Vida**
 
@@ -675,13 +675,13 @@ biológicos reales, no mutaciones; los de presión son patologías y presiones
 ecológicas documentadas, no hechizos: aquí no hay magia, y esa es la parte
 del set con más riesgo de romper la restricción paleontológica.
 
-### Gregarismo · Rara · coste 1 · 3 copias
+### Gregarismo · Rara · coste 1 · 2 copias
 
 Se juega **sobre un dinosaurio tuyo**. +1 de Ataque a todos tus dinosaurios de la misma especie que el objetivo.
 
 `INFERIDO` · Acumulaciones monoespecíficas en la Morrison sugieren agregación en varios taxones. La interpretación de estos yacimientos es discutida (¿manada viva o concentración tafonómica?).
 
-### Gastrolitos · Épica · coste 1 · 2 copias
+### Gastrolitos · Épica · coste 1 · 1 copia
 
 Se juega **sobre un dinosaurio tuyo**. Cura +1 de vida a un dinosaurio al final del turno
 
@@ -693,7 +693,7 @@ Se juega **sobre un dinosaurio tuyo**. +2 Poder y +2 Vida permanentes a un dinos
 
 `ESTABLECIDO` · La osteohistología muestra tasas de crecimiento altas y sostenidas en saurópodos y en Allosaurus, alcanzando talla adulta en pocas décadas o menos.
 
-### Neumaticidad ósea · Épica · coste 2 · 1 copia
+### Neumaticidad ósea · Épica · coste 2 · fuera del mazo de referencia
 
 Se juega **sobre un dinosaurio tuyo**. +2 de Ataque permanentes. Sólo sobre terópodos y saurópodos.
 
@@ -705,25 +705,25 @@ Se juega **sobre un dinosaurio del rival**. −2 Poder permanente a un dinosauri
 
 `ESTABLECIDO` · El registro patológico de la Morrison es abundante: costillas fracturadas y consolidadas, infecciones óseas y lesiones por estrés, especialmente documentadas en ejemplares de Allosaurus. Un animal cojo caza peor, pero sigue vivo.
 
-### Competencia trófica · Épica · coste 3 · 1 copia
+### Competencia trófica · Épica · coste 3 · fuera del mazo de referencia
 
 Se juega **undefined**. −2 de Vida a dos dinosaurios rivales que elijas.
 
 `INFERIDO` · La coexistencia de varios saurópodos y de varios terópodos grandes en la misma formación implica reparto de recursos. La partición de nicho está sustentada por el desgaste dental; su intensidad como presión competitiva es una inferencia.
 
-### Trampa de depredadores · Rara · coste 1 · 3 copias
+### Trampa de depredadores · Rara · coste 1 · 2 copias
 
 Se juega **sobre la mesa entera, sin elegir objetivo**. El rival pierde 5 cartas de su mazo. Tú pierdes 3: el fango no distingue.
 
 `DEBATIDO` · La cantera Cleveland-Lloyd, en la Morrison de Utah, acumula decenas de individuos de Allosaurus en una proporción de depredadores frente a presas que no se da en un ecosistema vivo. La trampa de depredadores es una de las explicaciones; también se ha propuesto sequía o agua envenenada. El yacimiento es un hecho, su mecanismo no.
 
-### Mortandad estacional · Legendaria · coste 1 · 1 copia
+### Mortandad estacional · Legendaria · coste 1 · fuera del mazo de referencia
 
 Se juega **sobre la mesa entera, sin elegir objetivo**. 3 de daño a TODOS los dinosaurios del campo, incluidos los tuyos.
 
 `DEBATIDO` · Algunas acumulaciones óseas de la Morrison se han interpretado como mortandades masivas asociadas a sequía o a eventos de crecida. La causa concreta de cada yacimiento sigue discutiéndose.
 
-### Sabana de helechos · Común · coste 0 · fuera del mazo de referencia
+### Sabana de helechos · Común · coste 0 · 2 copias
 
 Se juega **sobre la mesa entera, sin elegir objetivo**. Robas 2 cartas. Luego descartas 1 carta de tu mano al azar.
 
@@ -735,7 +735,7 @@ Se juega **sobre la mesa entera, sin elegir objetivo**. Ambos jugadores pierden 
 
 `ESTABLECIDO` · Las llanuras de inundación de la Morrison se construyeron crecida a crecida: limo de desbordamiento sobre paleosuelos. Una crecida arrasa a los dos lados del río, pero deja el suelo nuevo a quien vuelve primero.
 
-### Canal fluvial trenzado · Rara · coste 1 · fuera del mazo de referencia
+### Canal fluvial trenzado · Rara · coste 1 · 1 copia
 
 Se juega **sobre la mesa entera, sin elegir objetivo**. Todos tus dinosaurios recuperan 2 de Vida.
 
@@ -753,19 +753,19 @@ Se juega **sobre la mesa entera, sin elegir objetivo**. Ambos jugadores descarta
 
 `ESTABLECIDO` · El clima de la Morrison se fue secando a lo largo del Kimmeridgiense y el Titoniense: paleosuelos con caliche, dunas al norte de la cuenca. Cuando el paisaje cambia, lo que cada uno tenía planeado deja de valer y hay que volver a empezar.
 
-### Nido con huevos · Común · coste 1 · fuera del mazo de referencia
+### Nido con huevos · Común · coste 1 · 2 copias
 
 Se juega **sobre la mesa entera, sin elegir objetivo**. Robas 2 cartas.
 
 `ESTABLECIDO` · La Morrison conserva nidos y huevos de saurópodo y de terópodo pequeño, y cáscaras dispersas en muchos yacimientos. Un nido es la promesa de lo que viene después.
 
-### Gregarismo · Rara · coste 1 · 3 copias
+### Gregarismo · Rara · coste 1 · 2 copias
 
 +1 de Ataque a todos tus dinosaurios de la misma especie que el objetivo.
 
 `INFERIDO` · Acumulaciones monoespecíficas en la Morrison sugieren agregación en varios taxones. La interpretación de estos yacimientos es discutida (¿manada viva o concentración tafonómica?).
 
-### Gastrolitos · Épica · coste 1 · 2 copias
+### Gastrolitos · Épica · coste 1 · 1 copia
 
 Cura +1 de vida a un dinosaurio al final del turno
 
@@ -777,7 +777,7 @@ Cura +1 de vida a un dinosaurio al final del turno
 
 `ESTABLECIDO` · La osteohistología muestra tasas de crecimiento altas y sostenidas en saurópodos y en Allosaurus, alcanzando talla adulta en pocas décadas o menos.
 
-### Neumaticidad ósea · Épica · coste 2 · 1 copia
+### Neumaticidad ósea · Épica · coste 2 · fuera del mazo de referencia
 
 +2 de Ataque permanentes. Sólo sobre terópodos y saurópodos.
 
@@ -789,25 +789,25 @@ Cura +1 de vida a un dinosaurio al final del turno
 
 `ESTABLECIDO` · El registro patológico de la Morrison es abundante: costillas fracturadas y consolidadas, infecciones óseas y lesiones por estrés, especialmente documentadas en ejemplares de Allosaurus. Un animal cojo caza peor, pero sigue vivo.
 
-### Competencia trófica · Épica · coste 3 · 1 copia
+### Competencia trófica · Épica · coste 3 · fuera del mazo de referencia
 
 −2 de Vida a dos dinosaurios rivales que elijas.
 
 `INFERIDO` · La coexistencia de varios saurópodos y de varios terópodos grandes en la misma formación implica reparto de recursos. La partición de nicho está sustentada por el desgaste dental; su intensidad como presión competitiva es una inferencia.
 
-### Trampa de depredadores · Rara · coste 1 · 3 copias
+### Trampa de depredadores · Rara · coste 1 · 2 copias
 
 El rival pierde 5 cartas de su mazo. Tú pierdes 3: el fango no distingue.
 
 `DEBATIDO` · La cantera Cleveland-Lloyd, en la Morrison de Utah, acumula decenas de individuos de Allosaurus en una proporción de depredadores frente a presas que no se da en un ecosistema vivo. La trampa de depredadores es una de las explicaciones; también se ha propuesto sequía o agua envenenada. El yacimiento es un hecho, su mecanismo no.
 
-### Mortandad estacional · Legendaria · coste 1 · 1 copia
+### Mortandad estacional · Legendaria · coste 1 · fuera del mazo de referencia
 
 3 de daño a TODOS los dinosaurios del campo, incluidos los tuyos.
 
 `DEBATIDO` · Algunas acumulaciones óseas de la Morrison se han interpretado como mortandades masivas asociadas a sequía o a eventos de crecida. La causa concreta de cada yacimiento sigue discutiéndose.
 
-### Sabana de helechos · Común · coste 0 · fuera del mazo de referencia
+### Sabana de helechos · Común · coste 0 · 2 copias
 
 Robas 2 cartas. Luego descartas 1 carta de tu mano al azar.
 
@@ -819,7 +819,7 @@ Ambos jugadores pierden 3 cartas del mazo. Tú robas 1.
 
 `ESTABLECIDO` · Las llanuras de inundación de la Morrison se construyeron crecida a crecida: limo de desbordamiento sobre paleosuelos. Una crecida arrasa a los dos lados del río, pero deja el suelo nuevo a quien vuelve primero.
 
-### Canal fluvial trenzado · Rara · coste 1 · fuera del mazo de referencia
+### Canal fluvial trenzado · Rara · coste 1 · 1 copia
 
 Todos tus dinosaurios recuperan 2 de Vida.
 
@@ -837,7 +837,7 @@ Ambos jugadores descartan la mano entera y roban otras tantas cartas.
 
 `ESTABLECIDO` · El clima de la Morrison se fue secando a lo largo del Kimmeridgiense y el Titoniense: paleosuelos con caliche, dunas al norte de la cuenca. Cuando el paisaje cambia, lo que cada uno tenía planeado deja de valer y hay que volver a empezar.
 
-### Nido con huevos · Común · coste 1 · fuera del mazo de referencia
+### Nido con huevos · Común · coste 1 · 2 copias
 
 Robas 2 cartas.
 
@@ -851,7 +851,7 @@ Se juegan **boca arriba y surten efecto al instante**: dar Biomasa «este
 turno» no serviría de nada si esperasen a la revelación. A cambio el rival los
 ve venir, y eso es parte de su precio. Cuestan 0 y todos traen inconveniente.
 
-### Rebrote tras incendio · Rara · 3 copias
+### Rebrote tras incendio · Rara · 2 copias
 
 +2 Biomasa ahora mismo. Todos tus dinosaurios reciben 1 herida.
 
@@ -869,7 +869,7 @@ ve venir, y eso es parte de su precio. Cuestan 0 y todos traen inconveniente.
 
 `INFERIDO` · La Morrison conserva depósitos de lagos alcalinos efímeros de gran extensión, como el llamado lago T’oo’dichi’. Concentran recursos mientras duran; al secarse dejan salinas que el paisaje tarda en recuperar.
 
-### Nube de insectos · Común · fuera del mazo de referencia
+### Nube de insectos · Común · 2 copias
 
 +1 Biomasa ahora mismo. Robas 1 carta.
 
