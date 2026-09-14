@@ -250,6 +250,17 @@ function pasaFiltro(c, f) {
   return true;
 }
 
+/**
+ * La ficha de una carta CON el recorrido de lo que hay pintado: desde ella se
+ * pasa a la de al lado sin cerrarla, que armando un mazo se leen muchas. La
+ * lista sale del DOM y no del catálogo: lo que se ve es lo que hay, con la
+ * pestaña y los filtros puestos.
+ */
+function abrirFichaDe(id) {
+  const ids = [...dom.cuerpo.querySelectorAll('.mazo-celda[data-card]')].map((x) => x.dataset.card);
+  abrirFicha(fichaHTML(id), { ids, i: ids.indexOf(id) });
+}
+
 /** Cancela la pulsación larga en curso, si la hay. */
 function soltarLargo() {
   if (largo) clearTimeout(largo.t);
@@ -371,7 +382,7 @@ function pintarEditor() {
         largo = null;
         abrioLarga = Date.now();
         try { navigator.vibrate?.(12); } catch { /* sin vibración: no pasa nada */ }
-        abrirFicha(fichaHTML(id));
+        abrirFichaDe(id);
       }, LARGA),
     };
   };
@@ -400,7 +411,7 @@ function pintarEditor() {
     if (rareza) { f.rareza = f.rareza === rareza.dataset.rareza ? null : rareza.dataset.rareza; pintarEditor(); return; }
     if (coste) { const n = Number(coste.dataset.coste); f.coste = f.coste === n ? null : n; pintarEditor(); return; }
     if (b('limpiar')) { editando.filtro = filtroVacio(); pintarEditor(); return; }
-    if (ficha) { abrirFicha(fichaHTML(ficha.dataset.ficha)); return; }
+    if (ficha) { abrirFichaDe(ficha.dataset.ficha); return; }
     if (menos && !menos.disabled) {
       const c = menos.dataset.menos;
       editando.cartas[c] = Math.max(0, (editando.cartas[c] ?? 0) - 1);

@@ -12,7 +12,7 @@ import { decidir, PERFIL } from './engine/ai.js';
 import { semilla } from './engine/rng.js';
 import {
   montar, render, mensaje, el, JUGADOR, RIVAL,
-  fichaHTML, ayudaHTML, abrirFicha, abrirDescarte, cerrarHojas,
+  fichaHTML, ayudaHTML, abrirFicha, montarFicha, abrirDescarte, cerrarHojas,
   abrirVisor, cambiarModoVisor, cerrarVisor, abrirComprometidas, cartaHTML,
 } from './ui/render.js';
 import { tomarEntrada, soltarEntrada } from './ui/input.js';
@@ -1282,7 +1282,10 @@ function iniciar() {
   el.pDescBtn.addEventListener('click', () => { if (estado) abrirDescarte(estado, JUGADOR); });
   el.descarteCuerpo.addEventListener('click', (e) => {
     const f = e.target.closest('[data-card]');
-    if (f) abrirFicha(fichaHTML(f.dataset.card));
+    if (!f) return;
+    // Con el recorrido del montón: mirar un descarte es leerlo entero.
+    const ids = [...el.descarteCuerpo.querySelectorAll('[data-card]')].map((x) => x.dataset.card);
+    abrirFicha(fichaHTML(f.dataset.card), { ids, i: ids.indexOf(f.dataset.card) });
   });
   el.fichaCerrar.addEventListener('click', cerrarHojas);
 
@@ -1293,6 +1296,9 @@ function iniciar() {
     // La miniatura abre lo que enseña —la ilustración— y el botón la carta.
     if (b) abrirVisor(b.dataset.zoom, b.dataset.modo ?? 'carta');
   });
+
+  montarFicha();
+
   el.visorModos.addEventListener('click', (e) => {
     const b = e.target.closest('[data-modo]');
     if (b) cambiarModoVisor(b.dataset.modo);

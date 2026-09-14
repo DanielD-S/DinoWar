@@ -64,15 +64,17 @@ export function montarMeta(alVolver) {
     pintarColeccion();
   });
 
-  dom.rejilla.addEventListener('click', (e) => {
+  // La ficha se abre CON la lista que se está viendo, para poder pasar de una
+  // carta a la siguiente sin cerrarla. La lista sale del DOM y no de una copia
+  // guardada: lo que se ve es lo que hay, con sus filtros y su orden.
+  const alTocarCarta = (nodo) => (e) => {
     const c = e.target.closest('[data-card]');
-    if (c) abrirFicha(fichaHTML(c.dataset.card));
-  });
-
-  dom.tirada.addEventListener('click', (e) => {
-    const c = e.target.closest('[data-card]');
-    if (c) abrirFicha(fichaHTML(c.dataset.card));
-  });
+    if (!c) return;
+    const ids = [...nodo.querySelectorAll('[data-card]')].map((x) => x.dataset.card);
+    abrirFicha(fichaHTML(c.dataset.card), { ids, i: ids.indexOf(c.dataset.card) });
+  };
+  dom.rejilla.addEventListener('click', alTocarCarta(dom.rejilla));
+  dom.tirada.addEventListener('click', alTocarCarta(dom.tirada));
 
   dom.btnFundir.addEventListener('click', fundirSobrantes);
   dom.btnAbrir.addEventListener('click', comprarSobre);
