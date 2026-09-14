@@ -1,6 +1,7 @@
 // DinoWar — renderizado. Lee el estado, nunca lo muta.
 
 import { BALANCE } from '../data/balance.js';
+import { enMazo, enMano, comprometidas } from './ocultas.js';
 import {
   CARTAS, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, RAREZA_NOMBRE, RASGO, ES_DINOSAURIO, carta, CARTAS_DE_JEFE,
 } from '../data/cards.js';
@@ -373,7 +374,7 @@ function pintarFranja(estado) {
 
   // Cuántas cartas ha comprometido el rival, pero NO dónde: saber la ranura
   // arruinaría la información oculta, que es de lo que va el despliegue.
-  const n = estado.jugadores[RIVAL].pendientes.length;
+  const n = comprometidas(estado.jugadores[RIVAL]);
   el.franjaNota.textContent = n === 0 ? '' : `rival: ${n} oculta${n === 1 ? '' : 's'}`;
 
   // Y lo tuyo, que sí puedes deshacer mientras no pulses Listo.
@@ -462,19 +463,20 @@ export function render(estado) {
 
   el.pTrof.textContent = p.trofeos;
   el.pBio.textContent = p.biomasa;
-  el.pMano.textContent = p.mano.length;
-  el.pMazo.textContent = p.mazo.length;
+  el.pMano.textContent = enMano(p);
+  el.pMazo.textContent = enMazo(p);
   el.pDesc.textContent = p.descarte.length;
   el.rDesc.textContent = r.descarte.length;
   el.rTrof.textContent = r.trofeos;
   el.rBio.textContent = r.biomasa;
-  el.rMano.textContent = r.mano.length;
-  el.rMazo.textContent = r.mazo.length;
+  // En un duelo el rival no manda sus cartas: manda cuántas son.
+  el.rMano.textContent = enMano(r);
+  el.rMazo.textContent = enMazo(r);
   el.turno.textContent = `Turno ${estado.turno}`;
 
   // Quedarse sin mazo es perder: hay que poder verlo venir.
-  el.pPila.classList.toggle('aviso', p.mazo.length <= 4);
-  el.rPila.classList.toggle('aviso', r.mazo.length <= 4);
+  el.pPila.classList.toggle('aviso', enMazo(p) <= 4);
+  el.rPila.classList.toggle('aviso', enMazo(r) <= 4);
 
   pintarHabitat(estado);
   pintarRanuras(estado);
