@@ -131,11 +131,9 @@
       <div class="menu-acciones">
         <div class="menu-fila jugar-placas">
           <button id="btn-solitario" class="placa placa-solitario"><i aria-hidden="true"></i>En solitario</button>
-          <!-- El duelo no existe todavía: la columna de ELO está en la base y
-               las partidas se registran, pero no hay PvP. La placa se enseña
-               apagada y lo dice, que es mejor que esconderla y mejor que
-               fingir que hace algo. -->
-          <button id="btn-duelo" class="placa placa-duelo" disabled><i aria-hidden="true"></i>Duelo<small>Pronto</small></button>
+          <!-- El Duelo: contra una persona, con la partida llevada por el
+               servidor. La placa abre y cierra su panel, como la de misiones. -->
+          <button id="btn-duelo" class="placa placa-duelo" aria-expanded="false"><i aria-hidden="true"></i>Duelo</button>
           <button id="btn-misiones" class="placa placa-misiones" aria-expanded="false"><i aria-hidden="true"></i>Misiones</button>
         </div>
         <div class="menu-dificultad">
@@ -147,6 +145,9 @@
              rellena cuando `mis_misiones` contesta; si no contesta, no se
              enseña nada en vez de enseñar ceros que no son. -->
         <div class="menu-misiones oculta" id="menu-misiones"></div>
+        <!-- El panel del Duelo: tu liga, buscar rival, retar con código. Lo
+             pinta src/ui/duelo.js. -->
+        <div class="menu-misiones menu-duelo oculta" id="menu-duelo"></div>
         <button id="btn-jugar-volver" class="boton-fantasma jugar-volver">Volver</button>
       </div>
     </div>

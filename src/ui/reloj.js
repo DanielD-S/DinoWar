@@ -84,6 +84,17 @@ export function parar() {
   alLatir = null;
 }
 
+/**
+ * Lo que queda a cada bando, dicho desde fuera. En un duelo el reloj de verdad
+ * lo lleva el servidor y éste sólo lo enseña: cada respuesta trae los dos
+ * restantes y se ponen aquí, corra el que corra.
+ */
+export function poner(ms) {
+  restante = [Number(ms[0]) || 0, Number(ms[1]) || 0];
+  if (corriendo !== null) desde = Date.now();
+  alLatir?.();
+}
+
 /** De quién es el reloj que avanza ahora mismo, o null si no corre ninguno. */
 export const deQuien = () => corriendo;
 

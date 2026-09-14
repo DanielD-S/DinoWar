@@ -24,20 +24,25 @@
 // la función arranca y muere con «Module not found» AUNQUE LA URL CONTESTE 200.
 // Costó verlo porque todo lo demás —el commit, la URL, el contenido— estaba bien.
 //
-// Motor anclado en: cb716f3e00a54584d25620ddddaba270672d21c2
+// Motor anclado en: 03ce5092c16b102a6607d768ab9618d888f980e0
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import {
   validarAsalto, jefeDelEvento, AsaltoInvalido,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@cb716f3e00a54584d25620ddddaba270672d21c2/supabase/functions/_compartido/validarAsalto.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@03ce5092c16b102a6607d768ab9618d888f980e0/supabase/functions/_compartido/validarAsalto.js';
 import {
   validarSolitario,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@cb716f3e00a54584d25620ddddaba270672d21c2/supabase/functions/_compartido/validarSolitario.js';
-import { CUENCA } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@cb716f3e00a54584d25620ddddaba270672d21c2/src/data/tribu.js';
-import { ECONOMIA, abrirSobre } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@cb716f3e00a54584d25620ddddaba270672d21c2/src/data/coleccion.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@03ce5092c16b102a6607d768ab9618d888f980e0/supabase/functions/_compartido/validarSolitario.js';
+import {
+  crearDuelo, aplicarAccion, vistaDuelo, comprobarTiempo, rendirse, resultado, terminado,
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@03ce5092c16b102a6607d768ab9618d888f980e0/supabase/functions/_compartido/duelo.js';
+import { validarMazoLegal } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@03ce5092c16b102a6607d768ab9618d888f980e0/supabase/functions/_compartido/validarPartida.js';
+import { eloTras } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@03ce5092c16b102a6607d768ab9618d888f980e0/src/data/ligas.js';
+import { CUENCA } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@03ce5092c16b102a6607d768ab9618d888f980e0/src/data/tribu.js';
+import { ECONOMIA, abrirSobre } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@03ce5092c16b102a6607d768ab9618d888f980e0/src/data/coleccion.js';
 import {
   avancesDelParte, diaUTC, POR_ID,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@cb716f3e00a54584d25620ddddaba270672d21c2/src/data/misiones.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@03ce5092c16b102a6607d768ab9618d888f980e0/src/data/misiones.js';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -98,6 +103,7 @@ Deno.serve(async (req) => {
     if (tipo === 'asalto') return await hacerAsalto(servicio, user.id, envio);
     if (tipo === 'victoria') return await hacerVictoria(servicio, user.id, envio);
     if (tipo === 'sobre') return await hacerSobre(servicio, user.id);
+    if (tipo === 'duelo') return await hacerDuelo(servicio, user.id, envio);
     return json({ error: 'no sé hacer eso', detalle: tipo }, 400);
   } catch (e) {
     if (e instanceof AsaltoInvalido) return json({ error: e.message, detalle: e.detalle }, 422);
@@ -248,4 +254,163 @@ async function hacerSobre(servicio, jugadorId: string) {
   if (error) return json({ error: error.message }, 409);
 
   return json({ cartas, monedas: data?.monedas ?? null, precio: ECONOMIA.precioSobre });
+}
+
+// ------------------------------------------------------------------- duelo
+
+/**
+ * El Duelo: dos personas, una partida que lleva el servidor. Todo pasa por
+ * aquí con un `op`:
+ *
+ *   buscar    entrar en la cola pública con tu mazo (o seguir en ella)
+ *   retar     abrir un reto con código para un amigo
+ *   aceptar   entrar en el reto de un amigo con su código
+ *   cancelar  salir de la cola o retirar el reto, si nadie entró aún
+ *   estado    mi vista del duelo y los pasos que no he visto
+ *   accion    una jugada mía; si con ella los dos quedan servidos, se resuelve
+ *   rendirse  abandonar
+ *
+ * El estado se escribe con «versión»: leo, aplico, escribo si la versión sigue
+ * siendo la que leí; si el otro escribió entre medias, vuelvo a leer. Es lo
+ * que evita que dos jugadas simultáneas se pisen sin bloquear nada entre dos
+ * peticiones HTTP, que no se puede.
+ */
+async function hacerDuelo(servicio, jugadorId: string, envio: Record<string, unknown>) {
+  const op = envio.op as string;
+  const ahora = Date.now();
+
+  if (op === 'buscar' || op === 'retar') {
+    const mazo = envio.mazo;
+    validarMazoLegal(mazo);
+    const { error: errMazo } = await servicio.rpc('validar_mazo_de', {
+      p_jugador: jugadorId, p_cartas: aObjeto(mazo),
+    });
+    if (errMazo) return json({ error: errMazo.message }, 422);
+    const semilla = crypto.getRandomValues(new Uint32Array(1))[0] & 0x7fffffff;
+    const { data, error } = await servicio.rpc(op === 'buscar' ? 'duelo_buscar' : 'duelo_retar', {
+      p_jugador: jugadorId, p_mazo: mazo, p_semilla: semilla,
+    });
+    if (error) return json({ error: error.message }, 409);
+    return await responderDuelo(servicio, jugadorId, await asegurarDatos(servicio, data, ahora), 0, ahora);
+  }
+
+  if (op === 'aceptar') {
+    const mazo = envio.mazo;
+    validarMazoLegal(mazo);
+    const { error: errMazo } = await servicio.rpc('validar_mazo_de', {
+      p_jugador: jugadorId, p_cartas: aObjeto(mazo),
+    });
+    if (errMazo) return json({ error: errMazo.message }, 422);
+    const { data, error } = await servicio.rpc('duelo_aceptar', {
+      p_jugador: jugadorId, p_codigo: String(envio.codigo ?? ''), p_mazo: mazo,
+    });
+    if (error) return json({ error: error.message }, 409);
+    return await responderDuelo(servicio, jugadorId, await asegurarDatos(servicio, data, ahora), 0, ahora);
+  }
+
+  if (op === 'cancelar') {
+    const { error } = await servicio.rpc('duelo_cancelar', { p_jugador: jugadorId });
+    if (error) return json({ error: error.message }, 409);
+    return json({ ok: true });
+  }
+
+  if (op === 'estado' || op === 'accion' || op === 'rendirse') {
+    const id = String(envio.id ?? '');
+    let { data: fila, error } = await servicio.from('duelos').select('*').eq('id', id).single();
+    if (error || !fila) return json({ error: 'ese duelo no existe' }, 404);
+    if (fila.jugador_a !== jugadorId && fila.jugador_b !== jugadorId) {
+      return json({ error: 'ese duelo no es tuyo' }, 403);
+    }
+    const bando = fila.jugador_a === jugadorId ? 0 : 1;
+    const desde = Number(envio.desde ?? 0) || 0;
+
+    if (fila.estado === 'esperando') {
+      if (op !== 'estado') return json({ error: 'todavía no hay rival' }, 409);
+      return await responderDuelo(servicio, jugadorId, fila, desde, ahora);
+    }
+    fila = await asegurarDatos(servicio, fila, ahora);
+    if (!fila.datos) return json({ id: fila.id, estado: 'preparando' });
+
+    // Leer, aplicar, escribir si nadie escribió entre medias; si no, otra vez.
+    let d = null;
+    for (let intento = 0; intento < 4; intento++) {
+      d = structuredClone(fila.datos);
+      let cambio = comprobarTiempo(d, ahora);
+      if (fila.estado !== 'terminado') {
+        if (op === 'accion') { aplicarAccion(d, bando, envio.accion, ahora); cambio = true; }
+        if (op === 'rendirse') { rendirse(d, bando); cambio = true; }
+      }
+      if (!cambio) break;
+      const { data: escrito, error: errEscritura } = await servicio.from('duelos')
+        .update({ datos: d, version: fila.version + 1, actualizado_en: new Date().toISOString() })
+        .eq('id', id).eq('version', fila.version).select('version');
+      if (errEscritura) return json({ error: errEscritura.message }, 500);
+      if (escrito && escrito.length) { fila.datos = d; fila.version += 1; break; }
+      // El otro escribió antes: releer y aplicar sobre lo suyo.
+      const releida = await servicio.from('duelos').select('*').eq('id', id).single();
+      if (releida.error || !releida.data) return json({ error: 'el duelo se perdió' }, 500);
+      fila = releida.data;
+      if (intento === 3) return json({ error: 'el duelo está muy solicitado, prueba otra vez' }, 409);
+    }
+
+    if (terminado(fila.datos) && fila.estado !== 'terminado') {
+      fila = await cerrarDuelo(servicio, fila);
+    }
+    return await responderDuelo(servicio, jugadorId, fila, desde, ahora);
+  }
+
+  return json({ error: 'op de duelo desconocida', detalle: op }, 400);
+}
+
+/**
+ * Entre emparejar y escribir el primer estado hay un instante en que la fila
+ * está «jugando» sin datos. Quien llegue primero los crea; si los dos llegan a
+ * la vez, el `is('datos', null)` deja pasar sólo a uno y el otro relee.
+ */
+async function asegurarDatos(servicio, fila, ahora: number) {
+  if (!fila || fila.estado !== 'jugando' || fila.datos) return fila;
+  const d = crearDuelo(Number(fila.semilla), fila.mazo_a, fila.mazo_b, ahora);
+  const { data } = await servicio.from('duelos')
+    .update({ datos: d, version: fila.version + 1, actualizado_en: new Date().toISOString() })
+    .eq('id', fila.id).eq('version', fila.version).is('datos', null)
+    .select('*').maybeSingle();
+  if (data) return data;
+  const { data: releida } = await servicio.from('duelos').select('*').eq('id', fila.id).single();
+  return releida ?? fila;
+}
+
+/** Cierra el duelo: ELO, historial y monedas, una sola vez. */
+async function cerrarDuelo(servicio, fila) {
+  const r = resultado(fila.datos);
+  const { data: js } = await servicio.from('jugadores').select('id, duelos')
+    .in('id', [fila.jugador_a, fila.jugador_b]);
+  const duelosDe = (id: string) => (js ?? []).find((x) => x.id === id)?.duelos ?? 0;
+  const nuevos = eloTras(fila.elo_a, fila.elo_b, r.ganador === 0 ? 1 : 0,
+    duelosDe(fila.jugador_a), duelosDe(fila.jugador_b));
+  const { error } = await servicio.rpc('duelo_cerrar', {
+    p_id: fila.id, p_ganador: r.ganador, p_motivo: r.motivo, p_turnos: fila.datos.estado.turno,
+    p_elo_a: nuevos.a, p_elo_b: nuevos.b, p_monedas_victoria: ECONOMIA.monedasVictoria,
+  });
+  if (error) console.error('duelo_cerrar', error.message);
+  const { data } = await servicio.from('duelos').select('*').eq('id', fila.id).single();
+  return data ?? fila;
+}
+
+/** Lo que recibe el cliente: su vista, el rival, los ELO de antes y de ahora. */
+async function responderDuelo(servicio, jugadorId: string, fila, desde: number, ahora: number) {
+  const bando = fila.jugador_a === jugadorId ? 0 : 1;
+  const rivalId = bando === 0 ? fila.jugador_b : fila.jugador_a;
+  const { data: js } = await servicio.from('jugadores').select('id, apodo, elo, duelos')
+    .in('id', [jugadorId, rivalId].filter(Boolean));
+  const de = (id: string | null) => (js ?? []).find((x) => x.id === id) ?? null;
+  const yo = de(jugadorId);
+  const rival = de(rivalId);
+  const base = {
+    id: fila.id, estado: fila.estado, codigo: fila.codigo, bando,
+    yo: yo ? { apodo: yo.apodo, elo: yo.elo, duelos: yo.duelos } : null,
+    rival: rival ? { apodo: rival.apodo, elo: rival.elo, duelos: rival.duelos } : null,
+    eloInicial: bando === 0 ? fila.elo_a : fila.elo_b,
+  };
+  if (fila.estado === 'esperando' || !fila.datos) return json(base);
+  return json({ ...base, ...vistaDuelo(fila.datos, bando, desde, ahora) });
 }

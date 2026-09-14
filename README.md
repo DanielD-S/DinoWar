@@ -63,6 +63,19 @@ La mano inicial se puede **cambiar entera en el turno 1**: el primer cambio es
 gratis y roba las mismas cartas, y cada cambio siguiente roba una menos. Una mano
 de la que no puedes pagar nada no es mala suerte, es un turno perdido.
 
+## El Duelo y las ligas
+
+Contra una persona, con la partida en el servidor: cada jugada viaja a la
+Edge Function y el estado que ves es el que ella devuelve, sin la mano ni el
+mazo del otro. Se entra por la cola —te toca el primero que esté buscando— o
+retando a un amigo con un código de seis letras. Quince minutos por bando y
+tres por decisión; quien no contesta, pierde.
+
+El ELO existe pero no se enseña. Se enseñan las **ligas**: Triásico, Jurásico y
+Cretácico, con tres divisiones cada uno y una barra de 0 a 100, y Extinción
+arriba, la cola de los que llegaron al final. Ganar un duelo paga lo mismo que
+ganar contra la IA.
+
 ## Colección, sobres y mazos
 
 Empiezas con las 55 cartas del mazo de referencia y 240 dinomonedas. Se ganan

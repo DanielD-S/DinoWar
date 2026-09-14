@@ -270,6 +270,39 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
    se lee como una que se ha perdido. */
 .mision.hecha { border-color: rgba(217,164,65,.5); background: rgba(217,164,65,.08); }
 .mision.hecha .mision-cifra { color: var(--acento-vivo); }
+
+/* El panel del Duelo hereda el del de misiones: misma caja, mismo título. */
+#jugar.duelo-abierto .placa-duelo i { filter: brightness(1.25) saturate(1.2); }
+#jugar.duelo-abierto .placa-duelo { color: var(--acento-vivo); }
+.duelo-liga {
+  display: grid; grid-template-columns: 44px 1fr; grid-template-rows: auto auto auto;
+  column-gap: 10px; align-items: center; margin-bottom: 8px;
+}
+.duelo-emblema {
+  grid-row: 1 / 4; width: 44px; height: 44px; border-radius: 50%;
+  background: #2a2117 center / cover no-repeat; border: 2px solid var(--acento);
+  box-shadow: 0 0 0 1px #000, inset 0 0 12px rgba(0,0,0,.6);
+}
+.duelo-emblema.triasico { border-color: #8a6b3f; }
+.duelo-emblema.jurasico { border-color: #6f8f4a; }
+.duelo-emblema.cretacico { border-color: #b8513a; }
+.duelo-emblema.extincion { border-color: #d9a441; box-shadow: 0 0 10px rgba(217,164,65,.6); }
+.duelo-liga-nombre { font-family: var(--titulo, inherit); font-size: 15px; letter-spacing: .04em; }
+.duelo-liga-nota { font-size: 10.5px; color: var(--tenue); }
+.duelo-barra { height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; }
+.duelo-barra i { display: block; height: 100%; background: var(--acento-vivo); transition: width .5s ease; }
+.duelo-acciones { display: flex; flex-direction: column; gap: 6px; }
+.duelo-acciones .boton-grande { min-height: 40px; }
+.duelo-entrar { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: var(--tenue); }
+.duelo-entrar span { display: flex; gap: 6px; }
+.duelo-entrar input {
+  flex: 1; min-width: 0; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,.15);
+  background: rgba(0,0,0,.35); color: inherit; font: inherit; letter-spacing: .2em; text-transform: uppercase;
+}
+.duelo-estado { font-size: 13px; margin: 6px 0 2px; }
+.duelo-codigo { font-size: 22px; letter-spacing: .25em; color: var(--acento-vivo); font-family: monospace; }
+.duelo-reloj { color: var(--tenue); font-variant-numeric: tabular-nums; }
+.duelo-nota { font-size: 10.5px; color: var(--tenue); line-height: 1.35; margin: 4px 0 6px; }
 .mision.hecha .mision-barra i { background: linear-gradient(90deg, var(--acento-claro), var(--acento-vivo)); }
 
 @media (prefers-reduced-motion: reduce) { .mision-barra i { transition: none; } }

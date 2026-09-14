@@ -194,6 +194,59 @@ por rareza: es lo que da la colección de salida y lo que los ocho jugadores ya
 tienen en producción. Bajarla a 3 dejaría a todos con cuatro copias sobrantes
 y un mazo guardado ilegal.
 
+## El Duelo: dos personas, una partida que lleva el servidor
+
+Es la misma máquina que valida las partidas en solitario, con una diferencia
+que lo cambia todo: el servidor no RE-JUEGA una partida terminada, la LLEVA
+mientras se juega. Está en `supabase/functions/_compartido/duelo.js`, puro y
+con la hora por parámetro, y lo prueba `test/duelo.test.js` con dos IAs
+mandando jugadas de una en una. Cuatro decisiones que conviene conocer antes
+de discutirlas:
+
+- **No hay tiempo real, y no es una carencia.** El despliegue es simultáneo y
+  a ciegas, así que lo único que hay que sincronizar es «los dos han pulsado
+  Listo». Cada cliente pregunta cada `DUELO.sondeoMs` con el mismo `fetch` de
+  todo lo demás. Sin websockets, sin librería, sin nada que se caiga al
+  cambiar de red en el móvil. Si el juego crece, se cambia la tubería y el
+  resto queda igual.
+- **El cliente es SIEMPRE el jugador 0.** El tablero, el guión y el animador
+  lo llevan escrito, y en un duelo la mitad de las veces eres el 1. Antes que
+  enseñar al cliente a mirar desde el otro lado, `desdeMiLado()` le da la
+  vuelta a la vista en el servidor: jugadores, ranuras, cada `jugador`,
+  `dueno`, `bando`, `ganador` de cada evento, y los dos lados del CHOQUE. El
+  servidor sigue sabiendo quién es quién y pone el bando en cada jugada que
+  recibe: lo que diga el cliente en `accion.jugador` no se lee.
+- **La vista esconde el orden del mazo propio y el rng.** Con la IA daba igual
+  que tu mazo viajara en orden de robo; con una persona enfrente es saber qué
+  viene. Va ordenado por iid —se ve qué queda, que hace falta para las
+  búsquedas— y sin rng. Por eso el cliente aplica en local todas sus jugadas
+  menos dos: cambiar la mano y reciclar barajan o roban, y ésas se mandan y se
+  espera la respuesta.
+- **Un PASO por fase automática.** Cuando los dos están listos, el servidor
+  resuelve revelación, combate, chequeo y robo, y guarda el estado tras cada
+  una con `eventosDesde`. El cliente anima con «antes» y «después», igual que
+  su bucle contra la IA; sin los pasos sólo podría pintar el resultado de
+  golpe. Se guardan los últimos `DUELO.pasosGuardados`, no todos.
+
+Y las trampas de concurrencia, que son dos: **la escritura va con versión**
+—leer, aplicar, escribir si la versión sigue siendo la leída, si no releer—,
+que entre dos peticiones HTTP no se puede bloquear nada; y **emparejar y
+cerrar son SQL** (`duelo_buscar` con `for update skip locked`, `duelo_cerrar`
+con `for update`), que dos que buscan a la vez no pueden acabar en tres duelos
+ni el ELO moverse dos veces.
+
+El reloj lo lleva el servidor: quince minutos por bando y tres por decisión,
+en `src/data/duelo.js`. No hay proceso que vigile relojes: el primero que
+pregunte después del plazo se encuentra el duelo cerrado. El de la pantalla
+sólo enseña lo que el servidor manda en cada respuesta.
+
+**Las ligas son el ELO con nombre**, en `src/data/ligas.js`: Triásico, Jurásico
+y Cretácico con tres divisiones cada uno, y Extinción arriba. El número no se
+enseña nunca; la barra de 0 a 100 dentro de la división, sí. El ELO lo calcula
+la Edge Function con `eloTras()` —el mismo fichero que pinta la liga— sobre el
+ELO de CADA UNO AL EMPEZAR el duelo, guardado en la fila, y no sobre el de
+ahora: otro duelo cerrado entre medias no debe contaminar éste.
+
 ## Las dos cartas de jefe viven fuera del set
 
 `CARTAS_DE_JEFE` no está en `CARTAS`, y eso las ha dejado fuera de todas las
@@ -346,9 +399,9 @@ renglones más lo pasaron por 58 px — la línea de la cuenta se salía de la
 pantalla. Sacarlas a su propia pantalla devuelve el menú a lo que era y deja
 sitio para lo que venga.
 
-- **El Duelo se enseña apagado y dice «Pronto».** No hay PvP: la columna de ELO
-  está en la base y las partidas se registran, pero nadie las enfrenta.
-  Esconderlo habría sido más limpio y menos honesto; que hiciera algo, peor.
+- **La placa del Duelo abre su panel**, como la de misiones, y las dos se
+  excluyen: abrir una pliega la otra. Estuvo apagada con su «Pronto» hasta que
+  el Duelo existió (ver «El Duelo», más abajo).
 - **La dificultad del rival se fue con «En solitario».** Es el rival de ESA
   partida y en el menú estaba suelta, sin decir de qué.
 - **El panel de misiones se abre y se cierra con su placa**, y nace cerrado cada
@@ -1087,18 +1140,18 @@ pasos. CI corre los tests en cada push y necesita `fetch-depth: 0`, porque
 
 Dicho para que nadie lo descubra tarde:
 
-- **El Duelo (PvP) no existe.** La placa está en la pantalla de jugar, apagada
-  y con su «Pronto». El ELO sigue sin moverlo nadie.
-- **El CAPTCHA está en el cliente pero no activado en el panel.** El juego ya
-  manda el token de Turnstile en el alta y en la entrada; falta pegar la clave
-  secreta en Authentication → Attack Protection y encenderlo. Hasta entonces el
-  único freno son las 30 altas por hora y por IP de Supabase.
+- **Al Duelo le faltan tres cosas de liga:** la protección al descenso (hoy
+  el ELO baja en cuanto pierdes, sin las tres derrotas de margen), las
+  temporadas con reinicio, y la tabla con nombre y puesto de la liga Extinción.
+  Y las misiones diarias no avanzan con un duelo: el parte se saca re-jugando
+  y en un duelo no hay nada que re-jugar. Pide anotar el parte turno a turno.
+- **El CAPTCHA está activado** (Turnstile, desde el 13-09-2026). Si un día
+  nadie puede entrar, lo primero es ese interruptor en Authentication → Attack
+  Protection, y que el proveedor siga siendo Turnstile.
 - **La confirmación por correo está desactivada.** Se puede crear una cuenta con
   un correo que no es tuyo. Para activarla hace falta un SMTP propio: el
   integrado de Supabase manda 2 correos a la hora y sólo a direcciones del
   equipo.
-- **El ELO no lo mueve nadie.** La columna existe en `jugadores` y las partidas
-  se registran, pero no hay PvP todavía.
 - **El balance cumple 3 de 6** (`BALANCE.md`, mazo de referencia del 13-09-2026):
   cero cartas descalibradas y las vías en 44/56, pero el jugador inicial se
   queda en 47,5 % —lleva ahí desde la v2, es del turno y no del mazo—, la bola
