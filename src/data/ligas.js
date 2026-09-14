@@ -18,13 +18,19 @@
 // usan los dos lados —el cliente para pintar, el servidor para cerrar duelos—
 // y por eso no importa nada del DOM.
 
+// Cada liga tiene su METAL en el emblema, y es lo que la distingue de un
+// vistazo: cobre con pátina, latón, oro con laca roja, y oro agrietado. La
+// silueta del centro a 44 px apenas se lee; el color, sí.
 export const LIGAS = Object.freeze([
   // `desde` es el ELO donde empieza la liga; la última no tiene techo.
-  Object.freeze({ id: 'triasico', nombre: 'Triásico', desde: 0, emblema: 'plateosauravus', divisiones: 3 }),
-  Object.freeze({ id: 'jurasico', nombre: 'Jurásico', desde: 1150, emblema: 'allosaurus', divisiones: 3 }),
-  Object.freeze({ id: 'cretacico', nombre: 'Cretácico', desde: 1450, emblema: 'tyrannosaurus', divisiones: 3 }),
-  Object.freeze({ id: 'extincion', nombre: 'Extinción', desde: 1750, emblema: 'extincion', divisiones: 1 }),
+  Object.freeze({ id: 'triasico', nombre: 'Triásico', desde: 0, metal: 'cobre', divisiones: 3 }),
+  Object.freeze({ id: 'jurasico', nombre: 'Jurásico', desde: 1150, metal: 'latón', divisiones: 3 }),
+  Object.freeze({ id: 'cretacico', nombre: 'Cretácico', desde: 1450, metal: 'oro', divisiones: 3 }),
+  Object.freeze({ id: 'extincion', nombre: 'Extinción', desde: 1750, metal: 'oro roto', divisiones: 1 }),
 ]);
+
+/** El emblema servido de una liga. Lo escribe `tools/ligas.py`. */
+export const emblemaDe = (liga) => `assets/piel/ligas/liga_${liga.id}.webp`;
 
 export const ELO = Object.freeze({
   inicial: 1200,

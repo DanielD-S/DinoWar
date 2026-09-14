@@ -278,15 +278,26 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   display: grid; grid-template-columns: 44px 1fr; grid-template-rows: auto auto auto;
   column-gap: 10px; align-items: center; margin-bottom: 8px;
 }
+/* El emblema trae su propio aro de metal: no se le pone borde ni se recorta en
+   círculo, que las púas del Cretácico y la Extinción sobresalen del aro. La
+   sombra va en filter y no en box-shadow para que siga la silueta. */
 .duelo-emblema {
-  grid-row: 1 / 4; width: 44px; height: 44px; border-radius: 50%;
-  background: #2a2117 center / cover no-repeat; border: 2px solid var(--acento);
-  box-shadow: 0 0 0 1px #000, inset 0 0 12px rgba(0,0,0,.6);
+  grid-row: 1 / 4; width: 44px; height: 44px; object-fit: contain;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.7));
 }
-.duelo-emblema.triasico { border-color: #8a6b3f; }
-.duelo-emblema.jurasico { border-color: #6f8f4a; }
-.duelo-emblema.cretacico { border-color: #b8513a; }
-.duelo-emblema.extincion { border-color: #d9a441; box-shadow: 0 0 10px rgba(217,164,65,.6); }
+.fin-liga { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 4px 0 8px; }
+.fin-liga img { width: 96px; height: 96px; filter: drop-shadow(0 4px 8px rgba(0,0,0,.75)); }
+.fin-liga span { font-size: 13px; letter-spacing: .04em; color: var(--acento-claro); }
+/* Subir de liga: el emblema nuevo entra con un golpe de luz. Sin movimiento de
+   tamaño en la caja —el final es una columna y empujaría lo de abajo—: sólo
+   transform y filter sobre la imagen. */
+.fin-liga.sube img { animation: liga-sube .9s cubic-bezier(.2,.9,.3,1.2) backwards; }
+@keyframes liga-sube {
+  from { transform: scale(.4) rotate(-20deg); filter: brightness(3) drop-shadow(0 0 24px #ffd88a); opacity: 0; }
+  60% { filter: brightness(1.6) drop-shadow(0 0 18px #ffd88a); opacity: 1; }
+  to { transform: none; filter: drop-shadow(0 4px 8px rgba(0,0,0,.75)); }
+}
+@media (prefers-reduced-motion: reduce) { .fin-liga.sube img { animation: none; } }
 .duelo-liga-nombre { font-family: var(--titulo, inherit); font-size: 15px; letter-spacing: .04em; }
 .duelo-liga-nota { font-size: 10.5px; color: var(--tenue); }
 .duelo-barra { height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; }
