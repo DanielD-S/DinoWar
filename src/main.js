@@ -13,7 +13,7 @@ import { semilla } from './engine/rng.js';
 import {
   montar, render, mensaje, el, JUGADOR, RIVAL,
   fichaHTML, ayudaHTML, abrirFicha, montarFicha, abrirDescarte, cerrarHojas,
-  abrirVisor, cambiarModoVisor, cerrarVisor, abrirComprometidas, cartaHTML,
+  abrirVisor, cambiarModoVisor, cerrarVisor, abrirComprometidas, cartaHTML, fijarTopesHabitat,
 } from './ui/render.js';
 import { tomarEntrada, soltarEntrada } from './ui/input.js';
 import * as reloj from './ui/reloj.js';
@@ -41,8 +41,8 @@ import { rangoDe, nombreDeRango, emblemaDe } from './data/ligas.js';
 import { estaDentro } from './ui/supabase.js';
 import { sincronizar, modoPerfil, MODO as MODO_PERFIL } from './ui/perfil.js';
 import { asaltar, estadoDeTribu, entrar as entrarEnLaCuenca } from './ui/red.js';
-import { danoDeAsalto, habitatDeAsalto } from './data/tribu.js';
-import { JEFES, jefeActivo } from './data/eventos.js';
+import { danoDeAsalto, habitatDeAsalto, puedeAsaltar } from './data/tribu.js';
+import { jefeActivo } from './data/eventos.js';
 import { aListaDeMazo, ECONOMIA } from './data/coleccion.js';
 import {
   animarCombate, animarRevelacion, animarEventos, cancelarAnimaciones, esperar, lineasDeLog,
@@ -86,6 +86,12 @@ let rngIA = 0;
  */
 let duelo = null;
 let ultimaFueDuelo = false;
+/**
+ * Si la partida que acaba de terminar era un asalto. Lo mira «Otra partida»:
+ * el jefe lleva el triple de hábitat y su mazo, así que repetir contra la IA
+ * no es «otra» de lo mismo.
+ */
+let ultimaFueAsalto = false;
 let registro = [];
 let rafDebug = 0;
 
@@ -1079,15 +1085,24 @@ function grabar(accion) {
  * un segundo motor que mantener.
  */
 async function asaltoAlJefe() {
-  const cuenca = await estadoDeTribu();
-  const activo = jefeActivo(cuenca.arranque, Date.now());
-  if (!activo) return;
+  const ahora = Date.now();
+  const cuenca = await estadoDeTribu(ahora);
+  const activo = jefeActivo(cuenca.arranque, ahora);
+  // La comprobación vive AQUÍ y no sólo en el botón de la Cuenca, porque ya
+  // no es el único camino: «Otra partida» vuelve a entrar por aquí sin ese
+  // botón delante. Quien manda de verdad sigue siendo el servidor, que lo
+  // vuelve a mirar al cobrar; esto es para no meter al jugador en una partida
+  // que no se le va a contar.
+  if (!activo || puedeAsaltar({ almacen: cuenca.almacen, asaltosHoy: cuenca.asaltosHoy }, ahora, cuenca.jefe)) {
+    return false;
+  }
   // El jefe del ESTADO de la cuenca, no el del catálogo: el catálogo tiene su
   // Vida máxima, pero la que le queda hoy la lleva el servidor, y el informe
   // del final la enseña antes de que conteste. Con el del catálogo la barra
   // salía «NaN / 6000».
-  asaltando = cuenca.jefe ?? JEFES[activo.evento.jefe];
+  asaltando = cuenca.jefe;
   nuevaPartida(asaltando, activo.evento.id);
+  return true;
 }
 
 function nuevaPartida(jefe = null, jefeEvento = null, rivalId = null) {
@@ -1104,6 +1119,7 @@ function nuevaPartida(jefe = null, jefeEvento = null, rivalId = null) {
   asaltando = jefe;
   expedicionEnCurso = rivalId ? (rivalPorId(rivalId)?.rival ?? null) : null;
   ultimaFueExpedicion = !!expedicionEnCurso;
+  ultimaFueAsalto = !!jefe;
   ultimaFueDuelo = false;
   const miMazo = aListaDeMazo(mazoActivo());
   // La grabación se abre ANTES de crear la partida: la primera jugada puede ser
@@ -1125,8 +1141,11 @@ function nuevaPartida(jefe = null, jefeEvento = null, rivalId = null) {
     : expedicionEnCurso ? expedicionEnCurso.mazo.map((e) => [...e]) : null;
   estado = crearPartida(s, [miMazo, mazoRival]);
   // El jefe aguanta mucho más que un rival normal. No es una regla nueva: es el
-  // mismo hábitat, más alto, así que todo lo demás del motor sigue igual.
+  // mismo hábitat, más alto, así que todo lo demás del motor sigue igual. Y el
+  // marcador tiene que saberlo: sin su tope, el jefe salía «210 / 70» con la
+  // barra llena y quieta hasta bajar de 70.
   if (jefe) estado.jugadores[RIVAL].habitat = habitatDeAsalto();
+  fijarTopesHabitat(jefe ? habitatDeAsalto() : BALANCE.vidaHabitat);
   rngIA = semilla(s ^ 0x5bf03635);
   reloj.arrancar({ alAgotarse: seAcaboElTiempo, alLatir: pintarReloj });
   pintarReloj();
@@ -1243,6 +1262,17 @@ function iniciar() {
     // Tras un rival de expedición, «otra» vuelve al mapa: puede que se haya
     // abierto el siguiente nodo, y repetir contra el mismo no es lo que se busca.
     if (ultimaFueExpedicion) { abrirExpedicion(); irA(APP.EXPEDICION); return; }
+    // Y tras un asalto, «otra» es otro ASALTO. Caía en una partida normal
+    // contra la IA sin decirlo, y no se distingue hasta mirar el hábitat del
+    // rival: 70 en vez de los 210 del jefe. Si ya no se puede asaltar
+    // —almacén, tope del día, ventana cerrada— se vuelve a la Cuenca, que lo
+    // dice en su propio botón con el motivo.
+    if (ultimaFueAsalto) {
+      asaltoAlJefe().then((arrancó) => {
+        if (!arrancó) { abrirCuenca(); irA(APP.CUENCA); }
+      });
+      return;
+    }
     nuevaPartida();
   });
   // Terminar una partida no obligaba a jugar otra, pero lo parecía: no había
@@ -1415,6 +1445,8 @@ function empezarDuelo(r) {
   grabacion = null;
   ultimaFueDuelo = true;
   ultimaFueExpedicion = false;
+  ultimaFueAsalto = false;
+  fijarTopesHabitat();
   expedicionEnCurso = null;
   duelo = {
     id: r.id, n: r.n ?? 0, rival: r.rival, yo: r.yo, eloInicial: Number(r.eloInicial ?? r.yo?.elo ?? 1200),

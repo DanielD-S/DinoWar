@@ -346,11 +346,31 @@ function actualizarCarta(estado, nodo, inst) {
   if (p >= c.ataque && merma) nodo.querySelector('.c-merma').remove();
 }
 
+/**
+ * El tope de hábitat de cada bando en ESTA partida. Casi siempre es
+ * `BALANCE.vidaHabitat` para los dos, pero el jefe de un asalto lleva el
+ * triple, y con el tope fijo su barra salía al 300 % —llena y quieta hasta que
+ * bajaba de 70— y el número se leía «210 / 70». El tope no está en el estado
+ * del motor a propósito: es lo mismo que hace `main.js` al subirle el hábitat
+ * al jefe, una decisión de la partida y no una regla nueva.
+ */
+const topeHabitat = [BALANCE.vidaHabitat, BALANCE.vidaHabitat];
+
+/** Fija los topes de la partida que empieza. Sin jefe, los dos son el normal. */
+export function fijarTopesHabitat(rival = BALANCE.vidaHabitat, propio = BALANCE.vidaHabitat) {
+  topeHabitat[RIVAL] = rival;
+  topeHabitat[JUGADOR] = propio;
+  for (const [bando, num] of [[RIVAL, el.rHabitat], [JUGADOR, el.pHabitat]]) {
+    const meta = num.parentElement.querySelector('[data-meta="habitat"]');
+    if (meta) meta.textContent = `/${topeHabitat[bando]}`;
+  }
+}
+
 function pintarHabitat(estado) {
   for (const [bando, num, barra] of [[RIVAL, el.rHabitat, el.rBarra], [JUGADOR, el.pHabitat, el.pBarra]]) {
     const v = Math.max(0, estado.jugadores[bando].habitat);
     num.textContent = v;
-    barra.style.width = `${(100 * v) / BALANCE.vidaHabitat}%`;
+    barra.style.width = `${Math.min(100, (100 * v) / topeHabitat[bando])}%`;
   }
 }
 
