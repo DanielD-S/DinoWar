@@ -456,7 +456,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   overflow-y: auto; align-items: center; justify-content: safe center;
   background: radial-gradient(120% 70% at 50% 0%, rgba(217,164,65,.10), transparent 60%), var(--fondo);
 }
+/* Contenedor y no media query: el juego se pinta en una columna del ancho de
+   un móvil en mitad de la pantalla, y con `@media (min-width: 720px)` la
+   ventana ancha pasaba a tres columnas de 80 px dentro de esa columna. Lo que
+   decide es el sitio que tiene la caja, no el que tiene el navegador. */
 .ini-caja {
+  container-type: inline-size;
   width: 100%; max-width: 980px; display: flex; flex-direction: column; align-items: center;
   gap: 14px; text-align: center;
 }
@@ -497,7 +502,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .ini-aviso { min-height: 16px; font-size: 12px; color: var(--peligro); }
 .ini-empezar { width: 100%; max-width: 360px; }
-@media (min-width: 720px) {
+@container (min-width: 720px) {
   .ini-lista { grid-template-columns: repeat(3, 1fr); }
   .ini-mazo {
     min-height: 340px; grid-template-columns: 1fr; justify-items: center; align-content: end;
