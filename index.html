@@ -136,10 +136,6 @@
           <button id="btn-duelo" class="placa placa-duelo" aria-expanded="false"><i aria-hidden="true"></i>Duelo</button>
           <button id="btn-misiones" class="placa placa-misiones" aria-expanded="false"><i aria-hidden="true"></i>Misiones</button>
         </div>
-        <div class="menu-dificultad">
-          <span>Rival</span>
-          <div id="dificultad" class="menu-chips"></div>
-        </div>
         <!-- Las tres misiones del día. Las elige el calendario y el progreso lo
              lleva el servidor: el navegador sólo las pinta. Nace vacío y se
              rellena cuando `mis_misiones` contesta; si no contesta, no se
@@ -151,6 +147,20 @@
         <button id="btn-jugar-volver" class="boton-fantasma jugar-volver">Volver</button>
       </div>
     </div>
+  </section>
+
+  <!-- ------------------------------------------------------- EXPEDICIÓN -->
+  <!-- El solitario: un mapa por formación con rivales en fila. Lo pinta
+       src/ui/expedicion.js. Vuelve a la pantalla de jugar, no al menú, así que
+       su botón no lleva `data-volver`, que meta.js ata al menú. -->
+  <section id="expedicion" class="pantalla oculta meta expedicion">
+    <header class="meta-barra">
+      <button class="meta-volver" id="exp-volver">‹ Jugar</button>
+      <h2 id="exp-titulo">Expedición</h2>
+      <span class="meta-moneda"><b class="moneda">0</b></span>
+    </header>
+    <div class="meta-cuerpo exp-cuerpo" id="exp-cuerpo"></div>
+    <div class="exp-hoja oculta" id="exp-hoja" role="dialog" aria-modal="true"></div>
   </section>
 
   <!-- ---------------------------------------------------------- PARTIDA -->

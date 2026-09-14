@@ -13,7 +13,8 @@
 // Puro y sin dependencias de plataforma: corre igual en Node y en Deno.
 
 import { ECONOMIA } from '../../../src/data/coleccion.js';
-import { validarPartida, perfilValido } from './validarPartida.js';
+import { rivalPorId } from '../../../src/data/expediciones.js';
+import { validarPartida, perfilValido, PartidaInvalida } from './validarPartida.js';
 
 export { PartidaInvalida } from './validarPartida.js';
 
@@ -29,19 +30,33 @@ export { PartidaInvalida } from './validarPartida.js';
  *            danoAlHabitat:number, motivoFin:string}}
  */
 export function validarSolitario(envio) {
-  const r = validarPartida(envio, {
-    // null es el mazo de referencia. Es lo que hace `crearPartida` en el
-    // navegador cuando la partida no es un asalto, así que reproducirlo es
-    // literalmente no pasarle nada.
-    mazoRival: null,
-    habitatRival: null,
-    perfil: perfilValido(envio.perfil),
-  });
+  // Contra un rival de expedición, su mazo y su perfil salen de los DATOS por
+  // su id, nunca del envío: lo que diga el navegador sobre el mazo del rival o
+  // su dificultad no se lee. Un id que no existe es una partida inválida, no
+  // una partida contra el mazo de referencia.
+  const expedicion = envio?.rival ? rivalPorId(String(envio.rival)) : null;
+  if (envio?.rival && !expedicion) throw new PartidaInvalida('rival de expedición desconocido', envio.rival);
+
+  const r = validarPartida(envio, expedicion
+    ? {
+      mazoRival: expedicion.rival.mazo.map((e) => [...e]),
+      habitatRival: null,
+      perfil: perfilValido(expedicion.rival.perfil),
+    }
+    : {
+      // null es el mazo de referencia. Es lo que hace `crearPartida` en el
+      // navegador cuando la partida no es un asalto, así que reproducirlo es
+      // literalmente no pasarle nada.
+      mazoRival: null,
+      habitatRival: null,
+      perfil: perfilValido(envio.perfil),
+    });
 
   // Perder no paga: `monedasDerrota` es 0 y está aquí, y no un cero escrito a
   // mano, para que cambiarlo sea cambiar la economía en un solo sitio.
   return {
     ...r,
     premio: r.ganada ? ECONOMIA.monedasVictoria : ECONOMIA.monedasDerrota,
+    rival: expedicion ? expedicion.rival.id : null,
   };
 }

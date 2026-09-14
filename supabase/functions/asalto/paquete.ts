@@ -12,9 +12,9 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: f48bb107f9b82b4b
+// huella: e2094eab15412970
 //
-// Lleva dentro estos 22 ficheros del repositorio. La lista la da
+// Lleva dentro estos 23 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
 // aparece aquí solo. Un test recalcula la huella sobre esta misma lista y falla
 // si el paquete se ha quedado atrás del código.
@@ -35,6 +35,7 @@
 // fuente: src/data/misiones.js
 // fuente: supabase/functions/_compartido/validarPartida.js
 // fuente: supabase/functions/_compartido/validarAsalto.js
+// fuente: src/data/expediciones.js
 // fuente: supabase/functions/_compartido/validarSolitario.js
 // fuente: src/data/duelo.js
 // fuente: supabase/functions/_compartido/duelo.js
@@ -2471,9 +2472,9 @@ function alEntrar(s, inst, ayudas) {
   if (!HAY_ENTRADAS) return;
   const e = entradaDe(inst.cardId);
   if (!e) return;
-  const { ev: ev2, herir: herir2, rival: rival2, unidadEn: unidadEn2, unidadesDe: unidadesDe2, CAUSA: CAUSA2, vidaActual: vidaActual2 } = ayudas;
+  const { ev: ev2, herir: herir2, rival: rival3, unidadEn: unidadEn2, unidadesDe: unidadesDe2, CAUSA: CAUSA2, vidaActual: vidaActual2 } = ayudas;
   const j = inst.dueno;
-  const contrario = rival2(j);
+  const contrario = rival3(j);
   const jug = s.jugadores[j];
   const otro = s.jugadores[contrario];
   const contar = (efecto, n) => ev2(s, "ENTRADA", {
@@ -4117,17 +4118,17 @@ function parteVacio() {
   return p;
 }
 function anotarEventos(parte, eventos, bando = 0) {
-  const rival2 = bando === 0 ? 1 : 0;
+  const rival3 = bando === 0 ? 1 : 0;
   for (const e of eventos) {
     switch (e.tipo) {
       // Una criatura rival que se cae es una baja tuya. `dueno` es de quién ERA,
       // no quién la mató: matarte una propia con tu Mortandad no cuenta.
       case "MUERTE":
-        if (e.dueno === rival2) parte.bajas += 1;
+        if (e.dueno === rival3) parte.bajas += 1;
         break;
       // El daño al hábitat se cuenta por el bando que lo RECIBE.
       case "HABITAT":
-        if (e.bando === rival2) parte.danoHabitat += e.cantidad ?? 0;
+        if (e.bando === rival3) parte.danoHabitat += e.cantidad ?? 0;
         break;
       // REVELADA y no la acción de desplegar: lo que cuenta es la criatura que
       // LLEGÓ al campo. Una carta comprometida y luego rechazada se pagó igual,
@@ -4381,9 +4382,343 @@ function validarAsalto(envio) {
   return { ...r, dano: danoDeAsalto(r) };
 }
 
+// src/data/expediciones.js
+var RELLENO = ["biomasa", "araucarias", "cicadas", "ginkgos", "equisetos", "galeria", "helechal"];
+var topeDe = (id) => carta(id).copiasMax ?? BALANCE.copiasPorRareza[carta(id).rareza];
+function completar(lista) {
+  const cuenta = new Map(lista.map(([id, n]) => [id, n]));
+  let total = [...cuenta.values()].reduce((a, b) => a + b, 0);
+  for (const id of RELLENO) {
+    while (total < BALANCE.tamanoMazo && (cuenta.get(id) ?? 0) < topeDe(id)) {
+      cuenta.set(id, (cuenta.get(id) ?? 0) + 1);
+      total += 1;
+    }
+  }
+  return Object.freeze([...cuenta.entries()].map((e) => Object.freeze(e)));
+}
+var rival2 = (o) => Object.freeze({ ...o, mazo: completar(o.mazo) });
+var EXPEDICIONES = Object.freeze([
+  Object.freeze({
+    id: "morrison",
+    nombre: "Formaci\xF3n Morrison",
+    era: "Jur\xE1sico Superior \xB7 155\u2013148 Ma",
+    mapa: "mapa_morrison",
+    rivales: Object.freeze([
+      // El ORDEN sale de medirlos (`node sim/expediciones.mjs`), no de cómo
+      // suenan: el rebaño de saurópodos parecía un cuarto nodo y resultó más
+      // duro que el clan de Ceratosaurus. Jugar con cabeza apenas endurece un
+      // mazo flojo —el muro pasa del 99 % al 95 %—: la dificultad la da el mazo.
+      rival2({
+        id: "cria_dryosaurus",
+        nombre: "La cr\xEDa de Dryosaurus",
+        lema: "Muchos, peque\xF1os y nerviosos. Corren m\xE1s de lo que pegan.",
+        retrato: "dryosaurus",
+        perfil: "aleatoria",
+        premio: 30,
+        mazo: [
+          ["dryosaurus", 3],
+          ["eosinopteryx", 3],
+          ["bienosaurus", 3],
+          ["troodon", 3],
+          ["platyceratops", 3],
+          ["liaoceratops", 3],
+          ["shuangmiaosaurus", 3],
+          ["athenar", 3],
+          ["nido", 3],
+          ["insectos", 3],
+          ["sabana_helechos", 3],
+          ["gregarismo", 3]
+        ]
+      }),
+      rival2({
+        id: "muro_de_placas",
+        nombre: "El muro de placas",
+        lema: "Tire\xF3foros que no avanzan: esperan a que te rompas contra ellos.",
+        retrato: "stegosaurus",
+        perfil: "heuristica",
+        premio: 40,
+        mazo: [
+          ["stegosaurus", 3],
+          ["kentrosaurus", 3],
+          ["bienosaurus", 3],
+          ["loricatosaurus", 3],
+          ["gargoyleosaurus", 3],
+          ["invictarx", 3],
+          ["nodosaurus", 2],
+          ["euoplocephalus", 3],
+          ["gastrolitos", 2],
+          ["fractura", 2],
+          ["canal_trenzado", 3],
+          ["rebrote", 3]
+        ]
+      }),
+      rival2({
+        id: "cazadores_de_orilla",
+        nombre: "Cazadores de orilla",
+        lema: "Ter\xF3podos peque\xF1os en jaur\xEDa. Si los dejas crecer, muerden.",
+        retrato: "ornitholestes",
+        perfil: "heuristica",
+        premio: 50,
+        mazo: [
+          ["ornitholestes", 3],
+          ["ceratosaurus", 3],
+          ["dromaeosaurus", 3],
+          ["troodon", 3],
+          ["velociraptor", 3],
+          ["ojoraptorsaurus", 3],
+          ["halszkaraptor", 3],
+          ["tongtianlong", 3],
+          ["allosaurus", 2],
+          ["riparovenator", 2],
+          ["trampa", 3],
+          ["fractura", 2],
+          ["gregarismo", 3],
+          ["crecimiento_acelerado", 1]
+        ]
+      }),
+      rival2({
+        id: "clan_ceratosaurus",
+        nombre: "El clan de Ceratosaurus",
+        lema: "Todo dientes y ninguna paciencia. Si sobrevives al turno 5, es tuyo.",
+        retrato: "ceratosaurus",
+        perfil: "heuristica",
+        premio: 60,
+        mazo: [
+          ["ceratosaurus", 3],
+          ["ornitholestes", 3],
+          ["allosaurus", 3],
+          ["torvosaurus", 2],
+          ["riparovenator", 2],
+          ["dromaeosaurus", 3],
+          ["velociraptor", 3],
+          ["monolophosaurus", 3],
+          ["carnotaurus", 2],
+          ["fractura", 2],
+          ["competencia", 2],
+          ["gregarismo", 3],
+          ["trampa", 2]
+        ]
+      }),
+      rival2({
+        id: "lago_toodichi",
+        nombre: "El lago T\u2019oo\u2019dichi\u2019",
+        lema: "Lo que vuela y lo que nada. Llegan por donde no miras.",
+        retrato: "huaxiadraco",
+        perfil: "heuristica",
+        premio: 80,
+        mazo: [
+          ["plesiopleurodon", 2],
+          ["scanisaurus", 3],
+          ["elasmosaurus", 3],
+          ["huaxiadraco", 3],
+          ["pteranodon", 3],
+          ["quetzalcoatlus", 2],
+          ["halszkaraptor", 3],
+          ["suchomimus", 2],
+          ["lago", 2],
+          ["humedal", 2],
+          ["inundacion", 3],
+          ["canal_trenzado", 2]
+        ]
+      }),
+      rival2({
+        id: "rebano_de_cuellos",
+        nombre: "El reba\xF1o de cuellos largos",
+        lema: "Saur\xF3podos que se curan y no se caen. Hay que ganarles por f\xF3siles.",
+        retrato: "diplodocus",
+        perfil: "heuristica",
+        premio: 100,
+        mazo: [
+          ["diplodocus", 3],
+          ["apatosaurus", 3],
+          ["camarasaurus", 3],
+          ["amargasaurus", 3],
+          ["plateosauravus", 3],
+          ["athenar", 2],
+          ["atlasaurus", 2],
+          ["mamenchisaurus", 3],
+          ["brachiosaurus", 1],
+          ["gastrolitos", 2],
+          ["canal_trenzado", 3],
+          ["sabana", 1],
+          ["rebrote", 3]
+        ]
+      }),
+      rival2({
+        id: "cantera_cleveland",
+        nombre: "La cantera Cleveland-Lloyd",
+        lema: "El barro se lo traga todo. Cuida tu mazo: aqu\xED se pierde por extinci\xF3n.",
+        retrato: "allosaurus",
+        perfil: "heuristica",
+        premio: 120,
+        mazo: [
+          ["trampa", 3],
+          ["mortandad", 1],
+          ["deriva_arida", 2],
+          ["inundacion", 3],
+          ["aridez", 1],
+          ["suchomimus", 2],
+          ["quetzalcoatlus", 2],
+          ["spinosaurus", 1],
+          ["allosaurus", 3],
+          ["ceratosaurus", 3],
+          ["stegoceras", 3],
+          ["gargoyleosaurus", 3],
+          ["manada_paso", 3],
+          ["dryosaurus", 3],
+          ["huaxiadraco", 3]
+        ]
+      }),
+      rival2({
+        id: "big_al",
+        nombre: "Big Al",
+        lema: "El Allosaurus m\xE1s famoso de la Morrison: diecinueve heridas y ninguna le par\xF3.",
+        retrato: "allosaurus",
+        perfil: "heuristica",
+        premio: 200,
+        mazo: [
+          ["allosaurus", 3],
+          ["torvosaurus", 2],
+          ["tyrannotitan", 1],
+          ["ceratosaurus", 3],
+          ["ornitholestes", 3],
+          ["stegosaurus", 3],
+          ["nodosaurus", 2],
+          ["diplodocus", 3],
+          ["apatosaurus", 3],
+          ["camarasaurus", 2],
+          ["lokiceratops", 1],
+          ["crecimiento_acelerado", 1],
+          ["neumaticidad", 2],
+          ["fractura", 2],
+          ["gregarismo", 3],
+          ["trampa", 3],
+          ["gastrolitos", 2],
+          ["sabana", 1]
+        ]
+      })
+    ])
+  })
+]);
+var VISITANTES = Object.freeze([
+  rival2({
+    id: "visitante_tyrannosaurus",
+    nombre: "El rey de Hell Creek",
+    lema: "Sesenta y seis millones de a\xF1os de adelanto, y hambre de todos ellos.",
+    retrato: "tyrannosaurus",
+    perfil: "heuristica",
+    premio: 150,
+    mazo: [
+      // Sin Triceratops ni Ankylosaurus: con ellos se le ganaba el 37 % y los
+      // otros visitantes rondan el 50 %. Rotan por semana y tienen que costar
+      // parecido, que si no la semana del rey es la semana de no jugar.
+      ["tyrannosaurus", 1],
+      ["liaoceratops", 2],
+      ["stegoceras", 1],
+      ["pachycephalosaurus", 3],
+      ["parasaurolophus", 3],
+      ["edmontosaurus", 1],
+      ["quetzalcoatlus", 2],
+      ["troodon", 3],
+      ["dromaeosaurus", 3],
+      ["velociraptor", 3],
+      ["chasmosaurus", 3],
+      ["euoplocephalus", 3],
+      ["fractura", 2],
+      ["bosque_ribereno", 2],
+      ["crecimiento_acelerado", 1]
+    ]
+  }),
+  rival2({
+    id: "visitante_spinosaurus",
+    nombre: "El se\xF1or del Kem Kem",
+    lema: "Del r\xEDo no sale nada vivo. Tampoco tus cartas.",
+    retrato: "spinosaurus",
+    perfil: "heuristica",
+    premio: 150,
+    mazo: [
+      ["spinosaurus", 1],
+      ["suchomimus", 2],
+      ["carnotaurus", 2],
+      ["sanjuansaurus", 3],
+      // Con Allosaurus en vez de Scanisaurus y los eventos de presión se le gana
+      // el 52 %; como estaba al principio, el 73 %, la semana regalada.
+      ["elasmosaurus", 3],
+      ["allosaurus", 3],
+      ["plesiopleurodon", 2],
+      ["torvosaurus", 2],
+      ["fractura", 2],
+      ["competencia", 1],
+      ["crecimiento_acelerado", 1],
+      ["trampa", 3],
+      ["inundacion", 3],
+      ["lago", 2],
+      ["humedal", 2],
+      ["vega", 2]
+    ]
+  }),
+  rival2({
+    id: "visitante_mosasaurus",
+    nombre: "Lo que sube del mar",
+    lema: "Un mar interior entero detr\xE1s. Aguanta la marea o te arrastra.",
+    retrato: "mosasaurus",
+    perfil: "heuristica",
+    premio: 150,
+    mazo: [
+      ["mosasaurus", 1],
+      ["elasmosaurus", 3],
+      ["plesiopleurodon", 2],
+      ["scanisaurus", 3],
+      ["quetzalcoatlus", 2],
+      ["pteranodon", 3],
+      ["huaxiadraco", 3],
+      ["argentinosaurus", 2],
+      ["amargasaurus", 3],
+      ["canal_trenzado", 3],
+      ["gastrolitos", 2],
+      ["manada_paso", 3],
+      ["manantial", 1]
+    ]
+  })
+]);
+function semanaDe(dia) {
+  const ms = Date.parse(`${dia}T00:00:00Z`);
+  if (!Number.isFinite(ms)) throw new Error(`d\xEDa inv\xE1lido: ${dia}`);
+  return Math.floor((ms / 864e5 + 3) / 7);
+}
+var TODOS2 = new Map([
+  ...EXPEDICIONES.flatMap((e) => e.rivales.map((r, i) => [r.id, { rival: r, expedicion: e, indice: i }])),
+  ...VISITANTES.map((r) => [r.id, { rival: r, expedicion: null, indice: -1 }])
+]);
+var rivalPorId = (id) => TODOS2.get(id) ?? null;
+function requisitoDe(id) {
+  const r = rivalPorId(id);
+  if (!r || r.indice <= 0) return null;
+  return r.expedicion.rivales[r.indice - 1].id;
+}
+function claveDeVictoria(id, dia) {
+  const r = rivalPorId(id);
+  if (!r) return null;
+  return r.expedicion ? id : `${id}@${semanaDe(dia)}`;
+}
+for (const [id, { rival: r }] of TODOS2) {
+  const total = r.mazo.reduce((a, [, n]) => a + n, 0);
+  if (total !== BALANCE.tamanoMazo) throw new Error(`EXPEDICIONES: ${id} suma ${total} cartas`);
+  for (const [cardId, n] of r.mazo) {
+    if (n > topeDe(cardId)) throw new Error(`EXPEDICIONES: ${id} lleva ${n} ${cardId} y admite ${topeDe(cardId)}`);
+  }
+  carta(r.retrato);
+}
+
 // supabase/functions/_compartido/validarSolitario.js
 function validarSolitario(envio) {
-  const r = validarPartida(envio, {
+  const expedicion = envio?.rival ? rivalPorId(String(envio.rival)) : null;
+  if (envio?.rival && !expedicion) throw new PartidaInvalida("rival de expedici\xF3n desconocido", envio.rival);
+  const r = validarPartida(envio, expedicion ? {
+    mazoRival: expedicion.rival.mazo.map((e) => [...e]),
+    habitatRival: null,
+    perfil: perfilValido(expedicion.rival.perfil)
+  } : {
     // null es el mazo de referencia. Es lo que hace `crearPartida` en el
     // navegador cuando la partida no es un asalto, así que reproducirlo es
     // literalmente no pasarle nada.
@@ -4393,7 +4728,8 @@ function validarSolitario(envio) {
   });
   return {
     ...r,
-    premio: r.ganada ? ECONOMIA.monedasVictoria : ECONOMIA.monedasDerrota
+    premio: r.ganada ? ECONOMIA.monedasVictoria : ECONOMIA.monedasDerrota,
+    rival: expedicion ? expedicion.rival.id : null
   };
 }
 
@@ -4723,10 +5059,26 @@ async function hacerVictoria(servicio, jugadorId, envio) {
       yaCobrada ? 409 : 400
     );
   }
+  let expedicion = null;
+  if (resultado2.ganada && resultado2.rival) {
+    const { rival: r } = rivalPorId(resultado2.rival);
+    const { data: exp, error: errExp } = await servicio.rpc("aplicar_expedicion", {
+      p_jugador: jugadorId,
+      p_clave: claveDeVictoria(r.id, dia),
+      p_rival: r.id,
+      p_requisito: requisitoDe(r.id),
+      p_premio: r.premio
+    });
+    if (errExp) console.error("aplicar_expedicion", errExp.message);
+    else expedicion = exp;
+  }
   return json({
     ganada: resultado2.ganada,
     turnos: resultado2.turnos,
     premio: data?.premio ?? 0,
+    // Lo que pagó la expedición, aparte del premio de la victoria: la pantalla
+    // de fin lo dice por separado, que son dos cosas.
+    expedicion: expedicion ?? null,
     monedas: data?.monedas ?? null,
     // Lo que las misiones aportaron, para que la pantalla de fin lo diga en vez
     // de que aparezcan monedas de la nada.
@@ -4876,14 +5228,14 @@ async function responderDuelo(servicio, jugadorId, fila, desde, ahora) {
   const { data: js } = await servicio.from("jugadores").select("id, apodo, elo, duelos").in("id", [jugadorId, rivalId].filter(Boolean));
   const de = (id) => (js ?? []).find((x) => x.id === id) ?? null;
   const yo = de(jugadorId);
-  const rival2 = de(rivalId);
+  const rival3 = de(rivalId);
   const base = {
     id: fila.id,
     estado: fila.estado,
     codigo: fila.codigo,
     bando,
     yo: yo ? { apodo: yo.apodo, elo: yo.elo, duelos: yo.duelos } : null,
-    rival: rival2 ? { apodo: rival2.apodo, elo: rival2.elo, duelos: rival2.duelos } : null,
+    rival: rival3 ? { apodo: rival3.apodo, elo: rival3.elo, duelos: rival3.duelos } : null,
     eloInicial: bando === 0 ? fila.elo_a : fila.elo_b
   };
   if (fila.estado === "esperando" || !fila.datos) return json(base);

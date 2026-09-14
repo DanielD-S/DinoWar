@@ -63,6 +63,18 @@ La mano inicial se puede **cambiar entera en el turno 1**: el primer cambio es
 gratis y roba las mismas cartas, y cada cambio siguiente roba una menos. Una mano
 de la que no puedes pagar nada no es mala suerte, es un turno perdido.
 
+## Las Expediciones
+
+El solitario es un mapa por formación geológica con rivales en fila. Cada uno
+lleva su propio mazo —una cría de Dryosaurus que corre más de lo que pega, un
+muro de tireóforos, una cantera donde el barro se come tu mazo— y ganar a uno
+abre el siguiente. La primera victoria contra cada rival paga un premio que
+sube con el camino, de 30 a 200 dinomonedas; rejugarlo paga lo normal.
+
+Cada semana llega además un **visitante de otra era**, fuera del camino, con
+su premio propio. Hoy la única expedición es la **Formación Morrison**, con
+ocho rivales que acaban en Big Al.
+
 ## El Duelo y las ligas
 
 Contra una persona, con la partida en el servidor: cada jugada viaja a la

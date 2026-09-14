@@ -14,7 +14,7 @@
 
 import { desbloquear, sonido } from './audio.js';
 
-const TOCABLES = '.placa, .boton-piedra, .menu-chips .chip, .boton-fantasma';
+const TOCABLES = '.placa, .boton-piedra, .boton-fantasma';
 const CON_LATON = '.placa, .boton-piedra';
 
 export function montarTacto(raiz) {

@@ -24,25 +24,26 @@
 // la función arranca y muere con «Module not found» AUNQUE LA URL CONTESTE 200.
 // Costó verlo porque todo lo demás —el commit, la URL, el contenido— estaba bien.
 //
-// Motor anclado en: 780efd462c4029f1f0fd3561fdfb72835161dc26
+// Motor anclado en: e3227d1d672ba7e032452c8f1a30d6fbfd66a74d
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import {
   validarAsalto, jefeDelEvento, AsaltoInvalido,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@780efd462c4029f1f0fd3561fdfb72835161dc26/supabase/functions/_compartido/validarAsalto.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@e3227d1d672ba7e032452c8f1a30d6fbfd66a74d/supabase/functions/_compartido/validarAsalto.js';
 import {
   validarSolitario,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@780efd462c4029f1f0fd3561fdfb72835161dc26/supabase/functions/_compartido/validarSolitario.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@e3227d1d672ba7e032452c8f1a30d6fbfd66a74d/supabase/functions/_compartido/validarSolitario.js';
 import {
   crearDuelo, aplicarAccion, vistaDuelo, comprobarTiempo, rendirse, resultado, terminado,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@780efd462c4029f1f0fd3561fdfb72835161dc26/supabase/functions/_compartido/duelo.js';
-import { validarMazoLegal } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@780efd462c4029f1f0fd3561fdfb72835161dc26/supabase/functions/_compartido/validarPartida.js';
-import { eloTras } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@780efd462c4029f1f0fd3561fdfb72835161dc26/src/data/ligas.js';
-import { CUENCA } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@780efd462c4029f1f0fd3561fdfb72835161dc26/src/data/tribu.js';
-import { ECONOMIA, abrirSobre } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@780efd462c4029f1f0fd3561fdfb72835161dc26/src/data/coleccion.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@e3227d1d672ba7e032452c8f1a30d6fbfd66a74d/supabase/functions/_compartido/duelo.js';
+import { validarMazoLegal } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@e3227d1d672ba7e032452c8f1a30d6fbfd66a74d/supabase/functions/_compartido/validarPartida.js';
+import { eloTras } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@e3227d1d672ba7e032452c8f1a30d6fbfd66a74d/src/data/ligas.js';
+import { CUENCA } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@e3227d1d672ba7e032452c8f1a30d6fbfd66a74d/src/data/tribu.js';
+import { ECONOMIA, abrirSobre } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@e3227d1d672ba7e032452c8f1a30d6fbfd66a74d/src/data/coleccion.js';
 import {
   avancesDelParte, diaUTC, POR_ID,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@780efd462c4029f1f0fd3561fdfb72835161dc26/src/data/misiones.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@e3227d1d672ba7e032452c8f1a30d6fbfd66a74d/src/data/misiones.js';
+import { rivalPorId, requisitoDe, claveDeVictoria } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@e3227d1d672ba7e032452c8f1a30d6fbfd66a74d/src/data/expediciones.js';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -214,10 +215,31 @@ async function hacerVictoria(servicio, jugadorId: string, envio: Record<string, 
       yaCobrada ? 409 : 400);
   }
 
+  // La primera victoria contra un rival de expedición paga su premio, una vez.
+  // Rival, premio y requisito salen de los datos por el id que devolvió la
+  // re-jugada; el SQL sólo apunta y paga, y paga cero si el nodo anterior no
+  // está vencido o si ya lo estaba éste.
+  let expedicion = null;
+  if (resultado.ganada && resultado.rival) {
+    const { rival: r } = rivalPorId(resultado.rival);
+    const { data: exp, error: errExp } = await servicio.rpc('aplicar_expedicion', {
+      p_jugador: jugadorId,
+      p_clave: claveDeVictoria(r.id, dia),
+      p_rival: r.id,
+      p_requisito: requisitoDe(r.id),
+      p_premio: r.premio,
+    });
+    if (errExp) console.error('aplicar_expedicion', errExp.message);
+    else expedicion = exp;
+  }
+
   return json({
     ganada: resultado.ganada,
     turnos: resultado.turnos,
     premio: data?.premio ?? 0,
+    // Lo que pagó la expedición, aparte del premio de la victoria: la pantalla
+    // de fin lo dice por separado, que son dos cosas.
+    expedicion: expedicion ?? null,
     monedas: data?.monedas ?? null,
     // Lo que las misiones aportaron, para que la pantalla de fin lo diga en vez
     // de que aparezcan monedas de la nada.

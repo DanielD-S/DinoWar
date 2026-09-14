@@ -197,12 +197,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .menu-fila { display: flex; gap: 8px; }
 .menu-fila .boton-secundario { flex: 1; }
 
-.menu-dificultad {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--tenue);
-}
-.menu-chips { display: flex; gap: 6px; }
-.menu-chips .chip { padding: 5px 12px; letter-spacing: 0; text-transform: none; font-size: 12px; }
 
 .menu-monedas {
   display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -270,10 +264,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
    se lee como una que se ha perdido. */
 .mision.hecha { border-color: rgba(217,164,65,.5); background: rgba(217,164,65,.08); }
 .mision.hecha .mision-cifra { color: var(--acento-vivo); }
-
-/* La dificultad es del rival de la IA: con el panel del Duelo abierto se va,
-   que ahí el rival es una persona y el chip de «Fácil» lo contradecía. */
-#jugar.duelo-abierto .menu-dificultad { display: none; }
 
 /* El panel del Duelo hereda el del de misiones: misma caja, mismo título. */
 #jugar.duelo-abierto .placa-duelo i { filter: brightness(1.25) saturate(1.2); }
@@ -1099,8 +1089,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* Lo que queda debajo va a juego sin imagen: filete de latón en los chips y
    los enlaces, para que la piedra de arriba y la web de abajo no den un salto. */
-.menu-dificultad .chip { border-color: rgba(217,164,65,.4); font-family: 'Cinzel', Georgia, serif; font-weight: 600; font-size: 11px; }
-.menu-dificultad .chip.on { background: linear-gradient(180deg, #e2b95a, #b8862e); border-color: #f4d99b; color: #1a1208; }
 
 /* ------------------------------------------- el menú respira y contesta
    Las piezas son dibujadas y sin esto el menú era una lámina: se tocaba y no
@@ -1218,14 +1206,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   outline: 2px solid var(--acento-claro); outline-offset: 4px; border-radius: 6px;
 }
 
-/* Los chips y los enlaces de texto contestan igual, sin latón. */
-.menu-dificultad .chip {
-  transition: background .18s ease-out, border-color .18s ease-out, color .18s ease-out,
-              transform .25s cubic-bezier(.2,1.7,.4,1);
-}
-.menu-dificultad .chip:active { transform: scale(.93); transition-duration: .08s; }
-@keyframes menu-pop { 0% { transform: scale(.88); } 55% { transform: scale(1.08); } 100% { transform: none; } }
-.menu-dificultad .chip.recien { animation: menu-pop .32s cubic-bezier(.2,.8,.2,1); }
+/* Los enlaces de texto contestan sin latón. */
 .boton-fantasma { transition: color .15s ease-out, border-color .15s ease-out, transform .25s cubic-bezier(.2,1.7,.4,1); }
 .boton-fantasma:active { transform: scale(.96); transition-duration: .08s; }
 
@@ -1235,9 +1216,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   #jugar .menu-epigrafe, #jugar .menu-caja h1, #jugar .menu-lema,
   #jugar .menu-acciones > :not(.jugar-placas), #jugar .jugar-placas .placa,
   #jugar .menu-misiones,
-  .menu-heroe, .menu-monedas .punto, .menu-dificultad .chip.recien,
+  .menu-heroe, .menu-monedas .punto,
   .boton-piedra.pulsada::after, .menu-placas .placa.pulsada i::after { animation: none; }
-  .boton-piedra, .menu-placas .placa, .menu-dificultad .chip, .boton-fantasma { transition: none; }
+  .boton-piedra, .menu-placas .placa, .boton-fantasma { transition: none; }
 }
 
 /* ----------------------------------------------------- la marca de la casa
@@ -2659,3 +2640,138 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .fin-informe .cu-vida { max-width: 300px; margin: 8px auto; }
 .fin-informe .cu-vida i { transition: width 1.2s cubic-bezier(.2,.8,.2,1); }
 .fin-informe .cu-datos { max-width: 300px; margin: 0 auto; }
+
+/* ------------------------------------------------------------ expedición
+   El mapa es una columna alta que se desplaza; los nodos van en posición
+   absoluta sobre ella y el sendero en un SVG debajo. Sin arte, el mapa es un
+   degradado y los medallones son círculos de CSS; con arte, el marco WebP va
+   ENCIMA del retrato y el hueco transparente deja verlo. */
+.exp-cuerpo { padding: 0 0 24px; position: relative; }
+.exp-era {
+  text-align: center; font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--acento-claro); margin: 12px 0 6px;
+}
+.exp-visitante {
+  display: flex; align-items: center; gap: 12px; margin: 4px 14px 10px; padding: 10px 12px;
+  width: calc(100% - 28px); text-align: left; border-radius: 12px;
+  border: 1px solid rgba(217,164,65,.45);
+  background: linear-gradient(90deg, rgba(120,30,20,.35), rgba(15,11,8,.6));
+}
+.exp-visitante.vencido { border-color: var(--linea); background: rgba(15,11,8,.5); }
+.exp-visitante .exp-medallon { width: 58px; height: 58px; flex: none; }
+.exp-visitante-texto { display: flex; flex-direction: column; gap: 2px; }
+.exp-visitante-texto small { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--acento-claro); }
+.exp-visitante-texto b { font-size: 15px; font-weight: 600; }
+.exp-visitante-texto i { font-style: normal; font-size: 11.5px; color: var(--tenue); }
+.exp-mapa {
+  position: relative; margin: 0 8px; border-radius: 14px; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 20%, rgba(70,90,50,.35), transparent 60%),
+    linear-gradient(180deg, #1c2418 0%, #15180f 55%, #22170f 100%) center / cover no-repeat;
+  background-size: cover;
+}
+.exp-mapa.con-arte { background-color: #2a1c10; background-size: cover; background-position: center top; }
+/* Sobre el dibujo el sendero y los nombres se perdían entre ríos y estratos:
+   la sombra va en filter, que sigue la raya, y no en box-shadow. */
+.exp-sendero { position: absolute; inset: 0; pointer-events: none; filter: drop-shadow(0 0 2px rgba(0,0,0,.95)) drop-shadow(0 0 1px #000); }
+.exp-mapa.con-arte .exp-nombre { background: rgba(8,8,6,.86); box-shadow: 0 1px 4px rgba(0,0,0,.7); }
+.exp-sendero line { stroke: rgba(200,190,160,.35); stroke-width: 4; stroke-dasharray: 2 12; stroke-linecap: round; }
+.exp-sendero line.hecho { stroke: var(--acento-vivo); stroke-dasharray: 10 10; stroke-width: 5; }
+.exp-nodo {
+  position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column;
+  align-items: center; gap: 6px; width: 132px;
+}
+.exp-medallon { position: relative; display: block; width: 78px; height: 78px; }
+.exp-retrato {
+  position: absolute; inset: 11%; border-radius: 50%; overflow: hidden; background: #111;
+}
+.exp-retrato img, .exp-retrato svg { width: 100%; height: 100%; object-fit: cover; display: block; }
+.exp-marco { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+/* Con arte, el retrato va en el hueco del medallón. Medido por
+   `tools/expediciones.py`: 18–19,5 % del borde en abierto, vencido y semana;
+   el del bloqueado lo parten las cadenas y se mide mal, pero es la misma
+   geometría. Un punto por dentro, para que el aro tape el canto. */
+.exp-medallon.con-marco { width: 86px; height: 86px; filter: drop-shadow(0 4px 6px rgba(0,0,0,.7)); }
+.exp-medallon.con-marco .exp-retrato { inset: 18%; }
+.exp-visitante .exp-medallon.con-marco { width: 66px; height: 66px; }
+/* Sin arte: el aro lo pinta el CSS, con el color del estado. */
+.exp-medallon:not(.con-marco) { border-radius: 50%; border: 3px solid #5a5040; box-shadow: 0 4px 10px rgba(0,0,0,.6); }
+.exp-medallon:not(.con-marco) .exp-retrato { inset: 4px; }
+.exp-medallon.abierto:not(.con-marco) { border-color: var(--acento-vivo); box-shadow: 0 0 0 4px rgba(217,164,65,.25), 0 0 22px rgba(217,164,65,.55); }
+.exp-medallon.vencido:not(.con-marco) { border-color: #b8913e; }
+.exp-medallon.semana:not(.con-marco) { border-color: #b8513a; box-shadow: 0 0 14px rgba(184,81,58,.6); }
+.exp-medallon.bloqueado .exp-retrato { filter: grayscale(1) brightness(.35); }
+.exp-medallon.bloqueado:not(.con-marco)::after {
+  content: '🔒'; position: absolute; inset: 0; display: grid; place-items: center; font-size: 24px;
+}
+.exp-medallon.vencido:not(.con-marco)::after {
+  content: '✓'; position: absolute; right: -4px; bottom: -4px; width: 26px; height: 26px; border-radius: 50%;
+  display: grid; place-items: center; background: #7a1f16; color: #f4d99b; font-weight: 700; font-size: 15px;
+  border: 2px solid #b8913e;
+}
+.exp-nodo.abierto .exp-medallon { animation: exp-latido 2.4s ease-in-out infinite; }
+/* El brillo del nodo abierto. Venía dibujado, pero el generador lo mezcló con
+   el magenta en un aro rosa que no se puede separar del fondo: la herramienta
+   lo quita y el resplandor lo pone esto, que además sigue la silueta. */
+.exp-nodo.abierto .exp-medallon.con-marco {
+  filter: drop-shadow(0 0 6px rgba(240,196,90,.85)) drop-shadow(0 0 16px rgba(217,164,65,.55)) drop-shadow(0 4px 6px rgba(0,0,0,.7));
+}
+@keyframes exp-latido { 50% { transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .exp-nodo.abierto .exp-medallon { animation: none; } }
+.exp-nombre {
+  font-family: 'Cinzel', Georgia, serif; font-size: 11.5px; line-height: 1.25; text-align: center;
+  padding: 4px 8px; border-radius: 8px; background: rgba(10,12,8,.78); color: var(--texto);
+}
+.exp-nodo.bloqueado .exp-nombre { color: var(--tenue); }
+.exp-nodo:active .exp-medallon { transform: scale(.94); }
+
+.exp-hoja {
+  position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; padding: 18px;
+  background: rgba(0,0,0,.66); backdrop-filter: blur(2px);
+}
+.exp-cartela {
+  width: min(340px, 100%); display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 22px 20px 18px; border-radius: 16px; text-align: center;
+  background: linear-gradient(180deg, #2a2117, #15110c); border: 2px solid #8a6b3f;
+  box-shadow: 0 10px 30px rgba(0,0,0,.7);
+}
+/* Con arte, la cartela es la pieza entera y todo va colocado sobre ella en
+   porcentajes MEDIDOS del WebP (768×1282): la ventana del retrato por la
+   herramienta, la banda del nombre y la piedra lisa sobre el original. Nada
+   va en flujo, que un lema de dos líneas empujaría el nombre fuera de la banda. */
+.exp-cartela.con-marco {
+  position: relative; display: block; padding: 0; border: 0; border-radius: 0;
+  width: min(340px, 100%, calc((100dvh - 36px) * .599)); aspect-ratio: 768 / 1282;
+  background: url('assets/piel/expediciones/cartela_rival.webp') center / 100% 100% no-repeat;
+  box-shadow: none; filter: drop-shadow(0 10px 24px rgba(0,0,0,.8));
+}
+.exp-cartela.con-marco .exp-cartela-retrato {
+  position: absolute; left: 22.4%; top: 7.8%; width: 55.1%; height: 33.3%; border: 0;
+}
+.exp-cartela.con-marco h3 {
+  position: absolute; left: 12%; right: 12%; top: 44%; height: 10.3%; margin: 0;
+  display: grid; place-items: center; font-size: clamp(14px, 4.6vw, 18px); line-height: 1.1;
+  color: #1c140a; text-shadow: 0 1px 0 rgba(255,230,170,.45);
+}
+/* `width: auto`: la regla general le da 100 %, y con posición absoluta eso
+   pesa más que left y right; el lema y el botón se salían por la derecha. */
+.exp-cartela.con-marco .exp-cartela-texto {
+  position: absolute; left: 10%; right: 10%; top: 57%; bottom: 5.5%; width: auto;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 4px;
+}
+.exp-cartela.con-marco .exp-cartela-botones { margin-top: auto; }
+.exp-cartela.con-marco .exp-cartela-botones .boton-grande { min-height: 42px; }
+.exp-cartela-retrato {
+  width: 132px; height: 132px; border-radius: 50%; overflow: hidden;
+  border: 3px solid var(--acento-vivo); background: #111;
+}
+.exp-cartela.con-marco .exp-cartela-retrato { border: 0; }
+.exp-cartela-retrato img, .exp-cartela-retrato svg { width: 100%; height: 100%; object-fit: cover; display: block; }
+.exp-cartela h3 { font-family: 'Cinzel', Georgia, serif; font-size: 19px; margin-top: 4px; }
+.exp-cartela-lema { font-size: 13px; line-height: 1.4; color: var(--texto); opacity: .9; }
+.exp-cartela-dato { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--acento-claro); }
+.exp-cartela-premio { font-size: 13px; color: var(--tenue); }
+.exp-cartela-premio b { color: var(--bio); }
+.exp-cartela-aviso { font-size: 12.5px; color: var(--peligro); }
+.exp-cartela-texto { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
+.exp-cartela-botones { display: flex; flex-direction: column; gap: 6px; width: 100%; margin-top: 6px; }
+.exp-cartela-botones .boton-grande[disabled] { opacity: .45; }
