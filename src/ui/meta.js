@@ -150,6 +150,11 @@ export function pintarMenu() {
   const v = validarMazo(m?.cartas ?? {}, p.cartas);
   dom.menuMoneda.textContent = MONEDAS();
   dom.menuMazo.textContent = v.valido ? m.nombre : `${m?.nombre ?? '—'} (no válido)`;
+  // Las cabeceras de Mazos, Tribu y Cuenta llevan su propio contador y sólo lo
+  // repintaban Colección y Sobres: quien iba a Mazos antes que a ninguna de
+  // las dos veía el «0» del HTML con 240 dinomonedas en la cuenta. El menú se
+  // repinta al sincronizar y tras cada cambio, así que desde aquí llega a todas.
+  pintarMonedas();
   pintarAvisos();
 }
 
