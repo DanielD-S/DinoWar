@@ -9,6 +9,7 @@ import {
   CUENCA, acumular, faltaParaLlenar, depositoDe, ritmoPorHora, costeDeMejora,
   danoDeAsalto, puedeAsaltar, aplicarAsalto, mereceRecompensa, tablaDeAportes,
 } from '../src/data/tribu.js';
+import { ROL, puedeExpulsar, puedeCederMando, relevoDeMando } from '../src/data/mando.js';
 import {
   CALENDARIO, CICLO, JEFES, CARTAS_DE_JEFE, eventosActivos, jefeActivo, TIPO_EVENTO,
 } from '../src/data/eventos.js';
@@ -166,4 +167,41 @@ test('Todo evento del calendario apunta a algo real', () => {
     if (e.tipo === TIPO_EVENTO.JEFE) assert.ok(JEFES[e.jefe], `${e.id}: jefe "${e.jefe}" inexistente`);
     if (e.tipo === TIPO_EVENTO.CLIMA) assert.ok(CARTAS[e.clima], `${e.id}: clima "${e.clima}" inexistente`);
   }
+});
+
+// ------------------------------------------------------------------ mando
+
+const CAPATAZ = { id: 'a', rol: ROL.CAPATAZ, desde: 100 };
+const VIEJA = { id: 'b', rol: ROL.MIEMBRO, desde: 200 };
+const NUEVO = { id: 'c', rol: ROL.MIEMBRO, desde: 900 };
+const TRIBU = [CAPATAZ, VIEJA, NUEVO];
+
+test('Sólo el capataz echa a alguien, y nunca a sí mismo', () => {
+  assert.equal(puedeExpulsar(CAPATAZ, NUEVO), null);
+  assert.ok(puedeExpulsar(VIEJA, NUEVO), 'un miembro no puede echar a otro');
+  assert.ok(puedeExpulsar(CAPATAZ, CAPATAZ), 'echarse a sí mismo es salir, no expulsar');
+});
+
+test('Ceder el mando es cosa del capataz y hacia otra persona', () => {
+  assert.equal(puedeCederMando(CAPATAZ, VIEJA), null);
+  assert.ok(puedeCederMando(VIEJA, NUEVO));
+  assert.ok(puedeCederMando(CAPATAZ, CAPATAZ));
+});
+
+test('Si el capataz se va, hereda quien lleva más tiempo', () => {
+  assert.equal(relevoDeMando(TRIBU, 'a'), 'b');
+  // Y si se van los dos antiguos, el último que queda.
+  assert.equal(relevoDeMando([CAPATAZ, NUEVO], 'a'), 'c');
+});
+
+test('El último que se va no deja capataz: no queda tribu', () => {
+  assert.equal(relevoDeMando([CAPATAZ], 'a'), null);
+});
+
+test('Sin fecha de entrada el relevo sigue siendo determinista', () => {
+  // Dos filas antiguas sin `tribu_desde`: el desempate es el id, no el orden
+  // en que vinieran de la base de datos.
+  const sinFecha = [{ id: 'z', rol: ROL.MIEMBRO }, { id: 'm', rol: ROL.MIEMBRO }];
+  assert.equal(relevoDeMando([CAPATAZ, ...sinFecha], 'a'), 'm');
+  assert.equal(relevoDeMando([CAPATAZ, ...sinFecha.slice().reverse()], 'a'), 'm');
 });

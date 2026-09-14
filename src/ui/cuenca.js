@@ -14,8 +14,10 @@ import { CUENCA, depositoDe, ritmoPorHora, costeDeMejora, faltaParaLlenar,
   puedeAsaltar, saludDeJefe, tablaDeAportes, totalAportado } from '../data/tribu.js';
 import { CARTAS_DE_JEFE, eventosActivos, ventanaDe, TIPO_EVENTO } from '../data/eventos.js';
 import { carta } from '../data/cards.js';
+import { ROL, esCapataz } from '../data/mando.js';
 import {
   estadoDeTribu, aportar, mejorarYacimiento, reclamar, crearTribu, entrarEnTribu,
+  salirDeTribu, expulsar, cederMando,
   YO, modoActual, porQueLocal, MODO,
 } from './red.js';
 import { anotarRecompensa } from './perfil.js';
@@ -27,6 +29,13 @@ const id = (s) => document.getElementById(s);
 let dom = null;
 let alAsaltar = null;      // lo pone main.js: arrancar la partida contra el jefe
 let alVolver = null;
+/**
+ * El «¿seguro?» abierto: `{ accion, id }`. Echar a alguien y salir de la cuenca
+ * no tienen deshacer, así que preguntan EN SU SITIO —en la fila de esa persona,
+ * en el botón de salir— y no con un diálogo que tapa la pantalla. Se olvida en
+ * cada repintado que no sea el suyo.
+ */
+let confirmando = null;
 
 /** Duración legible. Sin segundos: nadie mira una cuenta atrás de catorce horas. */
 function duracion(ms) {
@@ -55,6 +64,15 @@ export function montarCuenca(volver, asaltar) {
     if (!b) return;
     // Compartir no toca el servidor: no hay que repintar ni apagar nada.
     if (b.dataset.accion === 'compartir') { compartirCodigo(b.dataset.codigo, b.dataset.nombre); return; }
+
+    // Abrir y cerrar un «¿seguro?» tampoco toca el servidor: sólo repinta.
+    const preguntar = { echar: 'echar', ceder: 'ceder', salir: 'salir' }[b.dataset.accion];
+    if (preguntar) {
+      confirmando = { accion: preguntar, id: b.dataset.id ?? null };
+      await pintarCuenca();
+      return;
+    }
+    if (b.dataset.accion === 'cancelar') { confirmando = null; await pintarCuenca(); return; }
     // Mientras el servidor contesta, el botón se apaga: pulsarlo dos veces
     // mandaría dos aportes, y el segundo no siempre es inofensivo.
     b.disabled = true;
@@ -74,6 +92,12 @@ export function montarCuenca(volver, asaltar) {
         const codigo = (id('cu-codigo')?.value ?? '').trim();
         if (codigo.length < 4) throw new Error('El código son 6 caracteres.');
         await entrarEnTribu(codigo);
+      } else if (b.dataset.accion === 'echar-si') {
+        await expulsar(b.dataset.id);
+      } else if (b.dataset.accion === 'ceder-si') {
+        await cederMando(b.dataset.id);
+      } else if (b.dataset.accion === 'salir-si') {
+        await salirDeTribu();
       } else if (b.dataset.accion === 'reclamar') {
         const cardId = await reclamar();
         if (cardId) {
@@ -89,6 +113,8 @@ export function montarCuenca(volver, asaltar) {
     } catch (err) {
       fallo = err;
     }
+    // Hecha la acción —o fallada—, la pregunta ya no pinta nada.
+    confirmando = null;
     // El aviso va DESPUÉS de repintar: al revés, el repintado se lo llevaba por
     // delante y el botón parecía no hacer nada.
     await pintarCuenca();
@@ -204,6 +230,31 @@ function bloqueSinTribu() {
   </section>`;
 }
 
+/**
+ * Una fila de miembro: medallón, apodo y, si mandas tú, qué puedes hacerle.
+ * Los botones no salen en local: allí los compañeros son simulados y echar a
+ * uno sería echar a nadie.
+ */
+function filaMiembro(m, mando) {
+  const nombre = escapar(m.apodo);
+  if (confirmando && confirmando.id === m.id) {
+    const echar = confirmando.accion === 'echar';
+    return `<li class="cu-miembro confirmando">
+      <span>${echar ? '¿Echar a' : '¿Ceder el mando a'} <b>${nombre}</b>?</span>
+      <button class="cu-mini ${echar ? 'mal' : ''}" data-accion="${echar ? 'echar-si' : 'ceder-si'}"
+              data-id="${m.id}">Sí</button>
+      <button class="cu-mini" data-accion="cancelar">No</button>
+    </li>`;
+  }
+  const acciones = mando && !m.yo ? `
+    <button class="cu-mini" data-accion="ceder" data-id="${m.id}">Ceder mando</button>
+    <button class="cu-mini mal" data-accion="echar" data-id="${m.id}">Echar</button>` : '';
+  return `<li class="cu-miembro ${m.yo ? 'yo' : ''}">
+    <i class="cu-medallon" aria-hidden="true"></i>${nombre}
+    ${esCapataz(m) ? '<span class="cu-rol">capataz</span>' : ''}${acciones}
+  </li>`;
+}
+
 function bloqueTribu(c) {
   if (!c.tribu && modoActual() === MODO.REMOTO) return bloqueSinTribu();
   const cabecera = c.tribu ? `<section class="cu-bloque cu-tribu">
@@ -215,16 +266,44 @@ function bloqueTribu(c) {
   </section>` : '';
 
   // Los miembros como medallones, no como una lista separada por puntos.
+  const compartida = modoActual() === MODO.REMOTO;
+  const yo = c.miembros.find((m) => m.yo) ?? null;
+  const mando = compartida && esCapataz(yo);
+  const soloQuedoYo = c.miembros.length <= 1;
   return `${cabecera}<section class="cu-bloque">
     <h3 class="cu-titulo">Almacén de la tribu</h3>
     <p class="cu-cifra"><i class="cu-ico-fosil" aria-hidden="true"></i>${numero(c.almacen)} <small>fósiles</small></p>
     <p class="cu-linea">Cada asalto al jefe cuesta <b>${CUENCA.costeAsalto}</b> del común.
       Tú llevas <b>${numero(c.aportado)}</b> de daño hecho.</p>
     <ul class="cu-miembros" aria-label="Miembros">
-      ${c.miembros.map((m) => `<li class="${m === YO ? 'yo' : ''}"><i class="cu-medallon" aria-hidden="true"></i>${escapar(m)}</li>`).join('')}
+      ${c.miembros.map((m) => filaMiembro(m, mando)).join('')}
     </ul>
-    <p class="cu-nota">${c.miembros.length} de ${CUENCA.miembrosMaximo}.</p>
+    <p class="cu-nota">${c.miembros.length} de ${CUENCA.miembrosMaximo}.${
+  mando ? ' Mandas tú: puedes ceder el mando o echar a alguien.' : ''}</p>
+    ${compartida ? salirHTML(yo, soloQuedoYo) : ''}
   </section>`;
+}
+
+/**
+ * Salir de la cuenca, con lo que cuesta dicho ANTES y no después: el almacén
+ * es común y se queda, y si eres el último la cuenca se deshace entera. Tu
+ * yacimiento, tu colección y tus mazos son tuyos y se van contigo.
+ */
+function salirHTML(yo, soloQuedoYo) {
+  if (confirmando?.accion !== 'salir') {
+    return '<p class="cu-linea"><button class="cu-mini mal" data-accion="salir">Salir de la cuenca</button></p>';
+  }
+  return `<div class="cu-salir">
+    <p class="cu-linea">${soloQuedoYo
+    ? 'Eres el último: la cuenca se deshace con su almacén y sus jefes.'
+    : `Los fósiles del almacén se quedan aquí.${esCapataz(yo)
+      ? ' El mando pasa a quien lleve más tiempo.' : ''}`}
+      Tu yacimiento y tus cartas se van contigo.</p>
+    <p class="cu-linea">
+      <button class="cu-mini mal" data-accion="salir-si">Sí, salir</button>
+      <button class="cu-mini" data-accion="cancelar">Quedarme</button>
+    </p>
+  </div>`;
 }
 
 /** La vitrina: el marco del jefe con su ilustración en la ventana y el nombre en la cartela. */

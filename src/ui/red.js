@@ -21,6 +21,7 @@ import {
 import { CONFIG } from '../data/config.js';
 import { CUENCA } from '../data/tribu.js';
 import { JEFES, CALENDARIO, TIPO_EVENTO } from '../data/eventos.js';
+import { ROL } from '../data/mando.js';
 import * as local from './red-local.js';
 
 export const MODO = Object.freeze({ REMOTO: 'REMOTO', LOCAL: 'LOCAL' });
@@ -110,7 +111,13 @@ function aFormaDePantalla(d) {
     asaltosHoy: Number(d.asaltos_hoy ?? 0),
     jefe,
     cartas: [],
-    miembros: (d.miembros ?? []).map((m) => m.apodo),
+    // Los miembros llegan con ROL y antigüedad: la pantalla necesita saber
+    // quién manda para enseñar sus botones, y `mando.js` para decir por qué no.
+    miembros: (d.miembros ?? []).map((m) => ({
+      id: m.id, apodo: m.apodo, rol: m.rol ?? ROL.MIEMBRO,
+      desde: m.desde ? new Date(m.desde).getTime() : 0,
+      yo: m.id === (d.yo ?? yoMismo),
+    })),
     puedeReclamar: Boolean(jefe && jefe.vida <= 0 && mioDano > 0 && !mioReclamado),
     tribu: tribu ? { nombre: tribu.nombre, codigo: tribu.codigo } : null,
     eventoJefe,
@@ -157,6 +164,30 @@ export async function crearTribu(nombre) {
 export async function entrarEnTribu(codigo) {
   if (modo === MODO.LOCAL) return null;
   return rpc('entrar_en_tribu', { p_codigo: codigo });
+}
+
+/**
+ * Salir, echar y ceder el mando. No existen en local: allí los compañeros son
+ * simulados y echar a uno sería echar a nadie. La pantalla no ofrece los
+ * botones en local, y esto es el segundo cerrojo.
+ */
+const soloEnLaCuencaDeVerdad = (qué) => {
+  throw new Error(`${qué} necesita una cuenca compartida, y estás en local`);
+};
+
+export async function salirDeTribu() {
+  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('salir de la cuenca');
+  return rpc('salir_de_tribu');
+}
+
+export async function expulsar(jugadorId) {
+  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('echar a alguien');
+  return rpc('expulsar', { p_jugador: jugadorId });
+}
+
+export async function cederMando(jugadorId) {
+  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('ceder el mando');
+  return rpc('ceder_mando', { p_jugador: jugadorId });
 }
 
 /**

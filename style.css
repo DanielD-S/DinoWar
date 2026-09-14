@@ -2640,6 +2640,24 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .cu-miembros { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 10px; }
 .cu-miembros li { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--texto-2); }
 .cu-miembros li.yo { color: var(--acento-claro); font-weight: 600; }
+/* Con mando la lista deja de ser una fila de nombres y pasa a tener botones:
+   un renglón por persona, que si no los botones se reparten por el hueco. */
+.cu-miembros li.cu-miembro { width: 100%; gap: 6px; }
+.cu-miembros li.confirmando { color: var(--texto); }
+.cu-rol {
+  font-size: 9px; letter-spacing: .08em; text-transform: uppercase;
+  padding: 1px 6px; border-radius: 3px; color: var(--bio);
+  box-shadow: 0 0 0 1px rgba(217,164,65,.45);
+}
+.cu-mini {
+  margin-left: auto; padding: 4px 9px; min-height: 30px; border-radius: 6px;
+  font-size: 11px; color: var(--texto-2);
+  border: 1px solid var(--borde); background: rgba(15,11,8,.5);
+}
+.cu-mini + .cu-mini { margin-left: 0; }
+.cu-mini:active { border-color: var(--borde-fuerte); }
+.cu-mini.mal { color: var(--peligro); border-color: rgba(200,80,60,.4); }
+.cu-salir { margin-top: 6px; }
 
 /* --- eventos ------------------------------------------------------------ */
 .cu-evento { position: relative; padding: 10px 12px; border-radius: 8px; margin-top: 8px; overflow: hidden; background: rgba(0,0,0,.28); }
