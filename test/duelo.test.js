@@ -18,6 +18,7 @@ import { MAZO } from '../src/data/balance.js';
 import { DUELO, FIN_DUELO } from '../src/data/duelo.js';
 import { desdeMiLado } from '../supabase/functions/_compartido/duelo.js';
 import { hayPartida } from '../src/ui/emparejado.js';
+import { enMazo, enMano, comprometidas } from '../src/ui/ocultas.js';
 import { LIGAS, ELO, ligaDe, rangoDe, nombreDeRango, eloTras } from '../src/data/ligas.js';
 
 const M = MAZO.map(([id, n]) => [id, n]);
@@ -233,6 +234,29 @@ test('El cliente reconoce la partida en la respuesta tal y como la monta la func
   assert.equal(hayPartida({ id: 'x', estado: 'jugando' }), false, 'emparejado pero sin datos aún: se sigue preguntando');
   assert.equal(hayPartida({ id: 'x', estado: 'preparando' }), false);
   assert.equal(hayPartida(null), false);
+});
+
+test('Los contadores del rival salen de la vista aunque sus cartas no viajen', () => {
+  // En el primer duelo el mazo del rival salió en blanco y su mano en cero: el
+  // tablero contaba listas y la vista manda cifras. Se comprueba contra lo que
+  // el servidor manda de verdad, en las dos direcciones.
+  const d = crearDuelo(17, M, M, 0);
+  aplicarAccion(d, 1, { tipo: ACCION.PASAR }, 10);      // el 1 compromete «nada» y pasa
+  for (const j of [0, 1]) {
+    const v = vistaDuelo(d, j, 0, 10).estado;
+    const real = d.estado.jugadores[1 - j];
+    assert.equal(enMazo(v.jugadores[1]), real.mazo.length, 'mazo del rival');
+    assert.equal(enMano(v.jugadores[1]), real.mano.length, 'mano del rival');
+    assert.equal(comprometidas(v.jugadores[1]), real.pendientes.length, 'comprometidas del rival');
+    // Y los propios se siguen contando por la lista.
+    const mio = d.estado.jugadores[j];
+    assert.equal(enMazo(v.jugadores[0]), mio.mazo.length);
+    assert.equal(enMano(v.jugadores[0]), mio.mano.length);
+  }
+  // Contra la IA el estado es entero y las listas mandan.
+  assert.equal(enMano({ mano: [1, 2, 3] }), 3);
+  assert.equal(enMano({ mano: [], manoOculta: 5 }), 5);
+  assert.equal(enMazo({ mazo: 12 }), 12);
 });
 
 // ------------------------------------------------------------------- ligas
