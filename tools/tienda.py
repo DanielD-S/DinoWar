@@ -11,8 +11,11 @@ Dos clases de pieza, y cada una llega distinta:
                    cinco, porque test/marcado.test.js las busca ahí.
   dorso_*          un dorso de carta. Llega A SANGRE, sin magenta: es el
                    reverso entero de la carta y se pinta a 100 % 100 % en cada
-                   sitio que enseña un dorso. Se recorta a la proporción de la
-                   carta (82:112) y se sirve en assets/piel/tienda/.
+                   sitio que enseña un dorso. NO se recorta: se reduce con su
+                   proporción y el CSS lo estira a la carta (82:112), como al
+                   dorso de siempre, que mide 2:3. Los primeros llegaron a
+                   0,714 y recortarlos a 0,732 se comía el filo del marco.
+                   Se sirve en assets/piel/tienda/.
 
 Los nombres son los de `PIEZAS` en src/ui/tienda.js, y test/tienda.test.js
 falla si las dos listas se separan o si están todas y ARTE_LISTO sigue en false.
@@ -47,18 +50,6 @@ def recortar_alfa(im, margen_rel=0.01):
                     min(im.size[0], caja[2] + m), min(im.size[1], caja[3] + m)))
 
 
-def a_proporcion_de_carta(im):
-    """Recorta al centro a 82:112 sin deformar."""
-    w, h = im.size
-    if w / h > PROPORCION_CARTA:
-        nw = round(h * PROPORCION_CARTA)
-        x = (w - nw) // 2
-        return im.crop((x, 0, x + nw, h))
-    nh = round(w / PROPORCION_CARTA)
-    y = (h - nh) // 2
-    return im.crop((0, y, w, y + nh))
-
-
 def main(escribir):
     faltan = 0
     for stem, (destino, ancho) in PIEZAS.items():
@@ -72,10 +63,13 @@ def main(escribir):
             pieza = recortar_alfa(keyear(original))
             calidad = 88
         else:
-            pieza = a_proporcion_de_carta(original.convert('RGB'))
+            # Sin recortar: el marco llega hasta el borde y el CSS estira.
+            pieza = original.convert('RGB')
             calidad = 86
         alto = round(ancho * pieza.size[1] / pieza.size[0])
-        print(f'{p.name} {original.size[0]}×{original.size[1]} -> {destino} {ancho}×{alto}')
+        desvio = (pieza.size[0] / pieza.size[1]) / PROPORCION_CARTA
+        nota = '' if stem.startswith('placa_') else f' (proporción {pieza.size[0] / pieza.size[1]:.3f}; el CSS la estira ×{1 / desvio:.2f} en alto)'
+        print(f'{p.name} {original.size[0]}×{original.size[1]} -> {destino} {ancho}×{alto}{nota}')
         if escribir:
             salida = RAIZ / destino
             salida.parent.mkdir(parents=True, exist_ok=True)

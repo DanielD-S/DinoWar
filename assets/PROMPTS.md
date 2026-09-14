@@ -1350,8 +1350,8 @@ lleguen, los dorsos se ven como el clásico tintado y la placa se dibuja con CSS
 
 La sexta del menú, junto a Colección, Sobres, Mazos, La Tribu y Cuenta. Tiene
 que parecer de la misma familia: **adjuntar `placa_sobres.png` y
-`placa_mazos.png`** y pedir «misma forma, mismo material, misma luz; sólo cambia
-el emblema».
+`placa_mazos.png`** (en `assets/piel/tablero_componentes/`) y pedir «misma forma,
+mismo material, misma luz; sólo cambia el emblema».
 
 Formato: **1122×1402**, vertical, como las otras cinco. Se sirve a 256.
 
@@ -1366,9 +1366,10 @@ Formato: **1122×1402**, vertical, como las otras cinco. Se sirve a 256.
 ### 2 · Los dos dorsos
 
 El reverso de la carta: se ve al abrir sobres, en las cartas que robas y en tu
-mazo del marcador final. **Adjuntar `dorso.png`** (el dorso de ahora) como
-referencia de forma: mismo formato de carta y mismo tipo de marco, distinto
-material y distinto emblema.
+mazo del marcador final. **Adjuntar el dorso de ahora**, cuyo original es
+`assets/piel/tablero_componentes/dorso_carta.png` (se sirve como
+`assets/piel/dorso.webp`), como referencia de forma: mismo formato de carta y
+mismo tipo de marco, distinto material y distinto emblema.
 
 Formato: **1024×1400**, vertical, **a sangre**: el reverso ocupa la imagen
 entera, sin magenta y sin fondo alrededor. Se sirven a 512.
@@ -1426,11 +1427,16 @@ ahora; cada yacimiento podría tener luego su dorso y completar su colección.
 > grandes y sin nada que destaque en un punto concreto. Sin texto, sin marca de
 > agua. Cuadrada, 1024×1024.
 
-Adjuntar `piedra.png` (la textura de ahora) como referencia de oscuridad.
+Adjuntar la textura de ahora como referencia de oscuridad. Su original no está
+en el proyecto: sólo existe la servida, `assets/piel/piedra.webp`. Hay una copia
+en PNG en `src/piel/tienda/referencias/piedra.png` (fuera del repositorio, como
+los demás originales); si falta, se saca del WebP.
 
 ### El bloque del MEDALLÓN (copiar literal)
 
-Adjuntar `simbolo_huella.png` y pedir sólo el cambio del centro:
+Adjuntar el medallón de ahora, `assets/piel/tablero_componentes/simbolo_huella.png`
+(copiado también en `src/piel/tienda/referencias/`), y pedir sólo el cambio del
+centro:
 
 > El mismo medallón de la imagen adjunta, idéntico en forma, tamaño y posición:
 > el mismo aro doble de latón viejo, las ocho puntas y las gemas encendidas.
@@ -1456,8 +1462,8 @@ Adjuntar `simbolo_huella.png` y pedir sólo el cambio del centro:
 - **La textura encogida a 170 px y repetida 3×3**, que es como se ve en el
   tablero: si se nota la costura o un motivo repetido, se regenera o se deja a
   la herramienta, que cierra costuras como hizo con la lluvia y la niebla.
-- **Oscuridad:** puesta al lado de `piedra.png`, no debería verse más clara.
-- **El medallón**, comparado con `simbolo_huella.png`: mismo aro, mismas puntas y
+- **Oscuridad:** puesta al lado de `referencias/piedra.png`, no debería verse más clara.
+- **El medallón**, comparado con `referencias/simbolo_huella.png`: mismo aro, mismas puntas y
   mismo tamaño. Si el generador cambia el aro, se nota en cuanto se cambia de
   tapete.
 

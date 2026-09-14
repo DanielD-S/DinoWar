@@ -24,7 +24,7 @@ import { cargarPerfil } from './almacen.js';
 import { comprarCosmetico, equiparCosmetico, PRUEBAS } from './perfil.js';
 
 /** Si las piezas de la tienda están en el disco. Lo vigila test/tienda.test.js. */
-export const ARTE_LISTO = false;
+export const ARTE_LISTO = true;
 
 /** Lo que sale de `tools/tienda.py`, sin extensión. */
 export const PIEZAS = Object.freeze(['placa_tienda', 'dorso_ambar', 'dorso_obsidiana']);

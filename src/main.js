@@ -176,6 +176,7 @@ const PIEZAS_DEL_MENU = [
   'assets/piel/portada.webp', 'assets/piel/boton_ancho.webp',
   'assets/piel/placa_coleccion.webp', 'assets/piel/placa_sobres.webp', 'assets/piel/placa_mazos.webp',
   'assets/piel/placa_cuenca.webp', 'assets/piel/placa_cuenta.webp',
+  'assets/piel/placa_tienda.webp',
 ];
 
 /**

@@ -1287,18 +1287,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .placa-mazos { --placa: url('assets/piel/placa_mazos.webp'); }
 .placa-cuenca { --placa: url('assets/piel/placa_cuenca.webp'); }
 .placa-cuenta { --placa: url('assets/piel/placa_cuenta.webp'); }
-/* La placa de la tienda, mientras no llega su dibujo: una piedra con filete de
-   latón y el rombo de las dinomonedas. Sin `--placa`, a propósito: el guardián
-   de marcado.test.js exige que toda placa declarada tenga fichero. */
-.menu-placas .placa-tienda i {
-  display: grid; place-items: center; border-radius: 12%;
-  background: radial-gradient(circle at 50% 38%, #3a2d1f, #15100b 75%);
-  box-shadow: inset 0 0 0 2px #8a6c38, inset 0 0 0 4px #2a2016;
-}
-.menu-placas .placa-tienda i::before {
-  content: '◈'; font-size: min(26px, 48cqi); line-height: 1; color: #d9a441;
-  text-shadow: 0 1px 2px #000, 0 0 10px rgba(217,164,65,.45);
-}
+/* La sexta placa, la de la tienda. Sale de tools/tienda.py. */
+.placa-tienda { --placa: url('assets/piel/placa_tienda.webp'); }
 
 /* El dorso del RIVAL es el clásico: sus cosméticos aún no viajan en el duelo.
    Sin esto, tu dorso comprado aparecería también en su mazo del marcador y en
