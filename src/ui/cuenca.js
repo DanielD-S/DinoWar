@@ -444,6 +444,27 @@ function salirHTML(yo, soloQuedoYo) {
   </div>`;
 }
 
+/**
+ * Los últimos asaltos de la tribu. Estaban guardados desde el primer día y no
+ * se veían: lo único que salía por pantalla era el total acumulado de cada uno
+ * contra el jefe de ahora, que no cuenta quién ha estado dando guerra esta
+ * semana. No se enseña en local: ahí los compañeros son un modelo y un
+ * historial inventado sería fingir una tribu.
+ */
+function bloqueHistorial(c, ahora) {
+  if (!c.historial?.length) return '';
+  return `<section class="cu-bloque">
+    <h3 class="cu-titulo">Últimos asaltos</h3>
+    <ul class="cu-historial">
+      ${c.historial.map((a) => `<li class="${a.yo ? 'yo' : ''}">
+        <span class="cu-h-quien">${escapar(a.apodo)}</span>
+        <span class="cu-h-dano">−${numero(a.dano)}</span>
+        <span class="cu-h-cuando">${a.ganada ? 'ganó · ' : ''}hace ${duracion(Math.max(0, ahora - a.cuando))}</span>
+      </li>`).join('')}
+    </ul>
+  </section>`;
+}
+
 /** La vitrina: el marco del jefe con su ilustración en la ventana y el nombre en la cartela. */
 function vitrina(j, vivo) {
   return `<div class="cu-vitrina ${vivo ? '' : 'caida'}">
@@ -548,6 +569,7 @@ export async function pintarCuenca() {
     sinTribu ? '' : bloqueEventos(c, ahora),
     sinTribu ? '' : bloqueJefe(c, ahora),
     sinTribu ? '' : bloquePendientes(c),
+    sinTribu ? '' : bloqueHistorial(c, ahora),
     // Sin tribu, lo primero que se ve tiene que ser GENTE: quien llega solo no
     // tiene código que escribir ni a quién pedírselo, y su yacimiento no le
     // sirve de nada hasta que entre en alguna cuenca.

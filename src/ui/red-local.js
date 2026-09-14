@@ -184,6 +184,9 @@ export function estadoDeTribu(ahora = Date.now()) {
     puedeReclamar: !!(jefe && mereceRecompensa(jefe, YO) && !c.jefes[activo.evento.id].reclamado),
     // Aquí no llama nadie a la puerta: no hay más tribus que ésta.
     solicitudes: [],
+    // Y no hay registro de asaltos: los compañeros son un modelo, no gente que
+    // haya jugado partidas. Inventar un historial sería fingir una tribu.
+    historial: [],
   };
 }
 

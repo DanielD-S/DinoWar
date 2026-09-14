@@ -143,6 +143,16 @@ function aFormaDePantalla(d) {
     } : null,
     // Sólo llegan al capataz: al resto no le toca contestarlas.
     solicitudes: (d.solicitudes ?? []).map((x) => ({ id: x.id, apodo: x.apodo })),
+    // Los últimos asaltos de la tribu, tal como los apuntó el servidor.
+    historial: (d.historial ?? []).map((x) => ({
+      jugadorId: x.jugador_id,
+      apodo: x.apodo,
+      dano: Number(x.dano),
+      turnos: Number(x.turnos),
+      ganada: Boolean(x.ganada),
+      cuando: x.jugado_en ? new Date(x.jugado_en).getTime() : 0,
+      yo: x.jugador_id === (d.yo ?? yoMismo),
+    })),
     eventoJefe,
   };
 }
