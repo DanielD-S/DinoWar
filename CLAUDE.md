@@ -734,6 +734,15 @@ Tres decisiones que no se ven en el código a la primera:
 - **Borrar pide confirmación en la propia fila** y no se puede borrar el
   último mazo: un jugador sin mazo no puede jugar. `borrarMazo()` existía en
   `perfil.js` desde las cuentas y no tenía botón.
+- **La ficha abierta desde una LISTA se recorre sin cerrarla**: botones ‹ ›
+  pegados arriba con «3 / 32», deslizamiento horizontal y flechas del teclado.
+  Leer una carta era abrir, leer, cerrar y buscar la siguiente, y armando un
+  mazo eso son sesenta y ocho viajes. La lista se lee del DOM al abrir —lo que
+  se ve, con su pestaña y sus filtros— y no del catálogo: pasar tiene que
+  llevar a la carta de al lado, no a una que el filtro esconde. No da la
+  vuelta: la primera y la última son el principio y el final de lo que hay en
+  pantalla. La ficha del TABLERO no lleva recorrido, que ahí una carta es una
+  copia concreta con su Vida y sus adherencias, no una entrada de una lista.
 - **En el editor la carta se LEE con una pulsación larga**, no con un toque: el
   toque corto ya está cogido —mete una copia— y en la carta a tamaño de rejilla
   sólo cabe el NOMBRE de la habilidad, «Tijera», no lo que hace. Es el mismo
@@ -743,7 +752,11 @@ Tres decisiones que no se ven en el código a la primera:
   al abrirse la ficha el dedo se levanta encima de la hoja, así que ese click
   puede no llegar nunca al editor y una bandera se quedaría puesta, comiéndose
   el siguiente toque de verdad. La «i» del nombre es la seña de que ahí se lee,
-  y el camino del ratón, que no tiene gesto largo.
+  y el camino del ratón, que no tiene gesto largo. Y el menú de imagen de
+  Android —que sale a los 500 ms— caía encima de la ficha recién abierta: una
+  carta es una pieza del juego, así que `main.js` frena el `contextmenu` sobre
+  `.carta`. El `-webkit-touch-callout` del CSS no basta, que Chrome en Android
+  no lo entiende; para guardar la ilustración está el visor.
 
 En el editor la curva de coste es un filtro —cada barra un botón— y la
 búsqueda repinta al escribir devolviendo el foco con el cursor al final, que

@@ -65,6 +65,13 @@
    el anillo del coste montado en la esquina. */
 
 .carta.con-marco {
+  /* Una carta es una PIEZA del juego, no una imagen que guardar: el menú de
+     imagen de Android —que sale a los 500 ms de tener el dedo encima— caía
+     encima de la ficha que la pulsación larga acababa de abrir. El menú sigue
+     estando donde tiene sentido: «Ver la ilustración», en el visor.
+     `main.js` frena además el `contextmenu`, que Chrome en Android no
+     entiende `-webkit-touch-callout`. */
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
   /* --- familia DINOSAURIO --- */
   --ban-x0: 23.2%; --ban-x1: 7.8%;  --ban-y0: 7.0%;  --ban-al: 6.8%;
   --ven-x0: 10.0%; --ven-x1: 10.1%; --ven-y0: 16.7%; --ven-alto: 37.7%;

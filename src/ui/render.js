@@ -551,7 +551,56 @@ function estadoEnJuegoHTML(estado, iid) {
 }
 
 /**
- * La ficha de una carta: la carta misma, con su marco y a tamaño de lectura,
+ * Ata los gestos de la ficha: los botones de pasar, el deslizamiento y las
+ * flechas del teclado. Vive aquí y no en `main.js` porque es comportamiento de
+ * la ficha, no cableado de la partida, y así el banco de pruebas monta lo
+ * mismo que el juego.
+ */
+export function montarFicha() {
+  el.fichaCuerpo.addEventListener('click', (e) => {
+    const p = e.target.closest('[data-pasar]');
+    if (p && !p.disabled) pasarFicha(Number(p.dataset.pasar));
+  });
+
+  // Pasar de carta también con el dedo. `.hoja-cuerpo` lleva `touch-action:
+  // pan-y`, así que el navegador no se queda el gesto horizontal y llega
+  // entero. El deslizamiento tiene que ser MÁS horizontal que vertical: en una
+  // hoja que se desplaza, un pulgar bajando también se mueve de lado.
+  let desliz = null;
+  let paso = 0;
+  el.fichaCuerpo.addEventListener('pointerdown', (e) => { desliz = { x: e.clientX, y: e.clientY }; });
+  el.fichaCuerpo.addEventListener('pointercancel', () => { desliz = null; });
+  el.fichaCuerpo.addEventListener('pointerup', (e) => {
+    if (!desliz) return;
+    const dx = e.clientX - desliz.x;
+    const dy = e.clientY - desliz.y;
+    desliz = null;
+    if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    if (pasarFicha(dx < 0 ? 1 : -1)) paso = Date.now();
+  });
+  // El click que cierra un deslizamiento no es un toque: sin esto, soltar el
+  // dedo encima de «Ver la ilustración» abría el visor al pasar de carta.
+  el.fichaCuerpo.addEventListener('click', (e) => {
+    if (Date.now() - paso < 300) { e.stopPropagation(); e.preventDefault(); }
+  }, true);
+
+  document.addEventListener('keydown', (e) => {
+    if (!fichaAbierta() || visorAbierto()) return;
+    if (e.key === 'ArrowRight') pasarFicha(1);
+    else if (e.key === 'ArrowLeft') pasarFicha(-1);
+  });
+
+  // Android saca su menú de imagen —«Abrir en pestaña nueva», «Descargar»— a
+  // los 500 ms de tener el dedo encima, y la ficha se abre con la pulsación
+  // larga a los 400: el menú caía sobre la carta recién abierta. Una carta es
+  // una pieza del juego, no una imagen que guardar; para eso está «Ver la
+  // ilustración», que abre el visor y ahí el menú sigue estando.
+  document.addEventListener('contextmenu', (e) => {
+    if (e.target.closest('.carta')) e.preventDefault();
+  });
+}
+
+/** La ficha de una carta: la carta misma, con su marco y a tamaño de lectura,
  * y debajo lo que la carta no lleva impreso. En partida, la carta enseña las
  * cifras de ESTA copia —el Ataque efectivo y la Vida que le queda— y el bloque
  * de estado explica de dónde salen.
@@ -602,9 +651,60 @@ export function fichaHTML(cardId, iid = null, estado = null) {
     <p class="ficha-nota">${c.nota_cientifica}</p>`;
 }
 
-export function abrirFicha(html) {
-  el.fichaCuerpo.innerHTML = html;
+/**
+ * La ficha abierta desde una LISTA —la colección, el editor de mazos, la
+ * tirada de un sobre— se puede recorrer sin cerrarla: leer una carta era
+ * abrir, leer, cerrar y buscar la siguiente, y armando un mazo eso son
+ * sesenta y ocho viajes. La lista es la que se ve en pantalla y en su orden,
+ * filtros incluidos: pasar tiene que llevar a la carta de al lado, no a otra
+ * que el filtro esconde.
+ *
+ * Es `{ ids, i }` y no una función que busque la siguiente porque la ficha no
+ * sabe de colecciones; quien la abre ya tiene la lista pintada.
+ */
+let fichaLista = null;
+
+/** Los botones de pasar, o nada si la ficha no vino de una lista. */
+function pasarHTML() {
+  if (!fichaLista) return '';
+  const { ids, i } = fichaLista;
+  return `<div class="ficha-pasar">
+    <button data-pasar="-1" ${i === 0 ? 'disabled' : ''} aria-label="Carta anterior">‹</button>
+    <span>${i + 1} / ${ids.length}</span>
+    <button data-pasar="1" ${i === ids.length - 1 ? 'disabled' : ''} aria-label="Carta siguiente">›</button>
+  </div>`;
+}
+
+/**
+ * @param {string} html
+ * @param {{ids: string[], i: number}} [lista] el recorrido del que sale, si sale de uno
+ */
+export function abrirFicha(html, lista = null) {
+  fichaLista = lista && lista.ids.length > 1 ? { ids: [...lista.ids], i: lista.i } : null;
+  el.fichaCuerpo.innerHTML = pasarHTML() + html;
+  el.fichaCuerpo.scrollTop = 0;
   el.ficha.classList.remove('oculta');
+}
+
+/**
+ * Pasa `n` cartas dentro de la ficha abierta. Devuelve si se movió: sin lista
+ * o en los extremos no se mueve, y no se envuelve —la primera y la última son
+ * el principio y el final de lo que hay en pantalla, y dar la vuelta sin
+ * avisar despista más que ayuda—.
+ */
+export function pasarFicha(n) {
+  if (!fichaLista) return false;
+  const i = fichaLista.i + n;
+  if (i < 0 || i >= fichaLista.ids.length) return false;
+  fichaLista.i = i;
+  el.fichaCuerpo.innerHTML = pasarHTML() + fichaHTML(fichaLista.ids[i]);
+  el.fichaCuerpo.scrollTop = 0;
+  return true;
+}
+
+/** Las cartas de la ficha no se pueden pasar cuando no hay ficha abierta. */
+export function fichaAbierta() {
+  return !el.ficha.classList.contains('oculta');
 }
 
 /**
@@ -696,6 +796,7 @@ export function visorAbierto() {
 
 export function cerrarHojas() {
   cerrarVisor();
+  fichaLista = null;
   for (const h of [el.ficha, el.log, el.eleccion, el.ayuda, el.descarte, el.comprometidas]) {
     h.classList.add('oculta');
   }
