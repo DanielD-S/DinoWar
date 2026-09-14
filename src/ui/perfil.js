@@ -73,6 +73,10 @@ function aFormaLocal(d) {
     // Cuántas veces más puedes cambiarte el nombre. Lo dice el servidor, que es
     // quien lleva la cuenta: si lo llevara la pantalla, recargar la regalaría.
     apodoRestantes: Number(d.apodo_restantes ?? 0),
+    // Si la cuenta ya tiene colección. Sólo un `false` explícito pide elegir el
+    // mazo inicial: un servidor sin la 0023 no manda el campo y sus cuentas
+    // están todas sembradas.
+    sembrado: d.sembrado !== false,
     // La dificultad es una preferencia de ESTE navegador, no estado de juego:
     // el servidor no la lleva y no debe pisarla al sincronizar.
     dificultad: cargarPerfil().dificultad,
@@ -91,6 +95,19 @@ export async function sincronizar() {
   // Se propaga el error y el arranque devuelve al jugador a la puerta.
   await sesionValida();
   const d = await rpc('mi_perfil');
+  const p = aFormaLocal(d);
+  guardarPerfil(p);
+  return p;
+}
+
+/**
+ * Elige el mazo inicial de una cuenta recién creada. Se manda sólo el id: qué
+ * cartas son lo sabe el servidor. Devuelve el perfil ya sembrado.
+ */
+export async function elegirMazoInicial(id) {
+  if (modo === MODO.LOCAL) return cargarPerfil();
+  await sesionValida();
+  const d = await rpc('elegir_mazo_inicial', { p_mazo: id });
   const p = aFormaLocal(d);
   guardarPerfil(p);
   return p;

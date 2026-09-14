@@ -26,6 +26,17 @@ create table if not exists public.catalogo_inicial (
   copias   int not null check (copias > 0)
 );
 
+-- Los mazos iniciales: uno se elige al crear la cuenta y es la colección
+-- de salida entera. `private.sembrar_inicial` (0023) lee de aquí; el
+-- cliente sólo manda el id del mazo. Sale de src/data/iniciales.js.
+create table if not exists public.catalogo_iniciales (
+  mazo     text not null,
+  nombre   text not null,
+  card_id  text not null references public.catalogo_cartas (card_id),
+  copias   int not null check (copias > 0),
+  primary key (mazo, card_id)
+);
+
 -- Los precios, en una fila. Que sean una tabla y no constantes en el SQL
 -- permite tocarlos sin volver a desplegar nada.
 create table if not exists public.catalogo_economia (
@@ -218,6 +229,170 @@ delete from public.catalogo_inicial where card_id not in (
   'cicadas'
 );
 
+insert into public.catalogo_iniciales (mazo, nombre, card_id, copias) values
+  ('teropodos', 'Cazadores', 'ornitholestes', 3),
+  ('teropodos', 'Cazadores', 'ceratosaurus', 3),
+  ('teropodos', 'Cazadores', 'dromaeosaurus', 3),
+  ('teropodos', 'Cazadores', 'velociraptor', 3),
+  ('teropodos', 'Cazadores', 'therizinosaurus', 2),
+  ('teropodos', 'Cazadores', 'ojoraptorsaurus', 2),
+  ('teropodos', 'Cazadores', 'sanjuansaurus', 3),
+  ('teropodos', 'Cazadores', 'allosaurus', 3),
+  ('teropodos', 'Cazadores', 'riparovenator', 2),
+  ('teropodos', 'Cazadores', 'carnotaurus', 2),
+  ('teropodos', 'Cazadores', 'torvosaurus', 1),
+  ('teropodos', 'Cazadores', 'tyrannotitan', 1),
+  ('teropodos', 'Cazadores', 'gregarismo', 2),
+  ('teropodos', 'Cazadores', 'trampa', 2),
+  ('teropodos', 'Cazadores', 'rebrote', 2),
+  ('teropodos', 'Cazadores', 'nido', 2),
+  ('teropodos', 'Cazadores', 'sabana_helechos', 2),
+  ('teropodos', 'Cazadores', 'insectos', 2),
+  ('teropodos', 'Cazadores', 'fractura', 2),
+  ('teropodos', 'Cazadores', 'gastrolitos', 1),
+  ('teropodos', 'Cazadores', 'crecimiento_acelerado', 1),
+  ('teropodos', 'Cazadores', 'sabana', 1),
+  ('teropodos', 'Cazadores', 'canal_trenzado', 1),
+  ('teropodos', 'Cazadores', 'biomasa', 5),
+  ('teropodos', 'Cazadores', 'araucarias', 2),
+  ('teropodos', 'Cazadores', 'cicadas', 2),
+  ('sauropodos', 'Gigantes', 'plateosauravus', 3),
+  ('sauropodos', 'Gigantes', 'athenar', 3),
+  ('sauropodos', 'Gigantes', 'amargasaurus', 3),
+  ('sauropodos', 'Gigantes', 'diplodocus', 3),
+  ('sauropodos', 'Gigantes', 'apatosaurus', 2),
+  ('sauropodos', 'Gigantes', 'camarasaurus', 2),
+  ('sauropodos', 'Gigantes', 'mamenchisaurus', 3),
+  ('sauropodos', 'Gigantes', 'atlasaurus', 1),
+  ('sauropodos', 'Gigantes', 'brachiosaurus', 1),
+  ('sauropodos', 'Gigantes', 'ceratosaurus', 3),
+  ('sauropodos', 'Gigantes', 'velociraptor', 3),
+  ('sauropodos', 'Gigantes', 'ornitholestes', 1),
+  ('sauropodos', 'Gigantes', 'gregarismo', 2),
+  ('sauropodos', 'Gigantes', 'trampa', 2),
+  ('sauropodos', 'Gigantes', 'rebrote', 2),
+  ('sauropodos', 'Gigantes', 'nido', 2),
+  ('sauropodos', 'Gigantes', 'sabana_helechos', 2),
+  ('sauropodos', 'Gigantes', 'insectos', 2),
+  ('sauropodos', 'Gigantes', 'fractura', 2),
+  ('sauropodos', 'Gigantes', 'gastrolitos', 1),
+  ('sauropodos', 'Gigantes', 'crecimiento_acelerado', 1),
+  ('sauropodos', 'Gigantes', 'sabana', 1),
+  ('sauropodos', 'Gigantes', 'canal_trenzado', 1),
+  ('sauropodos', 'Gigantes', 'biomasa', 5),
+  ('sauropodos', 'Gigantes', 'araucarias', 2),
+  ('sauropodos', 'Gigantes', 'cicadas', 2),
+  ('ornitopodos', 'Manadas', 'dryosaurus', 3),
+  ('ornitopodos', 'Manadas', 'shuangmiaosaurus', 3),
+  ('ornitopodos', 'Manadas', 'iguanodon', 3),
+  ('ornitopodos', 'Manadas', 'brachylophosaurus', 3),
+  ('ornitopodos', 'Manadas', 'parasaurolophus', 3),
+  ('ornitopodos', 'Manadas', 'rhinorex', 2),
+  ('ornitopodos', 'Manadas', 'maiasaura', 1),
+  ('ornitopodos', 'Manadas', 'edmontosaurus', 1),
+  ('ornitopodos', 'Manadas', 'pachycephalosaurus', 2),
+  ('ornitopodos', 'Manadas', 'allosaurus', 1),
+  ('ornitopodos', 'Manadas', 'ornitholestes', 1),
+  ('ornitopodos', 'Manadas', 'velociraptor', 3),
+  ('ornitopodos', 'Manadas', 'ceratosaurus', 2),
+  ('ornitopodos', 'Manadas', 'gregarismo', 2),
+  ('ornitopodos', 'Manadas', 'trampa', 2),
+  ('ornitopodos', 'Manadas', 'rebrote', 2),
+  ('ornitopodos', 'Manadas', 'nido', 2),
+  ('ornitopodos', 'Manadas', 'sabana_helechos', 2),
+  ('ornitopodos', 'Manadas', 'insectos', 2),
+  ('ornitopodos', 'Manadas', 'fractura', 2),
+  ('ornitopodos', 'Manadas', 'gastrolitos', 1),
+  ('ornitopodos', 'Manadas', 'crecimiento_acelerado', 1),
+  ('ornitopodos', 'Manadas', 'sabana', 1),
+  ('ornitopodos', 'Manadas', 'canal_trenzado', 1),
+  ('ornitopodos', 'Manadas', 'biomasa', 5),
+  ('ornitopodos', 'Manadas', 'araucarias', 2),
+  ('ornitopodos', 'Manadas', 'cicadas', 2)
+on conflict (mazo, card_id) do update set nombre = excluded.nombre, copias = excluded.copias;
+
+delete from public.catalogo_iniciales where (mazo, card_id) not in (values
+  ('teropodos', 'ornitholestes'),
+  ('teropodos', 'ceratosaurus'),
+  ('teropodos', 'dromaeosaurus'),
+  ('teropodos', 'velociraptor'),
+  ('teropodos', 'therizinosaurus'),
+  ('teropodos', 'ojoraptorsaurus'),
+  ('teropodos', 'sanjuansaurus'),
+  ('teropodos', 'allosaurus'),
+  ('teropodos', 'riparovenator'),
+  ('teropodos', 'carnotaurus'),
+  ('teropodos', 'torvosaurus'),
+  ('teropodos', 'tyrannotitan'),
+  ('teropodos', 'gregarismo'),
+  ('teropodos', 'trampa'),
+  ('teropodos', 'rebrote'),
+  ('teropodos', 'nido'),
+  ('teropodos', 'sabana_helechos'),
+  ('teropodos', 'insectos'),
+  ('teropodos', 'fractura'),
+  ('teropodos', 'gastrolitos'),
+  ('teropodos', 'crecimiento_acelerado'),
+  ('teropodos', 'sabana'),
+  ('teropodos', 'canal_trenzado'),
+  ('teropodos', 'biomasa'),
+  ('teropodos', 'araucarias'),
+  ('teropodos', 'cicadas'),
+  ('sauropodos', 'plateosauravus'),
+  ('sauropodos', 'athenar'),
+  ('sauropodos', 'amargasaurus'),
+  ('sauropodos', 'diplodocus'),
+  ('sauropodos', 'apatosaurus'),
+  ('sauropodos', 'camarasaurus'),
+  ('sauropodos', 'mamenchisaurus'),
+  ('sauropodos', 'atlasaurus'),
+  ('sauropodos', 'brachiosaurus'),
+  ('sauropodos', 'ceratosaurus'),
+  ('sauropodos', 'velociraptor'),
+  ('sauropodos', 'ornitholestes'),
+  ('sauropodos', 'gregarismo'),
+  ('sauropodos', 'trampa'),
+  ('sauropodos', 'rebrote'),
+  ('sauropodos', 'nido'),
+  ('sauropodos', 'sabana_helechos'),
+  ('sauropodos', 'insectos'),
+  ('sauropodos', 'fractura'),
+  ('sauropodos', 'gastrolitos'),
+  ('sauropodos', 'crecimiento_acelerado'),
+  ('sauropodos', 'sabana'),
+  ('sauropodos', 'canal_trenzado'),
+  ('sauropodos', 'biomasa'),
+  ('sauropodos', 'araucarias'),
+  ('sauropodos', 'cicadas'),
+  ('ornitopodos', 'dryosaurus'),
+  ('ornitopodos', 'shuangmiaosaurus'),
+  ('ornitopodos', 'iguanodon'),
+  ('ornitopodos', 'brachylophosaurus'),
+  ('ornitopodos', 'parasaurolophus'),
+  ('ornitopodos', 'rhinorex'),
+  ('ornitopodos', 'maiasaura'),
+  ('ornitopodos', 'edmontosaurus'),
+  ('ornitopodos', 'pachycephalosaurus'),
+  ('ornitopodos', 'allosaurus'),
+  ('ornitopodos', 'ornitholestes'),
+  ('ornitopodos', 'velociraptor'),
+  ('ornitopodos', 'ceratosaurus'),
+  ('ornitopodos', 'gregarismo'),
+  ('ornitopodos', 'trampa'),
+  ('ornitopodos', 'rebrote'),
+  ('ornitopodos', 'nido'),
+  ('ornitopodos', 'sabana_helechos'),
+  ('ornitopodos', 'insectos'),
+  ('ornitopodos', 'fractura'),
+  ('ornitopodos', 'gastrolitos'),
+  ('ornitopodos', 'crecimiento_acelerado'),
+  ('ornitopodos', 'sabana'),
+  ('ornitopodos', 'canal_trenzado'),
+  ('ornitopodos', 'biomasa'),
+  ('ornitopodos', 'araucarias'),
+  ('ornitopodos', 'cicadas')
+);
+
 delete from public.catalogo_cartas where card_id not in (
   'dryosaurus',
   'ornitholestes',
@@ -352,6 +527,13 @@ create policy "el catálogo es público" on public.catalogo_inicial
   for select to authenticated using (true);
 revoke insert, update, delete on public.catalogo_inicial from anon, authenticated;
 revoke select on public.catalogo_inicial from anon;
+
+alter table public.catalogo_iniciales enable row level security;
+drop policy if exists "el catálogo es público" on public.catalogo_iniciales;
+create policy "el catálogo es público" on public.catalogo_iniciales
+  for select to authenticated using (true);
+revoke insert, update, delete on public.catalogo_iniciales from anon, authenticated;
+revoke select on public.catalogo_iniciales from anon;
 
 alter table public.catalogo_economia enable row level security;
 drop policy if exists "el catálogo es público" on public.catalogo_economia;
