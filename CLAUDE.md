@@ -400,7 +400,8 @@ pantalla. Sacarlas a su propia pantalla devuelve el menú a lo que era y deja
 sitio para lo que venga.
 
 - **La placa del Duelo abre su panel**, como la de misiones, y las dos se
-  excluyen: abrir una pliega la otra. Estuvo apagada con su «Pronto» hasta que
+  excluyen: abrir una pliega la otra. Con el panel abierto se esconde la fila
+  de dificultad: es del rival de la IA, y en un duelo el rival es una persona. Estuvo apagada con su «Pronto» hasta que
   el Duelo existió (ver «El Duelo», más abajo).
 - **La dificultad del rival se fue con «En solitario».** Es el rival de ESA
   partida y en el menú estaba suelta, sin decir de qué.
