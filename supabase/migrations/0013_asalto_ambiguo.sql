@@ -17,6 +17,10 @@
 --
 -- Misma firma, mismos nombres de salida y misma lógica que 0001: aquí sólo
 -- cambian los prefijos de tabla.
+--
+-- Aplicada en producción el 14-09-2026. Comprobado en ejecución con una copia
+-- temporal de sus lecturas —crear la función no prueba nada, que el cuerpo no
+-- se analiza hasta llamarla— y comprobado que sólo la alcanza `service_role`.
 create or replace function public.aplicar_asalto(
   p_tribu     uuid,
   p_evento    text,
