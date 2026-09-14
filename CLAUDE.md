@@ -780,6 +780,23 @@ Lo que cambia de flujo y no sólo de piel:
   cuando el servidor contesta, baja la barra hasta lo que queda. La
   transición es literalmente lo que le has quitado. `pintarFin()` lo vacía en
   las partidas normales.
+- **El jefe pelea con el TRIPLE de hábitat** (`habitatDeAsalto()`, 210) y el
+  marcador tiene que saberlo: el tope estaba fijo en `BALANCE.vidaHabitat`, así
+  que el jefe se leía «210 / 70» y su barra salía al 300 % —llena y quieta
+  hasta bajar de 70, o sea las dos terceras partes del asalto sin moverse—.
+  `fijarTopesHabitat()` lo pone al empezar cada partida; el tope NO está en el
+  estado del motor, igual que subirle el hábitat al jefe tampoco: es una
+  decisión de la partida, no una regla nueva. El servidor usa el mismo
+  `habitatDeAsalto()` al re-jugar (`validarAsalto.js`), así que los dos cuentan
+  lo mismo.
+- **«Otra partida» tras un asalto es otro ASALTO**, no una partida contra la
+  IA. Caía en `nuevaPartida()` a secas y no se notaba hasta mirar el hábitat
+  del rival —70 en vez de 210—: la misma pantalla, el mazo de referencia, y
+  nada que se le restara al jefe. El duelo y la expedición ya tenían su caso;
+  el asalto era el que faltaba. Si ya no se puede asaltar —almacén, tope del
+  día, ventana cerrada— vuelve a la Cuenca, que lo dice con su motivo, y por
+  eso `puedeAsaltar()` se comprueba dentro de `asaltoAlJefe()` y no sólo en el
+  botón: ese botón ya no es el único camino.
 - **Reclamar la carta de jefe la invoca** como a una legendaria: `invocar()`
   acepta ahora `raiz`, porque su raíz por defecto es la partida y la Cuenca
   es otra pantalla.
