@@ -20,7 +20,7 @@
 import { reducido } from './efectos.js';
 
 /** Si las piezas de `assets/piel/fin/` están. Lo vigila test/fin.test.js. */
-export const ARTE_LISTO = false;
+export const ARTE_LISTO = true;
 
 /** Lo que salen de `tools/fin.py`, sin extensión. */
 export const PIEZAS = Object.freeze([

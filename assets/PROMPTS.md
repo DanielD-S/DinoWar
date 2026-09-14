@@ -1263,6 +1263,15 @@ Exportar a lo más vertical que dé el generador y recortar a 9:16.
   degradado, el sello con el icono de trofeo, los rombos con un borde—, así
   que se juega desde el primer día.
 
+### Lo que llegó
+
+Las ocho el 14-09-2026, en magenta limpio y sin letras. Las apaisadas vinieron a
+2172×724 y las cuadradas a 1254×1254; recortadas, el estandarte queda a 3,43:1 y
+las cintas a 3,6:1. El estandarte trae la barra más alta de lo pedido —ocupa el
+quinto de arriba—, así que la palabra lleva relleno encima para caer en la tela.
+El cráneo del fondo salió de perfil y no de frente, y sirve igual: queda
+detrás del marcador con el velo del CSS.
+
 ### Lo que NO se pide
 
 - El mazo rasgado: es `dorso.webp` cortado en zigzag por CSS, como el sobre.
