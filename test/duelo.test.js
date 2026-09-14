@@ -17,6 +17,7 @@ import { semilla } from '../src/engine/rng.js';
 import { MAZO } from '../src/data/balance.js';
 import { DUELO, FIN_DUELO } from '../src/data/duelo.js';
 import { desdeMiLado } from '../supabase/functions/_compartido/duelo.js';
+import { hayPartida } from '../src/ui/emparejado.js';
 import { LIGAS, ELO, ligaDe, rangoDe, nombreDeRango, eloTras } from '../src/data/ligas.js';
 
 const M = MAZO.map(([id, n]) => [id, n]);
@@ -214,6 +215,24 @@ test('Al jugador 1 el resultado y los relojes le llegan desde su lado', () => {
   assert.deepEqual(vistaDuelo(d, 0, 0, 4000).fin, { ganador: 1, motivo: FIN_DUELO.ABANDONO });
   const t1 = vistaDuelo(d, 1, 0, 4000).tiempos;
   assert.equal(t1[1], DUELO.relojMs - 4000, 'el reloj del 0 real es el del rival para el 1');
+});
+
+test('El cliente reconoce la partida en la respuesta tal y como la monta la función', () => {
+  // La función responde `{ ...fila, ...vistaDuelo() }`, y las dos traen
+  // `estado`: la fila en texto y la vista con el tablero. Mirar
+  // `r.estado === 'jugando'` no se cumplía nunca y las dos pantallas se
+  // quedaban en «Buscando rival…» con el duelo ya creado en el servidor.
+  const fila = { id: 'x', estado: 'jugando', codigo: null, bando: 0, yo: null, rival: null, eloInicial: 1200 };
+  const d = crearDuelo(3, M, M, 0);
+  for (const j of [0, 1]) {
+    const respuesta = { ...fila, bando: j, ...vistaDuelo(d, j, 0, 0) };
+    assert.equal(typeof respuesta.estado, 'object', 'la vista pisa el estado de la fila');
+    assert.equal(hayPartida(respuesta), true);
+  }
+  assert.equal(hayPartida({ id: 'x', estado: 'esperando', codigo: 'ABC123' }), false);
+  assert.equal(hayPartida({ id: 'x', estado: 'jugando' }), false, 'emparejado pero sin datos aún: se sigue preguntando');
+  assert.equal(hayPartida({ id: 'x', estado: 'preparando' }), false);
+  assert.equal(hayPartida(null), false);
 });
 
 // ------------------------------------------------------------------- ligas

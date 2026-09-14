@@ -14,6 +14,7 @@
 import { CONFIG } from '../data/config.js';
 import { DUELO } from '../data/duelo.js';
 import { rangoDe, nombreDeRango, emblemaDe, LIGAS } from '../data/ligas.js';
+import { hayPartida } from './emparejado.js';
 import { funcion } from './supabase.js';
 import { cargarPerfil, mazoActivo } from './almacen.js';
 import { aListaDeMazo } from '../data/coleccion.js';
@@ -146,7 +147,7 @@ async function aceptar() {
 
 /** Lo que contesta el servidor: o ya hay partida, o se sigue esperando. */
 function recibir(r) {
-  if (r.estado === 'jugando' && r.n !== undefined) {
+  if (hayPartida(r)) {
     if (espera) clearInterval(espera.temporizador);
     espera = null;
     abierto = false;
