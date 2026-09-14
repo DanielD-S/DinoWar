@@ -58,6 +58,7 @@ import { montarTacto } from './ui/tacto.js';
 import { arte } from './ui/art.js';
 import { mostrarMarca, empezarCarga, precargarPiezas } from './ui/carga.js';
 import { pedirMazoInicial } from './ui/iniciales.js';
+import { montarInstalar } from './ui/instalar.js';
 
 const APP = Object.freeze({
   BOOT: 'BOOT', MARCA: 'MARCA', CARGA: 'CARGA',
@@ -1480,6 +1481,10 @@ function iniciar() {
     desbloquear();
     empezarTutorial();
     nuevaPartida();
+  });
+  montarInstalar({
+    boton: document.getElementById('btn-instalar'),
+    nota: document.getElementById('menu-instalar'),
   });
 
   // Un botón de sonido por pantalla —puerta, menú, jugar y partida—, todos

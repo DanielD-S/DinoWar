@@ -103,7 +103,12 @@
         <div class="menu-fila">
           <button id="btn-ayuda-menu" class="boton-fantasma">Cómo se juega</button>
           <button id="btn-tutorial" class="boton-fantasma">Tutorial</button>
+          <!-- Sólo aparece cuando se puede instalar: el navegador lo ofrece
+               (Chrome y Edge) o es un iPhone, donde se explica cómo. Instalada
+               ya, no sale. Lo lleva src/ui/instalar.js. -->
+          <button id="btn-instalar" class="boton-fantasma" hidden>Instalar app</button>
         </div>
+        <p class="menu-instalar" id="menu-instalar" hidden></p>
         <p class="menu-monedas"><span class="punto"></span><b id="menu-moneda">0</b> dinomonedas
           <span class="sep"></span> mazo <b id="menu-mazo">—</b></p>
         <p class="menu-record" id="menu-record"></p>
