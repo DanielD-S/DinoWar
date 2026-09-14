@@ -180,6 +180,8 @@ export function estadoDeTribu(ahora = Date.now()) {
       })),
     ],
     puedeReclamar: !!(jefe && mereceRecompensa(jefe, YO) && !c.jefes[activo.evento.id].reclamado),
+    // Aquí no llama nadie a la puerta: no hay más tribus que ésta.
+    solicitudes: [],
   };
 }
 

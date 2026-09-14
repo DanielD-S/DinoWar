@@ -814,6 +814,18 @@ Lo que cambia de flujo y no sólo de piel:
     quien lleva más tiempo. Una tribu sin capataz no podría aceptar ni echar a
     nadie. Y si se va el último, la tribu se BORRA con su almacén: una guarida
     vacía con fósiles dentro no es de nadie.
+  - **Hay lista de cuencas abiertas**, porque entrar era saberse seis letras que
+    alguien te pasa por fuera del juego: quien llega solo no tiene a quién
+    pedírselas, y una cuenca de una persona no tira un jefe de 6.000 de Vida.
+    Se entra de dos formas y las dos siguen: el CÓDIGO es una invitación
+    privada y entra aunque la cuenca esté cerrada —quien lo tiene es porque se
+    lo dieron—, y la LISTA enseña las que tienen sitio, `libre` o `solicitud`.
+    Sin tribu, la lista va ANTES del yacimiento: lo primero que se ve tiene que
+    ser gente. La lista devuelve lo justo para decidir —nombre, emblema, cuánta
+    gente, cómo se entra— y nada de dentro: ni almacén, ni jefes, ni quién
+    está. Una lista pública no es una mirilla. Y el emblema son los DIEZ
+    medallones de los mazos, que ya existen y ya están medidos: arte nuevo,
+    cero.
   - **Las reglas viven en `src/data/mando.js` y NO en `tribu.js`**, que es lo
     que parecía natural. `tribu.js` entra en el paquete de la Edge Function
     —lo importa el validador de asaltos—, así que tocarlo obliga a regenerar

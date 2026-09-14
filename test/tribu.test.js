@@ -9,7 +9,9 @@ import {
   CUENCA, acumular, faltaParaLlenar, depositoDe, ritmoPorHora, costeDeMejora,
   danoDeAsalto, puedeAsaltar, aplicarAsalto, mereceRecompensa, tablaDeAportes,
 } from '../src/data/tribu.js';
-import { ROL, puedeExpulsar, puedeCederMando, relevoDeMando } from '../src/data/mando.js';
+import {
+  ROL, ACCESO, puedeExpulsar, puedeCederMando, relevoDeMando, estadoEnLista,
+} from '../src/data/mando.js';
 import {
   CALENDARIO, CICLO, JEFES, CARTAS_DE_JEFE, eventosActivos, jefeActivo, TIPO_EVENTO,
 } from '../src/data/eventos.js';
@@ -204,4 +206,26 @@ test('Sin fecha de entrada el relevo sigue siendo determinista', () => {
   const sinFecha = [{ id: 'z', rol: ROL.MIEMBRO }, { id: 'm', rol: ROL.MIEMBRO }];
   assert.equal(relevoDeMando([CAPATAZ, ...sinFecha], 'a'), 'm');
   assert.equal(relevoDeMando([CAPATAZ, ...sinFecha.slice().reverse()], 'a'), 'm');
+});
+
+// ------------------------------------------------------------ lista de cuencas
+
+const LIBRE = { id: 't1', acceso: ACCESO.LIBRE, miembros: 3, tope: 8, pedida: false };
+const CERRADA = { ...LIBRE, id: 't2', acceso: ACCESO.SOLICITUD };
+
+test('Una cuenca libre con sitio se entra; una cerrada se pide', () => {
+  assert.equal(estadoEnLista(LIBRE, false), 'entrar');
+  assert.equal(estadoEnLista(CERRADA, false), 'pedir');
+});
+
+test('Llena, pedida o con cuenca propia: no hay botón que valga', () => {
+  assert.equal(estadoEnLista({ ...LIBRE, miembros: 8 }, false), 'llena');
+  assert.equal(estadoEnLista({ ...CERRADA, pedida: true }, false), 'pedida');
+  assert.equal(estadoEnLista(LIBRE, true), 'tienes-cuenca');
+});
+
+test('Tener cuenca manda sobre todo lo demás', () => {
+  // Si ya estás en una, da igual que la de la lista esté libre y con sitio:
+  // primero se sale. Lo vuelve a comprobar `unirse_a_tribu`.
+  assert.equal(estadoEnLista({ ...LIBRE, pedida: true }, true), 'tienes-cuenca');
 });

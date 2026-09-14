@@ -52,3 +52,37 @@ export function relevoDeMando(miembros, saliente) {
   return resto.slice().sort((a, b) => (a.desde ?? 0) - (b.desde ?? 0)
     || (a.id < b.id ? -1 : 1))[0].id;
 }
+
+// ------------------------------------------------------------------ acceso
+//
+// Dos formas de entrar en una cuenca, y las dos siguen existiendo: el CÓDIGO,
+// que es una invitación privada y entra sin pedir permiso, y la LISTA, que
+// enseña las que tienen sitio. `libre` entra y ya; `solicitud` espera a que el
+// capataz diga que sí.
+
+export const ACCESO = Object.freeze({ LIBRE: 'libre', SOLICITUD: 'solicitud' });
+
+export const NOMBRE_ACCESO = Object.freeze({
+  [ACCESO.LIBRE]: 'Libre',
+  [ACCESO.SOLICITUD]: 'Por solicitud',
+});
+
+/**
+ * Qué se puede hacer con una cuenca de la lista. Uno de:
+ *
+ *   'entrar'        es libre y tiene sitio
+ *   'pedir'         hay que solicitarlo
+ *   'pedida'        ya lo pediste y no han contestado
+ *   'llena'         no cabe nadie más
+ *   'tienes-cuenca' estás en una: salir primero
+ *
+ * El servidor lo vuelve a comprobar en `unirse_a_tribu`, y no por
+ * desconfianza: la lista se pinta una vez y la cuenca se llena mientras la
+ * miras.
+ */
+export function estadoEnLista(tribu, tengoTribu) {
+  if (tengoTribu) return 'tienes-cuenca';
+  if (tribu.pedida) return 'pedida';
+  if ((tribu.miembros ?? 0) >= (tribu.tope ?? Infinity)) return 'llena';
+  return tribu.acceso === ACCESO.SOLICITUD ? 'pedir' : 'entrar';
+}
