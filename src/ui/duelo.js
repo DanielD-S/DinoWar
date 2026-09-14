@@ -13,11 +13,10 @@
 
 import { CONFIG } from '../data/config.js';
 import { DUELO } from '../data/duelo.js';
-import { rangoDe, nombreDeRango, LIGAS } from '../data/ligas.js';
+import { rangoDe, nombreDeRango, emblemaDe, LIGAS } from '../data/ligas.js';
 import { funcion } from './supabase.js';
 import { cargarPerfil, mazoActivo } from './almacen.js';
 import { aListaDeMazo } from '../data/coleccion.js';
-import { arte } from './art.js';
 
 // ------------------------------------------------------------------- red
 
@@ -75,9 +74,8 @@ function ligaHTML() {
   const elo = Number(cargarPerfil().elo ?? 1200);
   const r = rangoDe(elo);
   const arriba = r.liga.id === LIGAS[LIGAS.length - 1].id;
-  const foto = arte(r.liga.emblema);
   return `<div class="duelo-liga">
-    <span class="duelo-emblema ${r.liga.id}" style="${foto ? `background-image:url('${foto}')` : ''}"></span>
+    <img class="duelo-emblema" src="${emblemaDe(r.liga)}" alt="" width="44" height="44" decoding="async">
     <span class="duelo-liga-nombre">${escapar(nombreDeRango(elo))}</span>
     <span class="duelo-liga-nota">${arriba ? 'La cola de los que llegaron al final.' : `${r.puntos} de 100 para subir`}</span>
     ${arriba ? '' : `<span class="duelo-barra"><i style="width:${r.puntos}%"></i></span>`}
