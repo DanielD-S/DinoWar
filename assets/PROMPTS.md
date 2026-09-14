@@ -1117,3 +1117,12 @@ Formato: **1024×1536**, vertical. Se sirve a 768.
 - Los mapas no se keyean: son un fondo a sangre y sólo se escalan.
 - Mientras no lleguen, el juego pinta el mapa con un degradado oscuro y los
   nodos con CSS, así que se puede jugar desde el primer día.
+
+### Lo que llegó
+
+Las nueve piezas el 14-09-2026, a `assets/piel/expediciones/` —la carpeta
+servida— y se movieron a `src/piel/expediciones/`. Los mapas a 941×1672, los
+nodos a 1254×1254 y la cartela a 1024×1536, que recortada queda a 768×1282 y
+no a 2:3. El nodo abierto trajo el halo dorado convertido en un aro rosa opaco,
+que la herramienta quita y el CSS sustituye; si se regenera, pedirlo **sin
+halo ni brillo alrededor**.

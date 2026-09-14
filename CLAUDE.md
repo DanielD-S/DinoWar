@@ -284,6 +284,21 @@ mientras tanto. El juego sabe qué piezas hay por `assets/piel/expediciones/indi
 que escribe la herramienta, y **no pidiendo cada fichero**: una pieza que no
 existe es un 404 en la consola, y ya hubo quejas con los vídeos.
 
+Tres cosas que costaron al llegar el arte, por si vuelven:
+
+- **El brillo del nodo abierto llegó como un aro rosa OPACO**, no como un halo
+  semitransparente: el generador mezcló el dorado con el magenta y `keyear` lo
+  daba por pieza. `limpiar_halo` lo quita por parecido al magenta —rojo y azul
+  altos con el verde bajo, `min(r, b) − g`—, que no toca el oro, la piedra, el
+  lacre ni la laca. El brillo lo pone el CSS con `drop-shadow`.
+- **Y antes de escalar hay que sangrar el color**, con `sangrar_color` de
+  `placas.py`: lo transparente seguía siendo magenta y `Image.resize` lo metía
+  en el canto. Es la misma trampa de las placas del menú.
+- **La cartela no es 2:3, es 768×1282.** Todo va colocado encima en porcentajes
+  medidos y en posición absoluta; y el bloque de texto necesita `width: auto`,
+  que la regla general le da 100 % y eso pesa más que `left` y `right`: el lema
+  y el botón se salían por la derecha.
+
 El botón de volver del mapa no lleva `data-volver`: `meta.js` ata todos los
 `[data-volver]` al menú, y el mapa vuelve a la pantalla de jugar.
 

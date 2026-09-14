@@ -19,7 +19,10 @@ const escapar = (s) => String(s).replace(/[<>&"]/g, (c) => ({ '<': '&lt;', '>': 
 
 const RUTA = 'assets/piel/expediciones/';
 /** Separación vertical entre nodos y columnas del zigzag, en % del ancho. */
-const PASO_Y = 150;
+// 120 y no más: el mapa es vertical 9:16 y se pinta con `cover`; con la
+// columna más alta, el dibujo se escalaba tanto que perdía media anchura por
+// los lados, lagos incluidos.
+const PASO_Y = 120;
 const ARRIBA = 96;
 const COLUMNAS = [50, 78, 50, 22];
 
@@ -78,7 +81,9 @@ function pintar(desplazar = false) {
   const rivales = expedicion.rivales;
   const puntos = rivales.map((_, i) => ({ x: COLUMNAS[i % COLUMNAS.length], y: ARRIBA + i * PASO_Y }));
   const alto = ARRIBA + (rivales.length - 1) * PASO_Y + 140;
-  const mapa = piezas.has(expedicion.mapa) ? ` style="background-image:url('${RUTA}${expedicion.mapa}.webp')"` : '';
+  // UN solo atributo `style`: con dos, el navegador se queda con el primero y
+  // descarta el segundo, que era el que llevaba la altura. Sin arte no se veía.
+  const fondo = piezas.has(expedicion.mapa) ? `;background-image:url('${RUTA}${expedicion.mapa}.webp')` : '';
 
   // El sendero: un tramo por pareja de nodos, dorado si el de abajo ya está
   // abierto. Va en un SVG con viewBox en % de ancho y px de alto, para que el
@@ -104,7 +109,7 @@ function pintar(desplazar = false) {
         <i>${estVis === 'vencido' ? 'Vencido esta semana' : `Primera victoria: +${vis.premio} ◈`}</i>
       </span>
     </button>
-    <div class="exp-mapa"${mapa} style="height:${alto}px${mapa ? `;${mapa.slice(8, -1)}` : ''}">
+    <div class="exp-mapa ${fondo ? 'con-arte' : ''}" style="height:${alto}px${fondo}">
       <svg class="exp-sendero" width="100%" height="${alto}" aria-hidden="true">${tramos}</svg>
       ${nodos}
     </div>`;
@@ -154,13 +159,15 @@ function abrirCartela(rivalId) {
     <div class="exp-cartela${cartela}">
       <span class="exp-cartela-retrato">${arte(r.retrato)}</span>
       <h3>${escapar(r.nombre)}</h3>
-      <p class="exp-cartela-lema">${escapar(r.lema)}</p>
-      <p class="exp-cartela-dato">${r.perfil === 'aleatoria' ? 'Juega sin plan' : 'Juega con cabeza'}</p>
-      <p class="exp-cartela-premio">${premio}</p>
-      ${cerrado}
-      <div class="exp-cartela-botones">
-        <button class="boton-grande" data-luchar="${r.id}" ${estado === 'bloqueado' ? 'disabled' : ''}>Luchar</button>
-        <button class="boton-fantasma" data-cerrar>Volver al mapa</button>
+      <div class="exp-cartela-texto">
+        <p class="exp-cartela-lema">${escapar(r.lema)}</p>
+        <p class="exp-cartela-dato">${r.perfil === 'aleatoria' ? 'Juega sin plan' : 'Juega con cabeza'}</p>
+        <p class="exp-cartela-premio">${premio}</p>
+        ${cerrado}
+        <div class="exp-cartela-botones">
+          <button class="boton-grande" data-luchar="${r.id}" ${estado === 'bloqueado' ? 'disabled' : ''}>Luchar</button>
+          <button class="boton-fantasma" data-cerrar>Volver al mapa</button>
+        </div>
       </div>
     </div>`;
   dom.hoja.classList.remove('oculta');

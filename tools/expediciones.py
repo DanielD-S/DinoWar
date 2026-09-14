@@ -25,6 +25,7 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from marcos import keyear, distancia_a_magenta  # noqa: E402
+from placas import sangrar_color  # noqa: E402
 
 RAIZ = Path(__file__).resolve().parent.parent
 ORIGEN = RAIZ / 'src' / 'piel' / 'expediciones'
@@ -41,6 +42,32 @@ PIEZAS = {
 }
 MAPAS = ('mapa_morrison', 'mapa_hell_creek', 'mapa_tendaguru', 'mapa_kem_kem')
 ANCHO_MAPA = 900
+
+
+def limpiar_halo(im):
+    """Quita el halo rosado que el generador deja alrededor de los brillos.
+
+    El nodo abierto se pidió con un halo dorado sobre magenta, y el generador lo
+    pintó como un aro ROSA casi opaco: a esa distancia del magenta, `keyear` lo
+    da por parte de la pieza. Cortar el azul de lo semitransparente no bastó,
+    porque no era semitransparente.
+
+    Lo que distingue el rosa de todo lo que sí es pieza es cuánto se parece al
+    magenta: rojo Y azul altos con el verde bajo, `min(r, b) − g`. El oro tiene
+    poco azul, la piedra es gris, el lacre rojo y la laca tienen poco azul: en
+    todos sale negativo o cerca de cero. En el rosa sale muy positivo, y en esa
+    medida se vuelve transparente. El brillo que se pierde lo pone el CSS con
+    `drop-shadow`, que además sigue la silueta.
+    """
+    a = np.asarray(im).astype(float)
+    r, g, b, al = a[..., 0], a[..., 1], a[..., 2], a[..., 3]
+    magentez = np.minimum(r, b) - g
+    # 5 y 55, no 15 y 70: con los primeros quedaba un hilo melocotón en el
+    # borde del nodo abierto y otro rojizo en el hueco del bloqueado.
+    queda = 1 - np.clip((magentez - 5) / 55, 0, 1)
+    al2 = al * queda
+    b2 = np.where(al2 < 250, np.minimum(b, g), b)
+    return Image.fromarray(np.dstack([r, g, b2, al2]).astype(np.uint8), 'RGBA')
 
 
 def recortar(im, margen_rel=0.01):
@@ -92,6 +119,11 @@ def medir_hueco(original, caja):
 
 def guardar(im, nombre, ancho, calidad=86):
     DESTINO.mkdir(parents=True, exist_ok=True)
+    # Antes de escalar, el color del canto por debajo de lo transparente:
+    # `Image.resize` mezcla el color sin mirar el alfa, y lo transparente sigue
+    # siendo magenta. Es la trampa de las placas, con la función de las placas.
+    if im.mode == 'RGBA':
+        im = sangrar_color(im)
     alto = round(ancho * im.size[1] / im.size[0])
     im.resize((ancho, alto), Image.LANCZOS).save(DESTINO / f'{nombre}.webp', 'WEBP', quality=calidad)
 
@@ -107,7 +139,7 @@ def main(escribir):
             continue
         usados.add(p.name)
         original = Image.open(p)
-        recortada, caja = recortar(keyear(original))
+        recortada, caja = recortar(limpiar_halo(keyear(original)))
         print(f'{p.name} {original.size[0]}×{original.size[1]} -> {nombre}.webp @{ancho}')
         h = medir_hueco(original, caja)
         if h:

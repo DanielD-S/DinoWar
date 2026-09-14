@@ -1,3 +1,13 @@
 {
-  "piezas": []
+  "piezas": [
+    "cartela_rival",
+    "mapa_hell_creek",
+    "mapa_kem_kem",
+    "mapa_morrison",
+    "mapa_tendaguru",
+    "nodo_abierto",
+    "nodo_bloqueado",
+    "nodo_semana",
+    "nodo_vencido"
+  ]
 }
