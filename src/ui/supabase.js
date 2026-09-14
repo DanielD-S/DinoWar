@@ -66,7 +66,7 @@ async function pedir(ruta, opciones = {}, conSesion = true) {
   try {
     r = await fetch(`${url}${ruta}`, { ...opciones, headers: cabeceras });
   } catch (e) {
-    throw new ErrorDeRed('no hay conexión con la cuenca', 0, e?.message ?? null);
+    throw new ErrorDeRed('no hay conexión con la tribu', 0, e?.message ?? null);
   }
 
   const texto = await r.text();

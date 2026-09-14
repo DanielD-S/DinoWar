@@ -236,14 +236,14 @@ function bloqueLista() {
   if (modoActual() === MODO.LOCAL) return '';
   if (!listaDeCuencas.length) {
     return `<section class="cu-bloque">
-      <h3 class="cu-titulo">Cuencas abiertas</h3>
+      <h3 class="cu-titulo">Tribus abiertas</h3>
       <p class="cu-linea">Ahora mismo no hay ninguna con sitio. Funda la tuya y pasa
         el código: es como empiezan todas.</p>
     </section>`;
   }
   return `<section class="cu-bloque">
-    <h3 class="cu-titulo">Cuencas abiertas</h3>
-    <ul class="cu-lista" aria-label="Cuencas con sitio">
+    <h3 class="cu-titulo">Tribus abiertas</h3>
+    <ul class="cu-lista" aria-label="Tribus con sitio">
       ${listaDeCuencas.map(filaDeCuenca).join('')}
     </ul>
   </section>`;
@@ -273,14 +273,14 @@ function bloqueSinTribu() {
   return `${bloqueLista()}<section class="cu-bloque">
     <h3 class="cu-titulo">Todavía no estás en ninguna tribu</h3>
     <p class="cu-linea">Un jefe tiene miles de Vida y no cabe en una persona.
-      Funda una cuenca y pasa el código, o entra en la de alguien.</p>
+      Funda una tribu y pasa el código, o entra en la de alguien.</p>
     <div class="cu-formulario">
       <label class="cu-campo">
-        <span>Nombre de tu cuenca</span>
-        <input id="cu-nombre" type="text" maxlength="32" placeholder="Cuenca del Morrison"
+        <span>Nombre de tu tribu</span>
+        <input id="cu-nombre" type="text" maxlength="32" placeholder="Los del Morrison"
                autocomplete="off" enterkeyhint="done">
       </label>
-      <button class="boton-grande" data-accion="crear-tribu">Fundar la cuenca</button>
+      <button class="boton-grande" data-accion="crear-tribu">Fundar la tribu</button>
     </div>
     <div class="cu-formulario">
       <label class="cu-campo">
@@ -327,7 +327,7 @@ function bloqueTribu(c) {
     <p class="cu-linea">Código para entrar: <b class="cu-codigo">${escapar(c.tribu.codigo)}</b>
       <button class="cu-compartir" data-accion="compartir" data-codigo="${escapar(c.tribu.codigo)}"
               data-nombre="${escapar(c.tribu.nombre)}">Compartir</button></p>
-    <p class="cu-nota">Hasta ${CUENCA.miembrosMaximo} en la cuenca ·
+    <p class="cu-nota">Hasta ${CUENCA.miembrosMaximo} en la tribu ·
       ${NOMBRE_ACCESO[c.tribu.acceso] ?? 'Libre'} desde la lista.</p>
   </section>` : '';
 
@@ -391,14 +391,14 @@ function bloqueSolicitudes(c) {
 function bloqueAjustes(c) {
   const acceso = c.tribu?.acceso ?? ACCESO.LIBRE;
   return `<section class="cu-bloque">
-    <h3 class="cu-titulo">Ajustes de la cuenca</h3>
-    <p class="cu-linea">En la lista de cuencas abiertas:</p>
+    <h3 class="cu-titulo">Ajustes de la tribu</h3>
+    <p class="cu-linea">En la lista de tribus abiertas:</p>
     <p class="cu-linea">${Object.values(ACCESO).map((a) => `<button
       class="cu-mini ${a === acceso ? 'on' : ''}" data-accion="acceso" data-valor="${a}"
       ${a === acceso ? 'disabled' : ''}>${NOMBRE_ACCESO[a]}</button>`).join(' ')}</p>
     <p class="cu-nota">El código de entrar sigue funcionando en las dos: es una
       invitación privada y no pasa por la lista.</p>
-    <div class="cu-emblemas" role="group" aria-label="Emblema de la cuenca">
+    <div class="cu-emblemas" role="group" aria-label="Emblema de la tribu">
       ${EMBLEMAS.map((e) => `<button class="${e === (c.tribu?.emblema ?? '') ? 'on' : ''}"
         data-accion="emblema" data-valor="${e}" aria-label="${e.replace(/_/g, ' ')}">
         <i class="emblema emb-${e}" aria-hidden="true"></i></button>`).join('')}
@@ -421,13 +421,13 @@ const EMBLEMAS = Object.freeze([
 function salirHTML(yo, soloQuedoYo) {
   // Estando solo, salir y deshacer la cuenca son lo mismo —se borra al irse el
   // último—, así que el botón lo DICE en vez de esconderlo detrás de «Salir».
-  const rotulo = soloQuedoYo ? 'Deshacer la cuenca' : 'Salir de la cuenca';
+  const rotulo = soloQuedoYo ? 'Deshacer la tribu' : 'Salir de la tribu';
   if (confirmando?.accion !== 'salir') {
     return `<p class="cu-linea"><button class="cu-mini mal" data-accion="salir">${rotulo}</button></p>`;
   }
   return `<div class="cu-salir">
     <p class="cu-linea">${soloQuedoYo
-    ? 'No queda nadie más: la cuenca desaparece con su almacén, sus jefes y su código.'
+    ? 'No queda nadie más: la tribu desaparece con su almacén, sus jefes y su código.'
     : `Los fósiles del almacén se quedan aquí.${esCapataz(yo)
       ? ' El mando pasa a quien lleve más tiempo.' : ''}`}
       Tu yacimiento y tus cartas se van contigo.</p>
@@ -550,10 +550,10 @@ export async function pintarCuenca() {
     sinTribu ? bloqueYacimiento(c, ahora) : bloqueTribu(c),
     bloqueCartas(c),
     modoActual() === MODO.LOCAL
-      ? `<p class="cu-aviso"><b>Estás jugando la cuenca en local</b> (${porQueLocal()}).
+      ? `<p class="cu-aviso"><b>Estás jugando sin tribu de verdad</b> (${porQueLocal()}).
           Tus compañeros de tribu no son personas: los simula el propio juego con
           las mismas reglas y los mismos ritmos. Lo que hagas aquí no lo ve nadie más.</p>`
-      : `<p class="cu-aviso">Cuenca compartida. El daño a los jefes lo calcula el
+      : `<p class="cu-aviso">Tribu compartida. El daño a los jefes lo calcula el
           servidor re-jugando tu partida, así que lo que aporta cada uno es lo que
           hizo de verdad.</p>`,
   ].join('');

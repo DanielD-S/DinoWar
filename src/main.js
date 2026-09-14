@@ -1008,7 +1008,7 @@ function cerrarAsalto(gane) {
   asaltar({ ...(partida ?? {}), dano: estimado })
     .then((r) => {
       el.finPremio.textContent = r.cayo
-        ? `${jefe.nombre} ha caído. Reclama su carta en la Cuenca.`
+        ? `${jefe.nombre} ha caído. Reclama su carta en la Tribu.`
         : `${r.dano} de daño a ${jefe.nombre}. No paga dinomonedas: esto es para la tribu.`;
       informeDeAsalto(jefe, r.vida, r.dano, r.cayo);
       return pintarCuenca();

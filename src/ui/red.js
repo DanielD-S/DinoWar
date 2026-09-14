@@ -37,7 +37,7 @@ export const porQueLocal = () => motivoLocal;
 function caerALocal(e) {
   if (modo === MODO.LOCAL) return;
   modo = MODO.LOCAL;
-  motivoLocal = e?.message ?? 'no hay conexión con la cuenca';
+  motivoLocal = e?.message ?? 'no hay conexión con la tribu';
   console.warn('[cuenca] sin servidor, se juega en local:', motivoLocal);
 }
 
@@ -191,12 +191,12 @@ export async function entrarEnTribu(codigo) {
  * simulados y echar a uno sería echar a nadie. La pantalla no ofrece los
  * botones en local, y esto es el segundo cerrojo.
  */
-const soloEnLaCuencaDeVerdad = (qué) => {
-  throw new Error(`${qué} necesita una cuenca compartida, y estás en local`);
+const soloEnLaTribuDeVerdad = (qué) => {
+  throw new Error(`${qué} necesita una tribu compartida, y estás en local`);
 };
 
 export async function salirDeTribu() {
-  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('salir de la cuenca');
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('salir de la tribu');
   return rpc('salir_de_tribu');
 }
 
@@ -206,12 +206,12 @@ export async function salirDeTribu() {
  * de sacarte a ti y dejarle la cuenca a esa persona.
  */
 export async function deshacerTribu() {
-  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('deshacer la cuenca');
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('deshacer la tribu');
   return rpc('deshacer_tribu');
 }
 
 export async function expulsar(jugadorId) {
-  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('echar a alguien');
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('echar a alguien');
   return rpc('expulsar', { p_jugador: jugadorId });
 }
 
@@ -229,32 +229,32 @@ export async function tribusAbiertas() {
 }
 
 export async function unirseATribu(tribuId) {
-  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('entrar en otra cuenca');
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('entrar en otra tribu');
   return rpc('unirse_a_tribu', { p_tribu: tribuId });
 }
 
 export async function solicitarEntrada(tribuId) {
-  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('pedir entrada');
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('pedir entrada');
   return rpc('solicitar_entrada', { p_tribu: tribuId });
 }
 
 export async function retirarSolicitud(tribuId) {
-  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('retirar una solicitud');
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('retirar una solicitud');
   return rpc('retirar_solicitud', { p_tribu: tribuId });
 }
 
 export async function responderSolicitud(jugadorId, si) {
-  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('contestar una solicitud');
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('contestar una solicitud');
   return rpc('responder_solicitud', { p_jugador: jugadorId, p_si: si });
 }
 
 export async function ajustarTribu({ acceso = null, emblema = null } = {}) {
-  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('cambiar los ajustes');
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('cambiar los ajustes');
   return rpc('ajustar_tribu', { p_acceso: acceso, p_emblema: emblema });
 }
 
 export async function cederMando(jugadorId) {
-  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('ceder el mando');
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('ceder el mando');
   return rpc('ceder_mando', { p_jugador: jugadorId });
 }
 

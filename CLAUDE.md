@@ -765,6 +765,25 @@ sin eso cada letra cerraba el teclado del móvil. Para verlo sin cuenta:
 
 ## La Cuenca: vitrina, yacimiento y bandeja
 
+**En pantalla el grupo se llama TRIBU, y «cuenca» es el sitio.** El juego usaba
+las dos a la vez —«no estás en ninguna TRIBU», «fundar la CUENCA», «almacén de
+la TRIBU»— y por dentro mandaba tribu desde el principio: la tabla es `tribus`.
+La cuenca es un lugar y la tribu es la gente, y todo lo que hace el jugador es
+sobre la gente: fundarla, entrar, salir, echar, mandar, buscarla en una lista;
+un sitio no se funda ni se abandona. Así que gana «tribu» en todo lo que se
+lee, incluidos los `raise exception` del SQL, que salen por pantalla tal cual y
+por eso son texto de interfaz. «Cuenca» se queda donde se habla del lugar:
+«bajando a la cuenca», «en la cuenca ahora», «sin jefe en la cuenca».
+
+Las LLAVES no se tocaron —`cuenca.js`, `CUENCA`, `estado_cuenca`,
+`catalogo_cuenca`, `avisos_cuenca`, la pantalla `#cuenca`— por lo mismo que los
+climas siguen teniendo el id `sabana` aunque la carta se llame «Monzón de
+verano»: renombrar una llave es una migración de datos que no cambia nada de lo
+que se ve. Y la migración que cambió los mensajes (`0018`) no reescribe las
+nueve funciones a mano: coge la definición puesta con `pg_get_functiondef`, le
+cambia la palabra y la vuelve a crear. Reescribir nueve cuerpos enteros para
+cambiar una palabra es la forma segura de colar una errata en la que sí importa.
+
 [`src/ui/cuenca.js`](src/ui/cuenca.js) pinta la capa cooperativa con piezas
 que salen de `python tools/cuenca.py escribir` desde `src/piel/cuenca/`: el
 jefe en una **vitrina** cuya ventana y cartela mide la herramienta —los números
