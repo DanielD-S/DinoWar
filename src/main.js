@@ -1021,7 +1021,10 @@ function cerrarAsalto(gane) {
  * transición de la barra es literalmente lo que acabas de quitarle.
  */
 function informeDeAsalto(jefe, vidaQueQueda, dano, cayo) {
-  const vida = Math.max(0, Number.isFinite(vidaQueQueda) ? vidaQueQueda : jefe.vida);
+  // Tres caídas: lo que dijo el servidor, lo que le quedaba al empezar, y su
+  // Vida máxima. La última es la del catálogo, que existe siempre: una barra
+  // con «NaN» es peor que una optimista.
+  const vida = Math.max(0, [vidaQueQueda, jefe.vida, jefe.vidaMaxima].find(Number.isFinite) ?? 0);
   const pct = jefe.vidaMaxima > 0 ? (100 * vida) / jefe.vidaMaxima : 0;
   const barra = el.finInforme.querySelector('.cu-vida i');
   if (barra) {
@@ -1079,7 +1082,11 @@ async function asaltoAlJefe() {
   const cuenca = await estadoDeTribu();
   const activo = jefeActivo(cuenca.arranque, Date.now());
   if (!activo) return;
-  asaltando = JEFES[activo.evento.jefe];
+  // El jefe del ESTADO de la cuenca, no el del catálogo: el catálogo tiene su
+  // Vida máxima, pero la que le queda hoy la lleva el servidor, y el informe
+  // del final la enseña antes de que conteste. Con el del catálogo la barra
+  // salía «NaN / 6000».
+  asaltando = cuenca.jefe ?? JEFES[activo.evento.jefe];
   nuevaPartida(asaltando, activo.evento.id);
 }
 
