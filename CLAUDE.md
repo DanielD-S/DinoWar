@@ -729,6 +729,24 @@ y el del que perdió rasgado.
   contestan —dejaría ocho 404 por partida—, y `test/fin.test.js` obliga a
   encenderlo cuando están las ocho piezas y a apagarlo si falta una.
 
+## La presentación: quién contra quién
+
+[`src/ui/presentacion.js`](src/ui/presentacion.js). Antes de cada partida la
+pantalla se parte en diagonal —el rival arriba, tú abajo— con estandarte,
+emblema de clado, la portada del mazo como retrato, nombre y liga; en la
+costura, el VS, el modo y el objetivo. 2,6 s, 1,6 en un duelo, y un toque la
+salta. En la primera partida no sale: manda el tutorial.
+
+- **El reloj, la entrada y el bucle esperan a que se vaya.** `partidaVigente`
+  impide que una presentación vieja arranque su partida sobre una nueva.
+- **No dice quién empieza**, a propósito: el despliegue es simultáneo y
+  `compensacionSegundoJugador` vale cero cartas. «Tú empiezas» sólo
+  desempataría una igualdad absoluta, y enseñarlo sería mentir.
+  `test/presentacion.test.js` falla si alguien lo añade.
+- El rival de un duelo sale sin retrato ni emblema: su mazo es secreto.
+- Mismo interruptor de arte que el final (`ARTE_LISTO`), con sus piezas en
+  `assets/piel/vs/`. El VS reutiliza el medallón del final.
+
 ## Los mazos: placas, rejilla y una portada que se calcula
 
 [`src/ui/mazos.js`](src/ui/mazos.js) es la lista y el editor, fuera de
