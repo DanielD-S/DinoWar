@@ -119,6 +119,21 @@ function aFormaDePantalla(d) {
       yo: m.id === (d.yo ?? yoMismo),
     })),
     puedeReclamar: Boolean(jefe && jefe.vida <= 0 && mioDano > 0 && !mioReclamado),
+    // Cartas de jefe sin reclamar, de TODOS los jefes caídos y no sólo del de
+    // esta ventana: un jefe que cae no vuelve a levantarse para esa tribu, así
+    // que una carta sin reclamar se queda esperando para siempre. Sale de lo
+    // que ya llega —`jefes` y `aportes` vienen enteros—, sin pedir nada más.
+    cartasPendientes: (d.jefes ?? [])
+      .filter((x) => Number(x.vida) <= 0)
+      .map((x) => {
+        const ev = CALENDARIO.find((e) => e.id === x.evento_id);
+        const mio = (d.aportes ?? []).find(
+          (a) => a.evento_id === x.evento_id && a.jugador_id === yoMismo,
+        );
+        if (!ev || !mio || Number(mio.dano) <= 0 || mio.reclamado) return null;
+        return { evento: ev.id, titulo: ev.titulo, jefe: JEFES[ev.jefe] ?? null };
+      })
+      .filter(Boolean),
     tribu: tribu ? {
       id: tribu.id, nombre: tribu.nombre, codigo: tribu.codigo,
       acceso: tribu.acceso ?? ACCESO.LIBRE, emblema: tribu.emblema ?? 'clado_teropodo',
@@ -288,11 +303,40 @@ export function danoDeRespuesta(r) {
   );
 }
 
-export async function reclamar(ahora = Date.now()) {
+/**
+ * Reclamar la carta de un jefe caído. Sin evento, el de la ventana de ahora
+ * —que es el botón de siempre—; con evento, cualquiera que se quedara sin
+ * reclamar, que es lo que enseña el bloque de cartas pendientes.
+ */
+export async function reclamar(evento = null, ahora = Date.now()) {
   if (modo === MODO.LOCAL) return local.reclamar(ahora);
-  const estado = await estadoDeTribu();
-  if (!estado.eventoJefe) return null;
-  return rpc('reclamar_jefe', { p_evento: estado.eventoJefe.id });
+  let id = evento;
+  if (!id) {
+    const estado = await estadoDeTribu();
+    id = estado.eventoJefe?.id ?? null;
+  }
+  if (!id) return null;
+  return rpc('reclamar_jefe', { p_evento: id });
+}
+
+/**
+ * Lo que te está esperando: quién pide entrar —si mandas tú— y cuántas cartas
+ * de jefe tienes sin reclamar. Es una llamada aparte y diminuta porque la pide
+ * el MENÚ, que no abre la cuenca entera para pintar un punto.
+ */
+export async function avisosDeCuenca() {
+  if (modo === MODO.LOCAL) {
+    const c = local.estadoDeTribu();
+    return { solicitudes: 0, cartas: c.puedeReclamar ? 1 : 0 };
+  }
+  try {
+    const r = await rpc('avisos_cuenca');
+    return { solicitudes: Number(r?.solicitudes ?? 0), cartas: Number(r?.cartas ?? 0) };
+  } catch {
+    // Un aviso que no llega no es un error que enseñar: es no tener nada que
+    // decir todavía.
+    return { solicitudes: 0, cartas: 0 };
+  }
 }
 
 export function borrarCuenca() {

@@ -121,7 +121,7 @@ export function montarCuenca(volver, asaltar) {
         // pantalla, falla diciéndolo en vez de dejarle la cuenca a esa persona.
         await (b.dataset.deshacer !== undefined ? deshacerTribu() : salirDeTribu());
       } else if (b.dataset.accion === 'reclamar') {
-        const cardId = await reclamar();
+        const cardId = await reclamar(b.dataset.evento ?? null);
         if (cardId) {
           // A la colección de verdad, no sólo a la cuenca: una carta que no
           // puedes meter en un mazo no es una recompensa, es un cromo. Cuando
@@ -351,6 +351,24 @@ function bloqueTribu(c) {
   ${mando ? bloqueSolicitudes(c) + bloqueAjustes(c) : ''}`;
 }
 
+/**
+ * Cartas de jefe sin reclamar de ventanas ANTERIORES. La del jefe de ahora ya
+ * tiene su botón en el pie, así que aquí sólo van las otras: un jefe caído no
+ * se vuelve a levantar para su tribu, y sin esto la carta se quedaba esperando
+ * sin ninguna forma de cogerla.
+ */
+function bloquePendientes(c) {
+  const otras = (c.cartasPendientes ?? []).filter((p) => p.evento !== c.eventoJefe?.id);
+  if (!otras.length) return '';
+  return `<section class="cu-bloque">
+    <h3 class="cu-titulo">${otras.length === 1 ? 'Tienes una carta esperando' : `Tienes ${otras.length} cartas esperando`}</h3>
+    ${otras.map((p) => `<p class="cu-linea">
+      <b>${escapar(p.jefe?.nombre ?? p.titulo)}</b> cayó y no reclamaste tu parte.
+      <button class="cu-mini" data-accion="reclamar" data-evento="${escapar(p.evento)}">Reclamar</button>
+    </p>`).join('')}
+  </section>`;
+}
+
 /** Quién llama a la puerta. Sólo lo ve el capataz, que es quien contesta. */
 function bloqueSolicitudes(c) {
   if (!c.solicitudes?.length) return '';
@@ -524,6 +542,7 @@ export async function pintarCuenca() {
   dom.cuerpo.innerHTML = [
     sinTribu ? '' : bloqueEventos(c, ahora),
     sinTribu ? '' : bloqueJefe(c, ahora),
+    sinTribu ? '' : bloquePendientes(c),
     // Sin tribu, lo primero que se ve tiene que ser GENTE: quien llega solo no
     // tiene código que escribir ni a quién pedírselo, y su yacimiento no le
     // sirve de nada hasta que entre en alguna cuenca.

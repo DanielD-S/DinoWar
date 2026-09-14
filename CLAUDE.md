@@ -840,6 +840,21 @@ Lo que cambia de flujo y no sólo de piel:
     el paquete, re-anclar y volver a desplegar. `test/paquete.test.js` y
     `test/anclaje.test.js` lo cazaron al primer intento. Y aquí no hacía
     falta: quien comprueba el mando es SQL con `auth.uid()`, no la función.
+- **La placa de la Cuenca lleva un punto con lo que te espera dentro.** La capa
+  cooperativa no avisaba de nada: te aceptaban, te echaban, caía el jefe y
+  tenías una carta esperando, y sólo lo veías si entrabas a mirar. `avisos_cuenca`
+  cuenta SÓLO lo que pide una acción tuya —quién pide entrar si mandas tú, qué
+  cartas no has reclamado—. «Hay un jefe abierto» o «te quedan asaltos» no son
+  avisos, son pullas, y un punto que no se apaga nunca deja de significar nada.
+  Es una llamada aparte y diminuta porque la pide el MENÚ, que no va a abrir la
+  cuenca entera para pintar un punto; se refresca al arrancar y al volver de la
+  Cuenca, que es cuando cambia.
+- **Un jefe caído no se vuelve a levantar** para esa tribu: `abrir_jefe` no toca
+  la fila si ya existe, así que al repetirse el ciclo de 14 días sigue muerto y
+  tu carta sin reclamar se queda esperando para siempre. Por eso la Cuenca tiene
+  un bloque de **cartas pendientes** de ventanas anteriores y `reclamar()` acepta
+  el evento: enseñar un aviso de algo que no se puede hacer es un punto rojo que
+  no se apaga. Que el jefe no vuelva es otra cosa —contenido— y sigue abierta.
 - **Un evento de clima lleva de fondo la textura de ese clima**, la misma
   que pone en el tablero.
 

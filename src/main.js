@@ -24,6 +24,7 @@ import {
 import { detectarFotos, detectarEnteras, vigilarFotos, calentarFotos } from './ui/art.js';
 import {
   montarMeta, abrirColeccion, abrirSobres, abrirMazos, pintarMenu, recompensar,
+  refrescarAvisos,
   refrescarMisiones, pintarMisiones,
 } from './ui/meta.js';
 import { mazoActivo, cargarPerfil, actualizarPerfil } from './ui/almacen.js';
@@ -1198,7 +1199,9 @@ function iniciar() {
   // menú dejaba las tres placas de jugar mudas y sin destello.
   montarTacto(el.menu);
   montarTacto(el.jugar);
-  montarCuenca(() => irA(APP.MENU), asaltoAlJefe);
+  // Al volver de la cuenca, el punto de la placa se pone al día: lo que acabas
+  // de hacer ahí —aceptar a alguien, reclamar la carta— es justo lo que contaba.
+  montarCuenca(() => { refrescarAvisos(); irA(APP.MENU); }, asaltoAlJefe);
   montarCuenta(() => irA(APP.MENU), pintarCuentaEnMenu,
     () => { abrirEntrada('Sesión cerrada.'); irA(APP.ENTRADA); });
   montarEntrada(presentarse);
@@ -1676,5 +1679,6 @@ function finDuelo(r) {
     <span>${liga}</span></div>`;
   // Monedas y ELO los movió el servidor: se le vuelve a preguntar por el perfil.
   sincronizar().then(() => pintarMenu()).catch(() => {});
+  refrescarAvisos();
   sonido(gane ? 'gana' : 'pierde');
 }

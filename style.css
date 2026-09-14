@@ -1023,6 +1023,18 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   filter: drop-shadow(0 3px 5px rgba(0,0,0,.5));
 }
 .menu-placas .placa:active { transform: scale(.95); filter: brightness(1.18); }
+/* El punto de aviso: lo que te espera dentro y no se ve desde fuera. Va sobre
+   la esquina de la placa y no debajo del rótulo, que ahí compite con el nombre
+   y se lee como parte de él. */
+.menu-placas .placa { position: relative; }
+.placa-aviso {
+  position: absolute; top: -3px; right: -2px; z-index: 2;
+  min-width: 19px; height: 19px; padding: 0 5px; border-radius: 10px;
+  display: grid; place-items: center;
+  background: var(--peligro); color: #fff;
+  font-family: Inter, system-ui, sans-serif; font-size: 11px; font-weight: 700; line-height: 1;
+  box-shadow: 0 0 0 2px #17120e, 0 2px 4px rgba(0,0,0,.6);
+}
 /* ------------------------------------------- las tres placas de jugar
    Cuadradas, a diferencia de las cinco del menú, que son verticales: aquí son
    tres en la misma fila y les sobra ancho, así que el emblema se ve el doble
