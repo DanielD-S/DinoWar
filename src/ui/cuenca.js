@@ -313,9 +313,14 @@ function filaMiembro(m, mando) {
   const acciones = mando && !m.yo ? `
     <button class="cu-mini" data-accion="ceder" data-id="${m.id}">Ceder mando</button>
     <button class="cu-mini mal" data-accion="echar" data-id="${m.id}">Echar</button>` : '';
+  // Lo aportado va en la fila de cada uno: el almacén es común, pero llenarlo
+  // cuesta horas de yacimiento y hasta ahora no se reconocía en ningún sitio.
+  const puesto = m.fosiles > 0
+    ? `<span class="cu-aportado" title="Fósiles aportados al común"><i class="cu-ico-fosil" aria-hidden="true"></i>${numero(m.fosiles)}</span>`
+    : '';
   return `<li class="cu-miembro ${m.yo ? 'yo' : ''}">
     <i class="cu-medallon" aria-hidden="true"></i>${nombre}
-    ${esCapataz(m) ? '<span class="cu-rol">capataz</span>' : ''}${acciones}
+    ${esCapataz(m) ? '<span class="cu-rol">capataz</span>' : ''}${puesto}${acciones}
   </li>`;
 }
 

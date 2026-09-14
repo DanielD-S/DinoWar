@@ -174,9 +174,11 @@ export function estadoDeTribu(ahora = Date.now()) {
     // tenga dos formas de pintar lo mismo. Aquí mandas tú y no hay a quién
     // echar: los compañeros son un modelo, no personas.
     miembros: [
-      { id: YO, apodo: YO, rol: ROL.CAPATAZ, desde: c.arranque, yo: true },
+      { id: YO, apodo: YO, rol: ROL.CAPATAZ, desde: c.arranque, yo: true, fosiles: c.aportado },
       ...COMPANEROS.map((p, i) => ({
         id: p.id, apodo: p.id, rol: ROL.MIEMBRO, desde: c.arranque + i + 1, yo: false,
+        // Lo que llevan aportado los simulados sale de su ritmo, como su daño.
+        fosiles: Math.floor((c.almacen / (COMPANEROS.length + 1)) * p.ritmo),
       })),
     ],
     puedeReclamar: !!(jefe && mereceRecompensa(jefe, YO) && !c.jefes[activo.evento.id].reclamado),

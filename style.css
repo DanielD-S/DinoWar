@@ -2661,6 +2661,16 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   padding: 1px 6px; border-radius: 3px; color: var(--bio);
   box-shadow: 0 0 0 1px rgba(217,164,65,.45);
 }
+/* Lo aportado al común, en la fila de cada miembro. Va antes de los botones y
+   empuja con `margin-left: auto`, así queda pegado a la derecha cuando no hay
+   botones y justo antes de ellos cuando los hay. */
+.cu-aportado {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 3px;
+  font-size: 11px; color: var(--bio);
+}
+.cu-aportado .cu-ico-fosil { width: 13px; height: 13px; }
+.cu-miembro .cu-aportado + .cu-mini { margin-left: 6px; }
+
 .cu-mini {
   margin-left: auto; padding: 4px 9px; min-height: 30px; border-radius: 6px;
   font-size: 11px; color: var(--texto-2);

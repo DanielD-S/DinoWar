@@ -116,6 +116,9 @@ function aFormaDePantalla(d) {
     miembros: (d.miembros ?? []).map((m) => ({
       id: m.id, apodo: m.apodo, rol: m.rol ?? ROL.MIEMBRO,
       desde: m.desde ? new Date(m.desde).getTime() : 0,
+      // Lo que ha puesto de su yacimiento en el común, que hasta ahora no se
+      // guardaba en ningún sitio.
+      fosiles: Number(m.fosiles ?? 0),
       yo: m.id === (d.yo ?? yoMismo),
     })),
     puedeReclamar: Boolean(jefe && jefe.vida <= 0 && mioDano > 0 && !mioReclamado),
