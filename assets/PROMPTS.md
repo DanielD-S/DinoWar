@@ -1327,6 +1327,13 @@ Formato: **1024×1536**, vertical. Se sirven a 360.
   `src/ui/presentacion.js`. Mientras no lleguen, los estandartes se pintan
   con CSS.
 
+### Lo que llegó
+
+Los dos el 14-09-2026, a 793×1983 y en magenta limpio. Recortados quedan a
+787×1919 (1:2,44). La barra de arriba es más ancha que la tela, que ocupa el
+56 % central del ancho: por eso el emblema del clado va más estrecho que en la
+piel de CSS.
+
 ### Lo que NO se pide
 
 - El VS: reutiliza `medallon_vs` del final.

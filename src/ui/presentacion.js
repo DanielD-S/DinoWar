@@ -19,7 +19,7 @@
 import { reducido } from './efectos.js';
 
 /** Si las piezas de `assets/piel/vs/` están. Lo vigila test/presentacion.test.js. */
-export const ARTE_LISTO = false;
+export const ARTE_LISTO = true;
 
 /** Lo que sale de `tools/presentacion.py`, sin extensión. */
 export const PIEZAS = Object.freeze(['estandarte_propio', 'estandarte_rival']);

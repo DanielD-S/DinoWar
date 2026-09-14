@@ -359,7 +359,6 @@
 /* El estandarte cuelga por dentro de cada mitad, con el emblema del clado. */
 .pres-estandarte {
   position: absolute; width: min(22vw, 120px); aspect-ratio: 1 / 2.5;
-  display: flex; justify-content: center; padding-top: 38%;
   background: linear-gradient(#4a3a22, #2a2014);
   border-top: 3px solid var(--borde-fuerte);
   clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 88%, 0 100%);
@@ -367,11 +366,23 @@
 }
 .pres-mitad.rival .pres-estandarte { right: 9%; top: 0; background: linear-gradient(#5a2419, #2a100b); }
 .pres-mitad.propio .pres-estandarte { left: 9%; top: 58%; }
-.pres-estandarte .emblema { width: 64%; height: auto; aspect-ratio: 1; }
+/* El emblema va en absoluto y no con padding: un padding en % se mide contra
+   el ANCHO DEL CONTENEDOR —la mitad entera, 375 px— y no contra el
+   estandarte, y lo mandaba al pie de la tela. */
+.pres-estandarte .emblema {
+  position: absolute; left: 50%; top: 30%; translate: -50% 0;
+  width: 64%; height: auto; aspect-ratio: 1;
+}
+/* Con el arte, la caja lleva la proporción MEDIDA del estandarte recortado
+   (787 / 1919, tools/presentacion.py). La barra es más ancha que la tela —la
+   tela ocupa el 56 % central—, así que el emblema se estrecha para caber en
+   ella y baja a un tercio del alto. */
 .presentacion.con-arte .pres-estandarte {
-  border: 0; clip-path: none;
+  width: min(26vw, 140px); aspect-ratio: 787 / 1919;
+  border: 0; clip-path: none; filter: drop-shadow(0 8px 12px rgba(0,0,0,.6));
   background: url('assets/piel/vs/estandarte_propio.webp') center / 100% 100% no-repeat;
 }
+.presentacion.con-arte .pres-estandarte .emblema { width: 46%; top: 33%; }
 .presentacion.con-arte .pres-mitad.rival .pres-estandarte {
   background-image: url('assets/piel/vs/estandarte_rival.webp');
 }
