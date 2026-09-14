@@ -53,6 +53,7 @@ hay que hacer caso cuando el test lo dice.
 | `assets/piel/efectos/*.webp` | `python tools/efectos.py escribir` | `test/efectos.test.js` |
 | `assets/piel/mazos/*.webp` y la ventana de `.mazo-ventana` | `python tools/mazos.py escribir` | — |
 | `assets/piel/cuenca/*.webp` y los huecos de `.cu-vitrina` | `python tools/cuenca.py escribir` | — |
+| `assets/icono-*.png` (los cuatro de la app) | `python tools/icono.py escribir` | `test/manifest.test.js` |
 
 Y las migraciones **no las aplica nadie solo**: `supabase/migrations/` es el
 registro de lo que la base de datos DEBERÍA tener, no de lo que tiene.
