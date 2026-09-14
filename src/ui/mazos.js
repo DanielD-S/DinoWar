@@ -87,8 +87,11 @@ const cartasDe = (mazo) => Object.entries(mazo)
   .filter(([id, n]) => n > 0 && (CARTAS[id] || CARTAS_DE_JEFE[id]))
   .map(([id, n]) => ({ c: carta(id), n }));
 
-/** La criatura de más rareza; a igual rareza la más cara. Null si no hay nada. */
-function portadaDe(mazo) {
+/**
+ * La criatura de más rareza; a igual rareza la más cara. Null si no hay nada.
+ * La usa también la presentación de la partida, como retrato de cada bando.
+ */
+export function portadaDe(mazo) {
   const lista = cartasDe(mazo);
   const dinos = lista.filter((x) => esDino(x.c));
   const de = dinos.length ? dinos : lista;

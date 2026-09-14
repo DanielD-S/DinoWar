@@ -51,7 +51,8 @@ import {
 } from './ui/animate.js';
 import { invocar } from './ui/efectos.js';
 import { rotularFin, marcadorHTML, ARTE_LISTO as ARTE_DEL_FIN } from './ui/fin.js';
-import { emblemaDe as emblemaDeMazo } from './ui/mazos.js';
+import { emblemaDe as emblemaDeMazo, portadaDe as portadaDeMazo } from './ui/mazos.js';
+import { presentarPartida, PRESENTACION_DUELO } from './ui/presentacion.js';
 import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio, musica, precargarMusica, enSegundoPlano } from './ui/audio.js';
 import { montarTacto } from './ui/tacto.js';
 import { arte } from './ui/art.js';
@@ -91,6 +92,39 @@ let rivalDePartida = { nombre: 'Rival', mazo: MAZO };
  * otra partida, el final viejo no puede llevarse la pantalla nueva.
  */
 let finVigente = 0;
+/**
+ * Cuenta las partidas que empiezan. La presentación tarda en irse y, si
+ * mientras tanto empieza otra —«Otra partida» dos veces, un duelo que
+ * empareja—, la vieja no puede arrancar su reloj ni su bucle sobre la nueva.
+ */
+let partidaVigente = 0;
+
+/** Un bando de la presentación: nombre, subtítulo, retrato y emblema. */
+function bandoPresentado(nombre, subtitulo, retratoId, mazo) {
+  const mapa = mazo ? (Array.isArray(mazo) ? Object.fromEntries(mazo) : mazo) : null;
+  const retrato = retratoId ?? (mapa ? portadaDeMazo(mapa) : null);
+  return {
+    nombre,
+    subtitulo,
+    retrato: retrato ? arte(retrato) : '',
+    emblema: mapa ? (emblemaDeMazo(mapa)?.clave ?? null) : null,
+  };
+}
+
+/** Tú, para la presentación: tu nombre, tu liga y tu mazo activo. */
+function yoPresentado() {
+  const p = cargarPerfil();
+  return bandoPresentado(p.apodo || 'Tú', nombreDeRango(Number(p.elo ?? 1200)), null, mazoActivo());
+}
+
+/**
+ * La presentación, o nada. En la primera partida manda el tutorial, que ya
+ * tiene bastante que enseñar encima del tablero.
+ */
+function presentar(datos, dura) {
+  if (tutorialActivo()) return Promise.resolve();
+  return presentarPartida({ raiz: el.partida, dura, ...datos });
+}
 
 let app = APP.BOOT;
 let estado = null;
@@ -1200,19 +1234,40 @@ function nuevaPartida(jefe = null, jefeEvento = null, rivalId = null) {
   if (jefe) estado.jugadores[RIVAL].habitat = habitatDeAsalto();
   fijarTopesHabitat(jefe ? habitatDeAsalto() : BALANCE.vidaHabitat);
   rngIA = semilla(s ^ 0x5bf03635);
-  reloj.arrancar({ alAgotarse: seAcaboElTiempo, alLatir: pintarReloj });
-  pintarReloj();
 
   irA(APP.PLAYING);
   render(estado);
-  if (tutorialActivo()) pasoTutorial('inicio');
-  tomarEntrada({
-    interactivo,
-    admite,
-    soltar,
-    ficha: (cardId, iid = null) => abrirFicha(fichaHTML(cardId, iid, estado)),
+
+  // Quién está enfrente. El reloj, la entrada y el bucle esperan a que la
+  // presentación se vaya: la partida empieza entonces, no debajo de ella.
+  const rp = rivalId ? rivalPorId(rivalId) : null;
+  const rival = jefe
+    ? bandoPresentado(jefe.nombre, jefe.titulo ?? 'Jefe de la Cuenca', jefe.recompensa ?? null, jefe.mazo)
+    : expedicionEnCurso
+      ? bandoPresentado(expedicionEnCurso.nombre, rp?.expedicion?.nombre ?? 'Visitante',
+        expedicionEnCurso.retrato ?? null, expedicionEnCurso.mazo)
+      : bandoPresentado('Rival', 'Mazo de referencia', null, MAZO);
+  const n = ++partidaVigente;
+  presentar({
+    yo: yoPresentado(),
+    rival,
+    modo: jefe ? 'Asalto' : expedicionEnCurso ? 'Expedición' : 'Solitario',
+    objetivo: jefe
+      ? 'Hazle todo el daño que puedas'
+      : `${BALANCE.trofeosParaGanar} trofeos o su hábitat a cero`,
+  }).then(() => {
+    if (n !== partidaVigente || app !== APP.PLAYING) return;
+    reloj.arrancar({ alAgotarse: seAcaboElTiempo, alLatir: pintarReloj });
+    pintarReloj();
+    if (tutorialActivo()) pasoTutorial('inicio');
+    tomarEntrada({
+      interactivo,
+      admite,
+      soltar,
+      ficha: (cardId, iid = null) => abrirFicha(fichaHTML(cardId, iid, estado)),
+    });
+    bucle();
   });
-  bucle();
 }
 
 
@@ -1519,15 +1574,29 @@ function empezarDuelo(r) {
 
   irA(APP.PLAYING);
   render(estado);
-  tomarEntrada({
-    interactivo,
-    admite,
-    soltar,
-    ficha: (cardId, iid = null) => abrirFicha(fichaHTML(cardId, iid, estado)),
+
+  // El mazo del rival es secreto: sale sin retrato ni emblema, con su liga.
+  const d = duelo;
+  const n = ++partidaVigente;
+  const eloRival = Number(r.rival?.elo);
+  presentar({
+    yo: yoPresentado(),
+    rival: bandoPresentado(r.rival?.apodo ?? 'Rival',
+      Number.isFinite(eloRival) ? nombreDeRango(eloRival) : 'Duelo', null, null),
+    modo: 'Duelo',
+    objetivo: `${BALANCE.trofeosParaGanar} trofeos o su hábitat a cero`,
+  }, PRESENTACION_DUELO).then(() => {
+    if (n !== partidaVigente || duelo !== d || app !== APP.PLAYING) return;
+    tomarEntrada({
+      interactivo,
+      admite,
+      soltar,
+      ficha: (cardId, iid = null) => abrirFicha(fichaHTML(cardId, iid, estado)),
+    });
+    mensaje(`Duelo contra ${r.rival?.apodo ?? 'tu rival'}. Arrastra cartas al campo y pulsa Listo.`);
+    if ((r.deciden ?? []).includes(JUGADOR)) turnoDelJugador();
+    else esperarRival();
   });
-  mensaje(`Duelo contra ${r.rival?.apodo ?? 'tu rival'}. Arrastra cartas al campo y pulsa Listo.`);
-  if ((r.deciden ?? []).includes(JUGADOR)) turnoDelJugador();
-  else esperarRival();
 }
 
 /**

@@ -196,7 +196,7 @@ export function invocar({ html, titulo, subtitulo, destino, raiz = partida() }) 
 export function limpiarEfectos() {
   for (const t of temporizadores) clearTimeout(t);
   temporizadores.clear();
-  for (const n of document.querySelectorAll('.fx, .fx-fantasma, .invocacion, .fin-rotulo')) n.remove();
+  for (const n of document.querySelectorAll('.fx, .fx-fantasma, .invocacion, .fin-rotulo, .presentacion')) n.remove();
   for (const n of document.querySelectorAll('.en-vuelo, .retenida')) n.classList.remove('en-vuelo', 'retenida');
   campo()?.classList.remove('sacude');
   partida()?.classList.remove('congelado');
