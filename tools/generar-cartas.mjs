@@ -21,6 +21,7 @@ import { BALANCE } from '../src/data/balance.js';
 import { ECONOMIA, coleccionInicial } from '../src/data/coleccion.js';
 import { limiteDe } from '../src/data/coleccion.js';
 import { MAZOS_INICIALES } from '../src/data/iniciales.js';
+import { COSMETICOS } from '../src/data/cosmeticos.js';
 
 export const SALIDA = 'supabase/migrations/0006_catalogo_cartas.sql';
 
@@ -87,6 +88,15 @@ export function generar() {
   L.push('  primary key (mazo, card_id)');
   L.push(');');
   L.push('');
+  L.push('-- La tienda: lo que se vende y cuánto cuesta. `comprar_cosmetico` (0024) cobra');
+  L.push('-- el precio de AQUÍ; el cliente sólo manda el id. Sale de src/data/cosmeticos.js.');
+  L.push('create table if not exists public.catalogo_cosmeticos (');
+  L.push('  id           text primary key,');
+  L.push('  tipo         text not null,');
+  L.push('  precio       int  not null check (precio >= 0),');
+  L.push('  por_defecto  boolean not null default false');
+  L.push(');');
+  L.push('');
   L.push('-- Los precios, en una fila. Que sean una tabla y no constantes en el SQL');
   L.push('-- permite tocarlos sin volver a desplegar nada.');
   L.push('create table if not exists public.catalogo_economia (');
@@ -145,6 +155,18 @@ export function generar() {
   L.push(');');
   L.push('');
 
+  // La tienda. Un artículo que desaparece del código se borra de aquí, y si
+  // alguien lo compró la clave foránea de `jugador_cosmeticos` lo impide: no se
+  // le quita a nadie lo que pagó por un cambio en el catálogo.
+  L.push('insert into public.catalogo_cosmeticos (id, tipo, precio, por_defecto) values');
+  L.push(`${COSMETICOS.map((c) => `  (${sql(c.id)}, ${sql(c.tipo)}, ${c.precio}, ${!!c.porDefecto})`).join(',\n')}`);
+  L.push('on conflict (id) do update set tipo = excluded.tipo, precio = excluded.precio, por_defecto = excluded.por_defecto;');
+  L.push('');
+  L.push('delete from public.catalogo_cosmeticos where id not in (');
+  L.push(`${COSMETICOS.map((c) => `  ${sql(c.id)}`).join(',\n')}`);
+  L.push(');');
+  L.push('');
+
   // Las bajas de cartas van al final y en este orden: `catalogo_inicial` apunta
   // a `catalogo_cartas`, así que quitar del set una carta que todavía figura en
   // la colección de salida fallaría contra su propia clave foránea.
@@ -172,7 +194,7 @@ export function generar() {
 
   L.push('-- El catálogo lo lee cualquiera que haya entrado: son las reglas del');
   L.push('-- juego, no datos de nadie. Escribirlo, sólo las migraciones.');
-  for (const t of ['catalogo_cartas', 'catalogo_inicial', 'catalogo_iniciales', 'catalogo_economia']) {
+  for (const t of ['catalogo_cartas', 'catalogo_inicial', 'catalogo_iniciales', 'catalogo_cosmeticos', 'catalogo_economia']) {
     L.push(`alter table public.${t} enable row level security;`);
     L.push(`drop policy if exists "el catálogo es público" on public.${t};`);
     L.push(`create policy "el catálogo es público" on public.${t}`);

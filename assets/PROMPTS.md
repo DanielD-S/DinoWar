@@ -1339,3 +1339,138 @@ piel de CSS.
 - El VS: reutiliza `medallon_vs` del final.
 - Los emblemas de clado ni los retratos: ya existen.
 - Ningún texto: los nombres, el modo y el objetivo los escribe el juego.
+
+## La tienda
+
+La tienda vende cosméticos con dinomonedas y nada que dé ventaja. La primera
+tanda son **dos dorsos de carta** y **la sexta placa del menú**. Hasta que
+lleguen, los dorsos se ven como el clásico tintado y la placa se dibuja con CSS.
+
+### 1 · La placa de la tienda
+
+La sexta del menú, junto a Colección, Sobres, Mazos, La Tribu y Cuenta. Tiene
+que parecer de la misma familia: **adjuntar `placa_sobres.png` y
+`placa_mazos.png`** (en `assets/piel/tablero_componentes/`) y pedir «misma forma,
+mismo material, misma luz; sólo cambia el emblema».
+
+Formato: **1122×1402**, vertical, como las otras cinco. Se sirve a 256.
+
+- **`placa_tienda.png`.** Placa vertical de piedra oscura pulida con filete de
+  latón viejo biselado, idéntica en forma, proporción y marco a las placas
+  adjuntas. En el centro, en relieve de latón y oro viejo, una bolsa de cuero
+  de mercader atada con cordón, con tres monedas de latón con forma de rombo
+  asomando por la boca. Silueta maciza, reconocible a 60 píxeles. Sin texto,
+  sin letras, sin marca de agua. Fondo **magenta puro `#FF00FF`** fuera de la
+  placa, sin sombra proyectada.
+
+### 2 · Los dos dorsos
+
+El reverso de la carta: se ve al abrir sobres, en las cartas que robas y en tu
+mazo del marcador final. **Adjuntar el dorso de ahora**, cuyo original es
+`assets/piel/tablero_componentes/dorso_carta.png` (se sirve como
+`assets/piel/dorso.webp`), como referencia de forma: mismo formato de carta y
+mismo tipo de marco, distinto material y distinto emblema.
+
+Formato: **1024×1400**, vertical, **a sangre**: el reverso ocupa la imagen
+entera, sin magenta y sin fondo alrededor. Se sirven a 512.
+
+- **`dorso_ambar.png`.** Reverso de carta coleccionable de fantasía, vista
+  frontal y plana, sin perspectiva, ocupando la imagen entera. Un marco de latón
+  viejo biselado alrededor, con remaches en las esquinas. El interior, una
+  plancha de ámbar translúcido pulido color miel y naranja con luz cálida
+  atravesándolo, y dentro del ámbar, en el centro, un insecto fósil pequeño
+  —una libélula con las alas abiertas— atrapado, nítido. Simétrico. Sin texto,
+  sin letras, sin marca de agua.
+- **`dorso_obsidiana.png`.** El mismo reverso de la imagen adjunta, idéntico en
+  forma, marco y proporción, con el interior de **obsidiana negra pulida como un
+  espejo** con reflejos fríos grisáceos, y en el centro una garra de terópodo
+  grabada en la piedra con un filete fino de plata. Sin texto, sin letras, sin
+  marca de agua.
+
+### Después de generar
+
+- Los tres a `src/piel/tienda/` con esos nombres, en PNG.
+- `python tools/tienda.py escribir` deja la placa en `assets/piel/placa_tienda.webp`
+  y los dorsos en `assets/piel/tienda/`.
+- `npm test` pide entonces poner `ARTE_LISTO = true` en `src/ui/tienda.js`. Y hay
+  que declarar `--placa` en `.placa-tienda` de `style.css`, quitando su dibujo de
+  CSS, y subir `VERSION` en `sw.js`.
+
+## Los tapetes y las colecciones
+
+Un tapete cambia el fondo del tablero durante la partida. Hoy ese fondo son dos
+capas: **`piedra.webp`**, una losa de 512×512 que se repite en mosaico (roca
+agrietada casi negra, luminancia media 35 sobre 255), y **`simbolo_huella.webp`**,
+el medallón de latón con la huella tridáctila en el centro. Encima van un velo
+oscuro, las ranuras, las cartas y las capas del clima.
+
+Cada tapete son **dos piezas**: una **textura** que se repite y un **medallón**
+central. Nada de escenas a sangre: debajo de las cartas estorban y se recortan
+distinto en cada pantalla.
+
+**La condición que manda:** la textura tiene que ser **muy oscura y de poco
+contraste**. Es un fondo; si tiene mucho dibujo, las cartas y las ranuras dejan
+de leerse. La herramienta la oscurecerá a la luminancia de la piedra de ahora,
+pero cuanto más oscura llegue, mejor sale.
+
+**Colecciones:** Ámbar y Obsidiana hacen juego con los dorsos del mismo nombre y
+se pueden vender sueltos o como conjunto. El resto de tapetes van sueltos por
+ahora; cada yacimiento podría tener luego su dorso y completar su colección.
+
+### El bloque de ESTILO de la textura (copiar literal)
+
+> Textura de fondo para el tablero de un juego de cartas, vista cenital
+> perfectamente plana, sin perspectiva y sin sombras direccionales, iluminación
+> uniforme y tenue. Mosaico sin costuras: el borde izquierdo continúa en el
+> derecho y el superior en el inferior. Muy oscura y de poco contraste, casi
+> negra, con el detalle sutil, para que encima se lean cartas. Sin objetos
+> grandes y sin nada que destaque en un punto concreto. Sin texto, sin marca de
+> agua. Cuadrada, 1024×1024.
+
+Adjuntar la textura de ahora como referencia de oscuridad. Su original no está
+en el proyecto: sólo existe la servida, `assets/piel/piedra.webp`. Hay una copia
+en PNG en `src/piel/tienda/referencias/piedra.png` (fuera del repositorio, como
+los demás originales); si falta, se saca del WebP.
+
+### El bloque del MEDALLÓN (copiar literal)
+
+Adjuntar el medallón de ahora, `assets/piel/tablero_componentes/simbolo_huella.png`
+(copiado también en `src/piel/tienda/referencias/`), y pedir sólo el cambio del
+centro:
+
+> El mismo medallón de la imagen adjunta, idéntico en forma, tamaño y posición:
+> el mismo aro doble de latón viejo, las ocho puntas y las gemas encendidas.
+> Sólo cambia el disco central, que ahora muestra {CENTRO}, en relieve y con la
+> misma luz. Fondo **magenta puro `#FF00FF`** fuera del medallón, sin sombra
+> proyectada. Sin texto, sin letras, sin marca de agua. Cuadrado, 1024×1024.
+
+### Los ocho tapetes
+
+| fichero | textura: [ESTILO] + | medallón: {CENTRO} |
+|---|---|---|
+| `tapete_ambar` / `medallon_ambar` | Resina de ámbar muy oscura, casi marrón negro, translúcida, con burbujas diminutas y alguna partícula de insecto apenas visible. | una plancha de ámbar color miel pulido con una libélula fósil atrapada dentro, con las alas abiertas; las gemas del aro en ámbar |
+| `tapete_obsidiana` / `medallon_obsidiana` | Obsidiana negra con reflejos gris azulado muy tenues y fracturas concoideas suaves. | obsidiana negra pulida con una garra de terópodo grabada con un filete fino de plata; las gemas del aro en blanco frío |
+| `tapete_morrison` / `medallon_morrison` | Arenisca parda muy oscura con ondulaciones de corriente de río fosilizadas, suaves y paralelas. | la huella fosilizada de una pata de saurópodo, redonda y con cinco dedos cortos, hundida en arenisca |
+| `tapete_hell_creek` / `medallon_hell_creek` | Lutita gris muy oscura, casi negra, con láminas finas horizontales de estratos y algún fragmento diminuto de hueso fósil. | un cráneo de Tyrannosaurus rex de perfil, en relieve sobre piedra |
+| `tapete_kem_kem` / `medallon_kem_kem` | Arenisca rojiza muy oscura, color óxido apagado casi negro, de grano grueso. | un diente cónico de Spinosaurus con estrías longitudinales |
+| `tapete_solnhofen` / `medallon_solnhofen` | Caliza de grano finísimo, gris pardo muy oscuro, lisa, con dendritas de manganeso finas como helechos. | la impresión fosilizada de un Archaeopteryx con las alas extendidas en caliza |
+| `tapete_excavacion` / `medallon_excavacion` | Tierra compactada marrón muy oscura vista desde arriba, con una cuadrícula de excavación de cuerdas finas tensadas: 4×4 cuadrados alineados con los bordes para que la cuadrícula continúe al repetir, y una estaca pequeña en cada cruce. | un pincel y una piqueta de paleontólogo cruzados sobre un hueso fósil |
+| `tapete_volcan` / `medallon_volcan` | Basalto negro con grietas finas de un rojo brasa muy apagado. | un huevo fósil de dinosaurio agrietado; las gemas del aro en rojo brasa |
+
+### Qué comprobar al generar
+
+- **La textura encogida a 170 px y repetida 3×3**, que es como se ve en el
+  tablero: si se nota la costura o un motivo repetido, se regenera o se deja a
+  la herramienta, que cierra costuras como hizo con la lluvia y la niebla.
+- **Oscuridad:** puesta al lado de `referencias/piedra.png`, no debería verse más clara.
+- **El medallón**, comparado con `referencias/simbolo_huella.png`: mismo aro, mismas puntas y
+  mismo tamaño. Si el generador cambia el aro, se nota en cuanto se cambia de
+  tapete.
+
+### Después de generar
+
+- Todo a `src/piel/tienda/` con esos nombres, en PNG.
+- **La herramienta de los tapetes llega con la fase 2 de la tienda**, que es la
+  que los aplica al tablero: oscurecerá la textura a la luminancia de la piedra,
+  cerrará la costura si hace falta y keyeará el medallón. Hasta entonces los
+  PNG pueden esperar en la carpeta.

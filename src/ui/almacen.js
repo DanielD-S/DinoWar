@@ -21,6 +21,10 @@ import { ECONOMIA, coleccionInicial, mazoPorDefecto, TAM_MAZO } from '../data/co
 const CLAVE = 'dinowar.perfil.v1';
 
 /** Perfil de un jugador que acaba de llegar: puede jugar ya, sin abrir nada. */
+// La tienda: qué ids de cosmético existen, para no guardar en la caché uno que
+// el catálogo ya no conoce.
+import { TIPO_COSMETICO, cosmeticoPorId } from '../data/cosmeticos.js';
+
 export function perfilInicial() {
   return {
     v: 1,
@@ -34,6 +38,9 @@ export function perfilInicial() {
     elo: 1200,
     apodo: null,
     apodoRestantes: 0,
+    // Lo comprado en la tienda y lo que se lleva puesto por tipo.
+    cosmeticos: [],
+    equipado: {},
     dificultad: 'heuristica',
   };
 }
@@ -76,6 +83,11 @@ function sanear(bruto) {
     elo: Number.isFinite(bruto.elo) ? Math.floor(bruto.elo) : base.elo,
     apodo: typeof bruto.apodo === 'string' ? bruto.apodo.slice(0, 24) : null,
     apodoRestantes: Number.isFinite(bruto.apodoRestantes) ? Math.max(0, Math.floor(bruto.apodoRestantes)) : 0,
+    // Sin estas dos líneas la caché los descartaba al recargar: la tienda
+    // enseñaba como no comprado lo que ya lo estaba hasta la siguiente sincronización.
+    cosmeticos: (Array.isArray(bruto.cosmeticos) ? bruto.cosmeticos : []).filter((x) => cosmeticoPorId(x)),
+    equipado: Object.fromEntries(Object.entries(bruto.equipado ?? {})
+      .filter(([tipo, id]) => Object.values(TIPO_COSMETICO).includes(tipo) && cosmeticoPorId(id)?.tipo === tipo)),
     dificultad: bruto.dificultad === 'aleatoria' ? 'aleatoria' : base.dificultad,
   };
 }

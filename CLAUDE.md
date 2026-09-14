@@ -1391,6 +1391,31 @@ luego el rival; alternar los bandos cambia el resultado en 2 de cada 40
 partidas. El validador del servidor tiene que reproducir ese orden o cobra un
 daño que el jugador no vio.
 
+## La tienda: cosméticos con dinomonedas
+
+La regla del autor manda sobre todo lo de esta sección: **«no es un pay to
+win, sólo se comprarían cosas estéticas»**. Nada de la tienda cambia una
+carta, un mazo ni lo rápido que se progresa.
+
+- **El catálogo es un DATO**, [`src/data/cosmeticos.js`](src/data/cosmeticos.js),
+  y el generador lo escribe en la 0006 (`catalogo_cosmeticos`). Cada tipo tiene
+  un artículo gratuito, que es lo que el juego enseñaba antes de la tienda.
+- **Cobra el servidor**, `comprar_cosmetico(p_id)` en la 0024: sólo recibe el
+  id, lee el precio del catálogo y bloquea la fila del jugador. `equipar_cosmetico`
+  sólo deja ponerse lo comprado o el gratuito. Orden al aplicar: la 0006
+  regenerada y luego la 0024.
+- **Lo equipado se aplica con variables CSS en la raíz** (`--dorso`,
+  `--dorso-filtro`) desde `pintarMenu()`, que se repinta al sincronizar. Las
+  reglas del RIVAL fuerzan el dorso clásico: sus cosméticos todavía no viajan
+  en el duelo.
+- **Arte con interruptor**, como el final y la presentación: hasta que llegan
+  los dorsos se ven como el clásico tintado, y la sexta placa del menú lleva un
+  dibujo de CSS sin `--placa` (el guardián de `marcado.test.js` exige fichero a
+  toda placa declarada).
+- **Los packs de sobres** serán varios sobres seguidos al precio de uno por
+  sobre, sin descuento: con descuento acelerarían el progreso. Si algún día
+  hay dinero real, no se venden por dinero.
+
 ## Instalarlo como app
 
 El juego es una PWA: `manifest.json`, iconos en `assets/` y `sw.js`. Se instala

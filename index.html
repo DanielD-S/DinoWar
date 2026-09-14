@@ -101,6 +101,9 @@
           <button id="btn-mazos" class="placa placa-mazos"><i aria-hidden="true"></i>Mazos</button>
           <button id="btn-cuenca" class="placa placa-cuenca"><i aria-hidden="true"></i>La Tribu</button>
           <button id="btn-cuenta" class="placa placa-cuenta"><i aria-hidden="true"></i>Cuenta</button>
+          <!-- La sexta placa. Hasta que llegue su dibujo (tools/tienda.py) se
+               pinta con CSS: ver .placa-tienda en style.css. -->
+          <button id="btn-tienda" class="placa placa-tienda"><i aria-hidden="true"></i>Tienda</button>
         </div>
         <div class="menu-fila">
           <button id="btn-ayuda-menu" class="boton-fantasma">Cómo se juega</button>
@@ -334,6 +337,20 @@
     </div>
     <footer class="meta-pie">
       <button id="btn-abrir" class="boton-grande">Abrir sobre</button>
+    </footer>
+  </section>
+
+  <!-- ----------------------------------------------------------- TIENDA -->
+  <!-- Cosméticos con dinomonedas: nada que dé ventaja. La pinta src/ui/tienda.js. -->
+  <section id="tienda" class="pantalla oculta meta">
+    <header class="meta-barra">
+      <button class="meta-volver" data-volver>‹ Menú</button>
+      <h2>Tienda</h2>
+      <span class="meta-moneda"><b class="moneda">0</b></span>
+    </header>
+    <div class="meta-cuerpo" id="tienda-cuerpo"></div>
+    <footer class="meta-pie">
+      <p class="meta-nota" id="tienda-aviso"></p>
     </footer>
   </section>
 

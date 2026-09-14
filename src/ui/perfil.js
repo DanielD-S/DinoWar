@@ -30,6 +30,7 @@ import {
 import {
   ECONOMIA, abrirSobre, excedente, valorFusion,
 } from '../data/coleccion.js';
+import { cosmeticoPorId, loTiene } from '../data/cosmeticos.js';
 
 export const MODO = Object.freeze({ REMOTO: 'REMOTO', LOCAL: 'LOCAL' });
 
@@ -77,6 +78,10 @@ function aFormaLocal(d) {
     // mazo inicial: un servidor sin la 0023 no manda el campo y sus cuentas
     // están todas sembradas.
     sembrado: d.sembrado !== false,
+    // La tienda: lo comprado (ids) y lo que se lleva puesto por tipo. Un
+    // servidor sin la 0024 no manda ninguno de los dos y todo es el gratuito.
+    cosmeticos: Array.isArray(d.cosmeticos) ? d.cosmeticos.filter((x) => typeof x === 'string') : [],
+    equipado: d.equipado && typeof d.equipado === 'object' && !Array.isArray(d.equipado) ? d.equipado : {},
     // La dificultad es una preferencia de ESTE navegador, no estado de juego:
     // el servidor no la lleva y no debe pisarla al sincronizar.
     dificultad: cargarPerfil().dificultad,
@@ -206,6 +211,45 @@ export async function comprarSobre() {
   }
   await sincronizar();
   return { cartas: r.cartas, antes };
+}
+
+/**
+ * Compra un cosmético. En remoto cobra el SERVIDOR, con el precio de su
+ * catálogo: aquí sólo viaja el id. Devuelve el perfil tal como quedó.
+ */
+export async function comprarCosmetico(id) {
+  const c = cosmeticoPorId(id);
+  if (!c) throw new Error('ese artículo no existe');
+  if (modo === MODO.LOCAL) {
+    const p = cargarPerfil();
+    if (loTiene(p, id)) throw new Error('ya lo tienes');
+    if (!PRUEBAS && p.monedas < c.precio) throw new Error(`te faltan ${c.precio - p.monedas} dinomonedas`);
+    actualizarPerfil({
+      cosmeticos: [...p.cosmeticos, id],
+      monedas: PRUEBAS ? p.monedas : p.monedas - c.precio,
+    });
+    return cargarPerfil();
+  }
+  await sesionValida();
+  const p = aFormaLocal(await rpc('comprar_cosmetico', { p_id: id }));
+  guardarPerfil(p);
+  return p;
+}
+
+/** Se pone un cosmético que ya es tuyo (o el gratuito de su tipo). */
+export async function equiparCosmetico(id) {
+  const c = cosmeticoPorId(id);
+  if (!c) throw new Error('ese artículo no existe');
+  if (modo === MODO.LOCAL) {
+    const p = cargarPerfil();
+    if (!loTiene(p, id)) throw new Error('ese artículo no es tuyo');
+    actualizarPerfil({ equipado: { ...p.equipado, [c.tipo]: id } });
+    return cargarPerfil();
+  }
+  await sesionValida();
+  const p = aFormaLocal(await rpc('equipar_cosmetico', { p_id: id }));
+  guardarPerfil(p);
+  return p;
 }
 
 /** Funde el excedente: las copias que ya no caben en ningún mazo. */
