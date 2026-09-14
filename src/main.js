@@ -1,7 +1,7 @@
 // DinoWar — arranque, máquina de estados y pegamento entre motor e interfaz.
 // La interfaz sólo LEE el estado; toda mutación pasa por reduce().
 
-import { BALANCE } from './data/balance.js';
+import { BALANCE, MAZO } from './data/balance.js';
 import { TIPO, OBJETIVO, CLADO, CLADO_NOMBRE, RAREZA, carta } from './data/cards.js';
 import {
   crearPartida, vistaDe, FASE, MOTIVO_FIN, unidadesDe, buscablesDe, buscaEnElMazo,
@@ -50,6 +50,8 @@ import {
   revelarRetenida,
 } from './ui/animate.js';
 import { invocar } from './ui/efectos.js';
+import { rotularFin, marcadorHTML, ARTE_LISTO as ARTE_DEL_FIN } from './ui/fin.js';
+import { emblemaDe as emblemaDeMazo } from './ui/mazos.js';
 import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio, musica, precargarMusica, enSegundoPlano } from './ui/audio.js';
 import { montarTacto } from './ui/tacto.js';
 import { arte } from './ui/art.js';
@@ -77,6 +79,18 @@ const perfilIA = () => IA_FORZADA ?? (cargarPerfil().dificultad ?? PERFIL.HEURIS
 let expedicionEnCurso = null;
 let ultimaFueExpedicion = false;
 const perfilRival = () => expedicionEnCurso?.perfil ?? perfilIA();
+/**
+ * Quién está enfrente, para el marcador del final: nombre y mazo. Se apunta al
+ * EMPEZAR porque al terminar ya no queda de dónde sacarlo —el asalto suelta su
+ * jefe y el duelo se pone a null antes de pintar—. El mazo de un duelo es
+ * secreto y va a null: el rival sale sin emblema.
+ */
+let rivalDePartida = { nombre: 'Rival', mazo: MAZO };
+/**
+ * Cuenta los finales. El rótulo tarda en irse y, si mientras tanto empieza
+ * otra partida, el final viejo no puede llevarse la pantalla nueva.
+ */
+let finVigente = 0;
 
 let app = APP.BOOT;
 let estado = null;
@@ -597,11 +611,11 @@ function seAcaboElTiempo(bando) {
   pintarReloj();
   cerrarHojas();
   if (tutorialActivo()) terminarTutorial();
-  irA(APP.GAME_OVER);
   soltarEntrada();
   cancelarAnimaciones();
 
   const gane = bando === RIVAL;
+  alFinal(gane);
   const minutos = Math.round(BALANCE.relojPorJugador / 60);
   pintarFin({
     via: 'Se agotó el tiempo',
@@ -840,9 +854,9 @@ function rendirse() {
   reloj.parar();
   cerrarHojas();
   if (tutorialActivo()) terminarTutorial();
-  irA(APP.GAME_OVER);
   soltarEntrada();
   cancelarAnimaciones();
+  alFinal(false);
 
   pintarFin({
     via: 'Retirada',
@@ -881,22 +895,55 @@ function premioTexto(n, cobro = null) {
 }
 
 /**
- * Pantalla de fin: la vía de victoria arriba en versales, el titular, la frase
- * que lo explica y el resumen en tres cajas. Antes era un párrafo con todo
- * dentro y todo pesaba lo mismo.
+ * Pasa a la pantalla de fin DESPUÉS del rótulo, que va encima del tablero.
+ *
+ * No espera nadie más: quien llama pinta el final, cobra y anota enseguida, y
+ * lo pinta sobre una pantalla todavía oculta. Mientras el rótulo está puesto
+ * la app queda en RESOLVING —nada es interactivo— y la música de la partida se
+ * calla, porque ahí suena el remate de victoria o derrota.
+ *
+ * Si el final llega sin tablero a la vista —un duelo que se cierra mientras
+ * se espera al rival— no hay nada que rotular y se va directo.
+ */
+function alFinal(gane) {
+  const n = ++finVigente;
+  if (app !== APP.PLAYING && app !== APP.RESOLVING) { irA(APP.GAME_OVER); return; }
+  app = APP.RESOLVING;
+  musica(null);
+  rotularFin({ gane, raiz: el.partida }).then(() => {
+    if (n === finVigente && app === APP.RESOLVING) irA(APP.GAME_OVER);
+  });
+}
+
+/** Un bando del marcador: nombre, emblema del mazo y sus dos cifras. */
+function bandoDelMarcador(nombre, mazo, jugador) {
+  return {
+    nombre,
+    emblema: mazo ? (emblemaDeMazo(Array.isArray(mazo) ? Object.fromEntries(mazo) : mazo)?.clave ?? null) : null,
+    trofeos: jugador?.trofeos ?? 0,
+    habitat: jugador?.habitat ?? 0,
+  };
+}
+
+/**
+ * Pantalla de fin: el cara a cara arriba, luego la vía de victoria en
+ * versales, el titular y la frase que lo explica. Antes eran tres cajas
+ * sueltas y no se leía quién había quedado por delante en qué.
  */
 function pintarFin({ via, gane, titular, frase }) {
-  const [p, r] = estado.jugadores;
+  const [p, r] = estado?.jugadores ?? [];
   el.finInforme.innerHTML = '';
   el.finVia.textContent = via;
   el.finTitulo.textContent = titular;
   el.finTitulo.style.color = gane ? 'var(--acento-claro)' : 'var(--rival)';
   el.finDetalle.textContent = frase;
-  el.finResumen.innerHTML = [
-    ['Turnos', estado.turno],
-    ['Trofeos', `${p.trofeos}<span class="sep">–</span>${r.trofeos}`],
-    ['Hábitat', `${Math.max(0, p.habitat)}<span class="sep">–</span>${Math.max(0, r.habitat)}`],
-  ].map(([et, v]) => `<div class="fin-caja"><b>${v}</b><i>${et}</i></div>`).join('');
+  el.fin.classList.toggle('con-arte', ARTE_DEL_FIN);
+  el.finResumen.innerHTML = marcadorHTML({
+    gane,
+    turnos: estado?.turno ?? 0,
+    yo: bandoDelMarcador(cargarPerfil().apodo || 'Tú', mazoActivo(), p),
+    rival: bandoDelMarcador(rivalDePartida.nombre, rivalDePartida.mazo, r),
+  });
 }
 
 function preguntarRendicion() {
@@ -917,12 +964,12 @@ function preguntarRendicion() {
 
 function finPartida() {
   reloj.parar();
-  irA(APP.GAME_OVER);
   soltarEntrada();
   cancelarAnimaciones();
   if (tutorialActivo()) terminarTutorial();
 
   const gane = estado.ganador === JUGADOR;
+  alFinal(gane);
   const via = {
     [MOTIVO_FIN.TROFEOS]: 'Registro fósil completo',
     [MOTIVO_FIN.HABITAT]: 'Colapso del hábitat',
@@ -1140,6 +1187,11 @@ function nuevaPartida(jefe = null, jefeEvento = null, rivalId = null) {
   };
   const mazoRival = jefe ? jefe.mazo.map((e) => [...e])
     : expedicionEnCurso ? expedicionEnCurso.mazo.map((e) => [...e]) : null;
+  finVigente++;
+  rivalDePartida = {
+    nombre: jefe?.nombre ?? expedicionEnCurso?.nombre ?? 'Rival',
+    mazo: mazoRival ?? MAZO,
+  };
   estado = crearPartida(s, [miMazo, mazoRival]);
   // El jefe aguanta mucho más que un rival normal. No es una regla nueva: es el
   // mismo hábitat, más alto, así que todo lo demás del motor sigue igual. Y el
@@ -1451,6 +1503,8 @@ function empezarDuelo(r) {
   ultimaFueAsalto = false;
   fijarTopesHabitat();
   expedicionEnCurso = null;
+  finVigente++;
+  rivalDePartida = { nombre: r.rival?.apodo ?? 'Rival', mazo: null };
   duelo = {
     id: r.id, n: r.n ?? 0, rival: r.rival, yo: r.yo, eloInicial: Number(r.eloInicial ?? r.yo?.elo ?? 1200),
     cola: Promise.resolve(), pendientes: 0, ultimo: null,
@@ -1629,13 +1683,13 @@ function finDuelo(r) {
   const d = duelo;
   duelo = null;
   reloj.parar();
-  irA(APP.GAME_OVER);
   soltarEntrada();
   cancelarAnimaciones();
   if (hudRival) hudRival.textContent = 'Rival';
   if (r.estado) estado = r.estado;
 
   const gane = r.fin?.ganador === JUGADOR;
+  alFinal(gane);
   const rival = r.rival?.apodo ?? 'el rival';
   const via = {
     [MOTIVO_FIN.TROFEOS]: 'Registro fósil completo',

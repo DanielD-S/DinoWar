@@ -709,6 +709,26 @@ Para verlo sin jugar: `_banco_efectos.html` en la raíz —fuera del repositorio
 enseña el tablero con los botones de cada efecto. Con `prefers-reduced-motion`
 no se crea nada de lo que se mueve; las hojas sí.
 
+## El final: rótulo sobre el tablero y cara a cara
+
+[`src/ui/fin.js`](src/ui/fin.js). Al acabar, un estandarte con VICTORIA o
+DERROTA cae sobre el tablero congelado (`ROTULO`, 1,9 s, se salta con un toque)
+y luego la pantalla de fin enseña el marcador: los dos bandos con nombre y
+emblema de mazo, trofeos y hábitat en rombos, el sello sobre el mazo que ganó
+y el del que perdió rasgado.
+
+- **Nada espera al rótulo.** `alFinal()` en `main.js` sólo retrasa el cambio
+  de pantalla; pintar, cobrar y anotar siguen en el acto, sobre la pantalla
+  aún oculta. Mientras está puesto la app va en RESOLVING y la música se
+  calla. `finVigente` impide que un final viejo se lleve una partida nueva.
+- **El rival se apunta al EMPEZAR** (`rivalDePartida`): al terminar el
+  asalto ya soltó a su jefe y el duelo ya es null. El mazo de un duelo es
+  secreto, así que ese rival sale sin emblema.
+- **El arte llega después del código** y el CSS tiene dos pieles. El
+  interruptor es `ARTE_LISTO`, no una precarga que pruebe qué ficheros
+  contestan —dejaría ocho 404 por partida—, y `test/fin.test.js` obliga a
+  encenderlo cuando están las ocho piezas y a apagarlo si falta una.
+
 ## Los mazos: placas, rejilla y una portada que se calcula
 
 [`src/ui/mazos.js`](src/ui/mazos.js) es la lista y el editor, fuera de
