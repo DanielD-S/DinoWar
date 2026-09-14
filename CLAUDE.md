@@ -1191,6 +1191,17 @@ de ejecución, el empaquetado no ve la dependencia y la función muere con
 la extensión `http` (ver `supabase/functions/README.md`). Hacen falta las dos
 cabeceras, `apikey` y `Authorization`. Quitar la extensión después.
 
+**Una columna de salida de `returns table` es una VARIABLE dentro del cuerpo.**
+`aplicar_asalto` devuelve `(vida, cayo, almacen)` y hacía `select almacen from
+public.tribus`: ambiguo entre la columna y la salida, y el asalto nunca se
+registró —«No se pudo registrar el asalto: column reference "almacen" is
+ambiguous»—. Falla EN EJECUCIÓN y no al crear la función, que el cuerpo de una
+PL/pgSQL no se analiza hasta que se la llama, así que `apply_migration` dice
+que todo bien. Se cualifica la columna (`t.almacen`, `j.vida`); renombrar la
+salida no vale, que ese nombre es el que lee la Edge Function en la respuesta.
+Las funciones de `0005_cuenca_operaciones.sql` ya iban con alias: la que venía
+sin ellos era la de `0001`.
+
 **El orden de las jugadas importa.** En el navegador juegas tu turno entero y
 luego el rival; alternar los bandos cambia el resultado en 2 de cada 40
 partidas. El validador del servidor tiene que reproducir ese orden o cobra un
