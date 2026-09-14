@@ -1277,3 +1277,65 @@ detrás del marcador con el velo del CSS.
 - El mazo rasgado: es `dorso.webp` cortado en zigzag por CSS, como el sobre.
 - Los emblemas de las cintas: son los siete de clado que ya existen.
 - Ninguna palabra ni número: los escribe el juego.
+
+## La presentación de la partida
+
+Antes de cada partida la pantalla se parte en diagonal: el rival arriba y tú
+abajo, cada uno con su estandarte colgando, el emblema del clado de su mazo
+encima, la criatura que lo encabeza de fondo y su nombre. Casi todo ya existe:
+los emblemas de clado, las ilustraciones y el medallón del VS del final.
+Faltan **dos piezas**: los estandartes.
+
+### El bloque de MATERIAL (copiar literal)
+
+El de cuero, el mismo que se usó para el estandarte y las cintas del final.
+Adjuntar `cinta_propia.png` como referencia de color y de latón.
+
+> Pieza de interfaz de videojuego, vista de frente, sin perspectiva. Cuero
+> curtido oscuro y latón viejo con el canto biselado, iluminación lateral
+> suave que marque el relieve, sin brillos especulares fuertes. Paleta:
+> negro, marrón oscuro, latón `#d9a441` y oro viejo. Sin texto, sin letras,
+> sin números, sin marca de agua. Fondo **magenta puro `#FF00FF`** fuera de
+> la pieza, sin sombra proyectada.
+
+### 1 · Los dos estandartes verticales
+
+Uno por bando. El juego pone encima, a un tercio del alto, el medallón del
+clado del mazo, así que **esa zona va lisa**. Se genera el propio y el rival
+**a partir de él**, con la imagen adjunta y el color como único cambio.
+
+Formato: **1024×1536**, vertical. Se sirven a 360.
+
+- **`estandarte_propio.png`.** [MATERIAL] Estandarte vertical colgante, alto
+  y estrecho, de proporción 1:2,5, centrado en el lienzo. Arriba, una barra
+  horizontal corta de latón viejo con un remate en forma de punta de lanza en
+  cada extremo, un poco más ancha que la tela. Colgando de ella, una tela de
+  cuero teñido color ocre dorado oscuro, con el borde ribeteado de latón en
+  los dos lados y abajo, y el extremo de abajo cortado en cola de golondrina.
+  **Toda la tela lisa, sin ningún emblema, dibujo ni costura en el centro.**
+  Nada fuera del estandarte.
+- **`estandarte_rival.png`.** El mismo estandarte de la imagen adjunta,
+  **idéntico en forma, tamaño y posición**, con el cuero teñido de **rojo
+  óxido oscuro**, color sangre seca. Todo lo demás, igual. Mismo fondo magenta.
+
+### Después de generar
+
+- Los dos a `src/piel/vs/` con esos nombres.
+- `python tools/presentacion.py escribir` los deja en `assets/piel/vs/` e
+  imprime el `aspect-ratio` que tiene que llevar `.pres-estandarte`.
+- `npm test` pide entonces poner `ARTE_LISTO = true` en
+  `src/ui/presentacion.js`. Mientras no lleguen, los estandartes se pintan
+  con CSS.
+
+### Lo que llegó
+
+Los dos el 14-09-2026, a 793×1983 y en magenta limpio. Recortados quedan a
+787×1919 (1:2,44). La barra de arriba es más ancha que la tela, que ocupa el
+56 % central del ancho: por eso el emblema del clado va más estrecho que en la
+piel de CSS.
+
+### Lo que NO se pide
+
+- El VS: reutiliza `medallon_vs` del final.
+- Los emblemas de clado ni los retratos: ya existen.
+- Ningún texto: los nombres, el modo y el objetivo los escribe el juego.
