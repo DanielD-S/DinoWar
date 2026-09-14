@@ -19,7 +19,7 @@ import {
 } from '../data/mando.js';
 import {
   estadoDeTribu, aportar, mejorarYacimiento, reclamar, crearTribu, entrarEnTribu,
-  salirDeTribu, expulsar, cederMando,
+  salirDeTribu, deshacerTribu, expulsar, cederMando,
   tribusAbiertas, unirseATribu, solicitarEntrada, retirarSolicitud,
   responderSolicitud, ajustarTribu,
   YO, modoActual, porQueLocal, MODO,
@@ -117,7 +117,9 @@ export function montarCuenca(volver, asaltar) {
       } else if (b.dataset.accion === 'ceder-si') {
         await cederMando(b.dataset.id);
       } else if (b.dataset.accion === 'salir-si') {
-        await salirDeTribu();
+        // Deshacer es su propia llamada: si alguien entró mientras mirabas la
+        // pantalla, falla diciéndolo en vez de dejarle la cuenca a esa persona.
+        await (b.dataset.deshacer !== undefined ? deshacerTribu() : salirDeTribu());
       } else if (b.dataset.accion === 'reclamar') {
         const cardId = await reclamar();
         if (cardId) {
@@ -399,17 +401,21 @@ const EMBLEMAS = Object.freeze([
  * yacimiento, tu colección y tus mazos son tuyos y se van contigo.
  */
 function salirHTML(yo, soloQuedoYo) {
+  // Estando solo, salir y deshacer la cuenca son lo mismo —se borra al irse el
+  // último—, así que el botón lo DICE en vez de esconderlo detrás de «Salir».
+  const rotulo = soloQuedoYo ? 'Deshacer la cuenca' : 'Salir de la cuenca';
   if (confirmando?.accion !== 'salir') {
-    return '<p class="cu-linea"><button class="cu-mini mal" data-accion="salir">Salir de la cuenca</button></p>';
+    return `<p class="cu-linea"><button class="cu-mini mal" data-accion="salir">${rotulo}</button></p>`;
   }
   return `<div class="cu-salir">
     <p class="cu-linea">${soloQuedoYo
-    ? 'Eres el último: la cuenca se deshace con su almacén y sus jefes.'
+    ? 'No queda nadie más: la cuenca desaparece con su almacén, sus jefes y su código.'
     : `Los fósiles del almacén se quedan aquí.${esCapataz(yo)
       ? ' El mando pasa a quien lleve más tiempo.' : ''}`}
       Tu yacimiento y tus cartas se van contigo.</p>
     <p class="cu-linea">
-      <button class="cu-mini mal" data-accion="salir-si">Sí, salir</button>
+      <button class="cu-mini mal" data-accion="salir-si" ${soloQuedoYo ? 'data-deshacer' : ''}>${
+  soloQuedoYo ? 'Sí, deshacerla' : 'Sí, salir'}</button>
       <button class="cu-mini" data-accion="cancelar">Quedarme</button>
     </p>
   </div>`;

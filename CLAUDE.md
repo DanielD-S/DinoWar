@@ -814,6 +814,14 @@ Lo que cambia de flujo y no sólo de piel:
     quien lleva más tiempo. Una tribu sin capataz no podría aceptar ni echar a
     nadie. Y si se va el último, la tribu se BORRA con su almacén: una guarida
     vacía con fósiles dentro no es de nadie.
+  - **Estando solo, el botón dice «Deshacer la cuenca»** y no «Salir». Es lo
+    mismo —salir borra la tribu cuando se va el último— pero dicho con todas
+    las letras. Va por su propia función, `deshacer_tribu`, y no por `salir`
+    con otro rótulo: si alguien ha entrado por la lista entre que se pinta la
+    pantalla y se pulsa, salir te sacaría a TI y le dejaría la cuenca a esa
+    persona; ahí eso es un error con su motivo. No hay un «disolver» general:
+    una tribu no es del capataz, es de quien está dentro, y el almacén lo
+    llenaron entre todos.
   - **Hay lista de cuencas abiertas**, porque entrar era saberse seis letras que
     alguien te pasa por fuera del juego: quien llega solo no tiene a quién
     pedírselas, y una cuenca de una persona no tira un jefe de 6.000 de Vida.

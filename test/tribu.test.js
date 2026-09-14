@@ -11,6 +11,7 @@ import {
 } from '../src/data/tribu.js';
 import {
   ROL, ACCESO, puedeExpulsar, puedeCederMando, relevoDeMando, estadoEnLista,
+  puedeDeshacer,
 } from '../src/data/mando.js';
 import {
   CALENDARIO, CICLO, JEFES, CARTAS_DE_JEFE, eventosActivos, jefeActivo, TIPO_EVENTO,
@@ -194,6 +195,12 @@ test('Si el capataz se va, hereda quien lleva más tiempo', () => {
   assert.equal(relevoDeMando(TRIBU, 'a'), 'b');
   // Y si se van los dos antiguos, el último que queda.
   assert.equal(relevoDeMando([CAPATAZ, NUEVO], 'a'), 'c');
+});
+
+test('Deshacer la cuenca es del capataz, y sólo estando solo', () => {
+  assert.equal(puedeDeshacer(CAPATAZ, [CAPATAZ]), null);
+  assert.ok(puedeDeshacer(CAPATAZ, TRIBU), 'con gente dentro no se deshace');
+  assert.ok(puedeDeshacer(VIEJA, [VIEJA]), 'un miembro no deshace nada');
 });
 
 test('El último que se va no deja capataz: no queda tribu', () => {

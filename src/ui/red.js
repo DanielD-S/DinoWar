@@ -185,6 +185,16 @@ export async function salirDeTribu() {
   return rpc('salir_de_tribu');
 }
 
+/**
+ * Deshacer la cuenca. Es su propia llamada y no «salir» con otro nombre: si
+ * alguien ha entrado mientras mirabas la pantalla, esto falla diciéndolo en vez
+ * de sacarte a ti y dejarle la cuenca a esa persona.
+ */
+export async function deshacerTribu() {
+  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('deshacer la cuenca');
+  return rpc('deshacer_tribu');
+}
+
 export async function expulsar(jugadorId) {
   if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('echar a alguien');
   return rpc('expulsar', { p_jugador: jugadorId });
