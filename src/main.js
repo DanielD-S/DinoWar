@@ -35,7 +35,7 @@ import {
   jugarEnDuelo, estadoDuelo, rendirseEnDuelo,
 } from './ui/duelo.js';
 import { DUELO } from './data/duelo.js';
-import { rangoDe, nombreDeRango } from './data/ligas.js';
+import { rangoDe, nombreDeRango, emblemaDe } from './data/ligas.js';
 import { estaDentro } from './ui/supabase.js';
 import { sincronizar, modoPerfil, MODO as MODO_PERFIL } from './ui/perfil.js';
 import { asaltar, estadoDeTribu, entrar as entrarEnLaCuenca } from './ui/red.js';
@@ -1608,7 +1608,13 @@ function finDuelo(r) {
     liga = `${nombreDeRango(ahora)} · ${puntos >= 0 ? '+' : ''}${puntos} puntos`;
   }
   const premio = gane ? `+${ECONOMIA.monedasVictoria} dinomonedas` : 'Sin dinomonedas: sólo las da ganar';
-  el.finPremio.textContent = `${premio} · ${liga}`;
+  el.finPremio.textContent = premio;
+  // El emblema de la liga en la que quedas, grande, con la línea de lo que ha
+  // pasado debajo. Si cambias de liga, el emblema es ya el de la nueva.
+  const subio = ra.liga !== rb.liga && ahora > antes;
+  el.finInforme.innerHTML = `<div class="fin-liga ${subio ? 'sube' : ''}">
+    <img src="${emblemaDe(rb.liga)}" alt="" width="96" height="96" decoding="async">
+    <span>${liga}</span></div>`;
   // Monedas y ELO los movió el servidor: se le vuelve a preguntar por el perfil.
   sincronizar().then(() => pintarMenu()).catch(() => {});
   sonido(gane ? 'gana' : 'pierde');

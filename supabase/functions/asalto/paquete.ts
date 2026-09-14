@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: f39c0b31c627daaa
+// huella: f48bb107f9b82b4b
 //
 // Lleva dentro estos 22 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -4573,10 +4573,10 @@ function desdeMiLado(v, j) {
 // src/data/ligas.js
 var LIGAS = Object.freeze([
   // `desde` es el ELO donde empieza la liga; la última no tiene techo.
-  Object.freeze({ id: "triasico", nombre: "Tri\xE1sico", desde: 0, emblema: "plateosauravus", divisiones: 3 }),
-  Object.freeze({ id: "jurasico", nombre: "Jur\xE1sico", desde: 1150, emblema: "allosaurus", divisiones: 3 }),
-  Object.freeze({ id: "cretacico", nombre: "Cret\xE1cico", desde: 1450, emblema: "tyrannosaurus", divisiones: 3 }),
-  Object.freeze({ id: "extincion", nombre: "Extinci\xF3n", desde: 1750, emblema: "extincion", divisiones: 1 })
+  Object.freeze({ id: "triasico", nombre: "Tri\xE1sico", desde: 0, metal: "cobre", divisiones: 3 }),
+  Object.freeze({ id: "jurasico", nombre: "Jur\xE1sico", desde: 1150, metal: "lat\xF3n", divisiones: 3 }),
+  Object.freeze({ id: "cretacico", nombre: "Cret\xE1cico", desde: 1450, metal: "oro", divisiones: 3 }),
+  Object.freeze({ id: "extincion", nombre: "Extinci\xF3n", desde: 1750, metal: "oro roto", divisiones: 1 })
 ]);
 var ELO = Object.freeze({
   inicial: 1200,
