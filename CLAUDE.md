@@ -802,11 +802,44 @@ Lo que cambia de flujo y no sólo de piel:
   es otra pantalla.
 - **El código de la tribu se comparte** con `navigator.share` y cae al
   portapapeles; antes había que dictarlo.
+- **Una tribu tiene capataz, y ahora se puede salir de ella.** Se llama
+  capataz y no «jefe» porque un jefe aquí es el Saurophaganax. Manda quien la
+  funda; puede echar a alguien o ceder el mando, y las dos cosas preguntan en
+  la propia fila —no tienen deshacer—. Tres decisiones:
+  - **Salir tenía que existir antes que la lista de tribus.** Sin ella, entrar
+    en otra cuenca era pisar `tribu_id` y dejar la anterior huérfana sin
+    decirlo; con una lista para explorar eso pasa de caso raro a camino normal.
+    Por eso `crear_tribu` y `entrar_en_tribu` ahora RECHAZAN si ya tienes una.
+  - **El relevo no es una decisión de nadie**: si el capataz se va, hereda
+    quien lleva más tiempo. Una tribu sin capataz no podría aceptar ni echar a
+    nadie. Y si se va el último, la tribu se BORRA con su almacén: una guarida
+    vacía con fósiles dentro no es de nadie.
+  - **Hay lista de cuencas abiertas**, porque entrar era saberse seis letras que
+    alguien te pasa por fuera del juego: quien llega solo no tiene a quién
+    pedírselas, y una cuenca de una persona no tira un jefe de 6.000 de Vida.
+    Se entra de dos formas y las dos siguen: el CÓDIGO es una invitación
+    privada y entra aunque la cuenca esté cerrada —quien lo tiene es porque se
+    lo dieron—, y la LISTA enseña las que tienen sitio, `libre` o `solicitud`.
+    Sin tribu, la lista va ANTES del yacimiento: lo primero que se ve tiene que
+    ser gente. La lista devuelve lo justo para decidir —nombre, emblema, cuánta
+    gente, cómo se entra— y nada de dentro: ni almacén, ni jefes, ni quién
+    está. Una lista pública no es una mirilla. Y el emblema son los DIEZ
+    medallones de los mazos, que ya existen y ya están medidos: arte nuevo,
+    cero.
+  - **Las reglas viven en `src/data/mando.js` y NO en `tribu.js`**, que es lo
+    que parecía natural. `tribu.js` entra en el paquete de la Edge Function
+    —lo importa el validador de asaltos—, así que tocarlo obliga a regenerar
+    el paquete, re-anclar y volver a desplegar. `test/paquete.test.js` y
+    `test/anclaje.test.js` lo cazaron al primer intento. Y aquí no hacía
+    falta: quien comprueba el mando es SQL con `auth.uid()`, no la función.
 - **Un evento de clima lleva de fondo la textura de ese clima**, la misma
   que pone en el tablero.
 
-Para verlo sin cuenta: `_banco_cuenca.html`, fuera del repositorio, que cae a
-la cuenca local con compañeros simulados.
+Para verlo sin cuenta: `_banco_cuenca.html`, fuera del repositorio (los
+`_banco_*` están en `.gitignore`), que cae a la cuenca local con compañeros
+simulados. Para ver el MANDO hace falta una cuenca compartida, y ahí el banco
+sustituye `red.js` entero con un **import map** —`{"/src/ui/red.js":
+"/_banco_red.js"}`— en vez de meterle un interruptor de pruebas al juego.
 
 ## `transform` es una sola propiedad, y quien la escribe último gana
 

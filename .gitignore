@@ -11,6 +11,13 @@ desktop.ini
 # Dependencias de las herramientas de desarrollo (Playwright para los iconos)
 node_modules/
 
+# Los bancos de pruebas: páginas sueltas que montan una pantalla con datos de
+# mentira para verla sin cuenta y sin servidor. Se documentan en CLAUDE.md y
+# viven FUERA del repositorio a propósito; ignorarlos evita que uno se cuele en
+# un commit por descuido.
+_banco_*.html
+_banco_*.js
+
 # Editores
 .vscode/
 .idea/

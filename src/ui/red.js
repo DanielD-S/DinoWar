@@ -21,6 +21,7 @@ import {
 import { CONFIG } from '../data/config.js';
 import { CUENCA } from '../data/tribu.js';
 import { JEFES, CALENDARIO, TIPO_EVENTO } from '../data/eventos.js';
+import { ROL, ACCESO } from '../data/mando.js';
 import * as local from './red-local.js';
 
 export const MODO = Object.freeze({ REMOTO: 'REMOTO', LOCAL: 'LOCAL' });
@@ -110,9 +111,20 @@ function aFormaDePantalla(d) {
     asaltosHoy: Number(d.asaltos_hoy ?? 0),
     jefe,
     cartas: [],
-    miembros: (d.miembros ?? []).map((m) => m.apodo),
+    // Los miembros llegan con ROL y antigüedad: la pantalla necesita saber
+    // quién manda para enseñar sus botones, y `mando.js` para decir por qué no.
+    miembros: (d.miembros ?? []).map((m) => ({
+      id: m.id, apodo: m.apodo, rol: m.rol ?? ROL.MIEMBRO,
+      desde: m.desde ? new Date(m.desde).getTime() : 0,
+      yo: m.id === (d.yo ?? yoMismo),
+    })),
     puedeReclamar: Boolean(jefe && jefe.vida <= 0 && mioDano > 0 && !mioReclamado),
-    tribu: tribu ? { nombre: tribu.nombre, codigo: tribu.codigo } : null,
+    tribu: tribu ? {
+      id: tribu.id, nombre: tribu.nombre, codigo: tribu.codigo,
+      acceso: tribu.acceso ?? ACCESO.LIBRE, emblema: tribu.emblema ?? 'clado_teropodo',
+    } : null,
+    // Sólo llegan al capataz: al resto no le toca contestarlas.
+    solicitudes: (d.solicitudes ?? []).map((x) => ({ id: x.id, apodo: x.apodo })),
     eventoJefe,
   };
 }
@@ -157,6 +169,68 @@ export async function crearTribu(nombre) {
 export async function entrarEnTribu(codigo) {
   if (modo === MODO.LOCAL) return null;
   return rpc('entrar_en_tribu', { p_codigo: codigo });
+}
+
+/**
+ * Salir, echar y ceder el mando. No existen en local: allí los compañeros son
+ * simulados y echar a uno sería echar a nadie. La pantalla no ofrece los
+ * botones en local, y esto es el segundo cerrojo.
+ */
+const soloEnLaCuencaDeVerdad = (qué) => {
+  throw new Error(`${qué} necesita una cuenca compartida, y estás en local`);
+};
+
+export async function salirDeTribu() {
+  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('salir de la cuenca');
+  return rpc('salir_de_tribu');
+}
+
+export async function expulsar(jugadorId) {
+  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('echar a alguien');
+  return rpc('expulsar', { p_jugador: jugadorId });
+}
+
+/**
+ * Las cuencas con sitio. En local no hay ninguna que enseñar: los compañeros
+ * son simulados y no hay más tribus que la tuya.
+ */
+export async function tribusAbiertas() {
+  if (modo === MODO.LOCAL) return [];
+  const r = await rpc('tribus_abiertas');
+  return (Array.isArray(r) ? r : []).map((t) => ({
+    id: t.id, nombre: t.nombre, emblema: t.emblema, acceso: t.acceso,
+    miembros: Number(t.miembros), tope: Number(t.tope), pedida: Boolean(t.pedida),
+  }));
+}
+
+export async function unirseATribu(tribuId) {
+  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('entrar en otra cuenca');
+  return rpc('unirse_a_tribu', { p_tribu: tribuId });
+}
+
+export async function solicitarEntrada(tribuId) {
+  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('pedir entrada');
+  return rpc('solicitar_entrada', { p_tribu: tribuId });
+}
+
+export async function retirarSolicitud(tribuId) {
+  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('retirar una solicitud');
+  return rpc('retirar_solicitud', { p_tribu: tribuId });
+}
+
+export async function responderSolicitud(jugadorId, si) {
+  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('contestar una solicitud');
+  return rpc('responder_solicitud', { p_jugador: jugadorId, p_si: si });
+}
+
+export async function ajustarTribu({ acceso = null, emblema = null } = {}) {
+  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('cambiar los ajustes');
+  return rpc('ajustar_tribu', { p_acceso: acceso, p_emblema: emblema });
+}
+
+export async function cederMando(jugadorId) {
+  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('ceder el mando');
+  return rpc('ceder_mando', { p_jugador: jugadorId });
 }
 
 /**

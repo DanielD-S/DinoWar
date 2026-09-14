@@ -12,6 +12,7 @@ import {
   CUENCA, DIA, acumular, aplicarAsalto, mereceRecompensa,
 } from '../data/tribu.js';
 import { JEFES, jefeActivo, ventanaDe } from '../data/eventos.js';
+import { ROL } from '../data/mando.js';
 
 const CLAVE = 'dinowar.cuenca.v1';
 export const YO = 'tú';
@@ -169,8 +170,18 @@ export function estadoDeTribu(ahora = Date.now()) {
     asaltosHoy: c.asaltos.hechos,
     jefe,
     cartas: c.cartas,
-    miembros: [YO, ...COMPANEROS.map((p) => p.id)],
+    // Mismos campos que en la cuenca compartida, para que la pantalla no
+    // tenga dos formas de pintar lo mismo. Aquí mandas tú y no hay a quién
+    // echar: los compañeros son un modelo, no personas.
+    miembros: [
+      { id: YO, apodo: YO, rol: ROL.CAPATAZ, desde: c.arranque, yo: true },
+      ...COMPANEROS.map((p, i) => ({
+        id: p.id, apodo: p.id, rol: ROL.MIEMBRO, desde: c.arranque + i + 1, yo: false,
+      })),
+    ],
     puedeReclamar: !!(jefe && mereceRecompensa(jefe, YO) && !c.jefes[activo.evento.id].reclamado),
+    // Aquí no llama nadie a la puerta: no hay más tribus que ésta.
+    solicitudes: [],
   };
 }
 
