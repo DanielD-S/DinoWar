@@ -372,13 +372,16 @@ function bloqueTribu(c, ahora) {
 }
 
 /**
- * Cartas de jefe sin reclamar de ventanas ANTERIORES. La del jefe de ahora ya
- * tiene su botón en el pie, así que aquí sólo van las otras: un jefe caído no
- * se vuelve a levantar para su tribu, y sin esto la carta se quedaba esperando
- * sin ninguna forma de cogerla.
+ * Cartas de jefe sin reclamar de cacerías ANTERIORES. La de la cacería de ahora
+ * ya tiene su botón en el pie, así que aquí sólo van las otras — y «otras» es
+ * por evento Y por vuelta: el jefe vuelve cada ciclo, así que el Saurophaganax
+ * de hace catorce días es otra cacería aunque se llame igual, y comparando sólo
+ * el evento su carta se quedaba escondida detrás del que está en pie.
  */
 function bloquePendientes(c) {
-  const otras = (c.cartasPendientes ?? []).filter((p) => p.evento !== c.eventoJefe?.id);
+  const otras = (c.cartasPendientes ?? []).filter(
+    (p) => !(p.evento === c.eventoJefe?.id && (p.ciclo ?? 0) === (c.ciclo ?? 0)),
+  );
   if (!otras.length) return '';
   return `<section class="cu-bloque">
     <h3 class="cu-titulo">${otras.length === 1 ? 'Tienes una carta esperando' : `Tienes ${otras.length} cartas esperando`}</h3>

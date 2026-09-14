@@ -881,12 +881,29 @@ Lo que cambia de flujo y no sólo de piel:
   Es una llamada aparte y diminuta porque la pide el MENÚ, que no va a abrir la
   cuenca entera para pintar un punto; se refresca al arrancar y al volver de la
   Cuenca, que es cuando cambia.
-- **Un jefe caído no se vuelve a levantar** para esa tribu: `abrir_jefe` no toca
-  la fila si ya existe, así que al repetirse el ciclo de 14 días sigue muerto y
-  tu carta sin reclamar se queda esperando para siempre. Por eso la Cuenca tiene
-  un bloque de **cartas pendientes** de ventanas anteriores y `reclamar()` acepta
-  el evento: enseñar un aviso de algo que no se puede hacer es un punto rojo que
-  no se apaga. Que el jefe no vuelva es otra cosa —contenido— y sigue abierta.
+- **El jefe vuelve cada ciclo, y una cacería es el par (evento, VUELTA).** El
+  calendario daba la vuelta cada 14 días y la base de datos no: `jefes` tenía la
+  clave (tribu, evento) y `abrir_jefe` hacía `on conflict do nothing`, así que en
+  la segunda vuelta se encontraba la fila del primer ciclo con 0 de Vida y no
+  hacía nada. Jugando eso no era «se agotó el contenido»: era que una tribu que
+  mata a los dos jefes se queda sin capa cooperativa entera —los fósiles siguen
+  saliendo, el almacén sigue llenándose y no hay a quién pegarle—. Ahora `jefes`,
+  `aportes` y `asaltos` llevan `ciclo`, que es la vuelta, y lo calcula el
+  servidor de `creada_en` con `private.ciclo_de()`: si llegara en la petición,
+  cualquiera abriría un jefe nuevo cada minuto. Cuatro cosas que conviene saber:
+  las filas viejas NO se borran —la carta de una cacería vieja se coge meses
+  después—; la misma tribu puede tener la carta del Saurophaganax dos veces,
+  porque son dos cacerías de cinco días entre ocho y no una repetida;
+  `aplicar_asalto` conserva su firma a propósito, que la llama la Edge Function y
+  cambiarla obliga a re-empaquetar, re-anclar y desplegar; y `estado_cuenca` no
+  manda la historia entera —al año son 52 cacerías por tribu en CADA repintado—
+  sino las de la vuelta de ahora más las que te dejaron una carta sin coger.
+- **Las cartas pendientes siguen teniendo su bloque**, y ahora hace más falta:
+  la del jefe de ahora tiene su botón en el pie, y las otras se filtran por
+  evento Y vuelta. Comparando sólo el evento, la carta del Saurophaganax de hace
+  catorce días se quedaba escondida detrás del Saurophaganax que está en pie.
+  `reclamar_jefe` coge la cacería más antigua ganada y sin cobrar, así que el
+  navegador no tiene que decirle cuál.
 - **Un evento de clima lleva de fondo la textura de ese clima**, la misma
   que pone en el tablero.
 
@@ -1343,6 +1360,11 @@ Dicho para que nadie lo descubra tarde:
   como una victoria cualquiera. Una misión «vence a un rival nuevo» es un dato
   más en `misiones.js` y un campo en el parte.
 
+- **Sólo hay dos jefes, y ahora se repiten.** Que el jefe vuelva cada ciclo
+  arregla que la cuenca se quedara muerta, pero un calendario de 14 días con dos
+  cacerías es el mismo mes otra vez. Un jefe nuevo es un objeto en `JEFES` con su
+  mazo temático, su entrada en `CALENDARIO` y su carta — y `CARTAS_DE_JEFE`, que
+  vive fuera del set y se queda fuera de todas las listas.
 - **Al Duelo le faltan tres cosas de liga:** la protección al descenso (hoy
   el ELO baja en cuanto pierdes, sin las tres derrotas de margen), las
   temporadas con reinicio, y la tabla con nombre y puesto de la liga Extinción.

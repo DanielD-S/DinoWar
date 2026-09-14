@@ -64,8 +64,11 @@ export async function entrar(apodo = null) {
  * Traduce lo que devuelve el servidor a la forma que ya pinta la pantalla. La
  * traducción vive aquí y no en la pantalla a propósito: así el día que el
  * servidor cambie de forma, el que se entera es este fichero.
+ *
+ * Exportada para poder probarla sin servidor: lo que empareja aquí —qué aporte
+ * es de qué cacería— es exactamente lo que se puede equivocar en silencio.
  */
-function aFormaDePantalla(d) {
+export function aFormaDePantalla(d) {
   const ahora = Number(d.ahora);
   const tribu = d.tribu ?? null;
   const arranque = tribu ? new Date(tribu.creada_en).getTime() : ahora;
@@ -78,12 +81,23 @@ function aFormaDePantalla(d) {
     (e) => e.tipo === TIPO_EVENTO.JEFE && dia >= e.dia && dia < e.dia + e.dura,
   );
 
-  const fila = eventoJefe ? (d.jefes ?? []).find((j) => j.evento_id === eventoJefe.id) : null;
-  const mios = (d.aportes ?? []).filter((a) => a.evento_id === eventoJefe?.id);
+  // En qué VUELTA del calendario va la tribu. El jefe vuelve cada ciclo, así
+  // que un evento ya no identifica una cacería: hace falta el par (evento,
+  // vuelta) o el Saurophaganax de esta semana se confunde con el que cayó hace
+  // catorce días. La vuelta la cuenta el servidor, como el día.
+  const ciclo = Number(d.ciclo ?? 0);
+  const deEstaVuelta = (x) => Number(x.ciclo ?? 0) === ciclo;
+
+  const fila = eventoJefe
+    ? (d.jefes ?? []).find((j) => j.evento_id === eventoJefe.id && deEstaVuelta(j)) : null;
+  const mios = (d.aportes ?? []).filter((a) => a.evento_id === eventoJefe?.id && deEstaVuelta(a));
   const aportes = {};
   for (const a of mios) aportes[a.apodo] = Number(a.dano);
 
-  const yoMismo = usuarioActual()?.id;
+  // Quién soy, según el SERVIDOR. Lo manda en `yo` y esa es la buena: la sesión
+  // guardada en el navegador es una caché, y si las dos discrepan, quien sabe
+  // de quién son los aportes es quien los guarda.
+  const yoMismo = d.yo ?? usuarioActual()?.id;
   const mioReclamado = mios.find((a) => a.jugador_id === yoMismo)?.reclamado ?? false;
   const mioDano = mios.find((a) => a.jugador_id === yoMismo)?.dano ?? 0;
 
@@ -100,6 +114,9 @@ function aFormaDePantalla(d) {
 
   return {
     arranque,
+    // La vuelta del calendario en la que va la tribu. La pantalla la necesita
+    // para no confundir la cacería de ahora con la de hace catorce días.
+    ciclo,
     yacimiento: {
       nivel: d.yacimiento?.nivel ?? 1,
       fosiles: d.yacimiento?.fosiles ?? 0,
@@ -122,22 +139,27 @@ function aFormaDePantalla(d) {
       // Lo que ha puesto de su yacimiento en el común, que hasta ahora no se
       // guardaba en ningún sitio.
       fosiles: Number(m.fosiles ?? 0),
-      yo: m.id === (d.yo ?? yoMismo),
+      yo: m.id === yoMismo,
     })),
     puedeReclamar: Boolean(jefe && jefe.vida <= 0 && mioDano > 0 && !mioReclamado),
-    // Cartas de jefe sin reclamar, de TODOS los jefes caídos y no sólo del de
-    // esta ventana: un jefe que cae no vuelve a levantarse para esa tribu, así
-    // que una carta sin reclamar se queda esperando para siempre. Sale de lo
-    // que ya llega —`jefes` y `aportes` vienen enteros—, sin pedir nada más.
+    // Cartas de jefe sin reclamar, de TODAS las cacerías caídas y no sólo de la
+    // de esta ventana: el jefe vuelve cada vuelta, pero la carta de la vuelta
+    // pasada sigue esperando a que la cojas. El par (evento, ciclo) es lo que
+    // identifica una cacería, y emparejar sin él daría la carta del jefe de
+    // hace dos semanas por la del que sigue en pie.
     cartasPendientes: (d.jefes ?? [])
       .filter((x) => Number(x.vida) <= 0)
       .map((x) => {
         const ev = CALENDARIO.find((e) => e.id === x.evento_id);
         const mio = (d.aportes ?? []).find(
-          (a) => a.evento_id === x.evento_id && a.jugador_id === yoMismo,
+          (a) => a.evento_id === x.evento_id && a.jugador_id === yoMismo
+            && Number(a.ciclo ?? 0) === Number(x.ciclo ?? 0),
         );
         if (!ev || !mio || Number(mio.dano) <= 0 || mio.reclamado) return null;
-        return { evento: ev.id, titulo: ev.titulo, jefe: JEFES[ev.jefe] ?? null };
+        return {
+          evento: ev.id, ciclo: Number(x.ciclo ?? 0),
+          titulo: ev.titulo, jefe: JEFES[ev.jefe] ?? null,
+        };
       })
       .filter(Boolean),
     tribu: tribu ? {
@@ -154,7 +176,7 @@ function aFormaDePantalla(d) {
       turnos: Number(x.turnos),
       ganada: Boolean(x.ganada),
       cuando: x.jugado_en ? new Date(x.jugado_en).getTime() : 0,
-      yo: x.jugador_id === (d.yo ?? yoMismo),
+      yo: x.jugador_id === yoMismo,
     })),
     eventoJefe,
   };

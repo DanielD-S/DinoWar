@@ -11,7 +11,7 @@
 import {
   CUENCA, DIA, acumular, aplicarAsalto, mereceRecompensa,
 } from '../data/tribu.js';
-import { JEFES, jefeActivo, ventanaDe } from '../data/eventos.js';
+import { JEFES, jefeActivo, ventanaDe, CICLO } from '../data/eventos.js';
 import { ROL } from '../data/mando.js';
 
 const CLAVE = 'dinowar.cuenca.v1';
@@ -83,6 +83,16 @@ function guardar(c) {
 const diaDe = (c, ahora) => Math.floor((ahora - c.arranque) / DIA);
 
 /**
+ * La llave de una cacería: el evento MÁS la vuelta del calendario. El
+ * calendario da la vuelta cada `CICLO` días, así que el Saurophaganax de esta
+ * semana y el que cayó hace catorce son dos cacerías distintas. Con la llave
+ * puesta sólo en el evento, la fila del primero tapaba a la del segundo y el
+ * jefe no se volvía a levantar nunca: quien lo mataba se quedaba sin capa
+ * cooperativa. Es el mismo `ciclo` que lleva la tabla `jefes` del servidor.
+ */
+const claveDeJefe = (c, evento, ahora) => `${evento.id}@${Math.floor(diaDe(c, ahora) / CICLO)}`;
+
+/**
  * Lo que la tribu hizo mientras no estabas. Es la parte que un servidor haría
  * de verdad; aquí se deduce del tiempo transcurrido, con el mismo ritmo para
  * cada compañero, así que dos visitas al mismo instante dan lo mismo.
@@ -91,6 +101,7 @@ const diaDe = (c, ahora) => Math.floor((ahora - c.arranque) / DIA);
  * los números bailaran, no habría forma de saber si un aporte tuyo entró.
  */
 function avanzarCompaneros(c, ahora, jefe) {
+  const clave = jefe ? claveDeJefe(c, jefe.evento, ahora) : null;
   const horas = Math.max(0, (ahora - c.ultimaVisita) / 3600_000);
   if (horas < 0.02) return c;
 
@@ -99,7 +110,7 @@ function avanzarCompaneros(c, ahora, jefe) {
 
   const jefes = { ...c.jefes };
   if (jefe) {
-    const estado = jefes[jefe.evento.id] ?? nuevoJefe(jefe);
+    const estado = jefes[clave] ?? nuevoJefe(jefe);
     if (estado.vida > 0) {
       const aportes = { ...estado.aportes };
       let vida = estado.vida;
@@ -117,7 +128,7 @@ function avanzarCompaneros(c, ahora, jefe) {
         aportes[p.id] = (aportes[p.id] ?? 0) + dano;
         if (vida <= 0) break;
       }
-      jefes[jefe.evento.id] = {
+      jefes[clave] = {
         ...estado,
         vida: Math.max(0, vida),
         aportes,
@@ -153,12 +164,13 @@ export function estadoDeTribu(ahora = Date.now()) {
   const hoy = diaDe(c, ahora);
   if (c.asaltos.dia !== hoy) c = { ...c, asaltos: { dia: hoy, hechos: 0 } };
 
-  if (activo && !c.jefes[activo.evento.id]) {
-    c = { ...c, jefes: { ...c.jefes, [activo.evento.id]: nuevoJefe(activo) } };
+  const clave = activo ? claveDeJefe(c, activo.evento, ahora) : null;
+  if (activo && !c.jefes[clave]) {
+    c = { ...c, jefes: { ...c.jefes, [clave]: nuevoJefe(activo) } };
   }
   guardar(c);
 
-  const jefe = activo ? { ...JEFES[activo.evento.jefe], ...c.jefes[activo.evento.id],
+  const jefe = activo ? { ...JEFES[activo.evento.jefe], ...c.jefes[clave],
     ...ventanaDe(activo.evento, c.arranque, ahora), evento: activo.evento } : null;
 
   return {
@@ -181,7 +193,7 @@ export function estadoDeTribu(ahora = Date.now()) {
         fosiles: Math.floor((c.almacen / (COMPANEROS.length + 1)) * p.ritmo),
       })),
     ],
-    puedeReclamar: !!(jefe && mereceRecompensa(jefe, YO) && !c.jefes[activo.evento.id].reclamado),
+    puedeReclamar: !!(jefe && mereceRecompensa(jefe, YO) && !c.jefes[clave].reclamado),
     // Aquí no llama nadie a la puerta: no hay más tribus que ésta.
     solicitudes: [],
     // Y no hay registro de asaltos: los compañeros son un modelo, no gente que
@@ -224,7 +236,7 @@ export function asaltar(dano, ahora = Date.now()) {
   const c = cargar(ahora);
   const activo = jefeActivo(c.arranque, ahora);
   if (!activo) return null;
-  const clave = activo.evento.id;
+  const clave = claveDeJefe(c, activo.evento, ahora);
   const antes = c.jefes[clave] ?? nuevoJefe(activo);
   const despues = aplicarAsalto({ almacen: c.almacen, jefe: antes, ahora }, YO, dano);
   guardar({
@@ -241,12 +253,13 @@ export function reclamar(ahora = Date.now()) {
   const c = cargar(ahora);
   const activo = jefeActivo(c.arranque, ahora);
   if (!activo) return null;
-  const estado = c.jefes[activo.evento.id];
+  const clave = claveDeJefe(c, activo.evento, ahora);
+  const estado = c.jefes[clave];
   if (!estado || estado.reclamado || !mereceRecompensa(estado, YO)) return null;
   const cardId = JEFES[activo.evento.jefe].recompensa;
   guardar({
     ...c,
-    jefes: { ...c.jefes, [activo.evento.id]: { ...estado, reclamado: true } },
+    jefes: { ...c.jefes, [clave]: { ...estado, reclamado: true } },
     cartas: c.cartas.includes(cardId) ? c.cartas : [...c.cartas, cardId],
   });
   return cardId;
