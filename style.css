@@ -645,7 +645,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Las celdas: la carta de la colección con su contador y su paso. */
 .mazo-rejilla { gap: 8px 6px; }
 .mazo-celda { gap: 4px; }
-.mazo-arte { position: relative; cursor: pointer; }
+/* Una pulsación larga sobre la carta abre su ficha, así que el navegador no
+   puede quedarse el gesto: sin esto Android saca su menú de imagen y el
+   selector de texto encima de la carta a los 400 ms justos. */
+.mazo-arte {
+  position: relative; cursor: pointer;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
 .mazo-arte:active .carta { filter: brightness(1.15); }
 .mazo-celda:not(.puesta) .mazo-arte .carta { filter: saturate(.7) brightness(.78); }
 .mazo-celda.llena .mazo-arte .carta { filter: none; }
@@ -669,6 +675,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .mazo-cuenta { min-width: 26px; text-align: center; font-size: 10.5px; color: var(--texto-2); }
 .mazo-celda .col-nombre { text-align: center; font-size: 10px; cursor: pointer; }
 .mazo-celda.mal .col-nombre { color: var(--peligro); }
+/* La «i» del nombre dice que ahí se lee la carta: el toque corto sobre la
+   carta mete una copia, y sin seña nadie busca por dónde leerla. */
+.col-info {
+  display: inline-grid; place-items: center; width: 12px; height: 12px;
+  margin-left: 3px; vertical-align: -2px; border-radius: 6px;
+  box-shadow: 0 0 0 1px var(--borde); color: var(--texto-2);
+  font-style: normal; font-size: 9px; font-weight: 700; line-height: 1;
+}
+.mazo-celda .col-nombre:active .col-info { color: var(--bio); box-shadow: 0 0 0 1px var(--bio); }
 
 .meta-pie .fila { display: flex; gap: 8px; margin-bottom: 9px; }
 .meta-pie .fila .boton-secundario { flex: 1; font-size: 12px; padding: 11px 4px; min-height: 42px; }
