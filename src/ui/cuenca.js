@@ -16,10 +16,11 @@ import { CARTAS_DE_JEFE, eventosActivos, ventanaDe, TIPO_EVENTO } from '../data/
 import { carta } from '../data/cards.js';
 import {
   ROL, ACCESO, NOMBRE_ACCESO, esCapataz, estadoEnLista,
+  AUSENCIA_DIAS, ausenciaDe, puedeReclamarMando,
 } from '../data/mando.js';
 import {
   estadoDeTribu, aportar, mejorarYacimiento, reclamar, crearTribu, entrarEnTribu,
-  salirDeTribu, deshacerTribu, expulsar, cederMando,
+  salirDeTribu, deshacerTribu, expulsar, cederMando, reclamarMando,
   tribusAbiertas, unirseATribu, solicitarEntrada, retirarSolicitud,
   responderSolicitud, ajustarTribu,
   YO, modoActual, porQueLocal, MODO,
@@ -116,6 +117,9 @@ export function montarCuenca(volver, asaltar) {
         await expulsar(b.dataset.id);
       } else if (b.dataset.accion === 'ceder-si') {
         await cederMando(b.dataset.id);
+      } else if (b.dataset.accion === 'reclamar-mando') {
+        // Sin «¿seguro?»: no borra nada y tiene deshacer —el mando se cede—.
+        await reclamarMando();
       } else if (b.dataset.accion === 'salir-si') {
         // Deshacer es su propia llamada: si alguien entró mientras mirabas la
         // pantalla, falla diciéndolo en vez de dejarle la cuenca a esa persona.
@@ -299,7 +303,7 @@ function bloqueSinTribu() {
  * Los botones no salen en local: allí los compañeros son simulados y echar a
  * uno sería echar a nadie.
  */
-function filaMiembro(m, mando) {
+function filaMiembro(m, mando, ahora) {
   const nombre = escapar(m.apodo);
   if (confirmando && confirmando.id === m.id) {
     const echar = confirmando.accion === 'echar';
@@ -313,13 +317,23 @@ function filaMiembro(m, mando) {
   const acciones = mando && !m.yo ? `
     <button class="cu-mini" data-accion="ceder" data-id="${m.id}">Ceder mando</button>
     <button class="cu-mini mal" data-accion="echar" data-id="${m.id}">Echar</button>` : '';
+  // Lo aportado va en la fila de cada uno: el almacén es común, pero llenarlo
+  // cuesta horas de yacimiento y hasta ahora no se reconocía en ningún sitio.
+  const puesto = m.fosiles > 0
+    ? `<span class="cu-aportado" title="Fósiles aportados al común"><i class="cu-ico-fosil" aria-hidden="true"></i>${numero(m.fosiles)}</span>`
+    : '';
+  // Quién no aparece. Por debajo de dos días no se dice nada: todo el mundo
+  // duerme, y una fila que anuncia que ayer no entraste es una acusación.
+  const fuera = ausenciaDe(m, ahora);
+  const ausente = !m.yo && fuera !== null && fuera >= 2 * 86400_000
+    ? `<span class="cu-ausente">sin aparecer hace ${duracion(fuera)}</span>` : '';
   return `<li class="cu-miembro ${m.yo ? 'yo' : ''}">
     <i class="cu-medallon" aria-hidden="true"></i>${nombre}
-    ${esCapataz(m) ? '<span class="cu-rol">capataz</span>' : ''}${acciones}
+    ${esCapataz(m) ? '<span class="cu-rol">capataz</span>' : ''}${ausente}${puesto}${acciones}
   </li>`;
 }
 
-function bloqueTribu(c) {
+function bloqueTribu(c, ahora) {
   if (!c.tribu && modoActual() === MODO.REMOTO) return bloqueSinTribu();
   const cabecera = c.tribu ? `<section class="cu-bloque cu-tribu">
     <h3 class="cu-titulo"><i class="emblema emb-${escapar(c.tribu.emblema ?? 'clado_teropodo')}"
@@ -336,14 +350,20 @@ function bloqueTribu(c) {
   const yo = c.miembros.find((m) => m.yo) ?? null;
   const mando = compartida && esCapataz(yo);
   const soloQuedoYo = c.miembros.length <= 1;
+  // El relevo: una tribu cuyo capataz no vuelve se queda sin puerta y sin
+  // nadie que la arregle. Pasado el plazo, el mando lo coge quien lo pida.
+  const relevo = compartida && c.tribu && !puedeReclamarMando(yo, c.miembros, ahora);
   return `${cabecera}<section class="cu-bloque">
     <h3 class="cu-titulo">Almacén de la tribu</h3>
     <p class="cu-cifra"><i class="cu-ico-fosil" aria-hidden="true"></i>${numero(c.almacen)} <small>fósiles</small></p>
     <p class="cu-linea">Cada asalto al jefe cuesta <b>${CUENCA.costeAsalto}</b> del común.
       Tú llevas <b>${numero(c.aportado)}</b> de daño hecho.</p>
     <ul class="cu-miembros" aria-label="Miembros">
-      ${c.miembros.map((m) => filaMiembro(m, mando)).join('')}
+      ${c.miembros.map((m) => filaMiembro(m, mando, ahora)).join('')}
     </ul>
+    ${relevo ? `<p class="cu-linea cu-relevo">El capataz lleva más de ${AUSENCIA_DIAS} días
+      sin entrar y la tribu no puede aceptar ni echar a nadie.
+      <button class="cu-mini" data-accion="reclamar-mando">Tomar el mando</button></p>` : ''}
     <p class="cu-nota">${c.miembros.length} de ${CUENCA.miembrosMaximo}.${
   mando ? ' Mandas tú: puedes ceder el mando o echar a alguien.' : ''}</p>
     ${compartida ? salirHTML(yo, soloQuedoYo) : ''}
@@ -352,13 +372,16 @@ function bloqueTribu(c) {
 }
 
 /**
- * Cartas de jefe sin reclamar de ventanas ANTERIORES. La del jefe de ahora ya
- * tiene su botón en el pie, así que aquí sólo van las otras: un jefe caído no
- * se vuelve a levantar para su tribu, y sin esto la carta se quedaba esperando
- * sin ninguna forma de cogerla.
+ * Cartas de jefe sin reclamar de cacerías ANTERIORES. La de la cacería de ahora
+ * ya tiene su botón en el pie, así que aquí sólo van las otras — y «otras» es
+ * por evento Y por vuelta: el jefe vuelve cada ciclo, así que el Saurophaganax
+ * de hace catorce días es otra cacería aunque se llame igual, y comparando sólo
+ * el evento su carta se quedaba escondida detrás del que está en pie.
  */
 function bloquePendientes(c) {
-  const otras = (c.cartasPendientes ?? []).filter((p) => p.evento !== c.eventoJefe?.id);
+  const otras = (c.cartasPendientes ?? []).filter(
+    (p) => !(p.evento === c.eventoJefe?.id && (p.ciclo ?? 0) === (c.ciclo ?? 0)),
+  );
   if (!otras.length) return '';
   return `<section class="cu-bloque">
     <h3 class="cu-titulo">${otras.length === 1 ? 'Tienes una carta esperando' : `Tienes ${otras.length} cartas esperando`}</h3>
@@ -437,6 +460,27 @@ function salirHTML(yo, soloQuedoYo) {
       <button class="cu-mini" data-accion="cancelar">Quedarme</button>
     </p>
   </div>`;
+}
+
+/**
+ * Los últimos asaltos de la tribu. Estaban guardados desde el primer día y no
+ * se veían: lo único que salía por pantalla era el total acumulado de cada uno
+ * contra el jefe de ahora, que no cuenta quién ha estado dando guerra esta
+ * semana. No se enseña en local: ahí los compañeros son un modelo y un
+ * historial inventado sería fingir una tribu.
+ */
+function bloqueHistorial(c, ahora) {
+  if (!c.historial?.length) return '';
+  return `<section class="cu-bloque">
+    <h3 class="cu-titulo">Últimos asaltos</h3>
+    <ul class="cu-historial">
+      ${c.historial.map((a) => `<li class="${a.yo ? 'yo' : ''}">
+        <span class="cu-h-quien">${escapar(a.apodo)}</span>
+        <span class="cu-h-dano">−${numero(a.dano)}</span>
+        <span class="cu-h-cuando">${a.ganada ? 'ganó · ' : ''}hace ${duracion(Math.max(0, ahora - a.cuando))}</span>
+      </li>`).join('')}
+    </ul>
+  </section>`;
 }
 
 /** La vitrina: el marco del jefe con su ilustración en la ventana y el nombre en la cartela. */
@@ -543,11 +587,12 @@ export async function pintarCuenca() {
     sinTribu ? '' : bloqueEventos(c, ahora),
     sinTribu ? '' : bloqueJefe(c, ahora),
     sinTribu ? '' : bloquePendientes(c),
+    sinTribu ? '' : bloqueHistorial(c, ahora),
     // Sin tribu, lo primero que se ve tiene que ser GENTE: quien llega solo no
     // tiene código que escribir ni a quién pedírselo, y su yacimiento no le
     // sirve de nada hasta que entre en alguna cuenca.
-    sinTribu ? bloqueTribu(c) : bloqueYacimiento(c, ahora),
-    sinTribu ? bloqueYacimiento(c, ahora) : bloqueTribu(c),
+    sinTribu ? bloqueTribu(c, ahora) : bloqueYacimiento(c, ahora),
+    sinTribu ? bloqueYacimiento(c, ahora) : bloqueTribu(c, ahora),
     bloqueCartas(c),
     modoActual() === MODO.LOCAL
       ? `<p class="cu-aviso"><b>Estás jugando sin tribu de verdad</b> (${porQueLocal()}).

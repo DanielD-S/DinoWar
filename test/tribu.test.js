@@ -11,7 +11,7 @@ import {
 } from '../src/data/tribu.js';
 import {
   ROL, ACCESO, puedeExpulsar, puedeCederMando, relevoDeMando, estadoEnLista,
-  puedeDeshacer,
+  puedeDeshacer, puedeReclamarMando, ausenciaDe, AUSENCIA,
 } from '../src/data/mando.js';
 import {
   CALENDARIO, CICLO, JEFES, CARTAS_DE_JEFE, eventosActivos, jefeActivo, TIPO_EVENTO,
@@ -205,6 +205,47 @@ test('Deshacer la cuenca es del capataz, y sólo estando solo', () => {
 
 test('El último que se va no deja capataz: no queda tribu', () => {
   assert.equal(relevoDeMando([CAPATAZ], 'a'), null);
+});
+
+// -------------------------------------------------- el capataz que no vuelve
+
+const AHORA = T0;
+const conVisto = (m, hace) => ({ ...m, visto: AHORA - hace });
+const DIA = 86400_000;
+
+test('Al capataz que sigue entrando no se le quita el mando', () => {
+  const tribu = [conVisto(CAPATAZ, DIA), conVisto(VIEJA, 0)];
+  assert.ok(puedeReclamarMando(tribu[1], tribu, AHORA));
+});
+
+test('Pasado el plazo, el mando lo coge quien lo pida', () => {
+  const tribu = [conVisto(CAPATAZ, 9 * DIA), conVisto(VIEJA, 0), conVisto(NUEVO, 0)];
+  // Cualquiera de los dos, y no sólo el más antiguo: si la tribu se apagó, el
+  // más antiguo suele ser otro ausente y el mando se quedaría donde no hay nadie.
+  assert.equal(puedeReclamarMando(tribu[1], tribu, AHORA), null);
+  assert.equal(puedeReclamarMando(tribu[2], tribu, AHORA), null);
+  // El capataz no se releva a sí mismo.
+  assert.ok(puedeReclamarMando(tribu[0], tribu, AHORA));
+});
+
+test('Justo en el plazo todavía no, y un instante después sí', () => {
+  const enElFilo = [conVisto(CAPATAZ, AUSENCIA - 1), conVisto(VIEJA, 0)];
+  assert.ok(puedeReclamarMando(enElFilo[1], enElFilo, AHORA));
+  const pasado = [conVisto(CAPATAZ, AUSENCIA), conVisto(VIEJA, 0)];
+  assert.equal(puedeReclamarMando(pasado[1], pasado, AHORA), null);
+});
+
+test('Una tribu sin capataz la coge cualquiera sin esperar', () => {
+  const huerfana = [conVisto(VIEJA, 0), conVisto(NUEVO, 0)];
+  assert.equal(puedeReclamarMando(huerfana[0], huerfana, AHORA), null);
+});
+
+test('Sin saber cuándo se le vio, el capataz no es relevable', () => {
+  // Una fila vieja puede no traer `visto`. Tratarlo como «ausente desde
+  // siempre» le quitaría el mando a alguien que está jugando.
+  const tribu = [CAPATAZ, VIEJA];
+  assert.equal(ausenciaDe(CAPATAZ, AHORA), null);
+  assert.ok(puedeReclamarMando(VIEJA, tribu, AHORA));
 });
 
 test('Sin fecha de entrada el relevo sigue siendo determinista', () => {

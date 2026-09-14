@@ -2661,6 +2661,30 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   padding: 1px 6px; border-radius: 3px; color: var(--bio);
   box-shadow: 0 0 0 1px rgba(217,164,65,.45);
 }
+/* Lo aportado al común, en la fila de cada miembro. Va antes de los botones y
+   empuja con `margin-left: auto`, así queda pegado a la derecha cuando no hay
+   botones y justo antes de ellos cuando los hay. */
+.cu-aportado {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 3px;
+  font-size: 11px; color: var(--bio);
+}
+.cu-aportado .cu-ico-fosil { width: 13px; height: 13px; }
+.cu-miembro .cu-aportado + .cu-mini { margin-left: 6px; }
+
+/* Quién no aparece. En gris tenue y sin adorno: es un dato de la tribu, no un
+   reproche, y sólo sale pasados dos días. Empuja igual que lo aportado, y si
+   están los dos el `auto` lo gasta el primero. */
+.cu-ausente { margin-left: auto; font-size: 10.5px; color: var(--tenue); font-style: italic; }
+.cu-ausente + .cu-aportado { margin-left: 8px; }
+.cu-miembro .cu-ausente + .cu-mini { margin-left: 6px; }
+/* El relevo: la línea que aparece cuando el capataz lleva más del plazo sin
+   entrar. Enmarcada, que es lo único de esta pantalla que cambia quién manda. */
+.cu-relevo {
+  margin-top: 8px; padding: 8px 10px; border-radius: 8px;
+  background: rgba(217,164,65,.08); box-shadow: 0 0 0 1px rgba(217,164,65,.3);
+}
+.cu-relevo .cu-mini { margin-left: 8px; }
+
 .cu-mini {
   margin-left: auto; padding: 4px 9px; min-height: 30px; border-radius: 6px;
   font-size: 11px; color: var(--texto-2);
@@ -2670,6 +2694,17 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .cu-mini:active { border-color: var(--borde-fuerte); }
 .cu-mini.mal { color: var(--peligro); border-color: rgba(200,80,60,.4); }
 .cu-salir { margin-top: 6px; }
+
+/* --- los últimos asaltos ------------------------------------------------- */
+.cu-historial { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.cu-historial li {
+  display: flex; align-items: baseline; gap: 8px; font-size: 12px; color: var(--texto-2);
+  padding: 5px 8px; border-radius: 6px; background: rgba(0,0,0,.24);
+}
+.cu-historial li.yo { color: var(--acento-claro); }
+.cu-h-quien { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cu-h-dano { color: var(--bio); font-weight: 700; white-space: nowrap; }
+.cu-h-cuando { font-size: 10.5px; color: var(--tenue); white-space: nowrap; }
 
 /* --- la lista de cuencas abiertas --------------------------------------- */
 .cu-lista { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
