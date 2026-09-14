@@ -734,6 +734,16 @@ Tres decisiones que no se ven en el código a la primera:
 - **Borrar pide confirmación en la propia fila** y no se puede borrar el
   último mazo: un jugador sin mazo no puede jugar. `borrarMazo()` existía en
   `perfil.js` desde las cuentas y no tenía botón.
+- **En el editor la carta se LEE con una pulsación larga**, no con un toque: el
+  toque corto ya está cogido —mete una copia— y en la carta a tamaño de rejilla
+  sólo cabe el NOMBRE de la habilidad, «Tijera», no lo que hace. Es el mismo
+  gesto y los mismos 400 ms del tablero (`input.js`), abre la misma ficha que
+  la colección, y se cancela al desplazarse 8 px para no robarle el scroll a la
+  rejilla. El click que llega al soltar se descarta POR RELOJ y no por bandera:
+  al abrirse la ficha el dedo se levanta encima de la hoja, así que ese click
+  puede no llegar nunca al editor y una bandera se quedaría puesta, comiéndose
+  el siguiente toque de verdad. La «i» del nombre es la seña de que ahí se lee,
+  y el camino del ratón, que no tiene gesto largo.
 
 En el editor la curva de coste es un filtro —cada barra un botón— y la
 búsqueda repinta al escribir devolviendo el foco con el cursor al final, que

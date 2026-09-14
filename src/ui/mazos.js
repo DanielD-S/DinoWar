@@ -38,8 +38,22 @@ const GRUPOS = [
     .map((t) => ({ clave: `tipo_${t.toLowerCase()}`, nombre: TIPO_NOMBRE[t], filtra: (x) => x.tipo === t })),
 ];
 
+/**
+ * La pulsación larga sobre una carta abre su ficha, con el mismo gesto y los
+ * mismos números que el tablero (`input.js`). Aquí hace falta por lo mismo que
+ * allí: la carta del editor va a tamaño de rejilla y en la caja del marco sólo
+ * cabe el NOMBRE de la habilidad —«Tijera»—, no lo que hace. Y el toque corto
+ * ya está cogido: mete una copia.
+ */
+const LARGA = 400;   // ms de pulsación larga
+const UMBRAL = 8;    // px de movimiento: a partir de ahí es un desplazamiento, no una pulsación
+/** Los ms tras abrir la ficha en los que un click sobre la rejilla no cuenta. */
+const SORDO = 500;
+
 let dom = null;
 let pintarMenu = () => {};
+let largo = null;    // { t, x, y } mientras el dedo sigue abajo
+let abrioLarga = 0;  // cuándo abrió la ficha la última pulsación larga
 let editando = null;        // { indice, nombre, cartas, pestana, filtro } mientras se edita
 let confirmando = null;     // índice del mazo con el «¿borrar?» abierto
 
@@ -114,6 +128,13 @@ function resumenDe(mazo) {
 
 function pintarMazos() {
   if (editando) return pintarEditor();
+  // Volver del editor deja sus manejadores de puntero puestos sobre el mismo
+  // nodo: en la lista no hay cartas que pulsar, así que se sueltan.
+  soltarLargo();
+  dom.cuerpo.onpointerdown = null;
+  dom.cuerpo.onpointermove = null;
+  dom.cuerpo.onpointerup = null;
+  dom.cuerpo.onpointercancel = null;
   const p = cargarPerfil();
   dom.titulo.textContent = 'Mazos';
 
@@ -229,6 +250,12 @@ function pasaFiltro(c, f) {
   return true;
 }
 
+/** Cancela la pulsación larga en curso, si la hay. */
+function soltarLargo() {
+  if (largo) clearTimeout(largo.t);
+  largo = null;
+}
+
 /**
  * Una celda del editor: la carta con su marco, el contador y el paso. `mal`
  * es una copia de más —por rareza o porque no la tienes— y se ve en la propia
@@ -250,7 +277,8 @@ function celda(c, n, p) {
       <span class="mazo-cuenta ${mal ? 'mal' : ''}">${n}/${tope}</span>
       <button data-mas="${c.id}" ${n >= tope ? 'disabled' : ''} aria-label="Meter una copia">+</button>
     </div>
-    <div class="col-nombre" data-ficha="${c.id}">${nombreHTML(c)}</div>
+    <div class="col-nombre" data-ficha="${c.id}" role="button"
+         aria-label="Ver la ficha de ${escapar(c.binomial)}">${nombreHTML(c)}<i class="col-info" aria-hidden="true">i</i></div>
   </div>`;
 }
 
@@ -328,7 +356,37 @@ function pintarEditor() {
     b.setSelectionRange(b.value.length, b.value.length);
   };
 
+  // Pulsación larga sobre la carta: abre la ficha. No se hace `preventDefault`
+  // en `pointerdown` —la rejilla tiene que poder desplazarse— así que el
+  // desplazamiento se detecta por distancia y cancela el temporizador.
+  dom.cuerpo.onpointerdown = (e) => {
+    const arte = e.target.closest('.mazo-arte');
+    if (!arte) return;
+    soltarLargo();
+    const id = arte.closest('[data-card]').dataset.card;
+    largo = {
+      x: e.clientX,
+      y: e.clientY,
+      t: setTimeout(() => {
+        largo = null;
+        abrioLarga = Date.now();
+        try { navigator.vibrate?.(12); } catch { /* sin vibración: no pasa nada */ }
+        abrirFicha(fichaHTML(id));
+      }, LARGA),
+    };
+  };
+  dom.cuerpo.onpointermove = (e) => {
+    if (largo && Math.hypot(e.clientX - largo.x, e.clientY - largo.y) > UMBRAL) soltarLargo();
+  };
+  dom.cuerpo.onpointerup = soltarLargo;
+  dom.cuerpo.onpointercancel = soltarLargo;
+
   dom.cuerpo.onclick = (e) => {
+    // El click que sigue a una pulsación larga no mete copia. Va por reloj y
+    // no por bandera: al abrir la ficha el dedo se levanta ENCIMA de la hoja,
+    // así que ese click puede no llegar aquí nunca y una bandera se quedaría
+    // puesta, comiéndose el siguiente toque de verdad.
+    if (Date.now() - abrioLarga < SORDO) return;
     const b = (k) => e.target.closest(`[data-${k}]`);
     const tab = b('pestana');
     const grupo = b('grupo');
