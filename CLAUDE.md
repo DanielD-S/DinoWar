@@ -1390,6 +1390,26 @@ luego el rival; alternar los bandos cambia el resultado en 2 de cada 40
 partidas. El validador del servidor tiene que reproducir ese orden o cobra un
 daño que el jugador no vio.
 
+## Instalarlo como app
+
+El juego es una PWA: `manifest.json`, iconos en `assets/` y `sw.js`. Se instala
+desde Chrome y Edge en Android y PC, y en iPhone con «Añadir a pantalla de
+inicio». El menú lleva un botón «Instalar app» (`src/ui/instalar.js`) que sólo
+aparece cuando sirve: guarda el `beforeinstallprompt` y lo lanza al tocarlo;
+en iPhone, que no tiene ese aviso, explica el gesto; instalado, no sale.
+
+- **El manifest es texto de cara al público**: es lo que enseña la ventana de
+  instalación y lo que leería una tienda. Decía «sin cuenta, sin conexión»
+  meses después de que las dos cosas dejaran de ser ciertas.
+  `test/manifest.test.js` lo vigila.
+- **Las capturas de `assets/capturas/` salen de los bancos** con Chrome sin
+  ventana y el tamaño se declara en el manifest: Chrome descarta una captura
+  que no mide lo que dice, y el test lee la cabecera del WebP para comprobarlo.
+  Hay que rehacerlas cuando cambien esas pantallas.
+- **`id: "./"`** fija la identidad de la app instalada. Si algún día se sirve
+  desde un dominio propio, el origen cambia y es otra app para el sistema: los
+  que la tengan instalada tendrán que volver a instalarla.
+
 ## El service worker
 
 **«Red primero» hay que escribirlo, no sólo decirlo.** `fetch(request)` pasa por

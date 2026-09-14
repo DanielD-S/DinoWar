@@ -317,6 +317,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   text-align: center; color: var(--tenue-2); font-size: 11px; min-height: 14px;
   margin: 2px 0 0;
 }
+/* Cómo instalar en iPhone, que no tiene ventana de instalación que lanzar. */
+.menu-instalar {
+  text-align: center; color: var(--acento-claro); font-size: 12px; line-height: 1.35;
+  margin: -2px 0 2px;
+}
 
 /* Fin de partida: misma portada, otro titular. */
 #fin {
