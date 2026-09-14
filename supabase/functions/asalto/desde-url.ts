@@ -24,25 +24,25 @@
 // la función arranca y muere con «Module not found» AUNQUE LA URL CONTESTE 200.
 // Costó verlo porque todo lo demás —el commit, la URL, el contenido— estaba bien.
 //
-// Motor anclado en: cb716f3e00a54584d25620ddddaba270672d21c2
+// Motor anclado en: 03ce5092c16b102a6607d768ab9618d888f980e0
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import {
   validarAsalto, jefeDelEvento, AsaltoInvalido,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@cb716f3e00a54584d25620ddddaba270672d21c2/supabase/functions/_compartido/validarAsalto.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@03ce5092c16b102a6607d768ab9618d888f980e0/supabase/functions/_compartido/validarAsalto.js';
 import {
   validarSolitario,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@cb716f3e00a54584d25620ddddaba270672d21c2/supabase/functions/_compartido/validarSolitario.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@03ce5092c16b102a6607d768ab9618d888f980e0/supabase/functions/_compartido/validarSolitario.js';
 import {
   crearDuelo, aplicarAccion, vistaDuelo, comprobarTiempo, rendirse, resultado, terminado,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@cb716f3e00a54584d25620ddddaba270672d21c2/supabase/functions/_compartido/duelo.js';
-import { validarMazoLegal } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@cb716f3e00a54584d25620ddddaba270672d21c2/supabase/functions/_compartido/validarPartida.js';
-import { eloTras } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@cb716f3e00a54584d25620ddddaba270672d21c2/src/data/ligas.js';
-import { CUENCA } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@cb716f3e00a54584d25620ddddaba270672d21c2/src/data/tribu.js';
-import { ECONOMIA, abrirSobre } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@cb716f3e00a54584d25620ddddaba270672d21c2/src/data/coleccion.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@03ce5092c16b102a6607d768ab9618d888f980e0/supabase/functions/_compartido/duelo.js';
+import { validarMazoLegal } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@03ce5092c16b102a6607d768ab9618d888f980e0/supabase/functions/_compartido/validarPartida.js';
+import { eloTras } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@03ce5092c16b102a6607d768ab9618d888f980e0/src/data/ligas.js';
+import { CUENCA } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@03ce5092c16b102a6607d768ab9618d888f980e0/src/data/tribu.js';
+import { ECONOMIA, abrirSobre } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@03ce5092c16b102a6607d768ab9618d888f980e0/src/data/coleccion.js';
 import {
   avancesDelParte, diaUTC, POR_ID,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@cb716f3e00a54584d25620ddddaba270672d21c2/src/data/misiones.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@03ce5092c16b102a6607d768ab9618d888f980e0/src/data/misiones.js';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
