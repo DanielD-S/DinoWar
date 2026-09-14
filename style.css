@@ -271,6 +271,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .mision.hecha { border-color: rgba(217,164,65,.5); background: rgba(217,164,65,.08); }
 .mision.hecha .mision-cifra { color: var(--acento-vivo); }
 
+/* La dificultad es del rival de la IA: con el panel del Duelo abierto se va,
+   que ahí el rival es una persona y el chip de «Fácil» lo contradecía. */
+#jugar.duelo-abierto .menu-dificultad { display: none; }
+
 /* El panel del Duelo hereda el del de misiones: misma caja, mismo título. */
 #jugar.duelo-abierto .placa-duelo i { filter: brightness(1.25) saturate(1.2); }
 #jugar.duelo-abierto .placa-duelo { color: var(--acento-vivo); }
