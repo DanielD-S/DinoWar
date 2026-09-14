@@ -54,6 +54,37 @@ export function relevoDeMando(miembros, saliente) {
 }
 
 /**
+ * Un capataz que no aparece congela la tribu entera: en «por solicitud» nadie
+ * contesta a la puerta, nadie echa a nadie y nadie puede arreglarlo. Pasado el
+ * plazo desde la última vez que se le vio, el mando lo coge quien lo pida.
+ *
+ * QUIEN LO PIDA, y no el más antiguo: si la tribu se apagó, el más antiguo es
+ * probablemente otro ausente, y el relevo automático dejaría el mando en otro
+ * sitio donde tampoco hay nadie. Quien lo pide es, por definición, quien está.
+ *
+ * El plazo está también en `0021_relevo_de_capataz.sql`, y el de allí es el que
+ * manda: éste sirve para enseñar el botón y decir cuánto falta, pero la hora
+ * buena es la del servidor y `visto_en` no lo escribe el navegador.
+ */
+export const AUSENCIA_DIAS = 7;
+export const AUSENCIA = AUSENCIA_DIAS * 86400_000;
+
+/** Cuánto lleva sin aparecer, en ms. `null` si no se sabe cuándo se le vio. */
+export const ausenciaDe = (m, ahora) => (m?.visto ? Math.max(0, ahora - m.visto) : null);
+
+/** ¿Puede `yo` reclamar el mando? Devuelve el motivo si no. */
+export function puedeReclamarMando(yo, miembros, ahora) {
+  if (!yo) return 'no estás en la tribu';
+  if (esCapataz(yo)) return 'ya mandas tú';
+  const capataz = (miembros ?? []).find(esCapataz);
+  // Una tribu sin capataz —no debería pasar— la coge cualquiera sin esperar:
+  // es la válvula, porque no tiene ninguna otra forma de volver a funcionar.
+  if (!capataz) return null;
+  if ((ausenciaDe(capataz, ahora) ?? 0) < AUSENCIA) return 'el capataz sigue apareciendo';
+  return null;
+}
+
+/**
  * ¿Puede deshacer la cuenca? Sólo el capataz y sólo si no queda nadie más.
  * Una tribu no es del capataz: es de quien está dentro, y el almacén lo
  * llenaron entre todos. Borrar el progreso de otros siete no es una atribución

@@ -116,6 +116,9 @@ function aFormaDePantalla(d) {
     miembros: (d.miembros ?? []).map((m) => ({
       id: m.id, apodo: m.apodo, rol: m.rol ?? ROL.MIEMBRO,
       desde: m.desde ? new Date(m.desde).getTime() : 0,
+      // La última vez que entró en el juego. Es lo que permite relevar a un
+      // capataz que no aparece, y lo pone `entrar()` en cada arranque.
+      visto: m.visto ? new Date(m.visto).getTime() : 0,
       // Lo que ha puesto de su yacimiento en el común, que hasta ahora no se
       // guardaba en ningún sitio.
       fosiles: Number(m.fosiles ?? 0),
@@ -269,6 +272,17 @@ export async function ajustarTribu({ acceso = null, emblema = null } = {}) {
 export async function cederMando(jugadorId) {
   if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('ceder el mando');
   return rpc('ceder_mando', { p_jugador: jugadorId });
+}
+
+/**
+ * Coger el mando de una tribu cuyo capataz lleva sin aparecer más del plazo.
+ * El navegador ya lo ha comprobado con `puedeReclamarMando` para enseñar el
+ * botón; esto lo vuelve a comprobar con la hora del servidor, que es la única
+ * que no se cambia desde los ajustes del móvil.
+ */
+export async function reclamarMando() {
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('reclamar el mando');
+  return rpc('reclamar_mando');
 }
 
 /**

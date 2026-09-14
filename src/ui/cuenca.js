@@ -16,10 +16,11 @@ import { CARTAS_DE_JEFE, eventosActivos, ventanaDe, TIPO_EVENTO } from '../data/
 import { carta } from '../data/cards.js';
 import {
   ROL, ACCESO, NOMBRE_ACCESO, esCapataz, estadoEnLista,
+  AUSENCIA_DIAS, ausenciaDe, puedeReclamarMando,
 } from '../data/mando.js';
 import {
   estadoDeTribu, aportar, mejorarYacimiento, reclamar, crearTribu, entrarEnTribu,
-  salirDeTribu, deshacerTribu, expulsar, cederMando,
+  salirDeTribu, deshacerTribu, expulsar, cederMando, reclamarMando,
   tribusAbiertas, unirseATribu, solicitarEntrada, retirarSolicitud,
   responderSolicitud, ajustarTribu,
   YO, modoActual, porQueLocal, MODO,
@@ -116,6 +117,9 @@ export function montarCuenca(volver, asaltar) {
         await expulsar(b.dataset.id);
       } else if (b.dataset.accion === 'ceder-si') {
         await cederMando(b.dataset.id);
+      } else if (b.dataset.accion === 'reclamar-mando') {
+        // Sin «¿seguro?»: no borra nada y tiene deshacer —el mando se cede—.
+        await reclamarMando();
       } else if (b.dataset.accion === 'salir-si') {
         // Deshacer es su propia llamada: si alguien entró mientras mirabas la
         // pantalla, falla diciéndolo en vez de dejarle la cuenca a esa persona.
@@ -299,7 +303,7 @@ function bloqueSinTribu() {
  * Los botones no salen en local: allí los compañeros son simulados y echar a
  * uno sería echar a nadie.
  */
-function filaMiembro(m, mando) {
+function filaMiembro(m, mando, ahora) {
   const nombre = escapar(m.apodo);
   if (confirmando && confirmando.id === m.id) {
     const echar = confirmando.accion === 'echar';
@@ -318,13 +322,18 @@ function filaMiembro(m, mando) {
   const puesto = m.fosiles > 0
     ? `<span class="cu-aportado" title="Fósiles aportados al común"><i class="cu-ico-fosil" aria-hidden="true"></i>${numero(m.fosiles)}</span>`
     : '';
+  // Quién no aparece. Por debajo de dos días no se dice nada: todo el mundo
+  // duerme, y una fila que anuncia que ayer no entraste es una acusación.
+  const fuera = ausenciaDe(m, ahora);
+  const ausente = !m.yo && fuera !== null && fuera >= 2 * 86400_000
+    ? `<span class="cu-ausente">sin aparecer hace ${duracion(fuera)}</span>` : '';
   return `<li class="cu-miembro ${m.yo ? 'yo' : ''}">
     <i class="cu-medallon" aria-hidden="true"></i>${nombre}
-    ${esCapataz(m) ? '<span class="cu-rol">capataz</span>' : ''}${puesto}${acciones}
+    ${esCapataz(m) ? '<span class="cu-rol">capataz</span>' : ''}${ausente}${puesto}${acciones}
   </li>`;
 }
 
-function bloqueTribu(c) {
+function bloqueTribu(c, ahora) {
   if (!c.tribu && modoActual() === MODO.REMOTO) return bloqueSinTribu();
   const cabecera = c.tribu ? `<section class="cu-bloque cu-tribu">
     <h3 class="cu-titulo"><i class="emblema emb-${escapar(c.tribu.emblema ?? 'clado_teropodo')}"
@@ -341,14 +350,20 @@ function bloqueTribu(c) {
   const yo = c.miembros.find((m) => m.yo) ?? null;
   const mando = compartida && esCapataz(yo);
   const soloQuedoYo = c.miembros.length <= 1;
+  // El relevo: una tribu cuyo capataz no vuelve se queda sin puerta y sin
+  // nadie que la arregle. Pasado el plazo, el mando lo coge quien lo pida.
+  const relevo = compartida && c.tribu && !puedeReclamarMando(yo, c.miembros, ahora);
   return `${cabecera}<section class="cu-bloque">
     <h3 class="cu-titulo">Almacén de la tribu</h3>
     <p class="cu-cifra"><i class="cu-ico-fosil" aria-hidden="true"></i>${numero(c.almacen)} <small>fósiles</small></p>
     <p class="cu-linea">Cada asalto al jefe cuesta <b>${CUENCA.costeAsalto}</b> del común.
       Tú llevas <b>${numero(c.aportado)}</b> de daño hecho.</p>
     <ul class="cu-miembros" aria-label="Miembros">
-      ${c.miembros.map((m) => filaMiembro(m, mando)).join('')}
+      ${c.miembros.map((m) => filaMiembro(m, mando, ahora)).join('')}
     </ul>
+    ${relevo ? `<p class="cu-linea cu-relevo">El capataz lleva más de ${AUSENCIA_DIAS} días
+      sin entrar y la tribu no puede aceptar ni echar a nadie.
+      <button class="cu-mini" data-accion="reclamar-mando">Tomar el mando</button></p>` : ''}
     <p class="cu-nota">${c.miembros.length} de ${CUENCA.miembrosMaximo}.${
   mando ? ' Mandas tú: puedes ceder el mando o echar a alguien.' : ''}</p>
     ${compartida ? salirHTML(yo, soloQuedoYo) : ''}
@@ -573,8 +588,8 @@ export async function pintarCuenca() {
     // Sin tribu, lo primero que se ve tiene que ser GENTE: quien llega solo no
     // tiene código que escribir ni a quién pedírselo, y su yacimiento no le
     // sirve de nada hasta que entre en alguna cuenca.
-    sinTribu ? bloqueTribu(c) : bloqueYacimiento(c, ahora),
-    sinTribu ? bloqueYacimiento(c, ahora) : bloqueTribu(c),
+    sinTribu ? bloqueTribu(c, ahora) : bloqueYacimiento(c, ahora),
+    sinTribu ? bloqueYacimiento(c, ahora) : bloqueTribu(c, ahora),
     bloqueCartas(c),
     modoActual() === MODO.LOCAL
       ? `<p class="cu-aviso"><b>Estás jugando sin tribu de verdad</b> (${porQueLocal()}).

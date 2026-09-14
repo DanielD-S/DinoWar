@@ -2671,6 +2671,20 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .cu-aportado .cu-ico-fosil { width: 13px; height: 13px; }
 .cu-miembro .cu-aportado + .cu-mini { margin-left: 6px; }
 
+/* Quién no aparece. En gris tenue y sin adorno: es un dato de la tribu, no un
+   reproche, y sólo sale pasados dos días. Empuja igual que lo aportado, y si
+   están los dos el `auto` lo gasta el primero. */
+.cu-ausente { margin-left: auto; font-size: 10.5px; color: var(--tenue); font-style: italic; }
+.cu-ausente + .cu-aportado { margin-left: 8px; }
+.cu-miembro .cu-ausente + .cu-mini { margin-left: 6px; }
+/* El relevo: la línea que aparece cuando el capataz lleva más del plazo sin
+   entrar. Enmarcada, que es lo único de esta pantalla que cambia quién manda. */
+.cu-relevo {
+  margin-top: 8px; padding: 8px 10px; border-radius: 8px;
+  background: rgba(217,164,65,.08); box-shadow: 0 0 0 1px rgba(217,164,65,.3);
+}
+.cu-relevo .cu-mini { margin-left: 8px; }
+
 .cu-mini {
   margin-left: auto; padding: 4px 9px; min-height: 30px; border-radius: 6px;
   font-size: 11px; color: var(--texto-2);

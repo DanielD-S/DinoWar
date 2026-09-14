@@ -853,6 +853,19 @@ Lo que cambia de flujo y no sólo de piel:
     está. Una lista pública no es una mirilla. Y el emblema son los DIEZ
     medallones de los mazos, que ya existen y ya están medidos: arte nuevo,
     cero.
+  - **Y un capataz que no vuelve ya no congela la tribu.** El mando sólo
+    cambiaba de manos por voluntad suya —cederlo, o irse—, y las dos piden que
+    esté: quien funda una, la deja en «por solicitud» y desaparece, deja dentro
+    a siete personas sin puerta, sin poder echar a nadie y sin arreglo salvo
+    irse todas y perder el almacén. `visto_en` estaba en la tabla desde el
+    primer día y lo pone al día `entrar()` en cada arranque, así que un capataz
+    que juega NUNCA es relevable. Pasados SIETE días, `reclamar_mando()` se lo
+    da a quien lo pida — a quien lo pida y no al más antiguo, que si la tribu se
+    apagó el más antiguo suele ser otro ausente y el mando acabaría otra vez
+    donde no hay nadie; quien lo pide es, por definición, quien está. Una tribu
+    sin capataz —que no debería pasar— la coge cualquiera sin esperar: es la
+    válvula. El plazo está en los dos sitios, `mando.js` y el SQL, y manda el
+    del SQL: `visto_en` no lo escribe el navegador y la hora tampoco.
   - **Las reglas viven en `src/data/mando.js` y NO en `tribu.js`**, que es lo
     que parecía natural. `tribu.js` entra en el paquete de la Edge Function
     —lo importa el validador de asaltos—, así que tocarlo obliga a regenerar
