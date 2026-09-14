@@ -11,6 +11,9 @@
 -- `src/data/mando.js` para poder decir POR QUÉ antes de mandar la petición;
 -- las de aquí son las que mandan, porque salen de `auth.uid()`.
 
+--
+-- Aplicada en producción el 14-09-2026.
+
 alter table public.jugadores
   add column if not exists rol text not null default 'miembro',
   add column if not exists tribu_desde timestamptz;

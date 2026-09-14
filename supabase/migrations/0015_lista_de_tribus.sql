@@ -15,6 +15,9 @@
 -- y tres familias de soporte—: no hay arte nuevo que generar, y una lista de
 -- nombres a pelo no se distingue de una hoja de cálculo.
 
+--
+-- Aplicada en producción el 14-09-2026.
+
 alter table public.tribus
   add column if not exists acceso  text not null default 'libre',
   add column if not exists emblema text not null default 'clado_teropodo';
