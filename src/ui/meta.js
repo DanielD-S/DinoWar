@@ -29,6 +29,7 @@ import { avisosDeCuenca } from './red.js';
 import { fichaHTML, abrirFicha, cartaHTML } from './render.js';
 import { ceremoniaDeSobre } from './apertura.js';
 import { montarMazos } from './mazos.js';
+import { montarTienda, aplicarEquipado } from './tienda.js';
 
 const id = (s) => document.getElementById(s);
 
@@ -81,6 +82,7 @@ export function montarMeta(alVolver) {
   dom.btnFundir.addEventListener('click', fundirSobrantes);
   dom.btnAbrir.addEventListener('click', comprarSobre);
   montarMazos({ titulo: dom.mazosTitulo, cuerpo: dom.mazosCuerpo, pie: dom.mazosPie, alPintarMenu: pintarMenu });
+  montarTienda({ cuerpo: id('tienda-cuerpo'), aviso: id('tienda-aviso'), alCambiar: pintarMenu });
 
   pintarMenu();
 }
@@ -155,6 +157,9 @@ export function pintarMenu() {
   // las dos veía el «0» del HTML con 240 dinomonedas en la cuenta. El menú se
   // repinta al sincronizar y tras cada cambio, así que desde aquí llega a todas.
   pintarMonedas();
+  // Lo equipado en la tienda (hoy, el dorso) se aplica aquí por lo mismo: el
+  // menú se repinta al traer el perfil del servidor y tras cada cambio.
+  aplicarEquipado(p);
   pintarAvisos();
 }
 

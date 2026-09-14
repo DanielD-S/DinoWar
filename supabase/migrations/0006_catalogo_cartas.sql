@@ -37,6 +37,15 @@ create table if not exists public.catalogo_iniciales (
   primary key (mazo, card_id)
 );
 
+-- La tienda: lo que se vende y cuánto cuesta. `comprar_cosmetico` (0024) cobra
+-- el precio de AQUÍ; el cliente sólo manda el id. Sale de src/data/cosmeticos.js.
+create table if not exists public.catalogo_cosmeticos (
+  id           text primary key,
+  tipo         text not null,
+  precio       int  not null check (precio >= 0),
+  por_defecto  boolean not null default false
+);
+
 -- Los precios, en una fila. Que sean una tabla y no constantes en el SQL
 -- permite tocarlos sin volver a desplegar nada.
 create table if not exists public.catalogo_economia (
@@ -393,6 +402,18 @@ delete from public.catalogo_iniciales where (mazo, card_id) not in (values
   ('ornitopodos', 'cicadas')
 );
 
+insert into public.catalogo_cosmeticos (id, tipo, precio, por_defecto) values
+  ('dorso_clasico', 'DORSO', 0, true),
+  ('dorso_ambar', 'DORSO', 300, false),
+  ('dorso_obsidiana', 'DORSO', 300, false)
+on conflict (id) do update set tipo = excluded.tipo, precio = excluded.precio, por_defecto = excluded.por_defecto;
+
+delete from public.catalogo_cosmeticos where id not in (
+  'dorso_clasico',
+  'dorso_ambar',
+  'dorso_obsidiana'
+);
+
 delete from public.catalogo_cartas where card_id not in (
   'dryosaurus',
   'ornitholestes',
@@ -534,6 +555,13 @@ create policy "el catálogo es público" on public.catalogo_iniciales
   for select to authenticated using (true);
 revoke insert, update, delete on public.catalogo_iniciales from anon, authenticated;
 revoke select on public.catalogo_iniciales from anon;
+
+alter table public.catalogo_cosmeticos enable row level security;
+drop policy if exists "el catálogo es público" on public.catalogo_cosmeticos;
+create policy "el catálogo es público" on public.catalogo_cosmeticos
+  for select to authenticated using (true);
+revoke insert, update, delete on public.catalogo_cosmeticos from anon, authenticated;
+revoke select on public.catalogo_cosmeticos from anon;
 
 alter table public.catalogo_economia enable row level security;
 drop policy if exists "el catálogo es público" on public.catalogo_economia;

@@ -59,6 +59,7 @@ import { arte } from './ui/art.js';
 import { mostrarMarca, empezarCarga, precargarPiezas } from './ui/carga.js';
 import { pedirMazoInicial } from './ui/iniciales.js';
 import { montarInstalar } from './ui/instalar.js';
+import { abrirTienda } from './ui/tienda.js';
 
 const APP = Object.freeze({
   BOOT: 'BOOT', MARCA: 'MARCA', CARGA: 'CARGA',
@@ -66,6 +67,7 @@ const APP = Object.freeze({
   GAME_OVER: 'GAME_OVER',
   COLECCION: 'COLECCION', SOBRES: 'SOBRES', MAZOS: 'MAZOS', CUENCA: 'CUENCA',
   CUENTA: 'CUENTA', ENTRADA: 'ENTRADA', EXPEDICION: 'EXPEDICION', INICIALES: 'INICIALES',
+  TIENDA: 'TIENDA',
 });
 
 const params = new URLSearchParams(location.search);
@@ -295,6 +297,7 @@ const MUSICA_DE = {
   [APP.MENU]: 'musica-menu', [APP.JUGAR]: 'musica-menu', [APP.EXPEDICION]: 'musica-menu',
   [APP.COLECCION]: 'musica-menu', [APP.SOBRES]: 'musica-menu',
   [APP.MAZOS]: 'musica-menu', [APP.CUENTA]: 'musica-menu', [APP.INICIALES]: 'musica-menu',
+  [APP.TIENDA]: 'musica-menu',
   [APP.CUENCA]: 'musica-cuenca',
   [APP.PLAYING]: 'musica-partida', [APP.RESOLVING]: 'musica-partida',
 };
@@ -316,6 +319,7 @@ function irA(nuevo) {
   el.cuenta.classList.toggle('oculta', nuevo !== APP.CUENTA);
   el.entrada.classList.toggle('oculta', nuevo !== APP.ENTRADA);
   document.getElementById('iniciales').classList.toggle('oculta', nuevo !== APP.INICIALES);
+  document.getElementById('tienda').classList.toggle('oculta', nuevo !== APP.TIENDA);
 }
 
 const interactivo = () => app === APP.PLAYING && estado?.fase === FASE.DESPLIEGUE;
@@ -1375,6 +1379,7 @@ function iniciar() {
   el.btnMazos.addEventListener('click', () => { abrirMazos(); irA(APP.MAZOS); });
   el.btnCuenca.addEventListener('click', () => { abrirCuenca(); irA(APP.CUENCA); });
   el.btnCuenta.addEventListener('click', () => { abrirCuenta(); irA(APP.CUENTA); });
+  document.getElementById('btn-tienda').addEventListener('click', () => { abrirTienda(); irA(APP.TIENDA); });
   el.btnOtra.addEventListener('click', () => {
     pintarRecord();
     // Tras un duelo, «otra» no es otra contra la IA: es volver a buscar rival.

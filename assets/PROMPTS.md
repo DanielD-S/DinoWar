@@ -1339,3 +1339,58 @@ piel de CSS.
 - El VS: reutiliza `medallon_vs` del final.
 - Los emblemas de clado ni los retratos: ya existen.
 - Ningún texto: los nombres, el modo y el objetivo los escribe el juego.
+
+## La tienda
+
+La tienda vende cosméticos con dinomonedas y nada que dé ventaja. La primera
+tanda son **dos dorsos de carta** y **la sexta placa del menú**. Hasta que
+lleguen, los dorsos se ven como el clásico tintado y la placa se dibuja con CSS.
+
+### 1 · La placa de la tienda
+
+La sexta del menú, junto a Colección, Sobres, Mazos, La Tribu y Cuenta. Tiene
+que parecer de la misma familia: **adjuntar `placa_sobres.png` y
+`placa_mazos.png`** y pedir «misma forma, mismo material, misma luz; sólo cambia
+el emblema».
+
+Formato: **1122×1402**, vertical, como las otras cinco. Se sirve a 256.
+
+- **`placa_tienda.png`.** Placa vertical de piedra oscura pulida con filete de
+  latón viejo biselado, idéntica en forma, proporción y marco a las placas
+  adjuntas. En el centro, en relieve de latón y oro viejo, una bolsa de cuero
+  de mercader atada con cordón, con tres monedas de latón con forma de rombo
+  asomando por la boca. Silueta maciza, reconocible a 60 píxeles. Sin texto,
+  sin letras, sin marca de agua. Fondo **magenta puro `#FF00FF`** fuera de la
+  placa, sin sombra proyectada.
+
+### 2 · Los dos dorsos
+
+El reverso de la carta: se ve al abrir sobres, en las cartas que robas y en tu
+mazo del marcador final. **Adjuntar `dorso.png`** (el dorso de ahora) como
+referencia de forma: mismo formato de carta y mismo tipo de marco, distinto
+material y distinto emblema.
+
+Formato: **1024×1400**, vertical, **a sangre**: el reverso ocupa la imagen
+entera, sin magenta y sin fondo alrededor. Se sirven a 512.
+
+- **`dorso_ambar.png`.** Reverso de carta coleccionable de fantasía, vista
+  frontal y plana, sin perspectiva, ocupando la imagen entera. Un marco de latón
+  viejo biselado alrededor, con remaches en las esquinas. El interior, una
+  plancha de ámbar translúcido pulido color miel y naranja con luz cálida
+  atravesándolo, y dentro del ámbar, en el centro, un insecto fósil pequeño
+  —una libélula con las alas abiertas— atrapado, nítido. Simétrico. Sin texto,
+  sin letras, sin marca de agua.
+- **`dorso_obsidiana.png`.** El mismo reverso de la imagen adjunta, idéntico en
+  forma, marco y proporción, con el interior de **obsidiana negra pulida como un
+  espejo** con reflejos fríos grisáceos, y en el centro una garra de terópodo
+  grabada en la piedra con un filete fino de plata. Sin texto, sin letras, sin
+  marca de agua.
+
+### Después de generar
+
+- Los tres a `src/piel/tienda/` con esos nombres, en PNG.
+- `python tools/tienda.py escribir` deja la placa en `assets/piel/placa_tienda.webp`
+  y los dorsos en `assets/piel/tienda/`.
+- `npm test` pide entonces poner `ARTE_LISTO = true` en `src/ui/tienda.js`. Y hay
+  que declarar `--placa` en `.placa-tienda` de `style.css`, quitando su dibujo de
+  CSS, y subir `VERSION` en `sw.js`.
