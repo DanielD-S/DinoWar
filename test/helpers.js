@@ -62,8 +62,11 @@ export const MAZO_OK = MAZO.map((e) => [...e]);
  * jugar la misma partida, que es justo lo que `validarPartida` existe para
  * evitar un piso más arriba.
  */
-export function jugarSolo(seed, perfil = PERFIL.HEURISTICA) {
-  let s = crearPartida(seed, [MAZO_OK, null]);
+export function jugarSolo(seed, perfil = PERFIL.HEURISTICA, rival = null) {
+  // Contra un rival de expedición juega SU perfil con SU mazo, que es lo que
+  // el servidor reproduce; tú sigues con `perfil`.
+  const perfilRival = rival ? rival.perfil : perfil;
+  let s = crearPartida(seed, [MAZO_OK, rival ? rival.mazo.map((e) => [...e]) : null]);
   let rngIA = semilla(seed ^ 0x5bf03635);
   const acciones = [];
 
@@ -85,7 +88,7 @@ export function jugarSolo(seed, perfil = PERFIL.HEURISTICA) {
         }
         let suyas = 0;
         while (s.fase === faseInicial && legales(s, 1).length > 0) {
-          const d = decidir(vistaDe(s, 1), 1, rngIA, perfil);
+          const d = decidir(vistaDe(s, 1), 1, rngIA, perfilRival);
           rngIA = d.rng;
           if (!d.accion) break;
           s = reduce(s, d.accion);
@@ -101,7 +104,10 @@ export function jugarSolo(seed, perfil = PERFIL.HEURISTICA) {
     }
     s = reduce(s, { tipo: ACCION.AVANZAR });
   }
-  return { semilla: seed, mazo: MAZO_OK, acciones, perfil, ganada: s.ganador === 0 };
+  return {
+    semilla: seed, mazo: MAZO_OK, acciones, perfil, ganada: s.ganador === 0,
+    ...(rival ? { rival: rival.id } : {}),
+  };
 }
 
 export { reduce, ACCION };

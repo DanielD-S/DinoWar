@@ -247,6 +247,46 @@ la Edge Function con `eloTras()` —el mismo fichero que pinta la liga— sobre 
 ELO de CADA UNO AL EMPEZAR el duelo, guardado en la fila, y no sobre el de
 ahora: otro duelo cerrado entre medias no debe contaminar éste.
 
+## Las Expediciones: el solitario como un camino de rivales
+
+«Fácil» y «Normal» llevaban el MISMO mazo, el de referencia; sólo cambiaba que
+«Fácil» jugaba al azar. El solitario se sentía plano porque lo era. Ahora cada
+formación geológica es un mapa con rivales en fila, cada uno con su mazo, y
+ganar a uno abre el siguiente. Hoy hay uno, la Morrison, con ocho rivales, y
+un visitante de otra era que rota cada semana.
+
+Cuatro decisiones que conviene conocer antes de discutirlas:
+
+- **El mazo del rival NUNCA viaja en la petición.** El navegador manda el id del
+  nodo y el servidor busca su mazo y su perfil en `src/data/expediciones.js`.
+  Si viajara el mazo, cualquiera jugaría contra cincuenta y cinco cartas
+  elegidas para perder. Un id que no existe es una partida inválida, no una
+  contra el mazo de referencia: `test/expediciones.test.js` lo vigila.
+- **El orden del camino sale de medirlo**, con `node sim/expediciones.mjs`, que
+  juega el mazo de referencia con la heurística contra cada rival. Se escribió a
+  ojo y salió al revés en el medio: el rebaño de saurópodos, pensado cuarto,
+  era más duro que el clan de Ceratosaurus. Y **jugar con cabeza apenas
+  endurece un mazo flojo**: el muro de placas pasó del 99 % al 95 % al cambiar
+  de la IA al azar a la heurística. La dificultad la da el mazo.
+- **La primera victoria paga una vez, y sólo si el nodo anterior está vencido.**
+  Jugar un nodo cerrado se puede —el navegador no lo ofrece, pero nada impide
+  pedirlo—; cobrarlo, no. Lo decide `aplicar_expedicion` en SQL con la clave
+  `id` para el camino e `id@semana` para el visitante, así el camino se cobra
+  para siempre y el visitante una vez por semana con la misma tabla. Rejugar
+  un nodo vencido paga lo de una victoria normal.
+- **Los visitantes tienen que costar parecido.** Rotan por semana, y uno que se
+  gana el 73 % y otro el 37 % hacen que una semana sea la de no jugar. Se
+  ajustaron midiendo hasta rondar el 50 %.
+
+El arte llega aparte (`tools/expediciones.py`, prompts en `PROMPTS.md`) y puede
+no estar: el mapa es un degradado y los medallones son círculos de CSS
+mientras tanto. El juego sabe qué piezas hay por `assets/piel/expediciones/indice.json`,
+que escribe la herramienta, y **no pidiendo cada fichero**: una pieza que no
+existe es un 404 en la consola, y ya hubo quejas con los vídeos.
+
+El botón de volver del mapa no lleva `data-volver`: `meta.js` ata todos los
+`[data-volver]` al menú, y el mapa vuelve a la pantalla de jugar.
+
 ## Las dos cartas de jefe viven fuera del set
 
 `CARTAS_DE_JEFE` no está en `CARTAS`, y eso las ha dejado fuera de todas las
@@ -400,11 +440,11 @@ pantalla. Sacarlas a su propia pantalla devuelve el menú a lo que era y deja
 sitio para lo que venga.
 
 - **La placa del Duelo abre su panel**, como la de misiones, y las dos se
-  excluyen: abrir una pliega la otra. Con el panel abierto se esconde la fila
-  de dificultad: es del rival de la IA, y en un duelo el rival es una persona. Estuvo apagada con su «Pronto» hasta que
+  excluyen: abrir una pliega la otra. Estuvo apagada con su «Pronto» hasta que
   el Duelo existió (ver «El Duelo», más abajo).
-- **La dificultad del rival se fue con «En solitario».** Es el rival de ESA
-  partida y en el menú estaba suelta, sin decir de qué.
+- **«En solitario» abre el mapa de la expedición**, no una partida. Los chips de
+  «Fácil» y «Normal» se fueron con él: la dificultad la da el nodo del mapa
+  (ver «Las Expediciones», más abajo).
 - **El panel de misiones se abre y se cierra con su placa**, y nace cerrado cada
   visita: dejarlo abierto de la anterior hacía que la pantalla cambiara de alto
   sola entre una entrada y la siguiente.
@@ -1140,6 +1180,14 @@ pasos. CI corre los tests en cada push y necesita `fetch-depth: 0`, porque
 ## Lo que NO cierra todavía
 
 Dicho para que nadie lo descubra tarde:
+
+- **Sólo hay una expedición, la Morrison.** Los prompts de los mapas de Hell
+  Creek, Tendaguru y Kem Kem están, los rivales no. Añadir una es un objeto en
+  `EXPEDICIONES`, medirla con `sim/expediciones.mjs` y su mapa; pero el
+  cliente sólo pinta la primera, y elegir entre varias pide una pantalla.
+- **Las misiones diarias no saben de expediciones**: ganar a un rival cuenta
+  como una victoria cualquiera. Una misión «vence a un rival nuevo» es un dato
+  más en `misiones.js` y un campo en el parte.
 
 - **Al Duelo le faltan tres cosas de liga:** la protección al descenso (hoy
   el ELO baja en cuanto pierdes, sin las tres derrotas de margen), las

@@ -985,3 +985,135 @@ versión. Tres a 1254×1254 y Jurásico a 1536×1024, apaisado con el medallón 
 el centro: la herramienta lo cuadra recortando, no estirando. Llegaron a
 `assets/piel/ligas/`, la carpeta servida, y se movieron a `src/piel/ligas/`:
 un PNG de 2,5 MB en `assets/` se habría publicado tal cual.
+
+## Las Expediciones: mapas, medallones de nodo y cartela
+
+El solitario pasa a ser un mapa por formación geológica, con rivales en fila
+que se abren al ganar. Hacen falta tres familias de piezas:
+
+1. **Los mapas**, uno por formación. Fondo vertical sobre el que el juego
+   dibuja el sendero y los nodos.
+2. **Los medallones de nodo**, cuatro estados: bloqueado, abierto, vencido y
+   rival de la semana. Llevan un hueco magenta donde el juego pinta el retrato
+   del rival, que sale de la ilustración de su carta.
+3. **La cartela del rival**, la ficha que se abre al tocar un nodo.
+
+Todo va a `src/piel/expediciones/` con los nombres de cada bloque, nunca a
+`assets/`. La herramienta los keyea, escala y sirve.
+
+---
+
+### 1 · Los mapas
+
+Un solo prompt base y un hueco por formación. **Lo que NO hay que pedir: el
+sendero, los nodos, los nombres ni ningún icono.** Eso lo dibuja el juego
+encima, y un camino dibujado en la imagen nunca coincide con los nodos.
+
+Formato: **vertical, 1024×1792**, el más alto que dan los generadores. El
+juego lo desplaza de arriba abajo.
+
+#### Bloque base (copiar literal)
+
+> Mapa ilustrado de una región prehistórica visto desde arriba en perspectiva
+> cenital ligeramente inclinada, estilo de mapa de expedición pintado a mano
+> sobre pergamino oscuro envejecido, con acuarela terrosa y tinta sepia.
+> Paleta apagada: verdes oliva, ocres, arena, sepia y toques de azul pizarra en
+> el agua. Bordes del pergamino oscurecidos y quemados, viñeta suave. Relieve
+> sugerido con sombreado de tinta. Composición vertical 9:16, el paisaje
+> recorre la imagen de arriba abajo como un viaje. Sin texto, sin letras, sin
+> números, sin rosa de los vientos, sin leyenda, sin marco decorativo, sin
+> caminos ni senderos marcados, sin iconos, sin personas, sin animales. Zonas
+> amplias y tranquilas repartidas en zigzag por toda la altura, donde se
+> puedan poner marcadores encima sin tapar detalle importante.
+
+#### Los cuatro huecos
+
+- **`mapa_morrison.png` — Formación Morrison, Jurásico Superior.** Arriba,
+  tierras altas con coníferas y araucarias; en el centro, un río trenzado ancho
+  con barras de arena que baja serpenteando; a los lados, llanuras de
+  inundación con helechos y lagos someros alcalinos de orillas blancas; abajo,
+  badlands de estratos rojos, morados y grises con una cantera de huesos
+  insinuada.
+- **`mapa_hell_creek.png` — Hell Creek, Cretácico final.** Arriba, bosque
+  húmedo subtropical denso con palmeras y magnolios; en el centro, un delta
+  con canales y marismas; abajo, costa de un mar interior somero; en la
+  esquina inferior, un cielo que empieza a enrojecer como presagio del impacto.
+  *(Aquí sí hay plantas con flor: el Cretácico final ya las tenía.)*
+- **`mapa_tendaguru.png` — Tendaguru, Jurásico Superior de África.** Arriba,
+  meseta seca con coníferas dispersas; en el centro, lagunas costeras y
+  llanuras de marea; abajo, la costa de un mar cálido con arrecifes de coral
+  lejanos, arena clara.
+- **`mapa_kem_kem.png` — Kem Kem, Cretácico medio del norte de África.**
+  Arriba, desierto de dunas; en el centro, un sistema fluvial enorme con brazos
+  anchos y manglares; abajo, estuario lodoso que se abre al mar. Agua marrón,
+  mucha vida de río sugerida por la vegetación de las orillas.
+
+---
+
+### 2 · Los medallones de nodo
+
+Mismo material que las placas del menú, con el bloque de MATERIAL literal y
+**magenta puro** fuera de la pieza **y dentro del hueco del retrato**. El juego
+pinta la ilustración de la carta del rival recortada en ese hueco.
+
+Formato: **1024×1024**, el medallón ocupando el 85 % y centrado. Se sirven a
+192 px y se ven a unos 76.
+
+#### El bloque de MATERIAL (copiar literal)
+
+> Pieza de interfaz de videojuego, vista de frente, sin perspectiva. Roca
+> oscura pulida con vetas minerales y filete de latón viejo con el canto
+> biselado, iluminación lateral suave que marque el relieve, sin brillos
+> especulares fuertes. Paleta: negro, gris piedra, latón #d9a441 y oro viejo.
+> Sin texto, sin letras, sin números, sin marca de agua. Fondo magenta puro
+> #FF00FF fuera de la pieza, sin sombra proyectada.
+
+#### Los cuatro estados
+
+- **`nodo_bloqueado.png`.** [MATERIAL] Medallón redondo de roca oscura con
+  filete de hierro oxidado apagado, sin brillo. El centro es un círculo hueco
+  **relleno de magenta puro** que ocupa el 70 % del diámetro. Encima del hueco,
+  cruzándolo, dos cadenas de hierro en aspa con un candado pequeño en el
+  cruce. Aspecto frío y cerrado.
+- **`nodo_abierto.png`.** [MATERIAL] Medallón redondo de roca oscura con doble
+  filete de latón pulido y un halo dorado suave que lo rodea como si
+  brillara. El centro es un círculo hueco **relleno de magenta puro** que ocupa
+  el 70 % del diámetro, sin nada encima. Cuatro remaches de latón en los
+  puntos cardinales.
+- **`nodo_vencido.png`.** [MATERIAL] Medallón redondo de roca oscura con
+  filete de oro viejo. El centro es un círculo hueco **relleno de magenta
+  puro** que ocupa el 70 % del diámetro. Abajo a la derecha, sobre el borde,
+  un sello de lacre rojo oscuro con una huella de dinosaurio de tres dedos
+  grabada, montando entre el filete y el hueco sin taparlo más de un cuarto.
+- **`nodo_semana.png`.** [MATERIAL] Medallón redondo de roca oscura con
+  filete de oro con laca roja, más grande y ornamentado que los otros, y una
+  corona de doce púas cortas de latón en el borde. El centro es un círculo
+  hueco **relleno de magenta puro** que ocupa el 70 % del diámetro. Arriba,
+  sobre el filete, un pequeño reloj de arena de latón.
+
+---
+
+### 3 · La cartela del rival
+
+La ficha que se abre al tocar un nodo: retrato arriba, nombre, frase y el
+botón de jugar. El juego escribe todo el texto; la cartela es el marco.
+
+Formato: **1024×1536**, vertical. Se sirve a 768.
+
+- **`cartela_rival.png`.** [MATERIAL] Cartela vertical de proporción 2:3 de
+  roca oscura con filete de latón viejo y esquinas reforzadas con cantoneras
+  de latón. En el tercio superior, una ventana redonda grande **rellena de
+  magenta puro** con un anillo de latón alrededor, para el retrato. Debajo, una
+  banda horizontal lisa de latón oscuro para el nombre, **sin grabado**. El
+  resto de la cartela, liso y oscuro, para texto. Sin ningún adorno en las
+  zonas lisas.
+
+---
+
+### Después de generar
+
+- Todo a `src/piel/expediciones/` con esos nombres.
+- `python tools/expediciones.py escribir` los deja en `assets/piel/expediciones/`.
+- Los mapas no se keyean: son un fondo a sangre y sólo se escalan.
+- Mientras no lleguen, el juego pinta el mapa con un degradado oscuro y los
+  nodos con CSS, así que se puede jugar desde el primer día.

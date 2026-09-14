@@ -59,7 +59,6 @@ export function montar() {
     btnJugar: id('btn-jugar'), btnOtra: id('btn-otra'), btnFinMenu: id('btn-fin-menu'),
     jugar: id('jugar'), btnSolitario: id('btn-solitario'), btnDuelo: id('btn-duelo'),
     btnMisiones: id('btn-misiones'), btnJugarVolver: id('btn-jugar-volver'),
-    dificultad: id('dificultad'),
     btnRendirse: id('btn-rendirse'),
     mulligan: id('mulligan'), mulliganTexto: id('mulligan-texto'),
     btnMulligan: id('btn-mulligan'), btnQuedarse: id('btn-quedarse'),

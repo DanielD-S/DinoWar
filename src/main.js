@@ -30,6 +30,8 @@ import { mazoActivo, cargarPerfil, actualizarPerfil } from './ui/almacen.js';
 import { montarCuenca, abrirCuenca, pintarCuenca } from './ui/cuenca.js';
 import { montarCuenta, abrirCuenta, resumenDeCuenta } from './ui/cuenta.js';
 import { montarEntrada, abrirEntrada } from './ui/entrada.js';
+import { montarExpedicion, abrirExpedicion } from './ui/expedicion.js';
+import { rivalPorId } from './data/expediciones.js';
 import {
   montarDuelo, enseñarDuelo, pintarDuelo, abandonarEspera,
   jugarEnDuelo, estadoDuelo, rendirseEnDuelo,
@@ -57,15 +59,23 @@ const APP = Object.freeze({
   MENU: 'MENU', JUGAR: 'JUGAR', PLAYING: 'PLAYING', RESOLVING: 'RESOLVING',
   GAME_OVER: 'GAME_OVER',
   COLECCION: 'COLECCION', SOBRES: 'SOBRES', MAZOS: 'MAZOS', CUENCA: 'CUENCA',
-  CUENTA: 'CUENTA', ENTRADA: 'ENTRADA',
+  CUENTA: 'CUENTA', ENTRADA: 'ENTRADA', EXPEDICION: 'EXPEDICION',
 });
 
 const params = new URLSearchParams(location.search);
 const DEBUG = params.get('debug') === '1';
-// El parámetro de la URL sigue mandando —es lo que usan las pruebas— pero ya no
-// es la única manera de bajar la dificultad: eso está en el menú.
+// El parámetro de la URL sigue mandando —es lo que usan las pruebas—. En el
+// juego la dificultad ya no tiene botón: la da el nodo del mapa de expedición.
 const IA_FORZADA = params.get('ia');
 const perfilIA = () => IA_FORZADA ?? (cargarPerfil().dificultad ?? PERFIL.HEURISTICA);
+/**
+ * El rival de expedición de la partida en curso, o null. Mientras existe, la
+ * IA juega con SU perfil y SU mazo: la dificultad ya no la elige un botón, la
+ * da el nodo del mapa.
+ */
+let expedicionEnCurso = null;
+let ultimaFueExpedicion = false;
+const perfilRival = () => expedicionEnCurso?.perfil ?? perfilIA();
 
 let app = APP.BOOT;
 let estado = null;
@@ -218,7 +228,7 @@ function enseñarMisiones(abierto) {
  */
 const MUSICA_DE = {
   [APP.CARGA]: 'musica-menu', [APP.ENTRADA]: 'musica-menu',
-  [APP.MENU]: 'musica-menu', [APP.JUGAR]: 'musica-menu',
+  [APP.MENU]: 'musica-menu', [APP.JUGAR]: 'musica-menu', [APP.EXPEDICION]: 'musica-menu',
   [APP.COLECCION]: 'musica-menu', [APP.SOBRES]: 'musica-menu',
   [APP.MAZOS]: 'musica-menu', [APP.CUENTA]: 'musica-menu',
   [APP.CUENCA]: 'musica-cuenca',
@@ -232,6 +242,7 @@ function irA(nuevo) {
   el.carga.classList.toggle('oculta', nuevo !== APP.CARGA);
   el.menu.classList.toggle('oculta', nuevo !== APP.MENU);
   el.jugar.classList.toggle('oculta', nuevo !== APP.JUGAR);
+  document.getElementById('expedicion').classList.toggle('oculta', nuevo !== APP.EXPEDICION);
   el.partida.classList.toggle('oculta', nuevo !== APP.PLAYING && nuevo !== APP.RESOLVING);
   el.fin.classList.toggle('oculta', nuevo !== APP.GAME_OVER);
   el.coleccion.classList.toggle('oculta', nuevo !== APP.COLECCION);
@@ -609,7 +620,7 @@ function jugarIA() {
   reloj.correr(RIVAL);
   let guardia = 0;
   while (!estado.jugadores[RIVAL].listo && guardia++ < 80) {
-    const d = decidir(vistaDe(estado, RIVAL), RIVAL, rngIA, perfilIA());
+    const d = decidir(vistaDe(estado, RIVAL), RIVAL, rngIA, perfilRival());
     rngIA = d.rng;
     if (!d.accion) break;
     estado = reduce(estado, d.accion);
@@ -682,7 +693,7 @@ async function bucle() {
     if (estado.fase === FASE.DESCARTE) {
       if (estado.jugadores[RIVAL].mano.length > BALANCE.manoMaxima) {
         reloj.correr(RIVAL);
-        const d = decidir(vistaDe(estado, RIVAL), RIVAL, rngIA, perfilIA());
+        const d = decidir(vistaDe(estado, RIVAL), RIVAL, rngIA, perfilRival());
         rngIA = d.rng;
         estado = reduce(estado, d.accion);
         reloj.detener();
@@ -849,7 +860,12 @@ function rendirse() {
  * se leen como dos.
  */
 function premioTexto(n, cobro = null) {
-  const base = n > 0 ? `+${n} dinomonedas` : 'Sin dinomonedas: sólo las da ganar';
+  // La primera victoria contra un rival del mapa se dice aparte, como las
+  // misiones: sumada al premio, «+130» no diría de dónde sale cada parte.
+  const exp = cobro?.expedicion;
+  const porExpedicion = exp?.primera ? ` · primera victoria: +${exp.premio}`
+    : exp?.cerrado ? ' · ese rival aún estaba cerrado: sin premio de primera victoria' : '';
+  const base = (n > 0 ? `+${n} dinomonedas` : 'Sin dinomonedas: sólo las da ganar') + porExpedicion;
   const porMisiones = Number(cobro?.misiones ?? 0);
   if (porMisiones <= 0) return base;
   const cuantas = cobro.cumplidas?.length ?? 0;
@@ -1067,7 +1083,7 @@ async function asaltoAlJefe() {
   nuevaPartida(asaltando, activo.evento.id);
 }
 
-function nuevaPartida(jefe = null, jefeEvento = null) {
+function nuevaPartida(jefe = null, jefeEvento = null, rivalId = null) {
   cancelarAnimaciones();
   soltarEntrada();
   registro = [];
@@ -1079,19 +1095,28 @@ function nuevaPartida(jefe = null, jefeEvento = null) {
   // Tú llevas tu mazo; la IA lleva el de referencia, que es el que mide el
   // simulador. Así el balance publicado sigue significando algo.
   asaltando = jefe;
+  expedicionEnCurso = rivalId ? (rivalPorId(rivalId)?.rival ?? null) : null;
+  ultimaFueExpedicion = !!expedicionEnCurso;
+  ultimaFueDuelo = false;
   const miMazo = aListaDeMazo(mazoActivo());
   // La grabación se abre ANTES de crear la partida: la primera jugada puede ser
   // el cambio de mano del turno 1, y sin ella el servidor barajaría distinto.
   //
   // Ahora se graban TODAS las partidas, no sólo los asaltos: las dinomonedas de
   // una victoria también las paga el servidor después de re-jugarla. El perfil
-  // de IA viaja con ella porque la dificultad la eliges tú y el servidor tiene
-  // que reproducir el mismo rival; jugar en fácil es una opción del menú, no
-  // una trampa.
+  // de IA viaja con ella porque el servidor tiene que reproducir el mismo
+  // rival; en una expedición manda el del nodo, no éste.
+  //
+  // Contra un rival de expedición viaja su id y NO su mazo ni su perfil: el
+  // servidor los busca en los datos por el id, y lo que dijera el navegador
+  // sobre ellos no se lee.
   grabacion = {
-    jefeEvento, semilla: s, mazo: miMazo, acciones: [], perfil: perfilIA(),
+    jefeEvento, semilla: s, mazo: miMazo, acciones: [], perfil: perfilRival(),
+    ...(expedicionEnCurso ? { rival: expedicionEnCurso.id } : {}),
   };
-  estado = crearPartida(s, [miMazo, jefe ? jefe.mazo.map((e) => [...e]) : null]);
+  const mazoRival = jefe ? jefe.mazo.map((e) => [...e])
+    : expedicionEnCurso ? expedicionEnCurso.mazo.map((e) => [...e]) : null;
+  estado = crearPartida(s, [miMazo, mazoRival]);
   // El jefe aguanta mucho más que un rival normal. No es una regla nueva: es el
   // mismo hábitat, más alto, así que todo lo demás del motor sigue igual.
   if (jefe) estado.jugadores[RIVAL].habitat = habitatDeAsalto();
@@ -1111,19 +1136,6 @@ function nuevaPartida(jefe = null, jefeEvento = null) {
   bucle();
 }
 
-/**
- * El rival blando existía desde V2-2 pero sólo se llegaba a él escribiendo
- * `?ia=aleatoria` en la barra de direcciones, que es tanto como no existir.
- * La IA heurística no se ha tocado: lo que cambia es cuál de las dos juega.
- */
-function pintarDificultad() {
-  const actual = perfilIA();
-  el.dificultad.innerHTML = [
-    [PERFIL.ALEATORIA, 'Fácil'],
-    [PERFIL.HEURISTICA, 'Normal'],
-  ].map(([id, n]) => `<button class="chip ${id === actual ? 'on' : ''}" data-ia="${id}">${n}</button>`).join('');
-  el.dificultad.classList.toggle('fijada', !!IA_FORZADA);
-}
 
 function pintarDebug() {
   if (!DEBUG || !estado) return;
@@ -1186,7 +1198,14 @@ function iniciar() {
   // elige qué se juega. `desbloquear()` sigue aquí porque es el primer gesto
   // real del usuario y es lo que despierta el audio.
   el.btnJugar.addEventListener('click', () => { desbloquear(); abrirJugar(); });
-  el.btnSolitario.addEventListener('click', () => { desbloquear(); nuevaPartida(); });
+  // «En solitario» abre el mapa de la expedición; la partida empieza al tocar
+  // «Luchar» en un nodo. El solitario contra el mazo de referencia, sin mapa,
+  // ya no tiene botón: es el que usa el tutorial y el que mide el simulador.
+  montarExpedicion({
+    alJugar: (rivalId) => { desbloquear(); nuevaPartida(null, null, rivalId); },
+    alVolver: () => abrirJugar(),
+  });
+  el.btnSolitario.addEventListener('click', () => { desbloquear(); abrirExpedicion(); irA(APP.EXPEDICION); });
   // La placa del Duelo abre y cierra su panel, como la de misiones, y las dos
   // se excluyen: abrir una pliega la otra.
   montarDuelo({ cuandoEmpareje: empezarDuelo });
@@ -1214,6 +1233,9 @@ function iniciar() {
     pintarRecord();
     // Tras un duelo, «otra» no es otra contra la IA: es volver a buscar rival.
     if (ultimaFueDuelo) { abrirJugar(); el.btnDuelo.setAttribute('aria-expanded', 'true'); enseñarDuelo(true); return; }
+    // Tras un rival de expedición, «otra» vuelve al mapa: puede que se haya
+    // abierto el siguiente nodo, y repetir contra el mismo no es lo que se busca.
+    if (ultimaFueExpedicion) { abrirExpedicion(); irA(APP.EXPEDICION); return; }
     nuevaPartida();
   });
   // Terminar una partida no obligaba a jugar otra, pero lo parecía: no había
@@ -1236,16 +1258,6 @@ function iniciar() {
     pintarMulligan();
   });
 
-  pintarDificultad();
-  el.dificultad.addEventListener('click', (e) => {
-    const b = e.target.closest('[data-ia]');
-    if (!b) return;
-    actualizarPerfil({ dificultad: b.dataset.ia });
-    pintarDificultad();
-    // El chip recién elegido da un salto. Sólo al elegirlo: `pintarDificultad`
-    // también repinta al arrancar y ahí no hay nada que celebrar.
-    el.dificultad.querySelector('.chip.on')?.classList.add('recien');
-  });
 
   // Marcha atrás del despliegue. Sin esto, soltar una carta en la ranura
   // equivocada costaba el turno entero y la Biomasa.
@@ -1389,6 +1401,8 @@ function empezarDuelo(r) {
   asaltando = null;
   grabacion = null;
   ultimaFueDuelo = true;
+  ultimaFueExpedicion = false;
+  expedicionEnCurso = null;
   duelo = {
     id: r.id, n: r.n ?? 0, rival: r.rival, yo: r.yo, eloInicial: Number(r.eloInicial ?? r.yo?.elo ?? 1200),
     cola: Promise.resolve(), pendientes: 0, ultimo: null,

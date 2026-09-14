@@ -248,11 +248,14 @@ export async function cobrarPartida(partida, gane) {
 
   const r = await funcion(CONFIG.supabase.funcionAsalto, { tipo: 'victoria', ...partida });
   misionesEnCache = null;   // el progreso que acaba de cambiar lo dice el servidor
+  if (r?.expedicion?.primera) expedicionesCache = null;
   await sincronizar();
   return {
     premio: Number(r?.premio ?? 0),
     misiones: Number(r?.misiones ?? 0),
     cumplidas: Array.isArray(r?.cumplidas) ? r.cumplidas : [],
+    // Lo que pagó la primera victoria contra un rival de expedición, aparte.
+    expedicion: r?.expedicion ?? null,
   };
 }
 
@@ -287,6 +290,24 @@ export async function traerMisiones() {
   } catch {
     return misionesEnCache;
   }
+}
+
+/**
+ * A qué rivales de expedición has vencido, y qué día es para el servidor. Igual
+ * que las misiones: se lee de caché al pintar y no lanza si falla, que un mapa
+ * sin nodos vencidos se puede jugar y un mapa que no se pinta, no.
+ *
+ * @returns {Promise<{dia:string, vencidos:string[]}|null>}
+ */
+let expedicionesCache = null;
+export const expedicionesEnCache = () => expedicionesCache;
+export async function traerExpediciones() {
+  if (modo === MODO.LOCAL) return null;
+  try {
+    const d = await rpc('mis_expediciones');
+    expedicionesCache = { dia: d?.dia ?? null, vencidos: Array.isArray(d?.vencidos) ? d.vencidos : [] };
+  } catch { /* se queda lo que hubiera */ }
+  return expedicionesCache;
 }
 
 /**

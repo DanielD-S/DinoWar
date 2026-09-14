@@ -34,6 +34,7 @@ import { eloTras } from '../../../src/data/ligas.js';
 import { CUENCA } from '../../../src/data/tribu.js';
 import { ECONOMIA, abrirSobre } from '../../../src/data/coleccion.js';
 import { avancesDelParte, diaUTC, POR_ID } from '../../../src/data/misiones.js';
+import { rivalPorId, requisitoDe, claveDeVictoria } from '../../../src/data/expediciones.js';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -214,10 +215,31 @@ async function hacerVictoria(servicio, jugadorId: string, envio: Record<string, 
       yaCobrada ? 409 : 400);
   }
 
+  // La primera victoria contra un rival de expedición paga su premio, una vez.
+  // Rival, premio y requisito salen de los datos por el id que devolvió la
+  // re-jugada; el SQL sólo apunta y paga, y paga cero si el nodo anterior no
+  // está vencido o si ya lo estaba éste.
+  let expedicion = null;
+  if (resultado.ganada && resultado.rival) {
+    const { rival: r } = rivalPorId(resultado.rival);
+    const { data: exp, error: errExp } = await servicio.rpc('aplicar_expedicion', {
+      p_jugador: jugadorId,
+      p_clave: claveDeVictoria(r.id, dia),
+      p_rival: r.id,
+      p_requisito: requisitoDe(r.id),
+      p_premio: r.premio,
+    });
+    if (errExp) console.error('aplicar_expedicion', errExp.message);
+    else expedicion = exp;
+  }
+
   return json({
     ganada: resultado.ganada,
     turnos: resultado.turnos,
     premio: data?.premio ?? 0,
+    // Lo que pagó la expedición, aparte del premio de la victoria: la pantalla
+    // de fin lo dice por separado, que son dos cosas.
+    expedicion: expedicion ?? null,
     monedas: data?.monedas ?? null,
     // Lo que las misiones aportaron, para que la pantalla de fin lo diga en vez
     // de que aparezcan monedas de la nada.
