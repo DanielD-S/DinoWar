@@ -56,13 +56,14 @@ import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio, musica,
 import { montarTacto } from './ui/tacto.js';
 import { arte } from './ui/art.js';
 import { mostrarMarca, empezarCarga, precargarPiezas } from './ui/carga.js';
+import { pedirMazoInicial } from './ui/iniciales.js';
 
 const APP = Object.freeze({
   BOOT: 'BOOT', MARCA: 'MARCA', CARGA: 'CARGA',
   MENU: 'MENU', JUGAR: 'JUGAR', PLAYING: 'PLAYING', RESOLVING: 'RESOLVING',
   GAME_OVER: 'GAME_OVER',
   COLECCION: 'COLECCION', SOBRES: 'SOBRES', MAZOS: 'MAZOS', CUENCA: 'CUENCA',
-  CUENTA: 'CUENTA', ENTRADA: 'ENTRADA', EXPEDICION: 'EXPEDICION',
+  CUENTA: 'CUENTA', ENTRADA: 'ENTRADA', EXPEDICION: 'EXPEDICION', INICIALES: 'INICIALES',
 });
 
 const params = new URLSearchParams(location.search);
@@ -185,6 +186,13 @@ async function presentarse(nombre, marca = null) {
     throw e;
   }
   await carga.terminar();
+  // Una cuenta recién creada llega sin colección: primero elige su mazo
+  // inicial y sólo entonces hay menú que enseñar. Pasa también si se creó y se
+  // cerró antes de elegir, porque lo que manda es lo que dice el servidor.
+  if (p.sembrado === false) {
+    irA(APP.INICIALES);
+    await pedirMazoInicial(document.getElementById('iniciales'));
+  }
   pintarMenu();
   pintarCuentaEnMenu();
   pintarRecord();
@@ -251,7 +259,7 @@ const MUSICA_DE = {
   [APP.CARGA]: 'musica-menu', [APP.ENTRADA]: 'musica-menu',
   [APP.MENU]: 'musica-menu', [APP.JUGAR]: 'musica-menu', [APP.EXPEDICION]: 'musica-menu',
   [APP.COLECCION]: 'musica-menu', [APP.SOBRES]: 'musica-menu',
-  [APP.MAZOS]: 'musica-menu', [APP.CUENTA]: 'musica-menu',
+  [APP.MAZOS]: 'musica-menu', [APP.CUENTA]: 'musica-menu', [APP.INICIALES]: 'musica-menu',
   [APP.CUENCA]: 'musica-cuenca',
   [APP.PLAYING]: 'musica-partida', [APP.RESOLVING]: 'musica-partida',
 };
@@ -272,6 +280,7 @@ function irA(nuevo) {
   el.cuenca.classList.toggle('oculta', nuevo !== APP.CUENCA);
   el.cuenta.classList.toggle('oculta', nuevo !== APP.CUENTA);
   el.entrada.classList.toggle('oculta', nuevo !== APP.ENTRADA);
+  document.getElementById('iniciales').classList.toggle('oculta', nuevo !== APP.INICIALES);
 }
 
 const interactivo = () => app === APP.PLAYING && estado?.fase === FASE.DESPLIEGUE;

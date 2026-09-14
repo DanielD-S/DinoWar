@@ -1224,6 +1224,29 @@ el segundo falla el primero ya está hecho. Por eso un «User already registered
 en la pestaña de crear cuenta NO es el final: se entra con ese correo y se sigue.
 Pasó de verdad y dejaba la cuenta inservible.
 
+### El mazo inicial se elige
+
+Una cuenta nueva elige uno de tres mazos —Cazadores, Gigantes, Manadas; uno
+por clado— y esa es su colección de salida entera. Los datos están en
+[`src/data/iniciales.js`](src/data/iniciales.js), la pantalla en
+`src/ui/iniciales.js` y el servidor en `0023_mazo_inicial.sql`.
+
+- **`entrar()` ya no siembra.** Siembra `elegir_mazo_inicial(p_mazo)`, que sólo
+  recibe el id: las cartas salen de `catalogo_iniciales`, que genera
+  `tools/generar-cartas.mjs` en la 0006. El cliente enseña la elección cuando
+  `mi_perfil` dice `sembrado: false`, así que una cuenta que se cerró sin
+  elegir la ve al volver.
+- **Al aplicar: primero la 0006 regenerada, luego la 0023.** La 0023 lee una
+  tabla que crea la 0006. Y el cliente trata un perfil sin `sembrado` como
+  sembrado, así que el navegador puede publicarse antes que la migración.
+- **Los tres llevan el soporte y la Biomasa del mazo de referencia** y sólo
+  cambian las 28 criaturas: lo que se mide es el clado. Medidos con
+  `node sim/iniciales.mjs 400`, todos los cruces entre iniciales quedan entre
+  el 45 y el 55 %. Veintitrés muros de saurópodo ganaban el 69 %; los
+  comentarios de cada lista dicen qué se cambió y cuánto movió.
+- Los otros dos no se regalan. Sus cartas siguen saliendo en los sobres, y la
+  idea es que un día se puedan ganar con misiones.
+
 ### Misiones diarias
 
 Tres al día, elegidas por el calendario. El diseño entero cabe en cuatro

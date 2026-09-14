@@ -20,6 +20,7 @@ import { CARTAS, CARTAS_DE_JEFE } from '../src/data/cards.js';
 import { BALANCE } from '../src/data/balance.js';
 import { ECONOMIA, coleccionInicial } from '../src/data/coleccion.js';
 import { limiteDe } from '../src/data/coleccion.js';
+import { MAZOS_INICIALES } from '../src/data/iniciales.js';
 
 export const SALIDA = 'supabase/migrations/0006_catalogo_cartas.sql';
 
@@ -75,6 +76,17 @@ export function generar() {
   L.push('  copias   int not null check (copias > 0)');
   L.push(');');
   L.push('');
+  L.push('-- Los mazos iniciales: uno se elige al crear la cuenta y es la colección');
+  L.push('-- de salida entera. `private.sembrar_inicial` (0023) lee de aquí; el');
+  L.push('-- cliente sólo manda el id del mazo. Sale de src/data/iniciales.js.');
+  L.push('create table if not exists public.catalogo_iniciales (');
+  L.push('  mazo     text not null,');
+  L.push('  nombre   text not null,');
+  L.push('  card_id  text not null references public.catalogo_cartas (card_id),');
+  L.push('  copias   int not null check (copias > 0),');
+  L.push('  primary key (mazo, card_id)');
+  L.push(');');
+  L.push('');
   L.push('-- Los precios, en una fila. Que sean una tabla y no constantes en el SQL');
   L.push('-- permite tocarlos sin volver a desplegar nada.');
   L.push('create table if not exists public.catalogo_economia (');
@@ -119,6 +131,20 @@ export function generar() {
   L.push(');');
   L.push('');
 
+  // Los iniciales, con la misma regla: insertar o actualizar, y borrar sólo lo
+  // que ya no está. Nunca `truncate`: un día un mazo inicial cambia y los
+  // jugadores que ya lo eligieron no tienen nada que ver con esta tabla, pero
+  // la costumbre de vaciar tablas es la que casi se lleva la colección entera.
+  const filas = MAZOS_INICIALES.flatMap((m) => m.mazo.map(([id, n]) => ({ m, id, n })));
+  L.push('insert into public.catalogo_iniciales (mazo, nombre, card_id, copias) values');
+  L.push(`${filas.map(({ m, id, n }) => `  (${sql(m.id)}, ${sql(m.nombre)}, ${sql(id)}, ${n})`).join(',\n')}`);
+  L.push('on conflict (mazo, card_id) do update set nombre = excluded.nombre, copias = excluded.copias;');
+  L.push('');
+  L.push('delete from public.catalogo_iniciales where (mazo, card_id) not in (values');
+  L.push(`${filas.map(({ m, id }) => `  (${sql(m.id)}, ${sql(id)})`).join(',\n')}`);
+  L.push(');');
+  L.push('');
+
   // Las bajas de cartas van al final y en este orden: `catalogo_inicial` apunta
   // a `catalogo_cartas`, así que quitar del set una carta que todavía figura en
   // la colección de salida fallaría contra su propia clave foránea.
@@ -146,7 +172,7 @@ export function generar() {
 
   L.push('-- El catálogo lo lee cualquiera que haya entrado: son las reglas del');
   L.push('-- juego, no datos de nadie. Escribirlo, sólo las migraciones.');
-  for (const t of ['catalogo_cartas', 'catalogo_inicial', 'catalogo_economia']) {
+  for (const t of ['catalogo_cartas', 'catalogo_inicial', 'catalogo_iniciales', 'catalogo_economia']) {
     L.push(`alter table public.${t} enable row level security;`);
     L.push(`drop policy if exists "el catálogo es público" on public.${t};`);
     L.push(`create policy "el catálogo es público" on public.${t}`);

@@ -448,6 +448,70 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 #fin .boton-secundario { margin-top: 9px; }
 
+/* La elección del mazo inicial (src/ui/iniciales.js). En el móvil, tres placas
+   apaisadas una debajo de otra; con sitio, tres columnas altas como las de un
+   cartel. El retrato va detrás, fundido hacia el texto. */
+#iniciales {
+  padding: calc(var(--seguro-arriba) + 20px) 16px calc(var(--seguro-abajo) + 20px);
+  overflow-y: auto; align-items: center; justify-content: safe center;
+  background: radial-gradient(120% 70% at 50% 0%, rgba(217,164,65,.10), transparent 60%), var(--fondo);
+}
+.ini-caja {
+  width: 100%; max-width: 980px; display: flex; flex-direction: column; align-items: center;
+  gap: 14px; text-align: center;
+}
+.ini-titulo {
+  font-family: 'Terralis', 'Cinzel', Georgia, serif; font-size: clamp(24px, 7vw, 40px);
+  font-weight: 700; color: var(--acento-claro);
+}
+.ini-lema { color: var(--texto-2); font-size: 13px; max-width: 46ch; }
+.ini-lista { width: 100%; display: grid; grid-template-columns: 1fr; gap: 10px; }
+.ini-mazo {
+  position: relative; overflow: hidden; isolation: isolate;
+  display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: center;
+  min-height: 124px; padding: 12px 14px; text-align: left; color: var(--texto); font: inherit; cursor: pointer;
+  border: 1px solid var(--borde); border-radius: var(--radio); background: var(--panel);
+  transition: border-color .15s, box-shadow .15s;
+}
+.ini-retrato {
+  position: absolute; inset: 0; z-index: -1; opacity: .42; pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 15%, #000 75%);
+  mask-image: linear-gradient(90deg, transparent 15%, #000 75%);
+}
+.ini-retrato > img, .ini-retrato > svg { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ini-mazo .emblema { grid-row: 1 / 3; width: 46px; height: 46px; }
+.ini-mazo b {
+  font-family: 'Terralis', 'Cinzel', Georgia, serif; font-size: 21px; font-weight: 700;
+  align-self: end; text-shadow: 0 1px 3px #000;
+}
+.ini-mazo small {
+  align-self: start; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--acento-claro);
+}
+.ini-texto {
+  grid-column: 1 / 3; margin-top: 8px; font-size: 12.5px; line-height: 1.35; color: var(--texto-2);
+  text-shadow: 0 1px 2px #000;
+}
+.ini-mazo[aria-pressed="true"] {
+  border-color: var(--acento-claro);
+  box-shadow: 0 0 0 1px var(--acento-claro), 0 0 18px rgba(232,192,121,.25);
+}
+.ini-aviso { min-height: 16px; font-size: 12px; color: var(--peligro); }
+.ini-empezar { width: 100%; max-width: 360px; }
+@media (min-width: 720px) {
+  .ini-lista { grid-template-columns: repeat(3, 1fr); }
+  .ini-mazo {
+    min-height: 340px; grid-template-columns: 1fr; justify-items: center; align-content: end;
+    text-align: center; padding: 18px 16px;
+  }
+  .ini-mazo .emblema { grid-row: auto; width: 56px; height: 56px; margin-bottom: 6px; }
+  .ini-mazo b, .ini-mazo small { align-self: auto; }
+  .ini-texto { grid-column: auto; }
+  .ini-retrato {
+    -webkit-mask-image: linear-gradient(transparent 5%, #000 45%, transparent 100%);
+    mask-image: linear-gradient(transparent 5%, #000 45%, transparent 100%);
+  }
+}
+
 /* ------------------------------------------------- colección, sobres, mazos */
 
 .meta { background: var(--fondo); }
