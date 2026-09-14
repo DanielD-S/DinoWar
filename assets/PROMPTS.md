@@ -1470,7 +1470,20 @@ centro:
 ### Después de generar
 
 - Todo a `src/piel/tienda/` con esos nombres, en PNG.
-- **La herramienta de los tapetes llega con la fase 2 de la tienda**, que es la
-  que los aplica al tablero: oscurecerá la textura a la luminancia de la piedra,
-  cerrará la costura si hace falta y keyeará el medallón. Hasta entonces los
-  PNG pueden esperar en la carpeta.
+- `python tools/tienda.py escribir` los procesa: la textura se hace cuadrada y
+  se oscurece a la luminancia de la piedra si llega más clara, y el medallón,
+  el estandarte y la cinta se keyean. Cada artículo nuevo va además en
+  `src/data/cosmeticos.js`, y `node tools/generar-cartas.mjs` lo lleva al SQL.
+
+### Lo que llegó
+
+El 14-09-2026, cuatro tapetes completos (ámbar, obsidiana, Morrison y volcán,
+cada uno con su medallón) y cuatro estandartes (ámbar, obsidiana, fósil y
+volcán). Sólo ámbar y obsidiana trajeron cinta: los estandartes de fósil y
+volcán usan la cinta de siempre en el marcador hasta que llegue la suya. Dos
+nombres llegaron cambiados y se renombraron en `src/piel/tienda/`:
+`estandare_fosil.png` y `etiqueta_*.png` (las cintas). Los tapetes llegaron ya
+más oscuros que la piedra (16 a 33 de luminancia) y no hubo que oscurecerlos.
+El estandarte de volcán llegó más ancho (0,449 contra 0,410) y se estrecha un
+9 % al pintarse. Quedan por hacer los tapetes de Hell Creek, Kem Kem,
+Solnhofen y excavación.

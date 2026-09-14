@@ -4,36 +4,57 @@
 // del autor: nada que dé ventaja. Aquí se pinta, se compra, se equipa y se
 // aplica lo equipado al resto del juego.
 //
-// Tres cosas que conviene saber:
+// Cuatro cosas que conviene saber:
 //
-// - Comprar pide CONFIRMAR en la propia ficha, como borrar un mazo: 300
-//   dinomonedas son tres sobres y un toque sin querer no debería gastarlas.
+// - Comprar pide CONFIRMAR en la propia ficha, como borrar un mazo: cientos de
+//   dinomonedas son varios sobres y un toque sin querer no debería gastarlas.
 // - El precio que se cobra es el del servidor. El cliente sólo manda el id;
 //   el número de la ficha es para decidir, no para pagar.
-// - Lo equipado se aplica con variables CSS en la raíz del documento
-//   (`--dorso`, `--dorso-filtro`). Las reglas que pintan el dorso las leen, y
-//   las del RIVAL no: su dorso es el clásico hasta que viaje en el duelo.
+// - Lo equipado se aplica con variables CSS en la raíz del documento. Tuyas:
+//   `--dorso`, `--tapete`, `--tapete-medallon`, `--estandarte-propio`,
+//   `--cinta-propia`. Del rival de un duelo: `--dorso-rival`,
+//   `--estandarte-rival`, `--cinta-rival` (y `--cinta-rival-giro`, porque las
+//   cintas se dibujan apuntando a la izquierda y la del rival va a la derecha).
+//   Sin variable, cada regla usa lo de siempre.
+// - El TAPETE no viaja al rival: cada uno ve el suyo en su propio tablero.
 //
-// El arte llega aparte (assets/PROMPTS.md, «La tienda»). Hasta que está, los
-// dorsos nuevos se enseñan como el clásico tintado con un filtro y la placa
-// del menú lleva un dibujo de CSS. `ARTE_LISTO` es el interruptor, vigilado
-// por test/tienda.test.js como el del final y la presentación.
+// El arte llega aparte (assets/PROMPTS.md, «La tienda» y «Los tapetes») y
+// `ARTE_LISTO` es el interruptor, vigilado por test/tienda.test.js.
 
-import { COSMETICOS, TIPO_COSMETICO, loTiene, equipadoDe } from '../data/cosmeticos.js';
+import { COSMETICOS, TIPO_COSMETICO, loTiene, equipadoDe, cosmeticoPorId } from '../data/cosmeticos.js';
 import { cargarPerfil } from './almacen.js';
 import { comprarCosmetico, equiparCosmetico, PRUEBAS } from './perfil.js';
+import { rpc, hayServidor } from './supabase.js';
 
 /** Si las piezas de la tienda están en el disco. Lo vigila test/tienda.test.js. */
 export const ARTE_LISTO = true;
 
 /** Lo que sale de `tools/tienda.py`, sin extensión. */
-export const PIEZAS = Object.freeze(['placa_tienda', 'dorso_ambar', 'dorso_obsidiana']);
+export const PIEZAS = Object.freeze([
+  'placa_tienda', 'dorso_ambar', 'dorso_obsidiana',
+  'tapete_ambar', 'tapete_obsidiana', 'tapete_morrison', 'tapete_volcan',
+  'medallon_ambar', 'medallon_obsidiana', 'medallon_morrison', 'medallon_volcan',
+  'estandarte_ambar', 'estandarte_obsidiana', 'estandarte_fosil', 'estandarte_volcan',
+  'cinta_ambar', 'cinta_obsidiana',
+]);
+
+const T = TIPO_COSMETICO;
 
 const SECCIONES = [
   {
-    tipo: TIPO_COSMETICO.DORSO,
+    tipo: T.DORSO,
     titulo: 'Dorsos de carta',
-    nota: 'El reverso de tus cartas: al abrir sobres, al robar y en tu mazo del marcador final.',
+    nota: 'El reverso de tus cartas: al abrir sobres, al robar y en tu mazo del marcador final. En los duelos lo ve también tu rival.',
+  },
+  {
+    tipo: T.TAPETE,
+    titulo: 'Tapetes',
+    nota: 'El fondo de tu tablero durante la partida. Cada jugador ve el suyo.',
+  },
+  {
+    tipo: T.ESTANDARTE,
+    titulo: 'Estandartes',
+    nota: 'Tu estandarte en la presentación antes de cada partida y tu cinta en el marcador final. En los duelos lo ve también tu rival.',
   },
 ];
 
@@ -42,6 +63,13 @@ let alCambiar = () => {};
 let confirmando = null;   // id del artículo con el «¿comprar?» abierto
 let ocupado = false;
 
+const url = (ruta) => `url('${ruta}')`;
+
+function poner(raiz, nombre, valor) {
+  if (valor) raiz.setProperty(nombre, valor);
+  else raiz.removeProperty(nombre);
+}
+
 /** La imagen y el filtro con los que se ve un artículo hoy. */
 function aspecto(c) {
   if (c.porDefecto || ARTE_LISTO || !c.provisional) return { imagen: c.arte, filtro: 'none' };
@@ -49,22 +77,59 @@ function aspecto(c) {
 }
 
 /**
- * Aplica lo equipado al documento. Se llama en cada repintado del menú, que
- * ocurre al sincronizar con el servidor y tras cada cambio.
+ * Aplica lo que llevas puesto al documento. Se llama en cada repintado del
+ * menú, que ocurre al sincronizar con el servidor y tras cada cambio.
  */
 export function aplicarEquipado(perfil = cargarPerfil()) {
   if (typeof document === 'undefined') return;
   const raiz = document.documentElement.style;
-  const dorso = equipadoDe(perfil, TIPO_COSMETICO.DORSO);
-  if (dorso.porDefecto) {
-    raiz.removeProperty('--dorso');
-    raiz.removeProperty('--dorso-filtro');
-    return;
-  }
+
+  const dorso = equipadoDe(perfil, T.DORSO);
   const { imagen, filtro } = aspecto(dorso);
-  raiz.setProperty('--dorso', `url('${imagen}')`);
-  if (filtro === 'none') raiz.removeProperty('--dorso-filtro');
-  else raiz.setProperty('--dorso-filtro', filtro);
+  poner(raiz, '--dorso', dorso.porDefecto ? null : url(imagen));
+  poner(raiz, '--dorso-filtro', dorso.porDefecto || filtro === 'none' ? null : filtro);
+
+  const tapete = equipadoDe(perfil, T.TAPETE);
+  poner(raiz, '--tapete', tapete.porDefecto ? null : url(tapete.arte));
+  poner(raiz, '--tapete-medallon', tapete.porDefecto ? null : url(tapete.medallon));
+
+  const estandarte = equipadoDe(perfil, T.ESTANDARTE);
+  poner(raiz, '--estandarte-propio', estandarte.porDefecto ? null : url(estandarte.arte));
+  // Un estandarte sin cinta propia deja la de siempre en el marcador.
+  poner(raiz, '--cinta-propia', estandarte.porDefecto || !estandarte.cinta ? null : url(estandarte.cinta));
+}
+
+/**
+ * Aplica lo que lleva puesto el rival de un duelo. `equipado` es el {tipo: id}
+ * que devuelve el servidor; lo que no es un artículo conocido se ignora y cae
+ * a lo de siempre. Con null, se quita todo: una partida contra la IA no tiene
+ * cosméticos de rival.
+ */
+export function aplicarRival(equipado) {
+  if (typeof document === 'undefined') return;
+  const raiz = document.documentElement.style;
+  const de = (tipo) => {
+    const c = cosmeticoPorId(equipado?.[tipo]);
+    return c && c.tipo === tipo && !c.porDefecto ? c : null;
+  };
+  const dorso = de(T.DORSO);
+  const estandarte = de(T.ESTANDARTE);
+  poner(raiz, '--dorso-rival', dorso ? url(aspecto(dorso).imagen) : null);
+  poner(raiz, '--estandarte-rival', estandarte ? url(estandarte.arte) : null);
+  poner(raiz, '--cinta-rival', estandarte?.cinta ? url(estandarte.cinta) : null);
+  poner(raiz, '--cinta-rival-giro', estandarte?.cinta ? 'scaleX(-1)' : null);
+}
+
+export const limpiarRival = () => aplicarRival(null);
+
+/**
+ * Lo que lleva puesto tu rival en un duelo. Lo cuenta el servidor, y sólo a
+ * quien está en ese duelo. Null sin servidor.
+ */
+export async function traerEquipadoRival(dueloId) {
+  if (!dueloId || !hayServidor()) return null;
+  const r = await rpc('equipado_en_duelo', { p_duelo: dueloId });
+  return r?.rival ?? null;
 }
 
 export function montarTienda({ cuerpo, aviso, alCambiar: cambio }) {
@@ -85,10 +150,20 @@ function avisar(texto, mal = false) {
   dom.aviso.classList.toggle('mal', mal);
 }
 
+/** La vista previa: el dorso, el tapete con su medallón o el estandarte. */
+function vistaHTML(c) {
+  if (c.tipo === T.TAPETE) {
+    return `<div class="tienda-vista tienda-tapete" aria-hidden="true"
+      style="background-image:${url(c.medallon)},${url(c.arte)}"></div>`;
+  }
+  const { imagen, filtro } = aspecto(c);
+  return `<div class="tienda-vista tienda-${c.tipo.toLowerCase()}" aria-hidden="true"
+    style="background-image:${url(imagen)};filter:${filtro}"></div>`;
+}
+
 function fichaHTML(c, p) {
   const tiene = loTiene(p, c.id);
   const puesto = equipadoDe(p, c.tipo).id === c.id;
-  const { imagen, filtro } = aspecto(c);
   let acciones;
   if (puesto) {
     acciones = '<span class="tienda-estado">Equipado</span>';
@@ -104,8 +179,7 @@ function fichaHTML(c, p) {
       ${llega ? '' : `title="Te faltan ${c.precio - p.monedas} dinomonedas"`}>${c.precio} ◈</button>`;
   }
   return `<article class="tienda-ficha ${puesto ? 'puesto' : ''} ${tiene ? 'tuyo' : ''}">
-    <div class="tienda-vista tienda-${c.tipo.toLowerCase()}"
-      style="background-image:url('${imagen}');filter:${filtro}" aria-hidden="true"></div>
+    ${vistaHTML(c)}
     <b class="tienda-nombre">${c.nombre}</b>
     <small class="tienda-lema">${c.lema}</small>
     <div class="tienda-acciones">${acciones}</div>
@@ -142,7 +216,7 @@ async function alTocar(e) {
       avisar('Comprado. Ya puedes equiparlo.');
     } else {
       await equiparCosmetico(equipar);
-      avisar('Equipado. Se ve en tu próxima partida y al abrir sobres.');
+      avisar('Equipado. Se ve en tu próxima partida.');
     }
     confirmando = null;
   } catch (err) {

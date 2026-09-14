@@ -380,11 +380,13 @@
 .presentacion.con-arte .pres-estandarte {
   width: min(26vw, 140px); aspect-ratio: 787 / 1919;
   border: 0; clip-path: none; filter: drop-shadow(0 8px 12px rgba(0,0,0,.6));
-  background: url('assets/piel/vs/estandarte_propio.webp') center / 100% 100% no-repeat;
+  /* Con estandarte de la tienda, `--estandarte-propio` y, en un duelo,
+     `--estandarte-rival` (src/ui/tienda.js). */
+  background: var(--estandarte-propio, url('assets/piel/vs/estandarte_propio.webp')) center / 100% 100% no-repeat;
 }
 .presentacion.con-arte .pres-estandarte .emblema { width: 46%; top: 33%; }
 .presentacion.con-arte .pres-mitad.rival .pres-estandarte {
-  background-image: url('assets/piel/vs/estandarte_rival.webp');
+  background-image: var(--estandarte-rival, url('assets/piel/vs/estandarte_rival.webp'));
 }
 .pres-nombre {
   position: absolute; display: flex; flex-direction: column; gap: 3px; max-width: 58%;

@@ -405,13 +405,33 @@ delete from public.catalogo_iniciales where (mazo, card_id) not in (values
 insert into public.catalogo_cosmeticos (id, tipo, precio, por_defecto) values
   ('dorso_clasico', 'DORSO', 0, true),
   ('dorso_ambar', 'DORSO', 300, false),
-  ('dorso_obsidiana', 'DORSO', 300, false)
+  ('dorso_obsidiana', 'DORSO', 300, false),
+  ('tapete_clasico', 'TAPETE', 0, true),
+  ('tapete_ambar', 'TAPETE', 500, false),
+  ('tapete_obsidiana', 'TAPETE', 500, false),
+  ('tapete_morrison', 'TAPETE', 500, false),
+  ('tapete_volcan', 'TAPETE', 500, false),
+  ('estandarte_clasico', 'ESTANDARTE', 0, true),
+  ('estandarte_ambar', 'ESTANDARTE', 400, false),
+  ('estandarte_obsidiana', 'ESTANDARTE', 400, false),
+  ('estandarte_fosil', 'ESTANDARTE', 400, false),
+  ('estandarte_volcan', 'ESTANDARTE', 400, false)
 on conflict (id) do update set tipo = excluded.tipo, precio = excluded.precio, por_defecto = excluded.por_defecto;
 
 delete from public.catalogo_cosmeticos where id not in (
   'dorso_clasico',
   'dorso_ambar',
-  'dorso_obsidiana'
+  'dorso_obsidiana',
+  'tapete_clasico',
+  'tapete_ambar',
+  'tapete_obsidiana',
+  'tapete_morrison',
+  'tapete_volcan',
+  'estandarte_clasico',
+  'estandarte_ambar',
+  'estandarte_obsidiana',
+  'estandarte_fosil',
+  'estandarte_volcan'
 );
 
 delete from public.catalogo_cartas where card_id not in (
