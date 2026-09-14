@@ -31,6 +31,26 @@ test('Hay un icono adaptable y capturas para móvil y para ordenador', () => {
   }
 });
 
+/** Ancho, alto y tipo de color de un PNG, de su cabecera IHDR. */
+function cabeceraPng(ruta) {
+  const b = readFileSync(ruta);
+  return { w: b.readUInt32BE(16), h: b.readUInt32BE(20), color: b[25] };
+}
+
+test('Cada icono mide lo que declara, y los que se recortan son opacos', () => {
+  for (const i of manifest.icons) {
+    const { w, h } = cabeceraPng(i.src);
+    assert.equal(`${w}x${h}`, i.sizes, `${i.src} mide ${w}x${h} y el manifest dice ${i.sizes}`);
+  }
+  // Android recorta el adaptable y iPhone rellena de negro lo transparente:
+  // los dos tienen que llegar sin canal alfa (tipo de color 2, RGB).
+  const maskable = manifest.icons.find((i) => i.purpose === 'maskable');
+  assert.equal(cabeceraPng(maskable.src).color, 2, 'el icono adaptable trae transparencia');
+  const apple = html.match(/<link rel="apple-touch-icon" href="([^"]+)"/)[1];
+  assert.ok(existsSync(apple), `el icono de iPhone «${apple}» no está`);
+  assert.equal(cabeceraPng(apple).color, 2, 'el icono de iPhone trae transparencia');
+});
+
 test('Las capturas miden lo que dicen', () => {
   // Chrome descarta una captura cuyo tamaño no coincide con el declarado. Se
   // lee el ancho y el alto de la cabecera del WebP (VP8, VP8L o VP8X).
