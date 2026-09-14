@@ -96,8 +96,11 @@ function portadaDe(mazo) {
   return de.sort((a, b) => ORDEN.indexOf(a.c.rareza) - ORDEN.indexOf(b.c.rareza) || b.c.coste - a.c.coste)[0].c.id;
 }
 
-/** El grupo que más pesa en el mazo, o null si está vacío. */
-function emblemaDe(mazo) {
+/**
+ * El grupo que más pesa en el mazo, o null si está vacío. Lo usa también el
+ * marcador del final, para poner a cada bando su emblema.
+ */
+export function emblemaDe(mazo) {
   const lista = cartasDe(mazo);
   const cuenta = new Map();
   for (const { c, n } of lista) {

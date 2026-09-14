@@ -1126,3 +1126,154 @@ nodos a 1254×1254 y la cartela a 1024×1536, que recortada queda a 768×1282 y
 no a 2:3. El nodo abierto trajo el halo dorado convertido en un aro rosa opaco,
 que la herramienta quita y el CSS sustituye; si se regenera, pedirlo **sin
 halo ni brillo alrededor**.
+
+## El final de la partida
+
+Al acabar una partida, el juego cambiaba de pantalla en el acto y enseñaba
+tres cajas de texto. Ahora un **estandarte** con VICTORIA o DERROTA cae sobre
+el tablero congelado, y la pantalla de fin es un **cara a cara**: una cinta
+por bando con su nombre y el emblema de su mazo, un medallón con el VS en
+medio, las cifras en rombos de latón, un sello sobre el mazo que ganó y el
+del que perdió rasgado.
+
+Son **siete piezas y un fondo**. El juego escribe todo el texto —VICTORIA,
+DERROTA, VS, los nombres y los números—, así que ninguna pieza lleva letras.
+
+### El bloque de MATERIAL (copiar literal)
+
+El de los mazos. Adjuntar `boton_ancho.png` o `placa_de_mazo.png` como
+referencia y pedir «mismo material, misma luz».
+
+> Pieza de interfaz de videojuego, vista de frente, sin perspectiva. Roca
+> oscura pulida con vetas minerales y filete de latón viejo con el canto
+> biselado, iluminación lateral suave que marque el relieve, sin brillos
+> especulares fuertes. Paleta: negro, gris piedra, latón `#d9a441` y oro
+> viejo. Sin texto, sin letras, sin números, sin marca de agua. Fondo
+> **magenta puro `#FF00FF`** fuera de la pieza, sin sombra proyectada.
+
+### 1 · El estandarte
+
+Lo que cae sobre el tablero. El juego escribe VICTORIA o DERROTA en el
+centro de la tela con la letra del juego, así que **la tela tiene que ser
+lisa** en su franja central. Sirve para las dos cosas: lo que cambia entre
+ganar y perder es el sello de encima.
+
+Formato: **1536×512**, apaisado 3:1. Se sirve a 1040.
+
+- **`estandarte.png`.** [MATERIAL] Estandarte horizontal de proporción 3:1.
+  Arriba, de lado a lado, una barra de latón viejo con un remate en forma de
+  punta de lanza en cada extremo. Colgando de la barra, una tela ancha de
+  cuero curtido marrón oscuro, gastada, con el borde cosido con hilo de latón
+  y pequeñas tachuelas de latón a lo largo del canto superior. El borde de
+  abajo de la tela cortado en una V poco profunda. Dos borlas de cordón de
+  latón colgando a los lados. **La franja central de la tela, lisa, sin
+  ningún dibujo, emblema ni costura**, para escribir una palabra encima. Nada
+  en el centro de la barra: ahí se pone otra pieza.
+
+### 2 · Los dos sellos
+
+El que corona el estandarte y, en la pantalla de fin, se posa sobre el mazo
+que ganó. Es el equivalente de la corona. Se genera primero el de victoria y
+**el de derrota a partir de él**, con esa imagen adjunta y la rotura como
+único cambio.
+
+Formato: **1024×1024** los dos. Se sirven a 384.
+
+- **`sello_victoria.png`.** [MATERIAL] Emblema de trofeo, vista frontal: una
+  corona abierta de cinco dientes de dinosaurio terópodo fosilizados, curvos
+  y aserrados, engastados en un aro de oro viejo con el canto biselado. En el
+  centro del aro, un cabujón grande de ámbar rojo anaranjado pulido, con un
+  brillo interior cálido. Simétrico, compacto, reconocible a tamaño de icono.
+  Nada fuera de la pieza.
+- **`sello_derrota.png`.** El mismo emblema de la imagen adjunta, **idéntico
+  en forma, tamaño y posición**, pero partido por una grieta diagonal que lo
+  cruza entero, con un diente roto y caído, el oro ennegrecido y sin brillo y
+  el ámbar opaco y apagado, sin luz interior. Mismo fondo magenta.
+
+### 3 · El rombo de las cifras
+
+Cada cifra del marcador —trofeos y hábitat de cada bando— va dentro de uno.
+El juego escribe el número encima, y resalta con luz el del bando que va por
+delante.
+
+Formato: **512×512**. Se sirve a 128 y se ve a 40 px.
+
+- **`rombo.png`.** [MATERIAL] Placa en forma de rombo, un cuadrado girado 45
+  grados, con un filete grueso de latón viejo biselado. El interior, roca
+  oscura casi negra, **completamente liso y plano**, para escribir un número
+  de dos cifras. Formas gruesas, que se lean a 40 px. Nada fuera del rombo.
+
+### 4 · El medallón del VS
+
+Entre las dos cintas. El juego escribe «VS» en el centro.
+
+Formato: **512×512**. Se sirve a 160 y se ve a 44 px.
+
+- **`medallon_vs.png`.** [MATERIAL] Medallón circular pequeño de latón viejo
+  con el borde biselado, y detrás de él, asomando en diagonal por arriba y
+  por abajo, dos garras fósiles de terópodo cruzadas en aspa. El centro del
+  medallón, un disco de roca oscura **liso, sin ningún grabado**. Nada fuera
+  de la pieza.
+
+### 5 · Las dos cintas de bando
+
+Una por jugador, con su nombre y el emblema de su mazo encima. La tuya va a
+la izquierda y apunta hacia fuera; la del rival, a la derecha. Se piden en la
+misma conversación: **misma forma, espejada, y sólo cambia el color del
+cuero**.
+
+Formato: **1536×384**, apaisado 4:1. Se sirven a 480.
+
+- **`cinta_propia.png`.** [MATERIAL] Banderola horizontal de proporción 4:1
+  de cuero teñido color ocre dorado oscuro, con el borde de arriba y el de
+  abajo ribeteados de latón. El extremo **izquierdo** acaba en punta de cola
+  de golondrina; el extremo derecho, cortado recto. La superficie lisa, sin
+  dibujos, para escribir un nombre.
+- **`cinta_rival.png`.** La misma banderola de la imagen adjunta, **espejada**:
+  la cola de golondrina en el extremo **derecho** y el corte recto a la
+  izquierda. El cuero teñido de **rojo óxido oscuro**, color sangre seca.
+  Todo lo demás, idéntico.
+
+### 6 · El fondo de la pantalla de fin
+
+Detrás del marcador, oscurecido por CSS: sólo tiene que dar ambiente y dejar
+leer el centro.
+
+> [ESTILO de las ilustraciones, el bloque de PROMPTS.md] Una pared de roca
+> sedimentaria oscura en un yacimiento, de noche, con un cráneo enorme de
+> Allosaurus fosilizado incrustado en la roca, visto de frente y centrado,
+> medio excavado, las cuencas de los ojos en sombra. Luz tenue y cálida de
+> candil desde abajo, polvo en el aire, tonos negros, marrones y ámbar.
+> Composición vertical 9:16, el centro de la imagen poco contrastado. Sin
+> personas, sin herramientas en primer plano, sin texto.
+
+Exportar a lo más vertical que dé el generador y recortar a 9:16.
+
+---
+
+### Después de generar
+
+- Todo a `src/piel/fin/` con esos nombres, en PNG.
+- `python tools/fin.py escribir` los deja en `assets/piel/fin/` e imprime la
+  proporción de cada pieza recortada.
+- Cuando estén las ocho, `npm test` pide poner `ARTE_LISTO = true` en
+  `src/ui/fin.js`: es lo que cambia el CSS de las formas dibujadas a los WebP.
+  Y subir `VERSION` en `sw.js`.
+- Mientras no lleguen, el final se pinta entero con CSS —el estandarte con un
+  degradado, el sello con el icono de trofeo, los rombos con un borde—, así
+  que se juega desde el primer día.
+
+### Lo que llegó
+
+Las ocho el 14-09-2026, en magenta limpio y sin letras. Las apaisadas vinieron a
+2172×724 y las cuadradas a 1254×1254; recortadas, el estandarte queda a 3,43:1 y
+las cintas a 3,6:1. El estandarte trae la barra más alta de lo pedido —ocupa el
+quinto de arriba—, así que la palabra lleva relleno encima para caer en la tela.
+El cráneo del fondo salió de perfil y no de frente, y sirve igual: queda
+detrás del marcador con el velo del CSS.
+
+### Lo que NO se pide
+
+- El mazo rasgado: es `dorso.webp` cortado en zigzag por CSS, como el sobre.
+- Los emblemas de las cintas: son los siete de clado que ya existen.
+- Ninguna palabra ni número: los escribe el juego.
