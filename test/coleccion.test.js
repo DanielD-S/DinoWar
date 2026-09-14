@@ -169,20 +169,22 @@ test('La colección inicial monta exactamente el mazo por defecto', () => {
 });
 
 test('Un mazo ilegal dice POR QUÉ lo es', () => {
-  const col = { ...mazoPorDefecto(), torvosaurus: 3 };
+  const col = { ...mazoPorDefecto(), tyrannotitan: 3 };
 
   const corto = validarMazo({ dryosaurus: 3 }, col);
   assert.equal(corto.valido, false);
   assert.match(corto.problemas.join(' '), new RegExp(`${TAM_MAZO - 3} cartas`));
 
-  const pasado = validarMazo({ ...mazoPorDefecto(), torvosaurus: 3 }, col);
+  const pasado = validarMazo({ ...mazoPorDefecto(), tyrannotitan: 3 }, col);
   assert.equal(pasado.valido, false);
   // El tope sale de la rareza, que el autor recostea: escribirlo a mano aquí
-  // hacía fallar el test el día que Torvosaurus pasó de Legendario a Épico.
+  // hacía fallar el test el día que Torvosaurus pasó de Legendario a Épico. Y
+  // la carta es Tyrannotitan porque es la que el mazo de referencia lleva a
+  // una copia: Torvosaurus salió de él el 13-09-2026.
   assert.match(pasado.problemas.join(' '),
-    new RegExp(`el máximo es ${limiteDe('torvosaurus')}`));
+    new RegExp(`el máximo es ${limiteDe('tyrannotitan')}`));
 
-  const sinTener = validarMazo({ ...mazoPorDefecto(), torvosaurus: 3 }, mazoPorDefecto());
+  const sinTener = validarMazo({ ...mazoPorDefecto(), tyrannotitan: 3 }, mazoPorDefecto());
   assert.match(sinTener.problemas.join(' '), /tienes 1 y el mazo pide 3/);
 });
 

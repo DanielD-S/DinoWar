@@ -86,7 +86,7 @@ ver los seis números idénticos y creer que el cambio no hace nada.
 
 | herramienta | qué juega | punto ciego |
 |---|---|---|
-| `npm run sim` | el mazo de REFERENCIA, 27 entradas | las 39 cartas que no están en él. La Llanura se rediseñó dos veces y `BALANCE.md` no se movió un decimal |
+| `npm run sim` | el mazo de REFERENCIA, 32 entradas | las 69 cartas que no están en él. La Llanura se rediseñó dos veces y `BALANCE.md` no se movió un decimal |
 | `node sim/carta.mjs <id>` | el mazo de referencia CON esa carta contra el mismo SIN ella | una carta sola: no dice nada de sinergias entre dos nuevas |
 | `node sim/cobertura.mjs` | mazos aleatorios de todo el set | su ajuste filtra a CRIATURAS: ningún clima ni evento aparece |
 | `node sim/climas.js` | fuerza cada clima al campo | no dice si la carta es buena, sólo qué le hace al juego mientras está puesta |
@@ -1099,9 +1099,11 @@ Dicho para que nadie lo descubra tarde:
   equipo.
 - **El ELO no lo mueve nadie.** La columna existe en `jugadores` y las partidas
   se registran, pero no hay PvP todavía.
-- **Tres cartas mal calibradas** sobre un objetivo de cero (`BALANCE.md`), y 73
-  de las 101 cartas del set fuera del mazo de referencia, o sea sin calibración
-  comprobada.
+- **El balance cumple 3 de 6** (`BALANCE.md`, mazo de referencia del 13-09-2026):
+  cero cartas descalibradas y las vías en 44/56, pero el jugador inicial se
+  queda en 47,5 % —lleva ahí desde la v2, es del turno y no del mazo—, la bola
+  de nieve en 72 % y la extinción en 0 %. Y 69 de las 101 cartas del set siguen
+  fuera del mazo de referencia, o sea sin calibración comprobada.
 - **La inmunidad al clima no muerde.** Torvosaurus y Nodosaurus dicen «no le
   afectan los efectos del clima», y hoy los dos únicos efectos del clima sobre una
   criatura son BUENOS: el Canal da +1 de Vida y el Bosque cura saurópodos. O sea

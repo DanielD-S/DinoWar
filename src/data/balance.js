@@ -337,36 +337,41 @@ export const BALANCE = Object.freeze({
 // el hueco fue a Stegosaurus: es el otro tireóforo del mazo y su mecánica nueva
 // —+1 de Ataque por cada Stegosaurus propio— premia llevar la tercera.
 export const MAZO = Object.freeze([
-  // dinosaurios — 30
-  ['dryosaurus', 3], ['ornitholestes', 3], ['ceratosaurus', 2],
-  ['nodosaurus', 2],
-  ['stegosaurus', 3], ['allosaurus', 2], ['camarasaurus', 2],
-  // Lokiceratops pasó a legendaria y sólo admite una copia. La plaza que deja
-  // va a Brachylophosaurus, que con la rareza nueva admite tres y es el otro
-  // gregario del mazo: la lista sigue siendo la misma clase de mazo.
-  ['riparovenator', 2], ['lokiceratops', 1], ['brachylophosaurus', 2], ['huaxiadraco', 2],
-  ['diplodocus', 1], ['apatosaurus', 1], ['torvosaurus', 1], ['tyrannotitan', 1],
-  // soporte — 20
+  // ------------------------------------------------- la ronda de las cien
+  // Rehecho el 13-09-2026 con el set en 101 cartas: el de antes medía un juego
+  // de 28 cartas cuando ya había 101. Entran once de la ronda nueva y salen
+  // las tres que la IA no jugaba —Sequía 0,53, Bruma 0,00, Competencia 0,00—.
   //
-  // Los climas van a UNA copia. Sólo puede haber un paleoambiente activo, así
-  // que la segunda copia en la mano no tiene dónde ir: llevar tres Sabanas no
-  // hacía peor a la carta, hacía peor al mazo, y el índice lo cobraba a la
-  // carta (0,50 con tres copias, 0,68 con una).
+  // Medido sobre 1.000 partidas por candidato, ocho candidatos. Lo que se
+  // aprendió: los cuerpos baratos y agresivos (Velociraptor a 0, Kentrosaurus,
+  // Pachycephalosaurus) no hunden al jugador inicial más que los grandes, y
+  // meter Inundación o Manada de paso para buscar la extinción no la mueve del
+  // 0–2 % y deja las dos cartas descalibradas. La Biomasa a 9 copias (5+2+2)
+  // frente a 7 no sube al jugador inicial esta vez: 45,2 % con 9 y 46,9 % con
+  // 7 en el mazo viejo, que a 1.000 partidas es ruido (±1,6). Cero cartas
+  // descalibradas y las vías a 53/47, que el mazo viejo tenía en 36/64.
   //
-  // Las cuatro plazas que eso libera van a Rebrote y a las dos cartas que el
-  // mazo de referencia nunca había medido. Salen calibradas a la primera:
-  // neumaticidad 0,98 y competencia 1,05.
-  ['gregarismo', 3], ['trampa', 3], ['rebrote', 3],
-  ['gastrolitos', 2], ['fractura', 2],
-  ['sabana', 1], ['aridez', 1], ['canal', 1],
-  ['mortandad', 1], ['crecimiento_acelerado', 1], ['neumaticidad', 1], ['competencia', 1],
-  // biomasa — 7
+  // dinosaurios — 28
+  ['dryosaurus', 3], ['ornitholestes', 2], ['ceratosaurus', 2], ['stegosaurus', 1],
+  ['kentrosaurus', 2], ['velociraptor', 2], ['allosaurus', 2], ['camarasaurus', 1],
+  ['amargasaurus', 2], ['iguanodon', 2], ['pachycephalosaurus', 2],
+  ['riparovenator', 1], ['lokiceratops', 1], ['huaxiadraco', 1], ['brachylophosaurus', 1],
+  ['diplodocus', 1], ['apatosaurus', 1], ['tyrannotitan', 1],
+  // soporte — 18
   //
-  // No se suman a las 50 de antes: DESPLAZAN dos copias, las de las entradas
-  // más repetidas, para que el mazo pierda repeticiones y no variedad. Quitar
-  // la única copia de Torvosaurus cambiaría qué mazo es; bajar Ceratosaurus de
-  // 3 a 2 sólo lo hace más fino.
-  ['biomasa', 7],
+  // Un clima solo, el Monzón: sólo cabe uno en el campo. Crecimiento acelerado
+  // se queda por ser la legendaria de soporte de la colección de salida: sin
+  // ella, una cuenta nueva empezaría con una sola legendaria. Mortandad salió
+  // en la última vuelta: con 2.000 partidas medía 0,70 de índice, justo en el
+  // borde, y su plaza fue a la segunda Sabana de helechos.
+  ['gregarismo', 2], ['trampa', 2], ['rebrote', 2], ['nido', 2], ['sabana_helechos', 2],
+  ['insectos', 2], ['fractura', 2], ['gastrolitos', 1], ['crecimiento_acelerado', 1],
+  ['sabana', 1], ['canal_trenzado', 1],
+  // biomasa — 9
+  //
+  // Tres cartas distintas y no siete Praderas: la colección de salida es este
+  // mazo, y así una cuenta nueva ve que la Biomasa es una familia.
+  ['biomasa', 5], ['araucarias', 2], ['cicadas', 2],
 ].map((e) => Object.freeze(e)));
 
 export const TOTAL_MAZO = MAZO.reduce((n, [, copias]) => n + copias, 0);
