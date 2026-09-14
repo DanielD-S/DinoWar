@@ -135,9 +135,10 @@ test('La migración de cuentas lleva la comprobación de propiedad', () => {
 
 test('La Edge Function comprueba la propiedad antes de pagar nada', () => {
   const ts = readFileSync('supabase/functions/asalto/index.ts', 'utf8');
-  // Dos veces: una por el asalto y otra por la victoria. Una partida que paga
-  // sin pasar por aquí es una carta regalada.
-  assert.equal((ts.match(/validar_mazo_de/g) ?? []).length, 2,
+  // Cuatro veces: el asalto, la victoria, y las dos puertas del duelo —buscar
+  // o retar, y aceptar—. Una partida que paga sin pasar por aquí es una carta
+  // regalada, y un duelo con un mazo que no es tuyo, lo mismo.
+  assert.equal((ts.match(/validar_mazo_de/g) ?? []).length, 4,
     'Falta la comprobación de propiedad en alguno de los dos caminos que pagan');
 });
 
@@ -146,9 +147,9 @@ test('La versión por URL hace lo mismo que la empaquetada', () => {
   // Es la que está DESPLEGADA, no una de repuesto: se creyó lo contrario y por
   // eso estuvo un rato capada a asaltos. Tiene que despachar los tres tipos y
   // comprobar la propiedad en los dos caminos que pagan.
-  for (const tipo of ['asalto', 'victoria', 'sobre']) {
+  for (const tipo of ['asalto', 'victoria', 'sobre', 'duelo']) {
     assert.match(corta, new RegExp(`tipo === '${tipo}'`), `no despacha «${tipo}»`);
   }
-  assert.equal((corta.match(/validar_mazo_de/g) ?? []).length, 2,
+  assert.equal((corta.match(/validar_mazo_de/g) ?? []).length, 4,
     'Falta la comprobación de propiedad en alguno de los dos caminos que pagan');
 });

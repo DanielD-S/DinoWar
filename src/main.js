@@ -30,12 +30,18 @@ import { mazoActivo, cargarPerfil, actualizarPerfil } from './ui/almacen.js';
 import { montarCuenca, abrirCuenca, pintarCuenca } from './ui/cuenca.js';
 import { montarCuenta, abrirCuenta, resumenDeCuenta } from './ui/cuenta.js';
 import { montarEntrada, abrirEntrada } from './ui/entrada.js';
+import {
+  montarDuelo, enseñarDuelo, pintarDuelo, abandonarEspera,
+  jugarEnDuelo, estadoDuelo, rendirseEnDuelo,
+} from './ui/duelo.js';
+import { DUELO } from './data/duelo.js';
+import { rangoDe, nombreDeRango } from './data/ligas.js';
 import { estaDentro } from './ui/supabase.js';
 import { sincronizar, modoPerfil, MODO as MODO_PERFIL } from './ui/perfil.js';
 import { asaltar, estadoDeTribu, entrar as entrarEnLaCuenca } from './ui/red.js';
 import { danoDeAsalto, habitatDeAsalto } from './data/tribu.js';
 import { JEFES, jefeActivo } from './data/eventos.js';
-import { aListaDeMazo } from './data/coleccion.js';
+import { aListaDeMazo, ECONOMIA } from './data/coleccion.js';
 import {
   animarCombate, animarRevelacion, animarEventos, cancelarAnimaciones, esperar, lineasDeLog,
   revelarRetenida,
@@ -64,6 +70,12 @@ const perfilIA = () => IA_FORZADA ?? (cargarPerfil().dificultad ?? PERFIL.HEURIS
 let app = APP.BOOT;
 let estado = null;
 let rngIA = 0;
+/**
+ * El duelo en curso, o null si la partida es contra la IA. Mientras existe,
+ * cada jugada va al servidor y el estado que se pinta es el que él devuelve.
+ */
+let duelo = null;
+let ultimaFueDuelo = false;
 let registro = [];
 let rafDebug = 0;
 
@@ -184,6 +196,8 @@ function anotarResultado(gane, turnos) {
 function abrirJugar() {
   el.btnMisiones.setAttribute('aria-expanded', 'false');
   enseñarMisiones(false);
+  el.btnDuelo.setAttribute('aria-expanded', 'false');
+  enseñarDuelo(false);
   refrescarMisiones();
   irA(APP.JUGAR);
 }
@@ -231,6 +245,7 @@ function irA(nuevo) {
 const interactivo = () => app === APP.PLAYING && estado?.fase === FASE.DESPLIEGUE;
 
 function aplicar(accion) {
+  if (duelo) return aplicarEnDuelo(accion);
   const motivo = validar(estado, accion);
   if (motivo) { mensaje(motivo, true); sonido('error'); return false; }
   grabar(accion);
@@ -558,6 +573,9 @@ function pintarReloj() {
  */
 function seAcaboElTiempo(bando) {
   if (app !== APP.PLAYING && app !== APP.RESOLVING) return;
+  // En un duelo el reloj que decide es el del servidor: el de aquí sólo lo
+  // enseña, y la siguiente pregunta trae el duelo cerrado si de verdad se acabó.
+  if (duelo) return;
   pintarReloj();
   cerrarHojas();
   if (tutorialActivo()) terminarTutorial();
@@ -602,6 +620,7 @@ function jugarIA() {
 
 async function alPulsarListo() {
   if (!interactivo()) return;
+  if (duelo) return listoEnDuelo();
   reloj.detener();
   desbloquear();
   el.btnListo.disabled = true;
@@ -766,6 +785,13 @@ function pedirDescarte() {
     el.eleccion.classList.add('oculta');
     el.eleccionCuerpo.onclick = null;
     const descarte = { tipo: ACCION.DESCARTAR, jugador: JUGADOR, iid: Number(b.dataset.iid) };
+    if (duelo) {
+      // El descarte es una decisión, y las decisiones en un duelo las guarda
+      // el servidor. Después, a esperar a que el otro termine las suyas.
+      await enviarAlDuelo(descarte);
+      await esperarRival();
+      return;
+    }
     grabar(descarte);
     estado = reduce(estado, descarte);
     render(estado);
@@ -792,6 +818,7 @@ function abrirLog() {
  * único que la rendición tiene que decidir.
  */
 function rendirse() {
+  if (duelo) return rendirseEnElDuelo();
   reloj.parar();
   cerrarHojas();
   if (tutorialActivo()) terminarTutorial();
@@ -1160,21 +1187,35 @@ function iniciar() {
   // real del usuario y es lo que despierta el audio.
   el.btnJugar.addEventListener('click', () => { desbloquear(); abrirJugar(); });
   el.btnSolitario.addEventListener('click', () => { desbloquear(); nuevaPartida(); });
-  // El duelo no existe todavía. La placa está `disabled`, así que esto no llega
-  // a dispararse; queda escrito para que se vea dónde entra cuando exista.
-  el.btnDuelo.addEventListener('click', () => {});
+  // La placa del Duelo abre y cierra su panel, como la de misiones, y las dos
+  // se excluyen: abrir una pliega la otra.
+  montarDuelo({ cuandoEmpareje: empezarDuelo });
+  el.btnDuelo.addEventListener('click', () => {
+    const abierto = el.btnDuelo.getAttribute('aria-expanded') === 'true';
+    el.btnDuelo.setAttribute('aria-expanded', String(!abierto));
+    if (!abierto) { el.btnMisiones.setAttribute('aria-expanded', 'false'); enseñarMisiones(false); }
+    enseñarDuelo(!abierto);
+  });
   el.btnMisiones.addEventListener('click', () => {
     const abierto = el.btnMisiones.getAttribute('aria-expanded') === 'true';
     el.btnMisiones.setAttribute('aria-expanded', String(!abierto));
+    if (!abierto) { el.btnDuelo.setAttribute('aria-expanded', 'false'); enseñarDuelo(false); }
     enseñarMisiones(!abierto);
   });
-  el.btnJugarVolver.addEventListener('click', () => { pintarMenu(); irA(APP.MENU); });
+  // Salir de la pantalla de jugar es salir de la cola: quedarse esperando
+  // rival desde el menú sería empezar una partida sin estar mirando.
+  el.btnJugarVolver.addEventListener('click', () => { abandonarEspera(); pintarMenu(); irA(APP.MENU); });
   el.btnColeccion.addEventListener('click', () => { abrirColeccion(); irA(APP.COLECCION); });
   el.btnSobres.addEventListener('click', () => { abrirSobres(); irA(APP.SOBRES); });
   el.btnMazos.addEventListener('click', () => { abrirMazos(); irA(APP.MAZOS); });
   el.btnCuenca.addEventListener('click', () => { abrirCuenca(); irA(APP.CUENCA); });
   el.btnCuenta.addEventListener('click', () => { abrirCuenta(); irA(APP.CUENTA); });
-  el.btnOtra.addEventListener('click', () => { pintarRecord(); nuevaPartida(); });
+  el.btnOtra.addEventListener('click', () => {
+    pintarRecord();
+    // Tras un duelo, «otra» no es otra contra la IA: es volver a buscar rival.
+    if (ultimaFueDuelo) { abrirJugar(); el.btnDuelo.setAttribute('aria-expanded', 'true'); enseñarDuelo(true); return; }
+    nuevaPartida();
+  });
   // Terminar una partida no obligaba a jugar otra, pero lo parecía: no había
   // más salida que «Otra partida».
   el.btnFinMenu.addEventListener('click', () => {
@@ -1329,3 +1370,246 @@ window.addEventListener('pagehide', () => {
 });
 
 iniciar();
+
+// ------------------------------------------------------------------- duelo
+//
+// La partida contra una persona es el mismo tablero, el mismo guión y el mismo
+// animador. Lo que cambia es de dónde sale el estado: del servidor, que es el
+// único que ve las dos manos. Cada jugada se manda de una en una —con una
+// copia local para que la carta caiga al instante— y al pulsar Listo se espera
+// a que el otro también pulse, preguntando cada dos segundos y medio.
+
+const hudRival = document.querySelector('.hud-bando.rival .hud-etiqueta');
+
+/** Empieza el duelo con lo que devolvió el servidor al emparejar. */
+function empezarDuelo(r) {
+  cancelarAnimaciones();
+  soltarEntrada();
+  registro = [];
+  asaltando = null;
+  grabacion = null;
+  ultimaFueDuelo = true;
+  duelo = {
+    id: r.id, n: r.n ?? 0, rival: r.rival, yo: r.yo, eloInicial: Number(r.eloInicial ?? r.yo?.elo ?? 1200),
+    cola: Promise.resolve(), pendientes: 0, ultimo: null,
+  };
+  estado = r.estado;
+  if (hudRival) hudRival.textContent = r.rival?.apodo ?? 'Rival';
+  // El reloj de verdad es el del servidor; el de aquí lo enseña. Sin
+  // `alAgotarse`: llegar a cero no decide nada, la siguiente pregunta lo trae.
+  reloj.arrancar({ alAgotarse: () => {}, alLatir: pintarReloj });
+  if (r.tiempos) reloj.poner(r.tiempos);
+  pintarReloj();
+
+  irA(APP.PLAYING);
+  render(estado);
+  tomarEntrada({
+    interactivo,
+    admite,
+    soltar,
+    ficha: (cardId, iid = null) => abrirFicha(fichaHTML(cardId, iid, estado)),
+  });
+  mensaje(`Duelo contra ${r.rival?.apodo ?? 'tu rival'}. Arrastra cartas al campo y pulsa Listo.`);
+  if ((r.deciden ?? []).includes(JUGADOR)) turnoDelJugador();
+  else esperarRival();
+}
+
+/**
+ * Una jugada en el duelo: se valida aquí con el mismo `validar()` para que el
+ * error salga al instante, se aplica en local para que la carta caiga sin
+ * esperar, y se manda. Lo que el servidor devuelva es lo que vale.
+ *
+ * Dos jugadas no se pueden aplicar en local: cambiar la mano y reciclar. Las
+ * dos barajan o roban, y la vista no trae ni el rng ni el orden del mazo —a
+ * propósito, que con ellos se predice lo que viene—. Ésas se mandan y se espera.
+ */
+function aplicarEnDuelo(accion) {
+  const motivo = validar(estado, accion);
+  if (motivo) { mensaje(motivo, true); sonido('error'); return false; }
+  el.mulligan.classList.add('oculta');
+  sonido('carta');
+  const remota = accion.tipo === ACCION.MULLIGAN || accion.tipo === ACCION.RECICLAR;
+  if (!remota) {
+    estado = reduce(estado, accion);
+    render(estado);
+  }
+  enviarAlDuelo(accion);
+  return true;
+}
+
+/** Manda una jugada, en orden con las anteriores, y adopta la respuesta. */
+function enviarAlDuelo(accion) {
+  const d = duelo;
+  d.pendientes += 1;
+  d.cola = d.cola
+    .then(() => jugarEnDuelo(d.id, accion, d.n))
+    .then((r) => { d.pendientes -= 1; adoptar(d, r); })
+    .catch(async (e) => {
+      d.pendientes -= 1;
+      mensaje(e.message, true);
+      sonido('error');
+      // El servidor manda: si rechazó la jugada, se vuelve a su estado.
+      try { adoptar(d, await estadoDuelo(d.id, d.n)); } catch { /* la siguiente pregunta lo trae */ }
+    });
+  return d.cola;
+}
+
+/**
+ * Lo que devuelve el servidor tras una jugada. Sustituye al estado local sólo
+ * cuando no hay jugadas en vuelo —si no, pisaría una carta que acabas de
+ * soltar y aún no ha llegado— y nunca si trae pasos: los pasos son la
+ * revelación y el combate, y ésos los anima `esperarRival`.
+ */
+function adoptar(d, r) {
+  if (duelo !== d || !r?.estado) return;
+  d.n = r.n ?? d.n;
+  d.ultimo = r;
+  if (r.tiempos) reloj.poner(r.tiempos);
+  if (d.pendientes === 0 && !(r.pasos?.length) && !r.fin) {
+    estado = r.estado;
+    render(estado);
+  }
+}
+
+async function listoEnDuelo() {
+  reloj.detener();
+  desbloquear();
+  el.btnListo.disabled = true;
+  el.mulligan.classList.add('oculta');
+  cerrarHojas();
+  await enviarAlDuelo({ tipo: ACCION.PASAR });
+  await esperarRival();
+}
+
+/**
+ * Esperar a que el otro termine de decidir. Pregunta cada `DUELO.sondeoMs`;
+ * cuando llegan los pasos —la revelación, el combate, el robo— los anima uno a
+ * uno con «antes» y «después», exactamente como hace el bucle contra la IA, y
+ * después decide qué toca: tu turno, tu descarte, o seguir esperando.
+ */
+async function esperarRival() {
+  const d = duelo;
+  if (!d) return;
+  mensaje(`Esperando a ${d.rival?.apodo ?? 'tu rival'}…`);
+  reloj.correr(RIVAL);
+  for (;;) {
+    if (duelo !== d) return;
+    let r = d.ultimo;
+    d.ultimo = null;
+    const trae = (x) => x && ((x.pasos?.length ?? 0) > 0 || x.fin || (x.deciden ?? []).includes(JUGADOR));
+    if (!trae(r)) {
+      await new Promise((res) => setTimeout(res, DUELO.sondeoMs));
+      if (duelo !== d) return;
+      try { r = await estadoDuelo(d.id, d.n); } catch (e) { mensaje(e.message, true); continue; }
+      if (r?.tiempos) reloj.poner(r.tiempos);
+      if (!trae(r)) continue;
+    }
+    d.n = r.n ?? d.n;
+    if (r.pasos?.length) await animarPasos(r.pasos);
+    if (duelo !== d) return;
+    estado = r.estado;
+    render(estado);
+    if (r.fin) return finDuelo(r);
+    if (estado.fase === FASE.DESPLIEGUE) return turnoDelJugador();
+    if (estado.fase === FASE.DESCARTE && (r.deciden ?? []).includes(JUGADOR)) return pedirDescarte();
+    mensaje(`Esperando a ${d.rival?.apodo ?? 'tu rival'}…`);
+    reloj.correr(RIVAL);
+  }
+}
+
+/** Los pasos del servidor, animados como los anima el bucle local. */
+async function animarPasos(pasos) {
+  reloj.detener();
+  irA(APP.RESOLVING);
+  for (const p of pasos) {
+    const antes = estado;
+    estado = p.estado;
+    const nuevos = estado.eventos.slice(p.eventosDesde);
+    if (p.fase === FASE.REVELACION) {
+      render(estado);
+      mensaje(presionesRivales(nuevos) ?? 'Revelación simultánea…');
+      sonido('revelar');
+      const legendarias = nuevos
+        .filter((e) => e.tipo === 'REVELADA' && carta(e.cardId).rareza === RAREZA.LEGENDARIO);
+      const espera = animarRevelacion(antes, estado, legendarias.map((e) => e.iid));
+      for (const e of legendarias) {
+        sonido('joya');
+        await animarInvocacion(e.cardId, e.jugador, e.iid);
+        await esperar(revelarRetenida(e.iid));
+      }
+      await esperar(espera);
+      await animarEventos(nuevos);
+    } else if (p.fase === FASE.COMBATE) {
+      mensaje('Combate…');
+      if (nuevos.some((e) => e.tipo === 'MUERTE')) sonido('muerte');
+      await new Promise((res) => animarCombate(antes, estado, nuevos, res));
+    } else {
+      // El chequeo vacía la lista de eventos al pasar de turno: el registro se
+      // archiva con lo de ANTES, como hace el bucle local.
+      if (p.fase === FASE.CHEQUEO) { estado = antes; archivarLog(); estado = p.estado; }
+      render(estado);
+      if (p.fase === FASE.ROBO || p.fase === FASE.CHEQUEO) await animarEventos(nuevos);
+    }
+  }
+}
+
+function rendirseEnElDuelo() {
+  const d = duelo;
+  reloj.parar();
+  cerrarHojas();
+  rendirseEnDuelo(d.id)
+    .then((r) => { if (duelo === d) finDuelo(r); })
+    .catch((e) => { mensaje(e.message, true); });
+}
+
+/** El final de un duelo: quién ganó, por qué, y qué le pasó a tu liga. */
+function finDuelo(r) {
+  const d = duelo;
+  duelo = null;
+  reloj.parar();
+  irA(APP.GAME_OVER);
+  soltarEntrada();
+  cancelarAnimaciones();
+  if (hudRival) hudRival.textContent = 'Rival';
+  if (r.estado) estado = r.estado;
+
+  const gane = r.fin?.ganador === JUGADOR;
+  const rival = r.rival?.apodo ?? 'el rival';
+  const via = {
+    [MOTIVO_FIN.TROFEOS]: 'Registro fósil completo',
+    [MOTIVO_FIN.HABITAT]: 'Colapso del hábitat',
+    [MOTIVO_FIN.EXTINCION]: 'Extinción',
+    [MOTIVO_FIN.LIMITE_TURNOS]: 'Límite de turnos',
+    TIEMPO: 'Se agotó el tiempo',
+    ABANDONO: 'Retirada',
+  }[r.fin?.motivo] ?? '';
+  const frase = {
+    [MOTIVO_FIN.TROFEOS]: gane ? `Tu población dejó más fósiles que la de ${rival}.` : `El registro fósil se llenó de los de ${rival}.`,
+    [MOTIVO_FIN.HABITAT]: gane ? `El hábitat de ${rival} cedió antes que el tuyo.` : `Tu hábitat cedió antes que el de ${rival}.`,
+    [MOTIVO_FIN.EXTINCION]: gane ? `A ${rival} no le quedaban cartas que robar.` : 'Te quedaste sin cartas que robar.',
+    [MOTIVO_FIN.LIMITE_TURNOS]: 'Se acabaron los turnos sin decidirse.',
+    TIEMPO: gane ? `A ${rival} se le acabó el tiempo.` : 'Se te acabó el tiempo.',
+    ABANDONO: gane ? `${rival} abandonó el campo.` : 'Abandonas el campo antes de que se decida.',
+  }[r.fin?.motivo] ?? '';
+  pintarFin({ via, gane, titular: gane ? 'Victoria' : 'Derrota', frase });
+  anotarResultado(gane, estado?.turno ?? 0);
+
+  // La liga, dicha como liga: la barra que sube o el escalón que cambia. El
+  // ELO no aparece por ningún sitio, ni aquí.
+  const antes = Number(d?.eloInicial ?? 1200);
+  const ahora = Number(r.yo?.elo ?? antes);
+  const ra = rangoDe(antes);
+  const rb = rangoDe(ahora);
+  let liga;
+  if (ra.liga !== rb.liga || ra.division !== rb.division) {
+    liga = `${ahora > antes ? 'Subes a' : 'Bajas a'} ${nombreDeRango(ahora)}`;
+  } else {
+    const puntos = rb.puntos - ra.puntos;
+    liga = `${nombreDeRango(ahora)} · ${puntos >= 0 ? '+' : ''}${puntos} puntos`;
+  }
+  const premio = gane ? `+${ECONOMIA.monedasVictoria} dinomonedas` : 'Sin dinomonedas: sólo las da ganar';
+  el.finPremio.textContent = `${premio} · ${liga}`;
+  // Monedas y ELO los movió el servidor: se le vuelve a preguntar por el perfil.
+  sincronizar().then(() => pintarMenu()).catch(() => {});
+  sonido(gane ? 'gana' : 'pierde');
+}

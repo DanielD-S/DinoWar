@@ -935,3 +935,41 @@ encuadre, que era lo difícil.
 Dejar los originales en **`src/piel/cuenca/`** con esos nombres. La
 herramienta es `tools/cuenca.py`, hermana de `tools/mazos.py`: keyea el
 magenta, escala, y mide la ventana y la cartela del marco del jefe.
+
+## Los emblemas de las ligas
+
+Cuatro medallones redondos para el panel del Duelo, uno por liga: Triásico,
+Jurásico, Cretácico y Extinción. Se pintan a 44 px en el panel y a unos 120
+en el final de partida, así que la silueta tiene que leerse pequeña: un
+animal de perfil, macizo, sin detalle fino. Mientras no lleguen, el panel usa
+la ilustración de la carta emblema de cada liga (`ligas.js`), que a 44 px se
+lee regular.
+
+Mismo material que las placas del menú, el bloque de MATERIAL literal y
+**magenta puro** fuera del medallón. Van a `src/piel/ligas/` como
+`liga_triasico.png`, `liga_jurasico.png`, `liga_cretacico.png` y
+`liga_extincion.png`, a 512×512, y `tools/placas.py` los keyea como el resto
+de piezas con fondo.
+
+- **`liga_triasico`.** [MATERIAL] Medallón redondo de roca oscura con filete
+  de latón viejo, y en relieve de latón mate la silueta de perfil de un
+  Plateosaurus a dos patas, cuello largo y cabeza pequeña, mirando a la
+  izquierda. Un solo anillo de latón alrededor. Fondo magenta puro.
+- **`liga_jurasico`.** [MATERIAL] Medallón redondo de roca oscura con filete
+  de latón viejo, y en relieve de latón la silueta de perfil de un Allosaurus
+  en marcha, cola en alto, fauces entreabiertas, mirando a la izquierda. Dos
+  anillos concéntricos de latón. Fondo magenta puro.
+- **`liga_cretacico`.** [MATERIAL] Medallón redondo de roca oscura con filete
+  de latón viejo, y en relieve de latón bruñido la silueta de perfil de un
+  Tyrannosaurus con la cabeza baja y las fauces abiertas, mirando a la
+  izquierda. Tres anillos concéntricos de latón y una corona de púas cortas en
+  el borde. Fondo magenta puro.
+- **`liga_extincion`.** [MATERIAL] Medallón redondo de roca oscura agrietada,
+  con vetas de oro viejo saliendo del centro como grietas de impacto, y en el
+  centro un asteroide en relieve de oro con estela hacia arriba a la
+  derecha. El filete de latón del borde, roto en dos puntos como si el impacto
+  lo hubiera partido. Fondo magenta puro.
+
+Los tres animales son cartas del set y el generador puede recibir su
+ilustración como referencia de anatomía, pero el medallón es una SILUETA en
+relieve, no la ilustración recortada: a 44 px una ilustración es una mancha.

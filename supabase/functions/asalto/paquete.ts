@@ -12,9 +12,9 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: fd50847300c9b67a
+// huella: f39c0b31c627daaa
 //
-// Lleva dentro estos 19 ficheros del repositorio. La lista la da
+// Lleva dentro estos 22 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
 // aparece aquí solo. Un test recalcula la huella sobre esta misma lista y falla
 // si el paquete se ha quedado atrás del código.
@@ -36,6 +36,9 @@
 // fuente: supabase/functions/_compartido/validarPartida.js
 // fuente: supabase/functions/_compartido/validarAsalto.js
 // fuente: supabase/functions/_compartido/validarSolitario.js
+// fuente: src/data/duelo.js
+// fuente: supabase/functions/_compartido/duelo.js
+// fuente: src/data/ligas.js
 // fuente: supabase/functions/asalto/index.ts
 
 // supabase/functions/asalto/index.ts
@@ -3683,8 +3686,8 @@ function valorDeAccion(vista, j, a) {
       } else if (r === RASGO.COMPETENCIA) {
         delta = (a.objetivos ?? []).length * BALANCE.rasgos.competenciaDefensa;
       } else if (r === RASGO.TRAMPA) {
-        const restante = mazoDe(vista, contrario);
-        const acerca = BALANCE.rasgos.trampaMazoRival / Math.max(1, restante);
+        const restante2 = mazoDe(vista, contrario);
+        const acerca = BALANCE.rasgos.trampaMazoRival / Math.max(1, restante2);
         const arriesga = BALANCE.rasgos.trampaMazoPropio / Math.max(1, mazoDe(vista, j));
         delta = (acerca - arriesga) * IA.pesoTrofeo / IA.pesoDano * 3;
       } else if (r === RASGO.MORTANDAD) {
@@ -4394,6 +4397,207 @@ function validarSolitario(envio) {
   };
 }
 
+// src/data/duelo.js
+var DUELO = Object.freeze({
+  // El reloj de la partida en solitario, en milisegundos. Es el mismo número
+  // que `BALANCE.relojPorJugador`; vive aquí en ms porque el servidor cuenta
+  // en ms y porque el Duelo tiene que poder cambiarlo sin tocar el balance.
+  relojMs: 15 * 60 * 1e3,
+  // Tope por decisión. Sin esto, quien se va a comer se lleva los quince
+  // minutos del otro en espera; con esto, a los tres minutos sin contestar la
+  // partida se da por perdida.
+  turnoMaxMs: 3 * 60 * 1e3,
+  // Cada cuánto pregunta el cliente si el rival ya jugó.
+  sondeoMs: 2500,
+  // Cuánto se queda uno en la cola antes de rendirse a que no hay nadie.
+  esperaMaxMs: 3 * 60 * 1e3,
+  // Pasos de fases automáticas que el servidor guarda para que el cliente los
+  // anime: un turno son unos cinco, y un cliente que recarga no necesita más
+  // de dos turnos atrás.
+  pasosGuardados: 12
+});
+var FIN_DUELO = Object.freeze({
+  TIEMPO: "TIEMPO",
+  ABANDONO: "ABANDONO"
+});
+
+// supabase/functions/_compartido/duelo.js
+function crearDuelo(semilla2, mazoA, mazoB, ahora) {
+  if (!Number.isInteger(semilla2)) throw new PartidaInvalida("semilla inv\xE1lida");
+  validarMazoLegal(mazoA);
+  validarMazoLegal(mazoB);
+  const estado = crearPartida(semilla2, [mazoA, mazoB]);
+  const d = {
+    semilla: semilla2,
+    estado,
+    // Lo que le queda a cada uno, y desde cuándo está decidiendo (null si no
+    // le toca). El reloj sólo corre mientras te toca a ti, como en el ajedrez.
+    tiempos: [DUELO.relojMs, DUELO.relojMs],
+    desde: [null, null],
+    // Los pasos de fases automáticas, numerados: el cliente pide «desde n».
+    pasos: [],
+    n: 0,
+    fin: null
+    // { ganador, motivo } cuando lo decide el reloj o una rendición
+  };
+  resolverAutomaticas(d);
+  d.pasos = [];
+  d.n = 0;
+  abrirDecision(d, ahora);
+  return d;
+}
+function deciden(d) {
+  const s = d.estado;
+  if (s.fase === FASE.DESPLIEGUE) return [0, 1].filter((j) => !s.jugadores[j].listo);
+  if (s.fase === FASE.DESCARTE) {
+    return [0, 1].filter((j) => s.jugadores[j].mano.length > BALANCE.manoMaxima);
+  }
+  return [];
+}
+function abrirDecision(d, ahora) {
+  const quienes = deciden(d);
+  for (const j of [0, 1]) d.desde[j] = quienes.includes(j) ? ahora : null;
+}
+function cerrarDecision(d, j, ahora) {
+  if (d.desde[j] === null) return;
+  d.tiempos[j] -= Math.max(0, ahora - d.desde[j]);
+  d.desde[j] = null;
+}
+function restante(d, j, ahora) {
+  const corriendo = d.desde[j] === null ? 0 : Math.max(0, ahora - d.desde[j]);
+  return Math.max(0, d.tiempos[j] - corriendo);
+}
+var terminado = (d) => d.estado.fase === FASE.FIN || d.fin !== null;
+function comprobarTiempo(d, ahora) {
+  if (terminado(d)) return false;
+  for (const j of deciden(d)) {
+    const lleva = d.desde[j] === null ? 0 : ahora - d.desde[j];
+    if (restante(d, j, ahora) <= 0 || lleva > DUELO.turnoMaxMs) {
+      cerrar(d, 1 - j, FIN_DUELO.TIEMPO);
+      return true;
+    }
+  }
+  return false;
+}
+function rendirse(d, j) {
+  if (terminado(d)) return;
+  cerrar(d, 1 - j, FIN_DUELO.ABANDONO);
+}
+function cerrar(d, ganador, motivo) {
+  d.fin = { ganador, motivo };
+  d.desde = [null, null];
+}
+function resultado(d) {
+  if (d.fin) return { ganador: d.fin.ganador, motivo: d.fin.motivo };
+  if (d.estado.fase === FASE.FIN) return { ganador: d.estado.ganador, motivo: d.estado.motivoFin };
+  return null;
+}
+function aplicarAccion(d, j, accion, ahora) {
+  if (terminado(d)) throw new PartidaInvalida("el duelo ha terminado");
+  if (!accion || typeof accion !== "object") throw new PartidaInvalida("jugada vac\xEDa");
+  if (accion.tipo === ACCION.AVANZAR) throw new PartidaInvalida("las fases las avanza el servidor");
+  if (!deciden(d).includes(j)) throw new PartidaInvalida("no te toca");
+  const a = { ...accion, jugador: j };
+  const motivo = validar(d.estado, a);
+  if (motivo) throw new PartidaInvalida("jugada ilegal", { accion: a.tipo, motivo });
+  d.estado = reduce(d.estado, a);
+  if (!deciden(d).includes(j)) cerrarDecision(d, j, ahora);
+  if (!FASES_INTERACTIVAS.includes(d.estado.fase) && d.estado.fase !== FASE.FIN) {
+    resolverAutomaticas(d);
+    abrirDecision(d, ahora);
+  }
+  return d;
+}
+function resolverAutomaticas(d) {
+  let guardia = 0;
+  while (!FASES_INTERACTIVAS.includes(d.estado.fase) && d.estado.fase !== FASE.FIN) {
+    const fase = d.estado.fase;
+    const desde = d.estado.eventos.length;
+    d.estado = reduce(d.estado, { tipo: ACCION.AVANZAR });
+    d.n += 1;
+    d.pasos.push({ n: d.n, fase, eventosDesde: desde, estado: structuredClone(d.estado) });
+    if (++guardia > 64) throw new PartidaInvalida("las fases no convergen");
+  }
+  while (d.pasos.length > DUELO.pasosGuardados) d.pasos.shift();
+}
+function vistaDuelo(d, j, desde = 0, ahora = 0) {
+  const limpiar = (estado) => {
+    const v = vistaDe(estado, j);
+    v.jugadores[j].mazo = [...v.jugadores[j].mazo].sort((x, y) => x - y);
+    delete v.rng;
+    return desdeMiLado(v, j);
+  };
+  const r = resultado(d);
+  const mio = (b) => b === null || b === void 0 ? b : j === 0 ? b : 1 - b;
+  return {
+    n: d.n,
+    estado: limpiar(d.estado),
+    pasos: d.pasos.filter((p) => p.n > desde).map((p) => ({
+      n: p.n,
+      fase: p.fase,
+      eventosDesde: p.eventosDesde,
+      estado: limpiar(p.estado)
+    })),
+    deciden: terminado(d) ? [] : deciden(d).map(mio).sort(),
+    tiempos: j === 0 ? [restante(d, 0, ahora), restante(d, 1, ahora)] : [restante(d, 1, ahora), restante(d, 0, ahora)],
+    fin: r ? { ganador: mio(r.ganador), motivo: r.motivo } : null
+  };
+}
+var CLAVES_DE_BANDO = /* @__PURE__ */ new Set(["jugador", "dueno", "bando", "porBando", "ganador", "campoDe", "perspectiva"]);
+function desdeMiLado(v, j) {
+  if (j === 0) return v;
+  const flip = (b) => b === 0 ? 1 : b === 1 ? 0 : b;
+  const andar = (x, clave = null) => {
+    if (Array.isArray(x)) return x.map((e) => andar(e));
+    if (x && typeof x === "object") {
+      const o = {};
+      for (const [k, val] of Object.entries(x)) {
+        if (CLAVES_DE_BANDO.has(k) && (val === 0 || val === 1)) o[k] = flip(val);
+        else o[k] = andar(val, k);
+      }
+      if (o.tipo === "CHOQUE" && "a" in o && "b" in o) {
+        [o.a, o.b] = [o.b, o.a];
+        [o.danoA, o.danoB] = [o.danoB, o.danoA];
+      }
+      return o;
+    }
+    return x;
+  };
+  const w = andar(v);
+  w.jugadores = [w.jugadores[1], w.jugadores[0]];
+  w.ranuras = [w.ranuras[1], w.ranuras[0]];
+  for (const jug of w.jugadores) jug.id = flip(jug.id);
+  return w;
+}
+
+// src/data/ligas.js
+var LIGAS = Object.freeze([
+  // `desde` es el ELO donde empieza la liga; la última no tiene techo.
+  Object.freeze({ id: "triasico", nombre: "Tri\xE1sico", desde: 0, emblema: "plateosauravus", divisiones: 3 }),
+  Object.freeze({ id: "jurasico", nombre: "Jur\xE1sico", desde: 1150, emblema: "allosaurus", divisiones: 3 }),
+  Object.freeze({ id: "cretacico", nombre: "Cret\xE1cico", desde: 1450, emblema: "tyrannosaurus", divisiones: 3 }),
+  Object.freeze({ id: "extincion", nombre: "Extinci\xF3n", desde: 1750, emblema: "extincion", divisiones: 1 })
+]);
+var ELO = Object.freeze({
+  inicial: 1200,
+  // Cuánto mueve una partida. 32 es el clásico; alto al principio para que una
+  // cuenta nueva encuentre su sitio en diez duelos y no en cuarenta.
+  k: 32,
+  kNuevo: 64,
+  duelosDeNovato: 10,
+  // Suelo: de Triásico III no se baja, y la fórmula tampoco puede bajar de aquí.
+  suelo: 800
+});
+function eloTras(eloA, eloB, resultadoA, duelosA = 99, duelosB = 99) {
+  const esperadoA = 1 / (1 + 10 ** ((eloB - eloA) / 400));
+  const esperadoB = 1 - esperadoA;
+  const kA = duelosA < ELO.duelosDeNovato ? ELO.kNuevo : ELO.k;
+  const kB = duelosB < ELO.duelosDeNovato ? ELO.kNuevo : ELO.k;
+  const a = Math.round(eloA + kA * (resultadoA - esperadoA));
+  const b = Math.round(eloB + kB * (1 - resultadoA - esperadoB));
+  return { a: Math.max(ELO.suelo, a), b: Math.max(ELO.suelo, b) };
+}
+
 // supabase/functions/asalto/index.ts
 var cors = {
   "Access-Control-Allow-Origin": "*",
@@ -4439,6 +4643,7 @@ Deno.serve(async (req) => {
     if (tipo === "asalto") return await hacerAsalto(servicio, user.id, envio);
     if (tipo === "victoria") return await hacerVictoria(servicio, user.id, envio);
     if (tipo === "sobre") return await hacerSobre(servicio, user.id);
+    if (tipo === "duelo") return await hacerDuelo(servicio, user.id, envio);
     return json({ error: `no s\xE9 hacer \xAB${tipo}\xBB` }, 400);
   } catch (e) {
     if (e instanceof AsaltoInvalido) {
@@ -4448,7 +4653,7 @@ Deno.serve(async (req) => {
   }
 });
 async function hacerAsalto(servicio, jugadorId, envio) {
-  const resultado = validarAsalto(envio);
+  const resultado2 = validarAsalto(envio);
   const { evento: evento2 } = jefeDelEvento(envio.jefeEvento);
   const { data: jugador } = await servicio.from("jugadores").select("tribu_id").eq("id", jugadorId).single();
   if (!jugador?.tribu_id) return json({ error: "no est\xE1s en ninguna tribu" }, 409);
@@ -4465,9 +4670,9 @@ async function hacerAsalto(servicio, jugadorId, envio) {
     p_evento: evento2.id,
     p_jugador: jugadorId,
     p_semilla: envio.semilla,
-    p_dano: resultado.dano,
-    p_turnos: resultado.turnos,
-    p_ganada: resultado.ganada,
+    p_dano: resultado2.dano,
+    p_turnos: resultado2.turnos,
+    p_ganada: resultado2.ganada,
     p_coste: CUENCA.costeAsalto
   });
   if (error) {
@@ -4479,16 +4684,16 @@ async function hacerAsalto(servicio, jugadorId, envio) {
   }
   const fila = Array.isArray(data) ? data[0] : data;
   return json({
-    dano: resultado.dano,
-    turnos: resultado.turnos,
-    ganada: resultado.ganada,
+    dano: resultado2.dano,
+    turnos: resultado2.turnos,
+    ganada: resultado2.ganada,
     vida: fila?.vida ?? null,
     cayo: fila?.cayo ?? false,
     almacen: fila?.almacen ?? null
   });
 }
 async function hacerVictoria(servicio, jugadorId, envio) {
-  const resultado = validarSolitario(envio);
+  const resultado2 = validarSolitario(envio);
   const { error: errMazo } = await servicio.rpc("validar_mazo_de", {
     p_jugador: jugadorId,
     p_cartas: aObjeto(envio.mazo)
@@ -4498,16 +4703,16 @@ async function hacerVictoria(servicio, jugadorId, envio) {
     return json({ error: "ya has cobrado tus partidas de hoy" }, 429);
   }
   const dia = diaUTC();
-  const avances = avancesDelParte(dia, resultado.parte).map((a) => {
+  const avances = avancesDelParte(dia, resultado2.parte).map((a) => {
     const m = POR_ID[a.id];
     return { id: a.id, avance: a.avance, meta: m.meta, premio: m.premio };
   });
   const { data, error } = await servicio.rpc("aplicar_partida", {
     p_jugador: jugadorId,
     p_semilla: envio.semilla,
-    p_turnos: resultado.turnos,
-    p_ganada: resultado.ganada,
-    p_monedas: resultado.premio,
+    p_turnos: resultado2.turnos,
+    p_ganada: resultado2.ganada,
+    p_monedas: resultado2.premio,
     p_dia: dia,
     p_avances: avances
   });
@@ -4519,8 +4724,8 @@ async function hacerVictoria(servicio, jugadorId, envio) {
     );
   }
   return json({
-    ganada: resultado.ganada,
-    turnos: resultado.turnos,
+    ganada: resultado2.ganada,
+    turnos: resultado2.turnos,
     premio: data?.premio ?? 0,
     monedas: data?.monedas ?? null,
     // Lo que las misiones aportaron, para que la pantalla de fin lo diga en vez
@@ -4542,4 +4747,145 @@ async function hacerSobre(servicio, jugadorId) {
   });
   if (error) return json({ error: error.message }, 409);
   return json({ cartas, monedas: data?.monedas ?? null, precio: ECONOMIA.precioSobre });
+}
+async function hacerDuelo(servicio, jugadorId, envio) {
+  const op = envio.op;
+  const ahora = Date.now();
+  if (op === "buscar" || op === "retar") {
+    const mazo = envio.mazo;
+    validarMazoLegal(mazo);
+    const { error: errMazo } = await servicio.rpc("validar_mazo_de", {
+      p_jugador: jugadorId,
+      p_cartas: aObjeto(mazo)
+    });
+    if (errMazo) return json({ error: errMazo.message }, 422);
+    const semilla2 = crypto.getRandomValues(new Uint32Array(1))[0] & 2147483647;
+    const { data, error } = await servicio.rpc(op === "buscar" ? "duelo_buscar" : "duelo_retar", {
+      p_jugador: jugadorId,
+      p_mazo: mazo,
+      p_semilla: semilla2
+    });
+    if (error) return json({ error: error.message }, 409);
+    return await responderDuelo(servicio, jugadorId, await asegurarDatos(servicio, data, ahora), 0, ahora);
+  }
+  if (op === "aceptar") {
+    const mazo = envio.mazo;
+    validarMazoLegal(mazo);
+    const { error: errMazo } = await servicio.rpc("validar_mazo_de", {
+      p_jugador: jugadorId,
+      p_cartas: aObjeto(mazo)
+    });
+    if (errMazo) return json({ error: errMazo.message }, 422);
+    const { data, error } = await servicio.rpc("duelo_aceptar", {
+      p_jugador: jugadorId,
+      p_codigo: String(envio.codigo ?? ""),
+      p_mazo: mazo
+    });
+    if (error) return json({ error: error.message }, 409);
+    return await responderDuelo(servicio, jugadorId, await asegurarDatos(servicio, data, ahora), 0, ahora);
+  }
+  if (op === "cancelar") {
+    const { error } = await servicio.rpc("duelo_cancelar", { p_jugador: jugadorId });
+    if (error) return json({ error: error.message }, 409);
+    return json({ ok: true });
+  }
+  if (op === "estado" || op === "accion" || op === "rendirse") {
+    const id = String(envio.id ?? "");
+    let { data: fila, error } = await servicio.from("duelos").select("*").eq("id", id).single();
+    if (error || !fila) return json({ error: "ese duelo no existe" }, 404);
+    if (fila.jugador_a !== jugadorId && fila.jugador_b !== jugadorId) {
+      return json({ error: "ese duelo no es tuyo" }, 403);
+    }
+    const bando = fila.jugador_a === jugadorId ? 0 : 1;
+    const desde = Number(envio.desde ?? 0) || 0;
+    if (fila.estado === "esperando") {
+      if (op !== "estado") return json({ error: "todav\xEDa no hay rival" }, 409);
+      return await responderDuelo(servicio, jugadorId, fila, desde, ahora);
+    }
+    fila = await asegurarDatos(servicio, fila, ahora);
+    if (!fila.datos) return json({ id: fila.id, estado: "preparando" });
+    let d = null;
+    for (let intento = 0; intento < 4; intento++) {
+      d = structuredClone(fila.datos);
+      let cambio = comprobarTiempo(d, ahora);
+      if (fila.estado !== "terminado") {
+        if (op === "accion") {
+          aplicarAccion(d, bando, envio.accion, ahora);
+          cambio = true;
+        }
+        if (op === "rendirse") {
+          rendirse(d, bando);
+          cambio = true;
+        }
+      }
+      if (!cambio) break;
+      const { data: escrito, error: errEscritura } = await servicio.from("duelos").update({ datos: d, version: fila.version + 1, actualizado_en: (/* @__PURE__ */ new Date()).toISOString() }).eq("id", id).eq("version", fila.version).select("version");
+      if (errEscritura) return json({ error: errEscritura.message }, 500);
+      if (escrito && escrito.length) {
+        fila.datos = d;
+        fila.version += 1;
+        break;
+      }
+      const releida = await servicio.from("duelos").select("*").eq("id", id).single();
+      if (releida.error || !releida.data) return json({ error: "el duelo se perdi\xF3" }, 500);
+      fila = releida.data;
+      if (intento === 3) return json({ error: "el duelo est\xE1 muy solicitado, prueba otra vez" }, 409);
+    }
+    if (terminado(fila.datos) && fila.estado !== "terminado") {
+      fila = await cerrarDuelo(servicio, fila);
+    }
+    return await responderDuelo(servicio, jugadorId, fila, desde, ahora);
+  }
+  return json({ error: "op de duelo desconocida", detalle: op }, 400);
+}
+async function asegurarDatos(servicio, fila, ahora) {
+  if (!fila || fila.estado !== "jugando" || fila.datos) return fila;
+  const d = crearDuelo(Number(fila.semilla), fila.mazo_a, fila.mazo_b, ahora);
+  const { data } = await servicio.from("duelos").update({ datos: d, version: fila.version + 1, actualizado_en: (/* @__PURE__ */ new Date()).toISOString() }).eq("id", fila.id).eq("version", fila.version).is("datos", null).select("*").maybeSingle();
+  if (data) return data;
+  const { data: releida } = await servicio.from("duelos").select("*").eq("id", fila.id).single();
+  return releida ?? fila;
+}
+async function cerrarDuelo(servicio, fila) {
+  const r = resultado(fila.datos);
+  const { data: js } = await servicio.from("jugadores").select("id, duelos").in("id", [fila.jugador_a, fila.jugador_b]);
+  const duelosDe = (id) => (js ?? []).find((x) => x.id === id)?.duelos ?? 0;
+  const nuevos = eloTras(
+    fila.elo_a,
+    fila.elo_b,
+    r.ganador === 0 ? 1 : 0,
+    duelosDe(fila.jugador_a),
+    duelosDe(fila.jugador_b)
+  );
+  const { error } = await servicio.rpc("duelo_cerrar", {
+    p_id: fila.id,
+    p_ganador: r.ganador,
+    p_motivo: r.motivo,
+    p_turnos: fila.datos.estado.turno,
+    p_elo_a: nuevos.a,
+    p_elo_b: nuevos.b,
+    p_monedas_victoria: ECONOMIA.monedasVictoria
+  });
+  if (error) console.error("duelo_cerrar", error.message);
+  const { data } = await servicio.from("duelos").select("*").eq("id", fila.id).single();
+  return data ?? fila;
+}
+async function responderDuelo(servicio, jugadorId, fila, desde, ahora) {
+  const bando = fila.jugador_a === jugadorId ? 0 : 1;
+  const rivalId = bando === 0 ? fila.jugador_b : fila.jugador_a;
+  const { data: js } = await servicio.from("jugadores").select("id, apodo, elo, duelos").in("id", [jugadorId, rivalId].filter(Boolean));
+  const de = (id) => (js ?? []).find((x) => x.id === id) ?? null;
+  const yo = de(jugadorId);
+  const rival2 = de(rivalId);
+  const base = {
+    id: fila.id,
+    estado: fila.estado,
+    codigo: fila.codigo,
+    bando,
+    yo: yo ? { apodo: yo.apodo, elo: yo.elo, duelos: yo.duelos } : null,
+    rival: rival2 ? { apodo: rival2.apodo, elo: rival2.elo, duelos: rival2.duelos } : null,
+    eloInicial: bando === 0 ? fila.elo_a : fila.elo_b
+  };
+  if (fila.estado === "esperando" || !fila.datos) return json(base);
+  return json({ ...base, ...vistaDuelo(fila.datos, bando, desde, ahora) });
 }
