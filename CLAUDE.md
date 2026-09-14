@@ -765,6 +765,25 @@ sin eso cada letra cerraba el teclado del móvil. Para verlo sin cuenta:
 
 ## La Cuenca: vitrina, yacimiento y bandeja
 
+**En pantalla el grupo se llama TRIBU, y «cuenca» es el sitio.** El juego usaba
+las dos a la vez —«no estás en ninguna TRIBU», «fundar la CUENCA», «almacén de
+la TRIBU»— y por dentro mandaba tribu desde el principio: la tabla es `tribus`.
+La cuenca es un lugar y la tribu es la gente, y todo lo que hace el jugador es
+sobre la gente: fundarla, entrar, salir, echar, mandar, buscarla en una lista;
+un sitio no se funda ni se abandona. Así que gana «tribu» en todo lo que se
+lee, incluidos los `raise exception` del SQL, que salen por pantalla tal cual y
+por eso son texto de interfaz. «Cuenca» se queda donde se habla del lugar:
+«bajando a la cuenca», «en la cuenca ahora», «sin jefe en la cuenca».
+
+Las LLAVES no se tocaron —`cuenca.js`, `CUENCA`, `estado_cuenca`,
+`catalogo_cuenca`, `avisos_cuenca`, la pantalla `#cuenca`— por lo mismo que los
+climas siguen teniendo el id `sabana` aunque la carta se llame «Monzón de
+verano»: renombrar una llave es una migración de datos que no cambia nada de lo
+que se ve. Y la migración que cambió los mensajes (`0018`) no reescribe las
+nueve funciones a mano: coge la definición puesta con `pg_get_functiondef`, le
+cambia la palabra y la vuelve a crear. Reescribir nueve cuerpos enteros para
+cambiar una palabra es la forma segura de colar una errata en la que sí importa.
+
 [`src/ui/cuenca.js`](src/ui/cuenca.js) pinta la capa cooperativa con piezas
 que salen de `python tools/cuenca.py escribir` desde `src/piel/cuenca/`: el
 jefe en una **vitrina** cuya ventana y cartela mide la herramienta —los números
@@ -814,6 +833,14 @@ Lo que cambia de flujo y no sólo de piel:
     quien lleva más tiempo. Una tribu sin capataz no podría aceptar ni echar a
     nadie. Y si se va el último, la tribu se BORRA con su almacén: una guarida
     vacía con fósiles dentro no es de nadie.
+  - **Estando solo, el botón dice «Deshacer la cuenca»** y no «Salir». Es lo
+    mismo —salir borra la tribu cuando se va el último— pero dicho con todas
+    las letras. Va por su propia función, `deshacer_tribu`, y no por `salir`
+    con otro rótulo: si alguien ha entrado por la lista entre que se pinta la
+    pantalla y se pulsa, salir te sacaría a TI y le dejaría la cuenca a esa
+    persona; ahí eso es un error con su motivo. No hay un «disolver» general:
+    una tribu no es del capataz, es de quien está dentro, y el almacén lo
+    llenaron entre todos.
   - **Hay lista de cuencas abiertas**, porque entrar era saberse seis letras que
     alguien te pasa por fuera del juego: quien llega solo no tiene a quién
     pedírselas, y una cuenca de una persona no tira un jefe de 6.000 de Vida.
@@ -832,6 +859,21 @@ Lo que cambia de flujo y no sólo de piel:
     el paquete, re-anclar y volver a desplegar. `test/paquete.test.js` y
     `test/anclaje.test.js` lo cazaron al primer intento. Y aquí no hacía
     falta: quien comprueba el mando es SQL con `auth.uid()`, no la función.
+- **La placa de la Cuenca lleva un punto con lo que te espera dentro.** La capa
+  cooperativa no avisaba de nada: te aceptaban, te echaban, caía el jefe y
+  tenías una carta esperando, y sólo lo veías si entrabas a mirar. `avisos_cuenca`
+  cuenta SÓLO lo que pide una acción tuya —quién pide entrar si mandas tú, qué
+  cartas no has reclamado—. «Hay un jefe abierto» o «te quedan asaltos» no son
+  avisos, son pullas, y un punto que no se apaga nunca deja de significar nada.
+  Es una llamada aparte y diminuta porque la pide el MENÚ, que no va a abrir la
+  cuenca entera para pintar un punto; se refresca al arrancar y al volver de la
+  Cuenca, que es cuando cambia.
+- **Un jefe caído no se vuelve a levantar** para esa tribu: `abrir_jefe` no toca
+  la fila si ya existe, así que al repetirse el ciclo de 14 días sigue muerto y
+  tu carta sin reclamar se queda esperando para siempre. Por eso la Cuenca tiene
+  un bloque de **cartas pendientes** de ventanas anteriores y `reclamar()` acepta
+  el evento: enseñar un aviso de algo que no se puede hacer es un punto rojo que
+  no se apaga. Que el jefe no vuelva es otra cosa —contenido— y sigue abierta.
 - **Un evento de clima lleva de fondo la textura de ese clima**, la misma
   que pone en el tablero.
 

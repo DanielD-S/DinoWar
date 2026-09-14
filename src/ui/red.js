@@ -37,7 +37,7 @@ export const porQueLocal = () => motivoLocal;
 function caerALocal(e) {
   if (modo === MODO.LOCAL) return;
   modo = MODO.LOCAL;
-  motivoLocal = e?.message ?? 'no hay conexión con la cuenca';
+  motivoLocal = e?.message ?? 'no hay conexión con la tribu';
   console.warn('[cuenca] sin servidor, se juega en local:', motivoLocal);
 }
 
@@ -119,6 +119,21 @@ function aFormaDePantalla(d) {
       yo: m.id === (d.yo ?? yoMismo),
     })),
     puedeReclamar: Boolean(jefe && jefe.vida <= 0 && mioDano > 0 && !mioReclamado),
+    // Cartas de jefe sin reclamar, de TODOS los jefes caídos y no sólo del de
+    // esta ventana: un jefe que cae no vuelve a levantarse para esa tribu, así
+    // que una carta sin reclamar se queda esperando para siempre. Sale de lo
+    // que ya llega —`jefes` y `aportes` vienen enteros—, sin pedir nada más.
+    cartasPendientes: (d.jefes ?? [])
+      .filter((x) => Number(x.vida) <= 0)
+      .map((x) => {
+        const ev = CALENDARIO.find((e) => e.id === x.evento_id);
+        const mio = (d.aportes ?? []).find(
+          (a) => a.evento_id === x.evento_id && a.jugador_id === yoMismo,
+        );
+        if (!ev || !mio || Number(mio.dano) <= 0 || mio.reclamado) return null;
+        return { evento: ev.id, titulo: ev.titulo, jefe: JEFES[ev.jefe] ?? null };
+      })
+      .filter(Boolean),
     tribu: tribu ? {
       id: tribu.id, nombre: tribu.nombre, codigo: tribu.codigo,
       acceso: tribu.acceso ?? ACCESO.LIBRE, emblema: tribu.emblema ?? 'clado_teropodo',
@@ -176,17 +191,27 @@ export async function entrarEnTribu(codigo) {
  * simulados y echar a uno sería echar a nadie. La pantalla no ofrece los
  * botones en local, y esto es el segundo cerrojo.
  */
-const soloEnLaCuencaDeVerdad = (qué) => {
-  throw new Error(`${qué} necesita una cuenca compartida, y estás en local`);
+const soloEnLaTribuDeVerdad = (qué) => {
+  throw new Error(`${qué} necesita una tribu compartida, y estás en local`);
 };
 
 export async function salirDeTribu() {
-  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('salir de la cuenca');
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('salir de la tribu');
   return rpc('salir_de_tribu');
 }
 
+/**
+ * Deshacer la cuenca. Es su propia llamada y no «salir» con otro nombre: si
+ * alguien ha entrado mientras mirabas la pantalla, esto falla diciéndolo en vez
+ * de sacarte a ti y dejarle la cuenca a esa persona.
+ */
+export async function deshacerTribu() {
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('deshacer la tribu');
+  return rpc('deshacer_tribu');
+}
+
 export async function expulsar(jugadorId) {
-  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('echar a alguien');
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('echar a alguien');
   return rpc('expulsar', { p_jugador: jugadorId });
 }
 
@@ -204,32 +229,32 @@ export async function tribusAbiertas() {
 }
 
 export async function unirseATribu(tribuId) {
-  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('entrar en otra cuenca');
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('entrar en otra tribu');
   return rpc('unirse_a_tribu', { p_tribu: tribuId });
 }
 
 export async function solicitarEntrada(tribuId) {
-  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('pedir entrada');
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('pedir entrada');
   return rpc('solicitar_entrada', { p_tribu: tribuId });
 }
 
 export async function retirarSolicitud(tribuId) {
-  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('retirar una solicitud');
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('retirar una solicitud');
   return rpc('retirar_solicitud', { p_tribu: tribuId });
 }
 
 export async function responderSolicitud(jugadorId, si) {
-  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('contestar una solicitud');
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('contestar una solicitud');
   return rpc('responder_solicitud', { p_jugador: jugadorId, p_si: si });
 }
 
 export async function ajustarTribu({ acceso = null, emblema = null } = {}) {
-  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('cambiar los ajustes');
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('cambiar los ajustes');
   return rpc('ajustar_tribu', { p_acceso: acceso, p_emblema: emblema });
 }
 
 export async function cederMando(jugadorId) {
-  if (modo === MODO.LOCAL) return soloEnLaCuencaDeVerdad('ceder el mando');
+  if (modo === MODO.LOCAL) return soloEnLaTribuDeVerdad('ceder el mando');
   return rpc('ceder_mando', { p_jugador: jugadorId });
 }
 
@@ -278,11 +303,40 @@ export function danoDeRespuesta(r) {
   );
 }
 
-export async function reclamar(ahora = Date.now()) {
+/**
+ * Reclamar la carta de un jefe caído. Sin evento, el de la ventana de ahora
+ * —que es el botón de siempre—; con evento, cualquiera que se quedara sin
+ * reclamar, que es lo que enseña el bloque de cartas pendientes.
+ */
+export async function reclamar(evento = null, ahora = Date.now()) {
   if (modo === MODO.LOCAL) return local.reclamar(ahora);
-  const estado = await estadoDeTribu();
-  if (!estado.eventoJefe) return null;
-  return rpc('reclamar_jefe', { p_evento: estado.eventoJefe.id });
+  let id = evento;
+  if (!id) {
+    const estado = await estadoDeTribu();
+    id = estado.eventoJefe?.id ?? null;
+  }
+  if (!id) return null;
+  return rpc('reclamar_jefe', { p_evento: id });
+}
+
+/**
+ * Lo que te está esperando: quién pide entrar —si mandas tú— y cuántas cartas
+ * de jefe tienes sin reclamar. Es una llamada aparte y diminuta porque la pide
+ * el MENÚ, que no abre la cuenca entera para pintar un punto.
+ */
+export async function avisosDeCuenca() {
+  if (modo === MODO.LOCAL) {
+    const c = local.estadoDeTribu();
+    return { solicitudes: 0, cartas: c.puedeReclamar ? 1 : 0 };
+  }
+  try {
+    const r = await rpc('avisos_cuenca');
+    return { solicitudes: Number(r?.solicitudes ?? 0), cartas: Number(r?.cartas ?? 0) };
+  } catch {
+    // Un aviso que no llega no es un error que enseñar: es no tener nada que
+    // decir todavía.
+    return { solicitudes: 0, cartas: 0 };
+  }
 }
 
 export function borrarCuenca() {

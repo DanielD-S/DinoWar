@@ -53,6 +53,18 @@ export function relevoDeMando(miembros, saliente) {
     || (a.id < b.id ? -1 : 1))[0].id;
 }
 
+/**
+ * ¿Puede deshacer la cuenca? Sólo el capataz y sólo si no queda nadie más.
+ * Una tribu no es del capataz: es de quien está dentro, y el almacén lo
+ * llenaron entre todos. Borrar el progreso de otros siete no es una atribución
+ * del mando; quedarse con una guarida vacía tampoco tiene sentido.
+ */
+export function puedeDeshacer(yo, miembros) {
+  if (!esCapataz(yo)) return 'sólo el capataz deshace la cuenca';
+  if ((miembros ?? []).length > 1) return 'todavía hay gente dentro';
+  return null;
+}
+
 // ------------------------------------------------------------------ acceso
 //
 // Dos formas de entrar en una cuenca, y las dos siguen existiendo: el CÓDIGO,

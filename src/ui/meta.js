@@ -25,6 +25,7 @@ import {
   traerMisiones, misionesDeHoy,
 } from './perfil.js';
 import { misionesDelDia } from '../data/misiones.js';
+import { avisosDeCuenca } from './red.js';
 import { fichaHTML, abrirFicha, cartaHTML } from './render.js';
 import { ceremoniaDeSobre } from './apertura.js';
 import { montarMazos } from './mazos.js';
@@ -51,6 +52,7 @@ export function montarMeta(alVolver) {
     mazosTitulo: id('mazos-titulo'), mazosCuerpo: id('mazos-cuerpo'), mazosPie: id('mazos-pie'),
     menuMoneda: id('menu-moneda'), menuMazo: id('menu-mazo'),
     menuMisiones: id('menu-misiones'),
+    btnCuenca: id('btn-cuenca'),
   };
 
   for (const b of document.querySelectorAll('[data-volver]')) {
@@ -108,12 +110,47 @@ function pintarMonedas() {
   for (const m of document.querySelectorAll('.moneda')) m.textContent = MONEDAS();
 }
 
+/**
+ * El punto de la placa de la Cuenca: lo que te está esperando y que no se ve
+ * desde fuera —quién pide entrar, qué carta no has reclamado—. Sólo cuenta
+ * cosas que piden una ACCIÓN tuya: «hay un jefe abierto» no es un aviso, es
+ * una pulla, y un punto que no se apaga nunca deja de significar nada.
+ */
+let avisos = { solicitudes: 0, cartas: 0 };
+
+function pintarAvisos() {
+  const b = dom?.btnCuenca;
+  if (!b) return;
+  const n = (avisos.solicitudes ?? 0) + (avisos.cartas ?? 0);
+  let punto = b.querySelector('.placa-aviso');
+  if (!n) { punto?.remove(); b.removeAttribute('aria-description'); return; }
+  if (!punto) {
+    punto = document.createElement('b');
+    punto.className = 'placa-aviso';
+    b.prepend(punto);
+  }
+  punto.textContent = n > 9 ? '9+' : String(n);
+  b.setAttribute('aria-description', [
+    avisos.solicitudes ? `${avisos.solicitudes} piden entrar` : '',
+    avisos.cartas ? `${avisos.cartas} cartas sin reclamar` : '',
+  ].filter(Boolean).join(', '));
+}
+
+/**
+ * Pregunta qué te espera y repinta el punto. No bloquea nada: el menú se
+ * enseña con lo que hubiera y se corrige solo cuando conteste el servidor.
+ */
+export function refrescarAvisos() {
+  return avisosDeCuenca().then((a) => { avisos = a; pintarAvisos(); }).catch(() => {});
+}
+
 export function pintarMenu() {
   const p = cargarPerfil();
   const m = p.mazos[p.activo] ?? p.mazos[0];
   const v = validarMazo(m?.cartas ?? {}, p.cartas);
   dom.menuMoneda.textContent = MONEDAS();
   dom.menuMazo.textContent = v.valido ? m.nombre : `${m?.nombre ?? '—'} (no válido)`;
+  pintarAvisos();
 }
 
 // -------------------------------------------------------------- misiones
