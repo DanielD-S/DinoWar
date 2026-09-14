@@ -59,7 +59,7 @@ import { arte } from './ui/art.js';
 import { mostrarMarca, empezarCarga, precargarPiezas } from './ui/carga.js';
 import { pedirMazoInicial } from './ui/iniciales.js';
 import { montarInstalar } from './ui/instalar.js';
-import { abrirTienda } from './ui/tienda.js';
+import { abrirTienda, aplicarRival, limpiarRival, traerEquipadoRival } from './ui/tienda.js';
 
 const APP = Object.freeze({
   BOOT: 'BOOT', MARCA: 'MARCA', CARGA: 'CARGA',
@@ -1237,6 +1237,8 @@ function nuevaPartida(jefe = null, jefeEvento = null, rivalId = null) {
   const mazoRival = jefe ? jefe.mazo.map((e) => [...e])
     : expedicionEnCurso ? expedicionEnCurso.mazo.map((e) => [...e]) : null;
   finVigente++;
+  // Contra la IA, un jefe o una expedición el rival no lleva cosméticos.
+  limpiarRival();
   rivalDePartida = {
     nombre: jefe?.nombre ?? expedicionEnCurso?.nombre ?? 'Rival',
     mazo: mazoRival ?? MAZO,
@@ -1580,6 +1582,14 @@ function empezarDuelo(r) {
   expedicionEnCurso = null;
   finVigente++;
   rivalDePartida = { nombre: r.rival?.apodo ?? 'Rival', mazo: null };
+  // Lo que lleva puesto el rival: su dorso y su estandarte. Se pide sin
+  // esperar —la presentación ya está saliendo— y se aplica por variables CSS,
+  // así que si llega con la presentación en pantalla su estandarte cambia en
+  // el sitio. Si falla, el rival sale con lo de siempre.
+  limpiarRival();
+  traerEquipadoRival(r.id)
+    .then((equipado) => { if (duelo?.id === r.id) aplicarRival(equipado); })
+    .catch(() => {});
   duelo = {
     id: r.id, n: r.n ?? 0, rival: r.rival, yo: r.yo, eloInicial: Number(r.eloInicial ?? r.yo?.elo ?? 1200),
     cola: Promise.resolve(), pendientes: 0, ultimo: null,

@@ -18,9 +18,11 @@
    el tablero salía beige. Se usa en cuatro sitios y apagarla en cada uno con
    `background-blend-mode` era pedir que algún día se olvide en uno. */
 #campo {
+  /* El tapete de la tienda pone su medallón y su losa en `--tapete-medallon`
+     y `--tapete` (src/ui/tienda.js); sin ellos, los de siempre. */
   background-image:
-    url('assets/piel/simbolo_huella.webp'),
-    url('assets/piel/piedra.webp');
+    var(--tapete-medallon, url('assets/piel/simbolo_huella.webp')),
+    var(--tapete, url('assets/piel/piedra.webp'));
   background-repeat: no-repeat, repeat;
   background-position: center center, top left;
   background-size: auto 58%, 170px auto;

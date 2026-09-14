@@ -430,10 +430,19 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .marcador-turnos {
   margin-top: 12px; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--tenue-2);
 }
-.marcador.con-arte .marcador-bando {
-  background: url('assets/piel/fin/cinta_propia.webp') center / 100% 100% no-repeat; border: 0;
+/* La cinta va en un pseudoelemento y no en el fondo del bando: las cintas de
+   la tienda se dibujan apuntando a la izquierda y la del rival tiene que
+   reflejarse, y reflejar el bando entero volvería del revés su nombre. La
+   cinta roja de siempre del rival ya viene dibujada hacia su lado y no gira. */
+.marcador.con-arte .marcador-bando { position: relative; isolation: isolate; background: none; border: 0; }
+.marcador.con-arte .marcador-bando::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: var(--cinta-propia, url('assets/piel/fin/cinta_propia.webp')) center / 100% 100% no-repeat;
 }
-.marcador.con-arte .marcador-bando.rival { background-image: url('assets/piel/fin/cinta_rival.webp'); }
+.marcador.con-arte .marcador-bando.rival::before {
+  background-image: var(--cinta-rival, url('assets/piel/fin/cinta_rival.webp'));
+  transform: var(--cinta-rival-giro, none);
+}
 .marcador.con-arte .marcador-vs {
   border: 0; background: url('assets/piel/fin/medallon_vs.webp') center / contain no-repeat;
 }
@@ -1290,12 +1299,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* La sexta placa, la de la tienda. Sale de tools/tienda.py. */
 .placa-tienda { --placa: url('assets/piel/placa_tienda.webp'); }
 
-/* El dorso del RIVAL es el clásico: sus cosméticos aún no viajan en el duelo.
-   Sin esto, tu dorso comprado aparecería también en su mazo del marcador y en
-   las cartas que vuelan a su pila. */
+/* El dorso del RIVAL es el suyo, no el tuyo: en un duelo `--dorso-rival` lo
+   pone src/ui/tienda.js con lo que dice el servidor, y contra la IA es el de
+   siempre. Sin esta regla tu dorso comprado aparecería también en su mazo del
+   marcador y en las cartas que vuelan a su pila. */
 .marcador-mazo.rival .marcador-dorso i,
 .fx-fantasma.rival .carta-dorso {
-  background-image: url('assets/piel/dorso.webp'); filter: none;
+  background-image: var(--dorso-rival, url('assets/piel/dorso.webp')); filter: none;
 }
 
 /* ------------------------------------------------------------ la tienda */
@@ -1328,6 +1338,17 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .tienda-boton:not(:disabled):active { transform: scale(.96); }
 .tienda-estado { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--acento-vivo); }
 .tienda-pregunta { width: 100%; font-size: 11px; color: var(--texto-2); }
+/* El tapete se enseña como en el tablero: la losa repetida y el medallón. */
+.tienda-vista.tienda-tapete {
+  width: 100%; aspect-ratio: 1; border-radius: 8px;
+  background-repeat: no-repeat, repeat; background-position: center, top left;
+  background-size: 62% auto, 56px auto;
+}
+.tienda-vista.tienda-estandarte {
+  width: 44%; aspect-ratio: 787 / 1919; border-radius: 0; box-shadow: none;
+  background-color: transparent; background-size: 100% 100%;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,.6));
+}
 
 /* Lo que queda debajo va a juego sin imagen: filete de latón en los chips y
    los enlaces, para que la piedra de arriba y la web de abajo no den un salto. */

@@ -11,40 +11,86 @@
 // sólo manda el id.
 //
 // Cada tipo tiene UN artículo por defecto, gratis y de todos, que es lo que
-// el juego enseñaba antes de que existiera la tienda.
+// el juego enseñaba antes de que existiera la tienda. Las rutas de arte de
+// cada tipo son distintas:
+//
+//   DORSO       `arte`: el reverso de la carta.
+//   TAPETE      `arte`: la losa que se repite en el tablero; `medallon`: el
+//               emblema del centro.
+//   ESTANDARTE  `arte`: el estandarte vertical de la presentación; `cinta`: la
+//               banderola del marcador final, o null si no tiene y se usa la
+//               de siempre.
 
 export const TIPO_COSMETICO = Object.freeze({
   DORSO: 'DORSO',
+  TAPETE: 'TAPETE',
+  ESTANDARTE: 'ESTANDARTE',
 });
 
+const T = TIPO_COSMETICO;
+const tienda = (nombre) => `assets/piel/tienda/${nombre}.webp`;
+
 export const COSMETICOS = Object.freeze([
+  // ------------------------------------------------------------ dorsos
   Object.freeze({
-    id: 'dorso_clasico',
-    tipo: TIPO_COSMETICO.DORSO,
-    nombre: 'Escamas de latón',
-    lema: 'El dorso de siempre.',
-    precio: 0,
-    porDefecto: true,
-    arte: 'assets/piel/dorso.webp',
+    id: 'dorso_clasico', tipo: T.DORSO, nombre: 'Escamas de latón', lema: 'El dorso de siempre.',
+    precio: 0, porDefecto: true, arte: 'assets/piel/dorso.webp',
   }),
   Object.freeze({
-    id: 'dorso_ambar',
-    tipo: TIPO_COSMETICO.DORSO,
-    nombre: 'Ámbar fósil',
+    id: 'dorso_ambar', tipo: T.DORSO, nombre: 'Ámbar fósil',
     lema: 'Resina de hace ciento cincuenta millones de años, con algo dentro.',
-    precio: 300,
-    arte: 'assets/piel/tienda/dorso_ambar.webp',
-    // Hasta que llegue su ilustración se enseña el dorso clásico tintado.
+    precio: 300, arte: tienda('dorso_ambar'),
+    // Lo que se enseñaba mientras no había ilustración; con ARTE_LISTO no se usa.
     provisional: 'sepia(.7) saturate(2.4) hue-rotate(-14deg) brightness(1.08)',
   }),
   Object.freeze({
-    id: 'dorso_obsidiana',
-    tipo: TIPO_COSMETICO.DORSO,
-    nombre: 'Obsidiana',
-    lema: 'Piedra volcánica pulida hasta ser espejo.',
-    precio: 300,
-    arte: 'assets/piel/tienda/dorso_obsidiana.webp',
+    id: 'dorso_obsidiana', tipo: T.DORSO, nombre: 'Obsidiana', lema: 'Piedra volcánica pulida hasta ser espejo.',
+    precio: 300, arte: tienda('dorso_obsidiana'),
     provisional: 'grayscale(.85) brightness(.7) contrast(1.3)',
+  }),
+
+  // ----------------------------------------------------------- tapetes
+  Object.freeze({
+    id: 'tapete_clasico', tipo: T.TAPETE, nombre: 'Piedra de la huella', lema: 'El tablero de siempre.',
+    precio: 0, porDefecto: true, arte: 'assets/piel/piedra.webp', medallon: 'assets/piel/simbolo_huella.webp',
+  }),
+  Object.freeze({
+    id: 'tapete_ambar', tipo: T.TAPETE, nombre: 'Ámbar', lema: 'Resina oscura con algo atrapado dentro.',
+    precio: 500, arte: tienda('tapete_ambar'), medallon: tienda('medallon_ambar'),
+  }),
+  Object.freeze({
+    id: 'tapete_obsidiana', tipo: T.TAPETE, nombre: 'Obsidiana', lema: 'Roca volcánica negra como un espejo apagado.',
+    precio: 500, arte: tienda('tapete_obsidiana'), medallon: tienda('medallon_obsidiana'),
+  }),
+  Object.freeze({
+    id: 'tapete_morrison', tipo: T.TAPETE, nombre: 'Lecho de Morrison', lema: 'Arenisca con las ondas del río que la dejó.',
+    precio: 500, arte: tienda('tapete_morrison'), medallon: tienda('medallon_morrison'),
+  }),
+  Object.freeze({
+    id: 'tapete_volcan', tipo: T.TAPETE, nombre: 'Volcán', lema: 'Basalto con la brasa todavía dentro.',
+    precio: 500, arte: tienda('tapete_volcan'), medallon: tienda('medallon_volcan'),
+  }),
+
+  // -------------------------------------------------------- estandartes
+  Object.freeze({
+    id: 'estandarte_clasico', tipo: T.ESTANDARTE, nombre: 'Cuero curtido', lema: 'El estandarte de siempre.',
+    precio: 0, porDefecto: true, arte: 'assets/piel/vs/estandarte_propio.webp', cinta: 'assets/piel/fin/cinta_propia.webp',
+  }),
+  Object.freeze({
+    id: 'estandarte_ambar', tipo: T.ESTANDARTE, nombre: 'Ámbar', lema: 'Un estandarte de resina con la luz dentro.',
+    precio: 400, arte: tienda('estandarte_ambar'), cinta: tienda('cinta_ambar'),
+  }),
+  Object.freeze({
+    id: 'estandarte_obsidiana', tipo: T.ESTANDARTE, nombre: 'Obsidiana', lema: 'Negro volcánico, frío como un espejo.',
+    precio: 400, arte: tienda('estandarte_obsidiana'), cinta: tienda('cinta_obsidiana'),
+  }),
+  Object.freeze({
+    id: 'estandarte_fosil', tipo: T.ESTANDARTE, nombre: 'Caliza fósil', lema: 'Vértebras de piedra colgando de latón.',
+    precio: 400, arte: tienda('estandarte_fosil'), cinta: null,
+  }),
+  Object.freeze({
+    id: 'estandarte_volcan', tipo: T.ESTANDARTE, nombre: 'Volcán', lema: 'Basalto con grietas de brasa.',
+    precio: 400, arte: tienda('estandarte_volcan'), cinta: null,
   }),
 ]);
 
@@ -84,5 +130,7 @@ for (const c of COSMETICOS) {
   if (c.porDefecto ? c.precio !== 0 : !(Number.isInteger(c.precio) && c.precio > 0)) {
     throw new Error(`COSMETICOS: ${c.id} tiene un precio que no cuadra con ser ${c.porDefecto ? 'gratuito' : 'de pago'}`);
   }
+  if (!c.arte) throw new Error(`COSMETICOS: ${c.id} sin arte`);
+  if (c.tipo === T.TAPETE && !c.medallon) throw new Error(`COSMETICOS: ${c.id} es un tapete sin medallón`);
 }
 if (POR_ID.size !== COSMETICOS.length) throw new Error('COSMETICOS: hay ids repetidos');

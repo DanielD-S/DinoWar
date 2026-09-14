@@ -2,8 +2,8 @@
 //
 // Lo que se vigila es lo que se equivoca en silencio: un precio del SQL que no
 // es el del código, una compra que no bloquea la fila o que acepta el precio
-// del cliente, un equipado que deja ponerse lo que no es tuyo, y el
-// interruptor de arte mintiendo sobre el disco.
+// del cliente, un equipado que deja ponerse lo que no es tuyo, lo del rival
+// contado a quien no está en el duelo, y el interruptor de arte mintiendo.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -22,17 +22,28 @@ test('Cada tipo tiene su artículo gratuito y el resto cuesta dinomonedas', () =
   for (const c of COSMETICOS.filter((x) => !x.porDefecto)) assert.ok(c.precio > 0, `${c.id} gratis sin serlo`);
 });
 
+test('Lo gratuito de cada tipo es lo que el juego enseñaba antes de la tienda', () => {
+  // Si cambiara, todo jugador que no ha comprado nada vería otra cosa.
+  assert.equal(porDefecto('DORSO').arte, 'assets/piel/dorso.webp');
+  assert.equal(porDefecto('TAPETE').arte, 'assets/piel/piedra.webp');
+  assert.equal(porDefecto('TAPETE').medallon, 'assets/piel/simbolo_huella.webp');
+  assert.equal(porDefecto('ESTANDARTE').arte, 'assets/piel/vs/estandarte_propio.webp');
+});
+
 test('Lo equipado que no es tuyo cae al gratuito', () => {
   const nadie = { cosmeticos: [], equipado: {} };
   assert.equal(equipadoDe(nadie, 'DORSO').id, 'dorso_clasico');
+  assert.equal(equipadoDe(nadie, 'TAPETE').id, 'tapete_clasico');
   // Equipado a mano en una caché, sin haberlo comprado: no cuenta.
-  const tramposo = { cosmeticos: [], equipado: { DORSO: 'dorso_ambar' } };
+  const tramposo = { cosmeticos: [], equipado: { DORSO: 'dorso_ambar', TAPETE: 'tapete_volcan' } };
   assert.equal(equipadoDe(tramposo, 'DORSO').id, 'dorso_clasico');
+  assert.equal(equipadoDe(tramposo, 'TAPETE').id, 'tapete_clasico');
   assert.equal(loTiene(tramposo, 'dorso_ambar'), false);
   const comprador = { cosmeticos: ['dorso_ambar'], equipado: { DORSO: 'dorso_ambar' } };
   assert.equal(equipadoDe(comprador, 'DORSO').id, 'dorso_ambar');
-  // Un id que ya no existe tampoco deja a nadie sin dorso.
+  // Un id que ya no existe tampoco deja a nadie sin dorso, ni uno de otro tipo.
   assert.equal(equipadoDe({ cosmeticos: ['viejo'], equipado: { DORSO: 'viejo' } }, 'DORSO').id, 'dorso_clasico');
+  assert.equal(equipadoDe({ cosmeticos: ['tapete_ambar'], equipado: { DORSO: 'tapete_ambar' } }, 'DORSO').id, 'dorso_clasico');
 });
 
 test('El SQL del catálogo lleva exactamente los precios del código', () => {
@@ -44,38 +55,51 @@ test('El SQL del catálogo lleva exactamente los precios del código', () => {
   assert.deepEqual(filas, esperadas);
 });
 
-const MIGRACION = readFileSync('supabase/migrations/0024_tienda.sql', 'utf8');
-const funcion = (nombre) => MIGRACION.split(`create or replace function ${nombre}(`)[1]?.split('$$;')[0] ?? '';
+const TIENDA = readFileSync('supabase/migrations/0024_tienda.sql', 'utf8');
+const RIVAL = readFileSync('supabase/migrations/0025_equipado_del_rival.sql', 'utf8');
+const funcion = (sql, nombre) => sql.split(`create or replace function ${nombre}(`)[1]?.split('$$;')[0] ?? '';
 
 test('Comprar cobra el precio del catálogo, con la fila bloqueada, y no dos veces', () => {
-  const cuerpo = funcion('public.comprar_cosmetico');
+  const cuerpo = funcion(TIENDA, 'public.comprar_cosmetico');
   assert.ok(cuerpo, 'la 0024 no define comprar_cosmetico');
   assert.match(cuerpo, /from public\.catalogo_cosmeticos where id = p_id/);
   assert.match(cuerpo, /where id = v_id for update/);
   assert.match(cuerpo, /ya lo tienes/);
   assert.match(cuerpo, /v_monedas < v_precio/);
   // La función recibe sólo el id: un precio en la firma sería un precio del cliente.
-  assert.match(MIGRACION, /function public\.comprar_cosmetico\(p_id text\)/);
+  assert.match(TIENDA, /function public\.comprar_cosmetico\(p_id text\)/);
 });
 
 test('Equipar sólo deja ponerse lo que es tuyo o el gratuito', () => {
-  const cuerpo = funcion('public.equipar_cosmetico');
+  const cuerpo = funcion(TIENDA, 'public.equipar_cosmetico');
   assert.match(cuerpo, /not v_defecto and not exists/);
   assert.match(cuerpo, /no es tuyo/);
 });
 
-test('Las dos funciones son sólo para quien ha entrado', () => {
+test('Las funciones de la tienda son sólo para quien ha entrado', () => {
   for (const f of ['comprar_cosmetico', 'equipar_cosmetico']) {
-    assert.match(MIGRACION, new RegExp(`revoke all on function public\\.${f}\\(text\\) from public, anon;`));
-    assert.match(MIGRACION, new RegExp(`grant execute on function public\\.${f}\\(text\\) to authenticated;`));
+    assert.match(TIENDA, new RegExp(`revoke all on function public\\.${f}\\(text\\) from public, anon;`));
+    assert.match(TIENDA, new RegExp(`grant execute on function public\\.${f}\\(text\\) to authenticated;`));
   }
+  assert.match(RIVAL, /revoke all on function public\.equipado_en_duelo\(uuid\) from public, anon;/);
+  assert.match(RIVAL, /grant execute on function public\.equipado_en_duelo\(uuid\) to authenticated;/);
+});
+
+test('Lo que lleva puesto el rival sólo se cuenta a quien está en ese duelo, y sólo eso', () => {
+  const cuerpo = funcion(RIVAL, 'public.equipado_en_duelo');
+  assert.ok(cuerpo, 'la 0025 no define equipado_en_duelo');
+  assert.match(cuerpo, /v_id = d\.jugador_a/);
+  assert.match(cuerpo, /v_id = d\.jugador_b/);
+  assert.match(cuerpo, /ese duelo no es tuyo/);
+  // Devuelve lo equipado y nada más de la fila del rival.
+  assert.match(cuerpo, /select equipado from public\.jugadores where id = v_rival/);
+  assert.doesNotMatch(cuerpo, /monedas|coleccion|select \*/);
 });
 
 test('El perfil dice qué has comprado y qué llevas puesto', () => {
-  const cuerpo = funcion('public.mi_perfil');
+  const cuerpo = funcion(TIENDA, 'public.mi_perfil');
   assert.match(cuerpo, /'cosmeticos'/);
   assert.match(cuerpo, /'equipado', j\.equipado/);
-  // Y conserva lo que ya decía la 0023.
   assert.match(cuerpo, /'sembrado', j\.sembrado/);
 });
 
@@ -83,12 +107,29 @@ test('El menú tiene la placa de la tienda', () => {
   assert.match(readFileSync('index.html', 'utf8'), /<button id="btn-tienda" class="placa placa-tienda">/);
 });
 
+test('Las reglas que pintan lo equipado leen sus variables y conservan lo de siempre', () => {
+  const css = ['style.css', 'piel.css', 'efectos.css'].map((f) => readFileSync(f, 'utf8')).join('\n');
+  for (const [variable, siempre] of [
+    ['--tapete', 'assets/piel/piedra.webp'],
+    ['--tapete-medallon', 'assets/piel/simbolo_huella.webp'],
+    ['--estandarte-propio', 'assets/piel/vs/estandarte_propio.webp'],
+    ['--estandarte-rival', 'assets/piel/vs/estandarte_rival.webp'],
+    ['--cinta-propia', 'assets/piel/fin/cinta_propia.webp'],
+    ['--cinta-rival', 'assets/piel/fin/cinta_rival.webp'],
+    ['--dorso-rival', 'assets/piel/dorso.webp'],
+  ]) {
+    assert.ok(css.includes(`var(${variable}, url('${siempre}'))`), `ninguna regla lee ${variable} con ${siempre} de reserva`);
+  }
+});
+
 // ---------------------------------------------------------------- el arte
 // tienda.js importa perfil.js, que lee `location` al cargar: el interruptor y
 // la lista se leen como texto para no arrastrar el navegador a Node.
 const js = readFileSync('src/ui/tienda.js', 'utf8');
 const ARTE_LISTO = /export const ARTE_LISTO = true;/.test(js);
-const PIEZAS = JSON.parse(js.match(/export const PIEZAS = Object\.freeze\((\[[^\]]*\])\)/)[1].replace(/'/g, '"'));
+const PIEZAS = JSON.parse(js.match(/export const PIEZAS = Object\.freeze\((\[[^\]]*\])\)/)[1]
+  .replace(/'/g, '"').replace(/,\s*\]/, ']'));
+const ruta = (p) => (p.startsWith('placa_') ? `assets/piel/${p}.webp` : `assets/piel/tienda/${p}.webp`);
 
 test('tools/tienda.py sirve exactamente las piezas que la tienda conoce', () => {
   const py = readFileSync('tools/tienda.py', 'utf8');
@@ -98,15 +139,18 @@ test('tools/tienda.py sirve exactamente las piezas que la tienda conoce', () => 
 });
 
 test('ARTE_LISTO dice la verdad sobre el disco', () => {
-  const ruta = (p) => (p.startsWith('placa_') ? `assets/piel/${p}.webp` : `assets/piel/tienda/${p}.webp`);
   const faltan = PIEZAS.filter((p) => !existsSync(ruta(p)));
   if (ARTE_LISTO) assert.deepEqual(faltan, [], 'ARTE_LISTO está encendido y faltan piezas');
   else assert.ok(faltan.length > 0, 'están todas las piezas de la tienda: pon ARTE_LISTO = true en src/ui/tienda.js');
 });
 
-test('Cada dorso de pago apunta a una pieza que la herramienta conoce', () => {
-  for (const c of COSMETICOS.filter((x) => x.tipo === 'DORSO' && !x.porDefecto)) {
-    const nombre = c.arte.split('/').pop().replace('.webp', '');
-    assert.ok(PIEZAS.includes(nombre), `${c.id} pide «${c.arte}» y no está en PIEZAS`);
+test('Cada artículo de pago pide piezas que la herramienta conoce', () => {
+  for (const c of COSMETICOS.filter((x) => !x.porDefecto)) {
+    for (const campo of ['arte', 'medallon', 'cinta']) {
+      if (!c[campo]) continue;
+      assert.ok(c[campo].startsWith('assets/piel/tienda/'), `${c.id}.${campo} fuera de assets/piel/tienda/`);
+      const nombre = c[campo].split('/').pop().replace('.webp', '');
+      assert.ok(PIEZAS.includes(nombre), `${c.id} pide «${c[campo]}» y no está en PIEZAS`);
+    }
   }
 });

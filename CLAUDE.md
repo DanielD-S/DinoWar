@@ -1404,10 +1404,19 @@ carta, un mazo ni lo rápido que se progresa.
   id, lee el precio del catálogo y bloquea la fila del jugador. `equipar_cosmetico`
   sólo deja ponerse lo comprado o el gratuito. Orden al aplicar: la 0006
   regenerada y luego la 0024.
-- **Lo equipado se aplica con variables CSS en la raíz** (`--dorso`,
-  `--dorso-filtro`) desde `pintarMenu()`, que se repinta al sincronizar. Las
-  reglas del RIVAL fuerzan el dorso clásico: sus cosméticos todavía no viajan
-  en el duelo.
+- **Lo equipado se aplica con variables CSS en la raíz** desde `pintarMenu()`,
+  que se repinta al sincronizar: `--dorso`, `--tapete`, `--tapete-medallon`,
+  `--estandarte-propio`, `--cinta-propia`. Cada regla conserva lo de siempre de
+  reserva, y `test/tienda.test.js` lo comprueba.
+- **Lo del rival viaja por una función de lectura**, `equipado_en_duelo(p_duelo)`
+  (0025), que sólo contesta a quien está en ese duelo y sólo con lo equipado.
+  No va en la Edge Function a propósito: tocarla es re-empaquetar, re-anclar y
+  desplegar. El cliente la pide al empezar el duelo y pone `--dorso-rival`,
+  `--estandarte-rival` y `--cinta-rival`; cualquier otra partida las quita.
+  El tapete no viaja: cada uno ve el suyo.
+- **Las cintas de la tienda apuntan a la izquierda.** La del rival va en un
+  `::before` que se refleja con `--cinta-rival-giro`; la roja de siempre ya
+  viene dibujada hacia su lado y no gira.
 - **Arte con interruptor**, como el final y la presentación: hasta que llegan
   los dorsos se ven como el clásico tintado, y la sexta placa del menú lleva un
   dibujo de CSS sin `--placa` (el guardián de `marcado.test.js` exige fichero a
