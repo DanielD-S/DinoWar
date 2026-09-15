@@ -24,8 +24,10 @@ Cinco clases de pieza, y cada una llega distinta:
   marco_retrato    el aro de latón que va encima del retrato. MAGENTA, se keyea.
                    Imprime el diámetro del hueco, que es el `--retrato-hueco`
                    del CSS.
-  holografico      la lámina que brilla sobre las legendarias y las de jefe.
-                   A sangre; el CSS la mezcla con `color-dodge`.
+
+La lámina holográfica de las legendarias ya NO sale de aquí: es un degradado
+de carta.css. La textura que llegó traía una línea vertical dibujada y, al
+deslizarse, cruzaba la ilustración.
 
 Todo lo que no es la placa va a assets/piel/tienda/. Los nombres son los de
 `PIEZAS` en src/ui/tienda.js, y test/tienda.test.js falla si las dos listas se
@@ -88,7 +90,6 @@ PIEZAS = {
     'medallon_solnhofen': ('assets/piel/tienda/medallon_solnhofen.webp', 680),
     'medallon_excavacion': ('assets/piel/tienda/medallon_excavacion.webp', 680),
     'marco_retrato': ('assets/piel/tienda/marco_retrato.webp', 256),
-    'holografico': ('assets/piel/tienda/holografico.webp', 512),
     'retrato_saurophaganax': ('assets/piel/tienda/retrato_saurophaganax.webp', 512),
     'retrato_barosaurus': ('assets/piel/tienda/retrato_barosaurus.webp', 512),
     'dorso_cazador': ('assets/piel/tienda/dorso_cazador.webp', 512),

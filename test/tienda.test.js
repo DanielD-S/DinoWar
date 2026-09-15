@@ -74,7 +74,12 @@ test('Lo gratuito no se compra y se equipa sin comprarlo (0026)', () => {
 
 test('Las legendarias y las de jefe llevan la lámina holográfica, con la ilustración aislada', () => {
   const css = readFileSync('carta.css', 'utf8');
-  assert.match(css, /\.con-marco\.rareza-LEGENDARIO \.c-arte::before,\s*\.con-marco\.jefe \.c-arte::before \{[^}]*holografico\.webp/);
+  const regla = css.match(/\.con-marco\.rareza-LEGENDARIO \.c-arte::before,\s*\.con-marco\.jefe \.c-arte::before \{([^}]*)\}/)?.[1];
+  assert.ok(regla, 'no hay lámina holográfica');
+  assert.match(regla, /mix-blend-mode: color-dodge/);
+  // Sin imagen: la textura que hubo traía una línea dibujada que, al moverse,
+  // cruzaba la ilustración como una costura. Un degradado no tiene.
+  assert.doesNotMatch(regla, /url\(/, 'la lámina vuelve a llevar una imagen');
   assert.match(css, /\.con-marco\.jefe \.c-arte \{ overflow: hidden; isolation: isolate; \}/);
 });
 
