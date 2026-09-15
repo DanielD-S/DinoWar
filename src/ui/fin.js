@@ -76,7 +76,12 @@ export function marcadorHTML({ gane, turnos, yo, rival }) {
   const bando = (b, lado) => {
     const emb = /^[a-z_]+$/.test(b.emblema ?? '')
       ? `<i class="emblema emb-${b.emblema}" aria-hidden="true"></i>` : '';
-    return `<div class="marcador-bando ${lado}">${emb}<b>${escapar(b.nombre)}</b></div>`;
+    // El retrato lo pinta el CSS con `--retrato-propio` o `--retrato-rival`:
+    // aquí sólo se dice si ese bando lo lleva (tú siempre; el rival, en un duelo).
+    // Y va EN LUGAR del emblema: con los dos, a 375 px el nombre se quedaba en
+    // «Chocopl…». El clado ya se vio en la presentación.
+    const cara = b.retrato ? '<i class="retrato-medallon marcador-retrato" aria-hidden="true"></i>' : '';
+    return `<div class="marcador-bando ${lado}">${cara || emb}<b>${escapar(b.nombre)}</b></div>`;
   };
   const mazo = (lado, vence) => `<div class="marcador-mazo ${lado} ${vence ? 'vence' : 'cae'}">`
     + '<span class="marcador-dorso" aria-hidden="true"><i></i><i></i></span>'

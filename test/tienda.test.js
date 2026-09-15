@@ -19,7 +19,7 @@ test('Cada tipo tiene su artículo gratuito y el resto cuesta dinomonedas', () =
     assert.ok(gratis, `${tipo} sin artículo gratuito`);
     assert.equal(gratis.precio, 0);
   }
-  for (const c of COSMETICOS.filter((x) => !x.porDefecto)) assert.ok(c.precio > 0, `${c.id} gratis sin serlo`);
+  for (const c of COSMETICOS.filter((x) => !x.porDefecto && !x.gratis)) assert.ok(c.precio > 0, `${c.id} gratis sin serlo`);
 });
 
 test('Lo gratuito de cada tipo es lo que el juego enseñaba antes de la tienda', () => {
@@ -46,6 +46,36 @@ test('Lo equipado que no es tuyo cae al gratuito', () => {
   assert.equal(equipadoDe({ cosmeticos: ['tapete_ambar'], equipado: { DORSO: 'tapete_ambar' } }, 'DORSO').id, 'dorso_clasico');
 });
 
+test('Los retratos: uno por defecto, otro gratis para elegir, y el resto de pago', () => {
+  assert.equal(porDefecto('RETRATO').id, 'retrato_paleontologa');
+  const nadie = { cosmeticos: [], equipado: {} };
+  assert.equal(equipadoDe(nadie, 'RETRATO').id, 'retrato_paleontologa');
+  // El gratuito se lleva sin comprarlo; uno de pago, no.
+  assert.equal(loTiene(nadie, 'retrato_buscador'), true);
+  assert.equal(equipadoDe({ cosmeticos: [], equipado: { RETRATO: 'retrato_buscador' } }, 'RETRATO').id, 'retrato_buscador');
+  assert.equal(equipadoDe({ cosmeticos: [], equipado: { RETRATO: 'retrato_amonite' } }, 'RETRATO').id, 'retrato_paleontologa');
+  for (const c of COSMETICOS.filter((x) => x.precio === 0)) {
+    assert.ok(c.porDefecto || c.gratis, `${c.id} cuesta 0 sin decir que es gratis`);
+  }
+});
+
+test('Lo gratuito no se compra y se equipa sin comprarlo (0026)', () => {
+  const RETRATOS = readFileSync('supabase/migrations/0026_retratos.sql', 'utf8');
+  assert.match(funcion(RETRATOS, 'public.comprar_cosmetico'), /if v_defecto or v_precio = 0 then raise exception 'ese ya es tuyo'/);
+  const equipar = funcion(RETRATOS, 'public.equipar_cosmetico');
+  assert.match(equipar, /not v_defecto and v_precio > 0 and not exists/);
+  assert.match(equipar, /no es tuyo/);
+  for (const f of ['comprar_cosmetico', 'equipar_cosmetico']) {
+    assert.match(RETRATOS, new RegExp(`revoke all on function public\\.${f}\\(text\\) from public, anon;`));
+  }
+});
+
+test('Las legendarias y las de jefe llevan la lámina holográfica, con la ilustración aislada', () => {
+  const css = readFileSync('carta.css', 'utf8');
+  assert.match(css, /\.con-marco\.rareza-LEGENDARIO \.c-arte::before,\s*\.con-marco\.jefe \.c-arte::before \{[^}]*holografico\.webp/);
+  assert.match(css, /\.con-marco\.jefe \.c-arte \{ overflow: hidden; isolation: isolate; \}/);
+});
+
 test('El SQL del catálogo lleva exactamente los precios del código', () => {
   const sql = readFileSync(SALIDA, 'utf8');
   const bloque = sql.split('insert into public.catalogo_cosmeticos ')[1].split(';')[0];
@@ -57,7 +87,9 @@ test('El SQL del catálogo lleva exactamente los precios del código', () => {
 
 const TIENDA = readFileSync('supabase/migrations/0024_tienda.sql', 'utf8');
 const RIVAL = readFileSync('supabase/migrations/0025_equipado_del_rival.sql', 'utf8');
-const funcion = (sql, nombre) => sql.split(`create or replace function ${nombre}(`)[1]?.split('$$;')[0] ?? '';
+function funcion(sql, nombre) {
+  return sql.split(`create or replace function ${nombre}(`)[1]?.split('$$;')[0] ?? '';
+}
 
 test('Comprar cobra el precio del catálogo, con la fila bloqueada, y no dos veces', () => {
   const cuerpo = funcion(TIENDA, 'public.comprar_cosmetico');
@@ -120,6 +152,9 @@ test('Las reglas que pintan lo equipado leen sus variables y conservan lo de sie
   ]) {
     assert.ok(css.includes(`var(${variable}, url('${siempre}'))`), `ninguna regla lee ${variable} con ${siempre} de reserva`);
   }
+  // El retrato no tiene «lo de siempre»: sin variable, la presentación deja la portada del mazo.
+  assert.ok(css.includes('var(--retrato-propio, none)'));
+  assert.ok(css.includes('var(--retrato-rival, none)'));
 });
 
 // ---------------------------------------------------------------- el arte
@@ -147,7 +182,8 @@ test('ARTE_LISTO dice la verdad sobre el disco', () => {
 test('Cada artículo de pago pide piezas que la herramienta conoce', () => {
   for (const c of COSMETICOS.filter((x) => !x.porDefecto)) {
     for (const campo of ['arte', 'medallon', 'cinta']) {
-      if (!c[campo]) continue;
+      // Un tapete sin medallón propio lleva el de siempre.
+      if (!c[campo] || c[campo] === porDefecto('TAPETE').medallon) continue;
       assert.ok(c[campo].startsWith('assets/piel/tienda/'), `${c.id}.${campo} fuera de assets/piel/tienda/`);
       const nombre = c[campo].split('/').pop().replace('.webp', '');
       assert.ok(PIEZAS.includes(nombre), `${c.id} pide «${c[campo]}» y no está en PIEZAS`);

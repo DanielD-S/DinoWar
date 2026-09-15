@@ -1485,5 +1485,16 @@ nombres llegaron cambiados y se renombraron en `src/piel/tienda/`:
 `estandare_fosil.png` y `etiqueta_*.png` (las cintas). Los tapetes llegaron ya
 más oscuros que la piedra (16 a 33 de luminancia) y no hubo que oscurecerlos.
 El estandarte de volcán llegó más ancho (0,449 contra 0,410) y se estrecha un
-9 % al pintarse. Quedan por hacer los tapetes de Hell Creek, Kem Kem,
-Solnhofen y excavación.
+9 % al pintarse.
+
+Después, ese mismo día: los cuatro tapetes que faltaban (Hell Creek, Kem Kem,
+Solnhofen y excavación) **sin medallón**, que de momento llevan la huella de
+siempre; cuatro dorsos por yacimiento (Morrison, Hell Creek, Kem Kem y volcán);
+las cintas de fósil y volcán, y una de helecho **sin estandarte** que la lleve,
+que se queda fuera hasta que llegue `estandarte_helecho`. Llegaron también
+cinco retratos con su aro (`marco_retrato`) y la lámina `holografico`. Los
+marcos de carta alternativos se descartaron: no se veían bien.
+
+Quedan por hacer los medallones `medallon_hell_creek`, `medallon_kem_kem`,
+`medallon_solnhofen` y `medallon_excavacion` (tabla de arriba) y el
+`estandarte_helecho`.

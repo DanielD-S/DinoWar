@@ -965,9 +965,10 @@ function alFinal(gane) {
 }
 
 /** Un bando del marcador: nombre, emblema del mazo y sus dos cifras. */
-function bandoDelMarcador(nombre, mazo, jugador) {
+function bandoDelMarcador(nombre, mazo, jugador, retrato = false) {
   return {
     nombre,
+    retrato,
     emblema: mazo ? (emblemaDeMazo(Array.isArray(mazo) ? Object.fromEntries(mazo) : mazo)?.clave ?? null) : null,
     trofeos: jugador?.trofeos ?? 0,
     habitat: jugador?.habitat ?? 0,
@@ -990,8 +991,9 @@ function pintarFin({ via, gane, titular, frase }) {
   el.finResumen.innerHTML = marcadorHTML({
     gane,
     turnos: estado?.turno ?? 0,
-    yo: bandoDelMarcador(cargarPerfil().apodo || 'Tú', mazoActivo(), p),
-    rival: bandoDelMarcador(rivalDePartida.nombre, rivalDePartida.mazo, r),
+    yo: bandoDelMarcador(cargarPerfil().apodo || 'Tú', mazoActivo(), p, true),
+    // Contra la IA el rival no tiene retrato; en un duelo, el suyo.
+    rival: bandoDelMarcador(rivalDePartida.nombre, rivalDePartida.mazo, r, !!rivalDePartida.duelo),
   });
 }
 
@@ -1581,7 +1583,7 @@ function empezarDuelo(r) {
   fijarTopesHabitat();
   expedicionEnCurso = null;
   finVigente++;
-  rivalDePartida = { nombre: r.rival?.apodo ?? 'Rival', mazo: null };
+  rivalDePartida = { nombre: r.rival?.apodo ?? 'Rival', mazo: null, duelo: true };
   // Lo que lleva puesto el rival: su dorso y su estandarte. Se pide sin
   // esperar —la presentación ya está saliendo— y se aplica por variables CSS,
   // así que si llega con la presentación en pantalla su estandarte cambia en

@@ -15,13 +15,14 @@
 //   `--cinta-propia`. Del rival de un duelo: `--dorso-rival`,
 //   `--estandarte-rival`, `--cinta-rival` (y `--cinta-rival-giro`, porque las
 //   cintas se dibujan apuntando a la izquierda y la del rival va a la derecha).
-//   Sin variable, cada regla usa lo de siempre.
+//   Sin variable, cada regla usa lo de siempre. El retrato es la excepción:
+//   `--retrato-propio` va siempre y `--retrato-rival` sólo en un duelo.
 // - El TAPETE no viaja al rival: cada uno ve el suyo en su propio tablero.
 //
 // El arte llega aparte (assets/PROMPTS.md, «La tienda» y «Los tapetes») y
 // `ARTE_LISTO` es el interruptor, vigilado por test/tienda.test.js.
 
-import { COSMETICOS, TIPO_COSMETICO, loTiene, equipadoDe, cosmeticoPorId } from '../data/cosmeticos.js';
+import { COSMETICOS, TIPO_COSMETICO, loTiene, equipadoDe, cosmeticoPorId, porDefecto } from '../data/cosmeticos.js';
 import { cargarPerfil } from './almacen.js';
 import { comprarCosmetico, equiparCosmetico, PRUEBAS } from './perfil.js';
 import { rpc, hayServidor } from './supabase.js';
@@ -36,11 +37,21 @@ export const PIEZAS = Object.freeze([
   'medallon_ambar', 'medallon_obsidiana', 'medallon_morrison', 'medallon_volcan',
   'estandarte_ambar', 'estandarte_obsidiana', 'estandarte_fosil', 'estandarte_volcan',
   'cinta_ambar', 'cinta_obsidiana',
+  'dorso_morrison', 'dorso_hell_creek', 'dorso_kem_kem', 'dorso_volcan',
+  'tapete_hell_creek', 'tapete_kem_kem', 'tapete_solnhofen', 'tapete_excavacion',
+  'cinta_fosil', 'cinta_volcan',
+  'retrato_paleontologa', 'retrato_buscador', 'retrato_amonite', 'retrato_huevo', 'retrato_placas',
+  'marco_retrato', 'holografico',
 ]);
 
 const T = TIPO_COSMETICO;
 
 const SECCIONES = [
+  {
+    tipo: T.RETRATO,
+    titulo: 'Retratos',
+    nota: 'Tu cara en el menú, en la presentación antes de cada partida y en el marcador final. En los duelos lo ve también tu rival.',
+  },
   {
     tipo: T.DORSO,
     titulo: 'Dorsos de carta',
@@ -97,6 +108,10 @@ export function aplicarEquipado(perfil = cargarPerfil()) {
   poner(raiz, '--estandarte-propio', estandarte.porDefecto ? null : url(estandarte.arte));
   // Un estandarte sin cinta propia deja la de siempre en el marcador.
   poner(raiz, '--cinta-propia', estandarte.porDefecto || !estandarte.cinta ? null : url(estandarte.cinta));
+
+  // El retrato va SIEMPRE, también el gratuito: antes de la tienda no había
+  // retrato que conservar, así que sin variable no se pinta ninguno.
+  poner(raiz, '--retrato-propio', url(equipadoDe(perfil, T.RETRATO).arte));
 }
 
 /**
@@ -112,12 +127,17 @@ export function aplicarRival(equipado) {
     const c = cosmeticoPorId(equipado?.[tipo]);
     return c && c.tipo === tipo && !c.porDefecto ? c : null;
   };
+  // (`de` descarta el gratuito porque los otros tipos lo pintan sin variable.)
   const dorso = de(T.DORSO);
   const estandarte = de(T.ESTANDARTE);
   poner(raiz, '--dorso-rival', dorso ? url(aspecto(dorso).imagen) : null);
   poner(raiz, '--estandarte-rival', estandarte ? url(estandarte.arte) : null);
   poner(raiz, '--cinta-rival', estandarte?.cinta ? url(estandarte.cinta) : null);
   poner(raiz, '--cinta-rival-giro', estandarte?.cinta ? 'scaleX(-1)' : null);
+  // Un rival de duelo siempre tiene retrato: el suyo o el gratuito. Contra la
+  // IA (`equipado` null) no hay ninguno.
+  const retrato = equipado ? (de(T.RETRATO) ?? porDefecto(T.RETRATO)) : null;
+  poner(raiz, '--retrato-rival', retrato ? url(retrato.arte) : null);
 }
 
 export const limpiarRival = () => aplicarRival(null);
@@ -155,6 +175,10 @@ function vistaHTML(c) {
   if (c.tipo === T.TAPETE) {
     return `<div class="tienda-vista tienda-tapete" aria-hidden="true"
       style="background-image:${url(c.medallon)},${url(c.arte)}"></div>`;
+  }
+  if (c.tipo === T.RETRATO) {
+    return `<i class="tienda-vista tienda-retrato retrato-medallon" aria-hidden="true"
+      style="--retrato:${url(c.arte)}"></i>`;
   }
   const { imagen, filtro } = aspecto(c);
   return `<div class="tienda-vista tienda-${c.tipo.toLowerCase()}" aria-hidden="true"

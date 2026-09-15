@@ -1349,6 +1349,26 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   background-color: transparent; background-size: 100% 100%;
   filter: drop-shadow(0 6px 10px rgba(0,0,0,.6));
 }
+.tienda-vista.tienda-retrato { width: 86%; border-radius: 0; box-shadow: none; }
+
+/* El retrato del jugador (src/ui/tienda.js): el aro de latón encima y la cara
+   en un círculo debajo. `--retrato` la pone quien lo usa; el hueco del aro es
+   el 72 % de su ancho, medido por tools/tienda.py, y la cara entra un poco
+   por debajo del latón para que no quede una rendija. */
+.retrato-medallon {
+  position: relative; isolation: isolate; display: inline-block; flex: 0 0 auto;
+  aspect-ratio: 1; background: transparent url('assets/piel/tienda/marco_retrato.webp') center / contain no-repeat;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.6));
+}
+.retrato-medallon::before {
+  content: ''; position: absolute; inset: 13%; z-index: -1; border-radius: 50%;
+  background: #1c1610 var(--retrato, none) center / cover no-repeat;
+}
+.menu-cuenta { display: flex; align-items: center; justify-content: center; gap: 6px; }
+.menu-cuenta .retrato-medallon { width: 26px; --retrato: var(--retrato-propio); }
+.marcador-retrato { width: 34px; margin-inline: -2px; }
+.marcador-bando.propio .marcador-retrato { --retrato: var(--retrato-propio); }
+.marcador-bando.rival .marcador-retrato { --retrato: var(--retrato-rival); }
 
 /* Lo que queda debajo va a juego sin imagen: filete de latón en los chips y
    los enlaces, para que la piedra de arriba y la web de abajo no den un salto. */

@@ -20,15 +20,23 @@
 //   ESTANDARTE  `arte`: el estandarte vertical de la presentación; `cinta`: la
 //               banderola del marcador final, o null si no tiene y se usa la
 //               de siempre.
+//   RETRATO     `arte`: tu retrato, cuadrado; el círculo y el aro los pone el CSS.
+//
+// Además del gratuito de cada tipo puede haber artículos `gratis`: precio 0,
+// de todos sin comprarlos, pero no son lo que se ve por defecto. Hoy sólo los
+// retratos, que se estrenan con dos personas para elegir.
 
 export const TIPO_COSMETICO = Object.freeze({
   DORSO: 'DORSO',
   TAPETE: 'TAPETE',
   ESTANDARTE: 'ESTANDARTE',
+  RETRATO: 'RETRATO',
 });
 
 const T = TIPO_COSMETICO;
 const tienda = (nombre) => `assets/piel/tienda/${nombre}.webp`;
+// Los tapetes que llegaron sin medallón propio llevan el de siempre.
+const HUELLA = 'assets/piel/simbolo_huella.webp';
 
 export const COSMETICOS = Object.freeze([
   // ------------------------------------------------------------ dorsos
@@ -47,6 +55,22 @@ export const COSMETICOS = Object.freeze([
     id: 'dorso_obsidiana', tipo: T.DORSO, nombre: 'Obsidiana', lema: 'Piedra volcánica pulida hasta ser espejo.',
     precio: 300, arte: tienda('dorso_obsidiana'),
     provisional: 'grayscale(.85) brightness(.7) contrast(1.3)',
+  }),
+  Object.freeze({
+    id: 'dorso_morrison', tipo: T.DORSO, nombre: 'Huella de Morrison', lema: 'Una huella hundida en la arenisca del río.',
+    precio: 300, arte: tienda('dorso_morrison'),
+  }),
+  Object.freeze({
+    id: 'dorso_hell_creek', tipo: T.DORSO, nombre: 'Hell Creek', lema: 'El cráneo del último gran depredador, en pizarra.',
+    precio: 300, arte: tienda('dorso_hell_creek'),
+  }),
+  Object.freeze({
+    id: 'dorso_kem_kem', tipo: T.DORSO, nombre: 'Kem Kem', lema: 'Un diente de carcarodontosáurido en arenisca roja.',
+    precio: 300, arte: tienda('dorso_kem_kem'),
+  }),
+  Object.freeze({
+    id: 'dorso_volcan', tipo: T.DORSO, nombre: 'Huevo de brasa', lema: 'Una nidada fósil sobre basalto que aún quema.',
+    precio: 300, arte: tienda('dorso_volcan'),
   }),
 
   // ----------------------------------------------------------- tapetes
@@ -70,6 +94,22 @@ export const COSMETICOS = Object.freeze([
     id: 'tapete_volcan', tipo: T.TAPETE, nombre: 'Volcán', lema: 'Basalto con la brasa todavía dentro.',
     precio: 500, arte: tienda('tapete_volcan'), medallon: tienda('medallon_volcan'),
   }),
+  Object.freeze({
+    id: 'tapete_hell_creek', tipo: T.TAPETE, nombre: 'Hell Creek', lema: 'Lutita oscura del final del Cretácico.',
+    precio: 500, arte: tienda('tapete_hell_creek'), medallon: HUELLA,
+  }),
+  Object.freeze({
+    id: 'tapete_kem_kem', tipo: T.TAPETE, nombre: 'Kem Kem', lema: 'Arcilla roja cuarteada del río de los gigantes.',
+    precio: 500, arte: tienda('tapete_kem_kem'), medallon: HUELLA,
+  }),
+  Object.freeze({
+    id: 'tapete_solnhofen', tipo: T.TAPETE, nombre: 'Solnhofen', lema: 'La caliza fina donde quedaron las plumas.',
+    precio: 500, arte: tienda('tapete_solnhofen'), medallon: HUELLA,
+  }),
+  Object.freeze({
+    id: 'tapete_excavacion', tipo: T.TAPETE, nombre: 'Excavación', lema: 'La cuadrícula de cuerda sobre la tierra de la cata.',
+    precio: 500, arte: tienda('tapete_excavacion'), medallon: HUELLA,
+  }),
 
   // -------------------------------------------------------- estandartes
   Object.freeze({
@@ -86,11 +126,33 @@ export const COSMETICOS = Object.freeze([
   }),
   Object.freeze({
     id: 'estandarte_fosil', tipo: T.ESTANDARTE, nombre: 'Caliza fósil', lema: 'Vértebras de piedra colgando de latón.',
-    precio: 400, arte: tienda('estandarte_fosil'), cinta: null,
+    precio: 400, arte: tienda('estandarte_fosil'), cinta: tienda('cinta_fosil'),
   }),
   Object.freeze({
     id: 'estandarte_volcan', tipo: T.ESTANDARTE, nombre: 'Volcán', lema: 'Basalto con grietas de brasa.',
-    precio: 400, arte: tienda('estandarte_volcan'), cinta: null,
+    precio: 400, arte: tienda('estandarte_volcan'), cinta: tienda('cinta_volcan'),
+  }),
+
+  // ---------------------------------------------------------- retratos
+  Object.freeze({
+    id: 'retrato_paleontologa', tipo: T.RETRATO, nombre: 'La paleontóloga', lema: 'Brocha en mano y lámpara encendida.',
+    precio: 0, porDefecto: true, arte: tienda('retrato_paleontologa'),
+  }),
+  Object.freeze({
+    id: 'retrato_buscador', tipo: T.RETRATO, nombre: 'El buscador', lema: 'Lupa, sombrero y un mapa enrollado.',
+    precio: 0, gratis: true, arte: tienda('retrato_buscador'),
+  }),
+  Object.freeze({
+    id: 'retrato_amonite', tipo: T.RETRATO, nombre: 'Amonite', lema: 'Una espiral de nácar convertida en oro.',
+    precio: 350, arte: tienda('retrato_amonite'),
+  }),
+  Object.freeze({
+    id: 'retrato_huevo', tipo: T.RETRATO, nombre: 'La eclosión', lema: 'Alguien asoma entre los helechos.',
+    precio: 350, arte: tienda('retrato_huevo'),
+  }),
+  Object.freeze({
+    id: 'retrato_placas', tipo: T.RETRATO, nombre: 'Placas al ocaso', lema: 'Un estegosaurio contra el último sol.',
+    precio: 350, arte: tienda('retrato_placas'),
   }),
 ]);
 
@@ -101,10 +163,10 @@ export const cosmeticoPorId = (id) => POR_ID.get(id) ?? null;
 /** El artículo gratuito de un tipo: lo que se ve sin haber comprado nada. */
 export const porDefecto = (tipo) => COSMETICOS.find((c) => c.tipo === tipo && c.porDefecto);
 
-/** Si el perfil puede llevar ese artículo: es el gratuito o lo ha comprado. */
+/** Si el perfil puede llevar ese artículo: es gratuito o lo ha comprado. */
 export const loTiene = (perfil, id) => {
   const c = cosmeticoPorId(id);
-  return !!c && (c.porDefecto || (perfil?.cosmeticos ?? []).includes(id));
+  return !!c && (c.precio === 0 || (perfil?.cosmeticos ?? []).includes(id));
 };
 
 /**
@@ -127,8 +189,11 @@ for (const tipo of Object.values(TIPO_COSMETICO)) {
 for (const c of COSMETICOS) {
   if (!/^[a-z_]+$/.test(c.id)) throw new Error(`COSMETICOS: id «${c.id}» no válido`);
   if (!Object.values(TIPO_COSMETICO).includes(c.tipo)) throw new Error(`COSMETICOS: ${c.id} tiene un tipo desconocido`);
-  if (c.porDefecto ? c.precio !== 0 : !(Number.isInteger(c.precio) && c.precio > 0)) {
-    throw new Error(`COSMETICOS: ${c.id} tiene un precio que no cuadra con ser ${c.porDefecto ? 'gratuito' : 'de pago'}`);
+  // Un 0 escrito sin querer regalaría el artículo: sin `porDefecto` ni
+  // `gratis`, el precio tiene que ser positivo.
+  const gratuito = c.porDefecto || c.gratis;
+  if (gratuito ? c.precio !== 0 : !(Number.isInteger(c.precio) && c.precio > 0)) {
+    throw new Error(`COSMETICOS: ${c.id} tiene un precio que no cuadra con ser ${gratuito ? 'gratuito' : 'de pago'}`);
   }
   if (!c.arte) throw new Error(`COSMETICOS: ${c.id} sin arte`);
   if (c.tipo === T.TAPETE && !c.medallon) throw new Error(`COSMETICOS: ${c.id} es un tapete sin medallón`);

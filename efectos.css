@@ -356,6 +356,15 @@
 }
 .pres-retrato > img, .pres-retrato > svg { display: block; width: 100%; height: 100%; object-fit: cover; }
 .pres-retrato > svg { opacity: .35; }
+/* Tu retrato de la tienda tapa la portada del mazo; el del rival, sólo en un
+   duelo, que es cuando existe `--retrato-rival`. Sin variable no hay imagen y
+   se sigue viendo la portada. */
+.pres-retrato::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  /* Ampliado: los retratos traen una viñeta redonda y a sangre se veía su arco. */
+  background: var(--retrato-propio, none) center 28% / 130% auto no-repeat;
+}
+.pres-mitad.rival .pres-retrato::after { background-image: var(--retrato-rival, none); }
 /* El estandarte cuelga por dentro de cada mitad, con el emblema del clado. */
 .pres-estandarte {
   position: absolute; width: min(22vw, 120px); aspect-ratio: 1 / 2.5;
