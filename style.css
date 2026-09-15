@@ -1350,6 +1350,18 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   filter: drop-shadow(0 6px 10px rgba(0,0,0,.6));
 }
 .tienda-vista.tienda-retrato { width: 86%; border-radius: 0; box-shadow: none; }
+/* El pack: el sobre dibujado —el mismo de la pantalla de sobres— con el
+   número encima en una chapa. */
+.tienda-vista.tienda-pack {
+  position: relative; width: 62%; aspect-ratio: 2 / 3; border-radius: 0; box-shadow: none;
+  background: url('assets/piel/sobre.webp') center / 100% 100% no-repeat;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,.6));
+}
+.tienda-pack b {
+  position: absolute; right: -8px; bottom: 6px; padding: 2px 7px; border-radius: 10px;
+  font-family: 'Terralis', 'Cinzel', Georgia, serif; font-size: 14px; color: var(--acento-vivo);
+  background: #120d09; box-shadow: 0 0 0 1px var(--borde-fuerte);
+}
 
 /* El retrato del jugador (src/ui/tienda.js): el aro de latón encima y la cara
    en un círculo debajo. `--retrato` la pone quien lo usa; el hueco del aro es

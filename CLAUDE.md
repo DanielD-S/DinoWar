@@ -1442,9 +1442,16 @@ carta, un mazo ni lo rápido que se progresa.
   en todas partes, sólo sobre la ventana de la ilustración (`carta.css`). A
   opacidad .3 no se veía; va a .55 con `color-dodge` y `isolation` en la
   ventana, que sin ella se mezclaría con el tablero.
-- **Los packs de sobres** serán varios sobres seguidos al precio de uno por
-  sobre, sin descuento: con descuento acelerarían el progreso. Si algún día
-  hay dinero real, no se venden por dinero.
+- **Los packs de sobres** son varios sobres seguidos al precio de uno por
+  sobre, sin descuento: con descuento acelerarían el progreso (`PACKS` y
+  `precioDePack` en `cosmeticos.js`, con su test; NO en `coleccion.js`, que va
+  dentro de la Edge Function). NO son cosméticos ni están
+  en el catálogo: la tienda sólo dice cuántos y `abrirPack()` en `meta.js`
+  pide un sobre al servidor CADA vez, con la ceremonia de cada uno y una sola
+  rejilla al final. Así la Edge Function no sabe de packs —no hay que
+  re-empaquetar ni re-anclar— y si un sobre falla a medias, los anteriores
+  están pagados y abiertos y se enseñan con el motivo. Si algún día hay
+  dinero real, no se venden por dinero.
 
 ## Instalarlo como app
 

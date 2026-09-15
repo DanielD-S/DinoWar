@@ -26,6 +26,8 @@
 // de todos sin comprarlos, pero no son lo que se ve por defecto. Hoy sólo los
 // retratos, que se estrenan con dos personas para elegir.
 
+import { ECONOMIA } from './coleccion.js';
+
 export const TIPO_COSMETICO = Object.freeze({
   DORSO: 'DORSO',
   TAPETE: 'TAPETE',
@@ -173,6 +175,19 @@ export const COSMETICOS = Object.freeze([
     precio: 350, arte: tienda('retrato_trex'),
   }),
 ]);
+
+/**
+ * Los packs de sobres de la tienda: varios seguidos, uno tras otro, y cada uno
+ * al precio de siempre. SIN descuento, y es una regla del autor y no una
+ * tacañería: un pack más barato por sobre acelera la colección de quien tiene
+ * más monedas, y la tienda no puede dar ventaja. Lo vigila test/tienda.test.js.
+ *
+ * Viven aquí y no en coleccion.js porque ese fichero va dentro de la Edge
+ * Function: tocarlo obliga a re-empaquetar, re-anclar y desplegar, y los packs
+ * son cosa del navegador —el servidor cobra sobre a sobre y no sabe de ellos—.
+ */
+export const PACKS = Object.freeze([3, 5, 10]);
+export const precioDePack = (n) => n * ECONOMIA.precioSobre;
 
 const POR_ID = new Map(COSMETICOS.map((c) => [c.id, c]));
 

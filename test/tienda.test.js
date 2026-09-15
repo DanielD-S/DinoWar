@@ -9,9 +9,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import {
-  COSMETICOS, TIPO_COSMETICO, porDefecto, loTiene, equipadoDe,
+  COSMETICOS, TIPO_COSMETICO, PACKS, precioDePack, porDefecto, loTiene, equipadoDe,
 } from '../src/data/cosmeticos.js';
 import { SALIDA } from '../tools/generar-cartas.mjs';
+import { ECONOMIA } from '../src/data/coleccion.js';
 
 test('Cada tipo tiene su artículo gratuito y el resto cuesta dinomonedas', () => {
   for (const tipo of Object.values(TIPO_COSMETICO)) {
@@ -74,6 +75,16 @@ test('Las legendarias y las de jefe llevan la lámina holográfica, con la ilust
   const css = readFileSync('carta.css', 'utf8');
   assert.match(css, /\.con-marco\.rareza-LEGENDARIO \.c-arte::before,\s*\.con-marco\.jefe \.c-arte::before \{[^}]*holografico\.webp/);
   assert.match(css, /\.con-marco\.jefe \.c-arte \{ overflow: hidden; isolation: isolate; \}/);
+});
+
+test('Los packs de sobres no llevan descuento: n sobres cuestan n veces uno', () => {
+  assert.ok(PACKS.length > 0);
+  for (const n of PACKS) {
+    assert.ok(Number.isInteger(n) && n > 1, `un pack de ${n} no es un pack`);
+    assert.equal(precioDePack(n), n * ECONOMIA.precioSobre, `el pack de ${n} sale más barato por sobre`);
+  }
+  // Y los packs no son cosméticos: no entran en el catálogo que cobra el servidor.
+  assert.ok(!COSMETICOS.some((c) => /pack/.test(c.id)));
 });
 
 test('El SQL del catálogo lleva exactamente los precios del código', () => {
