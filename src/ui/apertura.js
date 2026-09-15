@@ -48,6 +48,130 @@ function recortes() {
 const reducido = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// ------------------------------------------------------------------ vídeo
+// Una legendaria puede traer un vídeo corto del animal —assets/video/<id>—
+// que se enseña a pantalla entera antes de voltear la carta. Lo usan la
+// ceremonia del sobre y la carta de jefe al reclamarla en la Cuenca. Una carta
+// sin vídeo no falla: el `error` la deja fuera y la carta sale sin más.
+
+/** Empieza a bajar el vídeo de una carta. `alFallar` se llama si no existe. */
+export function precargarVideo(id, alFallar = () => {}) {
+  const v = document.createElement('video');
+  v.muted = true;
+  v.playsInline = true;
+  v.preload = 'auto';
+  v.disablePictureInPicture = true;
+  v.disableRemotePlayback = true;
+  v.controls = false;
+  v.src = `assets/video/${id}.mp4`;
+  v.addEventListener('error', alFallar, { once: true });
+  return v;
+}
+
+/**
+ * La capa del vídeo sobre `raiz`, hasta que el jugador la toca. Resuelve sin
+ * enseñar nada si el vídeo no llega o `cancelado()` dice que ya no toca.
+ */
+export async function mostrarVideo({ raiz, video: v, binomial, dino = true, cancelado = () => false }) {
+  const capa = document.createElement('div');
+  capa.className = 'apertura-video';
+  const marco = document.createElement('div');
+  marco.className = 'apertura-video-marco';
+  // En vertical el plano apaisado no llena la pantalla: se enseña entero
+  // como banda y, detrás, el mismo vídeo ampliado, desenfocado y oscuro
+  // rellena arriba y abajo, como hacen los reproductores. En apaisado no
+  // hace falta —el plano cubre— y la copia no se crea, que son dos
+  // decodificaciones a la vez y en un móvil viejo se notan.
+  const vertical = window.matchMedia?.('(orientation: portrait)').matches;
+  let fondo = null;
+  if (vertical) {
+    fondo = document.createElement('video');
+    fondo.className = 'apertura-video-fondo';
+    fondo.muted = true;
+    fondo.playsInline = true;
+    fondo.disablePictureInPicture = true;
+    fondo.src = v.src;
+    marco.appendChild(fondo);
+  }
+  v.className = 'apertura-video-principal';
+  marco.appendChild(v);
+  const pie = document.createElement('div');
+  pie.className = 'apertura-video-pie';
+  const nombre = document.createElement('div');
+  nombre.className = `apertura-video-nombre${dino ? '' : ' recto'}`;
+  nombre.textContent = binomial;
+  const cerrar = document.createElement('button');
+  cerrar.type = 'button';
+  cerrar.className = 'apertura-video-cerrar';
+  cerrar.textContent = 'Ver la carta';
+  pie.append(nombre, cerrar);
+  capa.append(marco, pie);
+  raiz.appendChild(capa);
+
+  // Con tope: un vídeo que no llega no para la ceremonia.
+  await new Promise((listo) => {
+    if (v.readyState >= 3) { listo(); return; }
+    v.addEventListener('canplay', listo, { once: true });
+    v.addEventListener('error', listo, { once: true });
+    setTimeout(listo, 2500);
+  });
+  // Que la carta anterior termine de irse antes de que el fondo oscurezca:
+  // si no, el vídeo aparecía de golpe encima de una carta a medio vuelo.
+  await esperar(ENTRADA_VIDEO);
+  let reproduce = !cancelado() && !v.error && v.readyState >= 3;
+  if (reproduce) {
+    // Reflujo forzado y no requestAnimationFrame: con la pestaña en segundo
+    // plano el fotograma no llega y la capa se quedaba invisible con el
+    // vídeo ya corriendo debajo.
+    capa.getBoundingClientRect();
+    capa.classList.add('visible');
+    sonido('joya');
+    try { await v.play(); } catch { reproduce = false; }
+    if (reproduce && fondo) {
+      // A la par que el principal. Si no arranca se queda como fotograma
+      // quieto detrás, que sigue siendo mejor fondo que el negro: Chrome
+      // corta el `play()` de un vídeo sin audio en cuanto la pestaña pasa
+      // a segundo plano, y quitarlo por eso dejaba las bandas negras.
+      fondo.currentTime = v.currentTime;
+      fondo.play().catch(() => {});
+    }
+  }
+  if (reproduce) {
+    // La carta sale cuando el jugador CIERRA el vídeo, no cuando acaba:
+    // al terminar se queda en el último fotograma —las fauces— y espera
+    // un toque, en la capa o en el botón. Quien no quiera verlo entero
+    // toca antes.
+    await new Promise((fin) => {
+      capa.addEventListener('pointerdown', fin, { once: true });
+    });
+    v.pause();
+    fondo?.pause();
+    capa.classList.add('cierra');
+    capa.classList.remove('visible');
+    await esperar(SALIDA_VIDEO);
+  }
+  capa.remove();
+}
+
+/**
+ * El vídeo de una carta suelta, fuera del sobre: se pide, se enseña y se va.
+ * Si no existe, resuelve enseguida sin enseñar nada. Con movimiento reducido
+ * tampoco se enseña, como la ceremonia.
+ */
+export async function videoDeCarta({ raiz, id, binomial, dino = true }) {
+  if (reducido() || !raiz || !id) return;
+  let falta = false;
+  const v = precargarVideo(id, () => { falta = true; });
+  // Un 404 llega en un instante; un vídeo real tarda más en decir «puedo».
+  await new Promise((listo) => {
+    v.addEventListener('canplay', listo, { once: true });
+    v.addEventListener('error', listo, { once: true });
+    setTimeout(listo, 2500);
+  });
+  if (falta || v.error) return;
+  await mostrarVideo({ raiz, video: v, binomial, dino });
+}
+
 /**
  * @param {HTMLElement} contenedor  donde se pinta; se vacía al terminar
  * @param {Array<{html: string, rareza: string, binomial: string, dino: boolean,
@@ -155,16 +279,7 @@ export function ceremoniaDeSobre(contenedor, cartas) {
     const videos = new Map();
     for (const c of cartas) {
       if (c.rareza !== 'LEGENDARIO' || !c.dino || !c.id || videos.has(c.id)) continue;
-      const v = document.createElement('video');
-      v.muted = true;
-      v.playsInline = true;
-      v.preload = 'auto';
-      v.disablePictureInPicture = true;
-      v.disableRemotePlayback = true;
-      v.controls = false;
-      v.src = `assets/video/${c.id}.mp4`;
-      v.addEventListener('error', () => videos.delete(c.id), { once: true });
-      videos.set(c.id, v);
+      videos.set(c.id, precargarVideo(c.id, () => videos.delete(c.id)));
     }
     let presentando = false;
 
@@ -172,84 +287,7 @@ export function ceremoniaDeSobre(contenedor, cartas) {
       const v = videos.get(c.id);
       if (!v) return;
       presentando = true;
-      const capa = document.createElement('div');
-      capa.className = 'apertura-video';
-      const marco = document.createElement('div');
-      marco.className = 'apertura-video-marco';
-      // En vertical el plano apaisado no llena la pantalla: se enseña entero
-      // como banda y, detrás, el mismo vídeo ampliado, desenfocado y oscuro
-      // rellena arriba y abajo, como hacen los reproductores. En apaisado no
-      // hace falta —el plano cubre— y la copia no se crea, que son dos
-      // decodificaciones a la vez y en un móvil viejo se notan.
-      const vertical = window.matchMedia?.('(orientation: portrait)').matches;
-      let fondo = null;
-      if (vertical) {
-        fondo = document.createElement('video');
-        fondo.className = 'apertura-video-fondo';
-        fondo.muted = true;
-        fondo.playsInline = true;
-        fondo.disablePictureInPicture = true;
-        fondo.src = v.src;
-        marco.appendChild(fondo);
-      }
-      v.className = 'apertura-video-principal';
-      marco.appendChild(v);
-      const pie = document.createElement('div');
-      pie.className = 'apertura-video-pie';
-      const nombre = document.createElement('div');
-      nombre.className = `apertura-video-nombre${c.dino ? '' : ' recto'}`;
-      nombre.textContent = c.binomial;
-      const cerrar = document.createElement('button');
-      cerrar.type = 'button';
-      cerrar.className = 'apertura-video-cerrar';
-      cerrar.textContent = 'Ver la carta';
-      pie.append(nombre, cerrar);
-      capa.append(marco, pie);
-      raiz.appendChild(capa);
-
-      // Con tope: un vídeo que no llega no para la ceremonia.
-      await new Promise((listo) => {
-        if (v.readyState >= 3) { listo(); return; }
-        v.addEventListener('canplay', listo, { once: true });
-        v.addEventListener('error', listo, { once: true });
-        setTimeout(listo, 2500);
-      });
-      // Que la carta anterior termine de irse antes de que el fondo oscurezca:
-      // si no, el vídeo aparecía de golpe encima de una carta a medio vuelo.
-      await esperar(ENTRADA_VIDEO);
-      let reproduce = !acabado && !v.error && v.readyState >= 3;
-      if (reproduce) {
-        // Reflujo forzado y no requestAnimationFrame: con la pestaña en segundo
-        // plano el fotograma no llega y la capa se quedaba invisible con el
-        // vídeo ya corriendo debajo.
-        capa.getBoundingClientRect();
-        capa.classList.add('visible');
-        sonido('joya');
-        try { await v.play(); } catch { reproduce = false; }
-        if (reproduce && fondo) {
-          // A la par que el principal. Si no arranca se queda como fotograma
-          // quieto detrás, que sigue siendo mejor fondo que el negro: Chrome
-          // corta el `play()` de un vídeo sin audio en cuanto la pestaña pasa
-          // a segundo plano, y quitarlo por eso dejaba las bandas negras.
-          fondo.currentTime = v.currentTime;
-          fondo.play().catch(() => {});
-        }
-      }
-      if (reproduce) {
-        // La carta sale cuando el jugador CIERRA el vídeo, no cuando acaba:
-        // al terminar se queda en el último fotograma —las fauces— y espera
-        // un toque, en la capa o en el botón. Quien no quiera verlo entero
-        // toca antes.
-        await new Promise((fin) => {
-          capa.addEventListener('pointerdown', fin, { once: true });
-        });
-        v.pause();
-        fondo?.pause();
-        capa.classList.add('cierra');
-        capa.classList.remove('visible');
-        await esperar(SALIDA_VIDEO);
-      }
-      capa.remove();
+      await mostrarVideo({ raiz, video: v, binomial: c.binomial, dino: c.dino, cancelado: () => acabado });
       presentando = false;
     }
 
