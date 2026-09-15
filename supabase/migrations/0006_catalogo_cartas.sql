@@ -175,7 +175,10 @@ insert into public.catalogo_cartas (card_id, tipo, rareza, copias_max, valor_fus
   ('humedal', 'BIOMASA', 'EPICO', 2, 35, false),
   ('manantial', 'BIOMASA', 'LEGENDARIO', 1, 100, false),
   ('jefe_saurophaganax', 'DINOSAURIO', 'LEGENDARIO', 1, 100, true),
-  ('jefe_barosaurus', 'DINOSAURIO', 'LEGENDARIO', 1, 100, true)
+  ('jefe_barosaurus', 'DINOSAURIO', 'LEGENDARIO', 1, 100, true),
+  ('jefe_supersaurus', 'DINOSAURIO', 'LEGENDARIO', 1, 100, true),
+  ('jefe_hesperosaurus', 'DINOSAURIO', 'LEGENDARIO', 1, 100, true),
+  ('jefe_harpactognathus', 'DINOSAURIO', 'LEGENDARIO', 1, 100, true)
 on conflict (card_id) do update set
   tipo = excluded.tipo, rareza = excluded.rareza,
   copias_max = excluded.copias_max, valor_fusion = excluded.valor_fusion,
@@ -451,6 +454,9 @@ insert into public.catalogo_cosmeticos (id, tipo, precio, por_defecto, exclusivo
   ('retrato_trex', 'RETRATO', 350, false, false),
   ('retrato_saurophaganax', 'RETRATO', 0, false, true),
   ('retrato_barosaurus', 'RETRATO', 0, false, true),
+  ('retrato_supersaurus', 'RETRATO', 0, false, true),
+  ('retrato_hesperosaurus', 'RETRATO', 0, false, true),
+  ('retrato_harpactognathus', 'RETRATO', 0, false, true),
   ('titulo_ninguno', 'TITULO', 0, true, false),
   ('titulo_duelista', 'TITULO', 0, false, true),
   ('titulo_asaltante', 'TITULO', 0, false, true),
@@ -495,6 +501,9 @@ delete from public.catalogo_cosmeticos where id not in (
   'retrato_trex',
   'retrato_saurophaganax',
   'retrato_barosaurus',
+  'retrato_supersaurus',
+  'retrato_hesperosaurus',
+  'retrato_harpactognathus',
   'titulo_ninguno',
   'titulo_duelista',
   'titulo_asaltante',
@@ -612,7 +621,10 @@ delete from public.catalogo_cartas where card_id not in (
   'humedal',
   'manantial',
   'jefe_saurophaganax',
-  'jefe_barosaurus'
+  'jefe_barosaurus',
+  'jefe_supersaurus',
+  'jefe_hesperosaurus',
+  'jefe_harpactognathus'
 );
 
 insert into public.catalogo_economia

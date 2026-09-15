@@ -1331,6 +1331,52 @@ export const CARTAS_DE_JEFE = Object.freeze({
       + 'saurópodo de la Morrison llegaba.',
     formacion: 'Formación Morrison', edad: 'Kimmeridgiense–Titoniense (~155–150 Ma)',
   }),
+  // Los tres de la segunda hornada (15-09-2026), también de la Morrison y
+  // ninguno en el set. Verificados en PBDB y GBIF como géneros aceptados.
+  jefe_supersaurus: Object.freeze({
+    id: 'jefe_supersaurus',
+    tipo: TIPO.DINOSAURIO, clado: CLADO.SAUROPODO, rareza: RAREZA.LEGENDARIO,
+    binomial: 'Supersaurus vivianae',
+    coste: 4, ataque: 3, vida: 14,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Sombra del gigante',
+    rasgoTexto: 'Mientras esté en juego, tus saurópodos ganan +2 de Vida.',
+    mecanica: Object.freeze({ aura: { clado: CLADO.SAUROPODO, vida: 2 } }),
+    evidencia: 'ESTABLECIDO',
+    nota: 'Diplodócido de la Morrison que compite por el título de dinosaurio más '
+      + 'largo: más de treinta metros estimados a partir de unas vértebras y una '
+      + 'escápula enormes.',
+    formacion: 'Formación Morrison', edad: 'Kimmeridgiense–Titoniense (~155–145 Ma)',
+  }),
+  jefe_hesperosaurus: Object.freeze({
+    id: 'jefe_hesperosaurus',
+    tipo: TIPO.DINOSAURIO, clado: CLADO.TIREOFORO, rareza: RAREZA.LEGENDARIO,
+    binomial: 'Hesperosaurus mjosi',
+    coste: 4, ataque: 3, vida: 10,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Muralla viva',
+    rasgoTexto: 'Devuelve 2 de daño a quien lo hiera en combate, y mientras esté en juego tus tireóforos ganan +1 de Vida.',
+    mecanica: Object.freeze({ espinas: 2, aura: { clado: CLADO.TIREOFORO, vida: 1 } }),
+    evidencia: 'ESTABLECIDO',
+    nota: 'Estegosaurio de Wyoming, algo más antiguo que Stegosaurus, con placas '
+      + 'más bajas y anchas y un cráneo corto y alto.',
+    formacion: 'Formación Morrison', edad: 'Kimmeridgiense (~157–152 Ma)',
+  }),
+  jefe_harpactognathus: Object.freeze({
+    id: 'jefe_harpactognathus',
+    tipo: TIPO.DINOSAURIO, clado: CLADO.PTEROSAURIO, rareza: RAREZA.LEGENDARIO,
+    binomial: 'Harpactognathus gentryii',
+    coste: 3, ataque: 5, vida: 5,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Sombra del río',
+    rasgoTexto: 'Cuando entra en juego tu rival pierde 2 cartas del mazo y robas 1.',
+    mecanica: Object.freeze({ entrada: { mueleRival: 2, roba: 1 } }),
+    evidencia: 'INFERIDO',
+    nota: 'Uno de los mayores pterosaurios de la Morrison, y se conoce sólo por '
+      + 'parte del hocico, con una cresta baja y dientes largos. Todo lo demás es '
+      + 'reconstrucción.',
+    formacion: 'Formación Morrison', edad: 'Kimmeridgiense–Titoniense (~152–145 Ma)',
+  }),
 });
 
 /** ¿Existe esta carta en algún registro? El set, las de jefe o las de economía. */

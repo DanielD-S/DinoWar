@@ -49,6 +49,7 @@ export const PIEZAS = Object.freeze([
   'estandarte_helecho', 'cinta_helecho',
   'medallon_hell_creek', 'medallon_kem_kem', 'medallon_solnhofen', 'medallon_excavacion',
   'retrato_saurophaganax', 'retrato_barosaurus', 'dorso_cazador', 'estandarte_campeon', 'cinta_campeon',
+  'retrato_supersaurus', 'retrato_hesperosaurus', 'retrato_harpactognathus',
 ]);
 
 const T = TIPO_COSMETICO;

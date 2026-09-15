@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: 9b4c33d208789793
+// huella: d7c7d2bca7ff9e4c
 //
 // Lleva dentro estos 24 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -1702,6 +1702,62 @@ var CARTAS_DE_JEFE = Object.freeze({
     nota: "Diplod\xF3cido de cuello desmesurado incluso para su familia: v\xE9rtebras cervicales alargadas que lo hac\xEDan capaz de ramonear donde ning\xFAn otro saur\xF3podo de la Morrison llegaba.",
     formacion: "Formaci\xF3n Morrison",
     edad: "Kimmeridgiense\u2013Titoniense (~155\u2013150 Ma)"
+  }),
+  // Los tres de la segunda hornada (15-09-2026), también de la Morrison y
+  // ninguno en el set. Verificados en PBDB y GBIF como géneros aceptados.
+  jefe_supersaurus: Object.freeze({
+    id: "jefe_supersaurus",
+    tipo: TIPO.DINOSAURIO,
+    clado: CLADO.SAUROPODO,
+    rareza: RAREZA.LEGENDARIO,
+    binomial: "Supersaurus vivianae",
+    coste: 4,
+    ataque: 3,
+    vida: 14,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Sombra del gigante",
+    rasgoTexto: "Mientras est\xE9 en juego, tus saur\xF3podos ganan +2 de Vida.",
+    mecanica: Object.freeze({ aura: { clado: CLADO.SAUROPODO, vida: 2 } }),
+    evidencia: "ESTABLECIDO",
+    nota: "Diplod\xF3cido de la Morrison que compite por el t\xEDtulo de dinosaurio m\xE1s largo: m\xE1s de treinta metros estimados a partir de unas v\xE9rtebras y una esc\xE1pula enormes.",
+    formacion: "Formaci\xF3n Morrison",
+    edad: "Kimmeridgiense\u2013Titoniense (~155\u2013145 Ma)"
+  }),
+  jefe_hesperosaurus: Object.freeze({
+    id: "jefe_hesperosaurus",
+    tipo: TIPO.DINOSAURIO,
+    clado: CLADO.TIREOFORO,
+    rareza: RAREZA.LEGENDARIO,
+    binomial: "Hesperosaurus mjosi",
+    coste: 4,
+    ataque: 3,
+    vida: 10,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Muralla viva",
+    rasgoTexto: "Devuelve 2 de da\xF1o a quien lo hiera en combate, y mientras est\xE9 en juego tus tire\xF3foros ganan +1 de Vida.",
+    mecanica: Object.freeze({ espinas: 2, aura: { clado: CLADO.TIREOFORO, vida: 1 } }),
+    evidencia: "ESTABLECIDO",
+    nota: "Estegosaurio de Wyoming, algo m\xE1s antiguo que Stegosaurus, con placas m\xE1s bajas y anchas y un cr\xE1neo corto y alto.",
+    formacion: "Formaci\xF3n Morrison",
+    edad: "Kimmeridgiense (~157\u2013152 Ma)"
+  }),
+  jefe_harpactognathus: Object.freeze({
+    id: "jefe_harpactognathus",
+    tipo: TIPO.DINOSAURIO,
+    clado: CLADO.PTEROSAURIO,
+    rareza: RAREZA.LEGENDARIO,
+    binomial: "Harpactognathus gentryii",
+    coste: 3,
+    ataque: 5,
+    vida: 5,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Sombra del r\xEDo",
+    rasgoTexto: "Cuando entra en juego tu rival pierde 2 cartas del mazo y robas 1.",
+    mecanica: Object.freeze({ entrada: { mueleRival: 2, roba: 1 } }),
+    evidencia: "INFERIDO",
+    nota: "Uno de los mayores pterosaurios de la Morrison, y se conoce s\xF3lo por parte del hocico, con una cresta baja y dientes largos. Todo lo dem\xE1s es reconstrucci\xF3n.",
+    formacion: "Formaci\xF3n Morrison",
+    edad: "Kimmeridgiense\u2013Titoniense (~152\u2013145 Ma)"
   })
 });
 var existeCarta = (cardId) => Boolean(
@@ -3956,6 +4012,106 @@ var JEFES = Object.freeze({
       ["biomasa", 5]
     ]),
     nota: "No pega fuerte. Aguanta, que es peor."
+  }),
+  // La segunda hornada (15-09-2026). Cada uno con su mazo temático de la
+  // Morrison y su forma de pelear: un muro de Vida, uno que devuelve daño y
+  // uno que muele el mazo desde el aire.
+  supersaurus: Object.freeze({
+    id: "supersaurus",
+    nombre: "Supersaurus vivianae",
+    titulo: "El gigante del horizonte",
+    vidaMaxima: 7e3,
+    recompensa: "jefe_supersaurus",
+    mazo: Object.freeze([
+      ["camarasaurus", 3],
+      ["diplodocus", 3],
+      ["apatosaurus", 3],
+      ["athenar", 3],
+      ["atlasaurus", 2],
+      ["argentinosaurus", 2],
+      ["mamenchisaurus", 3],
+      ["amargasaurus", 3],
+      ["plateosauravus", 3],
+      ["antarctosaurus", 1],
+      ["brachiosaurus", 1],
+      ["dryosaurus", 3],
+      ["gregarismo", 3],
+      ["rebrote", 3],
+      ["gastrolitos", 2],
+      ["neumaticidad", 2],
+      ["crecimiento_acelerado", 1],
+      ["bosque", 1],
+      ["sabana", 1],
+      ["competencia", 2],
+      ["frutos", 2],
+      ["biomasa", 5],
+      ["araucarias", 3]
+    ]),
+    nota: "Es la Vida m\xE1s alta de la cuenca. No hay atajo: hay que tirarlo entre todos."
+  }),
+  hesperosaurus: Object.freeze({
+    id: "hesperosaurus",
+    nombre: "Hesperosaurus mjosi",
+    titulo: "La muralla de placas",
+    vidaMaxima: 5500,
+    recompensa: "jefe_hesperosaurus",
+    mazo: Object.freeze([
+      ["stegosaurus", 3],
+      ["kentrosaurus", 3],
+      ["loricatosaurus", 3],
+      ["invictarx", 3],
+      ["gargoyleosaurus", 3],
+      ["nodosaurus", 2],
+      ["euoplocephalus", 3],
+      ["bienosaurus", 3],
+      ["ankylosaurus", 1],
+      ["dryosaurus", 3],
+      ["camarasaurus", 2],
+      ["gregarismo", 3],
+      ["trampa", 3],
+      ["fractura", 2],
+      ["gastrolitos", 2],
+      ["rebrote", 3],
+      ["competencia", 2],
+      ["mortandad", 1],
+      ["aridez", 1],
+      ["nido", 2],
+      ["biomasa", 5],
+      ["cicadas", 2]
+    ]),
+    nota: "Cada golpe que le das te lo devuelve. Pega con criaturas que aguanten."
+  }),
+  harpactognathus: Object.freeze({
+    id: "harpactognathus",
+    nombre: "Harpactognathus gentryii",
+    titulo: "La sombra del r\xEDo",
+    vidaMaxima: 4500,
+    recompensa: "jefe_harpactognathus",
+    mazo: Object.freeze([
+      ["pteranodon", 3],
+      ["huaxiadraco", 3],
+      ["quetzalcoatlus", 2],
+      ["eosinopteryx", 3],
+      ["troodon", 3],
+      ["ornitholestes", 3],
+      ["dromaeosaurus", 3],
+      ["ceratosaurus", 3],
+      ["allosaurus", 2],
+      ["suchomimus", 1],
+      ["riparovenator", 2],
+      ["trampa", 3],
+      ["carrona", 1],
+      ["lago", 2],
+      ["insectos", 3],
+      ["canal", 1],
+      ["inundacion", 2],
+      ["gregarismo", 3],
+      ["fractura", 2],
+      ["neumaticidad", 2],
+      ["biomasa", 5],
+      ["equisetos", 3]
+    ]),
+    nota: "Poca Vida y muy r\xE1pido: te vac\xEDa el mazo antes de que lo alcances."
   })
 });
 var CALENDARIO = Object.freeze([
@@ -3994,6 +4150,62 @@ var CALENDARIO = Object.freeze([
     dura: 2,
     titulo: "Crecida del canal",
     texto: "El r\xEDo se desborda: mientras dure, todo el mundo pelea en la llanura de inundaci\xF3n."
+  }),
+  // La segunda vuelta del calendario, con los tres jefes nuevos. Las fechas de
+  // arriba no se tocan: las tribus que ya existen siguen en los mismos días.
+  Object.freeze({
+    id: "caza_supersaurus",
+    tipo: TIPO_EVENTO.JEFE,
+    jefe: "supersaurus",
+    dia: 14,
+    dura: 5,
+    titulo: "El gigante del horizonte",
+    texto: "Cinco d\xEDas contra el saur\xF3podo m\xE1s largo de la Morrison. No pega mucho, pero su Vida no se acaba nunca."
+  }),
+  Object.freeze({
+    id: "lluvias_cuenca",
+    tipo: TIPO_EVENTO.CLIMA,
+    clima: "bosque",
+    dia: 19,
+    dura: 2,
+    titulo: "Llegan las lluvias",
+    texto: "Dos d\xEDas de estaci\xF3n de lluvias: los saur\xF3podos curan una herida al final de cada turno."
+  }),
+  Object.freeze({
+    id: "muralla_hesperosaurus",
+    tipo: TIPO_EVENTO.JEFE,
+    jefe: "hesperosaurus",
+    dia: 21,
+    dura: 5,
+    titulo: "La muralla de placas",
+    texto: "Cinco d\xEDas contra un estegosaurio que devuelve cada golpe. Hay que pegarle con criaturas que aguanten."
+  }),
+  Object.freeze({
+    id: "monzon_cuenca",
+    tipo: TIPO_EVENTO.CLIMA,
+    clima: "sabana",
+    dia: 26,
+    dura: 2,
+    titulo: "El monz\xF3n de verano",
+    texto: "Dos d\xEDas de monz\xF3n: los dos jugadores ganan 1 de Biomasa m\xE1s cada turno."
+  }),
+  Object.freeze({
+    id: "sombra_harpactognathus",
+    tipo: TIPO_EVENTO.JEFE,
+    jefe: "harpactognathus",
+    dia: 28,
+    dura: 5,
+    titulo: "La sombra del r\xEDo",
+    texto: "Cinco d\xEDas contra un pterosaurio que vac\xEDa tu mazo desde el aire. Poca Vida y mucha prisa."
+  }),
+  Object.freeze({
+    id: "crecida_verano",
+    tipo: TIPO_EVENTO.CLIMA,
+    clima: "llanura",
+    dia: 33,
+    dura: 2,
+    titulo: "La crecida de verano",
+    texto: "Dos d\xEDas de crecida: cada jugador puede cambiar una carta de su mano por otra del mazo, una vez por turno."
   })
 ]);
 var CICLO = CALENDARIO.reduce((n, e) => Math.max(n, e.dia + e.dura), 0);
@@ -4129,6 +4341,9 @@ var VOCABULARIO = Object.freeze([
   // `reclamar_jefe` en SQL (0028) cuando la carta entra por primera vez.
   "jefe:saurophaganax",
   "jefe:barosaurus",
+  "jefe:supersaurus",
+  "jefe:hesperosaurus",
+  "jefe:harpactognathus",
   "cartasJefe"
   // cartas de jefe DISTINTAS que tienes
 ]);
@@ -5008,11 +5223,36 @@ var LOGROS = Object.freeze([
     { tipo: RECOMPENSA.COSMETICO, id: "retrato_barosaurus" }
   ),
   L(
+    "trofeo_supersaurus",
+    "El horizonte que camina",
+    "Reclama 1 carta del Supersaurus",
+    "jefe:supersaurus",
+    1,
+    { tipo: RECOMPENSA.COSMETICO, id: "retrato_supersaurus" }
+  ),
+  L(
+    "trofeo_hesperosaurus",
+    "Detr\xE1s de la muralla",
+    "Reclama 1 carta del Hesperosaurus",
+    "jefe:hesperosaurus",
+    1,
+    { tipo: RECOMPENSA.COSMETICO, id: "retrato_hesperosaurus" }
+  ),
+  L(
+    "trofeo_harpactognathus",
+    "La sombra del r\xEDo",
+    "Reclama 1 carta del Harpactognathus",
+    "jefe:harpactognathus",
+    1,
+    { tipo: RECOMPENSA.COSMETICO, id: "retrato_harpactognathus" }
+  ),
+  // Con cinco jefes el dorso pide las cinco: una vuelta entera del calendario.
+  L(
     "cazador_mayor",
     "Cazador mayor",
-    "Reclama las 2 cartas de jefe",
+    "Reclama las 5 cartas de jefe",
     "cartasJefe",
-    2,
+    5,
     { tipo: RECOMPENSA.COSMETICO, id: "dorso_cazador" }
   ),
   // Los de constancia.

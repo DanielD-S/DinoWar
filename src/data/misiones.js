@@ -75,6 +75,9 @@ export const VOCABULARIO = Object.freeze([
   // `reclamar_jefe` en SQL (0028) cuando la carta entra por primera vez.
   'jefe:saurophaganax',
   'jefe:barosaurus',
+  'jefe:supersaurus',
+  'jefe:hesperosaurus',
+  'jefe:harpactognathus',
   'cartasJefe',       // cartas de jefe DISTINTAS que tienes
 ]);
 

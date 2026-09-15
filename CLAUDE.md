@@ -1595,11 +1595,21 @@ Dicho para que nadie lo descubra tarde:
   como una victoria cualquiera. El contador `expedicionNuevos` ya existe (lo
   usa el logro de la Morrison); una misión diaria que lo mida es una línea.
 
-- **Sólo hay dos jefes, y ahora se repiten.** Que el jefe vuelva cada ciclo
-  arregla que la cuenca se quedara muerta, pero un calendario de 14 días con dos
-  cacerías es el mismo mes otra vez. Un jefe nuevo es un objeto en `JEFES` con su
-  mazo temático, su entrada en `CALENDARIO` y su carta — y `CARTAS_DE_JEFE`, que
-  vive fuera del set y se queda fuera de todas las listas.
+- **Hay cinco jefes y el calendario da la vuelta cada 35 días** (15-09-2026):
+  Saurophaganax, Barosaurus, Supersaurus, Hesperosaurus y Harpactognathus, con
+  un clima de dos días entre cacerías. Los catorce primeros días no se tocaron,
+  y por eso las tribus de menos de 35 días siguen en su vuelta:
+  `private.ciclo_de()` divide por `ciclo_dias`, así que **alargar el ciclo con
+  una tribu de más días le baja la vuelta** y su jefe de la vuelta anterior
+  aparecería otra vez muerto. Mirar `jefes` antes de volver a alargarlo.
+  Añadir otro jefe son siete sitios: `JEFES` con su mazo temático (legal, lo
+  vigila `tribu.test.js`), su evento en `CALENDARIO`, su carta en
+  `CARTAS_DE_JEFE` (fuera del set y de todas las listas), el conteo de
+  `entradas.test.js`, su logro de trofeo en `logros.js` y en `VOCABULARIO`, su
+  retrato exclusivo, y una migración con la copia nueva de
+  `private.catalogo_logros()`. Y re-empaquetar, re-anclar y desplegar, que
+  `eventos.js` y `cards.js` van dentro de la Edge Function. Las cinco cartas de
+  jefe miden entre el 57 y el 61 % con `sim/carta.mjs`.
 - **Al Duelo le faltan tres cosas de liga:** la protección al descenso (hoy
   el ELO baja en cuanto pierdes, sin las tres derrotas de margen), las
   temporadas con reinicio, y la tabla con nombre y puesto de la liga Extinción.

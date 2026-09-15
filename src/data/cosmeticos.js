@@ -197,6 +197,18 @@ export const COSMETICOS = Object.freeze([
     id: 'retrato_barosaurus', tipo: T.RETRATO, nombre: 'Barosaurus', lema: 'El gigante del río se gira a mirarte.',
     precio: 0, exclusivo: true, logro: 'trofeo_barosaurus', arte: tienda('retrato_barosaurus'),
   }),
+  Object.freeze({
+    id: 'retrato_supersaurus', tipo: T.RETRATO, nombre: 'Supersaurus', lema: 'Treinta metros de cuello bajando a mirarte.',
+    precio: 0, exclusivo: true, logro: 'trofeo_supersaurus', arte: tienda('retrato_supersaurus'),
+  }),
+  Object.freeze({
+    id: 'retrato_hesperosaurus', tipo: T.RETRATO, nombre: 'Hesperosaurus', lema: 'Placas anchas y un ojo que no se fía.',
+    precio: 0, exclusivo: true, logro: 'trofeo_hesperosaurus', arte: tienda('retrato_hesperosaurus'),
+  }),
+  Object.freeze({
+    id: 'retrato_harpactognathus', tipo: T.RETRATO, nombre: 'Harpactognathus', lema: 'El hocico de dientes que vigila el río.',
+    precio: 0, exclusivo: true, logro: 'trofeo_harpactognathus', arte: tienda('retrato_harpactognathus'),
+  }),
 
   // ----------------------------------------------------------- títulos
   // `texto` es lo que se lee bajo el nombre; el de por defecto no dice nada.

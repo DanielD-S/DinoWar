@@ -43,11 +43,17 @@ insert into public.catalogo_eventos (evento_id, tipo, dia, dura, jefe_id, vida_m
   ('caza_saurophaganax', 'JEFE', 0, 5, 'saurophaganax', 6000, 'jefe_saurophaganax', 'La caza del Saurophaganax'),
   ('sequia_cuenca', 'CLIMA', 5, 2, null, null, null, 'La cuenca se seca'),
   ('manada_barosaurus', 'JEFE', 7, 5, 'barosaurus', 5000, 'jefe_barosaurus', 'La manada de Barosaurus'),
-  ('crecida_cuenca', 'CLIMA', 12, 2, null, null, null, 'Crecida del canal');
+  ('crecida_cuenca', 'CLIMA', 12, 2, null, null, null, 'Crecida del canal'),
+  ('caza_supersaurus', 'JEFE', 14, 5, 'supersaurus', 7000, 'jefe_supersaurus', 'El gigante del horizonte'),
+  ('lluvias_cuenca', 'CLIMA', 19, 2, null, null, null, 'Llegan las lluvias'),
+  ('muralla_hesperosaurus', 'JEFE', 21, 5, 'hesperosaurus', 5500, 'jefe_hesperosaurus', 'La muralla de placas'),
+  ('monzon_cuenca', 'CLIMA', 26, 2, null, null, null, 'El monzón de verano'),
+  ('sombra_harpactognathus', 'JEFE', 28, 5, 'harpactognathus', 4500, 'jefe_harpactognathus', 'La sombra del río'),
+  ('crecida_verano', 'CLIMA', 33, 2, null, null, null, 'La crecida de verano');
 
 truncate public.catalogo_cuenca;
 insert into public.catalogo_cuenca (id, ciclo_dias, coste_asalto, asaltos_por_dia, nivel_maximo, miembros_maximo)
-values (1, 14, 150, 5, 8, 8);
+values (1, 35, 150, 5, 8, 8);
 
 truncate public.catalogo_yacimiento;
 insert into public.catalogo_yacimiento (nivel, fosiles_hora, deposito, coste_mejora) values
