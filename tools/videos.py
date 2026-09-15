@@ -102,6 +102,13 @@ def main(escribir):
     if escribir:
         DESTINO.mkdir(exist_ok=True)
 
+    # Con nombres detrás de «escribir» sólo se convierten ésos: re-codificar
+    # los nueve que ya están servidos cada vez que llega uno nuevo cambia sus
+    # bytes sin cambiar nada que se vea, y eso es ruido en el repositorio.
+    solo = {s.lower() for s in sys.argv[2:]}
+    if solo:
+        fuentes = [f for f in fuentes if f.stem.lower() in solo]
+
     ids = ids_de_cartas()
     for f in fuentes:
         # En minúsculas: la apertura pide `<id>.mp4` y el id va en minúsculas.

@@ -608,6 +608,14 @@ salía en un sobre. Las nueve legendarias con criatura lo tienen todas. Hubo un
 vídeo de relleno para las que no tenían el suyo y se quitó: el autor prefiere
 que una legendaria sin vídeo salga sin vídeo.
 
+**Las dos cartas de jefe también tienen vídeo**, y se enseña al RECLAMARLAS en
+la Cuenca, antes de la invocación: es la única vez que esa carta «sale», así
+que es su momento. La capa del vídeo es la misma que la del sobre —`mostrarVideo()`
+y `videoDeCarta()` en `apertura.js`, exportadas—; una carta sin vídeo resuelve
+en el acto porque el 404 llega antes que cualquier `canplay`.
+`python tools/videos.py escribir <ids>` convierte sólo los nombrados: sin
+nombres re-codifica los nueve y cambia sus bytes sin cambiar nada que se vea.
+
 `tools/videos.py` pasa el nombre a minúsculas y avisa si no es el `id` de
 ninguna carta: los dos primeros lotes llegaron con `Tyrannotitan.mp4` y
 `maiasaurua.mp4`, y un vídeo mal nombrado no falla, sólo no sale nunca. Los precarga al

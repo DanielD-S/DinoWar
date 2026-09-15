@@ -29,6 +29,7 @@ import { anotarRecompensa } from './perfil.js';
 import { arte } from './art.js';
 import { cartaHTML } from './render.js';
 import { invocar } from './efectos.js';
+import { videoDeCarta } from './apertura.js';
 
 const id = (s) => document.getElementById(s);
 let dom = null;
@@ -618,6 +619,9 @@ export async function pintarCuenca() {
 async function ceremoniaDeCarta(cardId) {
   const c = CARTAS_DE_JEFE[cardId];
   if (!c) return;
+  // Primero el vídeo del jefe, como el de una legendaria al salir del sobre,
+  // y al cerrarlo la invocación. Si no hay vídeo, la invocación sola.
+  await videoDeCarta({ raiz: dom.pantalla, id: cardId, binomial: c.binomial });
   await invocar({
     raiz: dom.pantalla,
     html: cartaHTML(cardId, { variante: 'visor' }),
