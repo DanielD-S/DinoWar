@@ -35,8 +35,6 @@ export const TIPO_COSMETICO = Object.freeze({
 
 const T = TIPO_COSMETICO;
 const tienda = (nombre) => `assets/piel/tienda/${nombre}.webp`;
-// Los tapetes que llegaron sin medallón propio llevan el de siempre.
-const HUELLA = 'assets/piel/simbolo_huella.webp';
 
 export const COSMETICOS = Object.freeze([
   // ------------------------------------------------------------ dorsos
@@ -96,19 +94,19 @@ export const COSMETICOS = Object.freeze([
   }),
   Object.freeze({
     id: 'tapete_hell_creek', tipo: T.TAPETE, nombre: 'Hell Creek', lema: 'Lutita oscura del final del Cretácico.',
-    precio: 500, arte: tienda('tapete_hell_creek'), medallon: HUELLA,
+    precio: 500, arte: tienda('tapete_hell_creek'), medallon: tienda('medallon_hell_creek'),
   }),
   Object.freeze({
     id: 'tapete_kem_kem', tipo: T.TAPETE, nombre: 'Kem Kem', lema: 'Arcilla roja cuarteada del río de los gigantes.',
-    precio: 500, arte: tienda('tapete_kem_kem'), medallon: HUELLA,
+    precio: 500, arte: tienda('tapete_kem_kem'), medallon: tienda('medallon_kem_kem'),
   }),
   Object.freeze({
     id: 'tapete_solnhofen', tipo: T.TAPETE, nombre: 'Solnhofen', lema: 'La caliza fina donde quedaron las plumas.',
-    precio: 500, arte: tienda('tapete_solnhofen'), medallon: HUELLA,
+    precio: 500, arte: tienda('tapete_solnhofen'), medallon: tienda('medallon_solnhofen'),
   }),
   Object.freeze({
     id: 'tapete_excavacion', tipo: T.TAPETE, nombre: 'Excavación', lema: 'La cuadrícula de cuerda sobre la tierra de la cata.',
-    precio: 500, arte: tienda('tapete_excavacion'), medallon: HUELLA,
+    precio: 500, arte: tienda('tapete_excavacion'), medallon: tienda('medallon_excavacion'),
   }),
 
   // -------------------------------------------------------- estandartes
@@ -132,6 +130,10 @@ export const COSMETICOS = Object.freeze([
     id: 'estandarte_volcan', tipo: T.ESTANDARTE, nombre: 'Volcán', lema: 'Basalto con grietas de brasa.',
     precio: 400, arte: tienda('estandarte_volcan'), cinta: tienda('cinta_volcan'),
   }),
+  Object.freeze({
+    id: 'estandarte_helecho', tipo: T.ESTANDARTE, nombre: 'Helecho', lema: 'Paño verde con la fronda del sotobosque.',
+    precio: 400, arte: tienda('estandarte_helecho'), cinta: tienda('cinta_helecho'),
+  }),
 
   // ---------------------------------------------------------- retratos
   Object.freeze({
@@ -153,6 +155,22 @@ export const COSMETICOS = Object.freeze([
   Object.freeze({
     id: 'retrato_placas', tipo: T.RETRATO, nombre: 'Placas al ocaso', lema: 'Un estegosaurio contra el último sol.',
     precio: 350, arte: tienda('retrato_placas'),
+  }),
+  Object.freeze({
+    id: 'retrato_cientifico', tipo: T.RETRATO, nombre: 'El científico', lema: 'Una muestra al trasluz y el laboratorio lleno de huesos.',
+    precio: 350, arte: tienda('retrato_cientifico'),
+  }),
+  Object.freeze({
+    id: 'retrato_cientifica', tipo: T.RETRATO, nombre: 'La científica', lema: 'Gafas redondas y un vial que brilla con el candil.',
+    precio: 350, arte: tienda('retrato_cientifica'),
+  }),
+  Object.freeze({
+    id: 'retrato_cazador', tipo: T.RETRATO, nombre: 'El cazador de fósiles', lema: 'Cartuchera, pañuelo y ganas de ir más lejos.',
+    precio: 350, arte: tienda('retrato_cazador'),
+  }),
+  Object.freeze({
+    id: 'retrato_trex', tipo: T.RETRATO, nombre: 'Rey tirano', lema: 'El rugido que cierra el Cretácico.',
+    precio: 350, arte: tienda('retrato_trex'),
   }),
 ]);
 

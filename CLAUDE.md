@@ -1433,8 +1433,6 @@ carta, un mazo ni lo rápido que se progresa.
   en todas partes, sólo sobre la ventana de la ilustración (`carta.css`). A
   opacidad .3 no se veía; va a .55 con `color-dodge` y `isolation` en la
   ventana, que sin ella se mezclaría con el tablero.
-- **Los tapetes sin medallón propio llevan la huella de siempre** en
-  `medallon`; `test/tienda.test.js` lo acepta sólo para ese fichero.
 - **Los packs de sobres** serán varios sobres seguidos al precio de uno por
   sobre, sin descuento: con descuento acelerarían el progreso. Si algún día
   hay dinero real, no se venden por dinero.
