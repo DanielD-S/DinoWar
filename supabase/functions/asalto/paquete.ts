@@ -12,9 +12,9 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: e2094eab15412970
+// huella: 674983d8fa0d1a73
 //
-// Lleva dentro estos 23 ficheros del repositorio. La lista la da
+// Lleva dentro estos 24 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
 // aparece aquí solo. Un test recalcula la huella sobre esta misma lista y falla
 // si el paquete se ha quedado atrás del código.
@@ -40,6 +40,7 @@
 // fuente: src/data/duelo.js
 // fuente: supabase/functions/_compartido/duelo.js
 // fuente: src/data/ligas.js
+// fuente: src/data/logros.js
 // fuente: supabase/functions/asalto/index.ts
 
 // supabase/functions/asalto/index.ts
@@ -4109,7 +4110,21 @@ var VOCABULARIO = Object.freeze([
   "danoHabitat",
   // daño que le hiciste al hábitat rival
   "trofeos",
-  ...Object.values(CLADO).map(porClado)
+  ...Object.values(CLADO).map(porClado),
+  // Los que no salen de re-jugar: los apunta el servidor al cerrar un asalto
+  // (sabe el daño y si el jefe cayó) o un duelo (sabe quién ganó). Un parte de
+  // partida contra la IA los deja a cero.
+  "asaltos",
+  // asaltos al jefe jugados
+  "danoJefe",
+  // daño hecho al jefe
+  "jefesVencidos",
+  // asaltos que dejaron al jefe a cero: el golpe final
+  "duelos",
+  // duelos jugados, se ganen o no
+  "duelosGanados",
+  "expedicionNuevos"
+  // rivales de expedición vencidos por primera vez
 ]);
 var ES_VOCABULARIO = new Set(VOCABULARIO);
 function parteVacio() {
@@ -4198,6 +4213,15 @@ var CATALOGO = Object.freeze([
   M("marginocefalos", "Testarazo", "Despliega 4 marginoc\xE9falos", porClado(CLADO.MARGINOCEFALO), 4, 40),
   M("pterosaurios", "Sombra en el cielo", "Despliega 3 pterosaurios", porClado(CLADO.PTEROSAURIO), 3, 45),
   M("marinos", "Mar de Sundance", "Despliega 3 reptiles marinos", porClado(CLADO.MARINO), 3, 45),
+  // Las del jefe y las de duelo. No salen de una partida contra la IA: hay que
+  // bajar a la cuenca o buscar rival, y un día sin jefe abierto o sin nadie
+  // conectado es un día en que ésa de las tres no se cumple. Se aceptó así:
+  // es lo que las hace pedir algo. Pagan por debajo de la relámpago para que
+  // el peor día posible siga cabiendo en el techo.
+  M("asalto_uno", "Bajar a la cuenca", "Asalta al jefe 1 vez", "asaltos", 1, 40),
+  M("dano_jefe", "Al hueso", "Hazle 40 de da\xF1o al jefe", "danoJefe", 40, 45),
+  M("duelo_uno", "Cara a cara", "Juega 1 duelo", "duelos", 1, 40),
+  M("duelo_ganar", "Mano a mano", "Gana 1 duelo", "duelosGanados", 1, 45),
   // La difícil del día. Una sola, y paga como tal.
   // El texto dice «1 partida» y no «una» a propósito: el guardián de
   // `misiones.test.js` pide que el texto cite la meta, igual que el de las
@@ -4934,7 +4958,46 @@ function eloTras(eloA, eloB, resultadoA, duelosA = 99, duelosB = 99) {
   return { a: Math.max(ELO.suelo, a), b: Math.max(ELO.suelo, b) };
 }
 
+// src/data/logros.js
+var RECOMPENSA = Object.freeze({ TITULO: "titulo", MAZO: "mazo", SOBRES: "sobres" });
+var L = (id, nombre, texto, mide, meta, recompensa) => Object.freeze({
+  id,
+  nombre,
+  texto,
+  mide,
+  meta,
+  recompensa: Object.freeze(recompensa)
+});
+var LOGROS = Object.freeze([
+  // Los de entrar en cada modo: baratos, para que quien no ha probado el duelo
+  // o la cuenca tenga un motivo pequeño para asomarse.
+  L("duelista", "Duelista", "Juega 1 duelo", "duelos", 1, { tipo: RECOMPENSA.TITULO, id: "titulo_duelista" }),
+  L("asaltante", "Asaltante", "Asalta al jefe 5 veces", "asaltos", 5, { tipo: RECOMPENSA.TITULO, id: "titulo_asaltante" }),
+  // El golpe de gracia: el asalto que deja al jefe a cero. Se lo lleva quien
+  // lo da, que es lo único que el servidor puede saber sin repartir méritos.
+  L("cazador", "Cazador de jefes", "Da el golpe final a 1 jefe", "jefesVencidos", 1, { tipo: RECOMPENSA.TITULO, id: "titulo_cazador" }),
+  // Los de constancia.
+  L("campeon", "Campe\xF3n", "Gana 10 duelos", "duelosGanados", 10, { tipo: RECOMPENSA.TITULO, id: "titulo_campeon" }),
+  L("explorador", "Explorador", "Gana 10 partidas", "victorias", 10, { tipo: RECOMPENSA.SOBRES, n: 3 }),
+  L("demoledor", "Demoledor", "Hazle 300 de da\xF1o a los jefes", "danoJefe", 300, { tipo: RECOMPENSA.SOBRES, n: 5 }),
+  // Los grandes: un mazo inicial más. Eran los otros dos que no elegiste al
+  // empezar y sólo se podían completar a base de sobres.
+  L("morrison", "La Morrison entera", "Vence por primera vez a los 8 rivales de la Morrison", "expedicionNuevos", 8, { tipo: RECOMPENSA.MAZO }),
+  L("veterano", "Veterano", "Gana 25 duelos", "duelosGanados", 25, { tipo: RECOMPENSA.MAZO })
+]);
+var LOGRO_POR_ID = Object.freeze(Object.fromEntries(LOGROS.map((l) => [l.id, l])));
+var ES_VOCABULARIO2 = new Set(VOCABULARIO);
+function avancesDeLogros(parte) {
+  return LOGROS.map((l) => ({ id: l.id, avance: parte[l.mide] ?? 0, meta: l.meta, recompensa: l.recompensa })).filter((a) => a.avance > 0);
+}
+
 // supabase/functions/asalto/index.ts
+function avancesConPremio(dia, parte) {
+  return avancesDelParte(dia, parte).map((a) => {
+    const m = POR_ID[a.id];
+    return { id: a.id, avance: a.avance, meta: m.meta, premio: m.premio };
+  });
+}
 var cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -5019,13 +5082,30 @@ async function hacerAsalto(servicio, jugadorId, envio) {
     );
   }
   const fila = Array.isArray(data) ? data[0] : data;
+  const dia = diaUTC();
+  const parte = {
+    asaltos: 1,
+    danoJefe: Math.max(0, Math.round(Number(resultado2.dano) || 0)),
+    jefesVencidos: fila?.cayo ? 1 : 0
+  };
+  const { data: av, error: errAv } = await servicio.rpc("aplicar_avances", {
+    p_jugador: jugadorId,
+    p_dia: dia,
+    p_avances: avancesConPremio(dia, parte),
+    p_logros: avancesDeLogros(parte)
+  });
+  if (errAv) console.error("aplicar_avances", errAv.message);
   return json({
     dano: resultado2.dano,
     turnos: resultado2.turnos,
     ganada: resultado2.ganada,
     vida: fila?.vida ?? null,
     cayo: fila?.cayo ?? false,
-    almacen: fila?.almacen ?? null
+    almacen: fila?.almacen ?? null,
+    monedas: av?.monedas ?? null,
+    misiones: av?.misiones ?? 0,
+    cumplidas: av?.cumplidas ?? [],
+    logros: av?.logros ?? []
   });
 }
 async function hacerVictoria(servicio, jugadorId, envio) {
@@ -5039,26 +5119,6 @@ async function hacerVictoria(servicio, jugadorId, envio) {
     return json({ error: "ya has cobrado tus partidas de hoy" }, 429);
   }
   const dia = diaUTC();
-  const avances = avancesDelParte(dia, resultado2.parte).map((a) => {
-    const m = POR_ID[a.id];
-    return { id: a.id, avance: a.avance, meta: m.meta, premio: m.premio };
-  });
-  const { data, error } = await servicio.rpc("aplicar_partida", {
-    p_jugador: jugadorId,
-    p_semilla: envio.semilla,
-    p_turnos: resultado2.turnos,
-    p_ganada: resultado2.ganada,
-    p_monedas: resultado2.premio,
-    p_dia: dia,
-    p_avances: avances
-  });
-  if (error) {
-    const yaCobrada = error.code === "23505";
-    return json(
-      { error: yaCobrada ? "esa partida ya se cobr\xF3" : error.message },
-      yaCobrada ? 409 : 400
-    );
-  }
   let expedicion = null;
   if (resultado2.ganada && resultado2.rival) {
     const { rival: r } = rivalPorId(resultado2.rival);
@@ -5072,6 +5132,24 @@ async function hacerVictoria(servicio, jugadorId, envio) {
     if (errExp) console.error("aplicar_expedicion", errExp.message);
     else expedicion = exp;
   }
+  const parte = { ...resultado2.parte, expedicionNuevos: expedicion?.primera ? 1 : 0 };
+  const { data, error } = await servicio.rpc("aplicar_partida", {
+    p_jugador: jugadorId,
+    p_semilla: envio.semilla,
+    p_turnos: resultado2.turnos,
+    p_ganada: resultado2.ganada,
+    p_monedas: resultado2.premio,
+    p_dia: dia,
+    p_avances: avancesConPremio(dia, parte),
+    p_logros: avancesDeLogros(parte)
+  });
+  if (error) {
+    const yaCobrada = error.code === "23505";
+    return json(
+      { error: yaCobrada ? "esa partida ya se cobr\xF3" : error.message },
+      yaCobrada ? 409 : 400
+    );
+  }
   return json({
     ganada: resultado2.ganada,
     turnos: resultado2.turnos,
@@ -5084,6 +5162,7 @@ async function hacerVictoria(servicio, jugadorId, envio) {
     // de que aparezcan monedas de la nada.
     misiones: data?.misiones ?? 0,
     cumplidas: data?.cumplidas ?? [],
+    logros: data?.logros ?? [],
     dia: data?.dia ?? dia
   });
 }
@@ -5209,6 +5288,15 @@ async function cerrarDuelo(servicio, fila) {
     duelosDe(fila.jugador_a),
     duelosDe(fila.jugador_b)
   );
+  const dia = diaUTC();
+  const parteDe = (gano) => ({
+    partidas: 1,
+    victorias: gano ? 1 : 0,
+    duelos: 1,
+    duelosGanados: gano ? 1 : 0
+  });
+  const pa = parteDe(r.ganador === 0);
+  const pb = parteDe(r.ganador === 1);
   const { error } = await servicio.rpc("duelo_cerrar", {
     p_id: fila.id,
     p_ganador: r.ganador,
@@ -5216,7 +5304,12 @@ async function cerrarDuelo(servicio, fila) {
     p_turnos: fila.datos.estado.turno,
     p_elo_a: nuevos.a,
     p_elo_b: nuevos.b,
-    p_monedas_victoria: ECONOMIA.monedasVictoria
+    p_monedas_victoria: ECONOMIA.monedasVictoria,
+    p_dia: dia,
+    p_avances_a: avancesConPremio(dia, pa),
+    p_avances_b: avancesConPremio(dia, pb),
+    p_logros_a: avancesDeLogros(pa),
+    p_logros_b: avancesDeLogros(pb)
   });
   if (error) console.error("duelo_cerrar", error.message);
   const { data } = await servicio.from("duelos").select("*").eq("id", fila.id).single();

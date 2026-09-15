@@ -1308,6 +1308,37 @@ Dos cosas que cambiaron de sitio al añadirlas:
   sin manera de llegar a ella. Se desplaza sólo `.menu-caja`; la portada va
   detrás, en su capa, y se queda quieta.
 
+### Logros: de una vez, y pagan con lo que no se compra
+
+[`src/data/logros.js`](src/data/logros.js) es el catálogo: miden los mismos
+contadores que las misiones (`VOCABULARIO`), acumulados para siempre en vez
+de por día, y lo que dan no son monedas: un **título** (un cosmético
+`exclusivo`, que se otorga y no se vende), **un mazo inicial más** a elegir
+entre los que no se tienen (`mazos_extra`), o **sobres gratis**
+(`sobres_gratis`, que `aplicar_sobre` gasta antes que las monedas). La
+recompensa viaja en la llamada como la meta y el premio de una misión, y
+`private.avanzar_logros` (0027) apunta y entrega. Cuatro cosas:
+
+- **Los asaltos y los duelos ya avanzan misiones y logros**, sin parte: el
+  servidor sabe que se asaltó, cuánto daño hizo y si fue el golpe final
+  (`asaltos`, `danoJefe`, `jefesVencidos`), y quién ganó el duelo (`duelos`,
+  `duelosGanados`, y también `partidas` y `victorias`). El asalto llama a
+  `aplicar_avances` aparte de `aplicar_asalto`, que conserva su firma;
+  `duelo_cerrar` recibe los avances de cada bando. Un duelo cuenta ahora como
+  partida jugada para «juega 3 partidas».
+- **«Vence al jefe con tu tribu» es «da el golpe final»**: lo que el servidor
+  puede saber sin repartir méritos. Y la primera victoria contra un rival de
+  expedición (`expedicionNuevos`) la dice `aplicar_expedicion`, que por eso
+  va ANTES de `aplicar_partida` en `hacerVictoria`.
+- **Las cuatro misiones diarias de jefe y de duelo pueden tocar un día en que
+  no se cumplen** —sin jefe abierto, sin nadie conectado—. Se aceptó: es lo
+  que las hace pedir algo. Pagan por debajo de la relámpago para que el peor
+  día siga en el techo.
+- **`iniciales_tomados` recuerda qué mazos iniciales se tienen.** Las cuentas
+  de antes de la 0023 no eligieron ninguno y tienen los tres disponibles; el
+  crédito de `mazos_extra` se gasta en la misma pantalla de la cuenta nueva
+  con «Ahora no» para dejarlo. Las cartas se SUMAN a la colección.
+
 **Al crear una función de lectura, revocar a PUBLIC antes de conceder.** Una
 función creada por `postgres` nace con `execute` para PUBLIC, y anon es miembro:
 `grant … to authenticated` no quita ese permiso, lo duplica. Pasó con
@@ -1509,8 +1540,8 @@ Dicho para que nadie lo descubra tarde:
   `EXPEDICIONES`, medirla con `sim/expediciones.mjs` y su mapa; pero el
   cliente sólo pinta la primera, y elegir entre varias pide una pantalla.
 - **Las misiones diarias no saben de expediciones**: ganar a un rival cuenta
-  como una victoria cualquiera. Una misión «vence a un rival nuevo» es un dato
-  más en `misiones.js` y un campo en el parte.
+  como una victoria cualquiera. El contador `expedicionNuevos` ya existe (lo
+  usa el logro de la Morrison); una misión diaria que lo mida es una línea.
 
 - **Sólo hay dos jefes, y ahora se repiten.** Que el jefe vuelva cada ciclo
   arregla que la cuenca se quedara muerta, pero un calendario de 14 días con dos
@@ -1520,8 +1551,9 @@ Dicho para que nadie lo descubra tarde:
 - **Al Duelo le faltan tres cosas de liga:** la protección al descenso (hoy
   el ELO baja en cuanto pierdes, sin las tres derrotas de margen), las
   temporadas con reinicio, y la tabla con nombre y puesto de la liga Extinción.
-  Y las misiones diarias no avanzan con un duelo: el parte se saca re-jugando
-  y en un duelo no hay nada que re-jugar. Pide anotar el parte turno a turno.
+  Y en un duelo sólo avanzan las misiones de jugar, ganar y duelo: las de
+  bajas, clados o clima piden un parte, y en un duelo no hay nada que
+  re-jugar. Pide anotar el parte turno a turno.
 - **El CAPTCHA está activado** (Turnstile, desde el 13-09-2026). Si un día
   nadie puede entrar, lo primero es ese interruptor en Authentication → Attack
   Protection, y que el proveedor siga siendo Turnstile.

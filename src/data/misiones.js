@@ -62,6 +62,15 @@ export const VOCABULARIO = Object.freeze([
   'danoHabitat',   // daño que le hiciste al hábitat rival
   'trofeos',
   ...Object.values(CLADO).map(porClado),
+  // Los que no salen de re-jugar: los apunta el servidor al cerrar un asalto
+  // (sabe el daño y si el jefe cayó) o un duelo (sabe quién ganó). Un parte de
+  // partida contra la IA los deja a cero.
+  'asaltos',          // asaltos al jefe jugados
+  'danoJefe',         // daño hecho al jefe
+  'jefesVencidos',    // asaltos que dejaron al jefe a cero: el golpe final
+  'duelos',           // duelos jugados, se ganen o no
+  'duelosGanados',
+  'expedicionNuevos', // rivales de expedición vencidos por primera vez
 ]);
 
 const ES_VOCABULARIO = new Set(VOCABULARIO);
@@ -195,6 +204,16 @@ export const CATALOGO = Object.freeze([
   M('marginocefalos', 'Testarazo', 'Despliega 4 marginocéfalos', porClado(CLADO.MARGINOCEFALO), 4, 40),
   M('pterosaurios', 'Sombra en el cielo', 'Despliega 3 pterosaurios', porClado(CLADO.PTEROSAURIO), 3, 45),
   M('marinos', 'Mar de Sundance', 'Despliega 3 reptiles marinos', porClado(CLADO.MARINO), 3, 45),
+
+  // Las del jefe y las de duelo. No salen de una partida contra la IA: hay que
+  // bajar a la cuenca o buscar rival, y un día sin jefe abierto o sin nadie
+  // conectado es un día en que ésa de las tres no se cumple. Se aceptó así:
+  // es lo que las hace pedir algo. Pagan por debajo de la relámpago para que
+  // el peor día posible siga cabiendo en el techo.
+  M('asalto_uno', 'Bajar a la cuenca', 'Asalta al jefe 1 vez', 'asaltos', 1, 40),
+  M('dano_jefe', 'Al hueso', 'Hazle 40 de daño al jefe', 'danoJefe', 40, 45),
+  M('duelo_uno', 'Cara a cara', 'Juega 1 duelo', 'duelos', 1, 40),
+  M('duelo_ganar', 'Mano a mano', 'Gana 1 duelo', 'duelosGanados', 1, 45),
 
   // La difícil del día. Una sola, y paga como tal.
   // El texto dice «1 partida» y no «una» a propósito: el guardián de

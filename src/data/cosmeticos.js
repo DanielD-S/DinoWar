@@ -21,10 +21,15 @@
 //               banderola del marcador final, o null si no tiene y se usa la
 //               de siempre.
 //   RETRATO     `arte`: tu retrato, cuadrado; el círculo y el aro los pone el CSS.
+//   TITULO      sin arte: `texto` es lo que sale bajo tu nombre en la
+//               presentación. Se GANAN con logros (src/data/logros.js).
 //
 // Además del gratuito de cada tipo puede haber artículos `gratis`: precio 0,
 // de todos sin comprarlos, pero no son lo que se ve por defecto. Hoy sólo los
-// retratos, que se estrenan con dos personas para elegir.
+// retratos, que se estrenan con dos personas para elegir. Y artículos
+// `exclusivo`: precio 0 también, pero NO se compran ni son de todos: los
+// otorga el servidor al cumplir un logro (`logro` dice cuál), y la tienda los
+// enseña bloqueados con lo que hay que hacer.
 
 import { ECONOMIA } from './coleccion.js';
 
@@ -33,6 +38,7 @@ export const TIPO_COSMETICO = Object.freeze({
   TAPETE: 'TAPETE',
   ESTANDARTE: 'ESTANDARTE',
   RETRATO: 'RETRATO',
+  TITULO: 'TITULO',
 });
 
 const T = TIPO_COSMETICO;
@@ -174,6 +180,29 @@ export const COSMETICOS = Object.freeze([
     id: 'retrato_trex', tipo: T.RETRATO, nombre: 'Rey tirano', lema: 'El rugido que cierra el Cretácico.',
     precio: 350, arte: tienda('retrato_trex'),
   }),
+
+  // ----------------------------------------------------------- títulos
+  // `texto` es lo que se lee bajo el nombre; el de por defecto no dice nada.
+  Object.freeze({
+    id: 'titulo_ninguno', tipo: T.TITULO, nombre: 'Sin título', lema: 'Sólo tu nombre y tu liga.',
+    precio: 0, porDefecto: true, texto: '',
+  }),
+  Object.freeze({
+    id: 'titulo_duelista', tipo: T.TITULO, nombre: 'Duelista', lema: 'Has cruzado cartas con una persona.',
+    precio: 0, exclusivo: true, logro: 'duelista', texto: 'Duelista',
+  }),
+  Object.freeze({
+    id: 'titulo_asaltante', tipo: T.TITULO, nombre: 'Asaltante', lema: 'Cinco veces bajaste a la cuenca a por el jefe.',
+    precio: 0, exclusivo: true, logro: 'asaltante', texto: 'Asaltante',
+  }),
+  Object.freeze({
+    id: 'titulo_cazador', tipo: T.TITULO, nombre: 'Cazador de jefes', lema: 'Diste el golpe final a un jefe.',
+    precio: 0, exclusivo: true, logro: 'cazador', texto: 'Cazador de jefes',
+  }),
+  Object.freeze({
+    id: 'titulo_campeon', tipo: T.TITULO, nombre: 'Campeón', lema: 'Diez duelos ganados.',
+    precio: 0, exclusivo: true, logro: 'campeon', texto: 'Campeón',
+  }),
 ]);
 
 /**
@@ -196,10 +225,14 @@ export const cosmeticoPorId = (id) => POR_ID.get(id) ?? null;
 /** El artículo gratuito de un tipo: lo que se ve sin haber comprado nada. */
 export const porDefecto = (tipo) => COSMETICOS.find((c) => c.tipo === tipo && c.porDefecto);
 
-/** Si el perfil puede llevar ese artículo: es gratuito o lo ha comprado. */
+/**
+ * Si el perfil puede llevar ese artículo: es de todos (por defecto o gratis),
+ * lo ha comprado, o se lo otorgó el servidor por un logro. Lo exclusivo no
+ * es de todos aunque cueste 0.
+ */
 export const loTiene = (perfil, id) => {
   const c = cosmeticoPorId(id);
-  return !!c && (c.precio === 0 || (perfil?.cosmeticos ?? []).includes(id));
+  return !!c && (c.porDefecto || c.gratis || (perfil?.cosmeticos ?? []).includes(id));
 };
 
 /**
@@ -222,13 +255,18 @@ for (const tipo of Object.values(TIPO_COSMETICO)) {
 for (const c of COSMETICOS) {
   if (!/^[a-z_]+$/.test(c.id)) throw new Error(`COSMETICOS: id «${c.id}» no válido`);
   if (!Object.values(TIPO_COSMETICO).includes(c.tipo)) throw new Error(`COSMETICOS: ${c.id} tiene un tipo desconocido`);
-  // Un 0 escrito sin querer regalaría el artículo: sin `porDefecto` ni
-  // `gratis`, el precio tiene que ser positivo.
-  const gratuito = c.porDefecto || c.gratis;
+  // Un 0 escrito sin querer regalaría el artículo: sin `porDefecto`, `gratis`
+  // ni `exclusivo`, el precio tiene que ser positivo.
+  const gratuito = c.porDefecto || c.gratis || c.exclusivo;
   if (gratuito ? c.precio !== 0 : !(Number.isInteger(c.precio) && c.precio > 0)) {
     throw new Error(`COSMETICOS: ${c.id} tiene un precio que no cuadra con ser ${gratuito ? 'gratuito' : 'de pago'}`);
   }
-  if (!c.arte) throw new Error(`COSMETICOS: ${c.id} sin arte`);
+  if (c.exclusivo && (c.porDefecto || c.gratis || !c.logro)) {
+    throw new Error(`COSMETICOS: ${c.id} es exclusivo y tiene que ganarse con un logro, sin ser de todos`);
+  }
+  if (c.tipo === T.TITULO ? typeof c.texto !== 'string' : !c.arte) {
+    throw new Error(`COSMETICOS: ${c.id} sin ${c.tipo === T.TITULO ? 'texto' : 'arte'}`);
+  }
   if (c.tipo === T.TAPETE && !c.medallon) throw new Error(`COSMETICOS: ${c.id} es un tapete sin medallón`);
 }
 if (POR_ID.size !== COSMETICOS.length) throw new Error('COSMETICOS: hay ids repetidos');

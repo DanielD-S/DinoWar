@@ -82,6 +82,12 @@ function aFormaLocal(d) {
     // servidor sin la 0024 no manda ninguno de los dos y todo es el gratuito.
     cosmeticos: Array.isArray(d.cosmeticos) ? d.cosmeticos.filter((x) => typeof x === 'string') : [],
     equipado: d.equipado && typeof d.equipado === 'object' && !Array.isArray(d.equipado) ? d.equipado : {},
+    // Lo que dan los logros y aún no se ha usado: sobres gratis y mazos
+    // iniciales por elegir; y qué iniciales se tienen ya. Un servidor sin la
+    // 0027 no manda nada de esto.
+    sobresGratis: Number(d.sobres_gratis ?? 0),
+    mazosExtra: Number(d.mazos_extra ?? 0),
+    inicialesTomados: Array.isArray(d.iniciales_tomados) ? d.iniciales_tomados.filter((x) => typeof x === 'string') : [],
     // La dificultad es una preferencia de ESTE navegador, no estado de juego:
     // el servidor no la lleva y no debe pisarla al sincronizar.
     dificultad: cargarPerfil().dificultad,
@@ -113,6 +119,24 @@ export async function elegirMazoInicial(id) {
   if (modo === MODO.LOCAL) return cargarPerfil();
   await sesionValida();
   const d = await rpc('elegir_mazo_inicial', { p_mazo: id });
+  const p = aFormaLocal(d);
+  guardarPerfil(p);
+  return p;
+}
+
+/**
+ * Un mazo inicial MÁS, ganado con un logro: gasta un `mazosExtra` en uno que
+ * no se tenga. Las cartas se suman a la colección; lo decide el servidor.
+ */
+export async function elegirMazoExtra(id) {
+  if (modo === MODO.LOCAL) {
+    const p = cargarPerfil();
+    if (p.mazosExtra <= 0) throw new Error('no tienes ningún mazo inicial por elegir');
+    actualizarPerfil({ mazosExtra: p.mazosExtra - 1, inicialesTomados: [...p.inicialesTomados, id] });
+    return cargarPerfil();
+  }
+  await sesionValida();
+  const d = await rpc('elegir_mazo_extra', { p_mazo: id });
   const p = aFormaLocal(d);
   guardarPerfil(p);
   return p;
@@ -191,7 +215,10 @@ export async function comprarSobre() {
 
   if (modo === MODO.LOCAL) {
     const p = cargarPerfil();
-    if (!PRUEBAS && p.monedas < ECONOMIA.precioSobre) {
+    // Un sobre gratis —de un logro— se gasta antes que las monedas, como en
+    // el servidor.
+    const gratis = p.sobresGratis > 0;
+    if (!PRUEBAS && !gratis && p.monedas < ECONOMIA.precioSobre) {
       throw new Error('no te llegan las dinomonedas');
     }
     const cartas = abrirSobre(Math.random, p.cartas);
@@ -199,7 +226,8 @@ export async function comprarSobre() {
     for (const id of cartas) nuevas[id] = (nuevas[id] ?? 0) + 1;
     actualizarPerfil({
       cartas: nuevas,
-      monedas: PRUEBAS ? p.monedas : p.monedas - ECONOMIA.precioSobre,
+      monedas: PRUEBAS || gratis ? p.monedas : p.monedas - ECONOMIA.precioSobre,
+      sobresGratis: gratis ? p.sobresGratis - 1 : p.sobresGratis,
       sobresAbiertos: p.sobresAbiertos + 1,
     });
     return { cartas, antes };
@@ -315,6 +343,8 @@ export async function cobrarPartida(partida, gane) {
     premio: Number(r?.premio ?? 0),
     misiones: Number(r?.misiones ?? 0),
     cumplidas: Array.isArray(r?.cumplidas) ? r.cumplidas : [],
+    // Los logros que esta partida acaba de cumplir, por id.
+    logros: Array.isArray(r?.logros) ? r.logros : [],
     // Lo que pagó la primera victoria contra un rival de expedición, aparte.
     expedicion: r?.expedicion ?? null,
   };
@@ -346,7 +376,7 @@ export async function traerMisiones() {
   if (modo === MODO.LOCAL) return null;
   try {
     const d = await rpc('mis_misiones');
-    misionesEnCache = { dia: d?.dia ?? null, progreso: d?.progreso ?? {} };
+    misionesEnCache = { dia: d?.dia ?? null, progreso: d?.progreso ?? {}, logros: d?.logros ?? {} };
     return misionesEnCache;
   } catch {
     return misionesEnCache;

@@ -96,6 +96,10 @@ export function generar() {
   L.push('  precio       int  not null check (precio >= 0),');
   L.push('  por_defecto  boolean not null default false');
   L.push(');');
+  L.push('-- Lo exclusivo cuesta 0 y NO se compra ni es de todos: lo otorga un logro.');
+  L.push('-- La columna llegó después de la tabla (0027), de ahí el `add column`.');
+  L.push('alter table public.catalogo_cosmeticos');
+  L.push('  add column if not exists exclusivo boolean not null default false;');
   L.push('');
   L.push('-- Los precios, en una fila. Que sean una tabla y no constantes en el SQL');
   L.push('-- permite tocarlos sin volver a desplegar nada.');
@@ -158,9 +162,10 @@ export function generar() {
   // La tienda. Un artículo que desaparece del código se borra de aquí, y si
   // alguien lo compró la clave foránea de `jugador_cosmeticos` lo impide: no se
   // le quita a nadie lo que pagó por un cambio en el catálogo.
-  L.push('insert into public.catalogo_cosmeticos (id, tipo, precio, por_defecto) values');
-  L.push(`${COSMETICOS.map((c) => `  (${sql(c.id)}, ${sql(c.tipo)}, ${c.precio}, ${!!c.porDefecto})`).join(',\n')}`);
-  L.push('on conflict (id) do update set tipo = excluded.tipo, precio = excluded.precio, por_defecto = excluded.por_defecto;');
+  L.push('insert into public.catalogo_cosmeticos (id, tipo, precio, por_defecto, exclusivo) values');
+  L.push(`${COSMETICOS.map((c) => `  (${sql(c.id)}, ${sql(c.tipo)}, ${c.precio}, ${!!c.porDefecto}, ${!!c.exclusivo})`).join(',\n')}`);
+  L.push('on conflict (id) do update set tipo = excluded.tipo, precio = excluded.precio,');
+  L.push('  por_defecto = excluded.por_defecto, exclusivo = excluded.exclusivo;');
   L.push('');
   L.push('delete from public.catalogo_cosmeticos where id not in (');
   L.push(`${COSMETICOS.map((c) => `  ${sql(c.id)}`).join(',\n')}`);

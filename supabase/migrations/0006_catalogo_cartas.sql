@@ -45,6 +45,10 @@ create table if not exists public.catalogo_cosmeticos (
   precio       int  not null check (precio >= 0),
   por_defecto  boolean not null default false
 );
+-- Lo exclusivo cuesta 0 y NO se compra ni es de todos: lo otorga un logro.
+-- La columna llegó después de la tabla (0027), de ahí el `add column`.
+alter table public.catalogo_cosmeticos
+  add column if not exists exclusivo boolean not null default false;
 
 -- Los precios, en una fila. Que sean una tabla y no constantes en el SQL
 -- permite tocarlos sin volver a desplegar nada.
@@ -402,39 +406,45 @@ delete from public.catalogo_iniciales where (mazo, card_id) not in (values
   ('ornitopodos', 'cicadas')
 );
 
-insert into public.catalogo_cosmeticos (id, tipo, precio, por_defecto) values
-  ('dorso_clasico', 'DORSO', 0, true),
-  ('dorso_ambar', 'DORSO', 300, false),
-  ('dorso_obsidiana', 'DORSO', 300, false),
-  ('dorso_morrison', 'DORSO', 300, false),
-  ('dorso_hell_creek', 'DORSO', 300, false),
-  ('dorso_kem_kem', 'DORSO', 300, false),
-  ('dorso_volcan', 'DORSO', 300, false),
-  ('tapete_clasico', 'TAPETE', 0, true),
-  ('tapete_ambar', 'TAPETE', 500, false),
-  ('tapete_obsidiana', 'TAPETE', 500, false),
-  ('tapete_morrison', 'TAPETE', 500, false),
-  ('tapete_volcan', 'TAPETE', 500, false),
-  ('tapete_hell_creek', 'TAPETE', 500, false),
-  ('tapete_kem_kem', 'TAPETE', 500, false),
-  ('tapete_solnhofen', 'TAPETE', 500, false),
-  ('tapete_excavacion', 'TAPETE', 500, false),
-  ('estandarte_clasico', 'ESTANDARTE', 0, true),
-  ('estandarte_ambar', 'ESTANDARTE', 400, false),
-  ('estandarte_obsidiana', 'ESTANDARTE', 400, false),
-  ('estandarte_fosil', 'ESTANDARTE', 400, false),
-  ('estandarte_volcan', 'ESTANDARTE', 400, false),
-  ('estandarte_helecho', 'ESTANDARTE', 400, false),
-  ('retrato_paleontologa', 'RETRATO', 0, true),
-  ('retrato_buscador', 'RETRATO', 0, false),
-  ('retrato_amonite', 'RETRATO', 350, false),
-  ('retrato_huevo', 'RETRATO', 350, false),
-  ('retrato_placas', 'RETRATO', 350, false),
-  ('retrato_cientifico', 'RETRATO', 350, false),
-  ('retrato_cientifica', 'RETRATO', 350, false),
-  ('retrato_cazador', 'RETRATO', 350, false),
-  ('retrato_trex', 'RETRATO', 350, false)
-on conflict (id) do update set tipo = excluded.tipo, precio = excluded.precio, por_defecto = excluded.por_defecto;
+insert into public.catalogo_cosmeticos (id, tipo, precio, por_defecto, exclusivo) values
+  ('dorso_clasico', 'DORSO', 0, true, false),
+  ('dorso_ambar', 'DORSO', 300, false, false),
+  ('dorso_obsidiana', 'DORSO', 300, false, false),
+  ('dorso_morrison', 'DORSO', 300, false, false),
+  ('dorso_hell_creek', 'DORSO', 300, false, false),
+  ('dorso_kem_kem', 'DORSO', 300, false, false),
+  ('dorso_volcan', 'DORSO', 300, false, false),
+  ('tapete_clasico', 'TAPETE', 0, true, false),
+  ('tapete_ambar', 'TAPETE', 500, false, false),
+  ('tapete_obsidiana', 'TAPETE', 500, false, false),
+  ('tapete_morrison', 'TAPETE', 500, false, false),
+  ('tapete_volcan', 'TAPETE', 500, false, false),
+  ('tapete_hell_creek', 'TAPETE', 500, false, false),
+  ('tapete_kem_kem', 'TAPETE', 500, false, false),
+  ('tapete_solnhofen', 'TAPETE', 500, false, false),
+  ('tapete_excavacion', 'TAPETE', 500, false, false),
+  ('estandarte_clasico', 'ESTANDARTE', 0, true, false),
+  ('estandarte_ambar', 'ESTANDARTE', 400, false, false),
+  ('estandarte_obsidiana', 'ESTANDARTE', 400, false, false),
+  ('estandarte_fosil', 'ESTANDARTE', 400, false, false),
+  ('estandarte_volcan', 'ESTANDARTE', 400, false, false),
+  ('estandarte_helecho', 'ESTANDARTE', 400, false, false),
+  ('retrato_paleontologa', 'RETRATO', 0, true, false),
+  ('retrato_buscador', 'RETRATO', 0, false, false),
+  ('retrato_amonite', 'RETRATO', 350, false, false),
+  ('retrato_huevo', 'RETRATO', 350, false, false),
+  ('retrato_placas', 'RETRATO', 350, false, false),
+  ('retrato_cientifico', 'RETRATO', 350, false, false),
+  ('retrato_cientifica', 'RETRATO', 350, false, false),
+  ('retrato_cazador', 'RETRATO', 350, false, false),
+  ('retrato_trex', 'RETRATO', 350, false, false),
+  ('titulo_ninguno', 'TITULO', 0, true, false),
+  ('titulo_duelista', 'TITULO', 0, false, true),
+  ('titulo_asaltante', 'TITULO', 0, false, true),
+  ('titulo_cazador', 'TITULO', 0, false, true),
+  ('titulo_campeon', 'TITULO', 0, false, true)
+on conflict (id) do update set tipo = excluded.tipo, precio = excluded.precio,
+  por_defecto = excluded.por_defecto, exclusivo = excluded.exclusivo;
 
 delete from public.catalogo_cosmeticos where id not in (
   'dorso_clasico',
@@ -467,7 +477,12 @@ delete from public.catalogo_cosmeticos where id not in (
   'retrato_cientifico',
   'retrato_cientifica',
   'retrato_cazador',
-  'retrato_trex'
+  'retrato_trex',
+  'titulo_ninguno',
+  'titulo_duelista',
+  'titulo_asaltante',
+  'titulo_cazador',
+  'titulo_campeon'
 );
 
 delete from public.catalogo_cartas where card_id not in (
