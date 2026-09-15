@@ -1710,22 +1710,32 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .habitat.golpe .habitat-num { animation: latido .45s ease-out; }
 @keyframes latido { 0%,100% { transform: none; } 40% { transform: scale(1.4); } }
 
-/* Pila de mazo: dos capas para que se lea como un montón de cartas. */
-/* La pila fija el alto de la barra de hábitat, así que su tamaño sale del
-   presupuesto vertical del campo y no sólo de la estética. */
-.pila { position: relative; width: 32px; height: 22px; flex: 0 0 auto; }
+/* Pila de mazo: una carta pequeña boca abajo (`i`) con el contador encima
+   (`b`). Era una cajita apaisada de 32×22 con el número, y el dorso de la
+   tienda no se veía en ninguna parte de la partida: pasaba volando del mazo a
+   la mano y ya. Ahora es el sitio donde se mira, el tuyo abajo y el del rival
+   arriba.
+
+   La pila fija el alto de la fila de hábitat, así que su tamaño sale del
+   presupuesto vertical del campo y no sólo de la estética: a 360×640 las
+   filas de ranuras quedan en 128 px con la pila a 36, y la carta de 112 cabe. */
+.pila { position: relative; width: 30px; height: 36px; flex: 0 0 auto; }
 .pila::before {
-  content: ''; position: absolute; left: 3px; top: 2px; width: 26px; height: 18px;
-  border-radius: 4px; background: #241b11; box-shadow: 0 0 0 1px #45372a;
+  content: ''; position: absolute; left: 3px; top: 2px; width: 26px; height: 34px;
+  border-radius: 3px; background: #241b11; box-shadow: 0 0 0 1px #45372a;
+}
+.pila i {
+  position: absolute; left: 0; top: 0; width: 26px; height: 34px; border-radius: 3px;
+  background: #1c1610; box-shadow: 0 0 0 1px #45372a;
 }
 .pila b {
-  position: absolute; left: 0; top: 0; width: 26px; height: 18px; border-radius: 4px;
-  background: #1c1610; display: grid; place-items: center;
-  font-size: 10px; font-weight: 500; color: var(--texto-2);
+  position: absolute; left: 50%; bottom: -4px; translate: -50% 0;
+  min-width: 18px; padding: 0 4px; border-radius: 8px; line-height: 13px;
+  background: #120d09; box-shadow: 0 0 0 1px var(--borde-fuerte);
+  font-size: 9px; font-weight: 600; color: var(--texto); text-align: center;
 }
-.habitat.rival .pila b { box-shadow: 0 0 0 1px var(--borde-fuerte); }
-.habitat.propio .pila b { box-shadow: 0 0 0 1px var(--bio); color: var(--texto); }
-.pila.aviso b { color: var(--peligro); }
+.habitat.propio .pila b { box-shadow: 0 0 0 1px var(--bio); }
+.pila.aviso b { color: var(--peligro); box-shadow: 0 0 0 1px var(--peligro); }
 
 /* Descarte: una ficha plana al lado del mazo, y se puede abrir. */
 .descarte-ficha {
@@ -2200,7 +2210,18 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
    la inclinación del puntero en una sola propiedad, y escribir `transform` aquí
    habría borrado la inclinación justo al levantarla, que es cuando se mira. */
 .carta--mano.alzada { box-shadow: 0 0 0 1px var(--bio), 0 10px 26px rgba(0,0,0,.6); --alzar: -6px; }
-.carta--mano.arrastrando { opacity: .25; }
+/* Mientras la arrastras, en su hueco de la mano queda la carta boca abajo:
+   iba al 25 % de opacidad, y la cara medio borrada con la inclinación puesta
+   se leía como una carta girada a medias. El dorso va en un `::after` por
+   encima de todo lo de la carta —el marco está en z 2, el coste en 4— y es
+   además el único sitio de la partida donde se puede MIRAR el dorso comprado:
+   las demás veces pasa volando. */
+.carta--mano.arrastrando { --alzar: 0px; box-shadow: none; }
+.carta--mano.arrastrando::after {
+  content: ''; position: absolute; inset: 0; z-index: 6; border-radius: inherit;
+  background: #1c1610 var(--dorso, url('assets/piel/dorso.webp')) center / 100% 100% no-repeat;
+  filter: var(--dorso-filtro, none) brightness(.85);
+}
 
 .c-adap { position: absolute; right: 3px; top: 3px; width: 7px; height: 7px; border-radius: 50%;
           background: var(--bio); box-shadow: 0 0 0 1px #17120e; }
