@@ -627,6 +627,16 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .col-carta.dino .col-nombre { font-style: italic; }
 .col-meta { font-size: 9px; color: var(--tenue); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Crear la copia que falta con esquirlas (src/data/crafteo.js). Un botón
+   pequeño bajo el pie; el primer toque pregunta, el segundo crea. */
+.col-crear {
+  align-self: flex-start; margin-top: 2px; padding: 3px 7px; border-radius: 5px;
+  font-size: 10px; font-weight: 600; line-height: 1.2;
+  border: 1px solid var(--borde-fuerte); background: rgba(217,164,65,.08); color: var(--acento-claro);
+}
+.col-crear.si { background: var(--bio); color: #17120e; border-color: var(--bio); }
+.col-crear:disabled { opacity: .4; }
+.col-crear:not(:disabled):active { transform: scale(.96); }
 
 /* Una especie que no tienes es un hueco, no una carta apagada. */
 .col-carta.ninguna { background: #1a1410; box-shadow: 0 0 0 1px #2e2519; overflow: hidden; }

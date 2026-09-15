@@ -1381,6 +1381,30 @@ Y el vocabulario tiene guardián, como las mecánicas: una misión que mida
 catálogo que se infla no falla en ningún sitio, sólo se nota meses después en la
 economía.
 
+### El crafteo: lo que sobra se funde en esquirlas
+
+Decisión del autor del 15-09-2026: **las copias sobrantes ya no dan
+dinomonedas**. Las monedas salen de jugar y compran sobres; lo que sobra se
+funde en **esquirlas**, y con esquirlas se CREA la carta que eliges, que es
+el camino gratis y lento. [`src/data/crafteo.js`](src/data/crafteo.js) tiene
+los números y `0029_crafteo.sql` las dos funciones. Cuatro cosas:
+
+- **Una esquirla para todas las rarezas, y el coste va por rareza.** Se pidió
+  «craftear de su misma rareza» y no puede funcionar: `abrirSobre` reparte
+  primero lo que te falta, así que las sobrantes de una rareza sólo existen
+  cuando ya la tienes ENTERA. Con una esquirla por rareza nunca habría nada
+  que crear; con una sola, las comunes completas pagan las raras y épicas.
+- **Números de Hearthstone**: fundir 5 / 20 / 100 / 400, crear 40 / 100 / 400 /
+  1600. Fundir una copia siempre da menos que crear otra de su rareza, y
+  `crear_carta` sólo deja llegar al tope de copias: lo creado nunca vuelve a
+  ser sobrante. `test/crafteo.test.js` vigila las dos cosas.
+- **Vive fuera de `coleccion.js`** porque ese fichero va en la Edge Function.
+  `ECONOMIA.fusion` y la columna `valor_fusion` se QUEDARON sin uso en el
+  servidor; quitarlos pide re-empaquetar, re-anclar y desplegar, y se dejaron
+  para no hacerlo por nada.
+- **El botón de crear sólo sale si te llegan las esquirlas.** En cada hueco que
+  le falta a quien empieza habría sido un muro de botones apagados.
+
 ### Regenerar el catálogo no es aplicarlo
 
 `node tools/generar-cartas.mjs` reescribe el SQL; **la base de datos no se entera
