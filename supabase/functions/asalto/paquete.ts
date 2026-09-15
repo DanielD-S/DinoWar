@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: 674983d8fa0d1a73
+// huella: 9b4c33d208789793
 //
 // Lleva dentro estos 24 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -4123,8 +4123,14 @@ var VOCABULARIO = Object.freeze([
   "duelos",
   // duelos jugados, se ganen o no
   "duelosGanados",
-  "expedicionNuevos"
+  "expedicionNuevos",
   // rivales de expedición vencidos por primera vez
+  // Los de las cartas de jefe. Ni el parte ni la Edge Function: los apunta
+  // `reclamar_jefe` en SQL (0028) cuando la carta entra por primera vez.
+  "jefe:saurophaganax",
+  "jefe:barosaurus",
+  "cartasJefe"
+  // cartas de jefe DISTINTAS que tienes
 ]);
 var ES_VOCABULARIO = new Set(VOCABULARIO);
 function parteVacio() {
@@ -4959,7 +4965,12 @@ function eloTras(eloA, eloB, resultadoA, duelosA = 99, duelosB = 99) {
 }
 
 // src/data/logros.js
-var RECOMPENSA = Object.freeze({ TITULO: "titulo", MAZO: "mazo", SOBRES: "sobres" });
+var RECOMPENSA = Object.freeze({
+  TITULO: "titulo",
+  COSMETICO: "cosmetico",
+  MAZO: "mazo",
+  SOBRES: "sobres"
+});
 var L = (id, nombre, texto, mide, meta, recompensa) => Object.freeze({
   id,
   nombre,
@@ -4976,6 +4987,34 @@ var LOGROS = Object.freeze([
   // El golpe de gracia: el asalto que deja al jefe a cero. Se lo lleva quien
   // lo da, que es lo único que el servidor puede saber sin repartir méritos.
   L("cazador", "Cazador de jefes", "Da el golpe final a 1 jefe", "jefesVencidos", 1, { tipo: RECOMPENSA.TITULO, id: "titulo_cazador" }),
+  // Los de las cartas de jefe: se cumplen al RECLAMAR la carta, o sea, al
+  // haberle hecho daño a una cacería que la tribu terminó. Es la forma de que
+  // el retrato del jefe sea de quien lo cazó con los suyos y no sólo de quien
+  // dio el último golpe. Los avanza `reclamar_jefe` (0028).
+  L(
+    "trofeo_saurophaganax",
+    "El due\xF1o de la llanura",
+    "Reclama 1 carta del Saurophaganax",
+    "jefe:saurophaganax",
+    1,
+    { tipo: RECOMPENSA.COSMETICO, id: "retrato_saurophaganax" }
+  ),
+  L(
+    "trofeo_barosaurus",
+    "El gigante del r\xEDo",
+    "Reclama 1 carta del Barosaurus",
+    "jefe:barosaurus",
+    1,
+    { tipo: RECOMPENSA.COSMETICO, id: "retrato_barosaurus" }
+  ),
+  L(
+    "cazador_mayor",
+    "Cazador mayor",
+    "Reclama las 2 cartas de jefe",
+    "cartasJefe",
+    2,
+    { tipo: RECOMPENSA.COSMETICO, id: "dorso_cazador" }
+  ),
   // Los de constancia.
   L("campeon", "Campe\xF3n", "Gana 10 duelos", "duelosGanados", 10, { tipo: RECOMPENSA.TITULO, id: "titulo_campeon" }),
   L("explorador", "Explorador", "Gana 10 partidas", "victorias", 10, { tipo: RECOMPENSA.SOBRES, n: 3 }),
@@ -4983,7 +5022,16 @@ var LOGROS = Object.freeze([
   // Los grandes: un mazo inicial más. Eran los otros dos que no elegiste al
   // empezar y sólo se podían completar a base de sobres.
   L("morrison", "La Morrison entera", "Vence por primera vez a los 8 rivales de la Morrison", "expedicionNuevos", 8, { tipo: RECOMPENSA.MAZO }),
-  L("veterano", "Veterano", "Gana 25 duelos", "duelosGanados", 25, { tipo: RECOMPENSA.MAZO })
+  L("veterano", "Veterano", "Gana 25 duelos", "duelosGanados", 25, { tipo: RECOMPENSA.MAZO }),
+  // Y el más grande: el estandarte azul con su cinta.
+  L(
+    "leyenda",
+    "Leyenda del duelo",
+    "Gana 50 duelos",
+    "duelosGanados",
+    50,
+    { tipo: RECOMPENSA.COSMETICO, id: "estandarte_campeon" }
+  )
 ]);
 var LOGRO_POR_ID = Object.freeze(Object.fromEntries(LOGROS.map((l) => [l.id, l])));
 var ES_VOCABULARIO2 = new Set(VOCABULARIO);

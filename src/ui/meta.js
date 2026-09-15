@@ -222,7 +222,11 @@ export function pintarMisiones(abierto) {
   // Los logros, debajo: de una vez y con recompensa que no son monedas. Los
   // cumplidos van al final, que lo que se mira es lo que falta.
   const p = cargarPerfil();
-  const nombreTitulo = (id) => cosmeticoPorId(id)?.nombre ?? id;
+  const QUE_ES = { TITULO: 'Título', RETRATO: 'Retrato', DORSO: 'Dorso', ESTANDARTE: 'Estandarte', TAPETE: 'Tapete' };
+  const nombreTitulo = (id) => {
+    const c = cosmeticoPorId(id);
+    return c ? `${QUE_ES[c.tipo] ?? ''} «${c.nombre}»`.trim() : id;
+  };
   const logros = LOGROS.map((l) => {
     const estado = hoy.logros?.[l.id] ?? { progreso: 0, cobrado: false };
     const llevo = Math.min(estado.progreso ?? 0, l.meta);

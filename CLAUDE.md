@@ -1334,6 +1334,20 @@ recompensa viaja en la llamada como la meta y el premio de una misión, y
   no se cumplen** —sin jefe abierto, sin nadie conectado—. Se aceptó: es lo
   que las hace pedir algo. Pagan por debajo de la relámpago para que el peor
   día siga en el techo.
+- **Los trofeos de jefe se ganan al RECLAMAR la carta, no con el golpe
+  final** (0028): el retrato de cada jefe con su primera carta, y el dorso
+  «Cazador de jefes» con las dos. Así es de quien le pegó a una cacería que
+  la tribu terminó, y no sólo de quien la remató. `reclamar_jefe` es SQL y no
+  pasa por la Edge Function, así que lleva una COPIA del catálogo de logros
+  (`private.catalogo_logros()`) que `test/logros.test.js` compara con
+  `logros.js`: si añades un logro, regenera esa copia en una migración nueva.
+- **La 0028 contó lo jugado antes de que existieran los logros**, hasta el
+  despliegue de la función que empezó a apuntarlos (2026-09-15 02:38 UTC):
+  victorias, duelos, asaltos, daño, expediciones y cartas de jefe. El golpe
+  final no se puede reconstruir y no se contó.
+- **`avanzar_logros` ya no da por cobrado un tipo de recompensa que no
+  entiende.** La 0027 lo marcaba cobrado y no entregaba nada: por eso toda
+  recompensa nueva pide antes su `when` en SQL y después desplegar.
 - **`iniciales_tomados` recuerda qué mazos iniciales se tienen.** Las cuentas
   de antes de la 0023 no eligieron ninguno y tienen los tres disponibles; el
   crédito de `mazos_extra` se gasta en la misma pantalla de la cuenta nueva

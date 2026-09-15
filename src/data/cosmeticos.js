@@ -78,6 +78,10 @@ export const COSMETICOS = Object.freeze([
     id: 'dorso_volcan', tipo: T.DORSO, nombre: 'Huevo de brasa', lema: 'Una nidada fósil sobre basalto que aún quema.',
     precio: 300, arte: tienda('dorso_volcan'),
   }),
+  Object.freeze({
+    id: 'dorso_cazador', tipo: T.DORSO, nombre: 'Cazador de jefes', lema: 'El colmillo del trofeo, colgado del cuero.',
+    precio: 0, exclusivo: true, logro: 'cazador_mayor', arte: tienda('dorso_cazador'),
+  }),
 
   // ----------------------------------------------------------- tapetes
   Object.freeze({
@@ -142,6 +146,10 @@ export const COSMETICOS = Object.freeze([
     id: 'estandarte_helecho', tipo: T.ESTANDARTE, nombre: 'Helecho', lema: 'Paño verde con la fronda del sotobosque.',
     precio: 400, arte: tienda('estandarte_helecho'), cinta: tienda('cinta_helecho'),
   }),
+  Object.freeze({
+    id: 'estandarte_campeon', tipo: T.ESTANDARTE, nombre: 'Campeón', lema: 'Azul noche y oro trenzado: cincuenta duelos ganados.',
+    precio: 0, exclusivo: true, logro: 'leyenda', arte: tienda('estandarte_campeon'), cinta: tienda('cinta_campeon'),
+  }),
 
   // ---------------------------------------------------------- retratos
   Object.freeze({
@@ -179,6 +187,15 @@ export const COSMETICOS = Object.freeze([
   Object.freeze({
     id: 'retrato_trex', tipo: T.RETRATO, nombre: 'Rey tirano', lema: 'El rugido que cierra el Cretácico.',
     precio: 350, arte: tienda('retrato_trex'),
+  }),
+  // Los de los jefes: se ganan al reclamar su carta, no se venden.
+  Object.freeze({
+    id: 'retrato_saurophaganax', tipo: T.RETRATO, nombre: 'Saurophaganax', lema: 'El dueño de la llanura, visto de cerca.',
+    precio: 0, exclusivo: true, logro: 'trofeo_saurophaganax', arte: tienda('retrato_saurophaganax'),
+  }),
+  Object.freeze({
+    id: 'retrato_barosaurus', tipo: T.RETRATO, nombre: 'Barosaurus', lema: 'El gigante del río se gira a mirarte.',
+    precio: 0, exclusivo: true, logro: 'trofeo_barosaurus', arte: tienda('retrato_barosaurus'),
   }),
 
   // ----------------------------------------------------------- títulos
