@@ -89,6 +89,11 @@ PIEZAS = {
     'medallon_excavacion': ('assets/piel/tienda/medallon_excavacion.webp', 680),
     'marco_retrato': ('assets/piel/tienda/marco_retrato.webp', 256),
     'holografico': ('assets/piel/tienda/holografico.webp', 512),
+    'retrato_saurophaganax': ('assets/piel/tienda/retrato_saurophaganax.webp', 512),
+    'retrato_barosaurus': ('assets/piel/tienda/retrato_barosaurus.webp', 512),
+    'dorso_cazador': ('assets/piel/tienda/dorso_cazador.webp', 512),
+    'estandarte_campeon': ('assets/piel/tienda/estandarte_campeon.webp', 360),
+    'cinta_campeon': ('assets/piel/tienda/cinta_campeon.webp', 480),
 }
 
 KEYEADAS = ('placa_', 'medallon_', 'estandarte_', 'cinta_', 'marco_')

@@ -71,6 +71,11 @@ export const VOCABULARIO = Object.freeze([
   'duelos',           // duelos jugados, se ganen o no
   'duelosGanados',
   'expedicionNuevos', // rivales de expedición vencidos por primera vez
+  // Los de las cartas de jefe. Ni el parte ni la Edge Function: los apunta
+  // `reclamar_jefe` en SQL (0028) cuando la carta entra por primera vez.
+  'jefe:saurophaganax',
+  'jefe:barosaurus',
+  'cartasJefe',       // cartas de jefe DISTINTAS que tienes
 ]);
 
 const ES_VOCABULARIO = new Set(VOCABULARIO);

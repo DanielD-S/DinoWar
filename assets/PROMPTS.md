@@ -1500,3 +1500,24 @@ excavación como `medallon_excavasion.png`, renombrado), el `estandarte_helecho`
 que estrena la cinta de helecho, y cuatro retratos más: el científico, la
 científica, el cazador de fósiles y el T. rex. Con eso los ocho tapetes están
 completos.
+
+## Las recompensas exclusivas
+
+No se venden: los da un logro (src/data/logros.js). Mismos formatos y mismas
+referencias que sus hermanos de la tienda.
+
+- **`retrato_saurophaganax.png`** y **`retrato_barosaurus.png`** — 1254×1254 a
+  sangre, con `retrato_trex.png` de referencia de estilo: el jefe en plano de
+  cabeza y hombros mirando al espectador, al ocaso, con la cabeza entera y
+  aire alrededor porque se recorta en círculo. Se ganan con la primera carta de
+  cada jefe.
+- **`dorso_cazador.png`** — 1024×1400 a sangre, con el dorso de siempre de
+  referencia de forma: cuero negro con marcas de garra y un colmillo de
+  terópodo engastado en oro colgando de una tira. Se gana con las dos cartas
+  de jefe.
+- **`estandarte_campeon.png`** y **`cinta_campeon.png`** — el estandarte y la
+  banderola de siempre en azul noche con ribete de oro trenzado, fondo magenta.
+  Se ganan con 50 duelos.
+
+Llegaron las cinco el 15-09-2026. El estandarte vino a 0,454 de proporción y
+se estrecha un 10 % al pintarse.
