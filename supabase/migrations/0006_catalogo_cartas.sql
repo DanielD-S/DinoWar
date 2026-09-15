@@ -424,11 +424,16 @@ insert into public.catalogo_cosmeticos (id, tipo, precio, por_defecto) values
   ('estandarte_obsidiana', 'ESTANDARTE', 400, false),
   ('estandarte_fosil', 'ESTANDARTE', 400, false),
   ('estandarte_volcan', 'ESTANDARTE', 400, false),
+  ('estandarte_helecho', 'ESTANDARTE', 400, false),
   ('retrato_paleontologa', 'RETRATO', 0, true),
   ('retrato_buscador', 'RETRATO', 0, false),
   ('retrato_amonite', 'RETRATO', 350, false),
   ('retrato_huevo', 'RETRATO', 350, false),
-  ('retrato_placas', 'RETRATO', 350, false)
+  ('retrato_placas', 'RETRATO', 350, false),
+  ('retrato_cientifico', 'RETRATO', 350, false),
+  ('retrato_cientifica', 'RETRATO', 350, false),
+  ('retrato_cazador', 'RETRATO', 350, false),
+  ('retrato_trex', 'RETRATO', 350, false)
 on conflict (id) do update set tipo = excluded.tipo, precio = excluded.precio, por_defecto = excluded.por_defecto;
 
 delete from public.catalogo_cosmeticos where id not in (
@@ -453,11 +458,16 @@ delete from public.catalogo_cosmeticos where id not in (
   'estandarte_obsidiana',
   'estandarte_fosil',
   'estandarte_volcan',
+  'estandarte_helecho',
   'retrato_paleontologa',
   'retrato_buscador',
   'retrato_amonite',
   'retrato_huevo',
-  'retrato_placas'
+  'retrato_placas',
+  'retrato_cientifico',
+  'retrato_cientifica',
+  'retrato_cazador',
+  'retrato_trex'
 );
 
 delete from public.catalogo_cartas where card_id not in (

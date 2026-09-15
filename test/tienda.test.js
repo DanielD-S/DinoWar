@@ -182,8 +182,7 @@ test('ARTE_LISTO dice la verdad sobre el disco', () => {
 test('Cada artículo de pago pide piezas que la herramienta conoce', () => {
   for (const c of COSMETICOS.filter((x) => !x.porDefecto)) {
     for (const campo of ['arte', 'medallon', 'cinta']) {
-      // Un tapete sin medallón propio lleva el de siempre.
-      if (!c[campo] || c[campo] === porDefecto('TAPETE').medallon) continue;
+      if (!c[campo]) continue;
       assert.ok(c[campo].startsWith('assets/piel/tienda/'), `${c.id}.${campo} fuera de assets/piel/tienda/`);
       const nombre = c[campo].split('/').pop().replace('.webp', '');
       assert.ok(PIEZAS.includes(nombre), `${c.id} pide «${c[campo]}» y no está en PIEZAS`);

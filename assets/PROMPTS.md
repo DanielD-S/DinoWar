@@ -1495,6 +1495,8 @@ que se queda fuera hasta que llegue `estandarte_helecho`. Llegaron también
 cinco retratos con su aro (`marco_retrato`) y la lámina `holografico`. Los
 marcos de carta alternativos se descartaron: no se veían bien.
 
-Quedan por hacer los medallones `medallon_hell_creek`, `medallon_kem_kem`,
-`medallon_solnhofen` y `medallon_excavacion` (tabla de arriba) y el
-`estandarte_helecho`.
+Y al final del día llegaron los cuatro medallones que faltaban (el de
+excavación como `medallon_excavasion.png`, renombrado), el `estandarte_helecho`
+que estrena la cinta de helecho, y cuatro retratos más: el científico, la
+científica, el cazador de fósiles y el T. rex. Con eso los ocho tapetes están
+completos.
