@@ -700,6 +700,20 @@ Tres decisiones que conviene conocer antes de tocarlo:
   mazo; una retirada vuelve desde su ranura, porque `render.js` apunta de dónde
   se fue antes de vaciar la ranura.
 
+- **Un cuadrado que gira sólo cubre siempre su CÍRCULO inscrito.** Los rayos
+  de la invocación son una textura cuadrada rotando, y `rayos.webp` llega
+  brillante hasta el canto —235 de 255 a cuatro quintos del radio—: en
+  `screen` sobre el velo, ese corte duro se veía dar vueltas detrás de la
+  legendaria, que era justo lo que no tenía que verse. Va recortada con una
+  máscara redonda por dentro del círculo inscrito, y el lado sube para que el
+  disco opaco llegue donde llegaba el cuadrado. Cualquier capa que gire pide
+  lo mismo.
+- **Un `max-width` no recorta el margen.** Las dos capas se centraban con
+  `width: 150vmin` y `margin: -75vmin`, con un tope en píxeles encima: en
+  cuanto el tope mordía, la caja encogía y el margen no, y la ceremonia entera
+  salía descentrada arriba y a la izquierda. El lado va en una variable y el
+  margen se calcula de ella.
+
 El hit-stop son 80 ms con `animation-play-state: paused` en toda la partida y
 el destello como única excepción: la sacudida y el flipbook arrancan al soltar.
 Y la invocación **retiene** la carta en su ranura —`.retenida`— mientras dura la
