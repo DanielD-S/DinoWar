@@ -19,6 +19,13 @@ Cinco clases de pieza, y cada una llega distinta:
   estandarte_*     el estandarte de la presentación. MAGENTA, se keyea.
   cinta_*          la banderola del marcador final. MAGENTA, se keyea. Apunta a
                    la izquierda; el CSS la refleja cuando la lleva el rival.
+  retrato_*        el retrato del jugador, A SANGRE y cuadrado. No se recorta:
+                   el círculo lo pone el CSS.
+  marco_retrato    el aro de latón que va encima del retrato. MAGENTA, se keyea.
+                   Imprime el diámetro del hueco, que es el `--retrato-hueco`
+                   del CSS.
+  holografico      la lámina que brilla sobre las legendarias y las de jefe.
+                   A sangre; el CSS la mezcla con `color-dodge`.
 
 Todo lo que no es la placa va a assets/piel/tienda/. Los nombres son los de
 `PIEZAS` en src/ui/tienda.js, y test/tienda.test.js falla si las dos listas se
@@ -55,9 +62,26 @@ PIEZAS = {
     'estandarte_volcan': ('assets/piel/tienda/estandarte_volcan.webp', 360),
     'cinta_ambar': ('assets/piel/tienda/cinta_ambar.webp', 480),
     'cinta_obsidiana': ('assets/piel/tienda/cinta_obsidiana.webp', 480),
+    'dorso_morrison': ('assets/piel/tienda/dorso_morrison.webp', 512),
+    'dorso_hell_creek': ('assets/piel/tienda/dorso_hell_creek.webp', 512),
+    'dorso_kem_kem': ('assets/piel/tienda/dorso_kem_kem.webp', 512),
+    'dorso_volcan': ('assets/piel/tienda/dorso_volcan.webp', 512),
+    'tapete_hell_creek': ('assets/piel/tienda/tapete_hell_creek.webp', 512),
+    'tapete_kem_kem': ('assets/piel/tienda/tapete_kem_kem.webp', 512),
+    'tapete_solnhofen': ('assets/piel/tienda/tapete_solnhofen.webp', 512),
+    'tapete_excavacion': ('assets/piel/tienda/tapete_excavacion.webp', 512),
+    'cinta_fosil': ('assets/piel/tienda/cinta_fosil.webp', 480),
+    'cinta_volcan': ('assets/piel/tienda/cinta_volcan.webp', 480),
+    'retrato_paleontologa': ('assets/piel/tienda/retrato_paleontologa.webp', 512),
+    'retrato_buscador': ('assets/piel/tienda/retrato_buscador.webp', 512),
+    'retrato_amonite': ('assets/piel/tienda/retrato_amonite.webp', 512),
+    'retrato_huevo': ('assets/piel/tienda/retrato_huevo.webp', 512),
+    'retrato_placas': ('assets/piel/tienda/retrato_placas.webp', 512),
+    'marco_retrato': ('assets/piel/tienda/marco_retrato.webp', 256),
+    'holografico': ('assets/piel/tienda/holografico.webp', 512),
 }
 
-KEYEADAS = ('placa_', 'medallon_', 'estandarte_', 'cinta_')
+KEYEADAS = ('placa_', 'medallon_', 'estandarte_', 'cinta_', 'marco_')
 
 # La luminancia media de assets/piel/piedra.webp, medida: el techo de un tapete.
 LUZ_PIEDRA = 35

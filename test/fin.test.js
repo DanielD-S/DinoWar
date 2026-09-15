@@ -56,6 +56,12 @@ test('Cada fila resalta la cifra mayor, y un hábitat hundido se lee como 0', ()
   assert.match(html, /1 turno</);
 });
 
+test('El retrato sale sólo en el bando que lo lleva', () => {
+  const html = marcadorHTML({ gane: true, turnos: 4, yo: bando({ retrato: true }), rival: bando() });
+  assert.match(html, /marcador-bando propio"><i class="retrato-medallon marcador-retrato"/);
+  assert.equal(html.match(/marcador-retrato/g).length, 1);
+});
+
 test('El nombre del rival se escapa y un emblema que no es clave no entra', () => {
   // En un duelo el nombre lo escribió otra persona.
   const html = marcadorHTML({

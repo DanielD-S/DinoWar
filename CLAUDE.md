@@ -1421,6 +1421,20 @@ carta, un mazo ni lo rápido que se progresa.
   los dorsos se ven como el clásico tintado, y la sexta placa del menú lleva un
   dibujo de CSS sin `--placa` (el guardián de `marcado.test.js` exige fichero a
   toda placa declarada).
+- **Los retratos son el único tipo que se pinta siempre.** Los otros tres
+  tenían algo que conservar antes de la tienda; el retrato no, así que
+  `--retrato-propio` va también con el gratuito y `--retrato-rival` sólo en
+  un duelo (contra la IA la presentación sigue enseñando la portada del mazo).
+  Hay DOS gratuitos: la paleontóloga es `porDefecto` y el buscador `gratis`.
+  Por eso existe la 0026: `equipar_cosmetico` deja poner lo de precio 0 sin
+  comprarlo y `comprar_cosmetico` lo rechaza. En el marcador final el retrato
+  va EN LUGAR del emblema: con los dos, el nombre se cortaba a 375 px.
+- **El holográfico no se vende**: brilla en las legendarias y las dos de jefe,
+  en todas partes, sólo sobre la ventana de la ilustración (`carta.css`). A
+  opacidad .3 no se veía; va a .55 con `color-dodge` y `isolation` en la
+  ventana, que sin ella se mezclaría con el tablero.
+- **Los tapetes sin medallón propio llevan la huella de siempre** en
+  `medallon`; `test/tienda.test.js` lo acepta sólo para ese fichero.
 - **Los packs de sobres** serán varios sobres seguidos al precio de uno por
   sobre, sin descuento: con descuento acelerarían el progreso. Si algún día
   hay dinero real, no se venden por dinero.

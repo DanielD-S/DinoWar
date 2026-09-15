@@ -109,6 +109,29 @@
 .con-marco .c-arte .foto { filter: saturate(1.04) contrast(1.03); }
 .con-marco .c-arte::after { background: none; }
 
+/* La lámina holográfica: las legendarias y las dos de jefe, en todas partes.
+   Brilla sobre la ILUSTRACIÓN y no sobre el marco, que ya dice la rareza con
+   su material. La lámina es el doble de ancha que la ventana y se desliza de
+   un lado a otro con `transform` —ida y vuelta, así no hay costura—, y se
+   mezcla con `color-dodge` DENTRO de la ventana (`isolation`): sin eso se
+   mezclaría con el tablero de detrás. */
+.con-marco.rareza-LEGENDARIO .c-arte,
+.con-marco.jefe .c-arte { overflow: hidden; isolation: isolate; }
+.con-marco.rareza-LEGENDARIO .c-arte::before,
+.con-marco.jefe .c-arte::before {
+  content: ''; position: absolute; z-index: 1; top: 0; bottom: 0; left: 0; width: 200%;
+  pointer-events: none;
+  background: url('assets/piel/tienda/holografico.webp') center / cover no-repeat;
+  /* A .3 no se veía en ninguna ilustración clara; a .55 se lee sin tapar. */
+  mix-blend-mode: color-dodge; opacity: .55;
+  animation: holografico 7s ease-in-out infinite alternate;
+}
+@keyframes holografico { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .con-marco.rareza-LEGENDARIO .c-arte::before,
+  .con-marco.jefe .c-arte::before { animation: none; transform: translateX(-25%); }
+}
+
 /* El coste va centrado en el campo de su chapa, igual que las otras dos cifras.
    Ya no lleva relleno propio: el campo oscuro lo trae la chapa de Biomasa, que
    es justo para lo que se pidió. Antes hacía falta porque el anillo del marco
