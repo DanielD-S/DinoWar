@@ -46,7 +46,7 @@ test('Toda criatura tiene habilidad, y toda habilidad tiene nombre y texto', () 
     assert.ok(c.rasgoNombre, `${c.id} no tiene nombre de rasgo`);
     assert.ok(c.rasgoTexto, `${c.id} no tiene texto`);
   }
-  assert.equal(CRIATURAS.length, 68, '66 del set y las 2 de jefe');
+  assert.equal(CRIATURAS.length, 71, '66 del set y las 5 de jefe');
 });
 
 test('Ninguna mecánica usa un campo que el motor no mire', () => {

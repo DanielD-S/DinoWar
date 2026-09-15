@@ -53,7 +53,14 @@ export const LOGROS = Object.freeze([
     { tipo: RECOMPENSA.COSMETICO, id: 'retrato_saurophaganax' }),
   L('trofeo_barosaurus', 'El gigante del río', 'Reclama 1 carta del Barosaurus', 'jefe:barosaurus', 1,
     { tipo: RECOMPENSA.COSMETICO, id: 'retrato_barosaurus' }),
-  L('cazador_mayor', 'Cazador mayor', 'Reclama las 2 cartas de jefe', 'cartasJefe', 2,
+  L('trofeo_supersaurus', 'El horizonte que camina', 'Reclama 1 carta del Supersaurus', 'jefe:supersaurus', 1,
+    { tipo: RECOMPENSA.COSMETICO, id: 'retrato_supersaurus' }),
+  L('trofeo_hesperosaurus', 'Detrás de la muralla', 'Reclama 1 carta del Hesperosaurus', 'jefe:hesperosaurus', 1,
+    { tipo: RECOMPENSA.COSMETICO, id: 'retrato_hesperosaurus' }),
+  L('trofeo_harpactognathus', 'La sombra del río', 'Reclama 1 carta del Harpactognathus', 'jefe:harpactognathus', 1,
+    { tipo: RECOMPENSA.COSMETICO, id: 'retrato_harpactognathus' }),
+  // Con cinco jefes el dorso pide las cinco: una vuelta entera del calendario.
+  L('cazador_mayor', 'Cazador mayor', 'Reclama las 5 cartas de jefe', 'cartasJefe', 5,
     { tipo: RECOMPENSA.COSMETICO, id: 'dorso_cazador' }),
 
   // Los de constancia.

@@ -15,6 +15,8 @@ import {
 } from '../src/data/logros.js';
 import { parteVacio, VOCABULARIO } from '../src/data/misiones.js';
 import { COSMETICOS, cosmeticoPorId } from '../src/data/cosmeticos.js';
+import { CARTAS_DE_JEFE } from '../src/data/cards.js';
+import { readdirSync } from 'node:fs';
 
 test('Todo logro mide un contador del vocabulario', () => {
   for (const l of LOGROS) assert.ok(logroMideAlgoConocido(l), `«${l.id}» mide «${l.mide}», que no existe`);
@@ -89,14 +91,24 @@ test('Reclamar una carta de jefe por primera vez avanza sus logros', () => {
   assert.match(cuerpo, /if v_nueva then\s+perform private\.avanzar_logros/);
   assert.match(cuerpo, /'jefe:' \|\| substr\(v_recompensa, 6\), 'cartasJefe'/);
   // Todo contador de carta de jefe que mida un logro lo escribe este camino.
-  for (const l of LOGROS.filter((x) => x.mide.startsWith('jefe:') || x.mide === 'cartasJefe')) {
-    const carta = l.mide === 'cartasJefe' ? null : `jefe_${l.mide.slice(5)}`;
-    if (carta) assert.ok(TROFEOS.includes(`'${carta}'`), `el recuento de la 0028 no cuenta «${carta}»`);
+  // `reclamar_jefe` deriva el contador de la carta: `jefe_x` avanza `jefe:x`.
+  // Un logro de jefe cuya carta no existe no avanzaría nunca, y una carta de
+  // jefe sin su logro dejaría su retrato sin forma de ganarse.
+  const deJefe = LOGROS.filter((x) => x.mide.startsWith('jefe:'));
+  for (const l of deJefe) {
+    assert.ok(CARTAS_DE_JEFE[`jefe_${l.mide.slice(5)}`], `«${l.id}» mide una carta de jefe que no existe`);
+  }
+  for (const id of Object.keys(CARTAS_DE_JEFE)) {
+    assert.ok(deJefe.some((l) => l.mide === `jefe:${id.slice(5)}`), `«${id}» no tiene logro de trofeo`);
   }
 });
 
 test('La copia del catálogo de la 0028 es exactamente src/data/logros.js', () => {
-  const literal = TROFEOS.split('-- LOGROS:INICIO')[1].split('-- LOGROS:FIN')[0];
+  // La copia que vale es la de la ÚLTIMA migración que la escribe.
+  const ultima = readdirSync('supabase/migrations').filter((f) => f.endsWith('.sql')).sort()
+    .map((f) => readFileSync(`supabase/migrations/${f}`, 'utf8'))
+    .filter((s) => s.includes('-- LOGROS:INICIO')).pop();
+  const literal = ultima.split('-- LOGROS:INICIO')[1].split('-- LOGROS:FIN')[0];
   const json = literal.match(/select '([^]*)'::jsonb/)[1].replace(/''/g, "'");
   const copia = JSON.parse(json);
   const esperado = LOGROS.map((l) => ({ id: l.id, mide: l.mide, meta: l.meta, recompensa: l.recompensa }));

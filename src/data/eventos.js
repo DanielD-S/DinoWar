@@ -57,6 +57,57 @@ export const JEFES = Object.freeze({
     ]),
     nota: 'No pega fuerte. Aguanta, que es peor.',
   }),
+  // La segunda hornada (15-09-2026). Cada uno con su mazo temático de la
+  // Morrison y su forma de pelear: un muro de Vida, uno que devuelve daño y
+  // uno que muele el mazo desde el aire.
+  supersaurus: Object.freeze({
+    id: 'supersaurus',
+    nombre: 'Supersaurus vivianae',
+    titulo: 'El gigante del horizonte',
+    vidaMaxima: 7000,
+    recompensa: 'jefe_supersaurus',
+    mazo: Object.freeze([
+      ['camarasaurus', 3], ['diplodocus', 3], ['apatosaurus', 3], ['athenar', 3],
+      ['atlasaurus', 2], ['argentinosaurus', 2], ['mamenchisaurus', 3], ['amargasaurus', 3],
+      ['plateosauravus', 3], ['antarctosaurus', 1], ['brachiosaurus', 1], ['dryosaurus', 3],
+      ['gregarismo', 3], ['rebrote', 3], ['gastrolitos', 2], ['neumaticidad', 2],
+      ['crecimiento_acelerado', 1], ['bosque', 1], ['sabana', 1], ['competencia', 2], ['frutos', 2],
+      ['biomasa', 5], ['araucarias', 3],
+    ]),
+    nota: 'Es la Vida más alta de la cuenca. No hay atajo: hay que tirarlo entre todos.',
+  }),
+  hesperosaurus: Object.freeze({
+    id: 'hesperosaurus',
+    nombre: 'Hesperosaurus mjosi',
+    titulo: 'La muralla de placas',
+    vidaMaxima: 5500,
+    recompensa: 'jefe_hesperosaurus',
+    mazo: Object.freeze([
+      ['stegosaurus', 3], ['kentrosaurus', 3], ['loricatosaurus', 3], ['invictarx', 3],
+      ['gargoyleosaurus', 3], ['nodosaurus', 2], ['euoplocephalus', 3], ['bienosaurus', 3],
+      ['ankylosaurus', 1], ['dryosaurus', 3], ['camarasaurus', 2],
+      ['gregarismo', 3], ['trampa', 3], ['fractura', 2], ['gastrolitos', 2], ['rebrote', 3],
+      ['competencia', 2], ['mortandad', 1], ['aridez', 1], ['nido', 2],
+      ['biomasa', 5], ['cicadas', 2],
+    ]),
+    nota: 'Cada golpe que le das te lo devuelve. Pega con criaturas que aguanten.',
+  }),
+  harpactognathus: Object.freeze({
+    id: 'harpactognathus',
+    nombre: 'Harpactognathus gentryii',
+    titulo: 'La sombra del río',
+    vidaMaxima: 4500,
+    recompensa: 'jefe_harpactognathus',
+    mazo: Object.freeze([
+      ['pteranodon', 3], ['huaxiadraco', 3], ['quetzalcoatlus', 2], ['eosinopteryx', 3],
+      ['troodon', 3], ['ornitholestes', 3], ['dromaeosaurus', 3], ['ceratosaurus', 3],
+      ['allosaurus', 2], ['suchomimus', 1], ['riparovenator', 2],
+      ['trampa', 3], ['carrona', 1], ['lago', 2], ['insectos', 3], ['canal', 1],
+      ['inundacion', 2], ['gregarismo', 3], ['fractura', 2], ['neumaticidad', 2],
+      ['biomasa', 5], ['equisetos', 3],
+    ]),
+    nota: 'Poca Vida y muy rápido: te vacía el mazo antes de que lo alcances.',
+  }),
 });
 
 /**
@@ -91,6 +142,49 @@ export const CALENDARIO = Object.freeze([
     titulo: 'Crecida del canal',
     texto: 'El río se desborda: mientras dure, todo el mundo pelea en la llanura de '
       + 'inundación.',
+  }),
+  // La segunda vuelta del calendario, con los tres jefes nuevos. Las fechas de
+  // arriba no se tocan: las tribus que ya existen siguen en los mismos días.
+  Object.freeze({
+    id: 'caza_supersaurus', tipo: TIPO_EVENTO.JEFE, jefe: 'supersaurus',
+    dia: 14, dura: 5,
+    titulo: 'El gigante del horizonte',
+    texto: 'Cinco días contra el saurópodo más largo de la Morrison. No pega mucho, '
+      + 'pero su Vida no se acaba nunca.',
+  }),
+  Object.freeze({
+    id: 'lluvias_cuenca', tipo: TIPO_EVENTO.CLIMA, clima: 'bosque',
+    dia: 19, dura: 2,
+    titulo: 'Llegan las lluvias',
+    texto: 'Dos días de estación de lluvias: los saurópodos curan una herida al final '
+      + 'de cada turno.',
+  }),
+  Object.freeze({
+    id: 'muralla_hesperosaurus', tipo: TIPO_EVENTO.JEFE, jefe: 'hesperosaurus',
+    dia: 21, dura: 5,
+    titulo: 'La muralla de placas',
+    texto: 'Cinco días contra un estegosaurio que devuelve cada golpe. Hay que pegarle '
+      + 'con criaturas que aguanten.',
+  }),
+  Object.freeze({
+    id: 'monzon_cuenca', tipo: TIPO_EVENTO.CLIMA, clima: 'sabana',
+    dia: 26, dura: 2,
+    titulo: 'El monzón de verano',
+    texto: 'Dos días de monzón: los dos jugadores ganan 1 de Biomasa más cada turno.',
+  }),
+  Object.freeze({
+    id: 'sombra_harpactognathus', tipo: TIPO_EVENTO.JEFE, jefe: 'harpactognathus',
+    dia: 28, dura: 5,
+    titulo: 'La sombra del río',
+    texto: 'Cinco días contra un pterosaurio que vacía tu mazo desde el aire. Poca Vida '
+      + 'y mucha prisa.',
+  }),
+  Object.freeze({
+    id: 'crecida_verano', tipo: TIPO_EVENTO.CLIMA, clima: 'llanura',
+    dia: 33, dura: 2,
+    titulo: 'La crecida de verano',
+    texto: 'Dos días de crecida: cada jugador puede cambiar una carta de su mano por '
+      + 'otra del mazo, una vez por turno.',
   }),
 ]);
 
