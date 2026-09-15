@@ -121,14 +121,15 @@
 
 /* La pila de mazo. Es el objeto MÁS animado del tablero —`enMazo` es el gesto
    que más usa el guión, seis veces: moler, buscar, reciclar, quedarse sin
-   robar— y hasta ahora eran dos rectángulos de CSS. */
-.pila::before { display: none; }
-.pila b {
-  width: 100%; height: 100%; left: 0; top: 0;
-  background: url('assets/piel/mazo.webp') center / contain no-repeat;
-  box-shadow: none !important; color: var(--texto);
-  text-shadow: 0 1px 2px #000, 0 0 4px #000;
-  font-size: 9px;
+   robar—. La carta de encima lleva TU dorso, el de la tienda si lo hay, y la
+   del rival el suyo: en un duelo `--dorso-rival` (src/ui/tienda.js) y si no
+   el de siempre, que tu dorso comprado no puede salir en su mazo. */
+.pila i {
+  background: #1c1610 var(--dorso, url('assets/piel/dorso.webp')) center / 100% 100% no-repeat;
+  filter: var(--dorso-filtro, none);
+}
+.habitat.rival .pila i {
+  background-image: var(--dorso-rival, url('assets/piel/dorso.webp')); filter: none;
 }
 
 /* -------------------------------------------------------------------- clima

@@ -1429,6 +1429,15 @@ carta, un mazo ni lo rápido que se progresa.
   Por eso existe la 0026: `equipar_cosmetico` deja poner lo de precio 0 sin
   comprarlo y `comprar_cosmetico` lo rechaza. En el marcador final el retrato
   va EN LUGAR del emblema: con los dos, el nombre se cortaba a 375 px.
+- **El dorso se MIRA en dos sitios de la partida**: la pila de mazo, que es
+  una carta pequeña boca abajo (la tuya abajo, la del rival arriba con
+  `--dorso-rival`), y el hueco de la mano mientras arrastras una carta. Antes
+  sólo pasaba volando y el autor preguntó para qué servía comprar uno. La pila
+  subió de 22 a 36 px de alto y las filas de ranuras lo pagan: a 360×640
+  quedan en 128 px, la carta de 112 cabe.
+- **La Biomasa NO lleva tope de familia**, y se volvió a decidir el 14-09-2026:
+  el autor recordaba «5 por mazo», que son los cinco de cada mazo de jefe. Lo
+  medido sigue mandando: con 12 en vez de 7 se gana menos.
 - **El holográfico no se vende**: brilla en las legendarias y las dos de jefe,
   en todas partes, sólo sobre la ventana de la ilustración (`carta.css`). A
   opacidad .3 no se veía; va a .55 con `color-dodge` y `isolation` en la
