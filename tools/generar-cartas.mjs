@@ -22,6 +22,7 @@ import { ECONOMIA, coleccionInicial } from '../src/data/coleccion.js';
 import { limiteDe } from '../src/data/coleccion.js';
 import { MAZOS_INICIALES } from '../src/data/iniciales.js';
 import { COSMETICOS } from '../src/data/cosmeticos.js';
+import { CRAFTEO } from '../src/data/crafteo.js';
 
 export const SALIDA = 'supabase/migrations/0006_catalogo_cartas.sql';
 
@@ -114,6 +115,15 @@ export function generar() {
   L.push('  mazos_maximo      int not null');
   L.push(');');
   L.push('');
+  L.push('-- El crafteo: cuántas esquirlas da fundir una copia sobrante y cuántas cuesta');
+  L.push('-- crear una, por rareza. `fundir_excedente` y `crear_carta` (0029) leen de');
+  L.push('-- AQUÍ; el cliente sólo manda el id. Sale de src/data/crafteo.js.');
+  L.push('create table if not exists public.catalogo_crafteo (');
+  L.push('  rareza  text primary key,');
+  L.push('  fundir  int not null check (fundir > 0),');
+  L.push('  crear   int not null check (crear > 0)');
+  L.push(');');
+  L.push('');
 
   // NADA DE `truncate`. Aquí hubo un `truncate public.catalogo_cartas cascade`
   // y era una bomba: `coleccion` tiene una clave foránea contra esta tabla, así
@@ -172,6 +182,11 @@ export function generar() {
   L.push(');');
   L.push('');
 
+  L.push('insert into public.catalogo_crafteo (rareza, fundir, crear) values');
+  L.push(`${Object.keys(CRAFTEO.crear).map((r) => `  (${sql(r)}, ${CRAFTEO.fundir[r]}, ${CRAFTEO.crear[r]})`).join(',\n')}`);
+  L.push('on conflict (rareza) do update set fundir = excluded.fundir, crear = excluded.crear;');
+  L.push('');
+
   // Las bajas de cartas van al final y en este orden: `catalogo_inicial` apunta
   // a `catalogo_cartas`, así que quitar del set una carta que todavía figura en
   // la colección de salida fallaría contra su propia clave foránea.
@@ -199,7 +214,7 @@ export function generar() {
 
   L.push('-- El catálogo lo lee cualquiera que haya entrado: son las reglas del');
   L.push('-- juego, no datos de nadie. Escribirlo, sólo las migraciones.');
-  for (const t of ['catalogo_cartas', 'catalogo_inicial', 'catalogo_iniciales', 'catalogo_cosmeticos', 'catalogo_economia']) {
+  for (const t of ['catalogo_cartas', 'catalogo_inicial', 'catalogo_iniciales', 'catalogo_cosmeticos', 'catalogo_crafteo', 'catalogo_economia']) {
     L.push(`alter table public.${t} enable row level security;`);
     L.push(`drop policy if exists "el catálogo es público" on public.${t};`);
     L.push(`create policy "el catálogo es público" on public.${t}`);

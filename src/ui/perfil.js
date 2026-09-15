@@ -28,8 +28,9 @@ import {
   cargarPerfil, guardarPerfil, actualizarPerfil, perfilInicial,
 } from './almacen.js';
 import {
-  ECONOMIA, abrirSobre, excedente, valorFusion,
+  ECONOMIA, abrirSobre, excedente,
 } from '../data/coleccion.js';
+import { esquirlasDeFundir, costeDeCrear, sePuedeCrear } from '../data/crafteo.js';
 import { cosmeticoPorId, loTiene } from '../data/cosmeticos.js';
 
 export const MODO = Object.freeze({ REMOTO: 'REMOTO', LOCAL: 'LOCAL' });
@@ -88,6 +89,8 @@ function aFormaLocal(d) {
     sobresGratis: Number(d.sobres_gratis ?? 0),
     mazosExtra: Number(d.mazos_extra ?? 0),
     inicialesTomados: Array.isArray(d.iniciales_tomados) ? d.iniciales_tomados.filter((x) => typeof x === 'string') : [],
+    // El material del crafteo. Un servidor sin la 0029 no lo manda.
+    esquirlas: Number(d.esquirlas ?? 0),
     // La dificultad es una preferencia de ESTE navegador, no estado de juego:
     // el servidor no la lleva y no debe pisarla al sincronizar.
     dificultad: cargarPerfil().dificultad,
@@ -282,18 +285,44 @@ export async function equiparCosmetico(id) {
 
 /** Funde el excedente: las copias que ya no caben en ningún mazo. */
 export async function fundir() {
+  // Da ESQUIRLAS, no dinomonedas (src/data/crafteo.js): las monedas salen de
+  // jugar y compran sobres; lo que sobra paga crear la carta que eliges.
   if (modo === MODO.LOCAL) {
     const p = cargarPerfil();
-    const valor = valorFusion(p.cartas);
+    const valor = esquirlasDeFundir(p.cartas);
     if (valor === 0) return 0;
     const cartas = { ...p.cartas };
     for (const [cid, n] of Object.entries(excedente(p.cartas))) cartas[cid] -= n;
-    actualizarPerfil({ cartas, monedas: p.monedas + valor });
+    actualizarPerfil({ cartas, esquirlas: (p.esquirlas ?? 0) + valor });
     return valor;
   }
   const r = await rpc('fundir_excedente');
   await sincronizar();
   return Number(r?.ganadas ?? 0);
+}
+
+/**
+ * Crea una copia de una carta con esquirlas. En remoto cobra el SERVIDOR, con
+ * el coste de su catálogo, y sólo hasta el tope de copias: aquí sólo viaja el
+ * id. Devuelve el perfil tal como quedó.
+ */
+export async function crearCarta(cardId) {
+  const p = cargarPerfil();
+  if (!sePuedeCrear(cardId, p.cartas)) throw new Error('esa carta no se puede crear');
+  if (modo === MODO.LOCAL) {
+    const coste = costeDeCrear(cardId);
+    if (!PRUEBAS && (p.esquirlas ?? 0) < coste) throw new Error(`te faltan ${coste - (p.esquirlas ?? 0)} esquirlas`);
+    actualizarPerfil({
+      cartas: { ...p.cartas, [cardId]: (p.cartas[cardId] ?? 0) + 1 },
+      esquirlas: PRUEBAS ? p.esquirlas : p.esquirlas - coste,
+    });
+    return cargarPerfil();
+  }
+  await sesionValida();
+  const d = await rpc('crear_carta', { p_card: cardId });
+  const nuevo = aFormaLocal(d);
+  guardarPerfil(nuevo);
+  return nuevo;
 }
 
 // -------------------------------------------------------------- recompensa

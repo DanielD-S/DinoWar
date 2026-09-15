@@ -17,11 +17,12 @@ import {
 } from '../data/cards.js';
 import {
   ECONOMIA, PROBABILIDAD, GARANTIA, TAM_MAZO, POR_RAREZA, abrirSobre,
-  excedente, valorFusion, limiteDe, validarMazo, mazoPorDefecto,
+  excedente, limiteDe, validarMazo, mazoPorDefecto,
 } from '../data/coleccion.js';
+import { esquirlasDeFundir, costeDeCrear, sePuedeCrear } from '../data/crafteo.js';
 import { cargarPerfil, perfilInicial } from './almacen.js';
 import {
-  PRUEBAS, comprarSobre as pedirSobre, fundir, cobrarPartida,
+  PRUEBAS, comprarSobre as pedirSobre, fundir, crearCarta, cobrarPartida,
   traerMisiones, misionesDeHoy,
 } from './perfil.js';
 import { misionesDelDia } from '../data/misiones.js';
@@ -80,6 +81,27 @@ export function montarMeta(alVolver, alAbrirPack = () => {}) {
     const ids = [...nodo.querySelectorAll('[data-card]')].map((x) => x.dataset.card);
     abrirFicha(fichaHTML(c.dataset.card), { ids, i: ids.indexOf(c.dataset.card) });
   };
+  // Crear con esquirlas: el primer toque pregunta y el segundo crea. Va en
+  // captura y corta la propagación, que si no el mismo toque abriría también
+  // la ficha de la carta.
+  dom.rejilla.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-crear], [data-crear-si]');
+    if (!b) return;
+    e.stopPropagation();
+    if (b.dataset.crear) { creando = b.dataset.crear; pintarColeccion(); return; }
+    const cardId = b.dataset.crearSi;
+    creando = null;
+    b.disabled = true;
+    try {
+      await crearCarta(cardId);
+    } catch (err) {
+      pintarColeccion();
+      dom.resumen.innerHTML += `<p class="meta-nota mal">No se pudo crear: ${err.message}</p>`;
+      return;
+    }
+    pintarColeccion();
+    pintarMenu();
+  }, { capture: true });
   dom.rejilla.addEventListener('click', alTocarCarta(dom.rejilla));
   dom.tirada.addEventListener('click', alTocarCarta(dom.tirada));
 
@@ -288,6 +310,7 @@ function pintarColeccion() {
         <div class="col-pie">
           <div class="col-nombre">${nombreHTML(c)}</div>
           <div class="col-meta">Sin ejemplares</div>
+          ${crearHTML(c, p)}
         </div>
       </div>`;
     }
@@ -302,19 +325,40 @@ function pintarColeccion() {
         <div class="col-nombre">${nombreHTML(c)}</div>
         <div class="col-meta"><span class="col-copias${extra ? ' sobra' : ''}">${n}/${limiteDe(c.id)}</span>
           <span class="col-rar rar-${c.rareza}">${RAREZA_NOMBRE[c.rareza]}</span> · ${familia(c)}</div>
+        ${crearHTML(c, p)}
       </div>
     </div>`;
   }).join('');
 
   const distintas = Object.values(CARTAS).filter((c) => (p.cartas[c.id] ?? 0) > 0).length;
   const copias = totalDe(p.cartas);
-  const valor = valorFusion(p.cartas);
+  const valor = esquirlasDeFundir(p.cartas);
   const sobrantes = Object.values(sobra).reduce((a, b) => a + b, 0);
   dom.resumen.textContent = `${distintas} de ${Object.keys(CARTAS).length} cartas distintas · ${copias} copias`
-    + (valor > 0 ? ` · ${sobrantes === 1 ? 'sobra 1 copia' : `sobran ${sobrantes} copias`}` : ' · nada que fundir');
+    + ` · ${PRUEBAS ? '∞' : (p.esquirlas ?? 0)} esquirlas ✦`
+    + (valor > 0 ? ` · ${sobrantes === 1 ? 'sobra 1 copia' : `sobran ${sobrantes} copias`}` : '');
   dom.btnFundir.disabled = valor === 0;
-  dom.btnFundir.textContent = valor > 0 ? `Fundir sobrantes · +${valor} ◈` : 'Nada que fundir';
+  dom.btnFundir.textContent = valor > 0 ? `Fundir sobrantes · +${valor} ✦` : 'Nada que fundir';
   pintarMonedas();
+}
+
+/** La carta con el «¿crear?» abierto en la colección, o null. */
+let creando = null;
+
+/**
+ * El botón de crear bajo una carta de la colección. Sólo sale cuando se puede
+ * crear —del set, por debajo de su tope— y te llegan las esquirlas: con él en
+ * cada hueco que te falta, la rejilla de quien empieza sería un muro de
+ * botones apagados.
+ */
+function crearHTML(c, p) {
+  if (!sePuedeCrear(c.id, p.cartas)) return '';
+  const coste = costeDeCrear(c.id);
+  if (creando === c.id) {
+    return `<button class="col-crear si" data-crear-si="${c.id}">¿Crear por ${coste} ✦?</button>`;
+  }
+  if (!PRUEBAS && (p.esquirlas ?? 0) < coste) return '';
+  return `<button class="col-crear" data-crear="${c.id}">Crear · ${coste} ✦</button>`;
 }
 
 /**
@@ -323,7 +367,7 @@ function pintarColeccion() {
  * legal, así que fundirla no cambia lo que puedes construir.
  */
 async function fundirSobrantes() {
-  if (valorFusion(cargarPerfil().cartas) === 0) return;
+  if (esquirlasDeFundir(cargarPerfil().cartas) === 0) return;
   dom.btnFundir.disabled = true;
   try {
     await fundir();
@@ -478,7 +522,7 @@ function pintarSobres(tirada = null, nuevas = new Set(), antesDeAbrir = {}) {
     ? `${abiertos}. Modo pruebas: los sobres no cuestan monedas. Quita ?pruebas=1 de la dirección para volver a lo normal.`
     : puede
       ? `${abiertos}. ${COMO_SE_GANAN}`
-      : `Te faltan ${ECONOMIA.precioSobre - p.monedas} monedas. ${COMO_SE_GANAN} También las da fundir copias sobrantes en la colección.`;
+      : `Te faltan ${ECONOMIA.precioSobre - p.monedas} monedas. ${COMO_SE_GANAN} Las copias sobrantes no dan monedas: se funden en esquirlas para crear, en la colección, la carta que eliges.`;
 }
 
 async function comprarSobre() {

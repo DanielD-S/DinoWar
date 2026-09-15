@@ -45,6 +45,8 @@ export function perfilInicial() {
     sobresGratis: 0,
     mazosExtra: 0,
     inicialesTomados: [],
+    // El material del crafteo: se gana fundiendo sobrantes y se gasta creando.
+    esquirlas: 0,
     dificultad: 'heuristica',
   };
 }
@@ -95,6 +97,7 @@ function sanear(bruto) {
     sobresGratis: Number.isFinite(bruto.sobresGratis) ? Math.max(0, Math.floor(bruto.sobresGratis)) : 0,
     mazosExtra: Number.isFinite(bruto.mazosExtra) ? Math.max(0, Math.floor(bruto.mazosExtra)) : 0,
     inicialesTomados: (Array.isArray(bruto.inicialesTomados) ? bruto.inicialesTomados : []).filter((x) => typeof x === 'string'),
+    esquirlas: Number.isFinite(bruto.esquirlas) ? Math.max(0, Math.floor(bruto.esquirlas)) : 0,
     dificultad: bruto.dificultad === 'aleatoria' ? 'aleatoria' : base.dificultad,
   };
 }

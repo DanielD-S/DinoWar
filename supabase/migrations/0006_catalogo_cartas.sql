@@ -63,6 +63,15 @@ create table if not exists public.catalogo_economia (
   mazos_maximo      int not null
 );
 
+-- El crafteo: cuántas esquirlas da fundir una copia sobrante y cuántas cuesta
+-- crear una, por rareza. `fundir_excedente` y `crear_carta` (0029) leen de
+-- AQUÍ; el cliente sólo manda el id. Sale de src/data/crafteo.js.
+create table if not exists public.catalogo_crafteo (
+  rareza  text primary key,
+  fundir  int not null check (fundir > 0),
+  crear   int not null check (crear > 0)
+);
+
 insert into public.catalogo_cartas (card_id, tipo, rareza, copias_max, valor_fusion, es_jefe) values
   ('dryosaurus', 'DINOSAURIO', 'COMUN', 3, 4, false),
   ('ornitholestes', 'DINOSAURIO', 'COMUN', 3, 4, false),
@@ -493,6 +502,13 @@ delete from public.catalogo_cosmeticos where id not in (
   'titulo_campeon'
 );
 
+insert into public.catalogo_crafteo (rareza, fundir, crear) values
+  ('COMUN', 5, 40),
+  ('RARO', 20, 100),
+  ('EPICO', 100, 400),
+  ('LEGENDARIO', 400, 1600)
+on conflict (rareza) do update set fundir = excluded.fundir, crear = excluded.crear;
+
 delete from public.catalogo_cartas where card_id not in (
   'dryosaurus',
   'ornitholestes',
@@ -641,6 +657,13 @@ create policy "el catálogo es público" on public.catalogo_cosmeticos
   for select to authenticated using (true);
 revoke insert, update, delete on public.catalogo_cosmeticos from anon, authenticated;
 revoke select on public.catalogo_cosmeticos from anon;
+
+alter table public.catalogo_crafteo enable row level security;
+drop policy if exists "el catálogo es público" on public.catalogo_crafteo;
+create policy "el catálogo es público" on public.catalogo_crafteo
+  for select to authenticated using (true);
+revoke insert, update, delete on public.catalogo_crafteo from anon, authenticated;
+revoke select on public.catalogo_crafteo from anon;
 
 alter table public.catalogo_economia enable row level security;
 drop policy if exists "el catálogo es público" on public.catalogo_economia;
