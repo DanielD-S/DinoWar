@@ -40,10 +40,12 @@ const ORDEN = [RAREZA.LEGENDARIO, RAREZA.EPICO, RAREZA.RARO, RAREZA.COMUN];
 
 let dom = null;
 let volverAlMenu = () => {};
+let alPack = () => {};      // la tienda pide abrir un pack: main.js cambia de pantalla y llama a abrirPack
 let filtro = null;          // rareza mostrada en la colección, null = todas
 
-export function montarMeta(alVolver) {
+export function montarMeta(alVolver, alAbrirPack = () => {}) {
   volverAlMenu = alVolver;
+  alPack = alAbrirPack;
   dom = {
     coleccion: id('coleccion'), sobres: id('sobres'), mazos: id('mazos'),
     filtros: id('col-filtros'), rejilla: id('col-rejilla'),
@@ -82,7 +84,7 @@ export function montarMeta(alVolver) {
   dom.btnFundir.addEventListener('click', fundirSobrantes);
   dom.btnAbrir.addEventListener('click', comprarSobre);
   montarMazos({ titulo: dom.mazosTitulo, cuerpo: dom.mazosCuerpo, pie: dom.mazosPie, alPintarMenu: pintarMenu });
-  montarTienda({ cuerpo: id('tienda-cuerpo'), aviso: id('tienda-aviso'), alCambiar: pintarMenu });
+  montarTienda({ cuerpo: id('tienda-cuerpo'), aviso: id('tienda-aviso'), alCambiar: pintarMenu, alPack });
 
   pintarMenu();
 }
@@ -468,11 +470,56 @@ async function comprarSobre() {
 }
 
 /**
+ * Un pack de la tienda: `n` sobres uno tras otro y una sola rejilla al final
+ * con todo lo que salió. Cada sobre es una compra aparte al servidor —la
+ * Edge Function no sabe de packs y no hace falta que sepa—, así que si uno
+ * falla a medias, lo ya abierto está pagado y abierto: se enseña lo que hay
+ * con el motivo. Se llama con la pantalla de sobres ya puesta.
+ */
+export async function abrirPack(n) {
+  const todas = [];
+  let antes = null;
+  let fallo = null;
+  dom.btnAbrir.disabled = true;
+  for (let i = 1; i <= n; i++) {
+    let r;
+    try {
+      r = await pedirSobre();
+    } catch (e) {
+      fallo = e;
+      break;
+    }
+    antes ??= r.antes;
+    pintarMenu();
+    dom.aviso.textContent = `Sobre ${i} de ${n}`;
+    // La ceremonia de cada sobre, sin rejilla entre medias: la rejilla es el
+    // resumen del pack entero.
+    await celebrar(r.cartas, antes, { resumen: false, cuentaDesde: todas });
+    todas.push(...r.cartas);
+  }
+  dom.btnAbrir.disabled = false;
+  if (todas.length === 0) {
+    pintarSobres();
+    dom.aviso.textContent = `No se pudo abrir el pack: ${fallo?.message ?? 'sin sobres'}`;
+    return;
+  }
+  const nuevas = new Set(todas.filter((cid) => (antes[cid] ?? 0) === 0));
+  pintarSobres(todas, nuevas, antes);
+  requestAnimationFrame(() => {
+    for (const x of dom.tirada.querySelectorAll('.sobre-carta')) x.classList.add('gira');
+  });
+  const abiertos = todas.length / ECONOMIA.cartasPorSobre;
+  dom.aviso.textContent = fallo
+    ? `Se abrieron ${abiertos} de ${n} sobres; el siguiente no se pudo: ${fallo.message}`
+    : `${abiertos} sobres abiertos, ${todas.length} cartas. ${dom.aviso.textContent.replace(/^Sobre \d+ de \d+/, '').trim()}`;
+}
+
+/**
  * La ceremonia y la rejilla de resumen de una tirada ya sorteada. Separado de
  * la compra para que el ensayo (`?ensayo=`) pase por el mismo camino que un
  * sobre de verdad y no por una copia que se quede atrás.
  */
-async function celebrar(tirada, antesDeAbrir) {
+async function celebrar(tirada, antesDeAbrir, { resumen = true, cuentaDesde = [] } = {}) {
   const nuevas = new Set(tirada.filter((cid) => (antesDeAbrir[cid] ?? 0) === 0));
 
   // La ceremonia: rasgar el sobre y descubrir las cinco una a una. Las cartas
@@ -480,7 +527,10 @@ async function celebrar(tirada, antesDeAbrir) {
   // en que se leen. El botón sigue apagado hasta el final, que un segundo
   // sobre a media ceremonia pisaría al primero.
   dom.btnAbrir.disabled = true;
+  // En un pack, «Copia 3 de 3» cuenta también las de los sobres anteriores:
+  // `antesDeAbrir` es de antes del pack entero y las salidas ya no están ahí.
   const cuenta = {};
+  for (const cid of cuentaDesde) cuenta[cid] = (cuenta[cid] ?? 0) + 1;
   const ceremonia = tirada.map((cid) => {
     const c = carta(cid);
     cuenta[cid] = (cuenta[cid] ?? 0) + 1;
@@ -493,6 +543,7 @@ async function celebrar(tirada, antesDeAbrir) {
   });
   dom.tirada.className = 'sobre-tirada ceremonia';
   await ceremoniaDeSobre(dom.tirada, ceremonia);
+  if (!resumen) return;
   dom.btnAbrir.disabled = false;
 
   // Y la rejilla de las cinco como resumen, que es lo que se queda en pantalla.

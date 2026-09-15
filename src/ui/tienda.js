@@ -22,7 +22,9 @@
 // El arte llega aparte (assets/PROMPTS.md, «La tienda» y «Los tapetes») y
 // `ARTE_LISTO` es el interruptor, vigilado por test/tienda.test.js.
 
-import { COSMETICOS, TIPO_COSMETICO, loTiene, equipadoDe, cosmeticoPorId, porDefecto } from '../data/cosmeticos.js';
+import {
+  COSMETICOS, TIPO_COSMETICO, PACKS, precioDePack, loTiene, equipadoDe, cosmeticoPorId, porDefecto,
+} from '../data/cosmeticos.js';
 import { cargarPerfil } from './almacen.js';
 import { comprarCosmetico, equiparCosmetico, PRUEBAS } from './perfil.js';
 import { rpc, hayServidor } from './supabase.js';
@@ -74,6 +76,7 @@ const SECCIONES = [
 
 let dom = null;
 let alCambiar = () => {};
+let alPack = () => {};
 let confirmando = null;   // id del artículo con el «¿comprar?» abierto
 let ocupado = false;
 
@@ -155,9 +158,10 @@ export async function traerEquipadoRival(dueloId) {
   return r?.rival ?? null;
 }
 
-export function montarTienda({ cuerpo, aviso, alCambiar: cambio }) {
+export function montarTienda({ cuerpo, aviso, alCambiar: cambio, alPack: pack }) {
   dom = { cuerpo, aviso };
   alCambiar = cambio ?? alCambiar;
+  alPack = pack ?? alPack;
   cuerpo.addEventListener('click', alTocar);
 }
 
@@ -213,6 +217,29 @@ function fichaHTML(c, p) {
   </article>`;
 }
 
+/**
+ * Un pack de sobres. No es un cosmético —no está en el catálogo ni se
+ * «tiene»—: es abrir n sobres seguidos, cada uno al precio de siempre. Lo que
+ * se ve es el sobre con el número encima, y el mismo «¿Por N ◈?» que el resto.
+ */
+function packHTML(n, p) {
+  const precio = precioDePack(n);
+  const llega = PRUEBAS || p.monedas >= precio;
+  const clave = `pack_${n}`;
+  const acciones = confirmando === clave
+    ? `<span class="tienda-pregunta">¿Por ${precio} ◈?</span>
+      <button class="tienda-boton si" data-pack-si="${n}">Abrir</button>
+      <button class="tienda-boton" data-comprar-no>No</button>`
+    : `<button class="tienda-boton precio" data-pack="${n}" ${llega ? '' : 'disabled'}
+      ${llega ? '' : `title="Te faltan ${precio - p.monedas} dinomonedas"`}>${precio} ◈</button>`;
+  return `<article class="tienda-ficha">
+    <div class="tienda-vista tienda-pack" aria-hidden="true"><b>×${n}</b></div>
+    <b class="tienda-nombre">${n} sobres</b>
+    <small class="tienda-lema">Uno tras otro, y al final todo lo que salió.</small>
+    <div class="tienda-acciones">${acciones}</div>
+  </article>`;
+}
+
 function pintar() {
   if (!dom) return;
   const p = cargarPerfil();
@@ -221,7 +248,12 @@ function pintar() {
       <h3 class="tienda-titulo">${s.titulo}</h3>
       <p class="meta-nota">${s.nota}</p>
       <div class="tienda-rejilla">${COSMETICOS.filter((c) => c.tipo === s.tipo).map((c) => fichaHTML(c, p)).join('')}</div>
-    </section>`).join('');
+    </section>`).join('')
+  + `<section class="tienda-seccion">
+      <h3 class="tienda-titulo">Packs de sobres</h3>
+      <p class="meta-nota">Varios sobres seguidos al precio de siempre, ${precioDePack(1)} ◈ cada uno: sin descuento, que abaratar las cartas sería dar ventaja.</p>
+      <div class="tienda-rejilla">${PACKS.map((n) => packHTML(n, p)).join('')}</div>
+    </section>`;
 }
 
 async function alTocar(e) {
@@ -229,7 +261,16 @@ async function alTocar(e) {
   if (!b || b.disabled || ocupado) return;
 
   if (b.dataset.comprar) { confirmando = b.dataset.comprar; return pintar(); }
+  if (b.dataset.pack) { confirmando = `pack_${b.dataset.pack}`; return pintar(); }
   if (b.dataset.comprarNo !== undefined) { confirmando = null; return pintar(); }
+  if (b.dataset.packSi) {
+    // Se cobra sobre a sobre en la pantalla de sobres; aquí no se paga nada.
+    const n = Number(b.dataset.packSi);
+    confirmando = null;
+    pintar();
+    if (PACKS.includes(n)) alPack(n);
+    return;
+  }
 
   const comprar = b.dataset.comprarSi;
   const equipar = b.dataset.equipar;

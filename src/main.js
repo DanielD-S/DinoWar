@@ -23,7 +23,7 @@ import {
 } from './ui/tutorial.js';
 import { detectarFotos, detectarEnteras, vigilarFotos, calentarFotos } from './ui/art.js';
 import {
-  montarMeta, abrirColeccion, abrirSobres, abrirMazos, pintarMenu, recompensar,
+  montarMeta, abrirColeccion, abrirSobres, abrirPack, abrirMazos, pintarMenu, recompensar,
   refrescarAvisos,
   refrescarMisiones, pintarMisiones,
 } from './ui/meta.js';
@@ -1320,7 +1320,9 @@ function iniciar() {
   detectarEnteras();
   pintarRecord();
 
-  montarMeta(() => irA(APP.MENU));
+  // Un pack de la tienda se abre en la pantalla de sobres, que es donde está
+  // la ceremonia: la tienda sólo dice cuántos.
+  montarMeta(() => irA(APP.MENU), (n) => { abrirSobres(); irA(APP.SOBRES); abrirPack(n); });
   // Las dos pantallas de piedra contestan igual al tacto. Montarlo sólo en el
   // menú dejaba las tres placas de jugar mudas y sin destello.
   montarTacto(el.menu);
