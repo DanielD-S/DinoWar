@@ -44,7 +44,7 @@ export const PIEZAS = Object.freeze([
   'tapete_hell_creek', 'tapete_kem_kem', 'tapete_solnhofen', 'tapete_excavacion',
   'cinta_fosil', 'cinta_volcan',
   'retrato_paleontologa', 'retrato_buscador', 'retrato_amonite', 'retrato_huevo', 'retrato_placas',
-  'marco_retrato', 'holografico',
+  'marco_retrato',
   'retrato_cientifico', 'retrato_cientifica', 'retrato_cazador', 'retrato_trex',
   'estandarte_helecho', 'cinta_helecho',
   'medallon_hell_creek', 'medallon_kem_kem', 'medallon_solnhofen', 'medallon_excavacion',

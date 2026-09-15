@@ -111,25 +111,50 @@
 
 /* La lámina holográfica: las legendarias y las dos de jefe, en todas partes.
    Brilla sobre la ILUSTRACIÓN y no sobre el marco, que ya dice la rareza con
-   su material. La lámina es el doble de ancha que la ventana y se desliza de
-   un lado a otro con `transform` —ida y vuelta, así no hay costura—, y se
-   mezcla con `color-dodge` DENTRO de la ventana (`isolation`): sin eso se
-   mezclaría con el tablero de detrás. */
+   su material, y se mezcla con `color-dodge` DENTRO de la ventana
+   (`isolation`): sin eso se mezclaría con el tablero de detrás.
+
+   Es CSS puro, sin imagen. La primera versión deslizaba una textura del
+   generador que traía una línea vertical dibujada —una columna al 21 % de su
+   ancho con el doble de contraste que las de al lado— y al moverse esa línea
+   cruzaba la ilustración como una costura. Un degradado no tiene ninguna.
+
+   Cuatro capas en un solo pseudoelemento, tres veces más ancho que la ventana,
+   que viaja entero con `transform`: dos juegos de bandas de arcoíris en
+   diagonal separados por un hueco —el brillo pasa, se va y vuelve—, un rayado
+   fino a otro ángulo que hace el tornasol, y dos punteados de destellos de
+   distinto paso para que no se lean como rejilla. En la mano, además, se
+   corre con la inclinación del puntero (`--tx`, el mismo de la mano), en
+   `translate`, que es otra propiedad y compone con la animación. */
 .con-marco.rareza-LEGENDARIO .c-arte,
 .con-marco.jefe .c-arte { overflow: hidden; isolation: isolate; }
 .con-marco.rareza-LEGENDARIO .c-arte::before,
 .con-marco.jefe .c-arte::before {
-  content: ''; position: absolute; z-index: 1; top: 0; bottom: 0; left: 0; width: 200%;
+  content: ''; position: absolute; z-index: 1; top: 0; bottom: 0; left: 0; width: 300%;
   pointer-events: none;
-  background: url('assets/piel/tienda/holografico.webp') center / cover no-repeat;
-  /* A .3 no se veía en ninguna ilustración clara; a .55 se lee sin tapar. */
-  mix-blend-mode: color-dodge; opacity: .55;
-  animation: holografico 7s ease-in-out infinite alternate;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, .95) 0 .6px, transparent 1.3px) 0 0 / 9px 11px,
+    radial-gradient(circle, rgba(255, 255, 255, .7) 0 .5px, transparent 1.1px) 4px 5px / 14px 8px,
+    repeating-linear-gradient(62deg,
+      transparent 0 8px, hsla(185, 90%, 62%, .22) 11px, hsla(300, 85%, 68%, .18) 14px, transparent 17px),
+    linear-gradient(108deg,
+      transparent 12%,
+      hsl(350, 90%, 62%) 15%, hsl(40, 95%, 58%) 17.5%, hsl(95, 80%, 56%) 20%,
+      hsl(180, 90%, 56%) 22.5%, hsl(235, 85%, 64%) 25%, hsl(290, 85%, 66%) 27.5%,
+      transparent 31%, transparent 62%,
+      hsl(350, 90%, 62%) 65%, hsl(40, 95%, 58%) 67.5%, hsl(95, 80%, 56%) 70%,
+      hsl(180, 90%, 56%) 72.5%, hsl(235, 85%, 64%) 75%, hsl(290, 85%, 66%) 77.5%,
+      transparent 81%);
+  /* Con bandas anchas y a .5 el arcoíris inundaba la ilustración entera: la
+     banda ocupa ahora un tercio de la ventana y la mezcla va a .35. */
+  mix-blend-mode: color-dodge; opacity: .35;
+  translate: calc(var(--tx, 0) * -6%) 0;
+  animation: holografico 9s ease-in-out infinite alternate;
 }
-@keyframes holografico { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes holografico { from { transform: translateX(0); } to { transform: translateX(-66.667%); } }
 @media (prefers-reduced-motion: reduce) {
   .con-marco.rareza-LEGENDARIO .c-arte::before,
-  .con-marco.jefe .c-arte::before { animation: none; transform: translateX(-25%); }
+  .con-marco.jefe .c-arte::before { animation: none; transform: translateX(-33.333%); }
 }
 
 /* El coste va centrado en el campo de su chapa, igual que las otras dos cifras.
