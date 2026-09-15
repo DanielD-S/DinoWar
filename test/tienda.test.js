@@ -13,6 +13,7 @@ import {
 } from '../src/data/cosmeticos.js';
 import { SALIDA } from '../tools/generar-cartas.mjs';
 import { ECONOMIA } from '../src/data/coleccion.js';
+import { LOGRO_POR_ID } from '../src/data/logros.js';
 
 test('Cada tipo tiene su artículo gratuito y el resto cuesta dinomonedas', () => {
   for (const tipo of Object.values(TIPO_COSMETICO)) {
@@ -20,7 +21,7 @@ test('Cada tipo tiene su artículo gratuito y el resto cuesta dinomonedas', () =
     assert.ok(gratis, `${tipo} sin artículo gratuito`);
     assert.equal(gratis.precio, 0);
   }
-  for (const c of COSMETICOS.filter((x) => !x.porDefecto && !x.gratis)) assert.ok(c.precio > 0, `${c.id} gratis sin serlo`);
+  for (const c of COSMETICOS.filter((x) => !x.porDefecto && !x.gratis && !x.exclusivo)) assert.ok(c.precio > 0, `${c.id} gratis sin serlo`);
 });
 
 test('Lo gratuito de cada tipo es lo que el juego enseñaba antes de la tienda', () => {
@@ -56,7 +57,7 @@ test('Los retratos: uno por defecto, otro gratis para elegir, y el resto de pago
   assert.equal(equipadoDe({ cosmeticos: [], equipado: { RETRATO: 'retrato_buscador' } }, 'RETRATO').id, 'retrato_buscador');
   assert.equal(equipadoDe({ cosmeticos: [], equipado: { RETRATO: 'retrato_amonite' } }, 'RETRATO').id, 'retrato_paleontologa');
   for (const c of COSMETICOS.filter((x) => x.precio === 0)) {
-    assert.ok(c.porDefecto || c.gratis, `${c.id} cuesta 0 sin decir que es gratis`);
+    assert.ok(c.porDefecto || c.gratis || c.exclusivo, `${c.id} cuesta 0 sin decir que es gratis`);
   }
 });
 
@@ -90,10 +91,28 @@ test('Los packs de sobres no llevan descuento: n sobres cuestan n veces uno', ()
 test('El SQL del catálogo lleva exactamente los precios del código', () => {
   const sql = readFileSync(SALIDA, 'utf8');
   const bloque = sql.split('insert into public.catalogo_cosmeticos ')[1].split(';')[0];
-  const filas = [...bloque.matchAll(/\('([a-z_]+)', '([A-Z]+)', (\d+), (true|false)\)/g)]
-    .map(([, id, tipo, precio, def]) => `${id}:${tipo}:${precio}:${def}`).sort();
-  const esperadas = COSMETICOS.map((c) => `${c.id}:${c.tipo}:${c.precio}:${!!c.porDefecto}`).sort();
+  const filas = [...bloque.matchAll(/\('([a-z_]+)', '([A-Z]+)', (\d+), (true|false), (true|false)\)/g)]
+    .map(([, id, tipo, precio, def, ex]) => `${id}:${tipo}:${precio}:${def}:${ex}`).sort();
+  const esperadas = COSMETICOS.map((c) => `${c.id}:${c.tipo}:${c.precio}:${!!c.porDefecto}:${!!c.exclusivo}`).sort();
   assert.deepEqual(filas, esperadas);
+});
+
+test('Lo exclusivo se gana con un logro que existe, y no es de nadie hasta entonces', () => {
+  const exclusivos = COSMETICOS.filter((c) => c.exclusivo);
+  assert.ok(exclusivos.length > 0);
+  for (const c of exclusivos) {
+    assert.equal(c.precio, 0);
+    assert.ok(LOGRO_POR_ID[c.logro], `${c.id} se gana con «${c.logro}», que no es un logro`);
+    assert.equal(loTiene({ cosmeticos: [], equipado: {} }, c.id), false, `${c.id} es de todos sin ganarlo`);
+    assert.equal(loTiene({ cosmeticos: [c.id], equipado: {} }, c.id), true);
+  }
+  // Y un título otorgado se equipa; sin otorgar, cae al de por defecto.
+  assert.equal(equipadoDe({ cosmeticos: ['titulo_duelista'], equipado: { TITULO: 'titulo_duelista' } }, 'TITULO').texto, 'Duelista');
+  assert.equal(equipadoDe({ cosmeticos: [], equipado: { TITULO: 'titulo_duelista' } }, 'TITULO').id, 'titulo_ninguno');
+  // El servidor rechaza comprar lo exclusivo y equiparlo sin tenerlo (0027).
+  const LOGROS_SQL = readFileSync('supabase/migrations/0027_logros.sql', 'utf8');
+  assert.match(funcion(LOGROS_SQL, 'public.comprar_cosmetico'), /v_exclusivo then raise exception 'ese se gana, no se compra'/);
+  assert.match(funcion(LOGROS_SQL, 'public.equipar_cosmetico'), /\(v_precio > 0 or v_exclusivo\) and not exists/);
 });
 
 const TIENDA = readFileSync('supabase/migrations/0024_tienda.sql', 'utf8');

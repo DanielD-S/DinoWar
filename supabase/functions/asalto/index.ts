@@ -34,6 +34,18 @@ import { eloTras } from '../../../src/data/ligas.js';
 import { CUENCA } from '../../../src/data/tribu.js';
 import { ECONOMIA, abrirSobre } from '../../../src/data/coleccion.js';
 import { avancesDelParte, diaUTC, POR_ID } from '../../../src/data/misiones.js';
+import { avancesDeLogros } from '../../../src/data/logros.js';
+
+/**
+ * Lo que un parte avanza en las misiones de hoy, con la meta y el premio
+ * puestos: el catálogo vive en misiones.js y el SQL sólo apunta y paga.
+ */
+function avancesConPremio(dia: string, parte: Record<string, number>) {
+  return avancesDelParte(dia, parte).map((a) => {
+    const m = POR_ID[a.id];
+    return { id: a.id, avance: a.avance, meta: m.meta, premio: m.premio };
+  });
+}
 import { rivalPorId, requisitoDe, claveDeVictoria } from '../../../src/data/expediciones.js';
 
 const cors = {
@@ -156,6 +168,24 @@ async function hacerAsalto(servicio, jugadorId: string, envio: Record<string, un
   }
 
   const fila = Array.isArray(data) ? data[0] : data;
+
+  // 5. Las misiones y los logros del asalto. No hay parte que re-jugar aquí:
+  //    lo que cuentan es lo que el servidor ya sabe —que se asaltó, cuánto
+  //    daño y si fue el golpe final—. Va aparte de `aplicar_asalto` a
+  //    propósito: esa función la llama esta misma Edge Function y conserva
+  //    su firma, y un fallo aquí no puede deshacer un asalto ya cobrado.
+  const dia = diaUTC();
+  const parte = {
+    asaltos: 1,
+    danoJefe: Math.max(0, Math.round(Number(resultado.dano) || 0)),
+    jefesVencidos: fila?.cayo ? 1 : 0,
+  };
+  const { data: av, error: errAv } = await servicio.rpc('aplicar_avances', {
+    p_jugador: jugadorId, p_dia: dia,
+    p_avances: avancesConPremio(dia, parte), p_logros: avancesDeLogros(parte),
+  });
+  if (errAv) console.error('aplicar_avances', errAv.message);
+
   return json({
     dano: resultado.dano,
     turnos: resultado.turnos,
@@ -163,6 +193,10 @@ async function hacerAsalto(servicio, jugadorId: string, envio: Record<string, un
     vida: fila?.vida ?? null,
     cayo: fila?.cayo ?? false,
     almacen: fila?.almacen ?? null,
+    monedas: av?.monedas ?? null,
+    misiones: av?.misiones ?? 0,
+    cumplidas: av?.cumplidas ?? [],
+    logros: av?.logros ?? [],
   });
 }
 
@@ -194,31 +228,12 @@ async function hacerVictoria(servicio, jugadorId: string, envio: Record<string, 
   // no es aplicar— y aquí no hace falta, porque lo único que el SQL hace con
   // una misión es sumarle progreso y pagarle el premio.
   const dia = diaUTC();
-  const avances = avancesDelParte(dia, resultado.parte).map((a) => {
-    const m = POR_ID[a.id];
-    return { id: a.id, avance: a.avance, meta: m.meta, premio: m.premio };
-  });
-
-  const { data, error } = await servicio.rpc('aplicar_partida', {
-    p_jugador: jugadorId,
-    p_semilla: envio.semilla,
-    p_turnos: resultado.turnos,
-    p_ganada: resultado.ganada,
-    p_monedas: resultado.premio,
-    p_dia: dia,
-    p_avances: avances,
-  });
-
-  if (error) {
-    const yaCobrada = error.code === '23505';
-    return json({ error: yaCobrada ? 'esa partida ya se cobró' : error.message },
-      yaCobrada ? 409 : 400);
-  }
 
   // La primera victoria contra un rival de expedición paga su premio, una vez.
   // Rival, premio y requisito salen de los datos por el id que devolvió la
   // re-jugada; el SQL sólo apunta y paga, y paga cero si el nodo anterior no
-  // está vencido o si ya lo estaba éste.
+  // está vencido o si ya lo estaba éste. Va ANTES de la partida porque el
+  // logro de la Morrison cuenta primeras victorias, y eso lo dice esta llamada.
   let expedicion = null;
   if (resultado.ganada && resultado.rival) {
     const { rival: r } = rivalPorId(resultado.rival);
@@ -233,6 +248,24 @@ async function hacerVictoria(servicio, jugadorId: string, envio: Record<string, 
     else expedicion = exp;
   }
 
+  const parte = { ...resultado.parte, expedicionNuevos: expedicion?.primera ? 1 : 0 };
+  const { data, error } = await servicio.rpc('aplicar_partida', {
+    p_jugador: jugadorId,
+    p_semilla: envio.semilla,
+    p_turnos: resultado.turnos,
+    p_ganada: resultado.ganada,
+    p_monedas: resultado.premio,
+    p_dia: dia,
+    p_avances: avancesConPremio(dia, parte),
+    p_logros: avancesDeLogros(parte),
+  });
+
+  if (error) {
+    const yaCobrada = error.code === '23505';
+    return json({ error: yaCobrada ? 'esa partida ya se cobró' : error.message },
+      yaCobrada ? 409 : 400);
+  }
+
   return json({
     ganada: resultado.ganada,
     turnos: resultado.turnos,
@@ -245,6 +278,7 @@ async function hacerVictoria(servicio, jugadorId: string, envio: Record<string, 
     // de que aparezcan monedas de la nada.
     misiones: data?.misiones ?? 0,
     cumplidas: data?.cumplidas ?? [],
+    logros: data?.logros ?? [],
     dia: data?.dia ?? dia,
   });
 }
@@ -409,9 +443,21 @@ async function cerrarDuelo(servicio, fila) {
   const duelosDe = (id: string) => (js ?? []).find((x) => x.id === id)?.duelos ?? 0;
   const nuevos = eloTras(fila.elo_a, fila.elo_b, r.ganador === 0 ? 1 : 0,
     duelosDe(fila.jugador_a), duelosDe(fila.jugador_b));
+  // Las misiones y los logros de cada bando. Aquí no hay parte: el duelo no
+  // se re-juega. Lo que sí se sabe es que se jugó y quién ganó, y con eso
+  // avanzan las de jugar, las de ganar y las de duelo.
+  const dia = diaUTC();
+  const parteDe = (gano: boolean) => ({
+    partidas: 1, victorias: gano ? 1 : 0, duelos: 1, duelosGanados: gano ? 1 : 0,
+  });
+  const pa = parteDe(r.ganador === 0);
+  const pb = parteDe(r.ganador === 1);
   const { error } = await servicio.rpc('duelo_cerrar', {
     p_id: fila.id, p_ganador: r.ganador, p_motivo: r.motivo, p_turnos: fila.datos.estado.turno,
     p_elo_a: nuevos.a, p_elo_b: nuevos.b, p_monedas_victoria: ECONOMIA.monedasVictoria,
+    p_dia: dia,
+    p_avances_a: avancesConPremio(dia, pa), p_avances_b: avancesConPremio(dia, pb),
+    p_logros_a: avancesDeLogros(pa), p_logros_b: avancesDeLogros(pb),
   });
   if (error) console.error('duelo_cerrar', error.message);
   const { data } = await servicio.from('duelos').select('*').eq('id', fila.id).single();

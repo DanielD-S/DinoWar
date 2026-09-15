@@ -328,7 +328,13 @@ export async function asaltar(partida, ahora = Date.now()) {
     acciones: partida.acciones,
   });
 
-  return { vida: Number(r?.vida), cayo: Boolean(r?.cayo), dano: danoDeRespuesta(r) };
+  return {
+    vida: Number(r?.vida), cayo: Boolean(r?.cayo), dano: danoDeRespuesta(r),
+    // Lo que el asalto avanzó en las misiones del día y los logros.
+    misiones: Number(r?.misiones ?? 0),
+    cumplidas: Array.isArray(r?.cumplidas) ? r.cumplidas : [],
+    logros: Array.isArray(r?.logros) ? r.logros : [],
+  };
 }
 
 /**
