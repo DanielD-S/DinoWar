@@ -59,7 +59,10 @@ import { arte } from './ui/art.js';
 import { mostrarMarca, empezarCarga, precargarPiezas } from './ui/carga.js';
 import { pedirMazoInicial } from './ui/iniciales.js';
 import { montarInstalar } from './ui/instalar.js';
-import { abrirTienda, aplicarRival, limpiarRival, traerEquipadoRival } from './ui/tienda.js';
+import {
+  abrirTienda, aplicarRival, limpiarRival, traerEquipadoRival, tituloPropio, tituloDeEquipado,
+} from './ui/tienda.js';
+import { LOGRO_POR_ID } from './data/logros.js';
 
 const APP = Object.freeze({
   BOOT: 'BOOT', MARCA: 'MARCA', CARGA: 'CARGA',
@@ -118,7 +121,10 @@ function bandoPresentado(nombre, subtitulo, retratoId, mazo) {
 /** Tú, para la presentación: tu nombre, tu liga y tu mazo activo. */
 function yoPresentado() {
   const p = cargarPerfil();
-  return bandoPresentado(p.apodo || 'Tú', nombreDeRango(Number(p.elo ?? 1200)), null, mazoActivo());
+  // El título ganado con un logro va delante de la liga: «Duelista · Jurásico II».
+  const titulo = tituloPropio(p);
+  const liga = nombreDeRango(Number(p.elo ?? 1200));
+  return bandoPresentado(p.apodo || 'Tú', titulo ? `${titulo} · ${liga}` : liga, null, mazoActivo());
 }
 
 /**
@@ -283,6 +289,18 @@ function abrirJugar() {
 function enseñarMisiones(abierto) {
   el.jugar.classList.toggle('misiones-abiertas', abierto);
   pintarMisiones(abierto);
+}
+
+/**
+ * Un mazo inicial más, ganado con un logro. Es la misma pantalla de la
+ * cuenta nueva con los que no se tienen; «Ahora no» vuelve sin gastar nada.
+ */
+async function elegirMazoExtra() {
+  const seccion = document.getElementById('iniciales');
+  irA(APP.INICIALES);
+  await pedirMazoInicial(seccion, { extra: true, excluir: cargarPerfil().inicialesTomados ?? [] });
+  pintarMenu();
+  abrirJugar();
 }
 
 /**
@@ -937,10 +955,18 @@ function premioTexto(n, cobro = null) {
     : exp?.cerrado ? ' · ese rival aún estaba cerrado: sin premio de primera victoria' : '';
   const base = (n > 0 ? `+${n} dinomonedas` : 'Sin dinomonedas: sólo las da ganar') + porExpedicion;
   const porMisiones = Number(cobro?.misiones ?? 0);
-  if (porMisiones <= 0) return base;
-  const cuantas = cobro.cumplidas?.length ?? 0;
-  return `${base} · ${cuantas === 1 ? 'misión cumplida' : `${cuantas} misiones cumplidas`}`
-    + `: +${porMisiones}`;
+  const cuantas = cobro?.cumplidas?.length ?? 0;
+  const conMisiones = porMisiones <= 0 ? base
+    : `${base} · ${cuantas === 1 ? 'misión cumplida' : `${cuantas} misiones cumplidas`}: +${porMisiones}`;
+  return conMisiones + logrosTexto(cobro);
+}
+
+/** « · logro: Duelista», si la partida cumplió alguno. Se nombra: no paga monedas. */
+function logrosTexto(cobro) {
+  const ids = cobro?.logros ?? [];
+  if (!ids.length) return '';
+  const nombres = ids.map((id) => LOGRO_POR_ID[id]?.nombre ?? id).join(', ');
+  return ` · ${ids.length === 1 ? 'logro' : 'logros'}: ${nombres}`;
 }
 
 /**
@@ -1105,9 +1131,14 @@ function cerrarAsalto(gane) {
 
   asaltar({ ...(partida ?? {}), dano: estimado })
     .then((r) => {
-      el.finPremio.textContent = r.cayo
+      // Y lo que el asalto avanzó en las misiones del día y los logros, que
+      // desde la 0027 también cuentan aquí.
+      const porMisiones = Number(r.misiones ?? 0);
+      const extra = (porMisiones > 0 ? ` · ${r.cumplidas.length === 1 ? 'misión cumplida' : `${r.cumplidas.length} misiones cumplidas`}: +${porMisiones}` : '')
+        + logrosTexto(r);
+      el.finPremio.textContent = (r.cayo
         ? `${jefe.nombre} ha caído. Reclama su carta en la Tribu.`
-        : `${r.dano} de daño a ${jefe.nombre}. No paga dinomonedas: esto es para la tribu.`;
+        : `${r.dano} de daño a ${jefe.nombre}. No paga dinomonedas: esto es para la tribu.`) + extra;
       informeDeAsalto(jefe, r.vida, r.dano, r.cayo);
       return pintarCuenca();
     })
@@ -1323,6 +1354,11 @@ function iniciar() {
   // Un pack de la tienda se abre en la pantalla de sobres, que es donde está
   // la ceremonia: la tienda sólo dice cuántos.
   montarMeta(() => irA(APP.MENU), (n) => { abrirSobres(); irA(APP.SOBRES); abrirPack(n); });
+  // El botón de elegir un mazo inicial ganado vive en el panel de misiones,
+  // que se repinta entero: se escucha en la caja y no en el botón.
+  document.getElementById('menu-misiones').addEventListener('click', (e) => {
+    if (e.target.closest('#btn-mazo-extra')) elegirMazoExtra();
+  });
   // Las dos pantallas de piedra contestan igual al tacto. Montarlo sólo en el
   // menú dejaba las tres placas de jugar mudas y sin destello.
   montarTacto(el.menu);
@@ -1592,7 +1628,15 @@ function empezarDuelo(r) {
   // el sitio. Si falla, el rival sale con lo de siempre.
   limpiarRival();
   traerEquipadoRival(r.id)
-    .then((equipado) => { if (duelo?.id === r.id) aplicarRival(equipado); })
+    .then((equipado) => {
+      if (duelo?.id !== r.id) return;
+      aplicarRival(equipado);
+      // Su título, delante de su liga, si la presentación sigue en pantalla:
+      // es texto y no una variable CSS, así que se escribe en el sitio.
+      const titulo = tituloDeEquipado(equipado);
+      const donde = el.partida.querySelector('.presentacion .pres-mitad.rival .pres-nombre span');
+      if (titulo && donde && !donde.textContent.startsWith(titulo)) donde.textContent = `${titulo} · ${donde.textContent}`;
+    })
     .catch(() => {});
   duelo = {
     id: r.id, n: r.n ?? 0, rival: r.rival, yo: r.yo, eloInicial: Number(r.eloInicial ?? r.yo?.elo ?? 1200),

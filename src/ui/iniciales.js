@@ -13,19 +13,29 @@
 import { MAZOS_INICIALES } from '../data/iniciales.js';
 import { CLADO_NOMBRE } from '../data/cards.js';
 import { arte } from './art.js';
-import { elegirMazoInicial } from './perfil.js';
+import { elegirMazoInicial, elegirMazoExtra } from './perfil.js';
 
 const escapar = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 
-/** Pinta la elección en `seccion` y resuelve cuando la cuenta está sembrada. */
-export function pedirMazoInicial(seccion) {
+/**
+ * Pinta la elección en `seccion` y resuelve cuando la cuenta está sembrada.
+ *
+ * Con `extra` es la misma pantalla para un mazo inicial MÁS, ganado con un
+ * logro: se enseñan sólo los que no se tienen (`excluir`), las cartas se
+ * suman a la colección y hay un botón para dejarlo para otro momento, que
+ * resuelve sin elegir.
+ */
+export function pedirMazoInicial(seccion, { extra = false, excluir = [] } = {}) {
   let elegido = null;
   let enviando = false;
+  const lista = extra ? MAZOS_INICIALES.filter((m) => !excluir.includes(m.id)) : MAZOS_INICIALES;
 
   seccion.innerHTML = `<div class="ini-caja">
-    <h1 class="ini-titulo">Elige tu mazo inicial</h1>
-    <p class="ini-lema">Es tu colección de salida. Las cartas de los otros dos siguen saliendo en los sobres.</p>
-    <div class="ini-lista">${MAZOS_INICIALES.map((m) => `
+    <h1 class="ini-titulo">${extra ? 'Un mazo inicial más' : 'Elige tu mazo inicial'}</h1>
+    <p class="ini-lema">${extra
+    ? 'Te lo has ganado. Sus 55 cartas se suman a tu colección, y el mazo queda guardado.'
+    : 'Es tu colección de salida. Las cartas de los otros dos siguen saliendo en los sobres.'}</p>
+    <div class="ini-lista">${lista.map((m) => `
       <button class="ini-mazo" data-mazo="${m.id}" aria-pressed="false">
         <span class="ini-retrato" aria-hidden="true">${arte(m.retrato)}</span>
         <i class="emblema emb-clado_${m.clado.toLowerCase()}" aria-hidden="true"></i>
@@ -36,6 +46,7 @@ export function pedirMazoInicial(seccion) {
     </div>
     <p class="ini-aviso" role="status"></p>
     <button class="boton-grande ini-empezar" disabled>Elige uno</button>
+    ${extra ? '<button class="boton-fantasma ini-luego">Ahora no</button>' : ''}
   </div>`;
 
   const boton = seccion.querySelector('.ini-empezar');
@@ -47,14 +58,18 @@ export function pedirMazoInicial(seccion) {
     }
     boton.disabled = !elegido || enviando;
     boton.textContent = enviando ? 'Un momento…'
-      : elegido ? `Empezar con ${elegido.nombre}` : 'Elige uno';
+      : elegido ? `${extra ? 'Quedarme con' : 'Empezar con'} ${elegido.nombre}` : 'Elige uno';
   };
 
   return new Promise((resolver) => {
     seccion.onclick = async (e) => {
+      if (extra && e.target.closest('.ini-luego') && !enviando) {
+        seccion.onclick = null;
+        return resolver(null);
+      }
       const tarjeta = e.target.closest('.ini-mazo');
       if (tarjeta && !enviando) {
-        elegido = MAZOS_INICIALES.find((m) => m.id === tarjeta.dataset.mazo) ?? null;
+        elegido = lista.find((m) => m.id === tarjeta.dataset.mazo) ?? null;
         aviso.textContent = '';
         return pintar();
       }
@@ -62,9 +77,9 @@ export function pedirMazoInicial(seccion) {
       enviando = true;
       pintar();
       try {
-        await elegirMazoInicial(elegido.id);
+        await (extra ? elegirMazoExtra(elegido.id) : elegirMazoInicial(elegido.id));
         seccion.onclick = null;
-        resolver();
+        resolver(elegido.id);
       } catch (err) {
         enviando = false;
         aviso.textContent = `No se pudo guardar la elección: ${err.message}`;

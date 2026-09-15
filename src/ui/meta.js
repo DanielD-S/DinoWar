@@ -25,6 +25,8 @@ import {
   traerMisiones, misionesDeHoy,
 } from './perfil.js';
 import { misionesDelDia } from '../data/misiones.js';
+import { LOGROS, textoDeRecompensa } from '../data/logros.js';
+import { cosmeticoPorId } from '../data/cosmeticos.js';
 import { avisosDeCuenca } from './red.js';
 import { fichaHTML, abrirFicha, cartaHTML } from './render.js';
 import { ceremoniaDeSobre } from './apertura.js';
@@ -217,7 +219,32 @@ export function pintarMisiones(abierto) {
     </li>`;
   }).join('');
 
-  caja.innerHTML = `<p class="menu-misiones-titulo">Misiones de hoy</p><ul>${filas}</ul>`;
+  // Los logros, debajo: de una vez y con recompensa que no son monedas. Los
+  // cumplidos van al final, que lo que se mira es lo que falta.
+  const p = cargarPerfil();
+  const nombreTitulo = (id) => cosmeticoPorId(id)?.nombre ?? id;
+  const logros = LOGROS.map((l) => {
+    const estado = hoy.logros?.[l.id] ?? { progreso: 0, cobrado: false };
+    const llevo = Math.min(estado.progreso ?? 0, l.meta);
+    const hecho = estado.cobrado || llevo >= l.meta;
+    return { l, llevo, hecho };
+  }).sort((a, b) => Number(a.hecho) - Number(b.hecho));
+  const filasLogros = logros.map(({ l, llevo, hecho }) => `<li class="mision logro ${hecho ? 'hecha' : ''}">
+      <span class="mision-nombre">${escapar(l.nombre)}</span>
+      <span class="mision-cifra">${hecho ? `${l.meta}/${l.meta} ✓` : `${llevo}/${l.meta}`}</span>
+      <span class="mision-texto">${escapar(l.texto)}</span>
+      <span class="mision-premio">${escapar(textoDeRecompensa(l.recompensa, nombreTitulo))}</span>
+      <span class="mision-barra"><i style="width:${Math.round((llevo / l.meta) * 100)}%"></i></span>
+    </li>`).join('');
+  // Lo ganado y aún sin gastar, dicho aquí porque es donde se ganó.
+  const pendiente = [
+    p.sobresGratis > 0 ? `<p class="menu-misiones-nota">Tienes ${p.sobresGratis === 1 ? '1 sobre gratis' : `${p.sobresGratis} sobres gratis`}: se abren en Sobres.</p>` : '',
+    p.mazosExtra > 0 ? `<p class="menu-misiones-nota">Tienes ${p.mazosExtra === 1 ? 'un mazo inicial' : `${p.mazosExtra} mazos iniciales`} por elegir.
+      <button class="boton-fantasma mision-elegir" id="btn-mazo-extra">Elegir mazo</button></p>` : '',
+  ].join('');
+
+  caja.innerHTML = `<p class="menu-misiones-titulo">Misiones de hoy</p><ul>${filas}</ul>`
+    + `<p class="menu-misiones-titulo">Logros</p><ul>${filasLogros}</ul>${pendiente}`;
   caja.classList.remove('oculta');
 }
 
@@ -433,11 +460,14 @@ function pintarSobres(tirada = null, nuevas = new Set(), antesDeAbrir = {}) {
     }).join('');
   }
 
-  const puede = PRUEBAS || p.monedas >= ECONOMIA.precioSobre;
+  // Un sobre gratis —de un logro— va antes que las monedas, y el botón lo dice.
+  const gratis = p.sobresGratis ?? 0;
+  const puede = PRUEBAS || gratis > 0 || p.monedas >= ECONOMIA.precioSobre;
   dom.btnAbrir.disabled = !puede;
   dom.btnAbrir.textContent = PRUEBAS
     ? 'Abrir sobre · modo pruebas'
-    : `Abrir sobre · ${ECONOMIA.precioSobre} ◈`;
+    : gratis > 0 ? `Abrir sobre · gratis (te quedan ${gratis})`
+      : `Abrir sobre · ${ECONOMIA.precioSobre} ◈`;
   dom.aviso.className = puede ? 'meta-nota' : 'meta-nota mal';
   const abiertos = p.sobresAbiertos === 1 ? 'Llevas 1 sobre abierto' : `Llevas ${p.sobresAbiertos} sobres abiertos`;
   dom.aviso.textContent = PRUEBAS
@@ -448,7 +478,8 @@ function pintarSobres(tirada = null, nuevas = new Set(), antesDeAbrir = {}) {
 }
 
 async function comprarSobre() {
-  if (!PRUEBAS && cargarPerfil().monedas < ECONOMIA.precioSobre) return;
+  const p = cargarPerfil();
+  if (!PRUEBAS && !(p.sobresGratis > 0) && p.monedas < ECONOMIA.precioSobre) return;
 
   // El sorteo ya no se hace aquí cuando hay servidor: las cinco cartas las saca
   // él. Pedirle que apunte las que hubiera sorteado el navegador sería pedirle

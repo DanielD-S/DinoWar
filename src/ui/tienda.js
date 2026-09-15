@@ -25,6 +25,7 @@
 import {
   COSMETICOS, TIPO_COSMETICO, PACKS, precioDePack, loTiene, equipadoDe, cosmeticoPorId, porDefecto,
 } from '../data/cosmeticos.js';
+import { LOGRO_POR_ID } from '../data/logros.js';
 import { cargarPerfil } from './almacen.js';
 import { comprarCosmetico, equiparCosmetico, PRUEBAS } from './perfil.js';
 import { rpc, hayServidor } from './supabase.js';
@@ -52,6 +53,11 @@ export const PIEZAS = Object.freeze([
 const T = TIPO_COSMETICO;
 
 const SECCIONES = [
+  {
+    tipo: T.TITULO,
+    titulo: 'Títulos',
+    nota: 'Bajo tu nombre en la presentación de cada partida. No se compran: se ganan con los logros de la pantalla de jugar.',
+  },
   {
     tipo: T.RETRATO,
     titulo: 'Retratos',
@@ -149,6 +155,18 @@ export function aplicarRival(equipado) {
 export const limpiarRival = () => aplicarRival(null);
 
 /**
+ * El título que lleva puesto un `equipado` ({tipo: id}) del servidor, o ''.
+ * Para el rival de un duelo: lo suyo llega como ids y no como perfil.
+ */
+export function tituloDeEquipado(equipado) {
+  const c = cosmeticoPorId(equipado?.[T.TITULO]);
+  return c && c.tipo === T.TITULO ? (c.texto ?? '') : '';
+}
+
+/** Tu título, o ''. */
+export const tituloPropio = (perfil = cargarPerfil()) => equipadoDe(perfil, T.TITULO).texto ?? '';
+
+/**
  * Lo que lleva puesto tu rival en un duelo. Lo cuenta el servidor, y sólo a
  * quien está en ese duelo. Null sin servidor.
  */
@@ -187,6 +205,9 @@ function vistaHTML(c) {
     return `<i class="tienda-vista tienda-retrato retrato-medallon" aria-hidden="true"
       style="--retrato:${url(c.arte)}"></i>`;
   }
+  if (c.tipo === T.TITULO) {
+    return `<div class="tienda-vista tienda-titulo-vista" aria-hidden="true"><b>Tu nombre</b><span>${c.texto || '—'}</span></div>`;
+  }
   const { imagen, filtro } = aspecto(c);
   return `<div class="tienda-vista tienda-${c.tipo.toLowerCase()}" aria-hidden="true"
     style="background-image:${url(imagen)};filter:${filtro}"></div>`;
@@ -200,6 +221,9 @@ function fichaHTML(c, p) {
     acciones = '<span class="tienda-estado">Equipado</span>';
   } else if (tiene) {
     acciones = `<button class="tienda-boton" data-equipar="${c.id}" ${ocupado ? 'disabled' : ''}>Equipar</button>`;
+  } else if (c.exclusivo) {
+    // Se gana, no se compra: la ficha dice con qué logro.
+    acciones = `<span class="tienda-bloqueado">Se gana: ${LOGRO_POR_ID[c.logro]?.texto ?? c.logro}</span>`;
   } else if (confirmando === c.id) {
     acciones = `<span class="tienda-pregunta">¿Por ${c.precio} ◈?</span>
       <button class="tienda-boton si" data-comprar-si="${c.id}" ${ocupado ? 'disabled' : ''}>Comprar</button>

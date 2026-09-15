@@ -41,6 +41,10 @@ export function perfilInicial() {
     // Lo comprado en la tienda y lo que se lleva puesto por tipo.
     cosmeticos: [],
     equipado: {},
+    // Lo que dan los logros y aún no se ha gastado, y qué iniciales se tienen.
+    sobresGratis: 0,
+    mazosExtra: 0,
+    inicialesTomados: [],
     dificultad: 'heuristica',
   };
 }
@@ -88,6 +92,9 @@ function sanear(bruto) {
     cosmeticos: (Array.isArray(bruto.cosmeticos) ? bruto.cosmeticos : []).filter((x) => cosmeticoPorId(x)),
     equipado: Object.fromEntries(Object.entries(bruto.equipado ?? {})
       .filter(([tipo, id]) => Object.values(TIPO_COSMETICO).includes(tipo) && cosmeticoPorId(id)?.tipo === tipo)),
+    sobresGratis: Number.isFinite(bruto.sobresGratis) ? Math.max(0, Math.floor(bruto.sobresGratis)) : 0,
+    mazosExtra: Number.isFinite(bruto.mazosExtra) ? Math.max(0, Math.floor(bruto.mazosExtra)) : 0,
+    inicialesTomados: (Array.isArray(bruto.inicialesTomados) ? bruto.inicialesTomados : []).filter((x) => typeof x === 'string'),
     dificultad: bruto.dificultad === 'aleatoria' ? 'aleatoria' : base.dificultad,
   };
 }
