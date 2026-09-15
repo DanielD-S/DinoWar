@@ -146,19 +146,37 @@
 @keyframes fx-velo {
   0% { opacity: 0; } 8% { opacity: 1; } 84% { opacity: 1; } 100% { opacity: 0; }
 }
+/* El lado va en una variable y el centrado se calcula DE ELLA. Estaba en
+   `vmin` con un `max-width` aparte, y el tope recorta la caja pero no el
+   margen: en cuanto la pantalla daba de sí, las dos capas se iban arriba y a
+   la izquierda la mitad de lo recortado. */
 .invocacion-rayos, .invocacion-aura {
-  position: absolute; left: 50%; top: 45%; width: 150vmin; height: 150vmin; max-width: 900px; max-height: 900px;
-  margin: -75vmin 0 0 -75vmin;
+  position: absolute; left: 50%; top: 45%;
+  width: var(--lado); height: var(--lado);
+  margin: calc(var(--lado) / -2) 0 0 calc(var(--lado) / -2);
   mix-blend-mode: screen; pointer-events: none;
 }
+/* Los rayos GIRAN, y un cuadrado que gira sólo cubre siempre su círculo
+   inscrito: fuera de él, sus cuatro cantos barren la pantalla. La textura
+   llega brillante hasta el borde —235 de 255 a cuatro quintos del radio, 41
+   a un píxel del canto— así que en `screen` sobre el velo ese corte se veía,
+   y lo que se veía era un cuadrado dando vueltas detrás de la carta.
+   La máscara redonda lo recorta por dentro del círculo inscrito: gira consigo
+   misma, así que ya no hay borde que se mueva. El lado sube lo justo para que
+   el disco opaco llegue donde llegaba el cuadrado (.76 x 195 ~ 150). */
 .invocacion-rayos {
+  --lado: min(195vmin, 1170px);
   background: url('assets/piel/efectos/rayos.webp') center / cover no-repeat;
+  -webkit-mask-image: radial-gradient(circle closest-side, #000 76%, transparent 99%);
+  mask-image: radial-gradient(circle closest-side, #000 76%, transparent 99%);
   animation: fx-girar 9s linear infinite, fx-rayos var(--ceremonia) ease-out both;
 }
 @keyframes fx-girar { to { transform: rotate(360deg); } }
 @keyframes fx-rayos { 0% { opacity: 0; } 15% { opacity: .9; } 78% { opacity: .9; } 100% { opacity: 0; } }
+/* El aura no gira —es un flipbook de 4x4— así que no necesita máscara: sólo
+   el centrado bueno. */
 .invocacion-aura {
-  width: 110vmin; height: 110vmin; margin: -55vmin 0 0 -55vmin; max-width: 640px; max-height: 640px;
+  --lado: min(110vmin, 640px);
   background: url('assets/piel/efectos/aura.webp') 0 0 / 400% 400% no-repeat;
   animation: fx-col 280ms steps(4) 4 120ms both, fx-fila 1120ms steps(4) 1 120ms both;
 }
