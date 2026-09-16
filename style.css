@@ -3086,6 +3086,37 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
    degradado y los medallones son círculos de CSS; con arte, el marco WebP va
    ENCIMA del retrato y el hueco transparente deja verlo. */
 .exp-cuerpo { padding: 0 0 24px; position: relative; }
+/* La tira de formaciones. Cada ficha lleva de fondo su propio mapa, oscurecido
+   con un degradado para que el nombre se lea encima: es arte que ya existe y
+   ahorra una pieza nueva. Se desplaza en horizontal, que a 360 px no caben
+   cuatro. */
+.exp-atlas {
+  display: flex; gap: 8px; padding: 10px 14px 2px; overflow-x: auto;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.exp-atlas::-webkit-scrollbar { display: none; }
+.exp-ficha {
+  position: relative; flex: 0 0 auto; width: 116px; min-height: 58px;
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 2px;
+  padding: 8px; text-align: left; border-radius: 10px; cursor: pointer;
+  border: 2px solid #4a4133; background-color: #17130e;
+  background-size: cover; background-position: center;
+  color: var(--texto); transition: border-color .18s, filter .18s;
+}
+/* El velo va en un pseudoelemento y no con `filter` sobre la ficha: el filtro
+   se llevaría por delante el texto, que es hijo. */
+.exp-ficha::before {
+  content: ''; position: absolute; inset: 0; border-radius: 8px;
+  background: linear-gradient(180deg, rgba(10,8,6,.35), rgba(10,8,6,.88));
+}
+.exp-ficha b, .exp-ficha i { position: relative; }
+.exp-ficha b { font-size: 12px; line-height: 1.15; font-weight: 700; }
+.exp-ficha i { font-style: normal; font-size: 10px; color: var(--acento-claro); }
+.exp-ficha.puesta { border-color: var(--acento-vivo); box-shadow: 0 0 14px rgba(217,164,65,.45); }
+.exp-ficha.completa i::after { content: ' ✓'; color: #b8913e; }
+.exp-ficha.bloqueada { filter: grayscale(1) brightness(.5); cursor: default; }
+.exp-ficha.bloqueada i { color: #8d8272; }
+
 .exp-era {
   text-align: center; font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
   color: var(--acento-claro); margin: 12px 0 6px;

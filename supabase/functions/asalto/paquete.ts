@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: d7c7d2bca7ff9e4c
+// huella: ba4a6245ecc8b7c1
 //
 // Lleva dentro estos 24 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -4335,6 +4335,8 @@ var VOCABULARIO = Object.freeze([
   "duelos",
   // duelos jugados, se ganen o no
   "duelosGanados",
+  "expediciones",
+  // partidas contra un rival de expedición, se ganen o no
   "expedicionNuevos",
   // rivales de expedición vencidos por primera vez
   // Los de las cartas de jefe. Ni el parte ni la Edge Function: los apunta
@@ -4443,6 +4445,11 @@ var CATALOGO = Object.freeze([
   M("dano_jefe", "Al hueso", "Hazle 40 de da\xF1o al jefe", "danoJefe", 40, 45),
   M("duelo_uno", "Cara a cara", "Juega 1 duelo", "duelos", 1, 40),
   M("duelo_ganar", "Mano a mano", "Gana 1 duelo", "duelosGanados", 1, 45),
+  // La de expedición mide partidas JUGADAS y no primeras victorias: los nodos
+  // se acaban, y quien ha recorrido los dos mapas sólo estrena rival una vez
+  // por semana. Una misión que la mitad del año no se puede cumplir no pide
+  // algo, sobra. Por eso `expedicionNuevos` se queda para los logros.
+  M("expedicion_dos", "Prospecci\xF3n", "Juega 2 partidas de expedici\xF3n", "expediciones", 2, 40),
   // La difícil del día. Una sola, y paga como tal.
   // El texto dice «1 partida» y no «una» a propósito: el guardián de
   // `misiones.test.js` pide que el texto cite la meta, igual que el de las
@@ -4843,37 +4850,249 @@ var EXPEDICIONES = Object.freeze([
         ]
       })
     ])
+  }),
+  // --------------------------------------------------------- Hell Creek
+  //
+  // La segunda, y la primera que se ABRE con otra: `requiere` encadena mapas,
+  // y `requisitoDe()` hace que el primer nodo de aquí pida a Big Al. No es
+  // sólo pintura: el servidor usa el mismo requisito para no pagar la primera
+  // victoria de un Hell Creek empezado por la puerta de atrás.
+  //
+  // Es de las tres formaciones con mapa la única que el set sostiene: hay 26
+  // cartas del Cretácico norteamericano y 22 no aparecen hoy en ninguna
+  // partida. Las otras dos pedirían cartas nuevas, no mapas — Kem Kem repetiría
+  // el mazo del visitante que ya existe y Tendaguru sería la Morrison otra vez.
+  //
+  // El mapa termina en el impacto, así que el camino va de los bosques del
+  // interior hacia la costa y el último rival cae encima del cráter.
+  Object.freeze({
+    id: "hell_creek",
+    nombre: "Formaci\xF3n Hell Creek",
+    era: "Cret\xE1cico Superior \xB7 68\u201366 Ma",
+    mapa: "mapa_hell_creek",
+    requiere: "morrison",
+    rivales: Object.freeze([
+      // El orden NO es el que se escribió: salió de medirlo. El clan de los
+      // cuernos se pensó cuarto y ganaba el 85 % —dos auras de clado apiladas
+      // sobre marginocéfalos baratos es lo más fuerte que hay en el set—, y
+      // el invierno del impacto, pensado como penúltimo golpe, perdía el 82 %
+      // porque un mazo que sólo muele no gana: la extinción está en el 0 %.
+      //
+      // El camino sigue el dibujo del mapa, que va de los bosques del interior
+      // a la costa y termina en el cráter.
+      rival2({
+        id: "sotobosque_hell_creek",
+        nombre: "Los peque\xF1os del sotobosque",
+        lema: "Lo que corretea entre los helechos. Ninguno te mata; todos juntos, s\xED.",
+        retrato: "platyceratops",
+        perfil: "heuristica",
+        premio: 60,
+        mazo: [
+          ["platyceratops", 3],
+          ["liaoceratops", 3],
+          ["troodon", 3],
+          ["tongtianlong", 3],
+          ["halszkaraptor", 3],
+          ["pteranodon", 3],
+          ["shuangmiaosaurus", 3],
+          ["stegoceras", 3],
+          ["alaskacephale", 3],
+          ["chasmosaurus", 3],
+          ["medusaceratops", 1],
+          ["nido", 3],
+          ["insectos", 3],
+          ["gregarismo", 3]
+        ]
+      }),
+      rival2({
+        id: "los_blindados",
+        nombre: "Los blindados",
+        lema: "Osteodermos y mazas. Lo que les pega se lleva la mitad de vuelta.",
+        retrato: "ankylosaurus",
+        perfil: "heuristica",
+        premio: 80,
+        mazo: [
+          ["ankylosaurus", 1],
+          ["euoplocephalus", 3],
+          ["nodosaurus", 2],
+          ["gargoyleosaurus", 3],
+          ["invictarx", 3],
+          ["stegoceras", 3],
+          ["loricatosaurus", 3],
+          ["bienosaurus", 3],
+          // Sin molienda: se probó con la Sequía y la Trampa y el muro pasó
+          // del 74 % al 80 %, o sea que empeoró. Un mazo que sólo muele no
+          // gana —la extinción está en el 0 %— y encima gasta las ranuras.
+          ["mortandad", 1],
+          ["competencia", 2],
+          ["canal_trenzado", 3],
+          ["rebrote", 3],
+          ["gregarismo", 3]
+        ]
+      }),
+      rival2({
+        id: "cabezas_de_hueso",
+        nombre: "Las cabezas de hueso",
+        lema: "Cr\xE1neos de veinte cent\xEDmetros de grosor. Golpean al llegar y siguen andando.",
+        retrato: "pachycephalosaurus",
+        perfil: "heuristica",
+        premio: 100,
+        mazo: [
+          ["pachycephalosaurus", 3],
+          ["stegoceras", 3],
+          ["alaskacephale", 3],
+          ["liaoceratops", 3],
+          ["platyceratops", 3],
+          ["chasmosaurus", 3],
+          ["wendiceratops", 1],
+          ["therizinosaurus", 3],
+          ["troodon", 3],
+          ["gregarismo", 3],
+          ["fractura", 2],
+          ["competencia", 2],
+          ["nido", 3]
+        ]
+      }),
+      rival2({
+        id: "marisma_edmontosaurus",
+        nombre: "La marisma de Edmontosaurus",
+        lema: "Hadrosaurios a cientos. No pegan: te cansan y se curan.",
+        retrato: "edmontosaurus",
+        perfil: "heuristica",
+        premio: 120,
+        mazo: [
+          ["edmontosaurus", 1],
+          ["parasaurolophus", 3],
+          ["brachylophosaurus", 3],
+          ["rhinorex", 2],
+          ["maiasaura", 1],
+          ["shuangmiaosaurus", 3],
+          ["iguanodon", 3],
+          ["canal_trenzado", 3],
+          ["nido", 3],
+          ["gregarismo", 3],
+          ["rebrote", 3],
+          ["gastrolitos", 2],
+          ["crecimiento_acelerado", 1],
+          ["competencia", 2],
+          ["fractura", 2]
+        ]
+      }),
+      rival2({
+        id: "mar_interior",
+        nombre: "El mar interior",
+        lema: "La v\xEDa mar\xEDtima parte el continente en dos. Llega por agua y por aire.",
+        retrato: "mosasaurus",
+        perfil: "heuristica",
+        premio: 150,
+        mazo: [
+          ["mosasaurus", 1],
+          ["elasmosaurus", 3],
+          ["plesiopleurodon", 2],
+          ["scanisaurus", 3],
+          ["quetzalcoatlus", 2],
+          ["pteranodon", 3],
+          ["huaxiadraco", 3],
+          ["suchomimus", 2],
+          ["inundacion", 3],
+          ["competencia", 2],
+          ["fractura", 2],
+          ["canal_trenzado", 3],
+          ["nido", 3],
+          ["gregarismo", 3]
+        ]
+      }),
+      rival2({
+        id: "clan_de_los_cuernos",
+        nombre: "El clan de los cuernos",
+        lema: "Golas que se cubren unas a otras. Cuanto m\xE1s entran, m\xE1s pega cada una.",
+        retrato: "triceratops",
+        perfil: "heuristica",
+        premio: 180,
+        mazo: [
+          // Sin Medusaceratops y sin Crecimiento acelerado: con los dos ganaba
+          // el 85 %. Dos auras de clado apiladas sobre marginocéfalos baratos
+          // es lo más fuerte que tiene el set, y aquí no toca todavía.
+          ["triceratops", 2],
+          ["titanoceratops", 1],
+          ["wendiceratops", 1],
+          ["lokiceratops", 2],
+          ["chasmosaurus", 3],
+          ["liaoceratops", 3],
+          ["platyceratops", 3],
+          ["alaskacephale", 3],
+          ["stegoceras", 3],
+          ["gregarismo", 3],
+          ["nido", 3],
+          ["canal_trenzado", 3]
+        ]
+      }),
+      rival2({
+        id: "invierno_del_impacto",
+        nombre: "El invierno del impacto",
+        lema: "Ceniza en el cielo y nada que comer. Aqu\xED no se gana: se dura m\xE1s.",
+        retrato: "quetzalcoatlus",
+        perfil: "heuristica",
+        premio: 220,
+        mazo: [
+          // La Mortandad es asimétrica a propósito: 3 de daño a todo el campo
+          // barre una mano de criaturas baratas y a éstas no las despeina.
+          ["aridez", 1],
+          ["mortandad", 1],
+          ["carrona", 1],
+          ["competencia", 2],
+          ["fractura", 2],
+          ["neumaticidad", 2],
+          ["crecimiento_acelerado", 1],
+          ["medusaceratops", 2],
+          ["therizinosaurus", 3],
+          ["euoplocephalus", 3],
+          ["elasmosaurus", 3],
+          ["quetzalcoatlus", 2],
+          ["carnotaurus", 2],
+          ["mosasaurus", 1],
+          ["titanoceratops", 2],
+          ["triceratops", 2],
+          ["wendiceratops", 2],
+          ["dromaeosaurus", 3]
+        ]
+      }),
+      rival2({
+        id: "el_ultimo_rey",
+        nombre: "El \xFAltimo rey",
+        lema: "Ocho toneladas de tiranosaurio en el \xFAltimo mill\xF3n de a\xF1os del Mesozoico.",
+        retrato: "tyrannosaurus",
+        perfil: "heuristica",
+        premio: 350,
+        mazo: [
+          ["tyrannosaurus", 1],
+          ["triceratops", 2],
+          ["wendiceratops", 2],
+          ["titanoceratops", 2],
+          ["medusaceratops", 2],
+          ["ankylosaurus", 1],
+          ["edmontosaurus", 1],
+          ["carnotaurus", 2],
+          ["quetzalcoatlus", 2],
+          ["pachycephalosaurus", 3],
+          ["dromaeosaurus", 3],
+          ["troodon", 3],
+          ["velociraptor", 3],
+          ["mosasaurus", 1],
+          ["carrona", 1],
+          ["mortandad", 1],
+          ["competencia", 2],
+          ["crecimiento_acelerado", 1],
+          ["neumaticidad", 2],
+          ["fractura", 2],
+          ["gregarismo", 3],
+          ["trampa", 3]
+        ]
+      })
+    ])
   })
 ]);
 var VISITANTES = Object.freeze([
-  rival2({
-    id: "visitante_tyrannosaurus",
-    nombre: "El rey de Hell Creek",
-    lema: "Sesenta y seis millones de a\xF1os de adelanto, y hambre de todos ellos.",
-    retrato: "tyrannosaurus",
-    perfil: "heuristica",
-    premio: 150,
-    mazo: [
-      // Sin Triceratops ni Ankylosaurus: con ellos se le ganaba el 37 % y los
-      // otros visitantes rondan el 50 %. Rotan por semana y tienen que costar
-      // parecido, que si no la semana del rey es la semana de no jugar.
-      ["tyrannosaurus", 1],
-      ["liaoceratops", 2],
-      ["stegoceras", 1],
-      ["pachycephalosaurus", 3],
-      ["parasaurolophus", 3],
-      ["edmontosaurus", 1],
-      ["quetzalcoatlus", 2],
-      ["troodon", 3],
-      ["dromaeosaurus", 3],
-      ["velociraptor", 3],
-      ["chasmosaurus", 3],
-      ["euoplocephalus", 3],
-      ["fractura", 2],
-      ["bosque_ribereno", 2],
-      ["crecimiento_acelerado", 1]
-    ]
-  }),
   rival2({
     id: "visitante_spinosaurus",
     nombre: "El se\xF1or del Kem Kem",
@@ -4924,6 +5143,104 @@ var VISITANTES = Object.freeze([
       ["manada_paso", 3],
       ["manantial", 1]
     ]
+  }),
+  rival2({
+    id: "visitante_gobi",
+    nombre: "El desierto de Gobi",
+    lema: "Arena, viento y garras. Lo que sobrevive aqu\xED no necesita beber.",
+    retrato: "therizinosaurus",
+    perfil: "heuristica",
+    premio: 150,
+    mazo: [
+      // La Sequía no está de adorno: el Therizinosaurus cobra +3 de Ataque
+      // mientras haya un clima en el campo, y su carta se llama Garra de sequía.
+      ["aridez", 1],
+      ["therizinosaurus", 3],
+      ["velociraptor", 3],
+      ["troodon", 3],
+      ["halszkaraptor", 3],
+      ["ojoraptorsaurus", 3],
+      ["monolophosaurus", 3],
+      ["shuangmiaosaurus", 3],
+      ["liaoceratops", 3],
+      ["platyceratops", 3],
+      ["alaskacephale", 3],
+      ["huaxiadraco", 3],
+      ["medusaceratops", 2],
+      ["quetzalcoatlus", 2],
+      ["suchomimus", 2],
+      ["neumaticidad", 2],
+      ["crecimiento_acelerado", 1],
+      ["competencia", 2],
+      ["gregarismo", 3],
+      ["fractura", 2]
+    ]
+  }),
+  rival2({
+    id: "visitante_patagonia",
+    nombre: "Los gigantes del sur",
+    lema: "Gondwana cri\xF3 los cuerpos m\xE1s grandes que ha habido. Y lo que los cazaba.",
+    retrato: "argentinosaurus",
+    perfil: "heuristica",
+    premio: 150,
+    mazo: [
+      ["argentinosaurus", 2],
+      ["antarctosaurus", 1],
+      ["tyrannotitan", 1],
+      ["carnotaurus", 2],
+      ["amargasaurus", 3],
+      ["sanjuansaurus", 3],
+      ["plateosauravus", 3],
+      ["atlasaurus", 2],
+      // Todo lo caro cuesta 4: sin rampa, la mitad de la mano se queda mirando.
+      ["carrona", 1],
+      ["humedal", 2],
+      ["vega", 2],
+      ["manantial", 1],
+      ["lago", 2],
+      ["elasmosaurus", 3],
+      ["neumaticidad", 2],
+      ["crecimiento_acelerado", 1],
+      ["gastrolitos", 2],
+      ["mortandad", 1],
+      ["competencia", 2],
+      ["canal_trenzado", 3],
+      ["rebrote", 3],
+      ["gregarismo", 3],
+      ["fractura", 2]
+    ]
+  }),
+  rival2({
+    id: "visitante_tendaguru",
+    nombre: "La colina de Tendaguru",
+    lema: "La Morrison tuvo una hermana en \xC1frica, y all\xED los cuellos eran m\xE1s largos.",
+    retrato: "brachiosaurus",
+    perfil: "heuristica",
+    premio: 150,
+    mazo: [
+      ["brachiosaurus", 1],
+      ["atlasaurus", 2],
+      ["mamenchisaurus", 3],
+      ["amargasaurus", 3],
+      ["kentrosaurus", 3],
+      ["stegosaurus", 3],
+      ["dryosaurus", 3],
+      ["ceratosaurus", 3],
+      ["ornitholestes", 3],
+      ["allosaurus", 3],
+      ["torvosaurus", 2],
+      ["manantial", 1],
+      ["lago", 2],
+      ["bosque", 1],
+      ["gastrolitos", 2],
+      ["neumaticidad", 2],
+      ["crecimiento_acelerado", 1],
+      ["competencia", 2],
+      ["canal_trenzado", 3],
+      ["rebrote", 3],
+      ["gregarismo", 3],
+      ["fractura", 2]
+    ]
   })
 ]);
 function semanaDe(dia) {
@@ -4938,8 +5255,10 @@ var TODOS2 = new Map([
 var rivalPorId = (id) => TODOS2.get(id) ?? null;
 function requisitoDe(id) {
   const r = rivalPorId(id);
-  if (!r || r.indice <= 0) return null;
-  return r.expedicion.rivales[r.indice - 1].id;
+  if (!r || r.indice < 0) return null;
+  if (r.indice > 0) return r.expedicion.rivales[r.indice - 1].id;
+  const previa = EXPEDICIONES.find((e) => e.id === r.expedicion.requiere);
+  return previa ? previa.rivales[previa.rivales.length - 1].id : null;
 }
 function claveDeVictoria(id, dia) {
   const r = rivalPorId(id);
@@ -5420,7 +5739,11 @@ async function hacerVictoria(servicio, jugadorId, envio) {
     if (errExp) console.error("aplicar_expedicion", errExp.message);
     else expedicion = exp;
   }
-  const parte = { ...resultado2.parte, expedicionNuevos: expedicion?.primera ? 1 : 0 };
+  const parte = {
+    ...resultado2.parte,
+    expediciones: resultado2.rival ? 1 : 0,
+    expedicionNuevos: expedicion?.primera ? 1 : 0
+  };
   const { data, error } = await servicio.rpc("aplicar_partida", {
     p_jugador: jugadorId,
     p_semilla: envio.semilla,

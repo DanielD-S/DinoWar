@@ -70,6 +70,7 @@ export const VOCABULARIO = Object.freeze([
   'jefesVencidos',    // asaltos que dejaron al jefe a cero: el golpe final
   'duelos',           // duelos jugados, se ganen o no
   'duelosGanados',
+  'expediciones',     // partidas contra un rival de expedición, se ganen o no
   'expedicionNuevos', // rivales de expedición vencidos por primera vez
   // Los de las cartas de jefe. Ni el parte ni la Edge Function: los apunta
   // `reclamar_jefe` en SQL (0028) cuando la carta entra por primera vez.
@@ -222,6 +223,12 @@ export const CATALOGO = Object.freeze([
   M('dano_jefe', 'Al hueso', 'Hazle 40 de daño al jefe', 'danoJefe', 40, 45),
   M('duelo_uno', 'Cara a cara', 'Juega 1 duelo', 'duelos', 1, 40),
   M('duelo_ganar', 'Mano a mano', 'Gana 1 duelo', 'duelosGanados', 1, 45),
+
+  // La de expedición mide partidas JUGADAS y no primeras victorias: los nodos
+  // se acaban, y quien ha recorrido los dos mapas sólo estrena rival una vez
+  // por semana. Una misión que la mitad del año no se puede cumplir no pide
+  // algo, sobra. Por eso `expedicionNuevos` se queda para los logros.
+  M('expedicion_dos', 'Prospección', 'Juega 2 partidas de expedición', 'expediciones', 2, 40),
 
   // La difícil del día. Una sola, y paga como tal.
   // El texto dice «1 partida» y no «una» a propósito: el guardián de

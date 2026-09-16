@@ -248,7 +248,15 @@ async function hacerVictoria(servicio, jugadorId: string, envio: Record<string, 
     else expedicion = exp;
   }
 
-  const parte = { ...resultado.parte, expedicionNuevos: expedicion?.primera ? 1 : 0 };
+  // `expediciones` cuenta la partida se gane o se pierda, y por eso puede
+  // medirla una misión diaria: `expedicionNuevos` se agota —quien ha
+  // vencido los dieciséis nodos sólo estrena uno por semana, el visitante—
+  // y una misión que no se puede cumplir no pide nada, estorba.
+  const parte = {
+    ...resultado.parte,
+    expediciones: resultado.rival ? 1 : 0,
+    expedicionNuevos: expedicion?.primera ? 1 : 0,
+  };
   const { data, error } = await servicio.rpc('aplicar_partida', {
     p_jugador: jugadorId,
     p_semilla: envio.semilla,
