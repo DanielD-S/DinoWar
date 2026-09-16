@@ -114,17 +114,21 @@ Para saber lo que vale un punto hay que contar partidas ganadas.
 
 Hay dos sistemas de mecánica y la frontera no es un accidente.
 
-Las **17 cartas de soporte** llevan la suya en `rasgo`, un valor del enum de
-`cards.js`, con su constante en `BALANCE` y su caso en el motor. Son diecisiete
+Las **cartas de soporte** llevan la suya en `rasgo`, un valor del enum de
+`cards.js`, con su constante en `BALANCE` y su caso en el motor. Son veintitantas
 reglas y ninguna se parece a otra: un caso por carta es lo honesto.
 
-Las **50 criaturas** llevan la suya en `mecanica`, un objeto de datos descrito en
-[`src/data/mecanicas.js`](src/data/mecanicas.js). Son cincuenta habilidades pero
-diez FORMAS: contadores, auras de clado, condicionales, inmunidades, espinas,
-coste añadido, búsquedas y disparos al entrar. Escritas como cincuenta ramas de
-`if` dentro de `ataqueEfectivo()` no habría quien las leyera, y `efectosDe()` —la
-función que le explica al jugador por qué su carta no marca lo que trae impresa—
-habría necesitado otras cincuenta.
+Las **criaturas** llevan la suya en `mecanica`, un objeto de datos descrito en
+[`src/data/mecanicas.js`](src/data/mecanicas.js). Son setenta y tantas
+habilidades pero diez FORMAS: contadores, auras de clado, condicionales,
+inmunidades, espinas, coste añadido, búsquedas y disparos al entrar. Escritas
+como setenta ramas de `if` dentro de `ataqueEfectivo()` no habría quien las
+leyera, y `efectosDe()` —la función que le explica al jugador por qué su carta no
+marca lo que trae impresa— habría necesitado otras setenta.
+
+Los números exactos NO se escriben aquí: se quedaron atrás dos veces —«17 de
+soporte» cuando ya eran 35— y un recuento desfasado es peor que ninguno.
+`test/entradas.test.js` los lleva y falla cuando cambian.
 
 Los campos se acumulan: una carta puede llevar `aura` y `entrada` a la vez, y
 `entrada` es un saco de efectos porque Spinosaurus muele los dos mazos de una
@@ -168,6 +172,87 @@ Tres decisiones que conviene conocer antes de discutirlas:
 - **Las búsquedas se eligen AL JUGAR la carta, no al revelarla.** El despliegue es
   a ciegas; parar la revelación para preguntar le diría al rival que has buscado
   algo.
+
+## La ronda del control: pelear por la MANO y no por el campo
+
+Quince cartas del 16-09-2026 —diez criaturas y cinco eventos— para la mitad del
+juego que no existía. El set sabía pelear por la mesa y no sabía tocar la mano
+de enfrente: el rival robaba dos por turno, jugaba lo que quería, y la vía de
+la extinción llevaba desde la v2 clavada en el 0 %. Lo pidió el autor con dos
+ejemplos —«los dos barajan su mano y roban 5», «descartas del mazo y te subes
+un dinosaurio»— y de ahí salieron cuatro formas nuevas y ni una rama por carta.
+
+**Las tres ZONAS del contador.** `cuenta.que` aceptaba dos cosas que se miran en
+el campo —`MISMA` y `CLADO`— y ahora acepta tres montones: `MANO`, `MANO_RIVAL`
+y `DESCARTE`. Tres cosas que no se deducen del código y se decidieron midiendo:
+
+- **Una zona NO mira `ambos`.** La mano del rival ya es la del rival, y un
+  contador que sumara los dos descartes no querría decir nada. Un `ambos`
+  escrito ahí sería un campo puesto y no leído, o sea el fallo mudo de siempre,
+  así que `test/entradas.test.js` lo prohíbe.
+- **Y piden freno, `cada` o `tope`.** Una mano son ocho cartas y un descarte
+  pasa de veinte: +1 por carta a pelo no es una carta, es un botón de ganar. El
+  test exige que toda zona declare uno de los dos.
+- **`cada` divide y `tope` corta, en ese orden.** «+1 de Vida por cada 4 cartas
+  de tu descarte, hasta +4» es `{ cada: 4, vida: 1, tope: 4 }`, y los tres
+  números salen en el texto porque `test/textos.test.js` los persigue.
+
+**`busca` puede ser un objeto.** Era una etiqueta —evento, clima, otra copia,
+un clado— y ahora acepta `{ ataqueMin }` y `{ ataqueMax }`, que es lo que
+pedían las dos caras del arquetipo: subirte el bicho que remata o el pequeño
+que rellena la curva. Mira el Ataque **impreso**, que es lo único que hay en el
+mazo: ahí no hay campo, ni auras, ni contadores. Y se sigue eligiendo AL JUGAR
+la carta, como todas las búsquedas.
+
+**Cuatro disparos nuevos al entrar**: `manoNueva`, `manosNuevas`,
+`topeManoRival` y `rescata`. Dos trampas que costaron:
+
+- **Una mano nueva pasa por el MAZO, no por el descarte.** Es lo que hace
+  jugable a toda la ronda: lo que sueltas vuelve a estar disponible, así que
+  cambiar una mano impagable no cuesta cartas. Si fuera al descarte, nadie lo
+  haría dos veces. Y roba a mano, sin `robar()`, porque el mazo acaba de crecer
+  con la mano entera: si aun así no llega, rebarajar el descarte sería regalar
+  cartas.
+- **`topeManoRival` va al REVÉS que todos los demás.** Su número es lo que le
+  DEJA al rival, así que cuanto más bajo, más fuerte. Tasarlo por su cifra
+  —`n × peso`, como los otros seis— hacía que un tope de 6, que no quita nada,
+  valiera el triple que uno de 2. Se tasa por lo que se lleva por delante desde
+  una mano típica, y por eso un tope de 0 es un número legítimo y no «sin
+  efecto»: se lee con `!== undefined` y no con un `if` a secas.
+
+**Y la lección que dejó Nigersaurus**: se escribió «los dos jugadores descartan
+3 cartas de su mazo» y el guardián saltó con «vale 0 para la IA». Era cierto:
+`mueleRival` pesa +0,4 y `muelePropio` −0,4, así que un molino simétrico se tasa
+en cero exacto y la IA no lo jugaría jamás. Quedó en 4 al rival y 2 a ti, que
+además es lo que la carta quería decir. Un efecto que se cancela consigo mismo
+no es una carta equilibrada: es una carta invisible.
+
+### Lo que costó medirlas, que fue la mitad del trabajo
+
+Con `node sim/carta.mjs`, 300 partidas cada una. **Los cinco eventos**, entre el
+49,0 % y el 53,0 %: calibrados y sin discusión. **Las diez criaturas** salieron
+del 46,7 % al 68,7 %, y cuatro se recostearon en el sitio —Tarbosaurus de 8/7 a
+7/6, Saurolophus de 3/9 a 2/7, Deinocheirus con tope 4 en vez de 5, Dakotaraptor
+de 5/5 a 4/5— y Shuvuuia AL REVÉS, de 1/2 a 1/3, que se quedaba corta. Quedan
+entre el 48,3 % y el 66,0 %.
+
+Y aquí está lo que conviene no volver a aprender:
+
+- **La escala de `sim/carta.mjs` no es comparable entre rarezas.** «60 % fuerte,
+  65 % empieza a doler» está escrito para la pregunta «¿está rota?», y una
+  épica metida en el mazo de referencia le quita el sitio a la carta MÁS
+  REPETIDA, que es una común. Parte del porcentaje es ese cambio y no la carta.
+  Medido a propósito para saberlo: **Suchomimus 69,3 %, Triceratops 66,3 %,
+  Torvosaurus 62,3 %, Rhinorex 59,3 %, Carnotaurus 58,0 %** — cinco épicas que
+  llevan meses en el set y que la escala llamaría «fuertes» o peor. Una carta
+  nueva se compara con sus iguales, no con el 50 %.
+- **Con esa banda delante, las cuatro recosteadas estaban dentro** y el recorte
+  fue de más. Se dejó igualmente: pegan menos y siguen haciendo lo suyo, y una
+  carta de control que además gana el cuerpo a cambio de nada es la clase de
+  carta que se vuelve obligatoria.
+- **Y lo que esto NO mide**, que es lo de siempre: el medidor las mete en el
+  mazo de REFERENCIA, que no es un mazo de control. Lo que valen de verdad sólo
+  se ve cuando alguien construya el mazo que las quiere, y ése no existe.
 
 ## Las diez cartas de Biomasa son las tierras, y se autolimitan
 
@@ -1738,8 +1823,17 @@ Dicho para que nadie lo descubra tarde:
 - **El balance cumple 3 de 6** (`BALANCE.md`, mazo de referencia del 13-09-2026):
   cero cartas descalibradas y las vías en 44/56, pero el jugador inicial se
   queda en 47,5 % —lleva ahí desde la v2, es del turno y no del mazo—, la bola
-  de nieve en 72 % y la extinción en 0 %. Y 69 de las 101 cartas del set siguen
-  fuera del mazo de referencia, o sea sin calibración comprobada.
+  de nieve en 72 % y la extinción en 0 %. Y **99 de las 116** cartas del set
+  siguen fuera del mazo de referencia, o sea sin calibración comprobada.
+  `BALANCE.md` NO se movió con la ronda del control y no tenía por qué: el mazo
+  de referencia no lleva ninguna de las quince, así que regenerarlo habría
+  gastado 2.000 partidas para volver a imprimir los mismos seis números. Es
+  exactamente el punto ciego que avisa la tabla de los simuladores.
+- **Y la extinción sigue en 0 % aunque la ronda del control exista.** Quince
+  cartas nuevas que muerden la mano y el mazo no mueven una vía que se mide
+  sobre un mazo que no las lleva. Para saber si la vía se abrió hay que
+  construir el mazo de control y medirlo contra el de referencia, que es
+  trabajo de diseño y no de esta tanda.
 - **La inmunidad al clima no muerde.** Torvosaurus y Nodosaurus dicen «no le
   afectan los efectos del clima», y hoy los dos únicos efectos del clima sobre una
   criatura son BUENOS: el Canal da +1 de Vida y el Bosque cura saurópodos. O sea

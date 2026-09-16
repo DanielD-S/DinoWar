@@ -3,7 +3,7 @@
 
 import { BALANCE, MAZO } from '../data/balance.js';
 import { CARTAS, TIPO, CLADO, RASGO, carta } from '../data/cards.js';
-import { QUE, CUANDO, INMUNE, TODOS } from '../data/mecanicas.js';
+import { QUE, CUANDO, INMUNE, TODOS, esZona } from '../data/mecanicas.js';
 import { barajar, semilla } from './rng.js';
 
 export const FASE = Object.freeze({
@@ -171,17 +171,38 @@ export const mecanicaDe = (cardId) => carta(cardId).mecanica ?? null;
 /**
  * ¿Cuántas cuentan para un contador? Se incluye a sí misma —es lo que dice el
  * texto de la carta— así que una sola en el campo ya suma uno.
+ *
+ * Cuenta dos cosas distintas según `que`: unidades EN EL CAMPO —las copias de
+ * sí misma o las de su clado, de un bando o de los dos— o cartas de una ZONA,
+ * que son montones y no unidades. Una zona no mira `ambos`: la mano del rival
+ * ya es la del rival, y sumar los dos descartes no querría decir nada.
+ *
+ * Luego pasa por los dos frenos, y en este orden: `cada` divide —«por cada 4
+ * cartas de tu descarte»— y `tope` corta. Sin ellos una mano de ocho cartas
+ * son ocho puntos de Ataque y un descarte de veinte, veinte: no es una carta,
+ * es un botón de ganar. Por eso las tres zonas los piden casi siempre.
  */
 function cuantasCuentan(state, inst, cuenta) {
   const c = carta(inst.cardId);
-  const bandos = cuenta.ambos ? [0, 1] : [inst.dueno];
   let n = 0;
-  for (const b of bandos) {
-    for (const o of unidadesDe(state, b)) {
-      const oc = carta(o.cardId);
-      if (cuenta.que === QUE.CLADO ? oc.clado === c.clado : o.cardId === inst.cardId) n += 1;
+
+  if (esZona(cuenta.que)) {
+    const jug = state.jugadores[inst.dueno];
+    if (cuenta.que === QUE.MANO) n = jug.mano.length;
+    else if (cuenta.que === QUE.MANO_RIVAL) n = state.jugadores[rival(inst.dueno)].mano.length;
+    else n = jug.descarte.length;
+  } else {
+    const bandos = cuenta.ambos ? [0, 1] : [inst.dueno];
+    for (const b of bandos) {
+      for (const o of unidadesDe(state, b)) {
+        const oc = carta(o.cardId);
+        if (cuenta.que === QUE.CLADO ? oc.clado === c.clado : o.cardId === inst.cardId) n += 1;
+      }
     }
   }
+
+  if (cuenta.cada) n = Math.floor(n / cuenta.cada);
+  if (cuenta.tope !== undefined) n = Math.min(n, cuenta.tope);
   return n;
 }
 
@@ -482,7 +503,7 @@ export function efectosDe(state, iid) {
       fuera.push({
         fuente: c.rasgoNombre,
         ataque: n * (m.cuenta.ataque ?? 0), vida: n * (m.cuenta.vida ?? 0), veces: n,
-        nota: m.cuenta.que === QUE.CLADO ? `${n} de su clado en el campo` : `${n} en el campo`,
+        nota: NOTA_CUENTA[m.cuenta.que]?.(n, m.cuenta) ?? `${n} en el campo`,
       });
     }
   }
@@ -506,6 +527,20 @@ export function efectosDe(state, iid) {
 
   return fuera;
 }
+
+/**
+ * De dónde salen los puntos de un contador. El jugador ve «4 · 1 · 2/3» y esto
+ * le dice por qué; con las zonas hace más falta que nunca, que una mano que
+ * cambia de tamaño cambia la carta a mitad de turno y sin explicación parece
+ * un fallo.
+ */
+const NOTA_CUENTA = Object.freeze({
+  [QUE.CLADO]: (n) => `${n} de su clado en el campo`,
+  [QUE.MISMA]: (n) => `${n} en el campo`,
+  [QUE.MANO]: (n, cuenta) => (cuenta.cada ? `${n} tramos de ${cuenta.cada} en tu mano` : `${n} en tu mano`),
+  [QUE.MANO_RIVAL]: (n, cuenta) => (cuenta.cada ? `${n} tramos de ${cuenta.cada} en la mano rival` : `${n} en la mano rival`),
+  [QUE.DESCARTE]: (n, cuenta) => (cuenta.cada ? `${n} tramos de ${cuenta.cada} en tu descarte` : `${n} en tu descarte`),
+});
 
 const NOTA_SI = Object.freeze({
   [CUANDO.CLIMA]: 'hay un clima en el campo',
@@ -543,10 +578,21 @@ export const buscaEnElMazo = (cardId) => filtroDeBusqueda(cardId) !== null;
  * Qué acepta la búsqueda de esta carta. `busca` es una etiqueta —evento, clima,
  * otra copia de sí misma— o directamente un clado, que es lo que hace falta
  * para «llévate a la mano un marginocéfalo».
+ *
+ * Y puede ser un OBJETO, `{ ataqueMin }` o `{ ataqueMax }`, para buscar una
+ * criatura por lo que pega y no por lo que es. Es la forma que pedían las dos
+ * caras del arquetipo de control: subirse el bicho grande que remata, o el
+ * pequeño que rellena la curva. Mira el Ataque IMPRESO y no el efectivo,
+ * porque la carta está en el mazo: ahí no hay campo, ni auras, ni contadores.
  */
 function filtroDeBusqueda(cardId) {
   const busca = mecanicaDe(cardId)?.busca;
   if (!busca) return null;
+  if (typeof busca === 'object') {
+    return (c) => c.tipo === TIPO.DINOSAURIO
+      && (busca.ataqueMin === undefined || c.ataque >= busca.ataqueMin)
+      && (busca.ataqueMax === undefined || c.ataque <= busca.ataqueMax);
+  }
   if (busca === QUE.EVENTO) return (c) => c.tipo === TIPO.EVENTO;
   if (busca === QUE.CLIMA) return (c) => c.tipo === TIPO.CLIMA;
   if (busca === QUE.MISMA) return (c) => c.id === cardId;

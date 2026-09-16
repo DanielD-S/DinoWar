@@ -19,7 +19,7 @@
 // `entrada` a la vez. `entrada` es un saco de efectos y no una etiqueta única
 // porque Spinosaurus muele los dos mazos de una sola llegada.
 //
-//   cuenta      { que, ambos, ataque, vida }   +n por cada X en juego
+//   cuenta      { que, ambos, cada, tope, ataque, vida }  +n por cada X
 //   aura        { clado, ataque, vida, inmune } a los tuyos de ese clado
 //   si          { cuando, umbral, ataque, vida } bonificación condicional
 //   trio        { copias, ataque, vida }        umbral que se gana PARA SIEMPRE
@@ -29,6 +29,7 @@
 //   guardia     { habitat }                     resta a cada golpe a TU hábitat
 //   costeExtra  { descartar }                   lo que hay que pagar además
 //   busca       QUE.EVENTO | QUE.CLIMA | QUE.MISMA | <CLADO>
+//               | { ataqueMin } | { ataqueMax }  una criatura por su Ataque
 //   entrada     { ... }                         ver src/engine/entradas.js
 
 /** Qué se cuenta o qué se busca. */
@@ -39,7 +40,23 @@ export const QUE = Object.freeze({
   CLADO: 'CLADO',
   EVENTO: 'EVENTO',
   CLIMA: 'CLIMA',
+  // Las tres ZONAS. Cuentan cartas de un montón y no unidades en el campo, así
+  // que no miran `ambos`: la mano del rival es su propio valor, no «las dos
+  // manos», y un contador que sumara los dos descartes no querría decir nada.
+  // `test/entradas.test.js` exige que una zona no declare `ambos`, que sería
+  // un campo puesto y no leído — el fallo silencioso de siempre.
+  //
+  // Y piden `cada` o `tope` casi siempre: una mano son ocho cartas y un
+  // descarte pasa de veinte, así que +1 por carta a pelo no es una carta, es
+  // un botón de ganar.
+  MANO: 'MANO',
+  MANO_RIVAL: 'MANO_RIVAL',
+  DESCARTE: 'DESCARTE',
 });
+
+/** Las zonas, que se cuentan distinto que lo que hay en el campo. */
+export const ZONAS = Object.freeze([QUE.MANO, QUE.MANO_RIVAL, QUE.DESCARTE]);
+export const esZona = (que) => ZONAS.includes(que);
 
 /** La condición de un `si`. */
 export const CUANDO = Object.freeze({

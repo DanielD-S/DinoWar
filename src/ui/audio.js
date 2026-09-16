@@ -206,6 +206,11 @@ export function sonido(tipo) {
     case 'descarte': tono(280, 190, 0.1, 'square', 0.04); break;
     case 'buscar': tono(600, 880, 0.12, 'sine', 0.05); break;
     case 'reciclar': tono(500, 380, 0.12, 'triangle', 0.045); break;
+    // Una mano entera que vuelve al mazo: tres golpes secos y descendentes,
+    // que es lo más parecido a barajar que dan tres osciladores.
+    case 'barajar':
+      [420, 360, 300].forEach((f, i) => tono(f, f * 0.8, 0.06, 'square', 0.03, i * 0.05));
+      break;
     case 'biomasa': tono(350, 520, 0.1, 'sine', 0.05); break;
     case 'curar': tono(560, 740, 0.16, 'sine', 0.045); break;
     case 'trofeo':

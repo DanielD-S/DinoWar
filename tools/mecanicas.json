@@ -11,6 +11,26 @@
       "sentido": "no lleva número: es una regla, no una cifra"
     },
     {
+      "rasgo": "AVENIDA_LODO",
+      "nombre": "Avenida de lodo",
+      "cartas": 1,
+      "quienes": "Avenida de lodo",
+      "texto": "Tu rival descarta cartas al azar hasta quedarse con 3 en la mano.",
+      "constante": "rasgos.avenidaLodoTope",
+      "valor": 3,
+      "sentido": "cartas que le quedan al rival en la mano"
+    },
+    {
+      "rasgo": "BARRERA_TRONCOS",
+      "nombre": "Barrera de troncos",
+      "cartas": 1,
+      "quienes": "Barrera de troncos",
+      "texto": "Tu rival pierde 4 cartas de su mazo, y 4 más si tiene más cartas en la mano que tú.",
+      "constante": "rasgos.barreraMazo",
+      "valor": 4,
+      "sentido": "cartas de mazo que pierde el rival, y otras tantas si va con más mano"
+    },
+    {
       "rasgo": "BOSQUE_RIBERENO",
       "nombre": "Bosque de coníferas ribereño",
       "cartas": 1,
@@ -51,6 +71,16 @@
       "sentido": "no lleva número: es una regla, no una cifra"
     },
     {
+      "rasgo": "CAUCE_ABANDONADO",
+      "nombre": "Cauce abandonado",
+      "cartas": 1,
+      "quienes": "Cauce abandonado",
+      "texto": "Descarta 2 cartas al azar de tu mano y roba 3.",
+      "constante": "rasgos.cauceRoba",
+      "valor": 3,
+      "sentido": "cartas que robas (y sueltas 2 de la mano)"
+    },
+    {
       "rasgo": "COMPETENCIA",
       "nombre": "Competencia trófica",
       "cartas": 1,
@@ -89,6 +119,16 @@
       "constante": "",
       "valor": "",
       "sentido": "no lleva número: es una regla, no una cifra"
+    },
+    {
+      "rasgo": "ENTERRAMIENTO",
+      "nombre": "Enterramiento rápido",
+      "cartas": 1,
+      "quienes": "Enterramiento rápido",
+      "texto": "Recupera 2 cartas al azar de tu descarte y llévatelas a la mano.",
+      "constante": "rasgos.enterramientoRescata",
+      "valor": 2,
+      "sentido": "cartas que vuelven de tu descarte a la mano"
     },
     {
       "rasgo": "CAMPO_BOSQUE",
@@ -251,6 +291,16 @@
       "sentido": "cartas de mazo que pierden los DOS"
     },
     {
+      "rasgo": "TORMENTA_POLVO",
+      "nombre": "Tormenta de polvo",
+      "cartas": 1,
+      "quienes": "Tormenta de polvo",
+      "texto": "Los dos jugadores barajan su mano dentro de su mazo y roban 5 cartas.",
+      "constante": "rasgos.tormentaPolvoRoba",
+      "valor": 5,
+      "sentido": "cartas que roban los DOS tras barajar su mano"
+    },
+    {
       "rasgo": "TRAMPA",
       "nombre": "Trampa de depredadores",
       "cartas": 1,
@@ -279,8 +329,8 @@
     {
       "campo": "busca",
       "forma": "Busca en el mazo",
-      "cartas": 4,
-      "quienes": "Athenar bermani, Sanjuansaurus gordilloi, Platyceratops tatarinovi, Liaoceratops yanzigouensis",
+      "cartas": 6,
+      "quienes": "Athenar bermani, Sanjuansaurus gordilloi, Platyceratops tatarinovi, Liaoceratops yanzigouensis, Shuvuuia deserti, Saurolophus angustirostris",
       "ejemplo": "Al jugarlo, puedes llevarte a la mano una carta de evento de tu mazo."
     },
     {
@@ -293,8 +343,8 @@
     {
       "campo": "cuenta",
       "forma": "Contador por especie",
-      "cartas": 7,
-      "quienes": "Dryosaurus altus, Stegosaurus stenops, Dromaeosaurus albertensis, Eosinopteryx brevipenna, Troodon formosus, Plateosauravus cullingworthi, Iguanodon bernissartensis",
+      "cartas": 10,
+      "quienes": "Dryosaurus altus, Stegosaurus stenops, Dromaeosaurus albertensis, Eosinopteryx brevipenna, Troodon formosus, Plateosauravus cullingworthi, Iguanodon bernissartensis, Deinocheirus mirificus, Psittacosaurus mongoliensis, Dakotaraptor steini",
       "ejemplo": "Gana +1 de Ataque por cada Dryosaurus en juego, sea de quien sea y este incluido."
     },
     {
@@ -327,10 +377,24 @@
     },
     {
       "campo": "entrada",
+      "forma": "Al entrar · mueleRival + muelePropio",
+      "cartas": 3,
+      "quienes": "Spinosaurus aegyptiacus, Mosasaurus hoffmannii, Nigersaurus taqueti",
+      "ejemplo": "Cuando entra en juego descarta 5 cartas del mazo de tu rival y 2 del tuyo."
+    },
+    {
+      "campo": "entrada",
       "forma": "Al entrar · manoRival",
       "cartas": 2,
       "quienes": "Allosaurus fragilis, Tyrannosaurus rex",
       "ejemplo": "Cuando entra en juego descarta 1 carta al azar de la mano de tu rival."
+    },
+    {
+      "campo": "entrada",
+      "forma": "Al entrar · muelePropio + roba",
+      "cartas": 2,
+      "quienes": "Pteranodon longiceps, Thescelosaurus neglectus",
+      "ejemplo": "Cuando entra en juego pierdes 1 carta de tu mazo y robas 1."
     },
     {
       "campo": "entrada",
@@ -341,17 +405,17 @@
     },
     {
       "campo": "entrada",
-      "forma": "Al entrar · mueleRival + muelePropio",
-      "cartas": 2,
-      "quienes": "Spinosaurus aegyptiacus, Mosasaurus hoffmannii",
-      "ejemplo": "Cuando entra en juego descarta 5 cartas del mazo de tu rival y 2 del tuyo."
-    },
-    {
-      "campo": "entrada",
       "forma": "Al entrar · roba",
       "cartas": 2,
       "quienes": "Huaxiadraco corollatus, Chasmosaurus belli",
       "ejemplo": "Cuando entra en juego robas 1 carta."
+    },
+    {
+      "campo": "entrada",
+      "forma": "Al entrar · manoNueva",
+      "cartas": 1,
+      "quienes": "Gallimimus bullatus",
+      "ejemplo": "Cuando entra en juego, baraja tu mano dentro de tu mazo y roba 5 cartas."
     },
     {
       "campo": "entrada",
@@ -362,10 +426,10 @@
     },
     {
       "campo": "entrada",
-      "forma": "Al entrar · muelePropio + roba",
+      "forma": "Al entrar · rescata",
       "cartas": 1,
-      "quienes": "Pteranodon longiceps",
-      "ejemplo": "Cuando entra en juego pierdes 1 carta de tu mazo y robas 1."
+      "quienes": "Tarbosaurus bataar",
+      "ejemplo": "Cuando entra en juego recupera 2 cartas al azar de tu descarte."
     },
     {
       "campo": "entrada",
@@ -373,6 +437,13 @@
       "cartas": 1,
       "quienes": "Parasaurolophus walkeri",
       "ejemplo": "Cuando entra en juego robas 1 carta y tu hábitat recupera 1 punto."
+    },
+    {
+      "campo": "entrada",
+      "forma": "Al entrar · topeManoRival",
+      "cartas": 1,
+      "quienes": "Anzu wyliei",
+      "ejemplo": "Cuando entra en juego, tu rival descarta cartas al azar hasta quedarse con 4 en la mano."
     },
     {
       "campo": "espinas",
@@ -558,16 +629,16 @@
   "clados": [
     {
       "clado": "Ornitópodo",
-      "cartas": 8,
-      "ataque": "2.0",
-      "vida": "7.1",
+      "cartas": 10,
+      "ataque": "1.9",
+      "vida": "6.8",
       "regla": "sin regla propia"
     },
     {
       "clado": "Terópodo",
-      "cartas": 20,
-      "ataque": "4.3",
-      "vida": "3.9",
+      "cartas": 26,
+      "ataque": "4.1",
+      "vida": "4.1",
       "regla": "sin regla propia"
     },
     {
@@ -579,16 +650,16 @@
     },
     {
       "clado": "Saurópodo",
-      "cartas": 11,
+      "cartas": 12,
       "ataque": "2.2",
-      "vida": "8.7",
+      "vida": "8.8",
       "regla": "sin regla propia"
     },
     {
       "clado": "Marginocéfalo",
-      "cartas": 11,
-      "ataque": "2.8",
-      "vida": "5.9",
+      "cartas": 12,
+      "ataque": "2.7",
+      "vida": "5.7",
       "regla": "sin regla propia"
     },
     {
