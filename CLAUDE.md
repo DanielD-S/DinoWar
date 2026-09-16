@@ -80,7 +80,7 @@ importar, antes de mirar el `tipo`. El orden es: mergear, volver a anclar sobre
 main, y desplegar entonces. `node tools/anclar-desde-url.mjs` lo avisa por
 pantalla cuando el commit no está en main.
 
-## Los cinco simuladores, y qué NO ve cada uno
+## Los seis simuladores, y qué NO ve cada uno
 
 Es el error que más veces se ha repetido: cambiar una carta, correr `npm run sim`,
 ver los seis números idénticos y creer que el cambio no hace nada.
@@ -92,6 +92,7 @@ ver los seis números idénticos y creer que el cambio no hace nada.
 | `node sim/cobertura.mjs` | mazos aleatorios de todo el set | su ajuste filtra a CRIATURAS: ningún clima ni evento aparece |
 | `node sim/climas.js` | fuerza cada clima al campo | no dice si la carta es buena, sólo qué le hace al juego mientras está puesta |
 | `node sim/entradas.js` | un mazo cargado de disparos al entrar | es la COTA, no el balance: el mazo está sesgado a propósito |
+| `node sim/arquetipos.mjs` | mazos ENTEROS construidos por idea, unos contra otros | no dice si una carta suelta está rota: para eso está `carta.mjs` |
 
 **`sim/carta.mjs` es el que responde a «¿esta carta está rota?»**, que es la única
 pregunta que se hace al escribir una carta y la que ninguno de los otros cuatro
@@ -361,6 +362,97 @@ carta que vuelve a la mano vuelve a entrar, y cada entrada vuelve a dispararse
 —Ouranosaurus y la Migración existen para eso—. Hoy sale caro, porque volver a
 bajarla cuesta la Biomasa otra vez y el turno entero; el día que haya una forma
 barata de rebotar lo propio, eso deja de ser verdad y hay que medirlo de nuevo.
+
+## Los arquetipos: la extinción existe, y se midió construyéndola
+
+`node sim/arquetipos.mjs` (16-09-2026). Es el sexto simulador y responde lo que
+ninguno de los otros cinco podía: **si una VÍA de victoria existe de verdad o
+sólo está escrita en las cartas.** Juega mazos enteros construidos alrededor de
+una idea, unos contra otros, y enseña por qué gana cada uno — que importa más
+que cuánto.
+
+Nació de un número que no cuadraba: la Ceniza volcánica mide 45,3 % con
+`sim/carta.mjs` y la Trampa de depredadores, que lleva meses en el set, 46,0 %.
+Las dos por debajo del 50 y ninguna es mala. Lo que pasa es que el mazo de
+referencia gana por hábitat y trofeos a los once turnos con la extinción en el
+0 %: **medir molienda ahí es medirla en el único sitio donde no sirve.**
+
+Lo que salió, 300 partidas por cruce:
+
+| mazo | contra | gana | por qué gana |
+|---|---|---|---|
+| MOLIENDA | Referencia | 74,7 % | trofeos 40 %, **EXTINCIÓN 25 %** |
+| MOLIENDA | Entierro | 47,7 % | **extinción 22 %**, trofeos 21 % |
+| MOLIENDA | Control | 60,3 % | trofeos 34 %, **extinción 26 %** |
+| ENTIERRO | Molienda | 52,3 % | trofeos 26 %, hábitat 26 % |
+| ENTIERRO | Referencia | 76,3 % | trofeos 50 %, hábitat 27 % |
+| CONTROL | Referencia | 49,0 % | hábitat 40 % |
+
+**La extinción pasó del 0 % al 22-26 % de las victorias** del mazo hecho para
+ella. Llevaba en cero desde la v2 y no hizo falta tocar una constante de
+balance: hacía falta que existieran las cartas. Y la segunda lectura vale lo
+mismo: **el Entierro le gana a la Molienda por 52,3 %**, o sea que la respuesta
+funciona y NO cierra la vía. Si ganara el 70 % habríamos tapado la puerta por
+el otro lado, que es lo que pasa cuando el antídoto es más barato que el veneno.
+
+Cuatro cosas que conviene no volver a aprender:
+
+- **La Molienda no lleva Trampa ni Inundación**, que son las dos cartas que el
+  set tenía para eso desde siempre. Muelen a los DOS, y en un mazo que va a
+  durar quince turnos te matan a ti primero. Lo que lo sostiene son Ceniza,
+  Barrera y Sedimento: 38 cartas de mazo rival y cero propias.
+- **Y aun así es medio mazo de MURO.** «Un mazo que sólo muele no gana, y
+  encima estorba» ya estaba medido en Hell Creek; aquí se confirma por el otro
+  lado. Si no aguantas al turno doce no llegas a gastar la molienda, y las
+  partidas de este cruce duran 15,7 turnos contra los 11 de todo lo demás.
+- **Los tres mazos se escribieron con 13-14 de Biomasa** «porque un mazo lento
+  las quiere», y `CLAUDE.md` ya tenía medido que catorce gana el 39,8 %.
+  Corregidos a nueve, la Molienda subió del 70,7 % al 74,7 % — y su extinción
+  BAJÓ del 32 % al 25 %, porque los huecos se llenaron de cuerpos y empezó a
+  ganar por trofeos. Menos Biomasa la hace mejor mazo y peor molino.
+- **El CONTROL es el arquetipo flojo**: 49 % contra la referencia, 39,7 % contra
+  molienda, 39,0 % contra entierro. Las quince cartas de la ronda de la mano son
+  piezas de apoyo, no un plan. Quien quiera arreglarlo tiene ahí el banco.
+
+Y el hallazgo incómodo: **el mazo de REFERENCIA es débil.** Pierde el 74,7 % y
+el 76,3 % contra dos mazos construidos en una tarde. Es el que juega la IA en
+solitario y el que mide `BALANCE.md`, así que los seis objetivos del balance se
+están midiendo sobre un mazo que cualquier construcción bate con holgura. No es
+un bug: es que el mazo de referencia se escribió para medir CARTAS y se ha
+quedado como si midiera el juego.
+
+### Cuántas cartas pide un set sano
+
+La aritmética sale del propio juego. Un mazo son 55; con nueve de Biomasa
+quedan 46 reales, y a 2,4 copias de media eso son **~19 cartas distintas**. Para
+que construir sea una decisión y no una receta, el arquetipo necesita más
+cartas de las que caben — al armar la Molienda hubo que dejar fuera la Trampa y
+la Inundación, y eso es exactamente la señal de salud.
+
+Medido sobre los cuatro mazos de aquí: comparten entre 3 y 8 cartas, y tres son
+siempre Biomasa. O sea **~22 cartas EXCLUSIVAS por arquetipo** y un fondo común
+pequeño. Con tres vías de victoria y dos mazos por vía —que es lo mínimo para
+que haya metajuego dentro de una vía— salen **165-180 cartas**. Hoy hay 131.
+
+Los agujeros, por lo que bloquean:
+
+| hueco | hoy | falta |
+|---|---|---|
+| **Soporte de hábitat** | **3 copias en todo el set** | 4-5 cartas |
+| Tireóforo tribal | 24 copias (pide 28) | 2 cartas |
+| Ornitópodo tribal | 27 copias (pide 28) | 1 carta |
+| Aperturas de coste 0 | 12 copias | 2-3 cartas |
+| Daño dirigido al rival | 5 copias | 3-4 cartas |
+
+El del hábitat es el que más pesa: **es la única vía de victoria para la que no
+se puede construir un mazo**. La molienda ya tiene el suyo, los trofeos lo
+tienen de siempre, y el hábitat gana de rebote —cuando el muro no llega— pero
+nadie puede ir a por él a propósito. Con una carta de evento y dos criaturas no
+hay paquete.
+
+Pterosaurio (10 copias) y Marino (9) NO entran en esa cuenta a propósito: el set
+los tiene como fauna que compartía paisaje, no como clados jugables, y forzarlos
+a tribal pediría seis o siete cartas cada uno para algo que no ha pedido nadie.
 
 ## Las diez cartas de Biomasa son las tierras, y se autolimitan
 
@@ -1969,13 +2061,20 @@ Dicho para que nadie lo descubra tarde:
   regenerarlo habría gastado 2.000 partidas para volver a imprimir los mismos
   seis números. Es exactamente el punto ciego que avisa la tabla de los
   simuladores.
-- **Y la extinción sigue en 0 % aunque las dos rondas existan.** Treinta cartas
-  que muerden la mano y el mazo —y ahora nueve que lo defienden— no mueven una
-  vía que se mide sobre un mazo que no las lleva. Para saber si la vía se abrió
-  hay que construir el mazo de molienda y el de entierro y medirlos contra el
-  de referencia, que es trabajo de diseño y no de estas tandas. **Es el
-  siguiente paso obvio del proyecto**, y el primero que puede dar un número
-  distinto de cero desde la v2.
+- **La extinción ya NO está en cero, y `BALANCE.md` sigue diciendo que sí.** Se
+  construyeron los mazos y se midieron (`sim/arquetipos.mjs`): la vía es el
+  22-26 % de las victorias del mazo hecho para ella. Lo que sigue en cero es lo
+  que mide `BALANCE.md`, que es el mazo de REFERENCIA jugando contra sí mismo —
+  y ése no lleva ninguna de las treinta cartas nuevas. Las dos cosas son
+  ciertas a la vez y conviene no confundirlas: la vía existe, el mazo que mide
+  el balance no la usa.
+- **El mazo de referencia se ha quedado corto como vara de medir.** Pierde el
+  74,7 % contra la Molienda y el 76,3 % contra el Entierro. Se escribió para
+  medir CARTAS y se usa como si midiera el juego; mientras siga así, los seis
+  objetivos de `BALANCE.md` hablan de un mazo que cualquier construcción bate.
+- **Y falta un paquete de HÁBITAT.** Es la única de las tres vías para la que
+  no se puede construir un mazo: tres copias en todo el set. Ver «Cuántas
+  cartas pide un set sano», más arriba.
 - **La inmunidad al clima no muerde.** Torvosaurus y Nodosaurus dicen «no le
   afectan los efectos del clima», y hoy los dos únicos efectos del clima sobre una
   criatura son BUENOS: el Canal da +1 de Vida y el Bosque cura saurópodos. O sea
