@@ -24,27 +24,27 @@
 // la función arranca y muere con «Module not found» AUNQUE LA URL CONTESTE 200.
 // Costó verlo porque todo lo demás —el commit, la URL, el contenido— estaba bien.
 //
-// Motor anclado en: ccdd73f6e638d5479ab03521284e9a2354c1c1d5
+// Motor anclado en: 66024db17b8c6bd2e17b5afd5930232732c24ffa
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import {
   validarAsalto, jefeDelEvento, AsaltoInvalido,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@ccdd73f6e638d5479ab03521284e9a2354c1c1d5/supabase/functions/_compartido/validarAsalto.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@66024db17b8c6bd2e17b5afd5930232732c24ffa/supabase/functions/_compartido/validarAsalto.js';
 import {
   validarSolitario,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@ccdd73f6e638d5479ab03521284e9a2354c1c1d5/supabase/functions/_compartido/validarSolitario.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@66024db17b8c6bd2e17b5afd5930232732c24ffa/supabase/functions/_compartido/validarSolitario.js';
 import {
   crearDuelo, aplicarAccion, vistaDuelo, comprobarTiempo, rendirse, resultado, terminado,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@ccdd73f6e638d5479ab03521284e9a2354c1c1d5/supabase/functions/_compartido/duelo.js';
-import { validarMazoLegal } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@ccdd73f6e638d5479ab03521284e9a2354c1c1d5/supabase/functions/_compartido/validarPartida.js';
-import { eloTras } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@ccdd73f6e638d5479ab03521284e9a2354c1c1d5/src/data/ligas.js';
-import { CUENCA } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@ccdd73f6e638d5479ab03521284e9a2354c1c1d5/src/data/tribu.js';
-import { ECONOMIA, abrirSobre } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@ccdd73f6e638d5479ab03521284e9a2354c1c1d5/src/data/coleccion.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@66024db17b8c6bd2e17b5afd5930232732c24ffa/supabase/functions/_compartido/duelo.js';
+import { validarMazoLegal } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@66024db17b8c6bd2e17b5afd5930232732c24ffa/supabase/functions/_compartido/validarPartida.js';
+import { eloTras } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@66024db17b8c6bd2e17b5afd5930232732c24ffa/src/data/ligas.js';
+import { CUENCA } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@66024db17b8c6bd2e17b5afd5930232732c24ffa/src/data/tribu.js';
+import { ECONOMIA, abrirSobre } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@66024db17b8c6bd2e17b5afd5930232732c24ffa/src/data/coleccion.js';
 import {
   avancesDelParte, diaUTC, POR_ID,
-} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@ccdd73f6e638d5479ab03521284e9a2354c1c1d5/src/data/misiones.js';
-import { rivalPorId, requisitoDe, claveDeVictoria } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@ccdd73f6e638d5479ab03521284e9a2354c1c1d5/src/data/expediciones.js';
-import { avancesDeLogros } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@ccdd73f6e638d5479ab03521284e9a2354c1c1d5/src/data/logros.js';
+} from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@66024db17b8c6bd2e17b5afd5930232732c24ffa/src/data/misiones.js';
+import { rivalPorId, requisitoDe, claveDeVictoria } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@66024db17b8c6bd2e17b5afd5930232732c24ffa/src/data/expediciones.js';
+import { avancesDeLogros } from 'https://cdn.jsdelivr.net/gh/DanielD-S/DinoWar@66024db17b8c6bd2e17b5afd5930232732c24ffa/src/data/logros.js';
 
 /**
  * Lo que un parte avanza en las misiones de hoy, con la meta y el premio
@@ -294,10 +294,11 @@ async function hacerVictoria(servicio, jugadorId: string, envio: Record<string, 
 // ------------------------------------------------------------------- sobre
 
 async function hacerSobre(servicio, jugadorId: string) {
-  // El sorteo mira tu colección para repartir entre lo que te FALTA: sin ese
-  // sesgo, el 94 % de lo que abrías era una copia que no podías jugar. Por eso
-  // se lee antes de sortear, y por eso lo sortea el servidor: es el único que
-  // sabe de verdad lo que tienes.
+  // El sorteo mira tu colección para repartir sobre todo entre lo que te FALTA
+  // (`ECONOMIA.sesgoFaltan`, el 70 % de las cartas): sin ese sesgo, el 94 % de
+  // lo que abrías era una copia que no podías jugar; con sesgo total no sobraba
+  // nada y el crafteo no tenía de qué comer. Por eso se lee antes de sortear, y
+  // por eso lo sortea el servidor: es el único que sabe de verdad lo que tienes.
   const { data: filas, error: errCol } = await servicio
     .from('coleccion').select('card_id, copias').eq('jugador_id', jugadorId);
   if (errCol) return json({ error: errCol.message }, 400);

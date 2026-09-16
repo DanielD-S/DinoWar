@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: 0622a7450f4fe32e
+// huella: aff4261d90dbafc8
 //
 // Lleva dentro estos 24 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -5243,6 +5243,16 @@ var ECONOMIA = Object.freeze({
   // limita— sino una cota al abuso: el servidor re-juega cada partida que cobra
   // y eso cuesta CPU, así que un cliente hostil no puede pedir mil.
   victoriasPorDia: 50,
+  // Qué parte de cada sobre mira tu colección antes de sortear la carta. Con 1
+  // —como fue hasta el 16-09-2026— no sale una copia repetida mientras te falte
+  // algo de esa rareza: la colección se completa en unos 116 sobres y el
+  // crafteo no pinta nada, porque en 50 sobres se juntan 64 esquirlas. Con 0 es
+  // el sorteo de Pokémon TCG Live —puro azar y lo repetido se funde— y más de
+  // la mitad de las épicas y legendarias que salen ya las tenías. Medido con
+  // 400 cuentas sobre las mismas semillas, 0,7 deja el 80 % de los hits nuevos,
+  // siete veces más esquirlas (432 en 50 sobres) y la colección en unos 128.
+  // Es el número que reparte el camino entre abrir sobres y crear cartas.
+  sesgoFaltan: 0.7,
   fusion: Object.freeze({
     [RAREZA.COMUN]: 4,
     [RAREZA.RARO]: 12,
@@ -5282,7 +5292,7 @@ function rarezaAlAzar(azar, minima = RAREZA.COMUN) {
   }
   return candidatas[candidatas.length - 1];
 }
-function abrirSobre(azar, tengo = null) {
+function abrirSobre(azar, tengo = null, sesgo = ECONOMIA.sesgoFaltan) {
   const salida = [];
   const cuenta = tengo ? { ...tengo } : null;
   for (let i = 0; i < ECONOMIA.cartasPorSobre; i++) {
@@ -5291,7 +5301,8 @@ function abrirSobre(azar, tengo = null) {
     const r = rarezaAlAzar(azar, ultima && !cumplida ? GARANTIA : RAREZA.COMUN);
     let pool = POR_RAREZA[r];
     if (cuenta) {
-      const faltan = pool.filter((id2) => (cuenta[id2] ?? 0) < limiteDe(id2));
+      const mira = sesgo >= 1 || azar() < sesgo;
+      const faltan = mira ? pool.filter((id2) => (cuenta[id2] ?? 0) < limiteDe(id2)) : [];
       if (faltan.length) pool = faltan;
       else {
         const sinRepetir = pool.filter((id2) => !salida.includes(id2));

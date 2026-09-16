@@ -457,14 +457,22 @@ function pintarSobres(tirada = null, nuevas = new Set(), antesDeAbrir = {}) {
   // primera, el 4 % de las legendarias parecía la respuesta a la segunda.
   //
   // La espera se calcula sobre las que le faltan al jugador, no sobre TODAS las
-  // de esa rareza, porque eso es lo que hace el sobre: si sólo te falta una,
-  // cada legendaria que salga es ésa. Y por eso el número mejora según
-  // completas la rareza, que es la parte que el jugador nota.
+  // de esa rareza, porque eso es lo que hace el sobre en el 70 % de sus cartas
+  // (`ECONOMIA.sesgoFaltan`): si sólo te falta una, casi cada legendaria que
+  // salga es ésa. El 30 % restante se sortea entre todas y entra en la cuenta
+  // con su parte. Y por eso el número mejora según completas la rareza, que es
+  // la parte que el jugador nota.
   //
   // Aquí no se escribe cuántas hay de cada rareza, y es a propósito: decía «las
   // ocho legendarias del set» y eran dieciocho. Todo sale de `POR_RAREZA`.
   const faltanDe = (r) => POR_RAREZA[r].filter((id) => (p.cartas[id] ?? 0) < limiteDe(id)).length;
-  const espera = (r) => Math.max(1, Math.round(faltanDe(r) / (PROBABILIDAD[r] * ECONOMIA.cartasPorSobre)));
+  const espera = (r) => {
+    const faltan = faltanDe(r);
+    if (!faltan) return 1;
+    const porCarta = PROBABILIDAD[r]
+      * (ECONOMIA.sesgoFaltan / faltan + (1 - ECONOMIA.sesgoFaltan) / POR_RAREZA[r].length);
+    return Math.max(1, Math.round(1 / (porCarta * ECONOMIA.cartasPorSobre)));
+  };
 
   dom.odds.innerHTML = '<tr><th>Rareza</th><td>del sobre</td><td>la que te falta</td><td>cartas</td></tr>'
     + ORDEN.map((r) => {

@@ -556,9 +556,9 @@ delete from public.catalogo_cosmeticos where id not in (
 );
 
 insert into public.catalogo_crafteo (rareza, fundir, crear) values
-  ('COMUN', 5, 40),
-  ('RARO', 20, 100),
-  ('EPICO', 100, 400),
+  ('COMUN', 10, 80),
+  ('RARO', 30, 200),
+  ('EPICO', 150, 500),
   ('LEGENDARIO', 400, 1600)
 on conflict (rareza) do update set fundir = excluded.fundir, crear = excluded.crear;
 

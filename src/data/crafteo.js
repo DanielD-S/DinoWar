@@ -7,16 +7,21 @@
 // que eliges. Es el camino gratis y lento, y es el único que te deja elegir.
 //
 // UNA esquirla para todo, y el coste va por rareza. No puede ser «craftear de su
-// misma rareza»: el sobre reparte primero lo que te falta (`abrirSobre` en
-// coleccion.js), así que las copias sobrantes de una rareza sólo aparecen cuando
-// ya la tienes entera. Con una esquirla por rareza nunca habría nada que crear.
-// Con una sola, las comunes que ya completaste pagan tus raras y tus épicas.
+// misma rareza»: el sobre reparte sobre todo lo que te falta (`abrirSobre` en
+// coleccion.js mira la colección en el 70 % de las cartas), así que las copias
+// sobrantes de una rareza escasean hasta que la tienes entera. Con una esquirla
+// por rareza casi no habría nada que crear. Con una sola, las comunes que ya
+// completaste pagan tus raras y tus épicas.
 //
-// Los números son los de Hearthstone, que llevan diez años de ajuste: fundir da
-// 5 / 20 / 100 / 400 y crear cuesta 40 / 100 / 400 / 1600. Fundir una carta
-// siempre da MENOS de lo que cuesta crear otra de su rareza, así que no hay
-// bucle, y crear sólo se puede hasta el tope de copias, así que lo creado nunca
-// vuelve a ser sobrante.
+// Los números empezaron siendo los de Hearthstone (fundir 5 / 20 / 100 / 400,
+// crear 40 / 100 / 400 / 1600) y el autor los subió el 16-09-2026 en las tres
+// rarezas de abajo, a la vez que el sobre pasó de mirar la colección siempre a
+// mirarla el 70 %: con más copias sobrantes, fundir da más y crear cuesta más,
+// y la legendaria se queda como estaba. Fundir una carta siempre da MENOS de
+// lo que cuesta crear otra de su rareza, así que no hay bucle, y crear sólo se
+// puede hasta el tope de copias, así que lo creado nunca vuelve a ser
+// sobrante. Lo que cambia con estos números está medido en la nota del
+// crafteo de CLAUDE.md.
 //
 // Vive aparte de coleccion.js a propósito: ese fichero va dentro de la Edge
 // Function, y tocarlo obliga a re-empaquetar, re-anclar y desplegar. El servidor
@@ -28,10 +33,10 @@ import { excedente, limiteDe } from './coleccion.js';
 
 export const CRAFTEO = Object.freeze({
   fundir: Object.freeze({
-    [RAREZA.COMUN]: 5, [RAREZA.RARO]: 20, [RAREZA.EPICO]: 100, [RAREZA.LEGENDARIO]: 400,
+    [RAREZA.COMUN]: 10, [RAREZA.RARO]: 30, [RAREZA.EPICO]: 150, [RAREZA.LEGENDARIO]: 400,
   }),
   crear: Object.freeze({
-    [RAREZA.COMUN]: 40, [RAREZA.RARO]: 100, [RAREZA.EPICO]: 400, [RAREZA.LEGENDARIO]: 1600,
+    [RAREZA.COMUN]: 80, [RAREZA.RARO]: 200, [RAREZA.EPICO]: 500, [RAREZA.LEGENDARIO]: 1600,
   }),
 });
 
