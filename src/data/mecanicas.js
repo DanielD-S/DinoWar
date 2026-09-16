@@ -1,15 +1,20 @@
 // DinoWar — el vocabulario de las habilidades de criatura.
 //
-// Las 16 cartas de soporte llevan su mecánica en `rasgo`: un evento ES su
-// rasgo, hay dieciséis y cada una hace algo distinto, así que un caso por carta
-// en el motor es lo honesto.
+// Las cartas de SOPORTE llevan su mecánica en `rasgo`: un evento ES su rasgo y
+// cada una hace algo distinto, así que un caso por carta en el motor es lo
+// honesto.
 //
-// Las criaturas son otra cosa. Son cincuenta y dos y sus habilidades se repiten
-// con otros números: cuatro auras de clado, ocho contadores, cuatro búsquedas,
-// once disparos al entrar. Escritas como cincuenta ramas de `if` en
-// `ataqueEfectivo()` no habría quien las leyera, y `efectosDe()` —la función que
-// le explica al jugador por qué su carta no marca lo que trae impreso— habría
-// necesitado otras cincuenta.
+// Las CRIATURAS son otra cosa. Son muchas y sus habilidades se repiten con
+// otros números: auras de clado, contadores, búsquedas, disparos al entrar.
+// Escritas como una rama de `if` por carta dentro de `ataqueEfectivo()` no
+// habría quien las leyera, y `efectosDe()` —la función que le explica al
+// jugador por qué su carta no marca lo que trae impreso— habría necesitado
+// otras tantas.
+//
+// Los conteos exactos NO se escriben aquí. Decía «16 de soporte» cuando eran
+// 49 y «cincuenta y dos criaturas» cuando eran 82: un recuento desfasado es
+// peor que ninguno, y quien lo quiera lo tiene en `test/entradas.test.js`, que
+// falla cuando cambia.
 //
 // Así que la criatura DECLARA su habilidad como datos y el motor aplica lo que
 // encuentra. Poner una carta nueva es escribir un objeto en `cards.js`; sólo se

@@ -87,7 +87,7 @@ ver los seis números idénticos y creer que el cambio no hace nada.
 
 | herramienta | qué juega | punto ciego |
 |---|---|---|
-| `npm run sim` | el mazo de REFERENCIA, 32 entradas | las 69 cartas que no están en él. La Llanura se rediseñó dos veces y `BALANCE.md` no se movió un decimal |
+| `npm run sim` | el mazo de REFERENCIA, 32 entradas | las 114 cartas que no están en él. La Llanura se rediseñó dos veces y `BALANCE.md` no se movió un decimal |
 | `node sim/carta.mjs <id>` | el mazo de referencia CON esa carta contra el mismo SIN ella | una carta sola: no dice nada de sinergias entre dos nuevas |
 | `node sim/cobertura.mjs` | mazos aleatorios de todo el set | su ajuste filtra a CRIATURAS: ningún clima ni evento aparece |
 | `node sim/climas.js` | fuerza cada clima al campo | no dice si la carta es buena, sólo qué le hace al juego mientras está puesta |
@@ -513,7 +513,9 @@ que recorra el set, comprobar si hay que sumarles `CARTAS_DE_JEFE`.
 
 ## El guión: qué se ve cuando pasa cada cosa
 
-El motor emite **treinta y un tipos de evento**. Durante mucho tiempo se
+El motor emite **decenas de tipos de evento** —hoy treinta y seis, y el número
+sube con cada tanda de cartas, así que no se escribe en ningún comentario: lo
+cuenta `test/guion.test.js` leyendo el motor—. Durante mucho tiempo se
 animaban CUATRO —choque, avance, golpe al hábitat y muerte— porque el animador
 era una sucesión de `if` contra esos cuatro. Todo lo demás cambiaba el tablero de
 golpe y salía como un renglón de texto.
@@ -824,9 +826,12 @@ el `id` y, si da error, voltea la carta como cualquier otra. Pero sólo lo pide
 para las legendarias CON CRIATURA (`c.dino`): las de soporte —climas, eventos,
 recursos, Biomasa— no llevan vídeo a propósito, que no hay animal que enseñar,
 y pedirlo igual dejaba un 404 en la consola por cada Mortandad o Manantial que
-salía en un sobre. Las nueve legendarias con criatura lo tienen todas. Hubo un
-vídeo de relleno para las que no tenían el suyo y se quitó: el autor prefiere
-que una legendaria sin vídeo salga sin vídeo.
+salía en un sobre. Las nueve primeras legendarias con criatura lo tienen todas;
+**Carcharodontosaurus y Giraffatitan, que llegaron el 16-09-2026, todavía no**,
+y salen del sobre volteando la carta sin más, que es lo que hace el juego
+cuando el fichero no está. Hubo un vídeo de relleno para las que no tenían el
+suyo y se quitó: el autor prefiere que una legendaria sin vídeo salga sin
+vídeo.
 
 **Y el vídeo es de ANIMALES, no de paisajes.** Se probó a darle a cada
 expedición dos cinemáticas —una al entrar en la formación y otra al cerrarla,
@@ -837,7 +842,7 @@ proponerlo, lo que falla no es el sitio donde se enseña, es la pieza.
 
 **El INTRO del arranque fue la prueba de que la regla era ésa y no «nada de
 cinemáticas»:** un plano de quince segundos de un Allosaurus bajando por un
-cauce, mismo encuadre que las nueve legendarias y sólo que más largo, y salió
+cauce, mismo encuadre que las legendarias con vídeo y sólo que más largo, y salió
 bien al primer intento. Se quitó igualmente el 16-09-2026 porque al autor no le
 gustó cómo quedaba en el arranque — la pieza estaba bien, el sitio no. Ver «Lo
 primero que se ve», más arriba.
@@ -1734,6 +1739,17 @@ la reemplaza entera, se despliega la plantilla y todo parece correcto: arranca,
 contesta 200, devuelve `{"message":"Hello undefined!"}`. Pasó cuatro veces.
 Comprobar con `ezbr_sha256` en la lista de funciones: **cambia cuando cambia el
 código**. Si repite entre dos despliegues, no entró.
+
+**esbuild se come los comentarios, y aun así un comentario cuesta un
+despliegue.** Se corrigió un recuento desfasado en la cabecera de
+`mecanicas.js` —decía «16 cartas de soporte» cuando eran 49— y el paquete
+regenerado salió IDÉNTICO salvo la línea de huella: el código que corre en el
+servidor no cambia ni un byte. Pero `test/anclaje.test.js` compara los FUENTES,
+no el bundle, así que salta igual y hay que re-anclar; y re-anclar sin desplegar
+deja el anclaje apuntando a un commit que no es el desplegado, que es justo lo
+que no se puede hacer. O sea: **un comentario dentro de un fichero del paquete
+cuesta el ciclo entero**. Conviene saberlo antes de escribirlo, no después: lo
+que no sea necesario ahí, mejor en `CLAUDE.md`, que no entra en el paquete.
 
 **Desplegar por MCP, no por el panel.** `mcp__Supabase__deploy_edge_function`
 sube el fichero directamente. Es la vía buena.
