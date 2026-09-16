@@ -1970,13 +1970,34 @@ los números y `0029_crafteo.sql` las dos funciones. Cuatro cosas:
 
 - **Una esquirla para todas las rarezas, y el coste va por rareza.** Se pidió
   «craftear de su misma rareza» y no puede funcionar: `abrirSobre` reparte
-  primero lo que te falta, así que las sobrantes de una rareza sólo existen
-  cuando ya la tienes ENTERA. Con una esquirla por rareza nunca habría nada
+  sobre todo lo que te falta, así que las sobrantes de una rareza escasean
+  hasta que la tienes ENTERA. Con una esquirla por rareza casi no habría nada
   que crear; con una sola, las comunes completas pagan las raras y épicas.
-- **Números de Hearthstone**: fundir 5 / 20 / 100 / 400, crear 40 / 100 / 400 /
-  1600. Fundir una copia siempre da menos que crear otra de su rareza, y
+- **El sobre mira la colección en el 70 % de sus cartas, no en todas**
+  (`ECONOMIA.sesgoFaltan`, 16-09-2026). Con el sesgo entero no salía una
+  repetida mientras faltara algo de esa rareza, y eso tenía dos facturas que
+  se midieron con 400 cuentas simuladas sobre las mismas semillas: la
+  colección entera caía en 116 sobres, y el crafteo no pintaba nada —64
+  esquirlas en 50 sobres, crear cartas la acortaba de 122 a 116—. El sorteo
+  de Pokémon TCG Live (puro azar, lo repetido se funde) alarga la colección a
+  181 sobres pero deja más de la mitad de las épicas y legendarias en
+  repetidas. Al 70 %, cada carta decide por su cuenta si mira la colección
+  —una moneda por sobre daría sobres enteros «buenos» y «malos»—: el 81 % de
+  los hits sigue siendo nuevo, se juntan 578 esquirlas en 50 sobres, la
+  legendaria que ELIGES es alcanzable hacia el sobre 71 y la colección dura
+  126. Se descartó filtrar sólo las legendarias (las épicas repetidas
+  alargaban el set a 148 con el 62 % de hits nuevos). Y sigue sin haber
+  garantía de legendaria cada X sobres: un 5 % de las cuentas pasa 34 sobres
+  seguidos sin una; un pity de 15 la deja en 14 sin mover nada más, y se
+  midió pero no se pidió.
+- **Los números empezaron siendo los de Hearthstone** (fundir 5 / 20 / 100 /
+  400, crear 40 / 100 / 400 / 1600) y el autor los subió con el sesgo: fundir
+  10 / 30 / 150 / 400 y crear 80 / 200 / 500 / 1600, la legendaria como
+  estaba. Fundir una copia siempre da menos que crear otra de su rareza, y
   `crear_carta` sólo deja llegar al tope de copias: lo creado nunca vuelve a
-  ser sobrante. `test/crafteo.test.js` vigila las dos cosas.
+  ser sobrante. `test/crafteo.test.js` vigila las dos cosas y que el SQL del
+  catálogo lleve estos números; **cambiarlos es regenerar la 0006 Y
+  aplicarla**, que el servidor cobra de `catalogo_crafteo` y no del código.
 - **Vive fuera de `coleccion.js`** porque ese fichero va en la Edge Function.
   `ECONOMIA.fusion` y la columna `valor_fusion` se QUEDARON sin uso en el
   servidor; quitarlos pide re-empaquetar, re-anclar y desplegar, y se dejaron

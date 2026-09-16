@@ -83,47 +83,71 @@ test('Las probabilidades siguen la forma del set y suman 1', () => {
   }
 });
 
-test('Con la colección delante, el sobre no da copias que ya no caben en un mazo', () => {
-  const azar = azarDe(31);
-  // Al tope todo menos una carta de cada rareza. La rareza se sortea igual que
-  // siempre; lo que cambia es que, salga la que salga, ha de tocarle a la única
-  // que aún falta de ese grupo.
-  const pendiente = {};
+// Al tope todo menos una carta de cada rareza: salga la rareza que salga, la
+// única que aún falta de ese grupo es la que el sesgo tiene que encontrar.
+const casiLlena = () => {
   const llenas = {};
   for (const r of Object.values(RAREZA)) {
     const ids = POR_RAREZA[r];
-    pendiente[r] = ids[ids.length - 1];
-    for (const id of ids) if (id !== pendiente[r]) llenas[id] = limiteDe(id);
+    for (const id of ids.slice(0, -1)) llenas[id] = limiteDe(id);
   }
+  return llenas;
+};
 
-  let inservibles = 0;
-  for (let i = 0; i < 400; i++) {
-    // Se lleva la cuenta dentro del sobre igual que la lleva abrirSobre: si la
-    // única carta que faltaba de una rareza se completa a mitad del sobre, que
-    // el resto salga repetido es lo correcto, no un fallo.
+// Copias que salieron repetidas cuando aún quedaba alguna carta de esa rareza
+// por completar. Se lleva la cuenta dentro del sobre igual que la lleva
+// abrirSobre: si la única carta que faltaba se completa a mitad del sobre, que
+// el resto salga repetido es lo correcto, no un fallo.
+const inservibles = (azar, llenas, sobres, sesgo) => {
+  let n = 0;
+  let cartas = 0;
+  for (let i = 0; i < sobres; i++) {
     const cuenta = { ...llenas };
-    for (const id of abrirSobre(azar, llenas)) {
+    for (const id of abrirSobre(azar, llenas, sesgo)) {
       const grupo = POR_RAREZA[CARTAS[id].rareza];
       const quedaba = grupo.some((x) => (cuenta[x] ?? 0) < limiteDe(x));
-      if (quedaba && (cuenta[id] ?? 0) >= limiteDe(id)) inservibles += 1;
+      if (quedaba) {
+        cartas += 1;
+        if ((cuenta[id] ?? 0) >= limiteDe(id)) n += 1;
+      }
       cuenta[id] = (cuenta[id] ?? 0) + 1;
     }
   }
-  assert.equal(inservibles, 0, `salieron ${inservibles} copias inservibles habiendo alternativa`);
+  return { n, cartas };
+};
+
+test('Con el sesgo entero, el sobre no da copias que ya no caben en un mazo', () => {
+  const { n } = inservibles(azarDe(31), casiLlena(), 400, 1);
+  assert.equal(n, 0, `salieron ${n} copias inservibles habiendo alternativa`);
+});
+
+test('Con el sesgo por defecto, sobra más o menos lo que dice ECONOMIA.sesgoFaltan', () => {
+  // Es lo que alimenta el crafteo: la parte del sobre que NO mira la colección.
+  // Con la colección casi llena, una carta que no mira sale repetida casi
+  // siempre, así que la cuota de repetidas es (1 − sesgo) con un pelo menos.
+  assert.ok(ECONOMIA.sesgoFaltan > 0 && ECONOMIA.sesgoFaltan < 1,
+    'con 0 es puro azar y con 1 el crafteo no tiene de qué comer: los dos se midieron y se descartaron');
+  const { n, cartas } = inservibles(azarDe(31), casiLlena(), 3000, undefined);
+  const cuota = n / cartas;
+  const esperada = 1 - ECONOMIA.sesgoFaltan;
+  assert.ok(Math.abs(cuota - esperada) < 0.05,
+    `el ${(cuota * 100).toFixed(1)} % de las cartas salió repetida; con el sesgo al ${ECONOMIA.sesgoFaltan} se esperaba cerca del ${(esperada * 100).toFixed(0)} %`);
 });
 
 test('Dos cartas del mismo sobre se tienen en cuenta entre sí', () => {
   const azar = azarDe(1234);
   // Sólo queda por completar una legendaria, de la que falta una única copia.
   // Aunque el sobre saque la rareza legendaria cinco veces, no puede dar cinco
-  // copias de esa carta como si cada tirada empezara de cero.
+  // copias de esa carta como si cada tirada empezara de cero. Con el sesgo
+  // entero, que es donde esa promesa es exacta: la parte que no mira la
+  // colección es puro azar y puede repetir lo que quiera.
   const casi = Object.fromEntries(Object.keys(CARTAS).map((id) => [id, limiteDe(id)]));
   const hueco = POR_RAREZA[RAREZA.LEGENDARIO][0];
   casi[hueco] = 0;
 
   let veces = 0;
   for (let i = 0; i < 300; i++) {
-    const s = abrirSobre(azar, casi);
+    const s = abrirSobre(azar, casi, 1);
     veces = Math.max(veces, s.filter((id) => id === hueco).length);
   }
   assert.ok(veces <= limiteDe(hueco),

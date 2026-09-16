@@ -73,6 +73,17 @@ export const ECONOMIA = Object.freeze({
   // y eso cuesta CPU, así que un cliente hostil no puede pedir mil.
   victoriasPorDia: 50,
 
+  // Qué parte de cada sobre mira tu colección antes de sortear la carta. Con 1
+  // —como fue hasta el 16-09-2026— no sale una copia repetida mientras te falte
+  // algo de esa rareza: la colección se completa en unos 116 sobres y el
+  // crafteo no pinta nada, porque en 50 sobres se juntan 64 esquirlas. Con 0 es
+  // el sorteo de Pokémon TCG Live —puro azar y lo repetido se funde— y más de
+  // la mitad de las épicas y legendarias que salen ya las tenías. Medido con
+  // 400 cuentas sobre las mismas semillas, 0,7 deja el 80 % de los hits nuevos,
+  // siete veces más esquirlas (432 en 50 sobres) y la colección en unos 128.
+  // Es el número que reparte el camino entre abrir sobres y crear cartas.
+  sesgoFaltan: 0.7,
+
   fusion: Object.freeze({
     [RAREZA.COMUN]: 4,
     [RAREZA.RARO]: 12,
@@ -164,18 +175,26 @@ export function rarezaAlAzar(azar, minima = RAREZA.COMUN) {
  * ninguna de las anteriores la cumplió, así que el sobre nunca sale vacío de
  * emoción pero tampoco regala una rara de más.
  *
- * Si se le pasa la colección, una vez elegida la rareza el sorteo se hace sólo
- * entre las cartas de esa rareza que aún caben en un mazo. No cambia lo raro
- * que es que salga una legendaria: cambia que, cuando sale, sea una que te
- * falta en vez de la cuarta copia de la misma. Sin ese sesgo el 94 % de todo
- * lo que abrías era una copia que no podías jugar. Cuando ya tienes toda la
- * rareza se sortea entre todas: eso es lo que alimenta la fusión.
+ * Si se le pasa la colección, una vez elegida la rareza el sorteo mira —con la
+ * probabilidad de `sesgo`— sólo las cartas de esa rareza que aún caben en un
+ * mazo. No cambia lo raro que es que salga una legendaria: cambia que, cuando
+ * sale, sea casi siempre una que te falta en vez de la cuarta copia de la
+ * misma. Sin sesgo ninguno el 94 % de todo lo que abrías era una copia que no
+ * podías jugar; con sesgo total nunca sobraba nada y el crafteo no tenía de
+ * qué comer. Lo que no mira la colección, o sale cuando ya tienes toda la
+ * rareza, se sortea entre todas: eso es lo que alimenta la fusión.
+ *
+ * Cada carta del sobre decide por su cuenta si mira la colección, y no el
+ * sobre entero: una moneda por sobre daría sobres «buenos» y sobres «malos»
+ * de cinco cartas, y lo que se quiere es que cada sobre traiga algo de las
+ * dos cosas. Con sesgo 1 no se gasta azar y las tiradas de antes salen igual.
  *
  * @param {() => number} azar
  * @param {Record<string, number>} [tengo] copias por carta que ya posee el jugador
+ * @param {number} [sesgo] probabilidad de que cada carta mire la colección
  * @returns {string[]} cardIds, en el orden en que se revelan
  */
-export function abrirSobre(azar, tengo = null) {
+export function abrirSobre(azar, tengo = null, sesgo = ECONOMIA.sesgoFaltan) {
   const salida = [];
   // Copia local: dos cartas del mismo sobre no deberían ignorarse entre sí.
   const cuenta = tengo ? { ...tengo } : null;
@@ -187,11 +206,12 @@ export function abrirSobre(azar, tengo = null) {
 
     let pool = POR_RAREZA[r];
     if (cuenta) {
-      const faltan = pool.filter((id) => (cuenta[id] ?? 0) < limiteDe(id));
-      // Si no falta ninguna de esa rareza se reparte entre todas —eso es lo que
-      // alimenta la fusión— pero sin repetir dentro del mismo sobre mientras
-      // queden alternativas: sacar dos veces la misma legendaria de una tirada
-      // se lee como un fallo, no como suerte.
+      const mira = sesgo >= 1 || azar() < sesgo;
+      const faltan = mira ? pool.filter((id) => (cuenta[id] ?? 0) < limiteDe(id)) : [];
+      // Si no se mira la colección, o no falta ninguna de esa rareza, se
+      // reparte entre todas —eso es lo que alimenta la fusión— pero sin repetir
+      // dentro del mismo sobre mientras queden alternativas: sacar dos veces
+      // la misma legendaria de una tirada se lee como un fallo, no como suerte.
       if (faltan.length) pool = faltan;
       else {
         const sinRepetir = pool.filter((id) => !salida.includes(id));

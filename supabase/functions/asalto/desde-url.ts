@@ -294,10 +294,11 @@ async function hacerVictoria(servicio, jugadorId: string, envio: Record<string, 
 // ------------------------------------------------------------------- sobre
 
 async function hacerSobre(servicio, jugadorId: string) {
-  // El sorteo mira tu colección para repartir entre lo que te FALTA: sin ese
-  // sesgo, el 94 % de lo que abrías era una copia que no podías jugar. Por eso
-  // se lee antes de sortear, y por eso lo sortea el servidor: es el único que
-  // sabe de verdad lo que tienes.
+  // El sorteo mira tu colección para repartir sobre todo entre lo que te FALTA
+  // (`ECONOMIA.sesgoFaltan`, el 70 % de las cartas): sin ese sesgo, el 94 % de
+  // lo que abrías era una copia que no podías jugar; con sesgo total no sobraba
+  // nada y el crafteo no tenía de qué comer. Por eso se lee antes de sortear, y
+  // por eso lo sortea el servidor: es el único que sabe de verdad lo que tienes.
   const { data: filas, error: errCol } = await servicio
     .from('coleccion').select('card_id, copias').eq('jugador_id', jugadorId);
   if (errCol) return json({ error: errCol.message }, 400);
