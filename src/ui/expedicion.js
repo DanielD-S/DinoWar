@@ -9,6 +9,11 @@
 // se pintan con CSS mientras tanto. Se sabe qué hay por `indice.json`, que
 // escribe `tools/expediciones.py`, y no pidiendo cada fichero: una pieza que
 // no existe es un 404 en la consola, y ya hubo quejas de eso con los vídeos.
+//
+// Con más de una formación hace falta elegir, y eso NO es una pantalla nueva:
+// es una tira de fichas arriba del mapa que lo cambia en el sitio. Una pantalla
+// de atlas metería un toque más a cada visita para todo el mundo, y con cuatro
+// formaciones no lo paga. El día que sean diez, sí.
 
 import { EXPEDICIONES, visitanteDe, claveDeVictoria, requisitoDe, rivalPorId } from '../data/expediciones.js';
 import { traerExpediciones, expedicionesEnCache } from './perfil.js';
@@ -37,6 +42,13 @@ export function montarExpedicion(callbacks) {
   dom = { cuerpo: id('exp-cuerpo'), hoja: id('exp-hoja'), titulo: id('exp-titulo'), volver: id('exp-volver') };
   dom.volver.addEventListener('click', () => { cerrarCartela(); avisar.alVolver(); });
   dom.cuerpo.addEventListener('click', (e) => {
+    const f = e.target.closest('[data-formacion]');
+    if (f) {
+      if (f.classList.contains('bloqueada')) return;
+      expedicion = EXPEDICIONES.find((x) => x.id === f.dataset.formacion) ?? expedicion;
+      pintar(true);
+      return;
+    }
     const b = e.target.closest('[data-rival]');
     if (b) abrirCartela(b.dataset.rival);
   });
@@ -67,6 +79,19 @@ export async function abrirExpedicion() {
 const vencidos = () => new Set(expedicionesEnCache()?.vencidos ?? []);
 /** El día lo pone el servidor; sin respuesta, el del navegador vale para pintar. */
 const hoy = () => expedicionesEnCache()?.dia ?? new Date().toISOString().slice(0, 10);
+
+/** Una formación está abierta si no pide nada o si su requisito está vencido. */
+function estadoDeFormacion(e) {
+  const req = requisitoDe(e.rivales[0].id);
+  const v = vencidos();
+  if (req && !v.has(req)) return 'bloqueada';
+  return e.rivales.every((r) => v.has(claveDeVictoria(r.id, hoy()))) ? 'completa' : 'abierta';
+}
+
+const progresoDe = (e) => {
+  const v = vencidos();
+  return e.rivales.filter((r) => v.has(claveDeVictoria(r.id, hoy()))).length;
+};
 
 function estadoDe(rivalId) {
   const v = vencidos();
@@ -99,7 +124,15 @@ function pintar(desplazar = false) {
   const vis = visitanteDe(hoy());
   const estVis = estadoDe(vis.id);
 
+  // Con una sola formación la tira sobra: es un botón que no lleva a ninguna
+  // parte. Aparece en cuanto hay algo entre lo que elegir.
+  const atlas = EXPEDICIONES.length < 2 ? '' : `
+    <nav class="exp-atlas" aria-label="Formaciones">
+      ${EXPEDICIONES.map((e) => fichaHTML(e)).join('')}
+    </nav>`;
+
   dom.cuerpo.innerHTML = `
+    ${atlas}
     <p class="exp-era">${escapar(expedicion.era)}</p>
     <button class="exp-visitante ${estVis}" data-rival="${vis.id}">
       ${medallon(vis, estVis === 'vencido' ? 'vencido' : 'semana')}
@@ -120,6 +153,22 @@ function pintar(desplazar = false) {
     const actual = dom.cuerpo.querySelector('.exp-nodo.abierto');
     if (actual) requestAnimationFrame(() => actual.scrollIntoView({ block: 'center' }));
   }
+}
+
+/** Una ficha de la tira: el mapa de fondo, el nombre y cuántos nodos llevas. */
+function fichaHTML(e) {
+  const estado = estadoDeFormacion(e);
+  const fondo = piezas.has(e.mapa) ? `background-image:url('${RUTA}${e.mapa}.webp')` : '';
+  const req = requisitoDe(e.rivales[0].id);
+  const pista = estado === 'bloqueada'
+    ? `Vence antes a ${escapar(rivalPorId(req)?.rival.nombre ?? '—')}`
+    : `${progresoDe(e)} / ${e.rivales.length}`;
+  return `<button class="exp-ficha ${estado} ${e.id === expedicion.id ? 'puesta' : ''}"
+      data-formacion="${e.id}" style="${fondo}"
+      aria-current="${e.id === expedicion.id}" ${estado === 'bloqueada' ? 'disabled' : ''}>
+    <b>${escapar(e.nombre.replace(/^Formación /, ''))}</b>
+    <i>${pista}</i>
+  </button>`;
 }
 
 function medallon(rival, estado) {

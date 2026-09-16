@@ -45,13 +45,36 @@ test('Ningún rival lleva el mazo de referencia: sería el solitario de antes co
 });
 
 test('El camino se abre en orden y los visitantes no piden nada', () => {
-  const [morrison] = EXPEDICIONES;
-  assert.equal(requisitoDe(morrison.rivales[0].id), null, 'el primero está abierto');
-  for (let i = 1; i < morrison.rivales.length; i++) {
-    assert.equal(requisitoDe(morrison.rivales[i].id), morrison.rivales[i - 1].id);
+  for (const e of EXPEDICIONES) {
+    for (let i = 1; i < e.rivales.length; i++) {
+      assert.equal(requisitoDe(e.rivales[i].id), e.rivales[i - 1].id, e.id);
+    }
   }
   for (const v of VISITANTES) assert.equal(requisitoDe(v.id), null);
   assert.equal(rivalPorId('no_existe'), null);
+});
+
+test('Una expedición encadenada pide el ÚLTIMO nodo de la que la abre', () => {
+  const porId = new Map(EXPEDICIONES.map((e) => [e.id, e]));
+  let encadenadas = 0;
+  for (const e of EXPEDICIONES) {
+    const primero = e.rivales[0].id;
+    if (!e.requiere) {
+      assert.equal(requisitoDe(primero), null, `${e.id}: sin requiere y aun así pide algo`);
+      continue;
+    }
+    const previa = porId.get(e.requiere);
+    assert.ok(previa, `${e.id}: requiere «${e.requiere}», que no existe`);
+    assert.equal(requisitoDe(primero), previa.rivales[previa.rivales.length - 1].id, e.id);
+    encadenadas += 1;
+  }
+  // Sin esta línea el test pasaría en vacío el día que alguien quitase el
+  // `requiere` de todas: comprobaría cero encadenados y diría que bien.
+  assert.ok(encadenadas > 0, 'ninguna expedición encadenada: ¿se perdió el requiere?');
+});
+
+test('Al menos una expedición queda abierta de entrada: si no, no se puede empezar', () => {
+  assert.ok(EXPEDICIONES.some((e) => !e.requiere));
 });
 
 test('La primera victoria se apunta una vez para siempre en el camino y una por semana con el visitante', () => {

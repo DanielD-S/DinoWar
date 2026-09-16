@@ -168,6 +168,160 @@ export const EXPEDICIONES = Object.freeze([
       }),
     ]),
   }),
+
+  // --------------------------------------------------------- Hell Creek
+  //
+  // La segunda, y la primera que se ABRE con otra: `requiere` encadena mapas,
+  // y `requisitoDe()` hace que el primer nodo de aquí pida a Big Al. No es
+  // sólo pintura: el servidor usa el mismo requisito para no pagar la primera
+  // victoria de un Hell Creek empezado por la puerta de atrás.
+  //
+  // Es de las tres formaciones con mapa la única que el set sostiene: hay 26
+  // cartas del Cretácico norteamericano y 22 no aparecen hoy en ninguna
+  // partida. Las otras dos pedirían cartas nuevas, no mapas — Kem Kem repetiría
+  // el mazo del visitante que ya existe y Tendaguru sería la Morrison otra vez.
+  //
+  // El mapa termina en el impacto, así que el camino va de los bosques del
+  // interior hacia la costa y el último rival cae encima del cráter.
+  Object.freeze({
+    id: 'hell_creek',
+    nombre: 'Formación Hell Creek',
+    era: 'Cretácico Superior · 68–66 Ma',
+    mapa: 'mapa_hell_creek',
+    requiere: 'morrison',
+    rivales: Object.freeze([
+      // El orden NO es el que se escribió: salió de medirlo. El clan de los
+      // cuernos se pensó cuarto y ganaba el 85 % —dos auras de clado apiladas
+      // sobre marginocéfalos baratos es lo más fuerte que hay en el set—, y
+      // el invierno del impacto, pensado como penúltimo golpe, perdía el 82 %
+      // porque un mazo que sólo muele no gana: la extinción está en el 0 %.
+      //
+      // El camino sigue el dibujo del mapa, que va de los bosques del interior
+      // a la costa y termina en el cráter.
+      rival({
+        id: 'sotobosque_hell_creek',
+        nombre: 'Los pequeños del sotobosque',
+        lema: 'Lo que corretea entre los helechos. Ninguno te mata; todos juntos, sí.',
+        retrato: 'platyceratops',
+        perfil: 'heuristica',
+        premio: 60,
+        mazo: [
+          ['platyceratops', 3], ['liaoceratops', 3], ['troodon', 3], ['tongtianlong', 3],
+          ['halszkaraptor', 3], ['pteranodon', 3], ['shuangmiaosaurus', 3], ['stegoceras', 3],
+          ['alaskacephale', 3], ['chasmosaurus', 3], ['medusaceratops', 1], ['nido', 3], ['insectos', 3], ['gregarismo', 3],
+        ],
+      }),
+      rival({
+        id: 'los_blindados',
+        nombre: 'Los blindados',
+        lema: 'Osteodermos y mazas. Lo que les pega se lleva la mitad de vuelta.',
+        retrato: 'ankylosaurus',
+        perfil: 'heuristica',
+        premio: 80,
+        mazo: [
+          ['ankylosaurus', 1], ['euoplocephalus', 3], ['nodosaurus', 2], ['gargoyleosaurus', 3],
+          ['invictarx', 3], ['stegoceras', 3], ['loricatosaurus', 3], ['bienosaurus', 3],
+          // Sin molienda: se probó con la Sequía y la Trampa y el muro pasó
+          // del 74 % al 80 %, o sea que empeoró. Un mazo que sólo muele no
+          // gana —la extinción está en el 0 %— y encima gasta las ranuras.
+          ['mortandad', 1], ['competencia', 2],
+          ['canal_trenzado', 3], ['rebrote', 3], ['gregarismo', 3],
+        ],
+      }),
+      rival({
+        id: 'cabezas_de_hueso',
+        nombre: 'Las cabezas de hueso',
+        lema: 'Cráneos de veinte centímetros de grosor. Golpean al llegar y siguen andando.',
+        retrato: 'pachycephalosaurus',
+        perfil: 'heuristica',
+        premio: 100,
+        mazo: [
+          ['pachycephalosaurus', 3], ['stegoceras', 3], ['alaskacephale', 3], ['liaoceratops', 3],
+          ['platyceratops', 3], ['chasmosaurus', 3], ['wendiceratops', 1], ['therizinosaurus', 3],
+          ['troodon', 3], ['gregarismo', 3], ['fractura', 2], ['competencia', 2], ['nido', 3],
+        ],
+      }),
+      rival({
+        id: 'marisma_edmontosaurus',
+        nombre: 'La marisma de Edmontosaurus',
+        lema: 'Hadrosaurios a cientos. No pegan: te cansan y se curan.',
+        retrato: 'edmontosaurus',
+        perfil: 'heuristica',
+        premio: 120,
+        mazo: [
+          ['edmontosaurus', 1], ['parasaurolophus', 3], ['brachylophosaurus', 3], ['rhinorex', 2],
+          ['maiasaura', 1], ['shuangmiaosaurus', 3], ['iguanodon', 3], ['canal_trenzado', 3],
+          ['nido', 3], ['gregarismo', 3], ['rebrote', 3], ['gastrolitos', 2],
+          ['crecimiento_acelerado', 1], ['competencia', 2], ['fractura', 2],
+        ],
+      }),
+      rival({
+        id: 'mar_interior',
+        nombre: 'El mar interior',
+        lema: 'La vía marítima parte el continente en dos. Llega por agua y por aire.',
+        retrato: 'mosasaurus',
+        perfil: 'heuristica',
+        premio: 150,
+        mazo: [
+          ['mosasaurus', 1], ['elasmosaurus', 3], ['plesiopleurodon', 2], ['scanisaurus', 3],
+          ['quetzalcoatlus', 2], ['pteranodon', 3], ['huaxiadraco', 3], ['suchomimus', 2],
+          ['inundacion', 3], ['competencia', 2], ['fractura', 2],
+          ['canal_trenzado', 3], ['nido', 3], ['gregarismo', 3],
+        ],
+      }),
+      rival({
+        id: 'clan_de_los_cuernos',
+        nombre: 'El clan de los cuernos',
+        lema: 'Golas que se cubren unas a otras. Cuanto más entran, más pega cada una.',
+        retrato: 'triceratops',
+        perfil: 'heuristica',
+        premio: 180,
+        mazo: [
+          // Sin Medusaceratops y sin Crecimiento acelerado: con los dos ganaba
+          // el 85 %. Dos auras de clado apiladas sobre marginocéfalos baratos
+          // es lo más fuerte que tiene el set, y aquí no toca todavía.
+          ['triceratops', 2], ['titanoceratops', 1], ['wendiceratops', 1],
+          ['lokiceratops', 2], ['chasmosaurus', 3], ['liaoceratops', 3], ['platyceratops', 3],
+          ['alaskacephale', 3], ['stegoceras', 3], ['gregarismo', 3], ['nido', 3],
+          ['canal_trenzado', 3],
+        ],
+      }),
+      rival({
+        id: 'invierno_del_impacto',
+        nombre: 'El invierno del impacto',
+        lema: 'Ceniza en el cielo y nada que comer. Aquí no se gana: se dura más.',
+        retrato: 'quetzalcoatlus',
+        perfil: 'heuristica',
+        premio: 220,
+        mazo: [
+          // La Mortandad es asimétrica a propósito: 3 de daño a todo el campo
+          // barre una mano de criaturas baratas y a éstas no las despeina.
+          ['aridez', 1], ['mortandad', 1], ['carrona', 1], ['competencia', 2], ['fractura', 2],
+          ['neumaticidad', 2], ['crecimiento_acelerado', 1], ['medusaceratops', 2],
+          ['therizinosaurus', 3], ['euoplocephalus', 3], ['elasmosaurus', 3], ['quetzalcoatlus', 2],
+          ['carnotaurus', 2], ['mosasaurus', 1], ['titanoceratops', 2], ['triceratops', 2],
+          ['wendiceratops', 2], ['dromaeosaurus', 3],
+        ],
+      }),
+      rival({
+        id: 'el_ultimo_rey',
+        nombre: 'El último rey',
+        lema: 'Ocho toneladas de tiranosaurio en el último millón de años del Mesozoico.',
+        retrato: 'tyrannosaurus',
+        perfil: 'heuristica',
+        premio: 350,
+        mazo: [
+          ['tyrannosaurus', 1], ['triceratops', 2], ['wendiceratops', 2], ['titanoceratops', 2],
+          ['medusaceratops', 2],
+          ['ankylosaurus', 1], ['edmontosaurus', 1], ['carnotaurus', 2], ['quetzalcoatlus', 2],
+          ['pachycephalosaurus', 3], ['dromaeosaurus', 3], ['troodon', 3], ['velociraptor', 3],
+          ['mosasaurus', 1], ['carrona', 1],
+          ['mortandad', 1], ['competencia', 2], ['crecimiento_acelerado', 1], ['neumaticidad', 2],
+          ['fractura', 2], ['gregarismo', 3], ['trampa', 3],
+        ],
+      }),
+    ]),
+  }),
 ]);
 
 // ------------------------------------------------------- los de la semana
@@ -179,23 +333,6 @@ export const EXPEDICIONES = Object.freeze([
  * adelantar el reloj traería al de la semana que viene.
  */
 export const VISITANTES = Object.freeze([
-  rival({
-    id: 'visitante_tyrannosaurus',
-    nombre: 'El rey de Hell Creek',
-    lema: 'Sesenta y seis millones de años de adelanto, y hambre de todos ellos.',
-    retrato: 'tyrannosaurus',
-    perfil: 'heuristica',
-    premio: 150,
-    mazo: [
-      // Sin Triceratops ni Ankylosaurus: con ellos se le ganaba el 37 % y los
-      // otros visitantes rondan el 50 %. Rotan por semana y tienen que costar
-      // parecido, que si no la semana del rey es la semana de no jugar.
-      ['tyrannosaurus', 1], ['liaoceratops', 2], ['stegoceras', 1], ['pachycephalosaurus', 3],
-      ['parasaurolophus', 3], ['edmontosaurus', 1], ['quetzalcoatlus', 2], ['troodon', 3],
-      ['dromaeosaurus', 3], ['velociraptor', 3], ['chasmosaurus', 3], ['euoplocephalus', 3],
-      ['fractura', 2], ['bosque_ribereno', 2], ['crecimiento_acelerado', 1],
-    ],
-  }),
   rival({
     id: 'visitante_spinosaurus',
     nombre: 'El señor del Kem Kem',
@@ -226,6 +363,62 @@ export const VISITANTES = Object.freeze([
       ['manantial', 1],
     ],
   }),
+  rival({
+    id: 'visitante_gobi',
+    nombre: 'El desierto de Gobi',
+    lema: 'Arena, viento y garras. Lo que sobrevive aquí no necesita beber.',
+    retrato: 'therizinosaurus',
+    perfil: 'heuristica',
+    premio: 150,
+    mazo: [
+      // La Sequía no está de adorno: el Therizinosaurus cobra +3 de Ataque
+      // mientras haya un clima en el campo, y su carta se llama Garra de sequía.
+      ['aridez', 1], ['therizinosaurus', 3], ['velociraptor', 3], ['troodon', 3],
+      ['halszkaraptor', 3], ['ojoraptorsaurus', 3], ['monolophosaurus', 3],
+      ['shuangmiaosaurus', 3], ['liaoceratops', 3], ['platyceratops', 3],
+      ['alaskacephale', 3], ['huaxiadraco', 3], ['medusaceratops', 2],
+      ['quetzalcoatlus', 2], ['suchomimus', 2],
+      ['neumaticidad', 2], ['crecimiento_acelerado', 1], ['competencia', 2],
+      ['gregarismo', 3], ['fractura', 2],
+    ],
+  }),
+  rival({
+    id: 'visitante_patagonia',
+    nombre: 'Los gigantes del sur',
+    lema: 'Gondwana crió los cuerpos más grandes que ha habido. Y lo que los cazaba.',
+    retrato: 'argentinosaurus',
+    perfil: 'heuristica',
+    premio: 150,
+    mazo: [
+      // Tenía diecisiete criaturas y treinta de soporte, y se ganaba el 59 %:
+      // medio mazo mirando mientras la otra mitad esperaba a la cuarta
+      // Biomasa. Ahora son veinticuatro, con ceratosáurido, azhdárquido y
+      // pliosaurio, que de Gondwana también son.
+      ['argentinosaurus', 2], ['antarctosaurus', 1], ['tyrannotitan', 1], ['carnotaurus', 2],
+      ['amargasaurus', 3], ['sanjuansaurus', 3], ['atlasaurus', 2], ['ceratosaurus', 3],
+      ['elasmosaurus', 3], ['quetzalcoatlus', 1],
+      // Todo lo grande cuesta 4: sin rampa, la mano se queda quieta.
+      ['carrona', 1], ['humedal', 2], ['vega', 2], ['manantial', 1], ['sabana', 3],
+      ['neumaticidad', 2], ['crecimiento_acelerado', 1], ['mortandad', 1],
+      ['competencia', 2], ['fractura', 2], ['nido', 3], ['gregarismo', 3],
+    ],
+  }),
+  rival({
+    id: 'visitante_tendaguru',
+    nombre: 'La colina de Tendaguru',
+    lema: 'La Morrison tuvo una hermana en África, y allí los cuellos eran más largos.',
+    retrato: 'brachiosaurus',
+    perfil: 'heuristica',
+    premio: 150,
+    mazo: [
+      ['brachiosaurus', 1], ['atlasaurus', 2], ['mamenchisaurus', 3], ['amargasaurus', 3],
+      ['kentrosaurus', 3], ['stegosaurus', 3], ['dryosaurus', 3], ['ceratosaurus', 3],
+      ['ornitholestes', 3], ['allosaurus', 3], ['torvosaurus', 2], ['manantial', 1],
+      ['lago', 2], ['bosque', 1], ['gastrolitos', 2],
+      ['neumaticidad', 2], ['crecimiento_acelerado', 1], ['competencia', 2],
+      ['canal_trenzado', 3], ['rebrote', 3], ['gregarismo', 3], ['fractura', 2],
+    ],
+  }),
 ]);
 
 /** Número de semana desde el 1 de enero de 1970 (UTC), a partir de 'AAAA-MM-DD'. */
@@ -250,14 +443,21 @@ const TODOS = new Map([
 export const rivalPorId = (id) => TODOS.get(id) ?? null;
 
 /**
- * El rival que hay que haber vencido antes, o null si es el primero del camino
- * o un visitante. El servidor lo usa para no pagar la primera victoria de un
- * nodo que aún estaba cerrado: jugarlo se puede, cobrarlo no.
+ * El rival que hay que haber vencido antes, o null si no lo pide nada. El
+ * servidor lo usa para no pagar la primera victoria de un nodo que aún estaba
+ * cerrado: jugarlo se puede, cobrarlo no.
+ *
+ * Dentro de un mapa es el nodo anterior. En el PRIMERO de un mapa encadenado
+ * —`requiere`— es el ÚLTIMO del mapa que lo abre, así que el encadenado no
+ * necesita ninguna regla nueva ni en el navegador ni en SQL: es el mismo
+ * requisito de siempre apuntando a otro sitio.
  */
 export function requisitoDe(id) {
   const r = rivalPorId(id);
-  if (!r || r.indice <= 0) return null;
-  return r.expedicion.rivales[r.indice - 1].id;
+  if (!r || r.indice < 0) return null;
+  if (r.indice > 0) return r.expedicion.rivales[r.indice - 1].id;
+  const previa = EXPEDICIONES.find((e) => e.id === r.expedicion.requiere);
+  return previa ? previa.rivales[previa.rivales.length - 1].id : null;
 }
 
 /**

@@ -253,10 +253,10 @@ ahora: otro duelo cerrado entre medias no debe contaminar éste.
 «Fácil» y «Normal» llevaban el MISMO mazo, el de referencia; sólo cambiaba que
 «Fácil» jugaba al azar. El solitario se sentía plano porque lo era. Ahora cada
 formación geológica es un mapa con rivales en fila, cada uno con su mazo, y
-ganar a uno abre el siguiente. Hoy hay uno, la Morrison, con ocho rivales, y
-un visitante de otra era que rota cada semana.
+ganar a uno abre el siguiente. Hoy hay DOS —la Morrison y Hell Creek, ocho
+rivales cada una— y cinco visitantes de otras eras que rotan por semana.
 
-Cuatro decisiones que conviene conocer antes de discutirlas:
+Cinco decisiones que conviene conocer antes de discutirlas:
 
 - **El mazo del rival NUNCA viaja en la petición.** El navegador manda el id del
   nodo y el servidor busca su mazo y su perfil en `src/data/expediciones.js`.
@@ -277,7 +277,28 @@ Cuatro decisiones que conviene conocer antes de discutirlas:
   un nodo vencido paga lo de una victoria normal.
 - **Los visitantes tienen que costar parecido.** Rotan por semana, y uno que se
   gana el 73 % y otro el 37 % hacen que una semana sea la de no jugar. Se
-  ajustaron midiendo hasta rondar el 50 %.
+  ajustaron midiendo hasta rondar el 50 %; los cinco de hoy caen entre el 48 y
+  el 58,5 %, y el más suelto es el del mar, que ya estaba así.
+- **Las expediciones se encadenan con `requiere`, y no hizo falta regla nueva.**
+  `requisitoDe()` devuelve, para el PRIMER nodo de un mapa encadenado, el
+  ÚLTIMO del que lo abre. Es el requisito de siempre apuntando a otro sitio, así
+  que el navegador lo pinta bloqueado y `aplicar_expedicion` no paga su primera
+  victoria sin tocar ni una línea de SQL. Y el selector de mapa es una TIRA de
+  fichas sobre el mapa, no una pantalla de atlas: una pantalla mete un toque más
+  a cada visita para todo el mundo y con cuatro formaciones no lo paga.
+
+Y dos cosas que Hell Creek volvió a enseñar midiendo, por si alguien las
+discute otra vez:
+
+- **Dos auras de clado apiladas es lo más fuerte del set.** Medusaceratops y
+  Titanoceratops sobre marginocéfalos baratos ganaban el 85 % con un mazo que
+  se escribió para ser el cuarto nodo. Los marginocéfalos son once cartas: la
+  familia más honda, y por eso la que más se dispara.
+- **Un mazo que sólo muele no gana, y encima estorba.** «El invierno del
+  impacto» se escribió lleno de Trampa, Inundación y Deriva y PERDÍA el 82 %;
+  a «Los blindados» se les probó la Sequía y la Trampa y empeoraron del 74 % al
+  80 %. Con la extinción en el 0 %, las ranuras gastadas en moler son ranuras
+  que no pegan.
 
 El arte llega aparte (`tools/expediciones.py`, prompts en `PROMPTS.md`) y puede
 no estar: el mapa es un degradado y los medallones son círculos de CSS
@@ -607,6 +628,13 @@ y pedirlo igual dejaba un 404 en la consola por cada Mortandad o Manantial que
 salía en un sobre. Las nueve legendarias con criatura lo tienen todas. Hubo un
 vídeo de relleno para las que no tenían el suyo y se quitó: el autor prefiere
 que una legendaria sin vídeo salga sin vídeo.
+
+**Y el vídeo es de ANIMALES, no de paisajes.** Se probó a darle a cada
+expedición dos cinemáticas —una al entrar en la formación y otra al cerrarla,
+con el impacto del Cretácico de remate— y se quitó antes de escribir ninguna:
+el generador entrega bien un plano corto de un bicho, y un plano de paisaje no.
+El código llegó a existir y se deshizo entero (15-09-2026); si alguien vuelve a
+proponerlo, lo que falla no es el sitio donde se enseña, es la pieza.
 
 **Las dos cartas de jefe también tienen vídeo**, y se enseña al RECLAMARLAS en
 la Cuenca, antes de la invocación: es la única vez que esa carta «sale», así
@@ -1587,13 +1615,14 @@ pasos. CI corre los tests en cada push y necesita `fetch-depth: 0`, porque
 
 Dicho para que nadie lo descubra tarde:
 
-- **Sólo hay una expedición, la Morrison.** Los prompts de los mapas de Hell
-  Creek, Tendaguru y Kem Kem están, los rivales no. Añadir una es un objeto en
-  `EXPEDICIONES`, medirla con `sim/expediciones.mjs` y su mapa; pero el
-  cliente sólo pinta la primera, y elegir entre varias pide una pantalla.
-- **Las misiones diarias no saben de expediciones**: ganar a un rival cuenta
-  como una victoria cualquiera. El contador `expedicionNuevos` ya existe (lo
-  usa el logro de la Morrison); una misión diaria que lo mida es una línea.
+- **Hay dos expediciones y quedan dos mapas sin rivales.** Morrison y Hell
+  Creek, encadenadas con `requiere`; los WebP de Tendaguru y Kem Kem llevan
+  meses servidos y no tienen a nadie dentro. Y no es por pereza: con el set de
+  hoy **Kem Kem repetiría el mazo del visitante que ya existe y Tendaguru sería
+  la Morrison otra vez**. Las dos piden CARTAS nuevas —Giraffatitan,
+  Carcharodontosaurus, Sarcosuchus—, no mapas, y eso es ilustración, mecánica,
+  medición y migración de catálogo. Mientras tanto son visitantes de la semana,
+  que es donde caben sin mentir.
 
 - **Hay cinco jefes y el calendario da la vuelta cada 35 días** (15-09-2026):
   Saurophaganax, Barosaurus, Supersaurus, Hesperosaurus y Harpactognathus, con
