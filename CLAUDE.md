@@ -424,6 +424,30 @@ la primera visita el logo baja por la red y, contando desde el arranque, la
 mitad del tiempo se iba en pantalla vacía. Con tope, para que una imagen que
 no llega no deje la marca colgada.
 
+**El intro** (`intro.mp4`) va DESPUÉS de la carga y antes de lo primero que se
+toca, y sólo la PRIMERA vez que alguien llega hasta ahí. Cuatro decisiones:
+
+- **Una vez, no cada arranque.** Un intro que se repite es el que todo el mundo
+  salta, y uno que se salta no vale nada; por eso no hace falta un «no volver a
+  mostrarlo». La marca va en `localStorage`, y **sin `localStorage` se da por
+  visto**: no poder recordar que ya se enseñó es razón para NO enseñarlo, que
+  repetirlo en cada arranque es peor que faltar.
+- **Empieza a bajar cuando las piezas del menú ya están**, no antes: son 1,2 MB
+  y la barra de carga está esperando esas piezas de verdad. A partir de ahí
+  quedan dos viajes al servidor, que es tiempo de sobra. Es la misma idea que
+  `precargarMusica`.
+- **Y si no ha llegado, al menú sin él** (`ESPERA_INTRO`, 1,2 s). Nadie va a
+  esperar mirando un rectángulo negro, y el arranque de este juego es lo último
+  que conviene alargar.
+- **Se enseña con la pantalla siguiente YA PUESTA debajo.** El vídeo se retira
+  con un fundido; si debajo quedara la carga, se la vería reaparecer medio
+  segundo antes de dar paso al menú.
+
+Reutiliza la capa del sobre tal cual —`videoDeCarta()` de `apertura.js`—, que
+por eso acepta el rótulo del botón y devuelve si llegó a verse: lo visto se
+apunta SÓLO si se vio, para que un fichero que aún no está servido no se marque
+y luego no salga nunca.
+
 **La carga** (`#carga`) va mientras el servidor contesta. Antes, con la sesión
 guardada, el arranque no enseñaba nada: todas las pantallas nacen ocultas y el
 menú aparecía cuando terminaban las dos llamadas. Tres cosas que decidir antes
@@ -610,9 +634,20 @@ Una legendaria puede llevar un vídeo corto del animal, `assets/video/<id>.mp4`,
 que la apertura del sobre enseña a pantalla entera antes de voltear la carta.
 El original va a `src/video/` —fuera del repositorio— y `python tools/videos.py
 escribir` lo deja en H.264 a 960 de ancho, sin audio, con `faststart` y sin
-la marca de agua de Kling, que va anclada a la esquina en píxeles y la borra
-`delogo` antes de escalar: el de Kling llegó a 14 MB y se sirve en 1,2. Si dura más de diez segundos se corta
-por el PRINCIPIO, que el último fotograma es sobre el que aparece la carta.
+la marca de agua de Kling, que borra `delogo` antes de escalar: el de Kling
+llegó a 14 MB y se sirve en 1,2. Si dura más de diez segundos se corta por el
+PRINCIPIO, que el último fotograma es sobre el que aparece la carta — salvo lo
+que esté en `SIN_TOPE`, que no es una carta sino una pieza montada y cortarle
+el principio la destroza.
+
+**La marca de agua ESCALA con el cuadro**, aunque durante nueve vídeos
+pareciera que no: los primeros lotes vinieron todos a ~1176 de ancho y unos
+píxeles fijos valían. El intro llegó a 1916×1080 con la marca de 187×36 en vez
+de 138×26, y el rectángulo fijo dejaba fuera 51 píxeles por la izquierda. Por
+eso `MARCA` va en PROPORCIÓN del cuadro. Y medirla no es cosa de ojo: la marca
+es lo ÚNICO del plano que no se mueve, así que sale de la varianza por píxel
+entre una decena de fotogramas repartidos —quieto y claro es marca, quieto y
+oscuro es fondo—.
 
 **Para verlo sin esperar al servidor: `?ensayo=mosasaurus`.** Al entrar en
 Sobres corre una ceremonia de mentira con esa carta en segundo lugar: no
@@ -635,6 +670,12 @@ con el impacto del Cretácico de remate— y se quitó antes de escribir ninguna
 el generador entrega bien un plano corto de un bicho, y un plano de paisaje no.
 El código llegó a existir y se deshizo entero (15-09-2026); si alguien vuelve a
 proponerlo, lo que falla no es el sitio donde se enseña, es la pieza.
+
+**El INTRO del arranque es la prueba de que la regla era ésa y no «nada de
+cinemáticas».** Es un plano de quince segundos de un Allosaurus bajando por un
+cauce con niebla al amanecer, que termina con su cabeza llenando el cuadro:
+mismo encuadre que las nueve legendarias, sólo que más largo. Salió bien al
+primer intento. Ver «Lo primero que se ve», más arriba.
 
 **Las dos cartas de jefe también tienen vídeo**, y se enseña al RECLAMARLAS en
 la Cuenca, antes de la invocación: es la única vez que esa carta «sale», así

@@ -15,17 +15,27 @@ ANCHO píxeles de ancho, sin pista de audio (el juego pone su música) y con el
 que bajarlo entero antes del primer fotograma. A CRF 27 el mosasaurio queda
 en 1,2 MB; a 23 en 2,3 y no se le nota en un móvil. Se recorta a TOPE
 segundos por el principio, que el final es el que importa: es sobre el
-último fotograma donde se pinta la carta.
+último fotograma donde se pinta la carta. Lo que está en SIN_TOPE no se
+recorta: no es una carta, es una pieza montada, y cortarle el principio la
+destroza.
 
 Y se le quita la marca de agua. Kling la pone en la esquina de abajo a la
-derecha —«KlingAI 3.0», logo incluido— y no escala con el cuadro: medida
-sobre los nueve originales, en los de 1176×784 ocupa 138×26 píxeles a 28 del
-borde derecho y 23 del de abajo, y en los de 1108×828 146×28 a 28 y 21. Por
-eso MARCA va en píxeles desde la esquina y no en porcentaje. El filtro
-`delogo` de ffmpeg no recorta imagen: rellena el rectángulo con lo que hay
-alrededor. A tamaño real no se nota; a tres aumentos, sobre cielo liso, se
-intuye el contorno. Va ANTES de escalar, que a más resolución el relleno se
-difumina mejor y luego se comprime una sola vez.
+derecha —«KlingAI 3.0», logo incluido— y SÍ escala con el cuadro, aunque
+durante nueve vídeos pareciera que no: los tres primeros lotes vinieron todos
+a ~1176 de ancho, así que unos píxeles fijos valían. El intro llegó a
+1916×1080 y la marca vino de 187×36 en vez de 138×26 — el rectángulo fijo
+dejaba fuera 51 píxeles por la izquierda. Por eso MARCA va en PROPORCIÓN del
+cuadro, medida sobre las dos resoluciones y con holgura.
+
+Medirla no es cosa de ojo: la marca es lo ÚNICO del plano que no se mueve, así
+que sale de la varianza por píxel entre una decena de fotogramas repartidos —
+quieto y claro es marca; quieto y oscuro es fondo—. Si un día cambia de sitio,
+se vuelve a medir así.
+
+El filtro `delogo` de ffmpeg no recorta imagen: rellena el rectángulo con lo
+que hay alrededor. A tamaño real no se nota; a tres aumentos, sobre cielo
+liso, se intuye el contorno. Va ANTES de escalar, que a más resolución el
+relleno se difumina mejor y luego se comprime una sola vez.
 
 El nombre es el `id` de la carta, igual que en las ilustraciones: la apertura
 busca `assets/video/<id>.mp4` y, si no existe, voltea la carta sin más.
@@ -44,9 +54,19 @@ DESTINO = RAIZ / 'assets' / 'video'
 ANCHO = 960
 CRF = 27
 TOPE = 10.0
-# La marca de agua, en píxeles desde la esquina de abajo a la derecha, con
-# margen sobre lo medido. `delogo` exige que el rectángulo no toque el borde.
-MARCA = {'derecha': 24, 'abajo': 17, 'ancho': 154, 'alto': 36}
+# Lo que NO es una carta y por tanto no se recorta: el tope existe porque en un
+# sobre lo que importa es el último fotograma —es el lienzo de la carta— y diez
+# segundos de espera ya son muchos. Una cinemática es una pieza montada y
+# cortarle el principio la destroza.
+SIN_TOPE = {'intro'}
+
+# La marca de agua, en PROPORCIÓN del cuadro y no en píxeles: Kling la escala
+# con la resolución de salida. Medido sobre dos entregas —1176×784 y 1916×1080—
+# la marca ocupa entre el 9,8 % y el 11,7 % del ancho, así que unos valores
+# fijos que cubrían la primera dejaban fuera 51 px de la segunda por la
+# izquierda. Con holgura sobre lo medido en las dos; `delogo` exige además que
+# el rectángulo no toque el borde.
+MARCA = {'derecha': 0.018, 'abajo': 0.024, 'ancho': 0.125, 'alto': 0.042}
 EXTENSIONES = {'.mp4', '.mov', '.webm', '.mkv', '.m4v'}
 
 
@@ -71,15 +91,18 @@ def medir(ruta):
 
 
 def sin_marca(ancho, alto):
-    x = ancho - MARCA['derecha'] - MARCA['ancho']
-    y = alto - MARCA['abajo'] - MARCA['alto']
-    return f"delogo=x={x}:y={y}:w={MARCA['ancho']}:h={MARCA['alto']}"
+    w = max(8, round(ancho * MARCA['ancho']))
+    h = max(8, round(alto * MARCA['alto']))
+    # `max(1, …)`: el rectángulo no puede tocar el borde o delogo se queja.
+    x = max(1, ancho - round(ancho * MARCA['derecha']) - w)
+    y = max(1, alto - round(alto * MARCA['abajo']) - h)
+    return f'delogo=x={x}:y={y}:w={w}:h={h}'
 
 
-def convertir(entrada, salida, m):
+def convertir(entrada, salida, m, entero=False):
     dura = m['dura']
     orden = ['ffmpeg', '-y', '-loglevel', 'error']
-    if dura > TOPE:
+    if dura > TOPE and not entero:
         # Se quita el principio, no el final: el último fotograma es el que
         # queda debajo de la carta.
         orden += ['-ss', f'{dura - TOPE:.3f}']
@@ -109,7 +132,7 @@ def main(escribir):
     if solo:
         fuentes = [f for f in fuentes if f.stem.lower() in solo]
 
-    ids = ids_de_cartas()
+    ids = ids_de_cartas() | SIN_TOPE
     for f in fuentes:
         # En minúsculas: la apertura pide `<id>.mp4` y el id va en minúsculas.
         # Y contra la lista de cartas, que un vídeo con el nombre mal escrito
@@ -122,7 +145,7 @@ def main(escribir):
         m = medir(f)
         origen = f"{m['ancho']}×{m['alto']}, {m['dura']:.1f} s, {m['kb'] // 1024}.{m['kb'] % 1024 * 10 // 1024} MB"
         if escribir:
-            convertir(f, destino, m)
+            convertir(f, destino, m, entero=nombre in SIN_TOPE)
             s = medir(destino)
             print(f"{f.name}: {origen} -> {destino.relative_to(RAIZ)} "
                   f"{s['ancho']}×{s['alto']}, {s['dura']:.1f} s, {s['kb']} KB")

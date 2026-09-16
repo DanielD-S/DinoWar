@@ -72,7 +72,9 @@ export function precargarVideo(id, alFallar = () => {}) {
  * La capa del vídeo sobre `raiz`, hasta que el jugador la toca. Resuelve sin
  * enseñar nada si el vídeo no llega o `cancelado()` dice que ya no toca.
  */
-export async function mostrarVideo({ raiz, video: v, binomial, dino = true, cancelado = () => false }) {
+export async function mostrarVideo({
+  raiz, video: v, binomial, dino = true, cancelado = () => false, cerrarTexto = 'Ver la carta',
+}) {
   const capa = document.createElement('div');
   capa.className = 'apertura-video';
   const marco = document.createElement('div');
@@ -103,7 +105,7 @@ export async function mostrarVideo({ raiz, video: v, binomial, dino = true, canc
   const cerrar = document.createElement('button');
   cerrar.type = 'button';
   cerrar.className = 'apertura-video-cerrar';
-  cerrar.textContent = 'Ver la carta';
+  cerrar.textContent = cerrarTexto;
   pie.append(nombre, cerrar);
   capa.append(marco, pie);
   raiz.appendChild(capa);
@@ -151,15 +153,21 @@ export async function mostrarVideo({ raiz, video: v, binomial, dino = true, canc
     await esperar(SALIDA_VIDEO);
   }
   capa.remove();
+  return reproduce;
 }
 
 /**
  * El vídeo de una carta suelta, fuera del sobre: se pide, se enseña y se va.
  * Si no existe, resuelve enseguida sin enseñar nada. Con movimiento reducido
  * tampoco se enseña, como la ceremonia.
+ *
+ * DEVUELVE si llegó a verse. Lo mira quien enseña algo UNA sola vez —el intro
+ * del arranque— para no apuntarlo como visto cuando no se vio.
+ *
+ * @returns {Promise<boolean>}
  */
-export async function videoDeCarta({ raiz, id, binomial, dino = true }) {
-  if (reducido() || !raiz || !id) return;
+export async function videoDeCarta({ raiz, id, binomial, dino = true, cerrarTexto }) {
+  if (reducido() || !raiz || !id) return false;
   let falta = false;
   const v = precargarVideo(id, () => { falta = true; });
   // Un 404 llega en un instante; un vídeo real tarda más en decir «puedo».
@@ -168,8 +176,8 @@ export async function videoDeCarta({ raiz, id, binomial, dino = true }) {
     v.addEventListener('error', listo, { once: true });
     setTimeout(listo, 2500);
   });
-  if (falta || v.error) return;
-  await mostrarVideo({ raiz, video: v, binomial, dino });
+  if (falta || v.error) return false;
+  return !!await mostrarVideo({ raiz, video: v, binomial, dino, cerrarTexto });
 }
 
 /**
