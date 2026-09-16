@@ -68,6 +68,8 @@ const NUMERO_DE = {
   [RASGO.MIGRACION]: ['rasgos.migracionRoba', 'cartas que robas al recoger a uno tuyo'],
   [RASGO.CRECIDA_DELTA]: ['rasgos.crecidaAtaqueMax', 'Ataque o menos: el del rival que vuelve a su mano'],
   [RASGO.CANTERA]: ['recursos.canteraBiomasa', 'Biomasa, a cambio de 4 cartas de tu mazo'],
+  [RASGO.INCENDIO]: ['rasgos.incendioHabitat', 'directo al hábitat rival, sin combate'],
+  [RASGO.ACUIFERO]: ['rasgos.acuiferoPorDino', 'al hábitat por cada dinosaurio tuyo, hasta 6'],
 };
 
 const valorDe = (ruta) => ruta.split('.').reduce((o, k) => (o === undefined ? o : o[k]), BALANCE);

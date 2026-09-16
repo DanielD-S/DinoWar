@@ -287,3 +287,60 @@ test('La Ceniza y el Sedimento muerden el mazo rival, y sólo el rival', () => {
   assert.equal(u.jugadores[1].mazo.length, suyoT - sedimentoMazo);
   assert.equal(u.jugadores[1].mano.length, 4 - sedimentoMano);
 });
+
+// -------------------------------------------------- la ronda del HÁBITAT
+
+test('El Incendio pega al hábitat rival y a nadie más', () => {
+  const s = tablero();
+  const suyo = poner(s, 'apatosaurus', 1, 0);
+  const antes = s.jugadores[1].habitat;
+  const r = soltar(s, 'incendio');
+  assert.equal(r.jugadores[1].habitat, antes - BALANCE.rasgos.incendioHabitat);
+  assert.equal(r.jugadores[0].habitat, antes, 'el tuyo no se toca');
+  assert.equal(r.instancias[suyo].heridas, 0, 'y no pasa por el combate');
+});
+
+test('El Acuífero escala con TU campo, no con el suyo, y tiene tope', () => {
+  const { acuiferoPorDino: por, acuiferoTope: tope } = BALANCE.rasgos;
+
+  // Con el campo vacío no hace nada: es el premio por haber ganado la mesa.
+  const vacio = tablero();
+  assert.equal(soltar(vacio, 'acuifero').jugadores[1].habitat, BALANCE.vidaHabitat);
+
+  // Dos tuyos: dos tramos.
+  const s = tablero();
+  poner(s, 'troodon', 0, 0);
+  poner(s, 'troodon', 0, 1);
+  poner(s, 'allosaurus', 1, 0);   // los suyos no cuentan
+  poner(s, 'allosaurus', 1, 1);
+  assert.equal(soltar(s, 'acuifero').jugadores[1].habitat, BALANCE.vidaHabitat - 2 * por);
+
+  // Y el campo lleno corta en el tope: sin él, cuatro carriles son ocho de
+  // hábitat gratis y la carta deja de ser una carta.
+  const lleno = tablero();
+  for (let k = 0; k < 4; k++) poner(lleno, 'troodon', 0, k);
+  const r = soltar(lleno, 'acuifero');
+  assert.equal(r.jugadores[1].habitat, BALANCE.vidaHabitat - tope);
+  assert.ok(4 * por > tope, 'si el tope no mordiera, este test no probaría nada');
+});
+
+test('La guardia de los blindados resta a CADA golpe, no al total', () => {
+  // Es lo que separa la defensa de verdad de curar al entrar: contra cuatro
+  // golpes por turno, restar 2 a cada uno son 8, y curar 4 son 4 y una vez.
+  const s = tablero();
+  const muro = poner(s, 'borealopelta', 0, 0);
+  assert.equal(CARTAS.borealopelta.mecanica.guardia.habitat, 2);
+  assert.equal(CARTAS.zuul.mecanica.guardia.habitat, 1);
+  assert.notEqual(muro, null);
+
+  // Y curar SÍ sube el hábitat, pero no por encima del tope.
+  const t = tablero();
+  t.jugadores[0].habitat -= 6;
+  const iid = t.siguienteInstId;
+  const enLaMano = enMano(t, 'sauropelta', 0);
+  t.jugadores[0].pendientes.push({ tipo: 'DESPLIEGUE', iid: enLaMano, ranura: 0 });
+  t.jugadores[0].mano = t.jugadores[0].mano.filter((x) => x !== enLaMano);
+  const r = ejecutar(t, FASE.REVELACION);
+  assert.equal(r.jugadores[0].habitat, BALANCE.vidaHabitat - 2, 'recupera 4 de los 6');
+  assert.ok(iid <= enLaMano);
+});

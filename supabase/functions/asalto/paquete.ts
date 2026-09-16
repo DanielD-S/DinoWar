@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: 633e7bc7483020f3
+// huella: 0622a7450f4fe32e
 //
 // Lleva dentro estos 24 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -237,6 +237,9 @@ var RASGO = Object.freeze({
   MIGRACION: "MIGRACION",
   CRECIDA_DELTA: "CRECIDA_DELTA",
   CANTERA: "CANTERA",
+  // La ronda del hábitat: daño directo a la vía que no tenía mazo.
+  INCENDIO: "INCENDIO",
+  ACUIFERO: "ACUIFERO",
   // pulsos
   REBROTE: "REBROTE",
   CARRONA: "CARRONA",
@@ -828,6 +831,33 @@ var CARTAS = Object.freeze({
     rasgoTexto: "+3 Biomasa ahora mismo. Pierdes 4 cartas de tu mazo.",
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Abrir una cantera es destruir el yacimiento para llegar a lo que tiene dentro: cada bloque que sale es contexto que se pierde. Es el intercambio que hace toda excavaci\xF3n, y el que hace esta carta."
+  }),
+  // La ronda del HÁBITAT, lado soporte. Dos eventos para la vía que no tenía
+  // ninguno: el set llevaba TRES copias de daño directo contra un hábitat
+  // de 70, o sea que no había paquete que construir.
+  incendio: evento({
+    id: "incendio",
+    rareza: RAREZA.RARO,
+    binomial: "Incendio estacional",
+    coste: 2,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.INCENDIO,
+    rasgoNombre: "Incendio estacional",
+    rasgoTexto: "Golpea 5 al h\xE1bitat de tu rival.",
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "El fusinita \u2014carb\xF3n vegetal f\xF3sil\u2014 aparece en toda la Morrison y es la firma de un incendio: madera quemada a alta temperatura y enterrada despu\xE9s. Con una estaci\xF3n seca larga y tormenta el\xE9ctrica al final, el fuego era parte del ciclo, no una cat\xE1strofe."
+  }),
+  acuifero: evento({
+    id: "acuifero",
+    rareza: RAREZA.EPICO,
+    binomial: "Colapso del acu\xEDfero",
+    coste: 3,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.ACUIFERO,
+    rasgoNombre: "Colapso del acu\xEDfero",
+    rasgoTexto: "Golpea 2 al h\xE1bitat de tu rival por cada dinosaurio tuyo en juego, hasta 6.",
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: "Los saur\xF3podos de la Morrison beb\xEDan de charcas alimentadas por el nivel fre\xE1tico, y una manada grande las agota antes de que se repongan. El pisoteo que compacta el suelo alrededor de un punto de agua est\xE1 documentado en herb\xEDvoros grandes actuales; para el Jur\xE1sico se infiere de los niveles de huellas."
   }),
   // ------------------------------------------------------------- recursos
   rebrote: recurso({
@@ -1988,6 +2018,108 @@ var CARTAS = Object.freeze({
     nivel_evidencia: EVIDENCIA.DEBATIDO,
     nota_cientifica: "Ter\xF3podo del Cenomaniense de Marruecos, descrito en 1996 sobre un esqueleto sin cr\xE1neo. Las extremidades traseras son largas y gr\xE1ciles, de donde sale su nombre y la idea de que corr\xEDa; a qu\xE9 familia pertenece y si el material es de un solo animal se sigue discutiendo."
   }),
+  // ---------------------------------------------- la ronda del HÁBITAT
+  //
+  // Cinco criaturas (16-09-2026) para la única de las tres vías de victoria
+  // que no tenía mazo posible. El set entero llevaba TRES copias de daño
+  // directo al hábitat contra los 70 que hay que bajar, así que esa vía se
+  // ganaba de rebote —cuando el muro no llegaba— y nunca a propósito.
+  //
+  // Y vienen con su contrapeso, que es la lección del Entierro: si sólo se
+  // añade el ataque, la vía no se abre, se dispara. Los tres tireóforos de
+  // abajo son la respuesta, y la GUARDIA es la pieza que de verdad defiende
+  // —resta a cada golpe, todos los turnos— mientras que curar al entrar es un
+  // extra pegado a un cuerpo que ya querías jugar.
+  patagotitan: dino({
+    id: "patagotitan",
+    rareza: RAREZA.LEGENDARIO,
+    clado: CLADO.SAUROPODO,
+    binomial: "Patagotitan mayorum",
+    coste: 4,
+    ataque: 4,
+    vida: 13,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "El peso que hunde la llanura",
+    rasgoTexto: "Cuando entra en juego golpea 4 al h\xE1bitat de tu rival.",
+    mecanica: Object.freeze({ entrada: { golpeHabitat: 4 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Titanosaurio del Albiense de Chubut, Argentina, descrito en 2017 sobre seis ejemplares de un mismo yacimiento. Es de los dinosaurios mejor conocidos entre los m\xE1s grandes: la mayor\xEDa de los gigantes se describen con un hueso suelto y \xE9ste tiene esqueleto."
+  }),
+  dreadnoughtus: dino({
+    id: "dreadnoughtus",
+    rareza: RAREZA.EPICO,
+    clado: CLADO.SAUROPODO,
+    binomial: "Dreadnoughtus schrani",
+    coste: 4,
+    ataque: 4,
+    vida: 11,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Paso que abre el cauce",
+    rasgoTexto: "Cuando entra en juego golpea 3 al h\xE1bitat de tu rival.",
+    mecanica: Object.freeze({ entrada: { golpeHabitat: 3 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Titanosaurio del Campaniense de Santa Cruz, Argentina. El holotipo conserva alrededor del 70 % del esqueleto sin contar el cr\xE1neo, una proporci\xF3n rar\xEDsima en un saur\xF3podo gigante, y las suturas indican que a\xFAn no hab\xEDa terminado de crecer."
+  }),
+  hatzegopteryx: dino({
+    id: "hatzegopteryx",
+    rareza: RAREZA.RARO,
+    clado: CLADO.PTEROSAURIO,
+    binomial: "Hatzegopteryx thambema",
+    coste: 3,
+    ataque: 5,
+    vida: 3,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Cazador de la isla",
+    rasgoTexto: "Cuando entra en juego golpea 2 al h\xE1bitat de tu rival.",
+    mecanica: Object.freeze({ entrada: { golpeHabitat: 2 } }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: "Azd\xE1rquido del Maastrichtiense de la isla de Hateg, Ruman\xEDa, con diez metros de envergadura. El cuello es corto y robusto \u2014al rev\xE9s que en sus parientes\u2014 y de ah\xED se infiere que cazaba presas grandes: en aquella isla enana no hab\xEDa ter\xF3podos que le hicieran competencia."
+  }),
+  borealopelta: dino({
+    id: "borealopelta",
+    rareza: RAREZA.EPICO,
+    clado: CLADO.TIREOFORO,
+    binomial: "Borealopelta markmitchelli",
+    coste: 3,
+    ataque: 1,
+    vida: 9,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Coraza de la marea",
+    rasgoTexto: "Resta 2 a cada golpe que llegue a tu h\xE1bitat.",
+    mecanica: Object.freeze({ guardia: { habitat: 2 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Nodos\xE1urido del Albiense de Alberta, conservado boca arriba en sedimento marino con la piel, los osteodermos en su sitio y el contenido estomacal dentro. Es probablemente el dinosaurio mejor conservado que se ha encontrado; hasta se le ha medido el patr\xF3n de contrasombreado."
+  }),
+  zuul: dino({
+    id: "zuul",
+    rareza: RAREZA.RARO,
+    clado: CLADO.TIREOFORO,
+    binomial: "Zuul crurivastator",
+    coste: 2,
+    ataque: 2,
+    vida: 6,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Destrozador de espinillas",
+    rasgoTexto: "Resta 1 a cada golpe que llegue a tu h\xE1bitat.",
+    mecanica: Object.freeze({ guardia: { habitat: 1 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Anquilos\xE1urido del Campaniense de Montana, con cr\xE1neo y cola completos. El ep\xEDteto \u2014\xABdestrozador de espinillas\xBB\u2014 viene del mazo caudal, y varios de sus osteodermos muestran lesiones curadas compatibles con combate entre individuos de la misma especie."
+  }),
+  sauropelta: dino({
+    id: "sauropelta",
+    rareza: RAREZA.RARO,
+    clado: CLADO.TIREOFORO,
+    binomial: "Sauropelta edwardsorum",
+    coste: 3,
+    ataque: 2,
+    vida: 7,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Repliegue tras las p\xFAas",
+    rasgoTexto: "Cuando entra en juego tu h\xE1bitat recupera 4.",
+    mecanica: Object.freeze({ entrada: { curaHabitat: 4 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Nodos\xE1urido del Aptiense-Albiense de Wyoming y Montana. Lleva una hilera de p\xFAas c\xF3nicas que crecen de tama\xF1o hacia el cuello, las m\xE1s largas de casi medio metro: una defensa que no requiere moverse del sitio."
+  }),
   // ------------------------------------------------------------- biomasa
   // La única carta que no se juega para HACER algo, sino para poder hacerlo:
   // da Biomasa y te cuesta una carta de tu propio mazo. Es la decisión que la
@@ -2452,8 +2584,20 @@ var BALANCE = Object.freeze({
     estampidaAtaqueMax: 2,
     // vuelven a la mano los de ESE Ataque o menos
     migracionRoba: 1,
-    crecidaAtaqueMax: 6
+    crecidaAtaqueMax: 6,
     // el del rival que se devuelve, como mucho
+    // La ronda del HÁBITAT. Es la única de las tres vías de victoria para la
+    // que no se podía construir: el set entero tenía TRES copias de daño
+    // directo contra un hábitat de 70, así que se ganaba por ahí de rebote
+    // —cuando el muro no llegaba— y nunca a propósito.
+    incendioHabitat: 5,
+    acuiferoPorDino: 2,
+    // por cada dinosaurio TUYO en juego
+    // El tope MUERDE: con cuatro carriles, 2 por dinosaurio da 8 como máximo,
+    // así que un tope de 8 era un campo puesto y no leído —lo cazó su propio
+    // test—. A 6 se llega con tres, y el cuarto ya no suma: la carta paga por
+    // haber ganado la mesa, no por llenarla hasta el último hueco.
+    acuiferoTope: 6
   }),
   // Cartas de recurso: Biomasa inmediata con inconveniente. Atacan el atasco de mano,
   // que venía de robar 2 por turno con una renta de 1 acumulativo.
@@ -3720,6 +3864,14 @@ function aplicarPresion(s, p) {
     const suyos = unidadesDe(s, contrario).filter((u) => carta(u.cardId).ataque <= tope && alcanzable(u.iid)).sort((a, b) => carta(b.cardId).ataque - carta(a.cardId).ataque || a.iid - b.iid);
     if (suyos[0]) devolverAMano(s, suyos[0].iid);
     ev(s, "PRESION", { jugador: p.jugador, cardId });
+  } else if (r === RASGO.INCENDIO) {
+    golpearHabitat(s, contrario, BALANCE.rasgos.incendioHabitat);
+    ev(s, "PRESION", { jugador: p.jugador, cardId });
+  } else if (r === RASGO.ACUIFERO) {
+    const { acuiferoPorDino, acuiferoTope } = BALANCE.rasgos;
+    const dano = Math.min(acuiferoTope, unidadesDe(s, p.jugador).length * acuiferoPorDino);
+    golpearHabitat(s, contrario, dano);
+    ev(s, "PRESION", { jugador: p.jugador, cardId, dano });
   } else if (r === RASGO.BARRERA_TRONCOS) {
     const mia = s.jugadores[p.jugador].mano.filter((iid) => iid !== p.iid).length;
     const doble = s.jugadores[contrario].mano.length > mia;
@@ -4596,6 +4748,11 @@ function valorDeAccion(vista, j, a) {
       } else if (r === RASGO.CRECIDA_DELTA) {
         const cabe = unidadesDe(vista, contrario).filter((u) => carta(u.cardId).ataque <= BALANCE.rasgos.crecidaAtaqueMax);
         delta = cabe.length > 0 ? 2.2 : 0;
+      } else if (r === RASGO.INCENDIO) {
+        delta = BALANCE.rasgos.incendioHabitat * IA.pesoHabitat;
+      } else if (r === RASGO.ACUIFERO) {
+        const { acuiferoPorDino, acuiferoTope } = BALANCE.rasgos;
+        delta = Math.min(acuiferoTope, unidadesDe(vista, j).length * acuiferoPorDino) * IA.pesoHabitat;
       } else if (r === RASGO.DERIVA_ARIDA) {
         const mia = vista.jugadores[j].mano.filter((iid) => iid !== a.iid);
         const impagables = mia.filter((iid) => carta(vista.instancias[iid].cardId).coste > vista.jugadores[j].biomasa + 2).length;

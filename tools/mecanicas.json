@@ -101,6 +101,16 @@
       "sentido": "cartas de mazo que pierde el rival"
     },
     {
+      "rasgo": "ACUIFERO",
+      "nombre": "Colapso del acuífero",
+      "cartas": 1,
+      "quienes": "Colapso del acuífero",
+      "texto": "Golpea 2 al hábitat de tu rival por cada dinosaurio tuyo en juego, hasta 6.",
+      "constante": "rasgos.acuiferoPorDino",
+      "valor": 2,
+      "sentido": "al hábitat por cada dinosaurio tuyo, hasta 6"
+    },
+    {
       "rasgo": "COMPETENCIA",
       "nombre": "Competencia trófica",
       "cartas": 1,
@@ -229,6 +239,16 @@
       "constante": "rasgos.gregarismoAtaque",
       "valor": 1,
       "sentido": "Ataque a toda la especie"
+    },
+    {
+      "rasgo": "INCENDIO",
+      "nombre": "Incendio estacional",
+      "cartas": 1,
+      "quienes": "Incendio estacional",
+      "texto": "Golpea 5 al hábitat de tu rival.",
+      "constante": "rasgos.incendioHabitat",
+      "valor": 5,
+      "sentido": "directo al hábitat rival, sin combate"
     },
     {
       "rasgo": "LAGO",
@@ -447,9 +467,16 @@
     {
       "campo": "entrada",
       "forma": "Al entrar · curaHabitat",
-      "cartas": 4,
-      "quienes": "Diplodocus carnegii, Apatosaurus louisae, Loricatosaurus priscus, Shuangmiaosaurus gilmorei",
+      "cartas": 5,
+      "quienes": "Diplodocus carnegii, Apatosaurus louisae, Loricatosaurus priscus, Shuangmiaosaurus gilmorei, Sauropelta edwardsorum",
       "ejemplo": "Cuando entra en juego tu hábitat recupera 1 punto."
+    },
+    {
+      "campo": "entrada",
+      "forma": "Al entrar · golpeHabitat",
+      "cartas": 5,
+      "quienes": "Carcharodontosaurus saharicus, Tupandactylus imperator, Patagotitan mayorum, Dreadnoughtus schrani, Hatzegopteryx thambema",
+      "ejemplo": "Cuando entra en juego golpea 3 al hábitat de tu rival."
     },
     {
       "campo": "entrada",
@@ -478,13 +505,6 @@
       "cartas": 2,
       "quienes": "Giraffatitan brancai, Deltadromeus agilis",
       "ejemplo": "Cuando entra en juego devuelve a la mano 1 dinosaurio tuyo y 1 del rival de 4 o menos de Ataque."
-    },
-    {
-      "campo": "entrada",
-      "forma": "Al entrar · golpeHabitat",
-      "cartas": 2,
-      "quienes": "Carcharodontosaurus saharicus, Tupandactylus imperator",
-      "ejemplo": "Cuando entra en juego golpea 3 al hábitat de tu rival."
     },
     {
       "campo": "entrada",
@@ -573,8 +593,8 @@
     {
       "campo": "guardia",
       "forma": "Guardia del hábitat",
-      "cartas": 1,
-      "quienes": "Elasmosaurus platyurus",
+      "cartas": 3,
+      "quienes": "Elasmosaurus platyurus, Borealopelta markmitchelli, Zuul crurivastator",
       "ejemplo": "Resta 1 a cada golpe que llegue a tu hábitat."
     },
     {
@@ -761,16 +781,16 @@
     },
     {
       "clado": "Tireóforo",
-      "cartas": 9,
-      "ataque": "1.4",
-      "vida": "5.8",
+      "cartas": 12,
+      "ataque": "1.5",
+      "vida": "6.2",
       "regla": "sin regla propia"
     },
     {
       "clado": "Saurópodo",
-      "cartas": 13,
-      "ataque": "2.2",
-      "vida": "9.1",
+      "cartas": 15,
+      "ataque": "2.5",
+      "vida": "9.5",
       "regla": "sin regla propia"
     },
     {
@@ -782,9 +802,9 @@
     },
     {
       "clado": "Pterosaurio",
-      "cartas": 4,
-      "ataque": "3.0",
-      "vida": "3.5",
+      "cartas": 5,
+      "ataque": "3.4",
+      "vida": "3.4",
       "regla": "sin regla propia"
     },
     {

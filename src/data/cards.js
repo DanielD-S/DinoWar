@@ -162,6 +162,9 @@ export const RASGO = Object.freeze({
   MIGRACION: 'MIGRACION',
   CRECIDA_DELTA: 'CRECIDA_DELTA',
   CANTERA: 'CANTERA',
+  // La ronda del hábitat: daño directo a la vía que no tenía mazo.
+  INCENDIO: 'INCENDIO',
+  ACUIFERO: 'ACUIFERO',
   // pulsos
   REBROTE: 'REBROTE',
   CARRONA: 'CARRONA',
@@ -641,6 +644,28 @@ export const CARTAS = Object.freeze({
     rasgoTexto: '+3 Biomasa ahora mismo. Pierdes 4 cartas de tu mazo.',
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Abrir una cantera es destruir el yacimiento para llegar a lo que tiene dentro: cada bloque que sale es contexto que se pierde. Es el intercambio que hace toda excavación, y el que hace esta carta.',
+  }),
+
+  // La ronda del HÁBITAT, lado soporte. Dos eventos para la vía que no tenía
+  // ninguno: el set llevaba TRES copias de daño directo contra un hábitat
+  // de 70, o sea que no había paquete que construir.
+
+  incendio: evento({
+    id: 'incendio', rareza: RAREZA.RARO, binomial: 'Incendio estacional', coste: 2,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.INCENDIO, rasgoNombre: 'Incendio estacional',
+    rasgoTexto: 'Golpea 5 al hábitat de tu rival.',
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'El fusinita —carbón vegetal fósil— aparece en toda la Morrison y es la firma de un incendio: madera quemada a alta temperatura y enterrada después. Con una estación seca larga y tormenta eléctrica al final, el fuego era parte del ciclo, no una catástrofe.',
+  }),
+
+  acuifero: evento({
+    id: 'acuifero', rareza: RAREZA.EPICO, binomial: 'Colapso del acuífero', coste: 3,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.ACUIFERO, rasgoNombre: 'Colapso del acuífero',
+    rasgoTexto: 'Golpea 2 al hábitat de tu rival por cada dinosaurio tuyo en juego, hasta 6.',
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: 'Los saurópodos de la Morrison bebían de charcas alimentadas por el nivel freático, y una manada grande las agota antes de que se repongan. El pisoteo que compacta el suelo alrededor de un punto de agua está documentado en herbívoros grandes actuales; para el Jurásico se infiere de los niveles de huellas.',
   }),
 
   // ------------------------------------------------------------- recursos
@@ -1529,6 +1554,91 @@ export const CARTAS = Object.freeze({
     mecanica: Object.freeze({ entrada: { devuelve: { rival: 1, ataqueMax: 4 } } }),
     nivel_evidencia: EVIDENCIA.DEBATIDO,
     nota_cientifica: 'Terópodo del Cenomaniense de Marruecos, descrito en 1996 sobre un esqueleto sin cráneo. Las extremidades traseras son largas y gráciles, de donde sale su nombre y la idea de que corría; a qué familia pertenece y si el material es de un solo animal se sigue discutiendo.',
+  }),
+
+  // ---------------------------------------------- la ronda del HÁBITAT
+  //
+  // Cinco criaturas (16-09-2026) para la única de las tres vías de victoria
+  // que no tenía mazo posible. El set entero llevaba TRES copias de daño
+  // directo al hábitat contra los 70 que hay que bajar, así que esa vía se
+  // ganaba de rebote —cuando el muro no llegaba— y nunca a propósito.
+  //
+  // Y vienen con su contrapeso, que es la lección del Entierro: si sólo se
+  // añade el ataque, la vía no se abre, se dispara. Los tres tireóforos de
+  // abajo son la respuesta, y la GUARDIA es la pieza que de verdad defiende
+  // —resta a cada golpe, todos los turnos— mientras que curar al entrar es un
+  // extra pegado a un cuerpo que ya querías jugar.
+
+  patagotitan: dino({
+    id: 'patagotitan', rareza: RAREZA.LEGENDARIO, clado: CLADO.SAUROPODO,
+    binomial: 'Patagotitan mayorum',
+    coste: 4, ataque: 4, vida: 13,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'El peso que hunde la llanura',
+    rasgoTexto: 'Cuando entra en juego golpea 4 al hábitat de tu rival.',
+    mecanica: Object.freeze({ entrada: { golpeHabitat: 4 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Titanosaurio del Albiense de Chubut, Argentina, descrito en 2017 sobre seis ejemplares de un mismo yacimiento. Es de los dinosaurios mejor conocidos entre los más grandes: la mayoría de los gigantes se describen con un hueso suelto y éste tiene esqueleto.',
+  }),
+
+  dreadnoughtus: dino({
+    id: 'dreadnoughtus', rareza: RAREZA.EPICO, clado: CLADO.SAUROPODO,
+    binomial: 'Dreadnoughtus schrani',
+    coste: 4, ataque: 4, vida: 11,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Paso que abre el cauce',
+    rasgoTexto: 'Cuando entra en juego golpea 3 al hábitat de tu rival.',
+    mecanica: Object.freeze({ entrada: { golpeHabitat: 3 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Titanosaurio del Campaniense de Santa Cruz, Argentina. El holotipo conserva alrededor del 70 % del esqueleto sin contar el cráneo, una proporción rarísima en un saurópodo gigante, y las suturas indican que aún no había terminado de crecer.',
+  }),
+
+  hatzegopteryx: dino({
+    id: 'hatzegopteryx', rareza: RAREZA.RARO, clado: CLADO.PTEROSAURIO,
+    binomial: 'Hatzegopteryx thambema',
+    coste: 3, ataque: 5, vida: 3,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Cazador de la isla',
+    rasgoTexto: 'Cuando entra en juego golpea 2 al hábitat de tu rival.',
+    mecanica: Object.freeze({ entrada: { golpeHabitat: 2 } }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: 'Azdárquido del Maastrichtiense de la isla de Hateg, Rumanía, con diez metros de envergadura. El cuello es corto y robusto —al revés que en sus parientes— y de ahí se infiere que cazaba presas grandes: en aquella isla enana no había terópodos que le hicieran competencia.',
+  }),
+
+  borealopelta: dino({
+    id: 'borealopelta', rareza: RAREZA.EPICO, clado: CLADO.TIREOFORO,
+    binomial: 'Borealopelta markmitchelli',
+    coste: 3, ataque: 1, vida: 9,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Coraza de la marea',
+    rasgoTexto: 'Resta 2 a cada golpe que llegue a tu hábitat.',
+    mecanica: Object.freeze({ guardia: { habitat: 2 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Nodosáurido del Albiense de Alberta, conservado boca arriba en sedimento marino con la piel, los osteodermos en su sitio y el contenido estomacal dentro. Es probablemente el dinosaurio mejor conservado que se ha encontrado; hasta se le ha medido el patrón de contrasombreado.',
+  }),
+
+  zuul: dino({
+    id: 'zuul', rareza: RAREZA.RARO, clado: CLADO.TIREOFORO,
+    binomial: 'Zuul crurivastator',
+    coste: 2, ataque: 2, vida: 6,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Destrozador de espinillas',
+    rasgoTexto: 'Resta 1 a cada golpe que llegue a tu hábitat.',
+    mecanica: Object.freeze({ guardia: { habitat: 1 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Anquilosáurido del Campaniense de Montana, con cráneo y cola completos. El epíteto —«destrozador de espinillas»— viene del mazo caudal, y varios de sus osteodermos muestran lesiones curadas compatibles con combate entre individuos de la misma especie.',
+  }),
+
+  sauropelta: dino({
+    id: 'sauropelta', rareza: RAREZA.RARO, clado: CLADO.TIREOFORO,
+    binomial: 'Sauropelta edwardsorum',
+    coste: 3, ataque: 2, vida: 7,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Repliegue tras las púas',
+    rasgoTexto: 'Cuando entra en juego tu hábitat recupera 4.',
+    mecanica: Object.freeze({ entrada: { curaHabitat: 4 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Nodosáurido del Aptiense-Albiense de Wyoming y Montana. Lleva una hilera de púas cónicas que crecen de tamaño hacia el cuello, las más largas de casi medio metro: una defensa que no requiere moverse del sitio.',
   }),
 
   // ------------------------------------------------------------- biomasa

@@ -378,6 +378,16 @@ function valorDeAccion(vista, j, a) {
           .filter((u) => carta(u.cardId).ataque <= BALANCE.rasgos.crecidaAtaqueMax);
         delta = cabe.length > 0 ? 2.2 : 0;
 
+      // La ronda del hábitat. Se tasa como `curaHabitat` y el golpe al entrar:
+      // por `IA.pesoHabitat`, que es lo que vale un punto de hábitat rival.
+      } else if (r === RASGO.INCENDIO) {
+        delta = BALANCE.rasgos.incendioHabitat * IA.pesoHabitat;
+
+      } else if (r === RASGO.ACUIFERO) {
+        const { acuiferoPorDino, acuiferoTope } = BALANCE.rasgos;
+        delta = Math.min(acuiferoTope, unidadesDe(vista, j).length * acuiferoPorDino)
+          * IA.pesoHabitat;
+
       } else if (r === RASGO.DERIVA_ARIDA) {
         // Vale cuando el rival tiene más mano que tú, o la tuya no se puede
         // pagar: lo que se suelta no se pierde, se cambia.
