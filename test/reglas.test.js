@@ -12,7 +12,10 @@ import {
 } from '../src/engine/state.js';
 import { decidir } from '../src/engine/ai.js';
 import { semilla } from '../src/engine/rng.js';
-import { limiteDe } from '../src/data/coleccion.js';
+import {
+  limiteDe, validarMazo, mazoPorDefecto, legendariasDinoEn, esLegendariaDino,
+  LEGENDARIAS_DINO_MAX,
+} from '../src/data/coleccion.js';
 import { reduce, ACCION, avanzar, validar } from '../src/engine/actions.js';
 import { tablero, poner, enMano, ejecutar, vivo } from './helpers.js';
 
@@ -725,6 +728,29 @@ test('Con el mazo en las últimas la IA deja de molerse', () => {
 
   const jugada = decidir(vistaDe(s, 0), 0, semilla(1));
   assert.notEqual(jugada?.tipo, ACCION.BIOMASA, 'con el mazo corto no la baja');
+});
+
+test('Un mazo lleva como mucho tres criaturas legendarias, contando las de jefe', () => {
+  // El tope por carta ya es 1, así que sin un tope de FAMILIA quien tuviera la
+  // colección entera metía las nueve legendarias del set más las de jefe.
+  assert.equal(LEGENDARIAS_DINO_MAX, BALANCE.legendariasDinoPorMazo);
+
+  // Criatura Y legendaria. Las de soporte no cuentan aunque sean legendarias:
+  // lo que se acumula es el cuerpo, no el efecto.
+  assert.ok(esLegendariaDino('tyrannosaurus'));
+  assert.ok(esLegendariaDino('jefe_saurophaganax'), 'las de jefe también son legendarias de criatura');
+  assert.ok(!esLegendariaDino('aridez'), 'la Sequía es legendaria y no es una criatura');
+  assert.ok(!esLegendariaDino('manantial'));
+  assert.ok(!esLegendariaDino('allosaurus'));
+
+  // El mazo de referencia cabe, y sumarle una cuarta legendaria no.
+  const base = mazoPorDefecto();
+  assert.ok(validarMazo(base, base).valido, 'el mazo de referencia deja de ser legal');
+  const cuatro = { ...base, tyrannosaurus: 1, mosasaurus: 1, spinosaurus: 1 };
+  assert.equal(legendariasDinoEn(cuatro), 4);
+  const v = validarMazo(cuatro, cuatro);
+  assert.ok(!v.valido);
+  assert.ok(v.problemas.some((x) => /criaturas legendarias/.test(x)), v.problemas.join(' | '));
 });
 
 test('Una carta puede traer su propio tope de copias, por encima de su rareza', () => {

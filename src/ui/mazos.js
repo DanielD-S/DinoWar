@@ -22,7 +22,10 @@
 import {
   CARTAS, CARTAS_DE_JEFE, RAREZA, RAREZA_NOMBRE, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, carta,
 } from '../data/cards.js';
-import { TAM_MAZO, limiteDe, validarMazo } from '../data/coleccion.js';
+import {
+  TAM_MAZO, LEGENDARIAS_DINO_MAX, limiteDe, validarMazo,
+  esLegendariaDino, legendariasDinoEn,
+} from '../data/coleccion.js';
 import { cargarPerfil } from './almacen.js';
 import { guardarMazo, usarMazo, borrarMazo } from './perfil.js';
 import { fichaHTML, abrirFicha, cartaHTML } from './render.js';
@@ -274,13 +277,27 @@ function soltarLargo() {
 }
 
 /**
+ * Copias de esta carta que caben AHORA MISMO en el mazo que se edita: su tope
+ * por rareza, lo que tienes, y —si es criatura legendaria— lo que queda del
+ * tope de familia. El presupuesto se suma a lo que la carta YA lleva puesto,
+ * que si no una legendaria metida cuando quedaba sitio se leería «1/0» en
+ * cuanto el mazo se llenara de legendarias.
+ */
+function topeDe(cardId, mazo, p) {
+  const tope = Math.min(limiteDe(cardId), p.cartas[cardId] ?? 0);
+  if (!esLegendariaDino(cardId)) return tope;
+  const n = mazo[cardId] ?? 0;
+  const queda = Math.max(0, LEGENDARIAS_DINO_MAX - legendariasDinoEn(mazo));
+  return Math.min(tope, n + queda);
+}
+
+/**
  * Una celda del editor: la carta con su marco, el contador y el paso. `mal`
- * es una copia de más —por rareza o porque no la tienes— y se ve en la propia
- * carta, no sólo en el aviso de abajo.
+ * es una copia de más —por rareza, por el tope de legendarias o porque no la
+ * tienes— y se ve en la propia carta, no sólo en el aviso de abajo.
  */
 function celda(c, n, p) {
-  const tengo = p.cartas[c.id] ?? 0;
-  const tope = Math.min(limiteDe(c.id), tengo);
+  const tope = topeDe(c.id, editando.cartas, p);
   const mal = n > tope;
   const llena = n >= tope && !mal;
   return `<div class="col-carta mazo-celda rareza-${c.rareza} ${n > 0 ? 'puesta' : ''} ${mal ? 'mal' : ''} ${llena ? 'llena' : ''}"
@@ -314,6 +331,7 @@ function pintarEditor() {
   const base = pestana === 'mazo' ? enMazo : tuyas;
   const lista = base.filter((c) => pasaFiltro(c, f));
   const r = resumenDe(editando.cartas);
+  const leg = legendariasDinoEn(editando.cartas);
   const portada = portadaDe(editando.cartas);
   const emb = emblemaDe(editando.cartas);
   const filtrando = f.grupo || f.rareza || f.coste !== null || f.texto;
@@ -330,6 +348,8 @@ function pintarEditor() {
         </div>
         <div class="mazo-resumen">${emb ? `${emblemaHTML(emb.clave)}${emb.nombre}<span class="sep">·</span>` : ''}
           ${r.criaturas} criaturas<span class="sep">·</span>${r.soporte} soporte<span class="sep">·</span>${r.distintas} distintas
+          <span class="sep">·</span><span class="${leg > LEGENDARIAS_DINO_MAX ? 'mal' : ''}"
+            title="Criaturas legendarias que caben en un mazo">◆ ${leg}/${LEGENDARIAS_DINO_MAX}</span>
         </div>
       </div>
     </div>
@@ -427,7 +447,7 @@ function pintarEditor() {
     }
     if (mas) {
       const c = mas.dataset.mas;
-      const tope = Math.min(limiteDe(c), p.cartas[c] ?? 0);
+      const tope = topeDe(c, editando.cartas, p);
       if ((editando.cartas[c] ?? 0) >= tope) return;
       editando.cartas[c] = (editando.cartas[c] ?? 0) + 1;
       pintarEditor();
@@ -478,7 +498,10 @@ function autocompletar(p) {
     for (const x of disponible) {
       if (total >= TAM_MAZO) break;
       const n = editando.cartas[x.id] ?? 0;
-      if (n >= x.tope) continue;
+      // El tope se vuelve a mirar en cada vuelta y no una vez al principio: el
+      // de las criaturas legendarias es de familia y se va gastando según se
+      // rellena, así que un tope calculado antes del bucle mete cuatro.
+      if (n >= topeDe(x.id, editando.cartas, p)) continue;
       editando.cartas[x.id] = n + 1;
       total += 1;
       movio = true;

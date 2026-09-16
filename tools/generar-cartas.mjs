@@ -115,6 +115,12 @@ export function generar() {
   L.push('  mazos_maximo      int not null');
   L.push(');');
   L.push('');
+  L.push('-- Criaturas legendarias que caben en un mazo, entre todas. La columna');
+  L.push('-- llegó después de la tabla, de ahí el `add column`: sin él una base ya');
+  L.push('-- creada se queda sin ella y `validar_mazo` no puede leer el tope.');
+  L.push('alter table public.catalogo_economia');
+  L.push(`  add column if not exists legendarias_dino_max int not null default ${BALANCE.legendariasDinoPorMazo};`);
+  L.push('');
   L.push('-- El crafteo: cuántas esquirlas da fundir una copia sobrante y cuántas cuesta');
   L.push('-- crear una, por rareza. `fundir_excedente` y `crear_carta` (0029) leen de');
   L.push('-- AQUÍ; el cliente sólo manda el id. Sale de src/data/crafteo.js.');
@@ -198,10 +204,11 @@ export function generar() {
 
   L.push('insert into public.catalogo_economia');
   L.push('  (id, precio_sobre, cartas_por_sobre, monedas_inicio, monedas_victoria,');
-  L.push('   monedas_derrota, tamano_mazo, mazos_maximo)');
+  L.push('   monedas_derrota, tamano_mazo, mazos_maximo, legendarias_dino_max)');
   L.push(`values (1, ${ECONOMIA.precioSobre}, ${ECONOMIA.cartasPorSobre}, `
     + `${ECONOMIA.monedasInicio}, ${ECONOMIA.monedasVictoria}, `
-    + `${ECONOMIA.monedasDerrota}, ${BALANCE.tamanoMazo}, ${MAZOS_MAXIMO})`);
+    + `${ECONOMIA.monedasDerrota}, ${BALANCE.tamanoMazo}, ${MAZOS_MAXIMO}, `
+    + `${BALANCE.legendariasDinoPorMazo})`);
   L.push('on conflict (id) do update set');
   L.push('  precio_sobre = excluded.precio_sobre,');
   L.push('  cartas_por_sobre = excluded.cartas_por_sobre,');
@@ -209,7 +216,8 @@ export function generar() {
   L.push('  monedas_victoria = excluded.monedas_victoria,');
   L.push('  monedas_derrota = excluded.monedas_derrota,');
   L.push('  tamano_mazo = excluded.tamano_mazo,');
-  L.push('  mazos_maximo = excluded.mazos_maximo;');
+  L.push('  mazos_maximo = excluded.mazos_maximo,');
+  L.push('  legendarias_dino_max = excluded.legendarias_dino_max;');
   L.push('');
 
   L.push('-- El catálogo lo lee cualquiera que haya entrado: son las reglas del');

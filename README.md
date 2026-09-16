@@ -100,12 +100,13 @@ que sobra no es una forma de farmear.
 
 Un mazo son 55 cartas exactas y de cada carta caben tantas copias como diga su
 rareza: 3 común, 3 rara, 2 épica, 1 legendaria; la Pradera de helechos admite 7,
-que es lo que se midió. Con 101 cartas distintas no caben ni de lejos todas, que
-es justo lo que hace que construir un mazo signifique algo. Tú llevas el tuyo;
-la IA lleva siempre el de referencia —28 criaturas, 13 eventos, 4 de recurso,
-1 clima y 9 de Biomasa—, que es el único que mide `BALANCE.md`: las 69 cartas
-que se quedan fuera de él se juegan igual, pero su calibración no está
-comprobada.
+que es lo que se midió. Y hay un tope más, de familia: **como mucho 3 criaturas
+legendarias por mazo**, contando las de jefe. Con 101 cartas distintas no caben
+ni de lejos todas, que es justo lo que hace que construir un mazo signifique
+algo. Tú llevas el tuyo; la IA lleva siempre el de referencia —28 criaturas,
+13 eventos, 4 de recurso, 1 clima y 9 de Biomasa—, que es el único que mide
+`BALANCE.md`: las 69 cartas que se quedan fuera de él se juegan igual, pero su
+calibración no está comprobada.
 
 Para probar sin esperar a juntar monedas: `?pruebas=1` en la dirección da sobres
 gratis. No toca el saldo guardado, sólo deja de cobrar.

@@ -25,7 +25,6 @@
 // el mínimo no manda: el oro se mueve cuando llega el hito, como antes.
 
 import { el } from './render.js';
-import { videoDeCarta } from './apertura.js';
 
 const reducido = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -38,77 +37,6 @@ const LENTO_MS = 6000;
 const CARGA = Object.freeze({ minimo: 3600, reducida: 900, oro: 550 });
 
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
-
-// ------------------------------------------------------------------- intro
-//
-// Una cinemática de quince segundos la PRIMERA vez que alguien llega al menú,
-// entre la carga y lo primero que se toca.
-//
-// Una vez, no cada arranque. Un intro que se repite es el que todo el mundo
-// salta, y uno que se salta no vale nada; por eso tampoco hace falta un «no
-// volver a mostrarlo». Con un toque en cualquier parte se va, como la
-// presentación de partida.
-//
-// Empieza a bajar durante la carga, que es tiempo que ya está pasando, y si
-// no ha llegado cuando la carga termina SE VA AL MENÚ SIN ÉL: son 1,2 MB y
-// nadie va a esperar mirando un rectángulo negro. Misma idea que
-// `precargarMusica`, y misma disciplina que el resto del arranque — lo que
-// no está listo no se hace esperar.
-
-const INTRO = 'intro';
-const VISTO = 'dinowar.intro.visto';
-/** Lo que se le espera al vídeo si la carga termina antes que él. */
-const ESPERA_INTRO = 1200;
-
-// Sin localStorage se da por visto: no poder recordar que ya se enseñó es
-// razón para NO enseñarlo, que repetirlo en cada arranque es peor que faltar.
-const introVisto = () => {
-  try { return localStorage.getItem(VISTO) === '1'; } catch { return true; }
-};
-const apuntarIntro = () => {
-  try { localStorage.setItem(VISTO, '1'); } catch { /* se verá otra vez */ }
-};
-
-let bajandoIntro = null;
-
-/**
- * Empieza a traer el intro sin esperarlo. Se llama en cuanto las piezas del
- * menú están, para no competir con lo que la barra de carga sí espera.
- *
- * Un `fetch` y no un `<video>`: lo único que interesa es que entre en la
- * caché —`assets/video/` va de caché primero en el service worker— y que el
- * `<video>` de después lo encuentre ya bajado.
- */
-export function precargarIntro() {
-  if (bajandoIntro || reducido() || introVisto()) return;
-  bajandoIntro = fetch(`assets/video/${INTRO}.mp4`)
-    .then((r) => (r.ok ? r.blob() : null))
-    .then((b) => !!b)
-    .catch(() => false);
-}
-
-/**
- * Enseña el intro si toca. Resuelve enseguida —sin enseñar nada— si ya se vio,
- * si no ha llegado a tiempo o con `prefers-reduced-motion`.
- *
- * Se apunta como visto SÓLO si llegó a verse: si el fichero no está servido,
- * apuntarlo dejaría el intro sin salir nunca el día que se suba.
- *
- * @returns {Promise<boolean>}
- */
-export async function mostrarIntro(raiz) {
-  if (reducido() || introVisto()) return false;
-  const listo = await Promise.race([
-    bajandoIntro ?? Promise.resolve(false),
-    espera(ESPERA_INTRO).then(() => false),
-  ]);
-  if (!listo) return false;
-  const visto = await videoDeCarta({
-    raiz, id: INTRO, binomial: 'DinoWar', dino: false, cerrarTexto: 'Saltar',
-  });
-  if (visto) apuntarIntro();
-  return visto;
-}
 
 /**
  * Deja la marca en pantalla su tiempo y la desvanece. Resuelve cuando ya se

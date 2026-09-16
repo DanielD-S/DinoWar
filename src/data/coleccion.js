@@ -5,7 +5,7 @@
 // navegador. Así las probabilidades y la economía se pueden testear.
 
 import { BALANCE, MAZO, TOTAL_MAZO } from './balance.js';
-import { CARTAS, RAREZA, carta, existeCarta } from './cards.js';
+import { CARTAS, RAREZA, TIPO, carta, existeCarta } from './cards.js';
 
 /** Tamaño exacto de un mazo legal. */
 export const TAM_MAZO = BALANCE.tamanoMazo;
@@ -21,6 +21,33 @@ export const TAM_MAZO = BALANCE.tamanoMazo;
 export const limiteDe = (cardId) => {
   const c = carta(cardId);
   return c.copiasMax ?? BALANCE.copiasPorRareza[c.rareza];
+};
+
+/** Cuántas criaturas legendarias caben en un mazo, entre todas. */
+export const LEGENDARIAS_DINO_MAX = BALANCE.legendariasDinoPorMazo;
+
+/**
+ * ¿Cuenta esta carta para el tope de criaturas legendarias? Es criatura Y
+ * legendaria; las de jefe cumplen las dos cosas y por eso entran, y las
+ * legendarias de soporte —climas, eventos, recursos, Biomasa— no.
+ */
+export const esLegendariaDino = (cardId) => {
+  const c = carta(cardId);
+  return c.tipo === TIPO.DINOSAURIO && c.rareza === RAREZA.LEGENDARIO;
+};
+
+/**
+ * Criaturas legendarias que lleva un mazo, contando copias. Acepta el mapa
+ * {cardId: copias} y la lista de pares, que son las dos formas en que un mazo
+ * viaja por el juego.
+ */
+export const legendariasDinoEn = (mazo) => {
+  const pares = Array.isArray(mazo) ? mazo : Object.entries(mazo);
+  let n = 0;
+  for (const [cardId, copias] of pares) {
+    if (existeCarta(cardId) && copias > 0 && esLegendariaDino(cardId)) n += copias;
+  }
+  return n;
 };
 
 export const ECONOMIA = Object.freeze({
@@ -237,6 +264,11 @@ export function validarMazo(mazo, cartas) {
     if (copias > tengo) {
       problemas.push(`${carta(cardId).binomial}: tienes ${tengo} y el mazo pide ${copias}.`);
     }
+  }
+
+  const legendarias = legendariasDinoEn(mazo);
+  if (legendarias > LEGENDARIAS_DINO_MAX) {
+    problemas.push(`${legendarias} criaturas legendarias: el máximo es ${LEGENDARIAS_DINO_MAX} por mazo.`);
   }
 
   if (total !== TAM_MAZO) {

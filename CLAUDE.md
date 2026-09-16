@@ -424,29 +424,18 @@ la primera visita el logo baja por la red y, contando desde el arranque, la
 mitad del tiempo se iba en pantalla vacía. Con tope, para que una imagen que
 no llega no deje la marca colgada.
 
-**El intro** (`intro.mp4`) va DESPUÉS de la carga y antes de lo primero que se
-toca, y sólo la PRIMERA vez que alguien llega hasta ahí. Cuatro decisiones:
+**El intro se QUITÓ** (16-09-2026). Fue un plano de quince segundos de un
+Allosaurus que se enseñaba una sola vez, entre la carga y el menú, y al autor
+no le convenció: se fueron `intro.mp4`, `precargarIntro()`, `mostrarIntro()` y
+la marca `dinowar.intro.visto` de `localStorage`. Lo que sobrevive de aquello
+es `videoDeCarta()`, que sigue devolviendo si llegó a verse y aceptando el
+rótulo del botón, porque la Cuenca la usa para las cartas de jefe.
 
-- **Una vez, no cada arranque.** Un intro que se repite es el que todo el mundo
-  salta, y uno que se salta no vale nada; por eso no hace falta un «no volver a
-  mostrarlo». La marca va en `localStorage`, y **sin `localStorage` se da por
-  visto**: no poder recordar que ya se enseñó es razón para NO enseñarlo, que
-  repetirlo en cada arranque es peor que faltar.
-- **Empieza a bajar cuando las piezas del menú ya están**, no antes: son 1,2 MB
-  y la barra de carga está esperando esas piezas de verdad. A partir de ahí
-  quedan dos viajes al servidor, que es tiempo de sobra. Es la misma idea que
-  `precargarMusica`.
-- **Y si no ha llegado, al menú sin él** (`ESPERA_INTRO`, 1,2 s). Nadie va a
-  esperar mirando un rectángulo negro, y el arranque de este juego es lo último
-  que conviene alargar.
-- **Se enseña con la pantalla siguiente YA PUESTA debajo.** El vídeo se retira
-  con un fundido; si debajo quedara la carga, se la vería reaparecer medio
-  segundo antes de dar paso al menú.
-
-Reutiliza la capa del sobre tal cual —`videoDeCarta()` de `apertura.js`—, que
-por eso acepta el rótulo del botón y devuelve si llegó a verse: lo visto se
-apunta SÓLO si se vio, para que un fichero que aún no está servido no se marque
-y luego no salga nunca.
+Quien vuelva a proponer una cinemática de arranque tiene el historial completo
+en el git; lo que se aprendió midiendo —que el reloj de la marca arranca cuando
+la imagen está descargada, que un vídeo se pide cuando las piezas del menú ya
+están y que lo que no llega no se hace esperar— sigue valiendo, y está aquí
+abajo.
 
 **La carga** (`#carga`) va mientras el servidor contesta. Antes, con la sesión
 guardada, el arranque no enseñaba nada: todas las pantallas nacen ocultas y el
@@ -671,11 +660,12 @@ el generador entrega bien un plano corto de un bicho, y un plano de paisaje no.
 El código llegó a existir y se deshizo entero (15-09-2026); si alguien vuelve a
 proponerlo, lo que falla no es el sitio donde se enseña, es la pieza.
 
-**El INTRO del arranque es la prueba de que la regla era ésa y no «nada de
-cinemáticas».** Es un plano de quince segundos de un Allosaurus bajando por un
-cauce con niebla al amanecer, que termina con su cabeza llenando el cuadro:
-mismo encuadre que las nueve legendarias, sólo que más largo. Salió bien al
-primer intento. Ver «Lo primero que se ve», más arriba.
+**El INTRO del arranque fue la prueba de que la regla era ésa y no «nada de
+cinemáticas»:** un plano de quince segundos de un Allosaurus bajando por un
+cauce, mismo encuadre que las nueve legendarias y sólo que más largo, y salió
+bien al primer intento. Se quitó igualmente el 16-09-2026 porque al autor no le
+gustó cómo quedaba en el arranque — la pieza estaba bien, el sitio no. Ver «Lo
+primero que se ve», más arriba.
 
 **Las dos cartas de jefe también tienen vídeo**, y se enseña al RECLAMARLAS en
 la Cuenca, antes de la invocación: es la única vez que esa carta «sale», así
@@ -838,6 +828,46 @@ salta. En la primera partida no sale: manda el tutorial.
 - El rival de un duelo sale sin retrato ni emblema: su mazo es secreto.
 - Mismo interruptor de arte que el final (`ARTE_LISTO`), con sus piezas en
   `assets/piel/vs/`. El VS reutiliza el medallón del final.
+
+## Tres criaturas legendarias por mazo, y ni una más
+
+Decisión del autor (16-09-2026). El tope por carta ya era 1, así que hasta ese
+día quien tuviera la colección entera metía las **nueve** legendarias del set
+más las cinco de jefe: catorce cuerpos enormes en 55 cartas, y quien las
+tuviera jugaba otro juego. Ahora `BALANCE.legendariasDinoPorMazo` vale 3 y se
+cuenta entre todas.
+
+Cuatro cosas que conviene saber antes de tocarlo:
+
+- **Es un tope de FAMILIA, no de rareza.** Cuenta lo que es criatura Y
+  legendaria: las de jefe entran —ganarlas cooperando no las hace otra cosa— y
+  las legendarias de soporte no, porque lo que se acumula es el cuerpo. Vive en
+  `esLegendariaDino()` y `legendariasDinoEn()` de `coleccion.js`, con UNA
+  implementación, que es lo mismo que se hizo con `limiteDe()`.
+- **Lo comprueban los dos lados, y por los dos motivos de siempre.** El
+  navegador (`validarMazo`, y el editor, que ya no deja pulsar el «+»), la Edge
+  Function (`validarMazoLegal`) y el SQL (`private.validar_mazo`, 0031). Sin el
+  servidor, un cliente hostil guarda el mazo por la puerta de atrás; sin el
+  navegador, el jugador se come un «no se pudo guardar» sin motivo.
+- **El número no se escribe en el SQL**: sale de
+  `catalogo_economia.legendarias_dino_max`, que pone la 0006 regenerada desde
+  `BALANCE`. Al aplicar: **primero la 0006, luego la 0031**, que la segunda lee
+  esa columna. Y la 0006 la añade con `add column if not exists`, que la tabla
+  ya existe en producción.
+- **La factura, medida antes de cobrarla**: en producción sólo había UN mazo
+  guardado por encima del tope, y es el mazo «PRUEBA» del propio autor con las
+  nueve. Cualquier mazo así deja de poder guardarse y de cobrar partidas hasta
+  que se reedite. Con ocho jugadores es un rato; el día que sean ochocientos,
+  esta clase de cambio pide una migración que los recorte.
+
+Y hubo que tocar un mazo de la IA: **«El último rey» llevaba cuatro** —
+Tyrannosaurus, Ankylosaurus, Edmontosaurus y Mosasaurus—, o sea un mazo que
+ningún jugador podría construir, y un rival de expedición no juega con cartas
+prohibidas. Se fue el único marino de una lista de Hell Creek y entró un
+Alaskacephale, que las dos auras de marginocéfalo del mazo ya estaban puestas.
+Medido con `node sim/expediciones.mjs`, 400 partidas: se le ganaba el 21,8 % y
+se le gana el 24,5 %. Sigue siendo el nodo más duro del juego y la curva no se
+movió de sitio.
 
 ## Los mazos: placas, rejilla y una portada que se calcula
 
@@ -1598,10 +1628,15 @@ carta, un mazo ni lo rápido que se progresa.
 - **La Biomasa NO lleva tope de familia**, y se volvió a decidir el 14-09-2026:
   el autor recordaba «5 por mazo», que son los cinco de cada mazo de jefe. Lo
   medido sigue mandando: con 12 en vez de 7 se gana menos.
-- **El holográfico no se vende**: brilla en las legendarias y las dos de jefe,
-  en todas partes, sólo sobre la ventana de la ilustración (`carta.css`). A
-  opacidad .3 no se veía; va a .55 con `color-dodge` y `isolation` en la
-  ventana, que sin ella se mezclaría con el tablero.
+- **El holográfico se QUITÓ** (16-09-2026, decisión del autor). Era una lámina
+  de arcoíris en `color-dodge` sobre la ventana de la ilustración de las
+  legendarias y las de jefe, en todas partes. Nunca se vendió, así que irse fue
+  borrar su regla de `carta.css` y nadie se queda sin nada comprado.
+  `test/tienda.test.js` vigila ahora que NO esté —ni el `@keyframes`, ni el
+  `::before` sobre la ventana, ni el `isolation` que sólo ella pedía—, que
+  media lámina reaparecida es peor que la lámina entera. El brillo dorado de
+  las legendarias en la colección y en el sobre (`brillo-legendario`, en
+  `style.css`) es OTRA cosa y se queda.
 - **Los packs de sobres** son varios sobres seguidos al precio de uno por
   sobre, sin descuento: con descuento acelerarían el progreso (`PACKS` y
   `precioDePack` en `cosmeticos.js`, con su test; NO en `coleccion.js`, que va

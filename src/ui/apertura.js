@@ -161,8 +161,7 @@ export async function mostrarVideo({
  * Si no existe, resuelve enseguida sin enseñar nada. Con movimiento reducido
  * tampoco se enseña, como la ceremonia.
  *
- * DEVUELVE si llegó a verse. Lo mira quien enseña algo UNA sola vez —el intro
- * del arranque— para no apuntarlo como visto cuando no se vio.
+ * DEVUELVE si llegó a verse, para quien tenga que apuntar que ya se enseñó.
  *
  * @returns {Promise<boolean>}
  */

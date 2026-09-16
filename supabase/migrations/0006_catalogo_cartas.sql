@@ -63,6 +63,12 @@ create table if not exists public.catalogo_economia (
   mazos_maximo      int not null
 );
 
+-- Criaturas legendarias que caben en un mazo, entre todas. La columna
+-- llegó después de la tabla, de ahí el `add column`: sin él una base ya
+-- creada se queda sin ella y `validar_mazo` no puede leer el tope.
+alter table public.catalogo_economia
+  add column if not exists legendarias_dino_max int not null default 3;
+
 -- El crafteo: cuántas esquirlas da fundir una copia sobrante y cuántas cuesta
 -- crear una, por rareza. `fundir_excedente` y `crear_carta` (0029) leen de
 -- AQUÍ; el cliente sólo manda el id. Sale de src/data/crafteo.js.
@@ -629,8 +635,8 @@ delete from public.catalogo_cartas where card_id not in (
 
 insert into public.catalogo_economia
   (id, precio_sobre, cartas_por_sobre, monedas_inicio, monedas_victoria,
-   monedas_derrota, tamano_mazo, mazos_maximo)
-values (1, 100, 5, 240, 50, 0, 55, 12)
+   monedas_derrota, tamano_mazo, mazos_maximo, legendarias_dino_max)
+values (1, 100, 5, 240, 50, 0, 55, 12, 3)
 on conflict (id) do update set
   precio_sobre = excluded.precio_sobre,
   cartas_por_sobre = excluded.cartas_por_sobre,
@@ -638,7 +644,8 @@ on conflict (id) do update set
   monedas_victoria = excluded.monedas_victoria,
   monedas_derrota = excluded.monedas_derrota,
   tamano_mazo = excluded.tamano_mazo,
-  mazos_maximo = excluded.mazos_maximo;
+  mazos_maximo = excluded.mazos_maximo,
+  legendarias_dino_max = excluded.legendarias_dino_max;
 
 -- El catálogo lo lee cualquiera que haya entrado: son las reglas del
 -- juego, no datos de nadie. Escribirlo, sólo las migraciones.
