@@ -191,6 +191,21 @@ export const BALANCE = Object.freeze({
     cauceRoba: 3,
     barreraMazo: 4,             // cartas de mazo que pierde el rival, y otras
                                 // tantas si además tiene más mano que tú
+
+    // La ronda del REBOTE. Tres ideas que el set no tenía: sacar una carta del
+    // campo a la mano, devolver del descarte al MAZO —lo único que alarga un
+    // mazo en todo el juego, y por tanto la primera respuesta a la extinción—
+    // y pegarle al hábitat sin pasar por el combate.
+    cenizaMazo: 6,              // lo que pierde el rival, y nada tú
+    sedimentoMazo: 4,
+    sedimentoMano: 2,
+    osarioEntierra: 2,          // del descarte a tu mazo
+    carronerosEntierra: 1,
+    carronerosRoba: 1,
+    oleadaHabitat: 2,           // directo al hábitat rival
+    estampidaAtaqueMax: 2,      // vuelven a la mano los de ESE Ataque o menos
+    migracionRoba: 1,
+    crecidaAtaqueMax: 6,        // el del rival que se devuelve, como mucho
   }),
 
   // Cartas de recurso: Biomasa inmediata con inconveniente. Atacan el atasco de mano,
@@ -208,6 +223,10 @@ export const BALANCE = Object.freeze({
     manadaPasoMazo: 3,
     frutosBiomasa: 3,
     frutosRobaRival: 1,
+    // El pulso de la ronda del rebote: el más generoso y el que más duele, y
+    // el único cuyo inconveniente es la vía de derrota que el set no usaba.
+    canteraBiomasa: 3,
+    canteraMazo: 4,
   }),
 
   efectosCampo: Object.freeze({
@@ -324,6 +343,13 @@ export const BALANCE = Object.freeze({
     manosNuevas: 0.5,   // le das otras tantas al rival: la mitad del valor
     topeManoRival: 1.2, // se tasa como manoRival, que es lo que hace
     rescata: 1.3,       // una carta a la mano, y elegida entre lo ya perdido
+    // Los tres de la ronda del rebote. Devolver al RIVAL vale bastante más que
+    // recoger lo tuyo: le deshace el turno entero, mientras que lo tuyo sólo
+    // cambia de sitio —y encima te lo tienes que volver a pagar—.
+    devuelvePropio: 0.8,
+    devuelveRival: 2.2,
+    entierra: 0.5,      // alarga tu mazo; poco, salvo cuando ya no queda
+    golpeHabitat: 1,    // se multiplica por ia.pesoHabitat, como curaHabitat
   }),
 
   // --------------------------------------------------------------------- IA

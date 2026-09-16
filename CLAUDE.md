@@ -254,6 +254,96 @@ Y aquí está lo que conviene no volver a aprender:
   mazo de REFERENCIA, que no es un mazo de control. Lo que valen de verdad sólo
   se ve cuando alguien construya el mazo que las quiere, y ése no existe.
 
+**Aplicado y desplegado el 16-09-2026.** Las quince están en `catalogo_cartas`
+y la Edge Function quedó anclada a `4a524c8`, que vive en `main` porque la PR
+#105 se mergeó con MERGE y no con squash. El despliegue se comprobó con la
+receta de `supabase/functions/README.md`: invocada desde la propia base
+contesta `401 {"error":"sesión inválida"}`, que es la prueba de que los once
+importes por URL resolvieron y el código vivo es el nuestro. Del fichero
+desplegado se comprobó antes, byte a byte, que era el anterior con el SHA
+cambiado y nada más: once líneas, las once del anclaje.
+
+## La ronda del rebote: del campo a la mano, y del descarte al mazo
+
+Quince cartas más (16-09-2026) —seis criaturas, dos de ellas legendarias, y
+nueve de soporte— para tres cosas que el juego no sabía hacer. La ronda del
+control aprendió a morder la MANO; ésta aprende a deshacer el CAMPO y a
+deshacer el descarte.
+
+- **El REBOTE**, `entrada.devuelve` y cuatro rasgos de soporte: una carta que
+  está en juego vuelve a la mano de su dueño. Es el primer gesto del juego que
+  deshace un despliegue.
+- **El ENTIERRO**, `entrada.entierra` y dos rasgos: del descarte al MAZO. Es lo
+  ÚNICO que alarga un mazo en todo el juego, y por tanto la primera respuesta
+  que la vía de la extinción ha tenido nunca. Hasta hoy molerte era un daño sin
+  vuelta atrás y por eso nadie temía la vía; ahora tiene con qué pelearse.
+- **El GOLPE AL HÁBITAT**, `entrada.golpeHabitat` y un rasgo: daño directo, sin
+  pasar por el combate. Las cifras son 2 y 3 a propósito: es la vía más corta
+  que hay a una de las tres victorias y no puede salir barata.
+
+Seis decisiones que no se deducen del código:
+
+- **Vuelve LIMPIO.** El rebote hace la misma limpieza que una muerte —heridas,
+  marcas, `modAtaque`— menos las dos cosas que lo separan de morir: no va al
+  descarte y no da trofeo. Se consideró devolverlo herido y no se sostiene: la
+  instancia es la misma pero la carta ya no está en juego, y un Allosaurus que
+  vuelve a la mano herido de 4 sería otra carta distinta de la que salió del
+  sobre. Lo que sí se pierde son las adaptaciones pegadas encima, que caen al
+  descarte como cuando muere quien las llevaba.
+- **Ninguno pregunta**, como todo lo que se resuelve en la revelación. El tuyo
+  que se recoge es **el más herido** —desempate por `iid`— porque es lo que
+  haría el jugador y porque vuelve entero; el del rival es **el que más pega de
+  los que caben bajo el listón**, que es la misma regla que Tijera. Quitarle el
+  pequeño de adorno no sería una carta.
+- **`devuelve` es el único disparo que lleva OBJETO** en vez de número:
+  `{ propio, rival, ataqueMax }`. Son dos cantidades que valen distinto y un
+  FILTRO, y `ataqueMax` no se tasa: un listón alto es una carta que alcanza a
+  más, no una que hace su efecto más veces. Partirlo en tres claves planas
+  habría metido ese filtro en la lista que se tasa multiplicando por su cifra,
+  que es el mismo error que ya tuvo `topeManoRival`.
+- **Devolver al rival vale casi el triple que recoger lo tuyo** (2,2 contra
+  0,8): a él le deshaces el turno y la Biomasa, y lo tuyo sólo cambia de sitio
+  —y encima te lo tienes que volver a pagar—.
+- **El entierro va BARAJADO, no encima del mazo.** Poner cartas conocidas arriba
+  arreglaría el robo de los próximos turnos, que es mucho más de lo que la carta
+  dice, y en un duelo el rival no puede mirar el mazo para comprobarlo.
+- **Y el rebote no encoge la carta.** El tablero es una rejilla: `.carta.rebota`
+  se desvanece en su sitio con `opacity` y `filter`, como manda la regla de los
+  gestos. El vuelo de vuelta a la mano lo hace el fantasma de `render.js`, que
+  va por encima de todo y no compone con esto.
+
+### Medidas, y esta vez sin recostear nada
+
+`node sim/carta.mjs`, 300 partidas cada una. **Las seis criaturas** entre el
+50,3 % y el 60,0 %; **los nueve de soporte**, entre el 45,3 % y el 55,7 %. No
+se tocó ninguna cifra, y eso es un resultado y no una dejadez: con las bandas
+de la tanda anterior delante, las quince caen dentro de la suya.
+
+| banda medida | contra qué se compara |
+|---|---|
+| Legendarias: Tyrannosaurus 63,3 %, Mosasaurus 60,3 % | Carcharodontosaurus 60,0 %, Giraffatitan 59,3 % |
+| Raras: Allosaurus 57,3 %, Iguanodon 56,3 %, Amargasaurus 52,0 % | Ouranosaurus 59,3 %, Rugops 50,3 % |
+| Épicas: Suchomimus 69,3 %, Triceratops 66,3 %, Torvosaurus 62,3 % | Deltadromeus 56,3 %, Tupandactylus 52,7 % |
+| **Molinos: Trampa 46,0 %**, Inundación 52,3 % | Ceniza 45,3 % |
+
+Esa última fila es la que hay que leer dos veces. **La Ceniza mide 45,3 % y la
+Trampa, que lleva meses en el set, mide 46,0 %.** La molienda se tasa por
+debajo del 50 % en el mazo de referencia y no porque las cartas sean malas: es
+que ese mazo gana por hábitat y por trofeos a los once turnos, con la extinción
+en el 0 %, así que quitarle cartas de un mazo que nunca se acaba no hace nada.
+Medir una carta de molienda ahí es medirla en el único sitio donde no sirve.
+
+Lo mismo vale para el ENTIERRO, por el otro lado: Rugops mide 50,3 % y el
+Osario 51,3 % porque alargar un mazo que sobra no cambia ninguna partida. Las
+dos familias —moler y enterrar— sólo dicen su número de verdad cuando exista el
+mazo que las lleva, y ése es el trabajo que sigue.
+
+Un aviso para quien siga: **el rebote de lo PROPIO es un motor de combos**. Una
+carta que vuelve a la mano vuelve a entrar, y cada entrada vuelve a dispararse
+—Ouranosaurus y la Migración existen para eso—. Hoy sale caro, porque volver a
+bajarla cuesta la Biomasa otra vez y el turno entero; el día que haya una forma
+barata de rebotar lo propio, eso deja de ser verdad y hay que medirlo de nuevo.
+
 ## Las diez cartas de Biomasa son las tierras, y se autolimitan
 
 Siete comunes que hacen lo mismo con otra ilustración, dos épicas de +2 y una
@@ -1823,17 +1913,20 @@ Dicho para que nadie lo descubra tarde:
 - **El balance cumple 3 de 6** (`BALANCE.md`, mazo de referencia del 13-09-2026):
   cero cartas descalibradas y las vías en 44/56, pero el jugador inicial se
   queda en 47,5 % —lleva ahí desde la v2, es del turno y no del mazo—, la bola
-  de nieve en 72 % y la extinción en 0 %. Y **99 de las 116** cartas del set
+  de nieve en 72 % y la extinción en 0 %. Y **114 de las 131** cartas del set
   siguen fuera del mazo de referencia, o sea sin calibración comprobada.
-  `BALANCE.md` NO se movió con la ronda del control y no tenía por qué: el mazo
-  de referencia no lleva ninguna de las quince, así que regenerarlo habría
-  gastado 2.000 partidas para volver a imprimir los mismos seis números. Es
-  exactamente el punto ciego que avisa la tabla de los simuladores.
-- **Y la extinción sigue en 0 % aunque la ronda del control exista.** Quince
-  cartas nuevas que muerden la mano y el mazo no mueven una vía que se mide
-  sobre un mazo que no las lleva. Para saber si la vía se abrió hay que
-  construir el mazo de control y medirlo contra el de referencia, que es
-  trabajo de diseño y no de esta tanda.
+  `BALANCE.md` NO se movió con ninguna de las dos rondas nuevas y no tenía por
+  qué: el mazo de referencia no lleva ninguna de las treinta, así que
+  regenerarlo habría gastado 2.000 partidas para volver a imprimir los mismos
+  seis números. Es exactamente el punto ciego que avisa la tabla de los
+  simuladores.
+- **Y la extinción sigue en 0 % aunque las dos rondas existan.** Treinta cartas
+  que muerden la mano y el mazo —y ahora nueve que lo defienden— no mueven una
+  vía que se mide sobre un mazo que no las lleva. Para saber si la vía se abrió
+  hay que construir el mazo de molienda y el de entierro y medirlos contra el
+  de referencia, que es trabajo de diseño y no de estas tandas. **Es el
+  siguiente paso obvio del proyecto**, y el primero que puede dar un número
+  distinto de cero desde la v2.
 - **La inmunidad al clima no muerde.** Torvosaurus y Nodosaurus dicen «no le
   afectan los efectos del clima», y hoy los dos únicos efectos del clima sobre una
   criatura son BUENOS: el Canal da +1 de Vida y el Bosque cura saurópodos. O sea

@@ -48,6 +48,11 @@ export const EFECTOS = Object.freeze([
   // el cuarto va al descarte a por lo que ya se perdió, que es lo que hace que
   // molerte a ti mismo deje de ser sólo un coste.
   'manoNueva', 'manosNuevas', 'topeManoRival', 'rescata',
+  // Los tres de la ronda del rebote. `devuelve` es el único que lleva objeto
+  // en vez de número: son dos cantidades y un filtro, y partirlo en tres claves
+  // planas —`devuelvePropio`, `devuelveRival`, `devuelveRivalMax`— habría
+  // metido un FILTRO en una lista que se tasa multiplicando por su cifra.
+  'devuelve', 'golpeHabitat', 'entierra',
 ]);
 
 export const entradaDe = (cardId) => mecanicaDe(cardId)?.entrada ?? null;
@@ -80,9 +85,22 @@ export function valorDeEntrada(cardId) {
       valor += Math.max(0, BALANCE.manoInicial - tope) * V.topeManoRival;
       continue;
     }
+    // `devuelve` lleva objeto: dos cantidades que valen distinto —quitarle uno
+    // del campo al rival no es lo mismo que recoger el tuyo— y un `ataqueMax`
+    // que es un FILTRO, no una cantidad. Multiplicarlo por su peso haría que
+    // una carta que sólo alcanza a los pequeños valiera más cuanto más alto
+    // fuera el listón que no usa.
+    if (efecto === 'devuelve') {
+      const d = e.devuelve;
+      if (!d) continue;
+      valor += (d.propio ?? 0) * V.devuelvePropio + (d.rival ?? 0) * V.devuelveRival;
+      continue;
+    }
     const n = e[efecto] ?? 0;
     if (n === 0) continue;
-    const peso = efecto === 'curaHabitat' ? V.curaHabitat * BALANCE.ia.pesoHabitat : V[efecto];
+    const peso = efecto === 'golpeHabitat' || efecto === 'curaHabitat'
+      ? V[efecto] * BALANCE.ia.pesoHabitat
+      : V[efecto];
     valor += n * peso;
   }
   return valor;
@@ -101,7 +119,10 @@ export function alEntrar(s, inst, ayudas) {
   const e = entradaDe(inst.cardId);
   if (!e) return;
 
-  const { ev, herir, rival, unidadEn, unidadesDe, CAUSA, vidaActual } = ayudas;
+  const {
+    ev, herir, rival, unidadEn, unidadesDe, CAUSA, vidaActual,
+    devolverAMano, enterrar, golpearHabitat,
+  } = ayudas;
   const j = inst.dueno;
   const contrario = rival(j);
   const jug = s.jugadores[j];
@@ -223,6 +244,43 @@ export function alEntrar(s, inst, ayudas) {
     const antes = jug.habitat;
     jug.habitat = Math.min(BALANCE.vidaHabitat, jug.habitat + e.curaHabitat);
     contar('curaHabitat', jug.habitat - antes);
+  }
+
+  // Del descarte al mazo: lo único que alarga un mazo en todo el juego.
+  if (e.entierra) contar('entierra', enterrar(s, j, e.entierra));
+
+  // Directo al hábitat, sin pasar por el combate. Es la vía más corta que hay
+  // a una de las tres victorias, así que las cifras son pequeñas a propósito.
+  if (e.golpeHabitat) {
+    golpearHabitat(s, contrario, e.golpeHabitat);
+    contar('golpeHabitat', e.golpeHabitat);
+  }
+
+  // El REBOTE: del campo a la mano. Ninguno pregunta, como el resto de la fase
+  // de revelación, así que los dos objetivos salen de una regla fija.
+  if (e.devuelve) {
+    let n = 0;
+    // El tuyo: el que peor lo lleva. Recoger al herido es lo que un jugador
+    // haría, y además es lo que hace la carta útil —vuelve entero— sin tener
+    // que preguntar. Desempate por iid, que la fase es simultánea.
+    for (let k = 0; k < (e.devuelve.propio ?? 0); k++) {
+      const mios = unidadesDe(s, j)
+        .filter((u) => u.iid !== inst.iid)
+        .sort((a, b) => vidaActual(s, a.iid) - vidaActual(s, b.iid) || a.iid - b.iid);
+      if (!mios[0] || !devolverAMano(s, mios[0].iid)) break;
+      n += 1;
+    }
+    // El suyo: el que más pega DE LOS QUE CABEN bajo el listón, que es la misma
+    // regla que usa Tijera. Quitarle el pequeño de adorno no sería una carta.
+    for (let k = 0; k < (e.devuelve.rival ?? 0); k++) {
+      const suyos = unidadesDe(s, contrario)
+        .filter((u) => e.devuelve.ataqueMax === undefined
+          || carta(u.cardId).ataque <= e.devuelve.ataqueMax)
+        .sort((a, b) => carta(b.cardId).ataque - carta(a.cardId).ataque || a.iid - b.iid);
+      if (!suyos[0] || !devolverAMano(s, suyos[0].iid)) break;
+      n += 1;
+    }
+    contar('devuelve', n);
   }
 
   // Cae encima del que tiene enfrente antes de que empiece el combate.

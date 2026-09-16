@@ -2024,6 +2024,18 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   100% { filter: brightness(1) saturate(1); box-shadow: 0 0 0 0 transparent; }
 }
 
+/* Vuelve a la mano: la única cosa que deshace un despliegue. Se desvanece en
+   su sitio y no se encoge ni se va volando, por la regla de arriba —la rejilla
+   no perdona—; el vuelo de vuelta a la mano lo hace el fantasma de `render.js`,
+   que va por encima de todo y no compone con esto. */
+.carta.rebota { animation: rebotar .42s ease-in; }
+@keyframes rebotar {
+  0%   { opacity: 1; filter: brightness(1); }
+  55%  { opacity: .5; filter: brightness(1.5) saturate(.45);
+         box-shadow: 0 0 0 2px rgba(150,190,230,.6), 0 0 18px rgba(150,190,230,.35); }
+  100% { opacity: 1; filter: brightness(1); box-shadow: 0 0 0 0 transparent; }
+}
+
 /* Se cura. */
 .carta.cura { animation: curarse .6s ease-out; }
 @keyframes curarse {
@@ -2141,7 +2153,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 @media (prefers-reduced-motion: reduce) {
   .carta--mano, .carta--mano .c-arte > * { transition: none; }
   .carta--mano { --tx: 0; --ty: 0; }
-  .carta.dispara, .carta.crece, .carta.merma, .carta.cura, .pulso { animation: none; }
+  .carta.dispara, .carta.crece, .carta.merma, .carta.cura, .carta.rebota,
+  .pulso { animation: none; }
   .rotulo-rasgo, .anuncio { animation-duration: .01s; animation-timing-function: step-end; }
 }
 
