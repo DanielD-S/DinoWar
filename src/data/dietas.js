@@ -42,8 +42,10 @@ const EXCEPCIONES = Object.freeze({
   gallimimus: OMNIVORO,
   deinocheirus: OMNIVORO,
 
-  // Pterosaurio: los tapejáridos se leen como frugívoros, no como pescadores.
+  // Pterosaurios: los tapejáridos se leen como frugívoros, no como pescadores.
+  // Tupandactylus es el tapejárido de manual, así que va con su pariente.
   huaxiadraco: HERBIVORO,
+  tupandactylus: HERBIVORO,
 });
 
 /** Por clado, para todo lo que no sea una excepción. */

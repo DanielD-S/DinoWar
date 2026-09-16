@@ -29,7 +29,7 @@ test('Toda criatura del set tiene dieta, y sólo las criaturas', () => {
     }
   }
   const n = repartoPorDieta();
-  assert.equal(n.CARNIVORO + n.HERBIVORO + n.OMNIVORO, 76);
+  assert.equal(n.CARNIVORO + n.HERBIVORO + n.OMNIVORO, 82);
 });
 
 test('El mazo de la economía por cartas sigue siendo de 50', () => {

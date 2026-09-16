@@ -61,6 +61,16 @@
       "sentido": "Vida que recuperan todos los tuyos"
     },
     {
+      "rasgo": "CANTERA",
+      "nombre": "Cantera abierta",
+      "cartas": 1,
+      "quienes": "Cantera abierta",
+      "texto": "+3 Biomasa ahora mismo. Pierdes 4 cartas de tu mazo.",
+      "constante": "recursos.canteraBiomasa",
+      "valor": 3,
+      "sentido": "Biomasa, a cambio de 4 cartas de tu mazo"
+    },
+    {
       "rasgo": "CARRONA",
       "nombre": "Carroña abundante",
       "cartas": 1,
@@ -81,6 +91,16 @@
       "sentido": "cartas que robas (y sueltas 2 de la mano)"
     },
     {
+      "rasgo": "CENIZA",
+      "nombre": "Ceniza volcánica",
+      "cartas": 1,
+      "quienes": "Ceniza volcánica",
+      "texto": "Tu rival pierde 6 cartas de su mazo.",
+      "constante": "rasgos.cenizaMazo",
+      "valor": 6,
+      "sentido": "cartas de mazo que pierde el rival"
+    },
+    {
       "rasgo": "COMPETENCIA",
       "nombre": "Competencia trófica",
       "cartas": 1,
@@ -89,6 +109,16 @@
       "constante": "rasgos.competenciaVida",
       "valor": 2,
       "sentido": "Vida que se quita, a dos rivales"
+    },
+    {
+      "rasgo": "CRECIDA_DELTA",
+      "nombre": "Crecida del delta",
+      "cartas": 1,
+      "quienes": "Crecida del delta",
+      "texto": "Devuelve a la mano 1 dinosaurio del rival de 6 o menos de Ataque.",
+      "constante": "rasgos.crecidaAtaqueMax",
+      "valor": 6,
+      "sentido": "Ataque o menos: el del rival que vuelve a su mano"
     },
     {
       "rasgo": "CAMPO_LLANURA",
@@ -121,6 +151,16 @@
       "sentido": "no lleva número: es una regla, no una cifra"
     },
     {
+      "rasgo": "CARRONEROS",
+      "nombre": "Enjambre de carroñeros",
+      "cartas": 1,
+      "quienes": "Enjambre de carroñeros",
+      "texto": "Devuelve 1 carta al azar de tu descarte a tu mazo y robas 1.",
+      "constante": "rasgos.carronerosEntierra",
+      "valor": 1,
+      "sentido": "carta que vuelve a tu mazo (y robas 1)"
+    },
+    {
       "rasgo": "ENTERRAMIENTO",
       "nombre": "Enterramiento rápido",
       "cartas": 1,
@@ -139,6 +179,16 @@
       "constante": "efectosCampo.bosqueCura",
       "valor": 1,
       "sentido": "heridas que curan los saurópodos"
+    },
+    {
+      "rasgo": "ESTAMPIDA",
+      "nombre": "Estampida",
+      "cartas": 1,
+      "quienes": "Estampida",
+      "texto": "Devuelve a la mano todos los dinosaurios de 2 o menos de Ataque, de los dos bandos.",
+      "constante": "rasgos.estampidaAtaqueMax",
+      "valor": 2,
+      "sentido": "Ataque o menos: vuelven a la mano, de los DOS bandos"
     },
     {
       "rasgo": "FRACTURA",
@@ -211,6 +261,16 @@
       "sentido": "Biomasa, a cambio de 3 cartas del mazo"
     },
     {
+      "rasgo": "MIGRACION",
+      "nombre": "Migración estacional",
+      "cartas": 1,
+      "quienes": "Migración estacional",
+      "texto": "Devuelve a tu mano 1 dinosaurio tuyo y robas 1.",
+      "constante": "rasgos.migracionRoba",
+      "valor": 1,
+      "sentido": "cartas que robas al recoger a uno tuyo"
+    },
+    {
       "rasgo": "CAMPO_SABANA",
       "nombre": "Monzón de verano",
       "cartas": 1,
@@ -261,6 +321,26 @@
       "sentido": "Biomasa, y además robas 1"
     },
     {
+      "rasgo": "OLEADA",
+      "nombre": "Oleada de calor",
+      "cartas": 1,
+      "quienes": "Oleada de calor",
+      "texto": "Golpea 2 al hábitat de tu rival.",
+      "constante": "rasgos.oleadaHabitat",
+      "valor": 2,
+      "sentido": "directo al hábitat rival, sin combate"
+    },
+    {
+      "rasgo": "OSARIO",
+      "nombre": "Osario de la charca",
+      "cartas": 1,
+      "quienes": "Osario de la charca",
+      "texto": "Devuelve 2 cartas al azar de tu descarte a tu mazo.",
+      "constante": "rasgos.osarioEntierra",
+      "valor": 2,
+      "sentido": "cartas que vuelven de tu descarte a tu MAZO"
+    },
+    {
       "rasgo": "REBROTE",
       "nombre": "Rebrote tras incendio",
       "cartas": 1,
@@ -279,6 +359,16 @@
       "constante": "rasgos.sabanaHelechosRoba",
       "valor": 2,
       "sentido": "cartas que robas (y descartas 1)"
+    },
+    {
+      "rasgo": "SEDIMENTO",
+      "nombre": "Sedimento en suspensión",
+      "cartas": 1,
+      "quienes": "Sedimento en suspensión",
+      "texto": "Tu rival pierde 4 cartas de su mazo y descarta 2 al azar de su mano.",
+      "constante": "rasgos.sedimentoMazo",
+      "valor": 4,
+      "sentido": "cartas de mazo, y 2 más de su mano"
     },
     {
       "rasgo": "CAMPO_ARIDEZ",
@@ -384,6 +474,20 @@
     },
     {
       "campo": "entrada",
+      "forma": "Al entrar · devuelve",
+      "cartas": 2,
+      "quienes": "Giraffatitan brancai, Deltadromeus agilis",
+      "ejemplo": "Cuando entra en juego devuelve a la mano 1 dinosaurio tuyo y 1 del rival de 4 o menos de Ataque."
+    },
+    {
+      "campo": "entrada",
+      "forma": "Al entrar · golpeHabitat",
+      "cartas": 2,
+      "quienes": "Carcharodontosaurus saharicus, Tupandactylus imperator",
+      "ejemplo": "Cuando entra en juego golpea 3 al hábitat de tu rival."
+    },
+    {
+      "campo": "entrada",
       "forma": "Al entrar · manoRival",
       "cartas": 2,
       "quienes": "Allosaurus fragilis, Tyrannosaurus rex",
@@ -409,6 +513,20 @@
       "cartas": 2,
       "quienes": "Huaxiadraco corollatus, Chasmosaurus belli",
       "ejemplo": "Cuando entra en juego robas 1 carta."
+    },
+    {
+      "campo": "entrada",
+      "forma": "Al entrar · devuelve + mueleRival",
+      "cartas": 1,
+      "quienes": "Ouranosaurus nigeriensis",
+      "ejemplo": "Cuando entra en juego devuelve a la mano 1 dinosaurio tuyo y tu rival pierde 2 cartas de su mazo."
+    },
+    {
+      "campo": "entrada",
+      "forma": "Al entrar · entierra",
+      "cartas": 1,
+      "quienes": "Rugops primus",
+      "ejemplo": "Cuando entra en juego devuelve 2 cartas al azar de tu descarte a tu mazo."
     },
     {
       "campo": "entrada",
@@ -629,15 +747,15 @@
   "clados": [
     {
       "clado": "Ornitópodo",
-      "cartas": 10,
+      "cartas": 11,
       "ataque": "1.9",
-      "vida": "6.8",
+      "vida": "6.7",
       "regla": "sin regla propia"
     },
     {
       "clado": "Terópodo",
-      "cartas": 26,
-      "ataque": "4.1",
+      "cartas": 29,
+      "ataque": "4.3",
       "vida": "4.1",
       "regla": "sin regla propia"
     },
@@ -650,9 +768,9 @@
     },
     {
       "clado": "Saurópodo",
-      "cartas": 12,
+      "cartas": 13,
       "ataque": "2.2",
-      "vida": "8.8",
+      "vida": "9.1",
       "regla": "sin regla propia"
     },
     {
@@ -664,9 +782,9 @@
     },
     {
       "clado": "Pterosaurio",
-      "cartas": 3,
+      "cartas": 4,
       "ataque": "3.0",
-      "vida": "3.3",
+      "vida": "3.5",
       "regla": "sin regla propia"
     },
     {

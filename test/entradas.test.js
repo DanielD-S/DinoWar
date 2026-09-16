@@ -46,7 +46,7 @@ test('Toda criatura tiene habilidad, y toda habilidad tiene nombre y texto', () 
     assert.ok(c.rasgoNombre, `${c.id} no tiene nombre de rasgo`);
     assert.ok(c.rasgoTexto, `${c.id} no tiene texto`);
   }
-  assert.equal(CRIATURAS.length, 81, '76 del set y las 5 de jefe');
+  assert.equal(CRIATURAS.length, 87, '82 del set y las 5 de jefe');
 });
 
 test('Ninguna mecánica usa un campo que el motor no mire', () => {
@@ -67,6 +67,14 @@ test('Toda entrada vale algo para la IA, o la carta no se juega jamás', () => {
   // Le pasó a la Llanura de inundación: cero usos en 300 partidas hasta que se
   // le puso número. Un efecto sin peso es una carta invisible.
   for (const efecto of EFECTOS) {
+    // `devuelve` es el único que lleva objeto —dos cantidades que valen
+    // distinto y un filtro— así que su peso está partido en dos claves. Las
+    // dos tienen que existir: con una sola, media carta se tasaría en cero.
+    if (efecto === 'devuelve') {
+      assert.ok(Number.isFinite(BALANCE.valorEntrada.devuelvePropio), 'falta devuelvePropio');
+      assert.ok(Number.isFinite(BALANCE.valorEntrada.devuelveRival), 'falta devuelveRival');
+      continue;
+    }
     assert.ok(Number.isFinite(BALANCE.valorEntrada[efecto]),
       `valorEntrada.${efecto} no es un número`);
   }
@@ -109,12 +117,12 @@ test('Las etiquetas de las mecánicas son las del vocabulario', () => {
 });
 
 test('El soporte conserva su rasgo: sin él no sería una carta', () => {
-  // 40: clima, evento, recurso y las diez de biomasa. Vale para éstas igual
+  // 49: clima, evento, recurso y las diez de biomasa. Vale para éstas igual
   // que para las otras — llevan rasgo, nombre y texto, y no llevan `mecanica`,
   // que es de criaturas. Sus números van en `biomasa`, y sin ellos la carta
   // no se juega: el motor los lee al bajarla.
   const soporte = Object.values(CARTAS).filter((c) => c.tipo !== TIPO.DINOSAURIO);
-  assert.equal(soporte.length, 40);
+  assert.equal(soporte.length, 49);
   for (const c of soporte) {
     assert.notEqual(c.rasgo, 'NINGUNO', `${c.id} se quedó sin mecánica`);
     assert.ok(c.rasgoNombre && c.rasgoTexto, `${c.id} no tiene nombre o texto`);
@@ -586,6 +594,109 @@ test('Una búsqueda por Ataque mira el impreso, que es lo único que hay en el m
   // Y no se cruzan: lo que vale para una no vale para la otra.
   const flojos = new Set(buscablesDe(s, 0, 'shuvuuia'));
   assert.ok(buscablesDe(s, 0, 'saurolophus').every((iid) => !flojos.has(iid)));
+});
+
+// ------------------------------------------------- el rebote y el entierro
+
+test('Devolver saca del campo a la mano, limpio y sin trofeo', () => {
+  const s = tablero();
+  const mio = poner(s, 'allosaurus', 0, 1, { heridas: 3, modAtaque: 2 });
+  const suyo = poner(s, 'troodon', 1, 0);
+  const trofeos = s.jugadores[1].trofeos;
+  const r = entrar(s, 'giraffatitan').estado;
+
+  assert.equal(r.ranuras[0][1], null, 'la ranura queda libre');
+  assert.equal(r.ranuras[1][0], null);
+  assert.ok(r.jugadores[0].mano.includes(mio), 'el tuyo vuelve a TU mano');
+  assert.ok(r.jugadores[1].mano.includes(suyo), 'y el suyo a la suya');
+  // Vuelve limpio: la instancia es la misma pero la carta ya no está en juego.
+  assert.equal(r.instancias[mio].heridas, 0);
+  assert.equal(r.instancias[mio].modAtaque, 0);
+  assert.equal(r.instancias[mio].ranura, null);
+  // Y no es una muerte: nadie se lleva un trofeo ni pasa por el descarte.
+  assert.equal(r.jugadores[1].trofeos, trofeos);
+  assert.equal(r.jugadores[0].descarte.length, 0);
+});
+
+test('El rebote elige sin preguntar: el tuyo más herido y el suyo que más pega', () => {
+  const s = tablero();
+  // La ranura 0 se deja libre: es donde `entrar` despliega al que dispara.
+  const sano = poner(s, 'apatosaurus', 0, 1);
+  const herido = poner(s, 'diplodocus', 0, 2, { heridas: 6 });
+  const grande = poner(s, 'carnotaurus', 1, 0);   // 7 de Ataque: no cabe bajo 4
+  const mediano = poner(s, 'dromaeosaurus', 1, 1); // 3
+  const chico = poner(s, 'troodon', 1, 2);         // 1
+  const r = entrar(s, 'giraffatitan').estado;
+
+  assert.equal(r.instancias[herido].ranura, null, 'se lleva al tuyo más herido');
+  assert.notEqual(r.instancias[sano].ranura, null, 'y deja al que aguanta');
+  assert.notEqual(r.instancias[grande].ranura, null, 'el de 7 no cabe bajo el listón');
+  assert.equal(r.instancias[mediano].ranura, null, 'de los que caben, el que más pega');
+  assert.notEqual(r.instancias[chico].ranura, null);
+});
+
+test('Un rebote sobre el campo vacío no rompe nada y deja constancia', () => {
+  const s = tablero();
+  const r = entrar(s, 'deltadromeus').estado;
+  const e = r.eventos.find((x) => x.tipo === 'ENTRADA' && x.efecto === 'devuelve');
+  assert.equal(e.n, 0);
+});
+
+test('Las adaptaciones pegadas no viajan con la carta: se quedan en el descarte', () => {
+  const s = tablero();
+  const suyo = poner(s, 'troodon', 1, 0);
+  const adap = enMano(s, 'neumaticidad', 1);
+  s.jugadores[1].biomasa = 9;
+  s.fase = FASE.DESPLIEGUE;
+  let r = reduce(s, { tipo: ACCION.EVENTO, jugador: 1, iid: adap, objetivo: suyo });
+  r = ejecutar(r, FASE.REVELACION);
+  assert.equal(r.instancias[suyo].adherencias.length, 1);
+
+  const t = entrar(r, 'deltadromeus').estado;
+  assert.ok(t.jugadores[1].mano.includes(suyo), 'la criatura vuelve a la mano');
+  assert.equal(t.instancias[suyo].adherencias.length, 0);
+  assert.ok(t.jugadores[1].descarte.includes(adap), 'la adaptación se queda en el descarte');
+});
+
+test('Enterrar va del descarte al MAZO y lo baraja; rescatar, a la mano', () => {
+  // Son las dos direcciones opuestas y conviene no confundirlas: enterrar es
+  // lo único del juego que ALARGA un mazo, o sea la primera respuesta que la
+  // vía de la extinción ha tenido nunca.
+  const s = tablero();
+  s.jugadores[0].descarte.push(...s.jugadores[0].mazo.splice(0, 5));
+  const mazo = s.jugadores[0].mazo.length;
+  const r = entrar(s, 'rugops').estado;
+
+  assert.equal(r.jugadores[0].mazo.length, mazo + 2, 'el mazo crece');
+  assert.equal(r.jugadores[0].descarte.length, 3);
+  assert.equal(r.jugadores[0].mano.length, 0, 'no pasa por la mano');
+
+  const t = tablero();
+  const u = entrar(t, 'rugops').estado;
+  const e = u.eventos.find((x) => x.tipo === 'ENTIERRO');
+  assert.equal(e.cartas, 0, 'sin descarte no inventa cartas');
+});
+
+test('El golpe al hábitat va directo y no toca a nadie del campo', () => {
+  const s = tablero();
+  const suyo = poner(s, 'apatosaurus', 1, 0);
+  const antes = s.jugadores[1].habitat;
+  const r = entrar(s, 'carcharodontosaurus').estado;
+
+  assert.equal(r.jugadores[1].habitat, antes - 3);
+  assert.equal(r.jugadores[0].habitat, BALANCE.vidaHabitat, 'el tuyo no se toca');
+  assert.equal(r.instancias[suyo].heridas, 0, 'y el de enfrente tampoco');
+});
+
+test('El peso de `devuelve` no tasa el filtro, que no es una cantidad', () => {
+  // Un `ataqueMax` alto es una carta que alcanza a MÁS, no una carta que hace
+  // más veces su efecto. Multiplicarlo por su peso haría que subir el listón
+  // valiera como hacerlo otra vez.
+  const V = BALANCE.valorEntrada;
+  assert.equal(valorDeEntrada('giraffatitan'), V.devuelvePropio + V.devuelveRival);
+  assert.equal(valorDeEntrada('deltadromeus'), V.devuelveRival);
+  assert.ok(V.devuelveRival > V.devuelvePropio,
+    'quitarle uno del campo al rival vale más que recoger el tuyo');
 });
 
 test('Con DINOWAR_ENTRADAS=0 no se dispara ninguna', () => {

@@ -59,6 +59,15 @@ const NUMERO_DE = {
   [RASGO.ENTERRAMIENTO]: ['rasgos.enterramientoRescata', 'cartas que vuelven de tu descarte a la mano'],
   [RASGO.CAUCE_ABANDONADO]: ['rasgos.cauceRoba', 'cartas que robas (y sueltas 2 de la mano)'],
   [RASGO.BARRERA_TRONCOS]: ['rasgos.barreraMazo', 'cartas de mazo que pierde el rival, y otras tantas si va con más mano'],
+  [RASGO.CENIZA]: ['rasgos.cenizaMazo', 'cartas de mazo que pierde el rival'],
+  [RASGO.SEDIMENTO]: ['rasgos.sedimentoMazo', 'cartas de mazo, y 2 más de su mano'],
+  [RASGO.OSARIO]: ['rasgos.osarioEntierra', 'cartas que vuelven de tu descarte a tu MAZO'],
+  [RASGO.CARRONEROS]: ['rasgos.carronerosEntierra', 'carta que vuelve a tu mazo (y robas 1)'],
+  [RASGO.OLEADA]: ['rasgos.oleadaHabitat', 'directo al hábitat rival, sin combate'],
+  [RASGO.ESTAMPIDA]: ['rasgos.estampidaAtaqueMax', 'Ataque o menos: vuelven a la mano, de los DOS bandos'],
+  [RASGO.MIGRACION]: ['rasgos.migracionRoba', 'cartas que robas al recoger a uno tuyo'],
+  [RASGO.CRECIDA_DELTA]: ['rasgos.crecidaAtaqueMax', 'Ataque o menos: el del rival que vuelve a su mano'],
+  [RASGO.CANTERA]: ['recursos.canteraBiomasa', 'Biomasa, a cambio de 4 cartas de tu mazo'],
 };
 
 const valorDe = (ruta) => ruta.split('.').reduce((o, k) => (o === undefined ? o : o[k]), BALANCE);

@@ -67,6 +67,13 @@ const ENTRADAS = {
   rescata: (e, api) => {
     if (e.n > 0) api.enMano(e.dueno, `+${e.n}`);
   },
+  // Las tres de la ronda del rebote. `devuelve` no dibuja nada aquí: cada carta
+  // que sale del campo emite su propia DEVUELTA, con su compás y su gesto, y
+  // marcarlo dos veces sería contar la misma cosa dos veces.
+  entierra: (e, api) => {
+    if (e.n > 0) api.enMazo(e.dueno, `+${e.n}`);
+  },
+  golpeHabitat: (e, api) => api.enHabitat(api.contrario(e.dueno), `−${e.n}`, 'malo'),
 };
 
 /**
@@ -161,6 +168,30 @@ export const GUION = Object.freeze({
     hacer: (e, api) => {
       const saldo = e.ahora - e.antes;
       api.enMano(e.jugador, saldo >= 0 ? `+${saldo}` : `${saldo}`, saldo >= 0 ? '' : 'malo');
+    },
+  },
+
+  // Del CAMPO a la mano. Es el único gesto que deshace un despliegue, así que
+  // la carta tiene que verse SALIR de su ranura: `render.js` ya apunta de dónde
+  // se fue una retirada y el fantasma vuela desde ahí, que es el mismo camino.
+  DEVUELTA: {
+    dura: MEDIO,
+    sonido: 'reciclar',
+    hacer: (e, api) => {
+      const nodo = api.carta(e.iid);
+      if (nodo) api.marcar(nodo, 'rebota', 420);
+      api.enMano(e.dueno, '+1');
+    },
+  },
+
+  // Del descarte al MAZO: el único gesto que alarga un mazo, así que se dibuja
+  // sobre la pila y con signo, que es donde el jugador mira para saber cuánto
+  // le queda antes de la extinción.
+  ENTIERRO: {
+    dura: BREVE,
+    sonido: 'barajar',
+    hacer: (e, api) => {
+      if (e.cartas > 0) api.enMazo(e.jugador, `+${e.cartas}`);
     },
   },
 

@@ -332,6 +332,52 @@ function valorDeAccion(vista, j, a) {
         const cartas = BALANCE.rasgos.barreraMazo * (doble ? 2 : 1);
         delta = cartas / Math.max(1, mazoDe(vista, contrario)) * IA.pesoTrofeo / IA.pesoDano * 3;
 
+      // La ronda del rebote. Lo que se le quita del campo al rival se tasa como
+      // se tasa una unidad puesta —no es matarla, pero es hacerle pagar otra
+      // vez el turno y la Biomasa—, y lo que se devuelve al mazo, por lo poco
+      // que vale alargarlo mientras sobren cartas.
+      } else if (r === RASGO.CENIZA) {
+        delta = BALANCE.rasgos.cenizaMazo / Math.max(1, mazoDe(vista, contrario))
+          * IA.pesoTrofeo / IA.pesoDano * 3;
+
+      } else if (r === RASGO.SEDIMENTO) {
+        delta = BALANCE.rasgos.sedimentoMazo / Math.max(1, mazoDe(vista, contrario))
+            * IA.pesoTrofeo / IA.pesoDano * 3
+          + Math.min(BALANCE.rasgos.sedimentoMano, vista.jugadores[contrario].mano.length) * 0.6;
+
+      } else if (r === RASGO.OSARIO || r === RASGO.CARRONEROS) {
+        // Alargar el mazo sólo vale cuando el mazo se acaba; con cuarenta
+        // cartas dentro, dos más no cambian ninguna partida. Por eso se mide
+        // contra lo que queda y no en absoluto.
+        const n = r === RASGO.OSARIO
+          ? BALANCE.rasgos.osarioEntierra
+          : BALANCE.rasgos.carronerosEntierra;
+        const devueltas = Math.min(n, vista.jugadores[j].descarte.length);
+        delta = devueltas * (12 / Math.max(1, mazoDe(vista, j)))
+          + (r === RASGO.CARRONEROS ? BALANCE.rasgos.carronerosRoba * 0.7 : 0);
+
+      } else if (r === RASGO.OLEADA) {
+        delta = BALANCE.rasgos.oleadaHabitat * IA.pesoHabitat;
+
+      } else if (r === RASGO.ESTAMPIDA) {
+        // Barre a los dos bandos, así que vale la diferencia. Lo del rival se
+        // tasa entero y lo tuyo a la mitad: lo tuyo vuelve a tu mano y lo suyo
+        // también a la suya, pero el que eligió el momento eres tú.
+        const cabe = (u) => carta(u.cardId).ataque <= BALANCE.rasgos.estampidaAtaqueMax;
+        delta = unidadesDe(vista, contrario).filter(cabe).length * 1.2
+          - unidadesDe(vista, j).filter(cabe).length * 0.6;
+
+      } else if (r === RASGO.MIGRACION) {
+        // Sólo vale si hay a quién recoger, y vale más cuanto peor lo lleve.
+        const mio = unidadesDe(vista, j)
+          .map((u) => vidaActual(vista, u.iid)).sort((a, b) => a - b)[0];
+        delta = (mio === undefined ? 0 : 1.2) + BALANCE.rasgos.migracionRoba * 0.7;
+
+      } else if (r === RASGO.CRECIDA_DELTA) {
+        const cabe = unidadesDe(vista, contrario)
+          .filter((u) => carta(u.cardId).ataque <= BALANCE.rasgos.crecidaAtaqueMax);
+        delta = cabe.length > 0 ? 2.2 : 0;
+
       } else if (r === RASGO.DERIVA_ARIDA) {
         // Vale cuando el rival tiene más mano que tú, o la tuya no se puede
         // pagar: lo que se suelta no se pierde, se cambia.
@@ -356,6 +402,7 @@ function valorDeAccion(vista, j, a) {
       if (r === RASGO.INSECTOS) { gana = P.insectosBiomasa; cuesta = -P.insectosRoba * 0.7; }
       if (r === RASGO.MANADA_PASO) { gana = P.manadaPasoBiomasa; cuesta = P.manadaPasoMazo * 0.15; }
       if (r === RASGO.FRUTOS) { gana = P.frutosBiomasa; cuesta = P.frutosRobaRival * 0.8; }
+      if (r === RASGO.CANTERA) { gana = P.canteraBiomasa; cuesta = P.canteraMazo * 0.15; }
 
       const biomasa = vista.jugadores[j].biomasa;
       const desbloquea = vista.jugadores[j].mano

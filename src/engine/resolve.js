@@ -240,7 +240,10 @@ export function faseRevelacion(s) {
       // tipo y luego por iid — sin ese orden, dos máquinas re-jugando la misma
       // partida llegarían a resultados distintos, y el servidor las valida
       // re-jugándolas.
-      alEntrar(s, inst, { ev, herir, rival, unidadEn, unidadesDe, CAUSA, vidaActual });
+      alEntrar(s, inst, {
+        ev, herir, rival, unidadEn, unidadesDe, CAUSA, vidaActual,
+        devolverAMano, enterrar, golpearHabitat,
+      });
 
     } else if (p.tipo === 'MOVIMIENTO') {
       if (inst.ranura === null || s.ranuras[p.jugador][p.ranura] !== null) continue;
@@ -437,6 +440,60 @@ function aplicarPresion(s, p) {
     robar(s, p.jugador, BALANCE.rasgos.cauceRoba);
     ev(s, 'PRESION', { jugador: p.jugador, cardId });
 
+  // ------------------------------------------------- la ronda del REBOTE
+
+  } else if (r === RASGO.CENIZA) {
+    perderDelMazo(s, contrario, BALANCE.rasgos.cenizaMazo);
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  } else if (r === RASGO.SEDIMENTO) {
+    perderDelMazo(s, contrario, BALANCE.rasgos.sedimentoMazo);
+    descartarAlAzar(s, contrario, BALANCE.rasgos.sedimentoMano);
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  } else if (r === RASGO.OSARIO) {
+    enterrar(s, p.jugador, BALANCE.rasgos.osarioEntierra);
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  } else if (r === RASGO.CARRONEROS) {
+    enterrar(s, p.jugador, BALANCE.rasgos.carronerosEntierra);
+    robar(s, p.jugador, BALANCE.rasgos.carronerosRoba);
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  } else if (r === RASGO.OLEADA) {
+    golpearHabitat(s, contrario, BALANCE.rasgos.oleadaHabitat);
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  } else if (r === RASGO.ESTAMPIDA) {
+    // Barre a los pequeños de LOS DOS bandos. La inmunidad a eventos tapa sólo
+    // a los del rival, como la Mortandad: la carta es tuya y de los tuyos no te
+    // libras. Se recorre una copia de la lista porque devolver vacía ranuras.
+    const tope = BALANCE.rasgos.estampidaAtaqueMax;
+    for (const inst of [...todasLasUnidades(s)]) {
+      if (carta(inst.cardId).ataque > tope) continue;
+      if (inst.dueno === contrario && !alcanzable(inst.iid)) continue;
+      devolverAMano(s, inst.iid);
+    }
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  } else if (r === RASGO.MIGRACION) {
+    // El tuyo que peor lo lleva, con la misma regla que la entrada `devuelve`:
+    // recoger al herido es lo que haría el jugador y no hace falta preguntar.
+    const mios = unidadesDe(s, p.jugador)
+      .sort((a, b) => vidaActual(s, a.iid) - vidaActual(s, b.iid) || a.iid - b.iid);
+    if (mios[0]) devolverAMano(s, mios[0].iid);
+    robar(s, p.jugador, BALANCE.rasgos.migracionRoba);
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  } else if (r === RASGO.CRECIDA_DELTA) {
+    // El del rival que más pega de los que caben bajo el listón, como Tijera.
+    const tope = BALANCE.rasgos.crecidaAtaqueMax;
+    const suyos = unidadesDe(s, contrario)
+      .filter((u) => carta(u.cardId).ataque <= tope && alcanzable(u.iid))
+      .sort((a, b) => carta(b.cardId).ataque - carta(a.cardId).ataque || a.iid - b.iid);
+    if (suyos[0]) devolverAMano(s, suyos[0].iid);
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
   } else if (r === RASGO.BARRERA_TRONCOS) {
     // La mano propia se cuenta SIN esta carta: se está jugando, ya no está en
     // la mano, y contarla haría que la condición dependiera de sí misma.
@@ -466,6 +523,66 @@ function manoNueva(s, j, cuantas) {
   jug.mazo = b.lista;
   for (let k = 0; k < cuantas && jug.mazo.length > 0; k++) jug.mano.push(jug.mazo.shift());
   ev(s, 'MANO_NUEVA', { jugador: j, antes, ahora: jug.mano.length });
+}
+
+/**
+ * Del CAMPO a la mano de su dueño. Es el primer gesto del juego que deshace un
+ * despliegue, y por eso hace la misma limpieza que una muerte —heridas, marcas,
+ * adherencias— menos las dos cosas que la separan de morir: no va al descarte y
+ * no le da un trofeo a nadie.
+ *
+ * La carta vuelve LIMPIA. Se consideró devolverla con sus heridas puestas y no
+ * se sostiene: la instancia es la misma pero la carta ya no está en juego, y un
+ * Allosaurus que vuelve a la mano herido de 4 sería una carta distinta de la que
+ * se compró en el sobre. Lo que sí se pierde son las adaptaciones pegadas
+ * encima, que se van al descarte como cuando muere quien las llevaba.
+ */
+export function devolverAMano(s, iid) {
+  const inst = s.instancias[iid];
+  if (!inst || inst.ranura === null) return false;
+  for (const aid of inst.adherencias) {
+    const a = s.instancias[aid];
+    a.adheridoA = null;
+    s.jugadores[a.dueno].descarte.push(aid);
+  }
+  inst.adherencias = [];
+  s.ranuras[inst.dueno][inst.ranura] = null;
+  inst.ranura = null;
+  inst.heridas = 0;
+  inst.modAtaque = 0;
+  inst.modVida = 0;
+  inst.marcas = [];
+  inst.desplegadoEnTurno = null;
+  s.jugadores[inst.dueno].mano.push(iid);
+  ev(s, 'DEVUELTA', { iid, cardId: inst.cardId, dueno: inst.dueno });
+  return true;
+}
+
+/**
+ * Del descarte al MAZO, barajado. Es lo contrario de moler y lo único del juego
+ * que alarga un mazo, así que es la respuesta que a la vía de la extinción le
+ * faltaba: hasta ahora molerte era un daño que no se podía deshacer.
+ *
+ * Va barajado y no encima: poner cartas conocidas encima del mazo sería
+ * arreglar el robo de los próximos turnos, que es mucho más de lo que la carta
+ * dice, y en un duelo el rival no puede ver el mazo para comprobarlo.
+ */
+export function enterrar(s, j, cuantas) {
+  const jug = s.jugadores[j];
+  let n = 0;
+  for (let k = 0; k < cuantas && jug.descarte.length > 0; k++) {
+    const d = entero(s.rng, jug.descarte.length);
+    s.rng = d.rng;
+    jug.mazo.push(jug.descarte.splice(d.valor, 1)[0]);
+    n += 1;
+  }
+  if (n > 0) {
+    const b = barajar(jug.mazo, s.rng);
+    s.rng = b.rng;
+    jug.mazo = b.lista;
+  }
+  ev(s, 'ENTIERRO', { jugador: j, cartas: n, mazo: jug.mazo.length });
+  return n;
 }
 
 /** Del descarte a la mano, al azar. Lo enterrado que vuelve a salir. */

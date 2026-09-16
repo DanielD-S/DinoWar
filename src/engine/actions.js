@@ -287,6 +287,13 @@ function aplicarRecurso(s, j, iid) {
   } else if (r === RASGO.FRUTOS) {
     jug.biomasa += P.frutosBiomasa;
     robar(s, rival(j), P.frutosRobaRival);
+  } else if (r === RASGO.CANTERA) {
+    // El pulso más generoso del set, y el que paga con la vía que nadie usaba:
+    // cuatro cartas de tu propio mazo. Con la extinción en el 0 % eso casi no
+    // duele, y ése es justo el punto — la ronda del rebote existe para que
+    // empiece a doler, y este recurso es el primero que lo apuesta.
+    jug.biomasa += P.canteraBiomasa;
+    perderDelMazo(s, j, P.canteraMazo);
   }
 
   ev(s, 'RECURSO', { jugador: j, cardId, biomasa: jug.biomasa });

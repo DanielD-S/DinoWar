@@ -416,6 +416,13 @@ export function lineasDeLog(eventos) {
           rescata: e.n > 0
             ? `recuperas <b>${e.n}</b> de tu descarte`
             : 'buscaría en su descarte, pero está vacío',
+          entierra: e.n > 0
+            ? `<b>${e.n}</b> de tu descarte vuelven a tu mazo`
+            : 'no hay nada en tu descarte que devolver',
+          golpeHabitat: `<b>${e.n}</b> directos al hábitat rival`,
+          devuelve: e.n > 0
+            ? `manda <b>${e.n}</b> del campo de vuelta a la mano`
+            : 'no hay a quién mandar de vuelta',
         }[e.efecto] ?? 'hace su efecto';
         push(`<i>${carta(e.cardId).binomial}</i> entra en juego: ${q}`, e.dueno);
         break;
@@ -426,6 +433,16 @@ export function lineasDeLog(eventos) {
           + `${saldo === 0 ? '' : ` (${saldo > 0 ? '+' : ''}${saldo})`}`, e.jugador);
         break;
       }
+      case 'DEVUELTA':
+        push(`<i>${carta(e.cardId).binomial}</i> vuelve a la mano de`
+          + ` <b>${bando(e.dueno)}</b>`, e.dueno);
+        break;
+      case 'ENTIERRO':
+        push(e.cartas > 0
+          ? `<b>${bando(e.jugador)}</b> devuelve <b>${e.cartas}</b> de su descarte al mazo`
+            + ` (le quedan <b>${e.mazo}</b>)`
+          : `<b>${bando(e.jugador)}</b> no tiene descarte que devolver`, e.jugador);
+        break;
       case 'RESCATE':
         push(e.cartas > 0
           ? `<b>${bando(e.jugador)}</b> recupera <b>${e.cartas}</b> de su descarte`

@@ -14,8 +14,9 @@ import {
 } from '../src/engine/state.js';
 import { legales, reduce, validar, ACCION } from '../src/engine/actions.js';
 import { BALANCE } from '../src/data/balance.js';
-import { CARTAS } from '../src/data/cards.js';
+import { CARTAS, carta } from '../src/data/cards.js';
 import { tablero, poner, enMano, ejecutar, vivo } from './helpers.js';
+import { vidaActual as vidaAhora } from '../src/engine/state.js';
 
 test('Los climas nuevos alcanzan a los dos bandos', () => {
   const s = tablero(114);
@@ -187,4 +188,102 @@ test('La Barrera de troncos dobla sólo si el rival va con más mano que tú', (
   const u = soltar(t, 'barrera_troncos');
   assert.equal(u.jugadores[1].mazo.length, antesT - n);
   assert.ok(u.eventos.find((x) => x.tipo === 'PRESION' && x.doble === false));
+});
+
+// --------------------------------------------------- la ronda del REBOTE
+
+test('La Estampida barre a los pequeños de LOS DOS bandos, y sólo a ésos', () => {
+  const tope = BALANCE.rasgos.estampidaAtaqueMax;
+  const s = tablero();
+  const chicoMio = poner(s, 'troodon', 0, 0);         // 1 de Ataque
+  const grandeMio = poner(s, 'allosaurus', 0, 1);     // 5
+  const chicoSuyo = poner(s, 'platyceratops', 1, 0);  // 1
+  const grandeSuyo = poner(s, 'carnotaurus', 1, 1);   // 7
+  assert.ok(carta('troodon').ataque <= tope && carta('allosaurus').ataque > tope);
+
+  const r = soltar(s, 'estampida');
+  assert.equal(r.instancias[chicoMio].ranura, null, 'de los tuyos tampoco te libras');
+  assert.equal(r.instancias[chicoSuyo].ranura, null);
+  assert.notEqual(r.instancias[grandeMio].ranura, null);
+  assert.notEqual(r.instancias[grandeSuyo].ranura, null);
+  assert.ok(r.jugadores[0].mano.includes(chicoMio));
+  assert.ok(r.jugadores[1].mano.includes(chicoSuyo), 'cada uno vuelve a SU mano');
+});
+
+test('La Crecida se lleva al del rival que más pega bajo el listón, y a ninguno tuyo', () => {
+  const tope = BALANCE.rasgos.crecidaAtaqueMax;
+  const s = tablero();
+  const mio = poner(s, 'troodon', 0, 0);
+  const enorme = poner(s, 'tyrannotitan', 1, 0);      // 10: no cabe
+  const medio = poner(s, 'allosaurus', 1, 1);         // 5: cabe y es el que más pega
+  const chico = poner(s, 'troodon', 1, 2);            // 1
+  assert.ok(carta('allosaurus').ataque <= tope && carta('tyrannotitan').ataque > tope);
+
+  const r = soltar(s, 'crecida_delta');
+  assert.equal(r.instancias[medio].ranura, null);
+  assert.notEqual(r.instancias[enorme].ranura, null, 'el de 10 no cabe bajo el listón');
+  assert.notEqual(r.instancias[chico].ranura, null, 'y sólo se lleva a uno');
+  assert.notEqual(r.instancias[mio].ranura, null, 'los tuyos no se tocan');
+});
+
+test('La Migración recoge al tuyo más herido y roba', () => {
+  const s = tablero();
+  const sano = poner(s, 'apatosaurus', 0, 0);
+  const herido = poner(s, 'diplodocus', 0, 1, { heridas: 6 });
+  assert.ok(vidaAhora(s, herido) < vidaAhora(s, sano));
+
+  const r = soltar(s, 'migracion');
+  assert.equal(r.instancias[herido].ranura, null);
+  assert.notEqual(r.instancias[sano].ranura, null);
+  // Vuelve entero: eso es lo que hace de la carta un rescate y no un descarte.
+  assert.equal(r.instancias[herido].heridas, 0);
+  assert.equal(r.jugadores[0].mano.length, 1 + BALANCE.rasgos.migracionRoba);
+});
+
+test('El Osario y los Carroñeros devuelven al MAZO, que es lo contrario de moler', () => {
+  const s = tablero();
+  s.jugadores[0].descarte.push(...s.jugadores[0].mazo.splice(0, 6));
+  const mazo = s.jugadores[0].mazo.length;
+  const r = soltar(s, 'osario');
+  const n = BALANCE.rasgos.osarioEntierra;
+  // El mazo crece n, y el descarte pierde n pero gana la propia carta gastada.
+  assert.equal(r.jugadores[0].mazo.length, mazo + n);
+  assert.equal(r.jugadores[0].descarte.length, 6 - n + 1);
+  assert.equal(r.jugadores[0].mano.length, 0, 'al mazo, no a la mano');
+
+  const t = tablero();
+  t.jugadores[0].descarte.push(...t.jugadores[0].mazo.splice(0, 2));
+  const mazoT = t.jugadores[0].mazo.length;
+  const u = soltar(t, 'carroneros');
+  const { carronerosEntierra: e, carronerosRoba: rb } = BALANCE.rasgos;
+  // Entierra y luego roba, así que el mazo queda en +entierra −roba.
+  assert.equal(u.jugadores[0].mazo.length, mazoT + e - rb);
+  assert.equal(u.jugadores[0].mano.length, rb);
+});
+
+test('La Oleada pega al hábitat rival sin pasar por el combate', () => {
+  const s = tablero();
+  const suyo = poner(s, 'apatosaurus', 1, 0);
+  const antes = s.jugadores[1].habitat;
+  const r = soltar(s, 'oleada');
+  assert.equal(r.jugadores[1].habitat, antes - BALANCE.rasgos.oleadaHabitat);
+  assert.equal(r.jugadores[0].habitat, antes, 'el tuyo no se toca');
+  assert.equal(r.instancias[suyo].heridas, 0, 'y el que defiende, tampoco');
+});
+
+test('La Ceniza y el Sedimento muerden el mazo rival, y sólo el rival', () => {
+  const s = tablero();
+  const suyo = s.jugadores[1].mazo.length;
+  const mio = s.jugadores[0].mazo.length;
+  const r = soltar(s, 'ceniza');
+  assert.equal(r.jugadores[1].mazo.length, suyo - BALANCE.rasgos.cenizaMazo);
+  assert.equal(r.jugadores[0].mazo.length, mio, 'a ti no te cuesta mazo');
+
+  const t = tablero();
+  for (let k = 0; k < 4; k++) enMano(t, 'troodon', 1);
+  const suyoT = t.jugadores[1].mazo.length;
+  const u = soltar(t, 'sedimento');
+  const { sedimentoMazo, sedimentoMano } = BALANCE.rasgos;
+  assert.equal(u.jugadores[1].mazo.length, suyoT - sedimentoMazo);
+  assert.equal(u.jugadores[1].mano.length, 4 - sedimentoMano);
 });

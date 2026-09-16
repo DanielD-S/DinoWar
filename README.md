@@ -53,17 +53,21 @@ acumulan y no se curan salvo que una carta lo diga, así que dos dinosaurios que
 no se atraviesan la Defensa se quedan bloqueados: ninguno muere y ninguno pega
 al hábitat.
 
-El set son **116 cartas**: 76 dinosaurios —bueno, 76 criaturas: hay pterosaurios
-y reptiles marinos que no lo son y lo dicen—, 19 eventos, 5 climas, 6 de recurso
+El set son **131 cartas**: 82 dinosaurios —bueno, 82 criaturas: hay pterosaurios
+y reptiles marinos que no lo son y lo dicen—, 27 eventos, 5 climas, 7 de recurso
 y 10 de Biomasa —siete comunes iguales con distinta ilustración, dos épicas y
 una legendaria; se bajan gratis, una por turno, y cuestan cartas de tu mazo—.
 Ver **[SET_DE_CARTAS.md](SET_DE_CARTAS.md)** para todas, con su referencia.
 
-Quince de ellas son la **ronda del control** (16-09-2026): diez criaturas y
-cinco eventos que no pelean por el campo sino por la MANO y por el MAZO —barajar
-la tuya y robar otra, recortarle la suya al rival, sacar del descarte lo que ya
-habías perdido, subirte del mazo el bicho que te falta—. El set sabía pelear por
-la mesa y no sabía hacer nada de esto.
+Treinta de ellas son de la misma tanda (16-09-2026) y son la mitad del juego
+que faltaba. La **ronda del control** —diez criaturas y cinco eventos— no pelea
+por el campo sino por la MANO y por el MAZO: barajar la tuya y robar otra,
+recortarle la suya al rival, sacar del descarte lo que ya habías perdido,
+subirte del mazo el bicho que te falta. Y la **ronda del rebote** —seis
+criaturas y nueve de soporte— deshace lo hecho: devuelve a la mano una carta que
+ya estaba en juego, devuelve del descarte al MAZO (lo único que alarga un mazo,
+y la primera respuesta que la extinción ha tenido nunca) y pega directo al
+hábitat sin pasar por el combate.
 
 La mano inicial se puede **cambiar entera en el turno 1**: el primer cambio es
 gratis y roba las mismas cartas, y cada cambio siguiente roba una menos. Una mano
@@ -107,7 +111,7 @@ que sobra no es una forma de farmear.
 Un mazo son 55 cartas exactas y de cada carta caben tantas copias como diga su
 rareza: 3 común, 3 rara, 2 épica, 1 legendaria; la Pradera de helechos admite 7,
 que es lo que se midió. Y hay un tope más, de familia: **como mucho 3 criaturas
-legendarias por mazo**, contando las de jefe. Con 116 cartas distintas no caben
+legendarias por mazo**, contando las de jefe. Con 131 cartas distintas no caben
 ni de lejos todas, que es justo lo que hace que construir un mazo signifique
 algo. Tú llevas el tuyo; la IA lleva siempre el de referencia —28 criaturas,
 13 eventos, 4 de recurso, 1 clima y 9 de Biomasa—, que es el único que mide

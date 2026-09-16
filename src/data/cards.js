@@ -151,6 +151,17 @@ export const RASGO = Object.freeze({
   ENTERRAMIENTO: 'ENTERRAMIENTO',
   CAUCE_ABANDONADO: 'CAUCE_ABANDONADO',
   BARRERA_TRONCOS: 'BARRERA_TRONCOS',
+  // La ronda del rebote: del campo a la mano, del descarte al mazo, y al
+  // hábitat sin pasar por el combate.
+  CENIZA: 'CENIZA',
+  SEDIMENTO: 'SEDIMENTO',
+  OSARIO: 'OSARIO',
+  CARRONEROS: 'CARRONEROS',
+  OLEADA: 'OLEADA',
+  ESTAMPIDA: 'ESTAMPIDA',
+  MIGRACION: 'MIGRACION',
+  CRECIDA_DELTA: 'CRECIDA_DELTA',
+  CANTERA: 'CANTERA',
   // pulsos
   REBROTE: 'REBROTE',
   CARRONA: 'CARRONA',
@@ -546,6 +557,90 @@ export const CARTAS = Object.freeze({
     rasgoTexto: 'Tu rival pierde 4 cartas de su mazo, y 4 más si tiene más cartas en la mano que tú.',
     nivel_evidencia: EVIDENCIA.INFERIDO,
     nota_cientifica: 'Los atascos de troncos son estructuras corrientes en ríos con orillas arboladas: represan el cauce, lo desvían y concentran lo que baja con la corriente. En el Jurásico se infieren de las acumulaciones de leña fósil orientadas en los rellenos de canal.',
+  }),
+
+  // La ronda del REBOTE, lado soporte. Ocho eventos y un pulso para las tres
+  // ideas nuevas: del campo a la mano, del descarte al mazo, y al hábitat sin
+  // pasar por el combate.
+
+  ceniza: evento({
+    id: 'ceniza', rareza: RAREZA.RARO, binomial: 'Ceniza volcánica', coste: 2,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.CENIZA, rasgoNombre: 'Ceniza volcánica',
+    rasgoTexto: 'Tu rival pierde 6 cartas de su mazo.',
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Los niveles de ceniza volcánica son los mejores relojes del registro: se depositan en días, cubren cuencas enteras y se pueden datar por radiometría. Varias de las edades de la Morrison salen de ellos.',
+  }),
+
+  sedimento: evento({
+    id: 'sedimento', rareza: RAREZA.EPICO, binomial: 'Sedimento en suspensión', coste: 2,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.SEDIMENTO, rasgoNombre: 'Sedimento en suspensión',
+    rasgoTexto: 'Tu rival pierde 4 cartas de su mazo y descarta 2 al azar de su mano.',
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'El agua cargada de finos no deja ver ni cazar: la turbidez es una de las presiones ecológicas mejor documentadas en ambientes fluviales, actuales y fósiles, y se lee en la granulometría del relleno de canal.',
+  }),
+
+  osario: evento({
+    id: 'osario', rareza: RAREZA.RARO, binomial: 'Osario de la charca', coste: 2,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.OSARIO, rasgoNombre: 'Osario de la charca',
+    rasgoTexto: 'Devuelve 2 cartas al azar de tu descarte a tu mazo.',
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Las charcas que se secan concentran cadáveres: la cantera Cleveland-Lloyd es el ejemplo de manual, con decenas de individuos amontonados en una proporción que no se da en un ecosistema vivo. Lo que se acumuló vuelve al registro.',
+  }),
+
+  carroneros: evento({
+    id: 'carroneros', rareza: RAREZA.COMUN, binomial: 'Enjambre de carroñeros', coste: 1,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.CARRONEROS, rasgoNombre: 'Enjambre de carroñeros',
+    rasgoTexto: 'Devuelve 1 carta al azar de tu descarte a tu mazo y robas 1.',
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: 'Los huesos de la Morrison llevan marcas de mordida de terópodo y galerías de insectos dermestoideos: dos oleadas de carroñeo, una de vertebrados y otra de artrópodos, sobre el mismo cadáver.',
+  }),
+
+  oleada: evento({
+    id: 'oleada', rareza: RAREZA.COMUN, binomial: 'Oleada de calor', coste: 1,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.OLEADA, rasgoNombre: 'Oleada de calor',
+    rasgoTexto: 'Golpea 2 al hábitat de tu rival.',
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: 'Los modelos climáticos del Jurásico Superior dan al interior de Laurasia veranos muy por encima de los actuales, con una estación seca larga. Los paleosuelos con caliche de la Morrison son coherentes con eso.',
+  }),
+
+  estampida: evento({
+    id: 'estampida', rareza: RAREZA.EPICO, binomial: 'Estampida', coste: 2,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.ESTAMPIDA, rasgoNombre: 'Estampida',
+    rasgoTexto: 'Devuelve a la mano todos los dinosaurios de 2 o menos de Ataque, de los dos bandos.',
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'El yacimiento de Lark Quarry, en Queensland, conserva más de tres mil huellas de animales pequeños que salen todas en la misma dirección. Si huían de un depredador o de una crecida se discute; que salieron corriendo a la vez, no.',
+  }),
+
+  migracion: evento({
+    id: 'migracion', rareza: RAREZA.RARO, binomial: 'Migración estacional', coste: 2,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.MIGRACION, rasgoNombre: 'Migración estacional',
+    rasgoTexto: 'Devuelve a tu mano 1 dinosaurio tuyo y robas 1.',
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Los isótopos de oxígeno del esmalte de Camarasaurus registran desplazamientos estacionales hacia tierras altas durante la estación seca. Es de las pocas migraciones de dinosaurio que no se infieren, se miden.',
+  }),
+
+  crecida_delta: evento({
+    id: 'crecida_delta', rareza: RAREZA.RARO, binomial: 'Crecida del delta', coste: 2,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.CRECIDA_DELTA, rasgoNombre: 'Crecida del delta',
+    rasgoTexto: 'Devuelve a la mano 1 dinosaurio del rival de 6 o menos de Ataque.',
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Un delta avanza y retrocede con el caudal, y con él la línea de costa. Lo que estaba en tierra firme queda bajo el agua en una temporada: los rellenos de canal cortan y desplazan los depósitos anteriores.',
+  }),
+
+  cantera: recurso({
+    id: 'cantera', rareza: RAREZA.EPICO, binomial: 'Cantera abierta',
+    rasgo: RASGO.CANTERA, rasgoNombre: 'Cantera abierta',
+    rasgoTexto: '+3 Biomasa ahora mismo. Pierdes 4 cartas de tu mazo.',
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Abrir una cantera es destruir el yacimiento para llegar a lo que tiene dentro: cada bloque que sale es contexto que se pierde. Es el intercambio que hace toda excavación, y el que hace esta carta.',
   }),
 
   // ------------------------------------------------------------- recursos
@@ -1354,6 +1449,86 @@ export const CARTAS = Object.freeze({
     mecanica: Object.freeze({ cuenta: { que: QUE.MANO_RIVAL, ataque: 1, tope: 3 } }),
     nivel_evidencia: EVIDENCIA.DEBATIDO,
     nota_cientifica: 'Dromeosáurido grande de Hell Creek descrito en 2015. Parte del material asignado al holotipo resultó después ser de una tortuga, así que qué huesos son suyos —y por tanto su tamaño— sigue discutido; la garra en hoz del segundo dedo sí es suya.',
+  }),
+
+  // ------------------------------------------------ la ronda del REBOTE
+  //
+  // Seis criaturas (16-09-2026) para tres ideas que el set no tenía: sacar una
+  // carta del CAMPO a la mano, devolver del descarte al MAZO —lo único que
+  // alarga un mazo en todo el juego— y pegarle al hábitat sin pasar por el
+  // combate. Las dos legendarias son además las dos cartas que `CLAUDE.md`
+  // lleva meses pidiendo para que Kem Kem y Tendaguru dejen de repetir mazos.
+
+  carcharodontosaurus: dino({
+    id: 'carcharodontosaurus', rareza: RAREZA.LEGENDARIO, clado: CLADO.TEROPODO,
+    binomial: 'Carcharodontosaurus saharicus',
+    coste: 4, ataque: 10, vida: 7,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Dentellada que desgarra',
+    rasgoTexto: 'Cuando entra en juego golpea 3 al hábitat de tu rival.',
+    mecanica: Object.freeze({ entrada: { golpeHabitat: 3 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Carcarodontosáurido del Cenomaniense del norte de África, de los terópodos más grandes conocidos. Sus dientes son hojas comprimidas y aserradas —de ahí el nombre, «lagarto con dientes de tiburón»—: una dentición para cortar carne, no para triturar hueso como la de los tiranosáuridos.',
+  }),
+
+  giraffatitan: dino({
+    id: 'giraffatitan', rareza: RAREZA.LEGENDARIO, clado: CLADO.SAUROPODO,
+    binomial: 'Giraffatitan brancai',
+    coste: 4, ataque: 3, vida: 13,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'El paso que despeja',
+    rasgoTexto: 'Cuando entra en juego devuelve a la mano 1 dinosaurio tuyo y 1 del rival de 4 o menos de Ataque.',
+    mecanica: Object.freeze({ entrada: { devuelve: { propio: 1, rival: 1, ataqueMax: 4 } } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Braquiosáurido de Tendaguru, Tanzania, Titoniense. El esqueleto montado en Berlín mide trece metros de alto y es el más alto del mundo. Se separó de Brachiosaurus en 1988: las proporciones del tronco y de las vértebras cervicales no son las mismas.',
+  }),
+
+  tupandactylus: dino({
+    id: 'tupandactylus', rareza: RAREZA.EPICO, clado: CLADO.PTEROSAURIO,
+    binomial: 'Tupandactylus imperator',
+    coste: 3, ataque: 3, vida: 4,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Picado sobre el nido',
+    rasgoTexto: 'Cuando entra en juego golpea 2 al hábitat de tu rival.',
+    mecanica: Object.freeze({ entrada: { golpeHabitat: 2 } }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: 'Tapejárido del Aptiense de Brasil. La cresta craneal es una vela ósea con un reborde de tejido blando conservado, tan grande que casi con seguridad fue de exhibición: no hay forma de que semejante superficie saliera gratis en vuelo.',
+  }),
+
+  rugops: dino({
+    id: 'rugops', rareza: RAREZA.RARO, clado: CLADO.TEROPODO,
+    binomial: 'Rugops primus',
+    coste: 2, ataque: 3, vida: 3,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Hocico de carroñero',
+    rasgoTexto: 'Cuando entra en juego devuelve 2 cartas al azar de tu descarte a tu mazo.',
+    mecanica: Object.freeze({ entrada: { entierra: 2 } }),
+    nivel_evidencia: EVIDENCIA.DEBATIDO,
+    nota_cientifica: 'Abelisáurido del Cenomaniense de Níger, conocido casi sólo por un cráneo. Es grácil, con una mandíbula poco resistente y hileras de forámenes en el hocico; de ahí se ha propuesto que carroñeara más que cazara, pero un solo cráneo da para poco.',
+  }),
+
+  ouranosaurus: dino({
+    id: 'ouranosaurus', rareza: RAREZA.RARO, clado: CLADO.ORNITOPODO,
+    binomial: 'Ouranosaurus nigeriensis',
+    coste: 2, ataque: 2, vida: 6,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Repliegue de la vela',
+    rasgoTexto: 'Cuando entra en juego devuelve a la mano 1 dinosaurio tuyo y tu rival pierde 2 cartas de su mazo.',
+    mecanica: Object.freeze({ entrada: { devuelve: { propio: 1 }, mueleRival: 2 } }),
+    nivel_evidencia: EVIDENCIA.DEBATIDO,
+    nota_cientifica: 'Iguanodontio del Aptiense de Níger con las espinas neurales alargadas. Si sostenían una vela de piel o una joroba de grasa lleva discutiéndose desde su descripción en 1976, y las dos hipótesis siguen vivas.',
+  }),
+
+  deltadromeus: dino({
+    id: 'deltadromeus', rareza: RAREZA.EPICO, clado: CLADO.TEROPODO,
+    binomial: 'Deltadromeus agilis',
+    coste: 3, ataque: 6, vida: 4,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Carrera que dispersa',
+    rasgoTexto: 'Cuando entra en juego devuelve a la mano 1 dinosaurio del rival de 4 o menos de Ataque.',
+    mecanica: Object.freeze({ entrada: { devuelve: { rival: 1, ataqueMax: 4 } } }),
+    nivel_evidencia: EVIDENCIA.DEBATIDO,
+    nota_cientifica: 'Terópodo del Cenomaniense de Marruecos, descrito en 1996 sobre un esqueleto sin cráneo. Las extremidades traseras son largas y gráciles, de donde sale su nombre y la idea de que corría; a qué familia pertenece y si el material es de un solo animal se sigue discutiendo.',
   }),
 
   // ------------------------------------------------------------- biomasa
