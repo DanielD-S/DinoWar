@@ -1769,6 +1769,10 @@ que no se puede hacer. O sea: **un comentario dentro de un fichero del paquete
 cuesta el ciclo entero**. Conviene saberlo antes de escribirlo, no después: lo
 que no sea necesario ahí, mejor en `CLAUDE.md`, que no entra en el paquete.
 
+Y se comprobó: **desplegado el 16-09-2026 anclado a `32bb495`**, con la receta
+de abajo —401 «sesión inválida»—. El `ezbr_sha256` cambió, como siempre; lo que
+NO cambió fue una sola línea del código que corre.
+
 **Desplegar por MCP, no por el panel.** `mcp__Supabase__deploy_edge_function`
 sube el fichero directamente. Es la vía buena.
 
@@ -1898,6 +1902,17 @@ En local no se reproduce ninguno de los dos problemas: `python -m http.server`
 no manda `Cache-Control`. Por eso sobrevivieron tanto.
 
 ## Publicar
+
+**Antes de sacar la rama de trabajo otra vez de `origin/main`, mirar si tiene
+commits que main no tenga.** Ha mordido dos veces seguidas: se empieza el
+cambio siguiente con `git checkout -B <rama> origin/main`, y lo que estaba en
+la rama y todavía no se había mergeado —la nota de «ya está en producción», las
+dos veces— desaparece sin decir nada. Los tiene siempre que haya una PR abierta
+sin mergear:
+
+```bash
+git log --oneline origin/main..origin/<rama>   # vacío = re-ramificar es seguro
+```
 
 `main` es lo que sirve GitHub Pages: lo que se mergea sale en producción sin más
 pasos. CI corre los tests en cada push y necesita `fetch-depth: 0`, porque
