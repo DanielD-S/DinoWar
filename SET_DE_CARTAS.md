@@ -8,9 +8,9 @@
 > **Sed**: heridas que recibe cuando sale *Sequía estacional*. **No es un
 > segundo coste**: no se paga al jugarla, sólo cuando el clima lo cobra.
 
-El set tiene **131 cartas distintas**. Un mazo son **55 cartas exactas**, así que no caben todas: el de referencia lleva 28 dinosaurios, 13 eventos, 4 de recurso y 1 de clima.
+El set tiene **139 cartas distintas**. Un mazo son **55 cartas exactas**, así que no caben todas: el de referencia lleva 28 dinosaurios, 13 eventos, 4 de recurso y 1 de clima.
 
-Fuera del mazo de referencia, y por tanto sin medir aquí: Torvosaurus tanneri, Nodosaurus textilis, Neumaticidad ósea, Competencia trófica, Mortandad estacional, Llanura de inundación, Bosque de coníferas ribereño, Deriva árida, Tormenta de polvo, Avenida de lodo, Enterramiento rápido, Cauce abandonado, Barrera de troncos, Ceniza volcánica, Sedimento en suspensión, Osario de la charca, Enjambre de carroñeros, Oleada de calor, Estampida, Migración estacional, Crecida del delta, Cantera abierta, Carroña abundante, Lago efímero, Manada de paso, Frutos de cícada, Crecida estacional, Bruma de valle, Estación de lluvias, Sequía prolongada, Plesiopleurodon wellesi, Ojoraptorsaurus boerei, Dromaeosaurus albertensis, Athenar bermani, Sanjuansaurus gordilloi, Suchomimus tenerensis, Eosinopteryx brevipenna, Troodon formosus, Carnotaurus sastrei, Spinosaurus aegyptiacus, Mosasaurus hoffmannii, Halszkaraptor escuilliei, Tongtianlong limosus, Scanisaurus nazarowi, Monolophosaurus jiangi, Invictarx zephyri, Medusaceratops lokii, Platyceratops tatarinovi, Loricatosaurus priscus, Therizinosaurus cheloniformis, Alaskacephale gangloffi, Titanoceratops ouranos, Atlasaurus imelakei, Stegoceras validum, Maiasaura peeblesorum, Edmontosaurus annectens, Plateosauravus cullingworthi, Gargoyleosaurus parkpinorum, Wendiceratops pinhornensis, Antarctosaurus wichmannianus, Liaoceratops yanzigouensis, Rhinorex condrupus, Bienosaurus lufengensis, Shuangmiaosaurus gilmorei, Chasmosaurus belli, Tyrannosaurus rex, Brachiosaurus altithorax, Argentinosaurus huinculensis, Mamenchisaurus hochuanensis, Ankylosaurus magniventris, Euoplocephalus tutus, Triceratops horridus, Parasaurolophus walkeri, Pteranodon longiceps, Quetzalcoatlus northropi, Elasmosaurus platyurus, Gallimimus bullatus, Thescelosaurus neglectus, Deinocheirus mirificus, Anzu wyliei, Nigersaurus taqueti, Shuvuuia deserti, Saurolophus angustirostris, Tarbosaurus bataar, Psittacosaurus mongoliensis, Dakotaraptor steini, Carcharodontosaurus saharicus, Giraffatitan brancai, Tupandactylus imperator, Rugops primus, Ouranosaurus nigeriensis, Deltadromeus agilis, Arboleda de ginkgos, Juncal de equisetos, Bosque de galería, Helechal arborescente, Vega de aluvión, Humedal de tierras bajas, Manantial perenne. Se juegan igual, pero su calibración no está comprobada.
+Fuera del mazo de referencia, y por tanto sin medir aquí: Torvosaurus tanneri, Nodosaurus textilis, Neumaticidad ósea, Competencia trófica, Mortandad estacional, Llanura de inundación, Bosque de coníferas ribereño, Deriva árida, Tormenta de polvo, Avenida de lodo, Enterramiento rápido, Cauce abandonado, Barrera de troncos, Ceniza volcánica, Sedimento en suspensión, Osario de la charca, Enjambre de carroñeros, Oleada de calor, Estampida, Migración estacional, Crecida del delta, Cantera abierta, Incendio estacional, Colapso del acuífero, Carroña abundante, Lago efímero, Manada de paso, Frutos de cícada, Crecida estacional, Bruma de valle, Estación de lluvias, Sequía prolongada, Plesiopleurodon wellesi, Ojoraptorsaurus boerei, Dromaeosaurus albertensis, Athenar bermani, Sanjuansaurus gordilloi, Suchomimus tenerensis, Eosinopteryx brevipenna, Troodon formosus, Carnotaurus sastrei, Spinosaurus aegyptiacus, Mosasaurus hoffmannii, Halszkaraptor escuilliei, Tongtianlong limosus, Scanisaurus nazarowi, Monolophosaurus jiangi, Invictarx zephyri, Medusaceratops lokii, Platyceratops tatarinovi, Loricatosaurus priscus, Therizinosaurus cheloniformis, Alaskacephale gangloffi, Titanoceratops ouranos, Atlasaurus imelakei, Stegoceras validum, Maiasaura peeblesorum, Edmontosaurus annectens, Plateosauravus cullingworthi, Gargoyleosaurus parkpinorum, Wendiceratops pinhornensis, Antarctosaurus wichmannianus, Liaoceratops yanzigouensis, Rhinorex condrupus, Bienosaurus lufengensis, Shuangmiaosaurus gilmorei, Chasmosaurus belli, Tyrannosaurus rex, Brachiosaurus altithorax, Argentinosaurus huinculensis, Mamenchisaurus hochuanensis, Ankylosaurus magniventris, Euoplocephalus tutus, Triceratops horridus, Parasaurolophus walkeri, Pteranodon longiceps, Quetzalcoatlus northropi, Elasmosaurus platyurus, Gallimimus bullatus, Thescelosaurus neglectus, Deinocheirus mirificus, Anzu wyliei, Nigersaurus taqueti, Shuvuuia deserti, Saurolophus angustirostris, Tarbosaurus bataar, Psittacosaurus mongoliensis, Dakotaraptor steini, Carcharodontosaurus saharicus, Giraffatitan brancai, Tupandactylus imperator, Rugops primus, Ouranosaurus nigeriensis, Deltadromeus agilis, Patagotitan mayorum, Dreadnoughtus schrani, Hatzegopteryx thambema, Borealopelta markmitchelli, Zuul crurivastator, Sauropelta edwardsorum, Arboleda de ginkgos, Juncal de equisetos, Bosque de galería, Helechal arborescente, Vega de aluvión, Humedal de tierras bajas, Manantial perenne. Se juegan igual, pero su calibración no está comprobada.
 
 **Qué revisar sobre todo:** los eventos de presión y las cartas de recurso.
 Son lo único del set que no describe un animal sino una presión sobre él, y
@@ -28,9 +28,9 @@ es legendario.
 | Rareza | Copias máximas | Cartas distintas | En el mazo de referencia |
 |---|---|---|---|
 | Común | 3 | 39 | 28 |
-| Rara | 3 | 38 | 20 |
-| Épica | 2 | 36 | 5 |
-| Legendaria | 1 | 18 | 2 |
+| Rara | 3 | 42 | 20 |
+| Épica | 2 | 39 | 5 |
+| Legendaria | 1 | 19 | 2 |
 
 ---
 
@@ -120,6 +120,12 @@ es legendario.
 | *Rugops primus* | Terópodo | Rara | 0 | 2 | 3 | 3 | undefined |
 | *Ouranosaurus nigeriensis* | Ornitópodo | Rara | 0 | 2 | 2 | 6 | undefined |
 | *Deltadromeus agilis* | Terópodo | Épica | 0 | 3 | 6 | 4 | undefined |
+| *Patagotitan mayorum* | Saurópodo | Legendaria | 0 | 4 | 4 | 13 | undefined |
+| *Dreadnoughtus schrani* | Saurópodo | Épica | 0 | 4 | 4 | 11 | undefined |
+| *Hatzegopteryx thambema* | Pterosaurio | Rara | 0 | 3 | 5 | 3 | undefined |
+| *Borealopelta markmitchelli* | Tireóforo | Épica | 0 | 3 | 1 | 9 | undefined |
+| *Zuul crurivastator* | Tireóforo | Rara | 0 | 2 | 2 | 6 | undefined |
+| *Sauropelta edwardsorum* | Tireóforo | Rara | 0 | 3 | 2 | 7 | undefined |
 
 *Camarasaurus* es inmune a la Sed: sus isótopos indican que migraba.
 
@@ -809,6 +815,54 @@ es legendario.
 
 `DEBATIDO` · Terópodo del Cenomaniense de Marruecos, descrito en 1996 sobre un esqueleto sin cráneo. Las extremidades traseras son largas y gráciles, de donde sale su nombre y la idea de que corría; a qué familia pertenece y si el material es de un solo animal se sigue discutiendo.
 
+### *Patagotitan mayorum* · Saurópodo · Legendaria · fuera del mazo de referencia
+
+**4 de coste · 4 de Ataque · 13 de Vida**
+
+**El peso que hunde la llanura** — Cuando entra en juego golpea 4 al hábitat de tu rival.
+
+`ESTABLECIDO` · Titanosaurio del Albiense de Chubut, Argentina, descrito en 2017 sobre seis ejemplares de un mismo yacimiento. Es de los dinosaurios mejor conocidos entre los más grandes: la mayoría de los gigantes se describen con un hueso suelto y éste tiene esqueleto.
+
+### *Dreadnoughtus schrani* · Saurópodo · Épica · fuera del mazo de referencia
+
+**4 de coste · 4 de Ataque · 11 de Vida**
+
+**Paso que abre el cauce** — Cuando entra en juego golpea 3 al hábitat de tu rival.
+
+`ESTABLECIDO` · Titanosaurio del Campaniense de Santa Cruz, Argentina. El holotipo conserva alrededor del 70 % del esqueleto sin contar el cráneo, una proporción rarísima en un saurópodo gigante, y las suturas indican que aún no había terminado de crecer.
+
+### *Hatzegopteryx thambema* · Pterosaurio · Rara · fuera del mazo de referencia
+
+**3 de coste · 5 de Ataque · 3 de Vida**
+
+**Cazador de la isla** — Cuando entra en juego golpea 2 al hábitat de tu rival.
+
+`INFERIDO` · Azdárquido del Maastrichtiense de la isla de Hateg, Rumanía, con diez metros de envergadura. El cuello es corto y robusto —al revés que en sus parientes— y de ahí se infiere que cazaba presas grandes: en aquella isla enana no había terópodos que le hicieran competencia.
+
+### *Borealopelta markmitchelli* · Tireóforo · Épica · fuera del mazo de referencia
+
+**3 de coste · 1 de Ataque · 9 de Vida**
+
+**Coraza de la marea** — Resta 2 a cada golpe que llegue a tu hábitat.
+
+`ESTABLECIDO` · Nodosáurido del Albiense de Alberta, conservado boca arriba en sedimento marino con la piel, los osteodermos en su sitio y el contenido estomacal dentro. Es probablemente el dinosaurio mejor conservado que se ha encontrado; hasta se le ha medido el patrón de contrasombreado.
+
+### *Zuul crurivastator* · Tireóforo · Rara · fuera del mazo de referencia
+
+**2 de coste · 2 de Ataque · 6 de Vida**
+
+**Destrozador de espinillas** — Resta 1 a cada golpe que llegue a tu hábitat.
+
+`ESTABLECIDO` · Anquilosáurido del Campaniense de Montana, con cráneo y cola completos. El epíteto —«destrozador de espinillas»— viene del mazo caudal, y varios de sus osteodermos muestran lesiones curadas compatibles con combate entre individuos de la misma especie.
+
+### *Sauropelta edwardsorum* · Tireóforo · Rara · fuera del mazo de referencia
+
+**3 de coste · 2 de Ataque · 7 de Vida**
+
+**Repliegue tras las púas** — Cuando entra en juego tu hábitat recupera 4.
+
+`ESTABLECIDO` · Nodosáurido del Aptiense-Albiense de Wyoming y Montana. Lleva una hilera de púas cónicas que crecen de tamaño hacia el cuello, las más largas de casi medio metro: una defensa que no requiere moverse del sitio.
+
 ---
 
 ## 2. Eventos
@@ -981,6 +1035,18 @@ Se juega **sobre la mesa entera, sin elegir objetivo**. Devuelve a la mano 1 din
 
 `ESTABLECIDO` · Un delta avanza y retrocede con el caudal, y con él la línea de costa. Lo que estaba en tierra firme queda bajo el agua en una temporada: los rellenos de canal cortan y desplazan los depósitos anteriores.
 
+### Incendio estacional · Rara · coste 2 · fuera del mazo de referencia
+
+Se juega **sobre la mesa entera, sin elegir objetivo**. Golpea 5 al hábitat de tu rival.
+
+`ESTABLECIDO` · El fusinita —carbón vegetal fósil— aparece en toda la Morrison y es la firma de un incendio: madera quemada a alta temperatura y enterrada después. Con una estación seca larga y tormenta eléctrica al final, el fuego era parte del ciclo, no una catástrofe.
+
+### Colapso del acuífero · Épica · coste 3 · fuera del mazo de referencia
+
+Se juega **sobre la mesa entera, sin elegir objetivo**. Golpea 2 al hábitat de tu rival por cada dinosaurio tuyo en juego, hasta 6.
+
+`INFERIDO` · Los saurópodos de la Morrison bebían de charcas alimentadas por el nivel freático, y una manada grande las agota antes de que se repongan. El pisoteo que compacta el suelo alrededor de un punto de agua está documentado en herbívoros grandes actuales; para el Jurásico se infiere de los niveles de huellas.
+
 ### Gregarismo · Rara · coste 1 · 2 copias
 
 +1 de Ataque a todos tus dinosaurios de la misma especie que el objetivo.
@@ -1142,6 +1208,18 @@ Devuelve a tu mano 1 dinosaurio tuyo y robas 1.
 Devuelve a la mano 1 dinosaurio del rival de 6 o menos de Ataque.
 
 `ESTABLECIDO` · Un delta avanza y retrocede con el caudal, y con él la línea de costa. Lo que estaba en tierra firme queda bajo el agua en una temporada: los rellenos de canal cortan y desplazan los depósitos anteriores.
+
+### Incendio estacional · Rara · coste 2 · fuera del mazo de referencia
+
+Golpea 5 al hábitat de tu rival.
+
+`ESTABLECIDO` · El fusinita —carbón vegetal fósil— aparece en toda la Morrison y es la firma de un incendio: madera quemada a alta temperatura y enterrada después. Con una estación seca larga y tormenta eléctrica al final, el fuego era parte del ciclo, no una catástrofe.
+
+### Colapso del acuífero · Épica · coste 3 · fuera del mazo de referencia
+
+Golpea 2 al hábitat de tu rival por cada dinosaurio tuyo en juego, hasta 6.
+
+`INFERIDO` · Los saurópodos de la Morrison bebían de charcas alimentadas por el nivel freático, y una manada grande las agota antes de que se repongan. El pisoteo que compacta el suelo alrededor de un punto de agua está documentado en herbívoros grandes actuales; para el Jurásico se infiere de los niveles de huellas.
 
 ---
 

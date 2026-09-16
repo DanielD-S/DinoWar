@@ -494,6 +494,21 @@ function aplicarPresion(s, p) {
     if (suyos[0]) devolverAMano(s, suyos[0].iid);
     ev(s, 'PRESION', { jugador: p.jugador, cardId });
 
+  // ------------------------------------------------ la ronda del HÁBITAT
+
+  } else if (r === RASGO.INCENDIO) {
+    golpearHabitat(s, contrario, BALANCE.rasgos.incendioHabitat);
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  } else if (r === RASGO.ACUIFERO) {
+    // Escala con TU campo y no con el suyo: es el premio por haber ganado la
+    // mesa, no un castigo por tenerla vacía. Con tope, que sin él cuatro
+    // carriles llenos son ocho de hábitat gratis todos los turnos.
+    const { acuiferoPorDino, acuiferoTope } = BALANCE.rasgos;
+    const dano = Math.min(acuiferoTope, unidadesDe(s, p.jugador).length * acuiferoPorDino);
+    golpearHabitat(s, contrario, dano);
+    ev(s, 'PRESION', { jugador: p.jugador, cardId, dano });
+
   } else if (r === RASGO.BARRERA_TRONCOS) {
     // La mano propia se cuenta SIN esta carta: se está jugando, ya no está en
     // la mano, y contarla haría que la condición dependiera de sí misma.

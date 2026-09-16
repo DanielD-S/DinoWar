@@ -206,6 +206,18 @@ export const BALANCE = Object.freeze({
     estampidaAtaqueMax: 2,      // vuelven a la mano los de ESE Ataque o menos
     migracionRoba: 1,
     crecidaAtaqueMax: 6,        // el del rival que se devuelve, como mucho
+
+    // La ronda del HÁBITAT. Es la única de las tres vías de victoria para la
+    // que no se podía construir: el set entero tenía TRES copias de daño
+    // directo contra un hábitat de 70, así que se ganaba por ahí de rebote
+    // —cuando el muro no llegaba— y nunca a propósito.
+    incendioHabitat: 5,
+    acuiferoPorDino: 2,         // por cada dinosaurio TUYO en juego
+    // El tope MUERDE: con cuatro carriles, 2 por dinosaurio da 8 como máximo,
+    // así que un tope de 8 era un campo puesto y no leído —lo cazó su propio
+    // test—. A 6 se llega con tres, y el cuarto ya no suma: la carta paga por
+    // haber ganado la mesa, no por llenarla hasta el último hueco.
+    acuiferoTope: 6,
   }),
 
   // Cartas de recurso: Biomasa inmediata con inconveniente. Atacan el atasco de mano,

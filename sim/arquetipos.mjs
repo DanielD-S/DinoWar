@@ -94,9 +94,30 @@ export const CONTROL = [
   ['biomasa', 5], ['araucarias', 2], ['cicadas', 2],
 ];
 
+/**
+ * HÁBITAT. La tercera vía, que hasta el 16-09-2026 no tenía mazo posible: el
+ * set entero llevaba TRES copias de daño directo contra los 70 que hay que
+ * bajar, así que se ganaba por ahí de rebote —cuando el muro no llegaba— y
+ * nunca a propósito.
+ *
+ * La apuesta es que el daño directo NO pasa por el combate, así que un muro no
+ * lo para. Y por eso el mazo no necesita ganar la mesa: le basta con aguantar
+ * mientras Incendio, Acuífero y los tres gigantes le van bajando la cifra.
+ */
+export const HABITAT = [
+  ['incendio', 3], ['acuifero', 2], ['oleada', 3],
+  ['patagotitan', 1], ['dreadnoughtus', 2], ['hatzegopteryx', 3],
+  ['carcharodontosaurus', 1], ['tupandactylus', 2],
+  ['brachylophosaurus', 3], ['loricatosaurus', 3], ['stegoceras', 3],
+  ['apatosaurus', 3], ['euoplocephalus', 3], ['parasaurolophus', 3],
+  ['medusaceratops', 2], ['atlasaurus', 2], ['elasmosaurus', 3],
+  ['diplodocus', 3], ['nodosaurus', 1],
+  ['biomasa', 5], ['araucarias', 2], ['cicadas', 2],
+];
+
 export const ARQUETIPOS = Object.freeze({
   REFERENCIA: MAZO.map((e) => [...e]),
-  MOLIENDA, ENTIERRO, CONTROL,
+  MOLIENDA, ENTIERRO, CONTROL, HABITAT,
 });
 
 // ------------------------------------------------------------ la medición
