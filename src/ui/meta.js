@@ -75,10 +75,19 @@ export function montarMeta(alVolver, alAbrirPack = () => {}) {
   // La ficha se abre CON la lista que se está viendo, para poder pasar de una
   // carta a la siguiente sin cerrarla. La lista sale del DOM y no de una copia
   // guardada: lo que se ve es lo que hay, con sus filtros y su orden.
-  const alTocarCarta = (nodo) => (e) => {
-    const c = e.target.closest('[data-card]');
+  //
+  // Y se acota a la CELDA, nunca a `[data-card]` a secas. `cartaHTML()` pone
+  // `data-card` en la propia carta y la celda lo pone otra vez en su
+  // envoltorio, así que un `querySelectorAll('[data-card]')` devuelve el id
+  // DOS veces por cada carta que tienes —la de fuera y la de dentro—. La
+  // lista salía duplicada y, como `indexOf` da siempre la primera, «siguiente»
+  // caía en el gemelo: se veía como «238 / 241» y «239 / 241» con la misma
+  // carta. El editor de mazos no lo tuvo nunca porque ya acotaba con
+  // `.mazo-celda[data-card]`.
+  const alTocarCarta = (nodo, celda) => (e) => {
+    const c = e.target.closest(celda);
     if (!c) return;
-    const ids = [...nodo.querySelectorAll('[data-card]')].map((x) => x.dataset.card);
+    const ids = [...nodo.querySelectorAll(celda)].map((x) => x.dataset.card);
     abrirFicha(fichaHTML(c.dataset.card), { ids, i: ids.indexOf(c.dataset.card) });
   };
   // Crear con esquirlas: el primer toque pregunta y el segundo crea. Va en
@@ -102,8 +111,8 @@ export function montarMeta(alVolver, alAbrirPack = () => {}) {
     pintarColeccion();
     pintarMenu();
   }, { capture: true });
-  dom.rejilla.addEventListener('click', alTocarCarta(dom.rejilla));
-  dom.tirada.addEventListener('click', alTocarCarta(dom.tirada));
+  dom.rejilla.addEventListener('click', alTocarCarta(dom.rejilla, '.col-carta[data-card]'));
+  dom.tirada.addEventListener('click', alTocarCarta(dom.tirada, '.sobre-carta[data-card]'));
 
   dom.btnFundir.addEventListener('click', fundirSobrantes);
   dom.btnAbrir.addEventListener('click', comprarSobre);
