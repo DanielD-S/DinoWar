@@ -55,6 +55,32 @@ def ids_de_cartas():
     set es JavaScript, y para comprobar un nombre no hace falta más."""
     fuente = (RAIZ / 'src' / 'data' / 'cards.js').read_text(encoding='utf-8')
     return set(re.findall(r"\bid:\s*'([a-z0-9_]+)'", fuente))
+def ids_de_expediciones():
+    """Los ids de las cinemáticas: `exp_<formacion>` y `exp_<formacion>_fin`.
+
+    No son cartas y no están en `cards.js`, así que sin esto la herramienta las
+    daría por mal escritas. Sólo las FORMACIONES —las que llevan `era`—: un
+    visitante de la semana no tiene mapa y no lleva cinemática."""
+    fuente = (RAIZ / 'src' / 'data' / 'expediciones.js').read_text(encoding='utf-8')
+    ids = re.findall(r"id: '([a-z0-9_]+)',\n\s*nombre: '[^']*',\n\s*era:", fuente)
+    return {f'exp_{i}' for i in ids} | {f'exp_{i}_fin' for i in ids}
+
+
+def escribir_indice():
+    """Qué vídeos hay servidos, para que el juego no los pida a ciegas.
+
+    La apertura del sobre puede preguntar por un `<id>.mp4` que no existe —una
+    legendaria sin criatura— y no pasa nada, porque eso ocurre una vez. Una
+    cinemática de expedición se pediría en CADA visita al mapa mientras falte
+    el fichero: un 404 por visita en la consola, que es la queja de siempre.
+    Es la misma razón por la que `assets/piel/expediciones/` tiene su índice."""
+    hay = sorted(f.stem for f in DESTINO.glob('*.mp4'))
+    destino = DESTINO / 'indice.json'
+    destino.write_text(json.dumps({'videos': hay}, indent=2, ensure_ascii=False) + '\n',
+                       encoding='utf-8')
+    print(f'{destino.relative_to(RAIZ)}: {len(hay)} vídeos servidos')
+
+
 
 
 def medir(ruta):
@@ -109,7 +135,7 @@ def main(escribir):
     if solo:
         fuentes = [f for f in fuentes if f.stem.lower() in solo]
 
-    ids = ids_de_cartas()
+    ids = ids_de_cartas() | ids_de_expediciones()
     for f in fuentes:
         # En minúsculas: la apertura pide `<id>.mp4` y el id va en minúsculas.
         # Y contra la lista de cartas, que un vídeo con el nombre mal escrito
@@ -117,7 +143,8 @@ def main(escribir):
         # `Tyrannotitan.mp4` y `maiasaurua.mp4` en el primer lote.
         nombre = f.stem.lower()
         if nombre not in ids:
-            print(f'{f.name}: ¡«{nombre}» no es el id de ninguna carta! No se enseñará. Se convierte igual.')
+            print(f'{f.name}: ¡«{nombre}» no es el id de ninguna carta ni de ninguna '
+                  f'cinemática! No se enseñará. Se convierte igual.')
         destino = DESTINO / f'{nombre}.mp4'
         m = medir(f)
         origen = f"{m['ancho']}×{m['alto']}, {m['dura']:.1f} s, {m['kb'] // 1024}.{m['kb'] % 1024 * 10 // 1024} MB"
@@ -129,7 +156,11 @@ def main(escribir):
         else:
             print(f'{f.name}: {origen} -> {destino.relative_to(RAIZ)}')
 
-    if not escribir:
+    if escribir:
+        # Siempre, aunque se hayan convertido sólo unos pocos: el índice
+        # describe la carpeta entera y no lo que se acaba de tocar.
+        escribir_indice()
+    else:
         print('\n(sin escribir; pasa «escribir» para generar)')
 
 
