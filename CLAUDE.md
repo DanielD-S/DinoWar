@@ -348,6 +348,49 @@ once del anclaje. Y después, con la receta de `supabase/functions/README.md`:
 contesta `401 {"error":"sesión inválida"}`, que prueba que los once importes
 por URL resolvieron y que el código vivo es el nuestro.
 
+**Aplicado y desplegado el 16-09-2026.** Las 144 filas están en
+`catalogo_cartas` —139 del set más las 5 de jefe— y la Edge Function quedó
+anclada a `ccdd73f`, el commit de merge de la PR #110, que vive en `main`
+porque se mergeó con MERGE y no con squash. Comprobado con la receta de
+`supabase/functions/README.md`: contesta `401 {"error":"sesión inválida"}`, y
+el `ezbr_sha256` pasó de `84d2d4d0…` a `71ef4557…`.
+
+Antes de aplicar se hizo el ensayo que conviene repetir siempre, porque la 0006
+BORRA lo que ya no está en el set y `coleccion` tiene una clave foránea contra
+esa tabla: una consulta que lista qué se añadiría y qué se borraría. Salieron
+las 8 altas y CERO bajas.
+
+### jsDelivr puede envenenar la caché de UN fichero, y se ve como un fallo del commit
+
+Lo que costó este despliegue, por si vuelve. El primer intento murió con
+`Module not found` sobre `src/engine/ai.js`, y el segundo —tres minutos
+después— con `403 Forbidden` sobre `src/engine/economia.js`. Parecía que el
+commit anclado no existía.
+
+No era eso. Probando los 23 ficheros del paquete uno a uno desde la propia base
+de datos con la extensión `http` —la misma receta de la prueba de humo, que
+sirve igual para esto—, **22 daban 200 y sólo `economia.js` daba 403**, cinco
+veces seguidas. Y el mismo fichero, en el mismo commit, daba 200 por
+`fastly.jsdelivr.net` y por `gcore.jsdelivr.net`, y también por
+`cdn.jsdelivr.net` pidiéndolo por `@main`. O sea: **un nodo de `cdn.` con un 403
+cacheado para esa única URL**, no un problema del commit ni del fichero.
+
+Dos cosas que llevarse:
+
+- **Un SHA nuevo son claves de caché nuevas**, así que la salida es re-anclar a
+  otro commit de `main` en vez de esperar a que expire. Aquí se re-ancló del
+  `4020cbc` al `ccdd73f`, que es el commit de merge y lleva el mismo motor.
+- **Antes de desplegar, comprobar los 23 ficheros de `VIGILADOS` en el SHA
+  anclado** con un `http_get` por fichero desde SQL. Tarda un segundo y
+  distingue «jsDelivr todavía no lo ve» de «hay un 403 pegado a un fichero»,
+  que desde el error del empaquetador se leen igual.
+
+Y una advertencia sobre la herramienta: `node tools/anclar-desde-url.mjs` **no
+acepta banderas**, y una inventada (`--comprobar`) no da error de uso: se la
+pasa a `git` por dentro, `git` falla, y la herramienta reescribe `desde-url.ts`
+dejando el SHA VACÍO —`DinoWar@`— y diciendo `MAL` en cada fichero. Se arregla
+con `git checkout --`, pero conviene no llamarla con argumentos.
+
 Y la trampa que enseñó esta tanda al desplegar: entre aplicar la migración y
 desplegar la función hay una ventana en la que producción está A MEDIAS, y no
 es simétrica. El cliente sale solo desde `main`, así que la gente ve las cartas
