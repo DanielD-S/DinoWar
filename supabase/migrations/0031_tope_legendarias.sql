@@ -15,6 +15,14 @@
 --
 -- Esto es una re-creación de `private.validar_mazo` con un bloque más; lo
 -- demás va palabra por palabra como estaba en la 0007.
+--
+-- Aplicada en producción el 16-09-2026, después del delta de la 0006 —la
+-- columna `legendarias_dino_max` y la fila de `catalogo_economia`, que es lo
+-- único que la regeneración cambió—. Comprobado en ejecución y no sólo al
+-- crearla, que el cuerpo de una PL/pgSQL no se analiza hasta llamarla: de los
+-- ocho mazos guardados, los siete legales pasan y el «PRUEBA» con nueve
+-- legendarias es el único que rebota. Y comprobado que anon sigue sin poder
+-- llamarla.
 
 create or replace function private.validar_mazo(p_jugador uuid, p_cartas jsonb)
 returns void

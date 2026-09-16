@@ -859,6 +859,13 @@ Cuatro cosas que conviene saber antes de tocarlo:
   nueve. Cualquier mazo así deja de poder guardarse y de cobrar partidas hasta
   que se reedite. Con ocho jugadores es un rato; el día que sean ochocientos,
   esta clase de cambio pide una migración que los recorte.
+- **Aplicado y desplegado el 16-09-2026.** Las dos migraciones están en
+  producción y la Edge Function está anclada a `68a5091`, que vive en `main`
+  porque la PR #103 se mergeó con MERGE y no con squash. El despliegue se
+  comprobó con la receta de `supabase/functions/README.md`: invocada desde la
+  propia base con la clave publicable contesta `401 {"error":"sesión
+  inválida"}`, que es la prueba de que los once importes por URL resolvieron y
+  el código vivo es el nuestro.
 
 Y hubo que tocar un mazo de la IA: **«El último rey» llevaba cuatro** —
 Tyrannosaurus, Ankylosaurus, Edmontosaurus y Mosasaurus—, o sea un mazo que
