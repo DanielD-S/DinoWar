@@ -338,6 +338,24 @@ Osario 51,3 % porque alargar un mazo que sobra no cambia ninguna partida. Las
 dos familias —moler y enterrar— sólo dicen su número de verdad cuando exista el
 mazo que las lleva, y ése es el trabajo que sigue.
 
+**Aplicado y desplegado el 16-09-2026.** Las quince están en
+`catalogo_cartas` —136 filas, las 131 del set más las 5 de jefe— y la Edge
+Function quedó anclada a `3c1d4a9`, que vive en `main` porque la PR #106 se
+mergeó con MERGE y no con squash. Del fichero desplegado se comprobó ANTES,
+por hash, que era el anterior con el SHA cambiado y nada más: once líneas, las
+once del anclaje. Y después, con la receta de `supabase/functions/README.md`:
+contesta `401 {"error":"sesión inválida"}`, que prueba que los once importes
+por URL resolvieron y que el código vivo es el nuestro.
+
+Y la trampa que enseñó esta tanda al desplegar: entre aplicar la migración y
+desplegar la función hay una ventana en la que producción está A MEDIAS, y no
+es simétrica. El cliente sale solo desde `main`, así que la gente ve las cartas
+nuevas enseguida; con el catálogo aplicado puede además guardar un mazo con
+ellas; y la partida que juegue con ese mazo la rechaza el servidor, que sigue
+re-jugando con el set viejo. **Se juega y no se cobra**, que es el fallo
+silencioso de siempre. Aplicar y desplegar son un solo paso, aunque sean dos
+comandos.
+
 Un aviso para quien siga: **el rebote de lo PROPIO es un motor de combos**. Una
 carta que vuelve a la mano vuelve a entrar, y cada entrada vuelve a dispararse
 —Ouranosaurus y la Migración existen para eso—. Hoy sale caro, porque volver a
