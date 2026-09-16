@@ -34,6 +34,13 @@ const EXCEPCIONES = Object.freeze({
   ojoraptorsaurus: OMNIVORO,    // oviraptorosaurio: sin dientes, dieta discutida
   tongtianlong: OMNIVORO,       // oviraptorosaurio, mismo caso
   troodon: OMNIVORO,            // dentición con dentículos grandes, discutido
+  anzu: OMNIVORO,               // cenagnátido: mismo caso que los otros dos
+  // Los dos ornitomimosaurios. El pico sin dientes de Gallimimus lleva surcos
+  // que se leen como láminas de filtración, y a Deinocheirus se le encontraron
+  // gastrolitos Y restos de pez en la misma cavidad abdominal: los dos comían
+  // de los dos lados, y es lo mejor documentado de todo este eje.
+  gallimimus: OMNIVORO,
+  deinocheirus: OMNIVORO,
 
   // Pterosaurio: los tapejáridos se leen como frugívoros, no como pescadores.
   huaxiadraco: HERBIVORO,

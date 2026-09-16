@@ -30,7 +30,7 @@
 import { BALANCE } from '../data/balance.js';
 import { carta } from '../data/cards.js';
 import { mecanicaDe } from './state.js';
-import { entero } from './rng.js';
+import { entero, barajar } from './rng.js';
 
 /** ¿Están encendidas? Se apagan por entorno para poder medir con y sin. */
 export const HAY_ENTRADAS = !(typeof process !== 'undefined' && process.env
@@ -44,6 +44,10 @@ export const HAY_ENTRADAS = !(typeof process !== 'undefined' && process.env
  */
 export const EFECTOS = Object.freeze([
   'roba', 'muelePropio', 'mueleRival', 'manoRival', 'curaHabitat', 'emboscada', 'fulmina',
+  // Los cuatro del control de mano. Los tres primeros mueven manos enteras y
+  // el cuarto va al descarte a por lo que ya se perdió, que es lo que hace que
+  // molerte a ti mismo deje de ser sólo un coste.
+  'manoNueva', 'manosNuevas', 'topeManoRival', 'rescata',
 ]);
 
 export const entradaDe = (cardId) => mecanicaDe(cardId)?.entrada ?? null;
@@ -65,6 +69,17 @@ export function valorDeEntrada(cardId) {
   const V = BALANCE.valorEntrada;
   let valor = 0;
   for (const efecto of EFECTOS) {
+    // `topeManoRival` va al revés que todos los demás: su número es lo que le
+    // DEJA al rival, así que cuanto más bajo, más fuerte. Tasarlo por su cifra
+    // haría que un tope de 6 —que no quita nada— valiera más que uno de 2. Se
+    // cuenta lo que se lleva por delante desde una mano típica, y por eso un
+    // tope de 0 es un número legítimo y no «sin efecto».
+    if (efecto === 'topeManoRival') {
+      const tope = e.topeManoRival;
+      if (tope === undefined) continue;
+      valor += Math.max(0, BALANCE.manoInicial - tope) * V.topeManoRival;
+      continue;
+    }
     const n = e[efecto] ?? 0;
     if (n === 0) continue;
     const peso = efecto === 'curaHabitat' ? V.curaHabitat * BALANCE.ia.pesoHabitat : V[efecto];
@@ -110,6 +125,56 @@ export function alEntrar(s, inst, ayudas) {
     return molidas;
   };
 
+  /**
+   * Suelta la mano DENTRO del mazo, lo baraja y roba otras tantas. No es lo
+   * mismo que descartarla: lo que sueltas vuelve a estar disponible, y por eso
+   * una mano impagable se cambia por otra sin perder cartas del mazo.
+   *
+   * Roba a mano —y no con `robar()` de resolve.js— porque aquí no puede haber
+   * rebarajado del descarte: el mazo acaba de crecer con la mano entera, así
+   * que si aun así no llega a `cuantas` es que quedaban menos cartas que eso
+   * en todo el montón y robar más sería inventárselas.
+   *
+   * El rng sale del estado, no de Math.random: el servidor re-juega la partida.
+   */
+  const manoNuevaDe = (quien, cuantas) => {
+    quien.mazo.push(...quien.mano);
+    quien.mano = [];
+    const b = barajar(quien.mazo, s.rng);
+    s.rng = b.rng;
+    quien.mazo = b.lista;
+    let robadas = 0;
+    for (let k = 0; k < cuantas && quien.mazo.length > 0; k++) {
+      quien.mano.push(quien.mazo.shift());
+      robadas += 1;
+    }
+    return robadas;
+  };
+
+  /** Le tira al azar de la mano hasta dejarle `tope` cartas. */
+  const recortarMano = (quien, tope) => {
+    let quitadas = 0;
+    while (quien.mano.length > tope) {
+      const d = entero(s.rng, quien.mano.length);
+      s.rng = d.rng;
+      quien.descarte.push(quien.mano.splice(d.valor, 1)[0]);
+      quitadas += 1;
+    }
+    return quitadas;
+  };
+
+  /** Del descarte a la mano, al azar. Lo enterrado que vuelve a salir. */
+  const rescatar = (quien, cuantas) => {
+    let sacadas = 0;
+    for (let k = 0; k < cuantas && quien.descarte.length > 0; k++) {
+      const d = entero(s.rng, quien.descarte.length);
+      s.rng = d.rng;
+      quien.mano.push(quien.descarte.splice(d.valor, 1)[0]);
+      sacadas += 1;
+    }
+    return sacadas;
+  };
+
   if (e.roba) {
     let robadas = 0;
     for (let k = 0; k < e.roba && jug.mazo.length > 0; k++) {
@@ -121,6 +186,24 @@ export function alEntrar(s, inst, ayudas) {
 
   if (e.mueleRival) contar('muele', moler(otro, e.mueleRival));
   if (e.muelePropio) contar('muelePropio', moler(jug, e.muelePropio));
+
+  // Manos nuevas. Se resuelve PRIMERO el rival y luego quien la juega, en orden
+  // fijo: los dos barajan y roban del mismo rng, y sin un orden escrito dos
+  // máquinas re-jugando la misma partida llegarían a manos distintas.
+  if (e.manosNuevas) {
+    contar('manosNuevas', manoNuevaDe(otro, e.manosNuevas));
+    contar('manoNueva', manoNuevaDe(jug, e.manosNuevas));
+  }
+  if (e.manoNueva) contar('manoNueva', manoNuevaDe(jug, e.manoNueva));
+
+  // El tope va DESPUÉS de `manosNuevas`, que es lo único que le llena la mano
+  // al rival: recortarle a cuatro y devolverle cinco después dejaría el tope
+  // en nada. Se escribe `!== undefined` porque un tope de 0 es un tope.
+  if (e.topeManoRival !== undefined) {
+    contar('topeManoRival', recortarMano(otro, e.topeManoRival));
+  }
+
+  if (e.rescata) contar('rescata', rescatar(jug, e.rescata));
 
   // Al AZAR de la mano rival, así que sale del rng del estado y no de
   // Math.random: la partida tiene que poder re-jugarse igual en el servidor.

@@ -408,10 +408,29 @@ export function lineasDeLog(eventos) {
           fulmina: e.objetivoCardId
             ? `se lleva por delante a <i>${carta(e.objetivoCardId).binomial}</i>`
             : 'busca a quién llevarse y no lo encuentra',
+          manoNueva: `barajas tu mano en el mazo y robas <b>${e.n}</b>`,
+          manosNuevas: `el rival baraja su mano y roba <b>${e.n}</b>`,
+          topeManoRival: e.n > 0
+            ? `al rival se le caen <b>${e.n}</b> de la mano`
+            : 'le recortaría la mano, pero ya la tenía corta',
+          rescata: e.n > 0
+            ? `recuperas <b>${e.n}</b> de tu descarte`
+            : 'buscaría en su descarte, pero está vacío',
         }[e.efecto] ?? 'hace su efecto';
         push(`<i>${carta(e.cardId).binomial}</i> entra en juego: ${q}`, e.dueno);
         break;
       }
+      case 'MANO_NUEVA': {
+        const saldo = e.ahora - e.antes;
+        push(`<b>${bando(e.jugador)}</b> baraja su mano en el mazo y roba <b>${e.ahora}</b>`
+          + `${saldo === 0 ? '' : ` (${saldo > 0 ? '+' : ''}${saldo})`}`, e.jugador);
+        break;
+      }
+      case 'RESCATE':
+        push(e.cartas > 0
+          ? `<b>${bando(e.jugador)}</b> recupera <b>${e.cartas}</b> de su descarte`
+          : `<b>${bando(e.jugador)}</b> no tiene nada que recuperar`, e.jugador);
+        break;
       case 'UMBRAL':
         push(`<i>${carta(e.cardId).binomial}</i> completa su grupo:`
           + ` <b>+${e.ataque}</b> de Ataque para siempre`, e.dueno);

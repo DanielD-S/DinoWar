@@ -178,6 +178,19 @@ export const BALANCE = Object.freeze({
     canalTrenzadoCura: 2,
     bosqueRiberenoMano: 2,    // cartas que el rival descarta de la mano
     nidoRoba: 2,
+
+    // La ronda del CONTROL. Cinco eventos que no tocan una sola cifra del
+    // campo: mueven manos, descartes y mazos. La vía de la extinción llevaba
+    // desde la v2 en el 0 % porque casi nada mordía el mazo de enfrente, y la
+    // mano no tenía a quién pelearla — el rival robaba dos por turno y jugaba
+    // lo que quería. Son la otra mitad del juego, no una ampliación temática.
+    tormentaPolvoRoba: 5,       // los DOS barajan su mano y roban esto
+    avenidaLodoTope: 3,         // cartas que le quedan al rival en la mano
+    enterramientoRescata: 2,    // cartas que vuelven de tu descarte a la mano
+    cauceDescarta: 2,           // de tu MANO, elegidas al azar
+    cauceRoba: 3,
+    barreraMazo: 4,             // cartas de mazo que pierde el rival, y otras
+                                // tantas si además tiene más mano que tú
   }),
 
   // Cartas de recurso: Biomasa inmediata con inconveniente. Atacan el atasco de mano,
@@ -302,6 +315,15 @@ export const BALANCE = Object.freeze({
     mueleRival: 0.4,    // acerca la extinción, pero lento
     muelePropio: -0.4,  // es un COSTE: te la acercas a ti
     fulmina: 3,         // matar algo del campo sin pelearlo
+    // Los cuatro del control de mano. `manoNueva` no vale lo que una carta
+    // robada por cada punto: lo que sueltas vuelve al mazo, así que lo que
+    // ganas de verdad es la DIFERENCIA con la mano que tenías, y eso la IA no
+    // lo sabe al tasar la carta en abstracto. Se le pone poco menos que `roba`
+    // y se mide; el peso está para que la carta se juegue, no para afinarla.
+    manoNueva: 0.9,
+    manosNuevas: 0.5,   // le das otras tantas al rival: la mitad del valor
+    topeManoRival: 1.2, // se tasa como manoRival, que es lo que hace
+    rescata: 1.3,       // una carta a la mano, y elegida entre lo ya perdido
   }),
 
   // --------------------------------------------------------------------- IA

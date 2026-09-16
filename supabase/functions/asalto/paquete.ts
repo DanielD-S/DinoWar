@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: 02cf0c114f3f8dca
+// huella: 2635715c01ba5177
 //
 // Lleva dentro estos 24 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -53,8 +53,22 @@ var QUE = Object.freeze({
   /** Cualquier carta del mismo clado. */
   CLADO: "CLADO",
   EVENTO: "EVENTO",
-  CLIMA: "CLIMA"
+  CLIMA: "CLIMA",
+  // Las tres ZONAS. Cuentan cartas de un montón y no unidades en el campo, así
+  // que no miran `ambos`: la mano del rival es su propio valor, no «las dos
+  // manos», y un contador que sumara los dos descartes no querría decir nada.
+  // `test/entradas.test.js` exige que una zona no declare `ambos`, que sería
+  // un campo puesto y no leído — el fallo silencioso de siempre.
+  //
+  // Y piden `cada` o `tope` casi siempre: una mano son ocho cartas y un
+  // descarte pasa de veinte, así que +1 por carta a pelo no es una carta, es
+  // un botón de ganar.
+  MANO: "MANO",
+  MANO_RIVAL: "MANO_RIVAL",
+  DESCARTE: "DESCARTE"
 });
+var ZONAS = Object.freeze([QUE.MANO, QUE.MANO_RIVAL, QUE.DESCARTE]);
+var esZona = (que) => ZONAS.includes(que);
 var CUANDO = Object.freeze({
   /** Hay una carta de clima en el campo, la haya puesto quien la haya puesto. */
   CLIMA: "CLIMA",
@@ -205,6 +219,13 @@ var RASGO = Object.freeze({
   BOSQUE_RIBERENO: "BOSQUE_RIBERENO",
   DERIVA_ARIDA: "DERIVA_ARIDA",
   NIDO: "NIDO",
+  // La ronda del control: cinco que no tocan una cifra del campo, sólo manos,
+  // descartes y mazos.
+  TORMENTA_POLVO: "TORMENTA_POLVO",
+  AVENIDA_LODO: "AVENIDA_LODO",
+  ENTERRAMIENTO: "ENTERRAMIENTO",
+  CAUCE_ABANDONADO: "CAUCE_ABANDONADO",
+  BARRERA_TRONCOS: "BARRERA_TRONCOS",
   // pulsos
   REBROTE: "REBROTE",
   CARRONA: "CARRONA",
@@ -624,6 +645,69 @@ var CARTAS = Object.freeze({
     rasgoTexto: "Robas 2 cartas.",
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "La Morrison conserva nidos y huevos de saur\xF3podo y de ter\xF3podo peque\xF1o, y c\xE1scaras dispersas en muchos yacimientos. Un nido es la promesa de lo que viene despu\xE9s."
+  }),
+  // La ronda del CONTROL. Cinco eventos que no tocan una sola cifra del campo:
+  // mueven manos, descartes y mazos. Ninguno señala a nadie, así que todos caen
+  // sobre la mesa entera y se anuncian como la Trampa.
+  tormenta_polvo: evento({
+    id: "tormenta_polvo",
+    rareza: RAREZA.RARO,
+    binomial: "Tormenta de polvo",
+    coste: 2,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.TORMENTA_POLVO,
+    rasgoNombre: "Tormenta de polvo",
+    rasgoTexto: "Los dos jugadores barajan su mano dentro de su mazo y roban 5 cartas.",
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Los paleosuelos de la Morrison alternan horizontes de caliche con niveles de arena e\xF3lica, y al norte de la cuenca hay campos de dunas: episodios secos con transporte de polvo, repetidos durante millones de a\xF1os."
+  }),
+  avenida_lodo: evento({
+    id: "avenida_lodo",
+    rareza: RAREZA.EPICO,
+    binomial: "Avenida de lodo",
+    coste: 2,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.AVENIDA_LODO,
+    rasgoNombre: "Avenida de lodo",
+    rasgoTexto: "Tu rival descarta cartas al azar hasta quedarse con 3 en la mano.",
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Los flujos de derrubios dejan dep\xF3sitos masivos, sin clasificar y con bloques flotando en la matriz. Varias de las grandes acumulaciones de huesos del Jur\xE1sico se han interpretado como cad\xE1veres arrastrados y amontonados por una de estas avenidas."
+  }),
+  enterramiento: evento({
+    id: "enterramiento",
+    rareza: RAREZA.RARO,
+    binomial: "Enterramiento r\xE1pido",
+    coste: 2,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.ENTERRAMIENTO,
+    rasgoNombre: "Enterramiento r\xE1pido",
+    rasgoTexto: "Recupera 2 cartas al azar de tu descarte y ll\xE9vatelas a la mano.",
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Todo yacimiento de conservaci\xF3n excepcional tiene lo mismo detr\xE1s: el cad\xE1ver qued\xF3 cubierto antes de que los carro\xF1eros y las bacterias hicieran su trabajo. Lo que se recupera del registro f\xF3sil es, casi siempre, lo que se enterr\xF3 deprisa."
+  }),
+  cauce_abandonado: evento({
+    id: "cauce_abandonado",
+    rareza: RAREZA.COMUN,
+    binomial: "Cauce abandonado",
+    coste: 1,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.CAUCE_ABANDONADO,
+    rasgoNombre: "Cauce abandonado",
+    rasgoTexto: "Descarta 2 cartas al azar de tu mano y roba 3.",
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Cuando un meandro se corta por el cuello, el brazo que queda se llena de finos y se convierte en una charca alargada. Los cauces abandonados de la Morrison son de los pocos sitios donde se conservan restos de plantas y de peces."
+  }),
+  barrera_troncos: evento({
+    id: "barrera_troncos",
+    rareza: RAREZA.COMUN,
+    binomial: "Barrera de troncos",
+    coste: 1,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.BARRERA_TRONCOS,
+    rasgoNombre: "Barrera de troncos",
+    rasgoTexto: "Tu rival pierde 4 cartas de su mazo, y 4 m\xE1s si tiene m\xE1s cartas en la mano que t\xFA.",
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: "Los atascos de troncos son estructuras corrientes en r\xEDos con orillas arboladas: represan el cauce, lo desv\xEDan y concentran lo que baja con la corriente. En el Jur\xE1sico se infieren de las acumulaciones de le\xF1a f\xF3sil orientadas en los rellenos de canal."
   }),
   // ------------------------------------------------------------- recursos
   rebrote: recurso({
@@ -1517,6 +1601,176 @@ var CARTAS = Object.freeze({
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: "Plesiosaurio de la Niobrara, Kansas, Campaniense. Setenta y dos v\xE9rtebras cervicales, m\xE1s que ning\xFAn otro animal conocido; el cuello era poco flexible y probablemente serv\xEDa para acercarse a los bancos de peces desde abajo."
   }),
+  // ---------------------------------------------- la ronda del CONTROL
+  //
+  // Diez criaturas y cinco eventos (16-09-2026) para la mitad del juego que
+  // faltaba. El set sabía pelear por el campo y no sabía pelear por la MANO:
+  // el rival robaba dos por turno, jugaba lo que quería y la vía de la
+  // extinción llevaba desde la v2 en el 0 %. Estas diez no se miden por lo que
+  // pegan —casi ninguna pega— sino por lo que le quitan a la partida de
+  // enfrente, o por lo que sacan de la propia.
+  //
+  // Son seis terópodos de diez, y no es descuido: los ornitomimosaurios y los
+  // oviraptorosaurios SON terópodos, y el arquetipo que pedía el autor —el que
+  // rebusca, esconde y roba— cae de su lado por anatomía, no por diseño.
+  gallimimus: dino({
+    id: "gallimimus",
+    rareza: RAREZA.RARO,
+    clado: CLADO.TEROPODO,
+    binomial: "Gallimimus bullatus",
+    coste: 2,
+    ataque: 2,
+    vida: 3,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Estampida de la manada",
+    rasgoTexto: "Cuando entra en juego, baraja tu mano dentro de tu mazo y roba 5 cartas.",
+    mecanica: Object.freeze({ entrada: { manoNueva: 5 } }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: "Ornitomimosaurio de la Formaci\xF3n Nemegt, Mongolia, Maastrichtiense, conocido por ejemplares casi completos. En el pico se han descrito surcos verticales que se han interpretado como l\xE1minas de filtraci\xF3n, lo que apuntar\xEDa a una dieta de peque\xF1os organismos del agua; la interpretaci\xF3n no es un\xE1nime."
+  }),
+  thescelosaurus: dino({
+    id: "thescelosaurus",
+    rareza: RAREZA.COMUN,
+    clado: CLADO.ORNITOPODO,
+    binomial: "Thescelosaurus neglectus",
+    coste: 1,
+    ataque: 1,
+    vida: 4,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Cavar y esperar",
+    rasgoTexto: "Cuando entra en juego descarta 3 cartas de tu mazo y roba 2.",
+    mecanica: Object.freeze({ entrada: { muelePropio: 3, roba: 2 } }),
+    nivel_evidencia: EVIDENCIA.DEBATIDO,
+    nota_cientifica: "Ornit\xF3podo peque\xF1o de Hell Creek, uno de los \xFAltimos dinosaurios no avianos del registro. Se le ha atribuido h\xE1bito excavador por la robustez de las extremidades anteriores y por comparaci\xF3n con Oryctodromeus, que s\xED se encontr\xF3 en su madriguera; en Thescelosaurus es una hip\xF3tesis discutida."
+  }),
+  deinocheirus: dino({
+    id: "deinocheirus",
+    rareza: RAREZA.EPICO,
+    clado: CLADO.TEROPODO,
+    binomial: "Deinocheirus mirificus",
+    // Midió el 63,7 % con 3/9 y tope 5: llegaba a 8/9 por 4 de Biomasa.
+    coste: 4,
+    ataque: 3,
+    vida: 8,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Brazos de dos metros y medio",
+    rasgoTexto: "Gana +1 de Ataque por cada carta que tengas en la mano, hasta +4.",
+    mecanica: Object.freeze({ cuenta: { que: QUE.MANO, ataque: 1, tope: 4 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Sus manos, de 2,4 m con las garras, se describieron en 1970 y durante cuarenta y cuatro a\xF1os fueron casi lo \xFAnico que se conoc\xEDa del animal. Los ejemplares de 2014 lo completaron: un ornitomimosaurio de once metros con gastrolitos y restos de pez en la cavidad abdominal."
+  }),
+  anzu: dino({
+    id: "anzu",
+    rareza: RAREZA.RARO,
+    clado: CLADO.TEROPODO,
+    binomial: "Anzu wyliei",
+    coste: 2,
+    ataque: 3,
+    vida: 3,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Saqueo del nido",
+    rasgoTexto: "Cuando entra en juego, tu rival descarta cartas al azar hasta quedarse con 4 en la mano.",
+    mecanica: Object.freeze({ entrada: { topeManoRival: 4 } }),
+    nivel_evidencia: EVIDENCIA.DEBATIDO,
+    nota_cientifica: "Cenagn\xE1tido de Hell Creek descrito en 2014 a partir de tres esqueletos parciales que, entre los tres, dan casi el animal completo. El saqueo de nidos ajenos es analog\xEDa con aves actuales de pico parecido, no evidencia: de su dieta s\xF3lo se sabe que era omn\xEDvora."
+  }),
+  nigersaurus: dino({
+    id: "nigersaurus",
+    rareza: RAREZA.EPICO,
+    clado: CLADO.SAUROPODO,
+    binomial: "Nigersaurus taqueti",
+    coste: 3,
+    ataque: 2,
+    vida: 9,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Siega a ras de suelo",
+    // Muele a los dos y NO a partes iguales, y no es un capricho de balance: un
+    // 3 y 3 se tasa en exactamente cero y la IA no la jugaría nunca. Lo caza
+    // `test/entradas.test.js`, que exige que toda entrada valga algo.
+    rasgoTexto: "Cuando entra en juego, tu rival descarta 4 cartas de su mazo y t\xFA 2.",
+    mecanica: Object.freeze({ entrada: { mueleRival: 4, muelePropio: 2 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Rebaquis\xE1urido del Aptiense-Albiense de N\xEDger. El hocico es m\xE1s ancho que el resto del cr\xE1neo y lleva una bater\xEDa de m\xE1s de quinientos dientes que se reemplazaban cada pocas semanas; la orientaci\xF3n del o\xEDdo interno indica que la cabeza iba habitualmente mirando al suelo."
+  }),
+  shuvuuia: dino({
+    id: "shuvuuia",
+    rareza: RAREZA.COMUN,
+    clado: CLADO.TEROPODO,
+    binomial: "Shuvuuia deserti",
+    // Midió el 46,7 % con 1/2: el cuerpo no pagaba ni el turno que ocupa.
+    coste: 1,
+    ataque: 1,
+    vida: 3,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "O\xEDdo de lechuza",
+    rasgoTexto: "Al jugarla, ll\xE9vate a la mano un dinosaurio de tu mazo de 2 o menos de Ataque.",
+    mecanica: Object.freeze({ busca: { ataqueMax: 2 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Alvarezs\xE1urido diminuto de la Formaci\xF3n Djadochta, Mongolia. La lagena de su o\xEDdo interno y el anillo escler\xF3tico son proporcionalmente comparables a los de la lechuza com\xFAn, lo que apunta a caza nocturna: es de las pocas inferencias de comportamiento que descansan en anatom\xEDa medible."
+  }),
+  saurolophus: dino({
+    id: "saurolophus",
+    rareza: RAREZA.EPICO,
+    clado: CLADO.ORNITOPODO,
+    binomial: "Saurolophus angustirostris",
+    // Midió el 66,0 % con 3/9: el 3/9 ya era una carta, y encima buscaba.
+    coste: 3,
+    ataque: 2,
+    vida: 7,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Reclamo de la cresta",
+    rasgoTexto: "Al jugarla, ll\xE9vate a la mano un dinosaurio de tu mazo de 8 o m\xE1s de Ataque.",
+    mecanica: Object.freeze({ busca: { ataqueMin: 8 } }),
+    nivel_evidencia: EVIDENCIA.DEBATIDO,
+    nota_cientifica: "Hadrosaurio de Nemegt con una cresta \xF3sea MACIZA, no hueca como la de Parasaurolophus: no pudo funcionar como tubo de resonancia. Se ha propuesto que sostuviera un saco nasal de piel inflable, y de ah\xED saldr\xEDa la llamada; es una hip\xF3tesis sin evidencia directa."
+  }),
+  tarbosaurus: dino({
+    id: "tarbosaurus",
+    rareza: RAREZA.EPICO,
+    clado: CLADO.TEROPODO,
+    binomial: "Tarbosaurus bataar",
+    // Midió el 68,7 % con 8/7: era un Torvosaurus mejor Y con premio encima.
+    coste: 4,
+    ataque: 7,
+    vida: 6,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Carro\xF1eo del tirano",
+    rasgoTexto: "Cuando entra en juego recupera 2 cartas al azar de tu descarte.",
+    mecanica: Object.freeze({ entrada: { rescata: 2 } }),
+    nivel_evidencia: EVIDENCIA.DEBATIDO,
+    nota_cientifica: "Tiranos\xE1urido de Nemegt, el gran depredador de la Mongolia del Maastrichtiense. Si los tiranos\xE1uridos cazaban, carro\xF1eaban o ambas cosas es uno de los debates m\xE1s viejos y menos resueltos del oficio; lo probable, por analog\xEDa con todo carn\xEDvoro grande actual, es que hicieran las dos."
+  }),
+  psittacosaurus: dino({
+    id: "psittacosaurus",
+    rareza: RAREZA.COMUN,
+    clado: CLADO.MARGINOCEFALO,
+    binomial: "Psittacosaurus mongoliensis",
+    coste: 1,
+    ataque: 1,
+    vida: 3,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Molleja de gastrolitos",
+    rasgoTexto: "Gana +1 de Vida por cada 4 cartas de tu descarte, hasta +4.",
+    mecanica: Object.freeze({ cuenta: { que: QUE.DESCARTE, cada: 4, vida: 1, tope: 4 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: "Ceratopsio basal del Cret\xE1cico Inferior de Asia, uno de los dinosaurios con m\xE1s ejemplares conocidos. Varios conservan masas de gastrolitos en la regi\xF3n g\xE1strica, y un ejemplar de Liaoning conserva adem\xE1s la piel y unas cerdas tubulares en la cola."
+  }),
+  dakotaraptor: dino({
+    id: "dakotaraptor",
+    rareza: RAREZA.EPICO,
+    clado: CLADO.TEROPODO,
+    binomial: "Dakotaraptor steini",
+    // Midió el 59,3 % con 5/5 y tope 4: llegaba a 9/5 por 3.
+    coste: 3,
+    ataque: 4,
+    vida: 5,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: "Acecho al rezagado",
+    rasgoTexto: "Gana +1 de Ataque por cada carta de la mano de tu rival, hasta +3.",
+    mecanica: Object.freeze({ cuenta: { que: QUE.MANO_RIVAL, ataque: 1, tope: 3 } }),
+    nivel_evidencia: EVIDENCIA.DEBATIDO,
+    nota_cientifica: "Dromeos\xE1urido grande de Hell Creek descrito en 2015. Parte del material asignado al holotipo result\xF3 despu\xE9s ser de una tortuga, as\xED que qu\xE9 huesos son suyos \u2014y por tanto su tama\xF1o\u2014 sigue discutido; la garra en hoz del segundo dedo s\xED es suya."
+  }),
   // ------------------------------------------------------------- biomasa
   // La única carta que no se juega para HACER algo, sino para poder hacerlo:
   // da Biomasa y te cuesta una carta de tu propio mazo. Es la decisión que la
@@ -1946,7 +2200,24 @@ var BALANCE = Object.freeze({
     canalTrenzadoCura: 2,
     bosqueRiberenoMano: 2,
     // cartas que el rival descarta de la mano
-    nidoRoba: 2
+    nidoRoba: 2,
+    // La ronda del CONTROL. Cinco eventos que no tocan una sola cifra del
+    // campo: mueven manos, descartes y mazos. La vía de la extinción llevaba
+    // desde la v2 en el 0 % porque casi nada mordía el mazo de enfrente, y la
+    // mano no tenía a quién pelearla — el rival robaba dos por turno y jugaba
+    // lo que quería. Son la otra mitad del juego, no una ampliación temática.
+    tormentaPolvoRoba: 5,
+    // los DOS barajan su mano y roban esto
+    avenidaLodoTope: 3,
+    // cartas que le quedan al rival en la mano
+    enterramientoRescata: 2,
+    // cartas que vuelven de tu descarte a la mano
+    cauceDescarta: 2,
+    // de tu MANO, elegidas al azar
+    cauceRoba: 3,
+    barreraMazo: 4
+    // cartas de mazo que pierde el rival, y otras
+    // tantas si además tiene más mano que tú
   }),
   // Cartas de recurso: Biomasa inmediata con inconveniente. Atacan el atasco de mano,
   // que venía de robar 2 por turno con una renta de 1 acumulativo.
@@ -2067,8 +2338,20 @@ var BALANCE = Object.freeze({
     // acerca la extinción, pero lento
     muelePropio: -0.4,
     // es un COSTE: te la acercas a ti
-    fulmina: 3
+    fulmina: 3,
     // matar algo del campo sin pelearlo
+    // Los cuatro del control de mano. `manoNueva` no vale lo que una carta
+    // robada por cada punto: lo que sueltas vuelve al mazo, así que lo que
+    // ganas de verdad es la DIFERENCIA con la mano que tenías, y eso la IA no
+    // lo sabe al tasar la carta en abstracto. Se le pone poco menos que `roba`
+    // y se mide; el peso está para que la carta se juegue, no para afinarla.
+    manoNueva: 0.9,
+    manosNuevas: 0.5,
+    // le das otras tantas al rival: la mitad del valor
+    topeManoRival: 1.2,
+    // se tasa como manoRival, que es lo que hace
+    rescata: 1.3
+    // una carta a la mano, y elegida entre lo ya perdido
   }),
   // --------------------------------------------------------------------- IA
   ia: Object.freeze({
@@ -2336,14 +2619,23 @@ function adherenciasCon(state, inst, rasgo) {
 var mecanicaDe = (cardId) => carta(cardId).mecanica ?? null;
 function cuantasCuentan(state, inst, cuenta) {
   const c = carta(inst.cardId);
-  const bandos = cuenta.ambos ? [0, 1] : [inst.dueno];
   let n = 0;
-  for (const b of bandos) {
-    for (const o of unidadesDe(state, b)) {
-      const oc = carta(o.cardId);
-      if (cuenta.que === QUE.CLADO ? oc.clado === c.clado : o.cardId === inst.cardId) n += 1;
+  if (esZona(cuenta.que)) {
+    const jug = state.jugadores[inst.dueno];
+    if (cuenta.que === QUE.MANO) n = jug.mano.length;
+    else if (cuenta.que === QUE.MANO_RIVAL) n = state.jugadores[rival(inst.dueno)].mano.length;
+    else n = jug.descarte.length;
+  } else {
+    const bandos = cuenta.ambos ? [0, 1] : [inst.dueno];
+    for (const b of bandos) {
+      for (const o of unidadesDe(state, b)) {
+        const oc = carta(o.cardId);
+        if (cuenta.que === QUE.CLADO ? oc.clado === c.clado : o.cardId === inst.cardId) n += 1;
+      }
     }
   }
+  if (cuenta.cada) n = Math.floor(n / cuenta.cada);
+  if (cuenta.tope !== void 0) n = Math.min(n, cuenta.tope);
   return n;
 }
 function seCumple(state, inst, si) {
@@ -2470,6 +2762,13 @@ function curacionDe(state, iid) {
   }
   return cura;
 }
+var NOTA_CUENTA = Object.freeze({
+  [QUE.CLADO]: (n) => `${n} de su clado en el campo`,
+  [QUE.MISMA]: (n) => `${n} en el campo`,
+  [QUE.MANO]: (n, cuenta) => cuenta.cada ? `${n} tramos de ${cuenta.cada} en tu mano` : `${n} en tu mano`,
+  [QUE.MANO_RIVAL]: (n, cuenta) => cuenta.cada ? `${n} tramos de ${cuenta.cada} en la mano rival` : `${n} en la mano rival`,
+  [QUE.DESCARTE]: (n, cuenta) => cuenta.cada ? `${n} tramos de ${cuenta.cada} en tu descarte` : `${n} en tu descarte`
+});
 var NOTA_SI = Object.freeze({
   [CUANDO.CLIMA]: "hay un clima en el campo",
   [CUANDO.ALIADO_CON_VIDA]: "tiene al lado a uno grande",
@@ -2484,6 +2783,9 @@ var buscaEnElMazo = (cardId) => filtroDeBusqueda(cardId) !== null;
 function filtroDeBusqueda(cardId) {
   const busca = mecanicaDe(cardId)?.busca;
   if (!busca) return null;
+  if (typeof busca === "object") {
+    return (c) => c.tipo === TIPO.DINOSAURIO && (busca.ataqueMin === void 0 || c.ataque >= busca.ataqueMin) && (busca.ataqueMax === void 0 || c.ataque <= busca.ataqueMax);
+  }
   if (busca === QUE.EVENTO) return (c) => c.tipo === TIPO.EVENTO;
   if (busca === QUE.CLIMA) return (c) => c.tipo === TIPO.CLIMA;
   if (busca === QUE.MISMA) return (c) => c.id === cardId;
@@ -2518,7 +2820,14 @@ var EFECTOS = Object.freeze([
   "manoRival",
   "curaHabitat",
   "emboscada",
-  "fulmina"
+  "fulmina",
+  // Los cuatro del control de mano. Los tres primeros mueven manos enteras y
+  // el cuarto va al descarte a por lo que ya se perdió, que es lo que hace que
+  // molerte a ti mismo deje de ser sólo un coste.
+  "manoNueva",
+  "manosNuevas",
+  "topeManoRival",
+  "rescata"
 ]);
 var entradaDe = (cardId) => mecanicaDe(cardId)?.entrada ?? null;
 function valorDeEntrada(cardId) {
@@ -2528,6 +2837,12 @@ function valorDeEntrada(cardId) {
   const V = BALANCE.valorEntrada;
   let valor = 0;
   for (const efecto of EFECTOS) {
+    if (efecto === "topeManoRival") {
+      const tope = e.topeManoRival;
+      if (tope === void 0) continue;
+      valor += Math.max(0, BALANCE.manoInicial - tope) * V.topeManoRival;
+      continue;
+    }
     const n = e[efecto] ?? 0;
     if (n === 0) continue;
     const peso = efecto === "curaHabitat" ? V.curaHabitat * BALANCE.ia.pesoHabitat : V[efecto];
@@ -2559,6 +2874,39 @@ function alEntrar(s, inst, ayudas) {
     }
     return molidas;
   };
+  const manoNuevaDe = (quien, cuantas) => {
+    quien.mazo.push(...quien.mano);
+    quien.mano = [];
+    const b = barajar(quien.mazo, s.rng);
+    s.rng = b.rng;
+    quien.mazo = b.lista;
+    let robadas = 0;
+    for (let k = 0; k < cuantas && quien.mazo.length > 0; k++) {
+      quien.mano.push(quien.mazo.shift());
+      robadas += 1;
+    }
+    return robadas;
+  };
+  const recortarMano = (quien, tope) => {
+    let quitadas = 0;
+    while (quien.mano.length > tope) {
+      const d = entero(s.rng, quien.mano.length);
+      s.rng = d.rng;
+      quien.descarte.push(quien.mano.splice(d.valor, 1)[0]);
+      quitadas += 1;
+    }
+    return quitadas;
+  };
+  const rescatar = (quien, cuantas) => {
+    let sacadas = 0;
+    for (let k = 0; k < cuantas && quien.descarte.length > 0; k++) {
+      const d = entero(s.rng, quien.descarte.length);
+      s.rng = d.rng;
+      quien.mano.push(quien.descarte.splice(d.valor, 1)[0]);
+      sacadas += 1;
+    }
+    return sacadas;
+  };
   if (e.roba) {
     let robadas = 0;
     for (let k = 0; k < e.roba && jug.mazo.length > 0; k++) {
@@ -2569,6 +2917,15 @@ function alEntrar(s, inst, ayudas) {
   }
   if (e.mueleRival) contar("muele", moler(otro, e.mueleRival));
   if (e.muelePropio) contar("muelePropio", moler(jug, e.muelePropio));
+  if (e.manosNuevas) {
+    contar("manosNuevas", manoNuevaDe(otro, e.manosNuevas));
+    contar("manoNueva", manoNuevaDe(jug, e.manosNuevas));
+  }
+  if (e.manoNueva) contar("manoNueva", manoNuevaDe(jug, e.manoNueva));
+  if (e.topeManoRival !== void 0) {
+    contar("topeManoRival", recortarMano(otro, e.topeManoRival));
+  }
+  if (e.rescata) contar("rescata", rescatar(jug, e.rescata));
   if (e.manoRival) {
     let quitadas = 0;
     for (let k = 0; k < e.manoRival && otro.mano.length > 0; k++) {
@@ -2632,6 +2989,14 @@ var EXCEPCIONES = Object.freeze({
   // oviraptorosaurio, mismo caso
   troodon: OMNIVORO,
   // dentición con dentículos grandes, discutido
+  anzu: OMNIVORO,
+  // cenagnátido: mismo caso que los otros dos
+  // Los dos ornitomimosaurios. El pico sin dientes de Gallimimus lleva surcos
+  // que se leen como láminas de filtración, y a Deinocheirus se le encontraron
+  // gastrolitos Y restos de pez en la misma cavidad abdominal: los dos comían
+  // de los dos lados, y es lo mejor documentado de todo este eje.
+  gallimimus: OMNIVORO,
+  deinocheirus: OMNIVORO,
   // Pterosaurio: los tapejáridos se leen como frugívoros, no como pescadores.
   huaxiadraco: HERBIVORO
 });
@@ -3001,7 +3366,48 @@ function aplicarPresion(s, p) {
   } else if (r === RASGO.NIDO) {
     robar(s, p.jugador, BALANCE.rasgos.nidoRoba);
     ev(s, "PRESION", { jugador: p.jugador, cardId });
+  } else if (r === RASGO.TORMENTA_POLVO) {
+    for (const j of [contrario, p.jugador]) manoNueva(s, j, BALANCE.rasgos.tormentaPolvoRoba);
+    ev(s, "PRESION", { jugador: p.jugador, cardId });
+  } else if (r === RASGO.AVENIDA_LODO) {
+    const tope = BALANCE.rasgos.avenidaLodoTope;
+    descartarAlAzar(s, contrario, Math.max(0, s.jugadores[contrario].mano.length - tope));
+    ev(s, "PRESION", { jugador: p.jugador, cardId });
+  } else if (r === RASGO.ENTERRAMIENTO) {
+    rescatarDelDescarte(s, p.jugador, BALANCE.rasgos.enterramientoRescata);
+    ev(s, "PRESION", { jugador: p.jugador, cardId });
+  } else if (r === RASGO.CAUCE_ABANDONADO) {
+    descartarAlAzar(s, p.jugador, BALANCE.rasgos.cauceDescarta);
+    robar(s, p.jugador, BALANCE.rasgos.cauceRoba);
+    ev(s, "PRESION", { jugador: p.jugador, cardId });
+  } else if (r === RASGO.BARRERA_TRONCOS) {
+    const mia = s.jugadores[p.jugador].mano.filter((iid) => iid !== p.iid).length;
+    const doble = s.jugadores[contrario].mano.length > mia;
+    perderDelMazo(s, contrario, BALANCE.rasgos.barreraMazo * (doble ? 2 : 1));
+    ev(s, "PRESION", { jugador: p.jugador, cardId, doble });
   }
+}
+function manoNueva(s, j, cuantas) {
+  const jug = s.jugadores[j];
+  const antes = jug.mano.length;
+  jug.mazo.push(...jug.mano);
+  jug.mano = [];
+  const b = barajar(jug.mazo, s.rng);
+  s.rng = b.rng;
+  jug.mazo = b.lista;
+  for (let k = 0; k < cuantas && jug.mazo.length > 0; k++) jug.mano.push(jug.mazo.shift());
+  ev(s, "MANO_NUEVA", { jugador: j, antes, ahora: jug.mano.length });
+}
+function rescatarDelDescarte(s, j, cuantas) {
+  const jug = s.jugadores[j];
+  let sacadas = 0;
+  for (let k = 0; k < cuantas && jug.descarte.length > 0; k++) {
+    const d = entero(s.rng, jug.descarte.length);
+    s.rng = d.rng;
+    jug.mano.push(jug.descarte.splice(d.valor, 1)[0]);
+    sacadas += 1;
+  }
+  ev(s, "RESCATE", { jugador: j, cartas: sacadas, descarte: jug.descarte.length });
 }
 function descartarAlAzar(s, j, n) {
   const jug = s.jugadores[j];
@@ -3773,6 +4179,24 @@ function valorDeAccion(vista, j, a) {
         delta = unidadesDe(vista, j).reduce((n, u) => n + Math.min(u.heridas, BALANCE.rasgos.canalTrenzadoCura), 0) * 0.5;
       } else if (r === RASGO.BOSQUE_RIBERENO) {
         delta = Math.min(BALANCE.rasgos.bosqueRiberenoMano, vista.jugadores[contrario].mano.length) * 0.6;
+      } else if (r === RASGO.TORMENTA_POLVO) {
+        const n = BALANCE.rasgos.tormentaPolvoRoba;
+        const mia = vista.jugadores[j].mano.filter((iid) => iid !== a.iid).length;
+        delta = (Math.min(n, mazoDe(vista, j) + mia) - mia) * 0.7 - Math.max(0, n - vista.jugadores[contrario].mano.length) * 0.5;
+      } else if (r === RASGO.AVENIDA_LODO) {
+        delta = Math.max(0, vista.jugadores[contrario].mano.length - BALANCE.rasgos.avenidaLodoTope) * 0.7;
+      } else if (r === RASGO.ENTERRAMIENTO) {
+        delta = Math.min(
+          BALANCE.rasgos.enterramientoRescata,
+          vista.jugadores[j].descarte.length
+        ) * 0.8;
+      } else if (r === RASGO.CAUCE_ABANDONADO) {
+        delta = BALANCE.rasgos.cauceRoba * 0.7 - BALANCE.rasgos.cauceDescarta * 0.5;
+      } else if (r === RASGO.BARRERA_TRONCOS) {
+        const mia = vista.jugadores[j].mano.filter((iid) => iid !== a.iid).length;
+        const doble = vista.jugadores[contrario].mano.length > mia;
+        const cartas = BALANCE.rasgos.barreraMazo * (doble ? 2 : 1);
+        delta = cartas / Math.max(1, mazoDe(vista, contrario)) * IA.pesoTrofeo / IA.pesoDano * 3;
       } else if (r === RASGO.DERIVA_ARIDA) {
         const mia = vista.jugadores[j].mano.filter((iid) => iid !== a.iid);
         const impagables = mia.filter((iid) => carta(vista.instancias[iid].cardId).coste > vista.jugadores[j].biomasa + 2).length;

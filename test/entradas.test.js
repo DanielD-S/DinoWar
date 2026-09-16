@@ -15,7 +15,7 @@ import { readFileSync } from 'node:fs';
 
 import { BALANCE } from '../src/data/balance.js';
 import { CARTAS, CARTAS_DE_JEFE, TIPO, CLADO, carta } from '../src/data/cards.js';
-import { QUE, CUANDO, INMUNE, TODOS } from '../src/data/mecanicas.js';
+import { QUE, CUANDO, INMUNE, TODOS, esZona } from '../src/data/mecanicas.js';
 import {
   FASE, ataqueEfectivo, vidaMaxima, vidaActual, curacionDe, espinasDe,
   inmuneA, mecanicaDe, buscablesDe,
@@ -46,7 +46,7 @@ test('Toda criatura tiene habilidad, y toda habilidad tiene nombre y texto', () 
     assert.ok(c.rasgoNombre, `${c.id} no tiene nombre de rasgo`);
     assert.ok(c.rasgoTexto, `${c.id} no tiene texto`);
   }
-  assert.equal(CRIATURAS.length, 71, '66 del set y las 5 de jefe');
+  assert.equal(CRIATURAS.length, 81, '76 del set y las 5 de jefe');
 });
 
 test('Ninguna mecánica usa un campo que el motor no mire', () => {
@@ -81,12 +81,27 @@ test('Las etiquetas de las mecánicas son las del vocabulario', () => {
   const clados = new Set(Object.values(CLADO));
   for (const c of CRIATURAS) {
     const m = c.mecanica;
-    if (m.cuenta) assert.ok(m.cuenta.que === QUE.MISMA || m.cuenta.que === QUE.CLADO, c.id);
+    if (m.cuenta) {
+      const zona = esZona(m.cuenta.que);
+      assert.ok(zona || m.cuenta.que === QUE.MISMA || m.cuenta.que === QUE.CLADO, c.id);
+      // Una zona NO mira `ambos`: la mano del rival ya es la del rival. Un
+      // `ambos` puesto ahí es un campo que nadie lee, que es el fallo mudo
+      // contra el que existe este fichero entero.
+      if (zona) assert.equal(m.cuenta.ambos, undefined, `${c.id}: una zona no mira «ambos»`);
+      // Y piden freno: sin `cada` ni `tope`, una mano de ocho cartas son ocho
+      // puntos y un descarte de veinte, veinte.
+      if (zona) {
+        assert.ok(m.cuenta.cada !== undefined || m.cuenta.tope !== undefined,
+          `${c.id}: cuenta una zona sin «cada» ni «tope»`);
+      }
+    }
     if (m.si) assert.ok(Object.values(CUANDO).includes(m.si.cuando), c.id);
     if (m.inmune) assert.ok(Object.values(INMUNE).includes(m.inmune), c.id);
     if (m.aura) assert.ok(m.aura.clado === TODOS || clados.has(m.aura.clado), c.id);
     if (m.busca) {
-      const vale = m.busca === QUE.EVENTO || m.busca === QUE.CLIMA || m.busca === QUE.MISMA
+      const vale = (typeof m.busca === 'object'
+        && (m.busca.ataqueMin !== undefined || m.busca.ataqueMax !== undefined))
+        || m.busca === QUE.EVENTO || m.busca === QUE.CLIMA || m.busca === QUE.MISMA
         || clados.has(m.busca);
       assert.ok(vale, `${c.id}: busca «${m.busca}», que no es nada`);
     }
@@ -94,12 +109,12 @@ test('Las etiquetas de las mecánicas son las del vocabulario', () => {
 });
 
 test('El soporte conserva su rasgo: sin él no sería una carta', () => {
-  // 26: clima, evento, recurso y las diez de biomasa. Vale para éstas igual
+  // 40: clima, evento, recurso y las diez de biomasa. Vale para éstas igual
   // que para las otras — llevan rasgo, nombre y texto, y no llevan `mecanica`,
   // que es de criaturas. Sus números van en `biomasa`, y sin ellos la carta
   // no se juega: el motor los lee al bajarla.
   const soporte = Object.values(CARTAS).filter((c) => c.tipo !== TIPO.DINOSAURIO);
-  assert.equal(soporte.length, 35);
+  assert.equal(soporte.length, 40);
   for (const c of soporte) {
     assert.notEqual(c.rasgo, 'NINGUNO', `${c.id} se quedó sin mecánica`);
     assert.ok(c.rasgoNombre && c.rasgoTexto, `${c.id} no tiene nombre o texto`);
@@ -475,6 +490,102 @@ test('Tijera se lleva al que cabe y pega más, y no pregunta', () => {
   // Determinista: la misma partida tiene que salir igual en el servidor.
   const otra = entrar(tablero(), 'tyrannotitan', 0).estado;
   assert.ok(otra.eventos.some((e) => e.tipo === 'ENTRADA' && e.efecto === 'fulmina'));
+});
+
+// ---------------------------------------------- el control de mano y descarte
+
+test('Una mano nueva pasa por el MAZO, no por el descarte', () => {
+  // Es la diferencia que hace jugable a toda la ronda del control: lo que
+  // sueltas vuelve a estar disponible. Si fuera al descarte, cambiar la mano
+  // sería pagar con cartas y nadie lo haría dos veces.
+  const s = tablero();
+  for (let k = 0; k < 4; k++) enMano(s, 'troodon', 0);
+  const mazo = s.jugadores[0].mazo.length;
+  const { estado } = entrar(s, 'gallimimus');
+
+  assert.equal(estado.jugadores[0].descarte.length, 0, 'la mano vieja no se descarta');
+  assert.equal(estado.jugadores[0].mano.length, 5, 'roba las 5 que promete');
+  // Las 4 que solté entran en el mazo y salen 5: el saldo es −1.
+  assert.equal(estado.jugadores[0].mazo.length, mazo + 4 - 5);
+});
+
+test('El tope recorta la mano del rival y se queda quieto si ya era corta', () => {
+  const s = tablero();
+  for (let k = 0; k < 7; k++) enMano(s, 'troodon', 1);
+  const r = entrar(s, 'anzu').estado;
+  assert.equal(r.jugadores[1].mano.length, 4);
+  assert.equal(r.jugadores[1].descarte.length, 3);
+
+  const t = tablero();
+  enMano(t, 'troodon', 1);
+  const u = entrar(t, 'anzu').estado;
+  assert.equal(u.jugadores[1].mano.length, 1, 'no le roba de menos');
+  const e = u.eventos.find((x) => x.tipo === 'ENTRADA' && x.efecto === 'topeManoRival');
+  assert.equal(e.n, 0, 'y deja constancia de que no quitó nada');
+});
+
+test('Un tope BAJO vale más que uno alto, que es lo contrario que el resto', () => {
+  // `topeManoRival` es el único efecto cuyo número va al revés: es lo que le
+  // DEJA al rival. Tasarlo por su cifra haría que un tope de 6 valiera más que
+  // uno de 2, y la IA jugaría la carta floja antes que la buena.
+  assert.ok(valorDeEntrada('anzu') > 0);
+  const V = BALANCE.valorEntrada;
+  assert.equal(valorDeEntrada('anzu'), (BALANCE.manoInicial - 4) * V.topeManoRival);
+});
+
+test('El rescate saca del descarte a la mano, y nada si el descarte está vacío', () => {
+  const s = tablero();
+  s.jugadores[0].descarte.push(...s.jugadores[0].mazo.splice(0, 3));
+  const r = entrar(s, 'tarbosaurus').estado;
+  assert.equal(r.jugadores[0].descarte.length, 1);
+  assert.equal(r.jugadores[0].mano.length, 2);
+
+  const t = tablero();
+  const u = entrar(t, 'tarbosaurus').estado;
+  const e = u.eventos.find((x) => x.tipo === 'ENTRADA' && x.efecto === 'rescata');
+  assert.equal(e.n, 0);
+});
+
+test('Un contador de zona mira la mano o el descarte, con su tope y su tramo', () => {
+  const s = tablero();
+  const deino = poner(s, 'deinocheirus', 0, 0);
+  assert.equal(ataqueEfectivo(s, deino), carta('deinocheirus').ataque, 'mano vacía, nada');
+  for (let k = 0; k < 3; k++) enMano(s, 'troodon', 0);
+  assert.equal(ataqueEfectivo(s, deino), carta('deinocheirus').ataque + 3);
+  for (let k = 0; k < 9; k++) enMano(s, 'troodon', 0);
+  assert.equal(ataqueEfectivo(s, deino), carta('deinocheirus').ataque + 4, 'el tope corta en 4');
+
+  // La del rival es la del rival: una zona no mira «ambos».
+  const t = tablero();
+  const raptor = poner(t, 'dakotaraptor', 0, 0);
+  for (let k = 0; k < 2; k++) enMano(t, 'troodon', 0);
+  assert.equal(ataqueEfectivo(t, raptor), carta('dakotaraptor').ataque, 'tu mano no le suma');
+  for (let k = 0; k < 6; k++) enMano(t, 'troodon', 1);
+  assert.equal(ataqueEfectivo(t, raptor), carta('dakotaraptor').ataque + 3, 'y el tope corta en 3');
+
+  // Y el tramo: +1 de Vida por cada 4 cartas del descarte.
+  const u = tablero();
+  const psit = poner(u, 'psittacosaurus', 0, 0);
+  u.jugadores[0].descarte.push(...u.jugadores[0].mazo.splice(0, 3));
+  assert.equal(vidaMaxima(u, psit), carta('psittacosaurus').vida, 'con 3 no llega al tramo');
+  u.jugadores[0].descarte.push(...u.jugadores[0].mazo.splice(0, 5));
+  assert.equal(vidaMaxima(u, psit), carta('psittacosaurus').vida + 2, 'con 8 son dos tramos');
+});
+
+test('Una búsqueda por Ataque mira el impreso, que es lo único que hay en el mazo', () => {
+  const s = tablero();
+  for (const iid of buscablesDe(s, 0, 'shuvuuia')) {
+    const c = carta(s.instancias[iid].cardId);
+    assert.equal(c.tipo, TIPO.DINOSAURIO);
+    assert.ok(c.ataque <= 2, `${c.id} pega ${c.ataque} y el filtro pedía 2 o menos`);
+  }
+  for (const iid of buscablesDe(s, 0, 'saurolophus')) {
+    const c = carta(s.instancias[iid].cardId);
+    assert.ok(c.ataque >= 8, `${c.id} pega ${c.ataque} y el filtro pedía 8 o más`);
+  }
+  // Y no se cruzan: lo que vale para una no vale para la otra.
+  const flojos = new Set(buscablesDe(s, 0, 'shuvuuia'));
+  assert.ok(buscablesDe(s, 0, 'saurolophus').every((iid) => !flojos.has(iid)));
 });
 
 test('Con DINOWAR_ENTRADAS=0 no se dispara ninguna', () => {

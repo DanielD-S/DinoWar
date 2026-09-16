@@ -144,6 +144,13 @@ export const RASGO = Object.freeze({
   BOSQUE_RIBERENO: 'BOSQUE_RIBERENO',
   DERIVA_ARIDA: 'DERIVA_ARIDA',
   NIDO: 'NIDO',
+  // La ronda del control: cinco que no tocan una cifra del campo, sólo manos,
+  // descartes y mazos.
+  TORMENTA_POLVO: 'TORMENTA_POLVO',
+  AVENIDA_LODO: 'AVENIDA_LODO',
+  ENTERRAMIENTO: 'ENTERRAMIENTO',
+  CAUCE_ABANDONADO: 'CAUCE_ABANDONADO',
+  BARRERA_TRONCOS: 'BARRERA_TRONCOS',
   // pulsos
   REBROTE: 'REBROTE',
   CARRONA: 'CARRONA',
@@ -492,6 +499,55 @@ export const CARTAS = Object.freeze({
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'La Morrison conserva nidos y huevos de saurópodo y de terópodo pequeño, y cáscaras dispersas en muchos yacimientos. Un nido es la promesa de lo que viene después.',
   }),
+  // La ronda del CONTROL. Cinco eventos que no tocan una sola cifra del campo:
+  // mueven manos, descartes y mazos. Ninguno señala a nadie, así que todos caen
+  // sobre la mesa entera y se anuncian como la Trampa.
+
+  tormenta_polvo: evento({
+    id: 'tormenta_polvo', rareza: RAREZA.RARO, binomial: 'Tormenta de polvo', coste: 2,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.TORMENTA_POLVO, rasgoNombre: 'Tormenta de polvo',
+    rasgoTexto: 'Los dos jugadores barajan su mano dentro de su mazo y roban 5 cartas.',
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Los paleosuelos de la Morrison alternan horizontes de caliche con niveles de arena eólica, y al norte de la cuenca hay campos de dunas: episodios secos con transporte de polvo, repetidos durante millones de años.',
+  }),
+
+  avenida_lodo: evento({
+    id: 'avenida_lodo', rareza: RAREZA.EPICO, binomial: 'Avenida de lodo', coste: 2,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.AVENIDA_LODO, rasgoNombre: 'Avenida de lodo',
+    rasgoTexto: 'Tu rival descarta cartas al azar hasta quedarse con 3 en la mano.',
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Los flujos de derrubios dejan depósitos masivos, sin clasificar y con bloques flotando en la matriz. Varias de las grandes acumulaciones de huesos del Jurásico se han interpretado como cadáveres arrastrados y amontonados por una de estas avenidas.',
+  }),
+
+  enterramiento: evento({
+    id: 'enterramiento', rareza: RAREZA.RARO, binomial: 'Enterramiento rápido', coste: 2,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.ENTERRAMIENTO, rasgoNombre: 'Enterramiento rápido',
+    rasgoTexto: 'Recupera 2 cartas al azar de tu descarte y llévatelas a la mano.',
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Todo yacimiento de conservación excepcional tiene lo mismo detrás: el cadáver quedó cubierto antes de que los carroñeros y las bacterias hicieran su trabajo. Lo que se recupera del registro fósil es, casi siempre, lo que se enterró deprisa.',
+  }),
+
+  cauce_abandonado: evento({
+    id: 'cauce_abandonado', rareza: RAREZA.COMUN, binomial: 'Cauce abandonado', coste: 1,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.CAUCE_ABANDONADO, rasgoNombre: 'Cauce abandonado',
+    rasgoTexto: 'Descarta 2 cartas al azar de tu mano y roba 3.',
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Cuando un meandro se corta por el cuello, el brazo que queda se llena de finos y se convierte en una charca alargada. Los cauces abandonados de la Morrison son de los pocos sitios donde se conservan restos de plantas y de peces.',
+  }),
+
+  barrera_troncos: evento({
+    id: 'barrera_troncos', rareza: RAREZA.COMUN, binomial: 'Barrera de troncos', coste: 1,
+    objetivo: OBJETIVO.NINGUNO,
+    rasgo: RASGO.BARRERA_TRONCOS, rasgoNombre: 'Barrera de troncos',
+    rasgoTexto: 'Tu rival pierde 4 cartas de su mazo, y 4 más si tiene más cartas en la mano que tú.',
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: 'Los atascos de troncos son estructuras corrientes en ríos con orillas arboladas: represan el cauce, lo desvían y concentran lo que baja con la corriente. En el Jurásico se infieren de las acumulaciones de leña fósil orientadas en los rellenos de canal.',
+  }),
+
   // ------------------------------------------------------------- recursos
 
   rebrote: recurso({
@@ -1159,6 +1215,147 @@ export const CARTAS = Object.freeze({
     nivel_evidencia: EVIDENCIA.ESTABLECIDO,
     nota_cientifica: 'Plesiosaurio de la Niobrara, Kansas, Campaniense. Setenta y dos vértebras cervicales, más que ningún otro animal conocido; el cuello era poco flexible y probablemente servía para acercarse a los bancos de peces desde abajo.',
   }),
+  // ---------------------------------------------- la ronda del CONTROL
+  //
+  // Diez criaturas y cinco eventos (16-09-2026) para la mitad del juego que
+  // faltaba. El set sabía pelear por el campo y no sabía pelear por la MANO:
+  // el rival robaba dos por turno, jugaba lo que quería y la vía de la
+  // extinción llevaba desde la v2 en el 0 %. Estas diez no se miden por lo que
+  // pegan —casi ninguna pega— sino por lo que le quitan a la partida de
+  // enfrente, o por lo que sacan de la propia.
+  //
+  // Son seis terópodos de diez, y no es descuido: los ornitomimosaurios y los
+  // oviraptorosaurios SON terópodos, y el arquetipo que pedía el autor —el que
+  // rebusca, esconde y roba— cae de su lado por anatomía, no por diseño.
+
+  gallimimus: dino({
+    id: 'gallimimus', rareza: RAREZA.RARO, clado: CLADO.TEROPODO,
+    binomial: 'Gallimimus bullatus',
+    coste: 2, ataque: 2, vida: 3,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Estampida de la manada',
+    rasgoTexto: 'Cuando entra en juego, baraja tu mano dentro de tu mazo y roba 5 cartas.',
+    mecanica: Object.freeze({ entrada: { manoNueva: 5 } }),
+    nivel_evidencia: EVIDENCIA.INFERIDO,
+    nota_cientifica: 'Ornitomimosaurio de la Formación Nemegt, Mongolia, Maastrichtiense, conocido por ejemplares casi completos. En el pico se han descrito surcos verticales que se han interpretado como láminas de filtración, lo que apuntaría a una dieta de pequeños organismos del agua; la interpretación no es unánime.',
+  }),
+
+  thescelosaurus: dino({
+    id: 'thescelosaurus', rareza: RAREZA.COMUN, clado: CLADO.ORNITOPODO,
+    binomial: 'Thescelosaurus neglectus',
+    coste: 1, ataque: 1, vida: 4,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Cavar y esperar',
+    rasgoTexto: 'Cuando entra en juego descarta 3 cartas de tu mazo y roba 2.',
+    mecanica: Object.freeze({ entrada: { muelePropio: 3, roba: 2 } }),
+    nivel_evidencia: EVIDENCIA.DEBATIDO,
+    nota_cientifica: 'Ornitópodo pequeño de Hell Creek, uno de los últimos dinosaurios no avianos del registro. Se le ha atribuido hábito excavador por la robustez de las extremidades anteriores y por comparación con Oryctodromeus, que sí se encontró en su madriguera; en Thescelosaurus es una hipótesis discutida.',
+  }),
+
+  deinocheirus: dino({
+    id: 'deinocheirus', rareza: RAREZA.EPICO, clado: CLADO.TEROPODO,
+    binomial: 'Deinocheirus mirificus',
+    // Midió el 63,7 % con 3/9 y tope 5: llegaba a 8/9 por 4 de Biomasa.
+    coste: 4, ataque: 3, vida: 8,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Brazos de dos metros y medio',
+    rasgoTexto: 'Gana +1 de Ataque por cada carta que tengas en la mano, hasta +4.',
+    mecanica: Object.freeze({ cuenta: { que: QUE.MANO, ataque: 1, tope: 4 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Sus manos, de 2,4 m con las garras, se describieron en 1970 y durante cuarenta y cuatro años fueron casi lo único que se conocía del animal. Los ejemplares de 2014 lo completaron: un ornitomimosaurio de once metros con gastrolitos y restos de pez en la cavidad abdominal.',
+  }),
+
+  anzu: dino({
+    id: 'anzu', rareza: RAREZA.RARO, clado: CLADO.TEROPODO,
+    binomial: 'Anzu wyliei',
+    coste: 2, ataque: 3, vida: 3,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Saqueo del nido',
+    rasgoTexto: 'Cuando entra en juego, tu rival descarta cartas al azar hasta quedarse con 4 en la mano.',
+    mecanica: Object.freeze({ entrada: { topeManoRival: 4 } }),
+    nivel_evidencia: EVIDENCIA.DEBATIDO,
+    nota_cientifica: 'Cenagnátido de Hell Creek descrito en 2014 a partir de tres esqueletos parciales que, entre los tres, dan casi el animal completo. El saqueo de nidos ajenos es analogía con aves actuales de pico parecido, no evidencia: de su dieta sólo se sabe que era omnívora.',
+  }),
+
+  nigersaurus: dino({
+    id: 'nigersaurus', rareza: RAREZA.EPICO, clado: CLADO.SAUROPODO,
+    binomial: 'Nigersaurus taqueti',
+    coste: 3, ataque: 2, vida: 9,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Siega a ras de suelo',
+    // Muele a los dos y NO a partes iguales, y no es un capricho de balance: un
+    // 3 y 3 se tasa en exactamente cero y la IA no la jugaría nunca. Lo caza
+    // `test/entradas.test.js`, que exige que toda entrada valga algo.
+    rasgoTexto: 'Cuando entra en juego, tu rival descarta 4 cartas de su mazo y tú 2.',
+    mecanica: Object.freeze({ entrada: { mueleRival: 4, muelePropio: 2 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Rebaquisáurido del Aptiense-Albiense de Níger. El hocico es más ancho que el resto del cráneo y lleva una batería de más de quinientos dientes que se reemplazaban cada pocas semanas; la orientación del oído interno indica que la cabeza iba habitualmente mirando al suelo.',
+  }),
+
+  shuvuuia: dino({
+    id: 'shuvuuia', rareza: RAREZA.COMUN, clado: CLADO.TEROPODO,
+    binomial: 'Shuvuuia deserti',
+    // Midió el 46,7 % con 1/2: el cuerpo no pagaba ni el turno que ocupa.
+    coste: 1, ataque: 1, vida: 3,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Oído de lechuza',
+    rasgoTexto: 'Al jugarla, llévate a la mano un dinosaurio de tu mazo de 2 o menos de Ataque.',
+    mecanica: Object.freeze({ busca: { ataqueMax: 2 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Alvarezsáurido diminuto de la Formación Djadochta, Mongolia. La lagena de su oído interno y el anillo esclerótico son proporcionalmente comparables a los de la lechuza común, lo que apunta a caza nocturna: es de las pocas inferencias de comportamiento que descansan en anatomía medible.',
+  }),
+
+  saurolophus: dino({
+    id: 'saurolophus', rareza: RAREZA.EPICO, clado: CLADO.ORNITOPODO,
+    binomial: 'Saurolophus angustirostris',
+    // Midió el 66,0 % con 3/9: el 3/9 ya era una carta, y encima buscaba.
+    coste: 3, ataque: 2, vida: 7,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Reclamo de la cresta',
+    rasgoTexto: 'Al jugarla, llévate a la mano un dinosaurio de tu mazo de 8 o más de Ataque.',
+    mecanica: Object.freeze({ busca: { ataqueMin: 8 } }),
+    nivel_evidencia: EVIDENCIA.DEBATIDO,
+    nota_cientifica: 'Hadrosaurio de Nemegt con una cresta ósea MACIZA, no hueca como la de Parasaurolophus: no pudo funcionar como tubo de resonancia. Se ha propuesto que sostuviera un saco nasal de piel inflable, y de ahí saldría la llamada; es una hipótesis sin evidencia directa.',
+  }),
+
+  tarbosaurus: dino({
+    id: 'tarbosaurus', rareza: RAREZA.EPICO, clado: CLADO.TEROPODO,
+    binomial: 'Tarbosaurus bataar',
+    // Midió el 68,7 % con 8/7: era un Torvosaurus mejor Y con premio encima.
+    coste: 4, ataque: 7, vida: 6,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Carroñeo del tirano',
+    rasgoTexto: 'Cuando entra en juego recupera 2 cartas al azar de tu descarte.',
+    mecanica: Object.freeze({ entrada: { rescata: 2 } }),
+    nivel_evidencia: EVIDENCIA.DEBATIDO,
+    nota_cientifica: 'Tiranosáurido de Nemegt, el gran depredador de la Mongolia del Maastrichtiense. Si los tiranosáuridos cazaban, carroñeaban o ambas cosas es uno de los debates más viejos y menos resueltos del oficio; lo probable, por analogía con todo carnívoro grande actual, es que hicieran las dos.',
+  }),
+
+  psittacosaurus: dino({
+    id: 'psittacosaurus', rareza: RAREZA.COMUN, clado: CLADO.MARGINOCEFALO,
+    binomial: 'Psittacosaurus mongoliensis',
+    coste: 1, ataque: 1, vida: 3,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Molleja de gastrolitos',
+    rasgoTexto: 'Gana +1 de Vida por cada 4 cartas de tu descarte, hasta +4.',
+    mecanica: Object.freeze({ cuenta: { que: QUE.DESCARTE, cada: 4, vida: 1, tope: 4 } }),
+    nivel_evidencia: EVIDENCIA.ESTABLECIDO,
+    nota_cientifica: 'Ceratopsio basal del Cretácico Inferior de Asia, uno de los dinosaurios con más ejemplares conocidos. Varios conservan masas de gastrolitos en la región gástrica, y un ejemplar de Liaoning conserva además la piel y unas cerdas tubulares en la cola.',
+  }),
+
+  dakotaraptor: dino({
+    id: 'dakotaraptor', rareza: RAREZA.EPICO, clado: CLADO.TEROPODO,
+    binomial: 'Dakotaraptor steini',
+    // Midió el 59,3 % con 5/5 y tope 4: llegaba a 9/5 por 3.
+    coste: 3, ataque: 4, vida: 5,
+    rasgo: RASGO.NINGUNO,
+    rasgoNombre: 'Acecho al rezagado',
+    rasgoTexto: 'Gana +1 de Ataque por cada carta de la mano de tu rival, hasta +3.',
+    mecanica: Object.freeze({ cuenta: { que: QUE.MANO_RIVAL, ataque: 1, tope: 3 } }),
+    nivel_evidencia: EVIDENCIA.DEBATIDO,
+    nota_cientifica: 'Dromeosáurido grande de Hell Creek descrito en 2015. Parte del material asignado al holotipo resultó después ser de una tortuga, así que qué huesos son suyos —y por tanto su tamaño— sigue discutido; la garra en hoz del segundo dedo sí es suya.',
+  }),
+
   // ------------------------------------------------------------- biomasa
 
   // La única carta que no se juega para HACER algo, sino para poder hacerlo:

@@ -54,6 +54,11 @@ const NUMERO_DE = {
   [RASGO.INSECTOS]: ['recursos.insectosBiomasa', 'Biomasa, y además robas 1'],
   [RASGO.MANADA_PASO]: ['recursos.manadaPasoBiomasa', 'Biomasa, a cambio de 3 cartas del mazo'],
   [RASGO.FRUTOS]: ['recursos.frutosBiomasa', 'Biomasa, y el rival roba 1'],
+  [RASGO.TORMENTA_POLVO]: ['rasgos.tormentaPolvoRoba', 'cartas que roban los DOS tras barajar su mano'],
+  [RASGO.AVENIDA_LODO]: ['rasgos.avenidaLodoTope', 'cartas que le quedan al rival en la mano'],
+  [RASGO.ENTERRAMIENTO]: ['rasgos.enterramientoRescata', 'cartas que vuelven de tu descarte a la mano'],
+  [RASGO.CAUCE_ABANDONADO]: ['rasgos.cauceRoba', 'cartas que robas (y sueltas 2 de la mano)'],
+  [RASGO.BARRERA_TRONCOS]: ['rasgos.barreraMazo', 'cartas de mazo que pierde el rival, y otras tantas si va con más mano'],
 };
 
 const valorDe = (ruta) => ruta.split('.').reduce((o, k) => (o === undefined ? o : o[k]), BALANCE);

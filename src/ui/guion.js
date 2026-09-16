@@ -56,6 +56,17 @@ const ENTRADAS = {
   fulmina: (e, api) => {
     if (e.objetivo) api.fulmina(e.objetivo);
   },
+  // Las cuatro del control de mano. `manoNueva` y `manosNuevas` no dicen el
+  // saldo porque el evento MANO_NUEVA del motor no lo emite aquí: lo que se
+  // ve es cuántas entran, que es lo que la carta promete.
+  manoNueva: (e, api) => api.enMano(e.dueno, `+${e.n}`),
+  manosNuevas: (e, api) => api.enMano(api.contrario(e.dueno), `+${e.n}`),
+  topeManoRival: (e, api) => {
+    if (e.n > 0) api.enMano(api.contrario(e.dueno), `−${e.n}`, 'malo');
+  },
+  rescata: (e, api) => {
+    if (e.n > 0) api.enMano(e.dueno, `+${e.n}`);
+  },
 };
 
 /**
@@ -137,6 +148,30 @@ export const GUION = Object.freeze({
     dura: BREVE,
     sonido: 'mazo',
     hacer: (e, api) => api.enMazo(e.jugador, `−${e.cartas}`, 'malo'),
+  },
+
+  // Una mano entera que se va al mazo y vuelve otra. Se dibuja en la MANO y no
+  // en el mazo aunque las cartas pasen por él: lo que el jugador nota es que
+  // sus cartas son otras, y el saldo con signo —«+2», «−1»— es lo único que
+  // resume eso en un vistazo. Sin saldo, cuando la mano queda igual de larga,
+  // no se vería que ha pasado nada.
+  MANO_NUEVA: {
+    dura: MEDIO,
+    sonido: 'barajar',
+    hacer: (e, api) => {
+      const saldo = e.ahora - e.antes;
+      api.enMano(e.jugador, saldo >= 0 ? `+${saldo}` : `${saldo}`, saldo >= 0 ? '' : 'malo');
+    },
+  },
+
+  // Del descarte a la mano: es el único gesto del juego que va hacia ATRÁS, así
+  // que se marca en la mano y no en el descarte, que no se pinta.
+  RESCATE: {
+    dura: BREVE,
+    sonido: 'buscar',
+    hacer: (e, api) => {
+      if (e.cartas > 0) api.enMano(e.jugador, `+${e.cartas}`);
+    },
   },
 
   COSTE_EXTRA: {

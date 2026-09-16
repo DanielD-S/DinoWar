@@ -406,7 +406,79 @@ function aplicarPresion(s, p) {
   } else if (r === RASGO.NIDO) {
     robar(s, p.jugador, BALANCE.rasgos.nidoRoba);
     ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  // ------------------------------------------------- la ronda del control
+  //
+  // Ninguno de los cinco toca una cifra del campo, así que ninguno tiene a
+  // quién marcar: se anuncian sobre el tablero como la Trampa.
+
+  } else if (r === RASGO.TORMENTA_POLVO) {
+    // Los dos sueltan la mano DENTRO del mazo y roban una mano nueva fija. No
+    // es la Deriva árida: aquella devuelve tantas como tenías —el que la tenía
+    // peor sale ganando— y ésta reparte el mismo número a los dos, así que
+    // castiga al que iba acumulando y rescata al que se quedó seco. Orden fijo,
+    // el rival primero, que los dos barajan del mismo rng.
+    for (const j of [contrario, p.jugador]) manoNueva(s, j, BALANCE.rasgos.tormentaPolvoRoba);
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  } else if (r === RASGO.AVENIDA_LODO) {
+    const tope = BALANCE.rasgos.avenidaLodoTope;
+    descartarAlAzar(s, contrario, Math.max(0, s.jugadores[contrario].mano.length - tope));
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  } else if (r === RASGO.ENTERRAMIENTO) {
+    rescatarDelDescarte(s, p.jugador, BALANCE.rasgos.enterramientoRescata);
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  } else if (r === RASGO.CAUCE_ABANDONADO) {
+    // Soltar antes de robar, que si no lo robado entra en el sorteo de lo que
+    // se suelta y la carta deja de hacer lo que dice.
+    descartarAlAzar(s, p.jugador, BALANCE.rasgos.cauceDescarta);
+    robar(s, p.jugador, BALANCE.rasgos.cauceRoba);
+    ev(s, 'PRESION', { jugador: p.jugador, cardId });
+
+  } else if (r === RASGO.BARRERA_TRONCOS) {
+    // La mano propia se cuenta SIN esta carta: se está jugando, ya no está en
+    // la mano, y contarla haría que la condición dependiera de sí misma.
+    const mia = s.jugadores[p.jugador].mano.filter((iid) => iid !== p.iid).length;
+    const doble = s.jugadores[contrario].mano.length > mia;
+    perderDelMazo(s, contrario, BALANCE.rasgos.barreraMazo * (doble ? 2 : 1));
+    ev(s, 'PRESION', { jugador: p.jugador, cardId, doble });
   }
+}
+
+/**
+ * Suelta la mano DENTRO del mazo, lo baraja y roba `cuantas`. Hermana de la
+ * que usa `alEntrar`, y aquí por lo mismo: lo que sueltas vuelve a estar
+ * disponible, así que una mano impagable se cambia sin perder mazo.
+ *
+ * Roba a mano y no con `robar()`: el mazo acaba de crecer con la mano entera,
+ * así que si aun así no llega es que quedaban menos cartas que eso en todo el
+ * montón, y ahí rebarajar el descarte sería regalar cartas.
+ */
+function manoNueva(s, j, cuantas) {
+  const jug = s.jugadores[j];
+  const antes = jug.mano.length;
+  jug.mazo.push(...jug.mano);
+  jug.mano = [];
+  const b = barajar(jug.mazo, s.rng);
+  s.rng = b.rng;
+  jug.mazo = b.lista;
+  for (let k = 0; k < cuantas && jug.mazo.length > 0; k++) jug.mano.push(jug.mazo.shift());
+  ev(s, 'MANO_NUEVA', { jugador: j, antes, ahora: jug.mano.length });
+}
+
+/** Del descarte a la mano, al azar. Lo enterrado que vuelve a salir. */
+function rescatarDelDescarte(s, j, cuantas) {
+  const jug = s.jugadores[j];
+  let sacadas = 0;
+  for (let k = 0; k < cuantas && jug.descarte.length > 0; k++) {
+    const d = entero(s.rng, jug.descarte.length);
+    s.rng = d.rng;
+    jug.mano.push(jug.descarte.splice(d.valor, 1)[0]);
+    sacadas += 1;
+  }
+  ev(s, 'RESCATE', { jugador: j, cartas: sacadas, descarte: jug.descarte.length });
 }
 
 /**

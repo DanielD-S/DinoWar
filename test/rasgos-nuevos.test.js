@@ -15,7 +15,7 @@ import {
 import { legales, reduce, validar, ACCION } from '../src/engine/actions.js';
 import { BALANCE } from '../src/data/balance.js';
 import { CARTAS } from '../src/data/cards.js';
-import { tablero, poner, ejecutar, vivo } from './helpers.js';
+import { tablero, poner, enMano, ejecutar, vivo } from './helpers.js';
 
 test('Los climas nuevos alcanzan a los dos bandos', () => {
   const s = tablero(114);
@@ -83,4 +83,108 @@ test('Reciclar no cuesta Biomasa', () => {
   assert.ok(opcion, 'con 0 de Biomasa se sigue pudiendo');
   assert.equal(validar(s, opcion), null);
   assert.equal(reduce(s, opcion).jugadores[0].biomasa, 0);
+});
+
+// ------------------------------------------------- la ronda del control
+
+/** Juega un evento sin objetivo y resuelve la revelación. */
+function soltar(s, cardId, jugador = 0) {
+  const iid = enMano(s, cardId, jugador);
+  s.jugadores[jugador].biomasa = 9;
+  s.fase = FASE.DESPLIEGUE;
+  return ejecutar(reduce(s, { tipo: ACCION.EVENTO, jugador, iid }), FASE.REVELACION);
+}
+
+test('La Tormenta de polvo reparte la MISMA mano a los dos, y por el mazo', () => {
+  // No es la Deriva árida: aquélla te devuelve tantas como tenías —el que la
+  // tenía peor sale ganando— y ésta reparte un número fijo, así que castiga a
+  // quien iba acumulando y rescata a quien se quedó seco. Y pasa por el MAZO:
+  // lo que sueltas vuelve a estar disponible, no se pierde.
+  const s = tablero();
+  for (let k = 0; k < 7; k++) enMano(s, 'troodon', 0);
+  for (let k = 0; k < 2; k++) enMano(s, 'troodon', 1);
+  const r = soltar(s, 'tormenta_polvo');
+
+  const n = BALANCE.rasgos.tormentaPolvoRoba;
+  assert.equal(r.jugadores[0].mano.length, n, 'el que la juega se queda con las suyas');
+  assert.equal(r.jugadores[1].mano.length, n, 'y el rival con las mismas');
+  // Al rival no le va NADA al descarte; al que la juega, sólo la propia carta,
+  // que se gasta al resolverse como cualquier evento.
+  assert.equal(r.jugadores[1].descarte.length, 0);
+  assert.deepEqual(r.jugadores[0].descarte.map((iid) => r.instancias[iid].cardId),
+    ['tormenta_polvo']);
+});
+
+test('La Avenida de lodo recorta la mano rival al tope, y sólo la suya', () => {
+  const s = tablero();
+  for (let k = 0; k < 6; k++) enMano(s, 'troodon', 1);
+  for (let k = 0; k < 6; k++) enMano(s, 'troodon', 0);
+  const r = soltar(s, 'avenida_lodo');
+
+  const tope = BALANCE.rasgos.avenidaLodoTope;
+  assert.equal(r.jugadores[1].mano.length, tope);
+  assert.equal(r.jugadores[1].descarte.length, 6 - tope);
+  // La mano propia queda como estaba menos la carta jugada.
+  assert.equal(r.jugadores[0].mano.length, 6);
+
+  // Con la mano ya corta no le quita ninguna, y tampoco le da.
+  const t = tablero();
+  enMano(t, 'troodon', 1);
+  const u = soltar(t, 'avenida_lodo');
+  assert.equal(u.jugadores[1].mano.length, 1);
+  assert.equal(u.jugadores[1].descarte.length, 0);
+});
+
+test('El Enterramiento saca del descarte, y no inventa cartas si está vacío', () => {
+  const s = tablero();
+  s.jugadores[0].descarte.push(...s.jugadores[0].mazo.splice(0, 5));
+  const r = soltar(s, 'enterramiento');
+  const n = BALANCE.rasgos.enterramientoRescata;
+  // Las 5 menos las rescatadas, más la propia carta: se gasta DESPUÉS de
+  // rescatar, así que no puede rescatarse a sí misma.
+  assert.equal(r.jugadores[0].descarte.length, 5 - n + 1);
+  assert.equal(r.jugadores[0].mano.length, n);
+  assert.ok(!r.jugadores[0].mano.some((iid) => r.instancias[iid].cardId === 'enterramiento'));
+
+  const t = tablero();
+  const u = soltar(t, 'enterramiento');
+  assert.equal(u.jugadores[0].mano.length, 0);
+  const e = u.eventos.find((x) => x.tipo === 'RESCATE');
+  assert.equal(e.cartas, 0, 'deja constancia de que no sacó nada');
+});
+
+test('El Cauce suelta ANTES de robar, que si no se descartaría lo robado', () => {
+  const s = tablero();
+  for (let k = 0; k < 4; k++) enMano(s, 'troodon', 0);
+  const r = soltar(s, 'cauce_abandonado');
+  const { cauceDescarta, cauceRoba } = BALANCE.rasgos;
+  assert.equal(r.jugadores[0].descarte.length, cauceDescarta + 1, 'y la propia carta gastada');
+  assert.equal(r.jugadores[0].mano.length, 4 - cauceDescarta + cauceRoba);
+  // Lo soltado salió de las que YA tenía —todas eran troodon— y no de lo
+  // robado: si se robara primero, la carta haría otra cosa que la que dice.
+  const soltadas = r.jugadores[0].descarte
+    .map((iid) => r.instancias[iid].cardId).filter((id) => id !== 'cauce_abandonado');
+  assert.deepEqual(soltadas, ['troodon', 'troodon']);
+});
+
+test('La Barrera de troncos dobla sólo si el rival va con más mano que tú', () => {
+  const n = BALANCE.rasgos.barreraMazo;
+
+  // Él con cuatro, tú con una (la carta jugada no cuenta: ya no está en la mano).
+  const s = tablero();
+  for (let k = 0; k < 4; k++) enMano(s, 'troodon', 1);
+  enMano(s, 'troodon', 0);
+  const antes = s.jugadores[1].mazo.length;
+  const r = soltar(s, 'barrera_troncos');
+  assert.equal(r.jugadores[1].mazo.length, antes - n * 2);
+  assert.ok(r.eventos.find((x) => x.tipo === 'PRESION' && x.doble === true));
+
+  // Empatados a mano: no dobla. «Más que tú» es más, no otro tanto.
+  const t = tablero();
+  for (let k = 0; k < 3; k++) enMano(t, 'troodon', 1);
+  for (let k = 0; k < 3; k++) enMano(t, 'troodon', 0);
+  const antesT = t.jugadores[1].mazo.length;
+  const u = soltar(t, 'barrera_troncos');
+  assert.equal(u.jugadores[1].mazo.length, antesT - n);
+  assert.ok(u.eventos.find((x) => x.tipo === 'PRESION' && x.doble === false));
 });

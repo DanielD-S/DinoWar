@@ -300,6 +300,38 @@ function valorDeAccion(vista, j, a) {
           .reduce((n, u) => n + Math.min(u.heridas, BALANCE.rasgos.canalTrenzadoCura), 0) * 0.5;
       } else if (r === RASGO.BOSQUE_RIBERENO) {
         delta = Math.min(BALANCE.rasgos.bosqueRiberenoMano, vista.jugadores[contrario].mano.length) * 0.6;
+      // La ronda del control. Ninguno mueve una cifra del campo, así que se
+      // tasan por cartas: una carta en la mano vale algo más que un punto
+      // —`valorEntrada.roba`— y una carta menos en la del rival, parecido.
+      } else if (r === RASGO.TORMENTA_POLVO) {
+        // Reparte lo mismo a los dos, así que vale la DIFERENCIA: lo que te
+        // sube a ti menos lo que le sube a él. Con la mano llena es una carta
+        // muerta, y con la mano seca y el rival cargado, la mejor del mazo.
+        const n = BALANCE.rasgos.tormentaPolvoRoba;
+        const mia = vista.jugadores[j].mano.filter((iid) => iid !== a.iid).length;
+        delta = (Math.min(n, mazoDe(vista, j) + mia) - mia) * 0.7
+          - Math.max(0, n - vista.jugadores[contrario].mano.length) * 0.5;
+
+      } else if (r === RASGO.AVENIDA_LODO) {
+        delta = Math.max(0, vista.jugadores[contrario].mano.length - BALANCE.rasgos.avenidaLodoTope) * 0.7;
+
+      } else if (r === RASGO.ENTERRAMIENTO) {
+        delta = Math.min(BALANCE.rasgos.enterramientoRescata,
+          vista.jugadores[j].descarte.length) * 0.8;
+
+      } else if (r === RASGO.CAUCE_ABANDONADO) {
+        // Suelta antes de robar, así que lo que gana es la diferencia. Plana a
+        // propósito: mirar si lo soltado se podía pagar exigiría saber QUÉ se
+        // suelta, y se sortea al resolver. La IA no puede tasar un azar que
+        // todavía no ha ocurrido, y fingir que sí es peor que no intentarlo.
+        delta = BALANCE.rasgos.cauceRoba * 0.7 - BALANCE.rasgos.cauceDescarta * 0.5;
+
+      } else if (r === RASGO.BARRERA_TRONCOS) {
+        const mia = vista.jugadores[j].mano.filter((iid) => iid !== a.iid).length;
+        const doble = vista.jugadores[contrario].mano.length > mia;
+        const cartas = BALANCE.rasgos.barreraMazo * (doble ? 2 : 1);
+        delta = cartas / Math.max(1, mazoDe(vista, contrario)) * IA.pesoTrofeo / IA.pesoDano * 3;
+
       } else if (r === RASGO.DERIVA_ARIDA) {
         // Vale cuando el rival tiene más mano que tú, o la tuya no se puede
         // pagar: lo que se suelta no se pierde, se cambia.

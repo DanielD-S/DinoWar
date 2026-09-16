@@ -8,9 +8,9 @@
 > **Sed**: heridas que recibe cuando sale *Sequía estacional*. **No es un
 > segundo coste**: no se paga al jugarla, sólo cuando el clima lo cobra.
 
-El set tiene **101 cartas distintas**. Un mazo son **55 cartas exactas**, así que no caben todas: el de referencia lleva 28 dinosaurios, 13 eventos, 4 de recurso y 1 de clima.
+El set tiene **116 cartas distintas**. Un mazo son **55 cartas exactas**, así que no caben todas: el de referencia lleva 28 dinosaurios, 13 eventos, 4 de recurso y 1 de clima.
 
-Fuera del mazo de referencia, y por tanto sin medir aquí: Torvosaurus tanneri, Nodosaurus textilis, Neumaticidad ósea, Competencia trófica, Mortandad estacional, Llanura de inundación, Bosque de coníferas ribereño, Deriva árida, Carroña abundante, Lago efímero, Manada de paso, Frutos de cícada, Crecida estacional, Bruma de valle, Estación de lluvias, Sequía prolongada, Plesiopleurodon wellesi, Ojoraptorsaurus boerei, Dromaeosaurus albertensis, Athenar bermani, Sanjuansaurus gordilloi, Suchomimus tenerensis, Eosinopteryx brevipenna, Troodon formosus, Carnotaurus sastrei, Spinosaurus aegyptiacus, Mosasaurus hoffmannii, Halszkaraptor escuilliei, Tongtianlong limosus, Scanisaurus nazarowi, Monolophosaurus jiangi, Invictarx zephyri, Medusaceratops lokii, Platyceratops tatarinovi, Loricatosaurus priscus, Therizinosaurus cheloniformis, Alaskacephale gangloffi, Titanoceratops ouranos, Atlasaurus imelakei, Stegoceras validum, Maiasaura peeblesorum, Edmontosaurus annectens, Plateosauravus cullingworthi, Gargoyleosaurus parkpinorum, Wendiceratops pinhornensis, Antarctosaurus wichmannianus, Liaoceratops yanzigouensis, Rhinorex condrupus, Bienosaurus lufengensis, Shuangmiaosaurus gilmorei, Chasmosaurus belli, Tyrannosaurus rex, Brachiosaurus altithorax, Argentinosaurus huinculensis, Mamenchisaurus hochuanensis, Ankylosaurus magniventris, Euoplocephalus tutus, Triceratops horridus, Parasaurolophus walkeri, Pteranodon longiceps, Quetzalcoatlus northropi, Elasmosaurus platyurus, Arboleda de ginkgos, Juncal de equisetos, Bosque de galería, Helechal arborescente, Vega de aluvión, Humedal de tierras bajas, Manantial perenne. Se juegan igual, pero su calibración no está comprobada.
+Fuera del mazo de referencia, y por tanto sin medir aquí: Torvosaurus tanneri, Nodosaurus textilis, Neumaticidad ósea, Competencia trófica, Mortandad estacional, Llanura de inundación, Bosque de coníferas ribereño, Deriva árida, Tormenta de polvo, Avenida de lodo, Enterramiento rápido, Cauce abandonado, Barrera de troncos, Carroña abundante, Lago efímero, Manada de paso, Frutos de cícada, Crecida estacional, Bruma de valle, Estación de lluvias, Sequía prolongada, Plesiopleurodon wellesi, Ojoraptorsaurus boerei, Dromaeosaurus albertensis, Athenar bermani, Sanjuansaurus gordilloi, Suchomimus tenerensis, Eosinopteryx brevipenna, Troodon formosus, Carnotaurus sastrei, Spinosaurus aegyptiacus, Mosasaurus hoffmannii, Halszkaraptor escuilliei, Tongtianlong limosus, Scanisaurus nazarowi, Monolophosaurus jiangi, Invictarx zephyri, Medusaceratops lokii, Platyceratops tatarinovi, Loricatosaurus priscus, Therizinosaurus cheloniformis, Alaskacephale gangloffi, Titanoceratops ouranos, Atlasaurus imelakei, Stegoceras validum, Maiasaura peeblesorum, Edmontosaurus annectens, Plateosauravus cullingworthi, Gargoyleosaurus parkpinorum, Wendiceratops pinhornensis, Antarctosaurus wichmannianus, Liaoceratops yanzigouensis, Rhinorex condrupus, Bienosaurus lufengensis, Shuangmiaosaurus gilmorei, Chasmosaurus belli, Tyrannosaurus rex, Brachiosaurus altithorax, Argentinosaurus huinculensis, Mamenchisaurus hochuanensis, Ankylosaurus magniventris, Euoplocephalus tutus, Triceratops horridus, Parasaurolophus walkeri, Pteranodon longiceps, Quetzalcoatlus northropi, Elasmosaurus platyurus, Gallimimus bullatus, Thescelosaurus neglectus, Deinocheirus mirificus, Anzu wyliei, Nigersaurus taqueti, Shuvuuia deserti, Saurolophus angustirostris, Tarbosaurus bataar, Psittacosaurus mongoliensis, Dakotaraptor steini, Arboleda de ginkgos, Juncal de equisetos, Bosque de galería, Helechal arborescente, Vega de aluvión, Humedal de tierras bajas, Manantial perenne. Se juegan igual, pero su calibración no está comprobada.
 
 **Qué revisar sobre todo:** los eventos de presión y las cartas de recurso.
 Son lo único del set que no describe un animal sino una presión sobre él, y
@@ -27,9 +27,9 @@ es legendario.
 
 | Rareza | Copias máximas | Cartas distintas | En el mazo de referencia |
 |---|---|---|---|
-| Común | 3 | 32 | 28 |
-| Rara | 3 | 28 | 20 |
-| Épica | 2 | 25 | 5 |
+| Común | 3 | 37 | 28 |
+| Rara | 3 | 32 | 20 |
+| Épica | 2 | 31 | 5 |
 | Legendaria | 1 | 16 | 2 |
 
 ---
@@ -104,6 +104,16 @@ es legendario.
 | *Pteranodon longiceps* | Pterosaurio | Común | 0 | 0 | 2 | 2 | undefined |
 | *Quetzalcoatlus northropi* | Pterosaurio | Épica | 0 | 3 | 5 | 4 | undefined |
 | *Elasmosaurus platyurus* | Reptil marino | Rara | 0 | 3 | 2 | 9 | undefined |
+| *Gallimimus bullatus* | Terópodo | Rara | 0 | 2 | 2 | 3 | undefined |
+| *Thescelosaurus neglectus* | Ornitópodo | Común | 0 | 1 | 1 | 4 | undefined |
+| *Deinocheirus mirificus* | Terópodo | Épica | 0 | 4 | 3 | 8 | undefined |
+| *Anzu wyliei* | Terópodo | Rara | 0 | 2 | 3 | 3 | undefined |
+| *Nigersaurus taqueti* | Saurópodo | Épica | 0 | 3 | 2 | 9 | undefined |
+| *Shuvuuia deserti* | Terópodo | Común | 0 | 1 | 1 | 3 | undefined |
+| *Saurolophus angustirostris* | Ornitópodo | Épica | 0 | 3 | 2 | 7 | undefined |
+| *Tarbosaurus bataar* | Terópodo | Épica | 0 | 4 | 7 | 6 | undefined |
+| *Psittacosaurus mongoliensis* | Marginocéfalo | Común | 0 | 1 | 1 | 3 | undefined |
+| *Dakotaraptor steini* | Terópodo | Épica | 0 | 3 | 4 | 5 | undefined |
 
 *Camarasaurus* es inmune a la Sed: sus isótopos indican que migraba.
 
@@ -665,6 +675,86 @@ es legendario.
 
 `ESTABLECIDO` · Plesiosaurio de la Niobrara, Kansas, Campaniense. Setenta y dos vértebras cervicales, más que ningún otro animal conocido; el cuello era poco flexible y probablemente servía para acercarse a los bancos de peces desde abajo.
 
+### *Gallimimus bullatus* · Terópodo · Rara · fuera del mazo de referencia
+
+**2 de coste · 2 de Ataque · 3 de Vida**
+
+**Estampida de la manada** — Cuando entra en juego, baraja tu mano dentro de tu mazo y roba 5 cartas.
+
+`INFERIDO` · Ornitomimosaurio de la Formación Nemegt, Mongolia, Maastrichtiense, conocido por ejemplares casi completos. En el pico se han descrito surcos verticales que se han interpretado como láminas de filtración, lo que apuntaría a una dieta de pequeños organismos del agua; la interpretación no es unánime.
+
+### *Thescelosaurus neglectus* · Ornitópodo · Común · fuera del mazo de referencia
+
+**1 de coste · 1 de Ataque · 4 de Vida**
+
+**Cavar y esperar** — Cuando entra en juego descarta 3 cartas de tu mazo y roba 2.
+
+`DEBATIDO` · Ornitópodo pequeño de Hell Creek, uno de los últimos dinosaurios no avianos del registro. Se le ha atribuido hábito excavador por la robustez de las extremidades anteriores y por comparación con Oryctodromeus, que sí se encontró en su madriguera; en Thescelosaurus es una hipótesis discutida.
+
+### *Deinocheirus mirificus* · Terópodo · Épica · fuera del mazo de referencia
+
+**4 de coste · 3 de Ataque · 8 de Vida**
+
+**Brazos de dos metros y medio** — Gana +1 de Ataque por cada carta que tengas en la mano, hasta +4.
+
+`ESTABLECIDO` · Sus manos, de 2,4 m con las garras, se describieron en 1970 y durante cuarenta y cuatro años fueron casi lo único que se conocía del animal. Los ejemplares de 2014 lo completaron: un ornitomimosaurio de once metros con gastrolitos y restos de pez en la cavidad abdominal.
+
+### *Anzu wyliei* · Terópodo · Rara · fuera del mazo de referencia
+
+**2 de coste · 3 de Ataque · 3 de Vida**
+
+**Saqueo del nido** — Cuando entra en juego, tu rival descarta cartas al azar hasta quedarse con 4 en la mano.
+
+`DEBATIDO` · Cenagnátido de Hell Creek descrito en 2014 a partir de tres esqueletos parciales que, entre los tres, dan casi el animal completo. El saqueo de nidos ajenos es analogía con aves actuales de pico parecido, no evidencia: de su dieta sólo se sabe que era omnívora.
+
+### *Nigersaurus taqueti* · Saurópodo · Épica · fuera del mazo de referencia
+
+**3 de coste · 2 de Ataque · 9 de Vida**
+
+**Siega a ras de suelo** — Cuando entra en juego, tu rival descarta 4 cartas de su mazo y tú 2.
+
+`ESTABLECIDO` · Rebaquisáurido del Aptiense-Albiense de Níger. El hocico es más ancho que el resto del cráneo y lleva una batería de más de quinientos dientes que se reemplazaban cada pocas semanas; la orientación del oído interno indica que la cabeza iba habitualmente mirando al suelo.
+
+### *Shuvuuia deserti* · Terópodo · Común · fuera del mazo de referencia
+
+**1 de coste · 1 de Ataque · 3 de Vida**
+
+**Oído de lechuza** — Al jugarla, llévate a la mano un dinosaurio de tu mazo de 2 o menos de Ataque.
+
+`ESTABLECIDO` · Alvarezsáurido diminuto de la Formación Djadochta, Mongolia. La lagena de su oído interno y el anillo esclerótico son proporcionalmente comparables a los de la lechuza común, lo que apunta a caza nocturna: es de las pocas inferencias de comportamiento que descansan en anatomía medible.
+
+### *Saurolophus angustirostris* · Ornitópodo · Épica · fuera del mazo de referencia
+
+**3 de coste · 2 de Ataque · 7 de Vida**
+
+**Reclamo de la cresta** — Al jugarla, llévate a la mano un dinosaurio de tu mazo de 8 o más de Ataque.
+
+`DEBATIDO` · Hadrosaurio de Nemegt con una cresta ósea MACIZA, no hueca como la de Parasaurolophus: no pudo funcionar como tubo de resonancia. Se ha propuesto que sostuviera un saco nasal de piel inflable, y de ahí saldría la llamada; es una hipótesis sin evidencia directa.
+
+### *Tarbosaurus bataar* · Terópodo · Épica · fuera del mazo de referencia
+
+**4 de coste · 7 de Ataque · 6 de Vida**
+
+**Carroñeo del tirano** — Cuando entra en juego recupera 2 cartas al azar de tu descarte.
+
+`DEBATIDO` · Tiranosáurido de Nemegt, el gran depredador de la Mongolia del Maastrichtiense. Si los tiranosáuridos cazaban, carroñeaban o ambas cosas es uno de los debates más viejos y menos resueltos del oficio; lo probable, por analogía con todo carnívoro grande actual, es que hicieran las dos.
+
+### *Psittacosaurus mongoliensis* · Marginocéfalo · Común · fuera del mazo de referencia
+
+**1 de coste · 1 de Ataque · 3 de Vida**
+
+**Molleja de gastrolitos** — Gana +1 de Vida por cada 4 cartas de tu descarte, hasta +4.
+
+`ESTABLECIDO` · Ceratopsio basal del Cretácico Inferior de Asia, uno de los dinosaurios con más ejemplares conocidos. Varios conservan masas de gastrolitos en la región gástrica, y un ejemplar de Liaoning conserva además la piel y unas cerdas tubulares en la cola.
+
+### *Dakotaraptor steini* · Terópodo · Épica · fuera del mazo de referencia
+
+**3 de coste · 4 de Ataque · 5 de Vida**
+
+**Acecho al rezagado** — Gana +1 de Ataque por cada carta de la mano de tu rival, hasta +3.
+
+`DEBATIDO` · Dromeosáurido grande de Hell Creek descrito en 2015. Parte del material asignado al holotipo resultó después ser de una tortuga, así que qué huesos son suyos —y por tanto su tamaño— sigue discutido; la garra en hoz del segundo dedo sí es suya.
+
 ---
 
 ## 2. Eventos
@@ -759,6 +849,36 @@ Se juega **sobre la mesa entera, sin elegir objetivo**. Robas 2 cartas.
 
 `ESTABLECIDO` · La Morrison conserva nidos y huevos de saurópodo y de terópodo pequeño, y cáscaras dispersas en muchos yacimientos. Un nido es la promesa de lo que viene después.
 
+### Tormenta de polvo · Rara · coste 2 · fuera del mazo de referencia
+
+Se juega **sobre la mesa entera, sin elegir objetivo**. Los dos jugadores barajan su mano dentro de su mazo y roban 5 cartas.
+
+`ESTABLECIDO` · Los paleosuelos de la Morrison alternan horizontes de caliche con niveles de arena eólica, y al norte de la cuenca hay campos de dunas: episodios secos con transporte de polvo, repetidos durante millones de años.
+
+### Avenida de lodo · Épica · coste 2 · fuera del mazo de referencia
+
+Se juega **sobre la mesa entera, sin elegir objetivo**. Tu rival descarta cartas al azar hasta quedarse con 3 en la mano.
+
+`ESTABLECIDO` · Los flujos de derrubios dejan depósitos masivos, sin clasificar y con bloques flotando en la matriz. Varias de las grandes acumulaciones de huesos del Jurásico se han interpretado como cadáveres arrastrados y amontonados por una de estas avenidas.
+
+### Enterramiento rápido · Rara · coste 2 · fuera del mazo de referencia
+
+Se juega **sobre la mesa entera, sin elegir objetivo**. Recupera 2 cartas al azar de tu descarte y llévatelas a la mano.
+
+`ESTABLECIDO` · Todo yacimiento de conservación excepcional tiene lo mismo detrás: el cadáver quedó cubierto antes de que los carroñeros y las bacterias hicieran su trabajo. Lo que se recupera del registro fósil es, casi siempre, lo que se enterró deprisa.
+
+### Cauce abandonado · Común · coste 1 · fuera del mazo de referencia
+
+Se juega **sobre la mesa entera, sin elegir objetivo**. Descarta 2 cartas al azar de tu mano y roba 3.
+
+`ESTABLECIDO` · Cuando un meandro se corta por el cuello, el brazo que queda se llena de finos y se convierte en una charca alargada. Los cauces abandonados de la Morrison son de los pocos sitios donde se conservan restos de plantas y de peces.
+
+### Barrera de troncos · Común · coste 1 · fuera del mazo de referencia
+
+Se juega **sobre la mesa entera, sin elegir objetivo**. Tu rival pierde 4 cartas de su mazo, y 4 más si tiene más cartas en la mano que tú.
+
+`INFERIDO` · Los atascos de troncos son estructuras corrientes en ríos con orillas arboladas: represan el cauce, lo desvían y concentran lo que baja con la corriente. En el Jurásico se infieren de las acumulaciones de leña fósil orientadas en los rellenos de canal.
+
 ### Gregarismo · Rara · coste 1 · 2 copias
 
 +1 de Ataque a todos tus dinosaurios de la misma especie que el objetivo.
@@ -842,6 +962,36 @@ Ambos jugadores descartan la mano entera y roban otras tantas cartas.
 Robas 2 cartas.
 
 `ESTABLECIDO` · La Morrison conserva nidos y huevos de saurópodo y de terópodo pequeño, y cáscaras dispersas en muchos yacimientos. Un nido es la promesa de lo que viene después.
+
+### Tormenta de polvo · Rara · coste 2 · fuera del mazo de referencia
+
+Los dos jugadores barajan su mano dentro de su mazo y roban 5 cartas.
+
+`ESTABLECIDO` · Los paleosuelos de la Morrison alternan horizontes de caliche con niveles de arena eólica, y al norte de la cuenca hay campos de dunas: episodios secos con transporte de polvo, repetidos durante millones de años.
+
+### Avenida de lodo · Épica · coste 2 · fuera del mazo de referencia
+
+Tu rival descarta cartas al azar hasta quedarse con 3 en la mano.
+
+`ESTABLECIDO` · Los flujos de derrubios dejan depósitos masivos, sin clasificar y con bloques flotando en la matriz. Varias de las grandes acumulaciones de huesos del Jurásico se han interpretado como cadáveres arrastrados y amontonados por una de estas avenidas.
+
+### Enterramiento rápido · Rara · coste 2 · fuera del mazo de referencia
+
+Recupera 2 cartas al azar de tu descarte y llévatelas a la mano.
+
+`ESTABLECIDO` · Todo yacimiento de conservación excepcional tiene lo mismo detrás: el cadáver quedó cubierto antes de que los carroñeros y las bacterias hicieran su trabajo. Lo que se recupera del registro fósil es, casi siempre, lo que se enterró deprisa.
+
+### Cauce abandonado · Común · coste 1 · fuera del mazo de referencia
+
+Descarta 2 cartas al azar de tu mano y roba 3.
+
+`ESTABLECIDO` · Cuando un meandro se corta por el cuello, el brazo que queda se llena de finos y se convierte en una charca alargada. Los cauces abandonados de la Morrison son de los pocos sitios donde se conservan restos de plantas y de peces.
+
+### Barrera de troncos · Común · coste 1 · fuera del mazo de referencia
+
+Tu rival pierde 4 cartas de su mazo, y 4 más si tiene más cartas en la mano que tú.
+
+`INFERIDO` · Los atascos de troncos son estructuras corrientes en ríos con orillas arboladas: represan el cauce, lo desvían y concentran lo que baja con la corriente. En el Jurásico se infieren de las acumulaciones de leña fósil orientadas en los rellenos de canal.
 
 ---
 
