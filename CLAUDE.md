@@ -629,6 +629,13 @@ salía en un sobre. Las nueve legendarias con criatura lo tienen todas. Hubo un
 vídeo de relleno para las que no tenían el suyo y se quitó: el autor prefiere
 que una legendaria sin vídeo salga sin vídeo.
 
+**Y el vídeo es de ANIMALES, no de paisajes.** Se probó a darle a cada
+expedición dos cinemáticas —una al entrar en la formación y otra al cerrarla,
+con el impacto del Cretácico de remate— y se quitó antes de escribir ninguna:
+el generador entrega bien un plano corto de un bicho, y un plano de paisaje no.
+El código llegó a existir y se deshizo entero (15-09-2026); si alguien vuelve a
+proponerlo, lo que falla no es el sitio donde se enseña, es la pieza.
+
 **Las dos cartas de jefe también tienen vídeo**, y se enseña al RECLAMARLAS en
 la Cuenca, antes de la invocación: es la única vez que esa carta «sale», así
 que es su momento. La capa del vídeo es la misma que la del sobre —`mostrarVideo()`

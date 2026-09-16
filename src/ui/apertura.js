@@ -72,9 +72,7 @@ export function precargarVideo(id, alFallar = () => {}) {
  * La capa del vídeo sobre `raiz`, hasta que el jugador la toca. Resuelve sin
  * enseñar nada si el vídeo no llega o `cancelado()` dice que ya no toca.
  */
-export async function mostrarVideo({
-  raiz, video: v, binomial, dino = true, cancelado = () => false, cerrarTexto = 'Ver la carta',
-}) {
+export async function mostrarVideo({ raiz, video: v, binomial, dino = true, cancelado = () => false }) {
   const capa = document.createElement('div');
   capa.className = 'apertura-video';
   const marco = document.createElement('div');
@@ -105,7 +103,7 @@ export async function mostrarVideo({
   const cerrar = document.createElement('button');
   cerrar.type = 'button';
   cerrar.className = 'apertura-video-cerrar';
-  cerrar.textContent = cerrarTexto;
+  cerrar.textContent = 'Ver la carta';
   pie.append(nombre, cerrar);
   capa.append(marco, pie);
   raiz.appendChild(capa);
@@ -153,22 +151,15 @@ export async function mostrarVideo({
     await esperar(SALIDA_VIDEO);
   }
   capa.remove();
-  return reproduce;
 }
 
 /**
  * El vídeo de una carta suelta, fuera del sobre: se pide, se enseña y se va.
  * Si no existe, resuelve enseguida sin enseñar nada. Con movimiento reducido
  * tampoco se enseña, como la ceremonia.
- *
- * DEVUELVE si llegó a verse. Lo mira quien enseña algo UNA vez —la cinemática
- * de una expedición— para no apuntarlo como visto cuando el fichero todavía no
- * está: si se apuntara igual, el vídeo que llegue mañana no saldría nunca.
- *
- * @returns {Promise<boolean>}
  */
-export async function videoDeCarta({ raiz, id, binomial, dino = true, cerrarTexto }) {
-  if (reducido() || !raiz || !id) return false;
+export async function videoDeCarta({ raiz, id, binomial, dino = true }) {
+  if (reducido() || !raiz || !id) return;
   let falta = false;
   const v = precargarVideo(id, () => { falta = true; });
   // Un 404 llega en un instante; un vídeo real tarda más en decir «puedo».
@@ -177,8 +168,8 @@ export async function videoDeCarta({ raiz, id, binomial, dino = true, cerrarText
     v.addEventListener('error', listo, { once: true });
     setTimeout(listo, 2500);
   });
-  if (falta || v.error) return false;
-  return !!await mostrarVideo({ raiz, video: v, binomial, dino, cerrarTexto });
+  if (falta || v.error) return;
+  await mostrarVideo({ raiz, video: v, binomial, dino });
 }
 
 /**

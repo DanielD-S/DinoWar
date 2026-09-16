@@ -18,7 +18,6 @@
 import { EXPEDICIONES, visitanteDe, claveDeVictoria, requisitoDe, rivalPorId } from '../data/expediciones.js';
 import { traerExpediciones, expedicionesEnCache } from './perfil.js';
 import { arte } from './art.js';
-import { videoDeCarta } from './apertura.js';
 
 const id = (s) => document.getElementById(s);
 const escapar = (s) => String(s).replace(/[<>&"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
@@ -48,7 +47,6 @@ export function montarExpedicion(callbacks) {
       if (f.classList.contains('bloqueada')) return;
       expedicion = EXPEDICIONES.find((x) => x.id === f.dataset.formacion) ?? expedicion;
       pintar(true);
-      quizaCinematica();
       return;
     }
     const b = e.target.closest('[data-rival]');
@@ -76,69 +74,6 @@ export async function abrirExpedicion() {
   pintar(true);
   await traerExpediciones();
   pintar(true);
-  quizaCinematica();
-}
-
-// ------------------------------------------------------------ cinemáticas
-//
-// Dos por formación y ninguna más: al ENTRAR la primera vez y al TERMINARLA.
-// No una por nodo, que un nodo se rejuega y un vídeo que se ve ocho veces se
-// salta desde la segunda. Es la misma gramática que el resto del juego: el
-// vídeo sale cuando algo pasa UNA vez —una legendaria que cae, una carta de
-// jefe que se reclama—, y por eso nadie lo salta.
-//
-// Se piden por el id del fichero y, si no está, no pasa nada: `videoDeCarta`
-// resuelve en el acto con el 404, igual que una legendaria sin vídeo. Así esto
-// puede ir publicado antes de que exista un solo mp4.
-
-const VISTOS = 'dinowar.expedicion.vistos';
-
-// Qué cinemáticas hay servidas. Se pregunta UNA vez, igual que las piezas del
-// mapa, y por el mismo motivo: pedir a ciegas un vídeo que aún no existe deja
-// un 404 en la consola en cada visita —una legendaria sin vídeo lo deja una
-// vez y se acabó, esto no—. Lo escribe `python tools/videos.py escribir`.
-let videos = null;
-const traerIndiceDeVideos = () => (videos ??= fetch('assets/video/indice.json', { cache: 'no-cache' })
-  .then((r) => (r.ok ? r.json() : null))
-  .then((j) => new Set(j?.videos ?? []))
-  .catch(() => new Set()));
-
-const leerVistos = () => {
-  try { const l = JSON.parse(localStorage.getItem(VISTOS)); return Array.isArray(l) ? l : []; } catch { return []; }
-};
-const apuntarVisto = (clave) => {
-  try {
-    const l = leerVistos();
-    if (!l.includes(clave)) localStorage.setItem(VISTOS, JSON.stringify([...l, clave]));
-  } catch { /* sin localStorage se verá otra vez, que es el fallo barato */ }
-};
-
-/**
- * Enseña la cinemática que toque, si toca y si existe. El CIERRE manda sobre
- * la entrada: quien acaba de rematar una formación no quiere su presentación.
- *
- * Lo visto se apunta SÓLO si llegó a verse, para que un vídeo que aún no está
- * servido no se marque y luego no salga nunca.
- */
-async function quizaCinematica() {
-  const e = expedicion;
-  const estado = estadoDeFormacion(e);
-  if (estado === 'bloqueada') return;
-  const vistos = new Set(leerVistos());
-  const cual = estado === 'completa' && !vistos.has(`${e.id}:fin`) ? 'fin'
-    : !vistos.has(`${e.id}:ini`) ? 'ini' : null;
-  if (!cual) return;
-  const video = cual === 'fin' ? `exp_${e.id}_fin` : `exp_${e.id}`;
-  const hay = await traerIndiceDeVideos();
-  if (!hay.has(video)) return;
-  const visto = await videoDeCarta({
-    raiz: id('expedicion'),
-    id: video,
-    binomial: e.nombre,
-    dino: false,
-    cerrarTexto: cual === 'fin' ? 'Volver al mapa' : 'Empezar',
-  });
-  if (visto) apuntarVisto(`${e.id}:${cual}`);
 }
 
 const vencidos = () => new Set(expedicionesEnCache()?.vencidos ?? []);
