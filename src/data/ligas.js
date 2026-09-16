@@ -43,6 +43,79 @@ export const ELO = Object.freeze({
   suelo: 800,
 });
 
+/**
+ * El escudo de descenso: al llegar a una liga se traen tres derrotas de
+ * margen. Mientras queden, una derrota que te sacaría de la liga te deja en
+ * su umbral y gasta una; se rellenan al SUBIR de liga. Es lo que hace que
+ * subir se sienta ganado y no prestado: sin él, el ELO bajaba en cuanto
+ * perdías y la promoción duraba una partida. Sólo protege el umbral de LIGA,
+ * no el de división: bajar de Jurásico I a II es un mal día, bajar de
+ * Jurásico a Triásico es perder el emblema.
+ */
+export const ESCUDO = Object.freeze({ derrotas: 3 });
+
+/**
+ * Las temporadas: cuatro semanas, contadas desde un lunes en UTC como las
+ * misiones. Al cerrar el PRIMER duelo de una temporada nueva, el ELO vuelve a
+ * medio camino del inicial —un reinicio blando—, así que quien está arriba
+ * sigue arriba pero tiene que volver a demostrarlo, y quien dejó de jugar no
+ * se queda clavado. No hay proceso que lo aplique a una hora: lo aplica el
+ * servidor al cerrar el duelo, y el cliente lo enseña antes con `eloVigente`.
+ */
+export const TEMPORADA = Object.freeze({
+  inicio: '2026-09-14',
+  dias: 28,
+  compresion: 0.5,
+});
+
+/** Número de temporada de un día 'AAAA-MM-DD'; 0 es la primera. */
+export function temporadaDe(dia) {
+  const ms = Date.parse(`${dia}T00:00:00Z`);
+  const desde = Date.parse(`${TEMPORADA.inicio}T00:00:00Z`);
+  if (!Number.isFinite(ms)) throw new Error(`día inválido: ${dia}`);
+  return Math.max(0, Math.floor((ms - desde) / 86400000 / TEMPORADA.dias));
+}
+
+/** Primer día de la temporada siguiente a la de `dia`. */
+export function finDeTemporada(dia) {
+  const desde = Date.parse(`${TEMPORADA.inicio}T00:00:00Z`);
+  const n = temporadaDe(dia) + 1;
+  return new Date(desde + n * TEMPORADA.dias * 86400000).toISOString().slice(0, 10);
+}
+
+/** El ELO tras el reinicio blando: a medio camino del inicial, nunca bajo el suelo. */
+export function reinicioDe(elo) {
+  return Math.max(ELO.suelo, Math.round(ELO.inicial + (elo - ELO.inicial) * TEMPORADA.compresion));
+}
+
+/**
+ * El ELO que vale HOY: el guardado, o el reiniciado si la temporada en que se
+ * guardó ya pasó. Lo usan los dos lados: el servidor antes de calcular un
+ * cierre, y el cliente para pintar la liga sin esperar a ese cierre. Se
+ * reinicia una vez por salto y no una por temporada saltada: quien vuelve tras
+ * tres meses no tiene que pagar tres veces.
+ */
+export function eloVigente(elo, temporadaGuardada, dia) {
+  const actual = temporadaDe(dia);
+  const guardada = Number.isInteger(temporadaGuardada) ? temporadaGuardada : actual;
+  return guardada < actual ? reinicioDe(elo) : elo;
+}
+
+/**
+ * Aplica el escudo a un cierre. Devuelve el ELO que queda y el escudo que
+ * queda: si con el nuevo ELO se sube de liga, el escudo se rellena; si se
+ * bajaría y quedan derrotas de margen, el ELO se queda en el umbral y se
+ * gasta una.
+ */
+export function conEscudo(eloAntes, eloDespues, escudo) {
+  const antes = ligaDe(eloAntes);
+  const despues = ligaDe(eloDespues);
+  const e = Number.isInteger(escudo) ? Math.max(0, escudo) : ESCUDO.derrotas;
+  if (LIGAS.indexOf(despues) > LIGAS.indexOf(antes)) return { elo: eloDespues, escudo: ESCUDO.derrotas };
+  if (eloDespues < antes.desde && e > 0) return { elo: antes.desde, escudo: e - 1 };
+  return { elo: eloDespues, escudo: e };
+}
+
 /** La liga que corresponde a un ELO. */
 export function ligaDe(elo) {
   let liga = LIGAS[0];

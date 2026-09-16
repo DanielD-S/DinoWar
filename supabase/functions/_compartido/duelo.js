@@ -22,6 +22,7 @@ import { crearPartida, vistaDe, FASE, FASES_INTERACTIVAS } from '../../../src/en
 import { reduce, ACCION, validar, avanzar } from '../../../src/engine/actions.js';
 import { BALANCE } from '../../../src/data/balance.js';
 import { DUELO, FIN_DUELO } from '../../../src/data/duelo.js';
+import { parteVacio, anotarEventos, nuevosEventos, cerrarParte } from '../../../src/data/misiones.js';
 import { validarMazoLegal, PartidaInvalida } from './validarPartida.js';
 
 export { PartidaInvalida };
@@ -43,6 +44,10 @@ export function crearDuelo(semilla, mazoA, mazoB, ahora) {
     pasos: [],
     n: 0,
     fin: null,     // { ganador, motivo } cuando lo decide el reloj o una rendición
+    // El parte de cada bando, anotado fase a fase: en un duelo no hay nada que
+    // re-jugar al final, así que las misiones de bajas, clados y clima se
+    // apuntan mientras pasa. Es el mismo `anotarEventos` del solitario.
+    partes: [parteVacio(), parteVacio()],
   };
   // La partida nace en la renta del turno 1: hasta el primer despliegue no
   // hay nada que decidir. Esos pasos no se guardan, que no hay nada que animar.
@@ -154,11 +159,19 @@ export function aplicarAccion(d, j, accion, ahora) {
  */
 function resolverAutomaticas(d) {
   let guardia = 0;
+  // Un duelo abierto antes de que existieran los partes no los trae: se le
+  // ponen vacíos y cuenta desde aquí, que es mejor que romperlo.
+  if (!Array.isArray(d.partes)) d.partes = [parteVacio(), parteVacio()];
   while (!FASES_INTERACTIVAS.includes(d.estado.fase) && d.estado.fase !== FASE.FIN) {
     const fase = d.estado.fase;
     const desde = d.estado.eventos.length;
     d.estado = reduce(d.estado, { tipo: ACCION.AVANZAR });
     d.n += 1;
+    // Todo lo que una misión mide —revelaciones, muertes, daño al hábitat,
+    // climas— lo emiten las fases automáticas: las jugadas de los dos sólo
+    // comprometen cartas. Por eso basta con anotar aquí.
+    const nuevos = nuevosEventos(d.estado, desde);
+    for (const j of [0, 1]) anotarEventos(d.partes[j], nuevos, j);
     // `eventosDesde` es cuántos eventos había antes de esta fase: el cliente
     // anima `estado.eventos.slice(eventosDesde)`. El chequeo vacía la lista al
     // pasar de turno, y por eso se guarda el número y no los eventos.
@@ -166,6 +179,27 @@ function resolverAutomaticas(d) {
     if (++guardia > 64) throw new PartidaInvalida('las fases no convergen');
   }
   while (d.pasos.length > DUELO.pasosGuardados) d.pasos.shift();
+}
+
+/**
+ * El parte cerrado de cada bando, para las misiones y los logros del cierre:
+ * lo anotado durante el duelo más lo que sólo se sabe al final —partida,
+ * victoria, trofeos, relámpago— y los dos contadores propios del duelo. Un
+ * duelo cerrado por el reloj o por rendición cuenta igual: se jugó y alguien
+ * lo ganó.
+ */
+export function partesDe(d) {
+  const r = resultado(d);
+  const partes = Array.isArray(d.partes) ? d.partes : [parteVacio(), parteVacio()];
+  return [0, 1].map((j) => {
+    const gano = r ? r.ganador === j : false;
+    const p = cerrarParte({ ...partes[j] }, {
+      ganada: gano, turnos: d.estado.turno, trofeos: d.estado.jugadores[j].trofeos,
+    });
+    p.duelos = 1;
+    p.duelosGanados = gano ? 1 : 0;
+    return p;
+  });
 }
 
 /**

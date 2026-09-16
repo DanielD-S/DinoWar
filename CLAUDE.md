@@ -715,13 +715,62 @@ la Edge Function con `eloTras()` —el mismo fichero que pinta la liga— sobre 
 ELO de CADA UNO AL EMPEZAR el duelo, guardado en la fila, y no sobre el de
 ahora: otro duelo cerrado entre medias no debe contaminar éste.
 
+**La liga tiene escudo, temporadas y tabla** (16-09-2026, `0032_ligas.sql`),
+y las tres reglas viven en `ligas.js` y las aplica la Edge Function al cerrar,
+en este orden: reinicio de temporada sobre el ELO de partida, movimiento del
+duelo, escudo. El SQL sólo guarda lo que ella decide (`escudo`, `temporada`).
+
+- **El escudo son tres derrotas de margen en el umbral de LIGA**, no de
+  división: mientras queden, perder en el umbral te deja en él y gasta una;
+  subir de liga lo rellena (`conEscudo`). Bajar de Jurásico I a II es un mal
+  día; bajar de Jurásico a Triásico es perder el emblema, y eso es lo que se
+  protege. En la Extinción no hay escudo: de ahí se baja al Cretácico.
+- **Las temporadas duran 28 días desde un lunes UTC y el reinicio es
+  BLANDO**: el ELO vuelve a medio camino del inicial (`reinicioDe`). No hay
+  proceso a una hora: lo aplica el cierre del PRIMER duelo de la temporada
+  nueva, y `eloVigente(elo, temporada, hoy)` —que usan los dos lados— lo
+  enseña antes. Una vez por salto, no una por temporada saltada. La función
+  devuelve los ELO ya vigentes (`yo`, `rival`, `eloInicial`) para que la liga
+  de antes y la de después del cierre sean la misma cuenta.
+- **La tabla de la Extinción** es `tabla_extincion(p_desde)`: nombre, puesto
+  y los puntos por encima del umbral, lo único de la liga que se enseña con
+  número. El umbral lo manda el cliente porque vive en `ligas.js` y no hay
+  copia en SQL —sólo decide qué filas se enseñan—. Devuelve el ELO crudo con
+  su temporada y el cliente aplica el mismo reinicio que a sí mismo; como el
+  reinicio conserva el orden, el puesto no cambia.
+- **En un duelo avanzan ya TODAS las misiones**, también las de bajas, clados
+  y clima: `duelo.js` lleva un parte por bando (`d.partes`) y lo anota en
+  cada fase automática con el mismo `anotarEventos` del solitario —todo lo
+  que una misión mide lo emiten esas fases—, y `partesDe(d)` lo cierra para
+  la Edge Function. Un duelo abierto antes de que existieran los partes se
+  encuentra sin ellos y cuenta desde donde está, que es mejor que romperlo.
+
 ## Las Expediciones: el solitario como un camino de rivales
 
 «Fácil» y «Normal» llevaban el MISMO mazo, el de referencia; sólo cambiaba que
 «Fácil» jugaba al azar. El solitario se sentía plano porque lo era. Ahora cada
 formación geológica es un mapa con rivales en fila, cada uno con su mazo, y
-ganar a uno abre el siguiente. Hoy hay DOS —la Morrison y Hell Creek, ocho
-rivales cada una— y cinco visitantes de otras eras que rotan por semana.
+ganar a uno abre el siguiente. Hoy hay CUATRO, encadenadas —la Morrison, Hell
+Creek, Tendaguru y Kem Kem, ocho rivales cada una— y cinco visitantes de otras
+eras que rotan por semana.
+
+Tendaguru y Kem Kem llegaron el 16-09-2026, cuando las tres rondas de cartas
+de ese día les dieron cuerpo propio (Giraffatitan, Rugops, Nigersaurus,
+Deltadromeus, Ouranosaurus, los tireóforos nuevos). Con ellas se fueron los
+visitantes de esas dos formaciones —un visitante de la misma formación que
+una expedición es la expedición repetida— y entraron el río Judith y el
+Nemegt. Curvas medidas con `node sim/expediciones.mjs` (lo que le gana EL
+JUGADOR): Tendaguru 100 → 91 → 88 → 72 → 70 → 62 → 48 → 22; Kem Kem 92 → 89
+→ 77 → 66 → 67 → 44 → 42 → 28. Tres mazos escritos «para ser duros» midieron
+95–99 % y hubo que rehacerlos: el de eventos de molienda (la lección del
+invierno del impacto, otra vez), el MURO de tireóforos con dos auras de Vida
+—un muro de 0–2 de Ataque no muere, pero pierde por hábitat—, y la jauría de
+terópodos pequeños. Lo que endurece contra la referencia es Ataque con
+cuerpo más un aura, y los pterosaurios solos vuelan y no aguantan (96 %).
+Los dos visitantes nuevos: el río Judith al 47 % y el Nemegt al 64 % tras
+tres vueltas —77, 75, 71, 64: las cartas de Mongolia son cuerpos flojos y lo
+único que lo bajó fue Dakotaraptor, la emboscada y la Sequía para el
+Therizinosaurus—. Es el más suelto de los cinco, como lo era el del mar.
 
 Cinco decisiones que conviene conocer antes de discutirlas:
 
@@ -2218,14 +2267,12 @@ pasos. CI corre los tests en cada push y necesita `fetch-depth: 0`, porque
 
 Dicho para que nadie lo descubra tarde:
 
-- **Hay dos expediciones y quedan dos mapas sin rivales.** Morrison y Hell
-  Creek, encadenadas con `requiere`; los WebP de Tendaguru y Kem Kem llevan
-  meses servidos y no tienen a nadie dentro. Y no es por pereza: con el set de
-  hoy **Kem Kem repetiría el mazo del visitante que ya existe y Tendaguru sería
-  la Morrison otra vez**. Las dos piden CARTAS nuevas —Giraffatitan,
-  Carcharodontosaurus, Sarcosuchus—, no mapas, y eso es ilustración, mecánica,
-  medición y migración de catálogo. Mientras tanto son visitantes de la semana,
-  que es donde caben sin mentir.
+- **Los cuatro mapas tienen rivales y no hay un quinto dibujado.** Una
+  expedición nueva pide un mapa (`tools/expediciones.py`, prompts en
+  `PROMPTS.md`) y ocho mazos medidos; el set da hoy para una de Mongolia (el
+  Nemegt es visitante) o de la Patagonia (también visitante). Y sólo la
+  Morrison tiene logro de «entera»: Hell Creek, Tendaguru y Kem Kem no, porque
+  añadir un logro es una migración con la copia de `private.catalogo_logros()`.
 
 - **Hay cinco jefes y el calendario da la vuelta cada 35 días** (15-09-2026):
   Saurophaganax, Barosaurus, Supersaurus, Hesperosaurus y Harpactognathus, con
@@ -2242,12 +2289,12 @@ Dicho para que nadie lo descubra tarde:
   `private.catalogo_logros()`. Y re-empaquetar, re-anclar y desplegar, que
   `eventos.js` y `cards.js` van dentro de la Edge Function. Las cinco cartas de
   jefe miden entre el 57 y el 61 % con `sim/carta.mjs`.
-- **Al Duelo le faltan tres cosas de liga:** la protección al descenso (hoy
-  el ELO baja en cuanto pierdes, sin las tres derrotas de margen), las
-  temporadas con reinicio, y la tabla con nombre y puesto de la liga Extinción.
-  Y en un duelo sólo avanzan las misiones de jugar, ganar y duelo: las de
-  bajas, clados o clima piden un parte, y en un duelo no hay nada que
-  re-jugar. Pide anotar el parte turno a turno.
+- **Al Duelo le falta el emparejamiento por ELO**: `duelo_buscar` casa con
+  quien más lleve esperando. Con nueve cuentas es lo sensato; la idea hablada
+  es una ventana de ELO que se ensancha con la espera, en esa misma función
+  SQL. Escudo, temporadas y tabla ya existen (16-09-2026); lo que no hay es
+  historial de temporadas pasadas —el reinicio pisa el ELO y no apunta dónde
+  se terminó— ni recompensa de fin de temporada.
 - **El CAPTCHA está activado** (Turnstile, desde el 13-09-2026). Si un día
   nadie puede entrar, lo primero es ese interruptor en Authentication → Attack
   Protection, y que el proveedor siga siendo Turnstile.

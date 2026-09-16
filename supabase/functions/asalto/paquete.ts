@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: aff4261d90dbafc8
+// huella: f2a5092d63e07122
 //
 // Lleva dentro estos 24 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -5464,7 +5464,7 @@ var CATALOGO = Object.freeze([
   M("duelo_uno", "Cara a cara", "Juega 1 duelo", "duelos", 1, 40),
   M("duelo_ganar", "Mano a mano", "Gana 1 duelo", "duelosGanados", 1, 45),
   // La de expedición mide partidas JUGADAS y no primeras victorias: los nodos
-  // se acaban, y quien ha recorrido los dos mapas sólo estrena rival una vez
+  // se acaban, y quien ha recorrido los cuatro mapas sólo estrena rival una vez
   // por semana. Una misión que la mitad del año no se puede cumplir no pide
   // algo, sobra. Por eso `expedicionNuevos` se queda para los logros.
   M("expedicion_dos", "Prospecci\xF3n", "Juega 2 partidas de expedici\xF3n", "expediciones", 2, 40),
@@ -6120,35 +6120,471 @@ var EXPEDICIONES = Object.freeze([
         ]
       })
     ])
+  }),
+  // ---------------------------------------------------------- Tendaguru
+  //
+  // La hermana africana de la Morrison: mismo Jurásico Superior, otra orilla
+  // del Tetis. Hasta el 16-09-2026 era imposible sin repetir la Morrison; con
+  // Giraffatitan, Rugops, Nigersaurus y Deltadromeus —africanos los cuatro—
+  // y los tireóforos y eventos de las tres rondas, ya tiene cuerpo propio.
+  // El mapa va de la meseta seca de arriba a la costa del mar cálido de abajo.
+  Object.freeze({
+    id: "tendaguru",
+    nombre: "Formaci\xF3n Tendaguru",
+    era: "Jur\xE1sico Superior \xB7 155\u2013145 Ma",
+    mapa: "mapa_tendaguru",
+    requiere: "hell_creek",
+    rivales: Object.freeze([
+      rival2({
+        id: "corredores_de_la_meseta",
+        nombre: "Los corredores de la meseta",
+        lema: "Ornit\xF3podos enanos a cientos. No paran quietos y no valen nada por separado.",
+        retrato: "dryosaurus",
+        perfil: "aleatoria",
+        premio: 80,
+        mazo: [
+          ["dryosaurus", 3],
+          ["eosinopteryx", 3],
+          ["tongtianlong", 3],
+          ["troodon", 3],
+          ["shuangmiaosaurus", 3],
+          ["thescelosaurus", 3],
+          ["psittacosaurus", 3],
+          ["kentrosaurus", 3],
+          ["migracion", 2],
+          ["gregarismo", 3],
+          ["oleada", 3],
+          ["nido", 3]
+        ]
+      }),
+      rival2({
+        id: "llanura_de_marea",
+        nombre: "La llanura de marea",
+        lema: "Sube el agua y con ella lo que vive dentro. Baja, y se lleva lo que dejaste.",
+        retrato: "elasmosaurus",
+        perfil: "heuristica",
+        premio: 100,
+        mazo: [
+          ["elasmosaurus", 3],
+          ["scanisaurus", 3],
+          ["plesiopleurodon", 2],
+          ["huaxiadraco", 3],
+          ["pteranodon", 3],
+          ["tupandactylus", 2],
+          ["halszkaraptor", 3],
+          ["crecida_delta", 3],
+          ["lago", 2],
+          ["sedimento", 2],
+          ["humedal", 2],
+          ["nido", 3]
+        ]
+      }),
+      rival2({
+        id: "espinas_de_kentrosaurus",
+        nombre: "Las espinas de Kentrosaurus",
+        lema: "P\xFAas en la cola, p\xFAas en los hombros. Todo lo que lo toca se pincha.",
+        retrato: "kentrosaurus",
+        perfil: "heuristica",
+        premio: 120,
+        mazo: [
+          // Con Invictarx —el aura de los tireóforos— y sin la Barrera: medía 91 % y un muro sin aura es un muro bajo.
+          ["kentrosaurus", 3],
+          ["stegosaurus", 3],
+          ["loricatosaurus", 3],
+          ["bienosaurus", 3],
+          ["sauropelta", 3],
+          ["zuul", 3],
+          ["gargoyleosaurus", 3],
+          ["euoplocephalus", 3],
+          ["invictarx", 3],
+          ["nodosaurus", 2],
+          ["rebrote", 3],
+          ["canal_trenzado", 3],
+          ["fractura", 2]
+        ]
+      }),
+      rival2({
+        id: "cazadores_de_la_meseta",
+        nombre: "Los cazadores de la meseta",
+        lema: "Abelisaurios y alosaurios en la misma tierra. Aqu\xED nadie caza solo.",
+        retrato: "rugops",
+        perfil: "heuristica",
+        premio: 150,
+        mazo: [
+          // Medía 89 % con jauría pequeña y Carroñeros. Entran Monolophosaurus (aura) y Torvosaurus; sale lo que no pega.
+          ["ceratosaurus", 3],
+          ["allosaurus", 3],
+          ["ojoraptorsaurus", 3],
+          ["dromaeosaurus", 3],
+          ["rugops", 3],
+          ["deltadromeus", 2],
+          ["monolophosaurus", 3],
+          ["torvosaurus", 2],
+          ["competencia", 2],
+          ["trampa", 3],
+          ["gregarismo", 3],
+          ["fractura", 2],
+          ["neumaticidad", 2]
+        ]
+      }),
+      rival2({
+        id: "cuellos_de_dicraeosaurus",
+        nombre: "Los cuellos de Dicraeosaurus",
+        lema: "Cuellos cortos y espinados, y detr\xE1s los largos. Comen a todas las alturas.",
+        retrato: "amargasaurus",
+        perfil: "heuristica",
+        premio: 180,
+        mazo: [
+          ["amargasaurus", 3],
+          ["diplodocus", 3],
+          ["apatosaurus", 3],
+          ["camarasaurus", 3],
+          ["mamenchisaurus", 3],
+          ["atlasaurus", 2],
+          ["nigersaurus", 2],
+          ["gastrolitos", 2],
+          ["canal_trenzado", 3],
+          ["migracion", 2],
+          ["rebrote", 3],
+          ["sabana", 1]
+        ]
+      }),
+      rival2({
+        id: "vientos_de_gondwana",
+        nombre: "Los vientos de Gondwana",
+        lema: "Polvo, ceniza y lodo. Lo que no aguanta enterrado, no aguanta.",
+        retrato: "brachylophosaurus",
+        perfil: "heuristica",
+        premio: 220,
+        mazo: [
+          // Dos veces medido y dos veces blando: con eventos de molienda 97 %, como muro de tireóforos con dos auras 95 %. Un muro que no pega no le gana a la referencia, que se lleva el hábitat. Ahora es el sur de Gondwana que pega: titanes con golpe al hábitat y abelisaurios.
+          ["argentinosaurus", 2],
+          ["dreadnoughtus", 2],
+          ["patagotitan", 1],
+          ["tyrannotitan", 1],
+          ["carnotaurus", 2],
+          ["amargasaurus", 3],
+          ["atlasaurus", 2],
+          ["sanjuansaurus", 3],
+          ["ceratosaurus", 3],
+          ["tormenta_polvo", 2],
+          ["oleada", 2],
+          ["mortandad", 1],
+          ["neumaticidad", 2],
+          ["crecimiento_acelerado", 1],
+          ["competencia", 2],
+          ["fractura", 2],
+          ["gregarismo", 3]
+        ]
+      }),
+      rival2({
+        id: "grandes_carnivoros",
+        nombre: "Los grandes carn\xEDvoros",
+        lema: "Un carcarodontos\xE1urido, un megalos\xE1urido y un abelis\xE1urido. Elige por cu\xE1l morir.",
+        retrato: "torvosaurus",
+        perfil: "heuristica",
+        premio: 280,
+        mazo: [
+          // Tendaguru tuvo su espinosáurido (Ostafrikasaurus): entran Spinosaurus y Suchomimus, que a 72 % era un séptimo nodo blando.
+          ["allosaurus", 3],
+          ["torvosaurus", 2],
+          ["tyrannotitan", 1],
+          ["spinosaurus", 1],
+          ["suchomimus", 2],
+          ["ceratosaurus", 3],
+          ["carnotaurus", 2],
+          ["rugops", 3],
+          ["monolophosaurus", 3],
+          ["ojoraptorsaurus", 3],
+          ["competencia", 2],
+          ["fractura", 2],
+          ["gregarismo", 3],
+          ["trampa", 3],
+          ["crecimiento_acelerado", 1],
+          ["neumaticidad", 2]
+        ]
+      }),
+      rival2({
+        id: "coloso_de_tendaguru",
+        nombre: "El coloso de Tendaguru",
+        lema: "Doce metros hasta la cabeza. No corre, no se esconde y no hace falta.",
+        retrato: "giraffatitan",
+        perfil: "heuristica",
+        premio: 400,
+        mazo: [
+          // Tres legendarias justas, que es el tope de un mazo de jugador.
+          ["giraffatitan", 1],
+          ["brachiosaurus", 1],
+          ["antarctosaurus", 1],
+          ["atlasaurus", 2],
+          ["argentinosaurus", 2],
+          ["dreadnoughtus", 2],
+          ["mamenchisaurus", 3],
+          ["amargasaurus", 3],
+          ["camarasaurus", 3],
+          ["apatosaurus", 3],
+          ["kentrosaurus", 3],
+          ["allosaurus", 3],
+          ["gastrolitos", 2],
+          ["neumaticidad", 2],
+          ["crecimiento_acelerado", 1],
+          ["canal_trenzado", 3],
+          ["rebrote", 3],
+          ["manantial", 1],
+          ["humedal", 2],
+          ["vega", 2],
+          ["gregarismo", 3]
+        ]
+      })
+    ])
+  }),
+  // ------------------------------------------------------------ Kem Kem
+  //
+  // El Sáhara del Cretácico medio: un sistema de ríos enorme con más
+  // depredadores que presas, que es el enigma de la formación. El camino baja
+  // por el río desde las dunas hasta el estuario, y el último rival es el
+  // carcarodontosáurido que le da nombre al diente del dorso de la tienda.
+  Object.freeze({
+    id: "kem_kem",
+    nombre: "Formaci\xF3n Kem Kem",
+    era: "Cret\xE1cico medio \xB7 100\u201395 Ma",
+    mapa: "mapa_kem_kem",
+    requiere: "tendaguru",
+    rivales: Object.freeze([
+      rival2({
+        id: "pescadores_del_delta",
+        nombre: "Los pescadores del delta",
+        lema: "Hocicos largos metidos en el agua. Lo que muerden no vuelve a la orilla.",
+        retrato: "suchomimus",
+        perfil: "aleatoria",
+        premio: 100,
+        mazo: [
+          ["suchomimus", 2],
+          ["sanjuansaurus", 3],
+          ["halszkaraptor", 3],
+          ["pteranodon", 3],
+          ["huaxiadraco", 3],
+          ["elasmosaurus", 3],
+          ["scanisaurus", 3],
+          ["crecida_delta", 3],
+          ["lago", 2],
+          ["inundacion", 3],
+          ["nido", 3]
+        ]
+      }),
+      rival2({
+        id: "abelisaurios_del_echkar",
+        nombre: "Los abelisaurios del Echkar",
+        lema: "Cr\xE1neos rugosos y brazos de adorno. Todo lo que tienen lo llevan en la boca.",
+        retrato: "rugops",
+        perfil: "heuristica",
+        premio: 130,
+        mazo: [
+          // Medía 98,8 % —cinco tipos de terópodo pequeño y ningún cuerpo—. Entran el aura y dos Suchomimus.
+          ["rugops", 3],
+          ["carnotaurus", 2],
+          ["ceratosaurus", 3],
+          ["sanjuansaurus", 3],
+          ["ojoraptorsaurus", 3],
+          ["monolophosaurus", 3],
+          ["suchomimus", 2],
+          ["velociraptor", 3],
+          ["gregarismo", 3],
+          ["trampa", 3],
+          ["competencia", 2],
+          ["neumaticidad", 2],
+          ["crecimiento_acelerado", 1]
+        ]
+      }),
+      rival2({
+        id: "vela_de_ouranosaurus",
+        nombre: "La vela de Ouranosaurus",
+        lema: "Ornit\xF3podos con vela por las llanuras del Elrhaz. Se van antes de que llegues.",
+        retrato: "ouranosaurus",
+        perfil: "heuristica",
+        premio: 160,
+        mazo: [
+          ["ouranosaurus", 3],
+          ["iguanodon", 3],
+          ["parasaurolophus", 3],
+          ["brachylophosaurus", 3],
+          ["saurolophus", 2],
+          ["thescelosaurus", 3],
+          ["rhinorex", 2],
+          ["nido", 3],
+          ["gregarismo", 3],
+          ["rebrote", 3],
+          ["oleada", 3],
+          ["canal_trenzado", 3]
+        ]
+      }),
+      rival2({
+        id: "segadora_del_elrhaz",
+        nombre: "La segadora del Elrhaz",
+        lema: "Quinientos dientes a ras de suelo. Detr\xE1s de Nigersaurus no queda helecho.",
+        retrato: "nigersaurus",
+        perfil: "heuristica",
+        premio: 200,
+        mazo: [
+          ["nigersaurus", 2],
+          ["amargasaurus", 3],
+          ["diplodocus", 3],
+          ["athenar", 3],
+          ["plateosauravus", 3],
+          ["atlasaurus", 2],
+          ["dreadnoughtus", 1],
+          ["gastrolitos", 2],
+          ["canal_trenzado", 3],
+          ["rebrote", 3],
+          ["migracion", 2],
+          ["cauce_abandonado", 3],
+          ["sabana", 1]
+        ]
+      }),
+      rival2({
+        id: "alas_del_sahara",
+        nombre: "Las alas del S\xE1hara",
+        lema: "Sombras de diez metros sobre las dunas. Llegan con la tormenta.",
+        retrato: "tupandactylus",
+        perfil: "heuristica",
+        premio: 240,
+        mazo: [
+          // Sólo pterosaurios medía 96 %: vuelan y no aguantan. Ahora es el mazo del golpe al hábitat con cuerpos debajo.
+          ["hatzegopteryx", 3],
+          ["tupandactylus", 2],
+          ["quetzalcoatlus", 2],
+          ["huaxiadraco", 3],
+          ["dreadnoughtus", 2],
+          ["nigersaurus", 2],
+          ["atlasaurus", 2],
+          ["camarasaurus", 3],
+          ["brachylophosaurus", 3],
+          ["tormenta_polvo", 2],
+          ["oleada", 2],
+          ["neumaticidad", 2],
+          ["crecimiento_acelerado", 1],
+          ["fractura", 2],
+          ["competencia", 2],
+          ["gregarismo", 3]
+        ]
+      }),
+      rival2({
+        id: "rio_de_spinosaurus",
+        nombre: "El r\xEDo de Spinosaurus",
+        lema: "El r\xEDo es suyo. Lo que entra en el agua ya no es tuyo.",
+        retrato: "spinosaurus",
+        perfil: "heuristica",
+        premio: 290,
+        mazo: [
+          // Medía 72 % como séptimo nodo: demasiada molienda y ningún aura. Entran Scanisaurus, Nigersaurus y Atlasaurus.
+          ["spinosaurus", 1],
+          ["mosasaurus", 1],
+          ["suchomimus", 2],
+          ["plesiopleurodon", 2],
+          ["elasmosaurus", 3],
+          ["scanisaurus", 3],
+          ["carnotaurus", 2],
+          ["deltadromeus", 2],
+          ["nigersaurus", 2],
+          ["atlasaurus", 2],
+          ["inundacion", 2],
+          ["lago", 2],
+          ["humedal", 2],
+          ["vega", 2],
+          ["competencia", 2],
+          ["fractura", 2],
+          ["neumaticidad", 2],
+          ["crecimiento_acelerado", 1],
+          ["gregarismo", 3]
+        ]
+      }),
+      rival2({
+        id: "corredor_del_delta",
+        nombre: "El corredor del delta",
+        lema: "Deltadromeus abre camino y la jaur\xEDa entra detr\xE1s. Nadie se queda a mirar.",
+        retrato: "deltadromeus",
+        perfil: "heuristica",
+        premio: 340,
+        mazo: [
+          // A 84 % era un sexto nodo blando: entran Deinocheirus, Monolophosaurus y Suchomimus.
+          ["deltadromeus", 2],
+          ["gallimimus", 3],
+          ["anzu", 3],
+          ["dakotaraptor", 2],
+          ["deinocheirus", 2],
+          ["monolophosaurus", 3],
+          ["suchomimus", 2],
+          ["velociraptor", 3],
+          ["dromaeosaurus", 3],
+          ["ojoraptorsaurus", 3],
+          ["estampida", 2],
+          ["gregarismo", 3],
+          ["fractura", 2],
+          ["trampa", 3],
+          ["competencia", 2],
+          ["neumaticidad", 2],
+          ["crecimiento_acelerado", 1]
+        ]
+      }),
+      rival2({
+        id: "diente_de_sierra",
+        nombre: "El diente de sierra",
+        lema: "Carcharodontosaurus. El nombre lo dice: dientes de tibur\xF3n, y del tama\xF1o de un T. rex.",
+        retrato: "carcharodontosaurus",
+        perfil: "heuristica",
+        premio: 450,
+        mazo: [
+          // A 40 % no era un jefe final: fuera Ouranosaurus, dentro el aura de los terópodos y la emboscada.
+          ["carcharodontosaurus", 1],
+          ["tyrannotitan", 1],
+          ["spinosaurus", 1],
+          ["deltadromeus", 2],
+          ["rugops", 3],
+          ["carnotaurus", 2],
+          ["suchomimus", 2],
+          ["torvosaurus", 2],
+          ["allosaurus", 3],
+          ["nigersaurus", 2],
+          ["monolophosaurus", 3],
+          ["ojoraptorsaurus", 3],
+          ["competencia", 2],
+          ["fractura", 2],
+          ["gregarismo", 3],
+          ["trampa", 3],
+          ["neumaticidad", 2],
+          ["crecimiento_acelerado", 1],
+          ["mortandad", 1]
+        ]
+      })
+    ])
   })
 ]);
 var VISITANTES = Object.freeze([
   rival2({
-    id: "visitante_spinosaurus",
-    nombre: "El se\xF1or del Kem Kem",
-    lema: "Del r\xEDo no sale nada vivo. Tampoco tus cartas.",
-    retrato: "spinosaurus",
+    id: "visitante_judith",
+    nombre: "El r\xEDo Judith",
+    lema: "Corazas, mazas y golas por las llanuras de Montana. Nada aqu\xED es blando.",
+    retrato: "zuul",
     perfil: "heuristica",
     premio: 150,
     mazo: [
-      ["spinosaurus", 1],
-      ["suchomimus", 2],
-      ["carnotaurus", 2],
-      ["sanjuansaurus", 3],
-      // Con Allosaurus en vez de Scanisaurus y los eventos de presión se le gana
-      // el 52 %; como estaba al principio, el 73 %, la semana regalada.
-      ["elasmosaurus", 3],
-      ["allosaurus", 3],
-      ["plesiopleurodon", 2],
-      ["torvosaurus", 2],
-      ["fractura", 2],
-      ["competencia", 1],
-      ["crecimiento_acelerado", 1],
-      ["trampa", 3],
-      ["inundacion", 3],
-      ["lago", 2],
-      ["humedal", 2],
-      ["vega", 2]
+      // El del Kem Kem se fue con su mapa (16-09-2026): un visitante de la
+      // misma formación que una expedición es la expedición repetida.
+      ["zuul", 3],
+      ["sauropelta", 3],
+      ["borealopelta", 2],
+      ["euoplocephalus", 3],
+      ["lokiceratops", 2],
+      ["medusaceratops", 2],
+      ["wendiceratops", 2],
+      ["chasmosaurus", 3],
+      ["brachylophosaurus", 3],
+      ["parasaurolophus", 3],
+      ["gregarismo", 3],
+      ["rebrote", 3],
+      ["canal_trenzado", 3],
+      ["competencia", 2],
+      ["ceniza", 2]
     ]
   }),
   rival2({
@@ -6244,35 +6680,36 @@ var VISITANTES = Object.freeze([
     ]
   }),
   rival2({
-    id: "visitante_tendaguru",
-    nombre: "La colina de Tendaguru",
-    lema: "La Morrison tuvo una hermana en \xC1frica, y all\xED los cuellos eran m\xE1s largos.",
-    retrato: "brachiosaurus",
+    id: "visitante_nemegt",
+    nombre: "Las dunas del Nemegt",
+    lema: "Tarbosaurus manda en el desierto de Mongolia. Lo que no corre, se entierra.",
+    retrato: "tarbosaurus",
     perfil: "heuristica",
     premio: 150,
     mazo: [
-      ["brachiosaurus", 1],
-      ["atlasaurus", 2],
-      ["mamenchisaurus", 3],
-      ["amargasaurus", 3],
-      ["kentrosaurus", 3],
-      ["stegosaurus", 3],
-      ["dryosaurus", 3],
-      ["ceratosaurus", 3],
-      ["ornitholestes", 3],
-      ["allosaurus", 3],
-      ["torvosaurus", 2],
-      ["manantial", 1],
-      ["lago", 2],
-      ["bosque", 1],
-      ["gastrolitos", 2],
+      // El de Tendaguru se fue con su mapa (16-09-2026). Éste es el Cretácico
+      // de Mongolia con las cartas de la ronda del control. Medía 77 % con
+      // Shuvuuia, Psittacosaurus y Saurolophus, y 75 % sólo con el aura: lo
+      // que lo baja es cambiar los cuerpos flojos por emboscada y contadores.
+      ["tarbosaurus", 2],
+      ["deinocheirus", 2],
+      ["dakotaraptor", 2],
+      ["monolophosaurus", 3],
+      ["therizinosaurus", 3],
+      ["velociraptor", 3],
+      ["halszkaraptor", 3],
+      ["dromaeosaurus", 3],
+      ["ojoraptorsaurus", 3],
+      // La Sequía no es de adorno: Therizinosaurus cobra +3 con un clima puesto.
+      ["aridez", 1],
+      ["tormenta_polvo", 2],
+      ["osario", 2],
+      ["gregarismo", 3],
+      ["competencia", 2],
+      ["fractura", 2],
       ["neumaticidad", 2],
       ["crecimiento_acelerado", 1],
-      ["competencia", 2],
-      ["canal_trenzado", 3],
-      ["rebrote", 3],
-      ["gregarismo", 3],
-      ["fractura", 2]
+      ["trampa", 3]
     ]
   })
 ]);
@@ -6370,8 +6807,12 @@ function crearDuelo(semilla2, mazoA, mazoB, ahora) {
     // Los pasos de fases automáticas, numerados: el cliente pide «desde n».
     pasos: [],
     n: 0,
-    fin: null
+    fin: null,
     // { ganador, motivo } cuando lo decide el reloj o una rendición
+    // El parte de cada bando, anotado fase a fase: en un duelo no hay nada que
+    // re-jugar al final, así que las misiones de bajas, clados y clima se
+    // apuntan mientras pasa. Es el mismo `anotarEventos` del solitario.
+    partes: [parteVacio(), parteVacio()]
   };
   resolverAutomaticas(d);
   d.pasos = [];
@@ -6443,15 +6884,33 @@ function aplicarAccion(d, j, accion, ahora) {
 }
 function resolverAutomaticas(d) {
   let guardia = 0;
+  if (!Array.isArray(d.partes)) d.partes = [parteVacio(), parteVacio()];
   while (!FASES_INTERACTIVAS.includes(d.estado.fase) && d.estado.fase !== FASE.FIN) {
     const fase = d.estado.fase;
     const desde = d.estado.eventos.length;
     d.estado = reduce(d.estado, { tipo: ACCION.AVANZAR });
     d.n += 1;
+    const nuevos = nuevosEventos(d.estado, desde);
+    for (const j of [0, 1]) anotarEventos(d.partes[j], nuevos, j);
     d.pasos.push({ n: d.n, fase, eventosDesde: desde, estado: structuredClone(d.estado) });
     if (++guardia > 64) throw new PartidaInvalida("las fases no convergen");
   }
   while (d.pasos.length > DUELO.pasosGuardados) d.pasos.shift();
+}
+function partesDe(d) {
+  const r = resultado(d);
+  const partes = Array.isArray(d.partes) ? d.partes : [parteVacio(), parteVacio()];
+  return [0, 1].map((j) => {
+    const gano = r ? r.ganador === j : false;
+    const p = cerrarParte({ ...partes[j] }, {
+      ganada: gano,
+      turnos: d.estado.turno,
+      trofeos: d.estado.jugadores[j].trofeos
+    });
+    p.duelos = 1;
+    p.duelosGanados = gano ? 1 : 0;
+    return p;
+  });
 }
 function vistaDuelo(d, j, desde = 0, ahora = 0) {
   const limpiar = (estado) => {
@@ -6521,6 +6980,39 @@ var ELO = Object.freeze({
   // Suelo: de Triásico III no se baja, y la fórmula tampoco puede bajar de aquí.
   suelo: 800
 });
+var ESCUDO = Object.freeze({ derrotas: 3 });
+var TEMPORADA = Object.freeze({
+  inicio: "2026-09-14",
+  dias: 28,
+  compresion: 0.5
+});
+function temporadaDe(dia) {
+  const ms = Date.parse(`${dia}T00:00:00Z`);
+  const desde = Date.parse(`${TEMPORADA.inicio}T00:00:00Z`);
+  if (!Number.isFinite(ms)) throw new Error(`d\xEDa inv\xE1lido: ${dia}`);
+  return Math.max(0, Math.floor((ms - desde) / 864e5 / TEMPORADA.dias));
+}
+function reinicioDe(elo) {
+  return Math.max(ELO.suelo, Math.round(ELO.inicial + (elo - ELO.inicial) * TEMPORADA.compresion));
+}
+function eloVigente(elo, temporadaGuardada, dia) {
+  const actual = temporadaDe(dia);
+  const guardada = Number.isInteger(temporadaGuardada) ? temporadaGuardada : actual;
+  return guardada < actual ? reinicioDe(elo) : elo;
+}
+function conEscudo(eloAntes, eloDespues, escudo) {
+  const antes = ligaDe(eloAntes);
+  const despues = ligaDe(eloDespues);
+  const e = Number.isInteger(escudo) ? Math.max(0, escudo) : ESCUDO.derrotas;
+  if (LIGAS.indexOf(despues) > LIGAS.indexOf(antes)) return { elo: eloDespues, escudo: ESCUDO.derrotas };
+  if (eloDespues < antes.desde && e > 0) return { elo: antes.desde, escudo: e - 1 };
+  return { elo: eloDespues, escudo: e };
+}
+function ligaDe(elo) {
+  let liga = LIGAS[0];
+  for (const l of LIGAS) if (elo >= l.desde) liga = l;
+  return liga;
+}
 function eloTras(eloA, eloB, resultadoA, duelosA = 99, duelosB = 99) {
   const esperadoA = 1 / (1 + 10 ** ((eloB - eloA) / 400));
   const esperadoB = 1 - esperadoA;
@@ -6923,37 +7415,33 @@ async function asegurarDatos(servicio, fila, ahora) {
 }
 async function cerrarDuelo(servicio, fila) {
   const r = resultado(fila.datos);
-  const { data: js } = await servicio.from("jugadores").select("id, duelos").in("id", [fila.jugador_a, fila.jugador_b]);
-  const duelosDe = (id) => (js ?? []).find((x) => x.id === id)?.duelos ?? 0;
-  const nuevos = eloTras(
-    fila.elo_a,
-    fila.elo_b,
-    r.ganador === 0 ? 1 : 0,
-    duelosDe(fila.jugador_a),
-    duelosDe(fila.jugador_b)
-  );
+  const { data: js } = await servicio.from("jugadores").select("id, duelos, escudo, temporada").in("id", [fila.jugador_a, fila.jugador_b]);
+  const de = (id) => (js ?? []).find((x) => x.id === id) ?? {};
+  const ja = de(fila.jugador_a);
+  const jb = de(fila.jugador_b);
   const dia = diaUTC();
-  const parteDe = (gano) => ({
-    partidas: 1,
-    victorias: gano ? 1 : 0,
-    duelos: 1,
-    duelosGanados: gano ? 1 : 0
-  });
-  const pa = parteDe(r.ganador === 0);
-  const pb = parteDe(r.ganador === 1);
+  const eloA = eloVigente(fila.elo_a, ja.temporada, dia);
+  const eloB = eloVigente(fila.elo_b, jb.temporada, dia);
+  const nuevos = eloTras(eloA, eloB, r.ganador === 0 ? 1 : 0, ja.duelos ?? 0, jb.duelos ?? 0);
+  const ea = conEscudo(eloA, nuevos.a, ja.escudo);
+  const eb = conEscudo(eloB, nuevos.b, jb.escudo);
+  const [pa, pb] = partesDe(fila.datos);
   const { error } = await servicio.rpc("duelo_cerrar", {
     p_id: fila.id,
     p_ganador: r.ganador,
     p_motivo: r.motivo,
     p_turnos: fila.datos.estado.turno,
-    p_elo_a: nuevos.a,
-    p_elo_b: nuevos.b,
+    p_elo_a: ea.elo,
+    p_elo_b: eb.elo,
     p_monedas_victoria: ECONOMIA.monedasVictoria,
     p_dia: dia,
     p_avances_a: avancesConPremio(dia, pa),
     p_avances_b: avancesConPremio(dia, pb),
     p_logros_a: avancesDeLogros(pa),
-    p_logros_b: avancesDeLogros(pb)
+    p_logros_b: avancesDeLogros(pb),
+    p_escudo_a: ea.escudo,
+    p_escudo_b: eb.escudo,
+    p_temporada: temporadaDe(dia)
   });
   if (error) console.error("duelo_cerrar", error.message);
   const { data } = await servicio.from("duelos").select("*").eq("id", fila.id).single();
@@ -6962,18 +7450,23 @@ async function cerrarDuelo(servicio, fila) {
 async function responderDuelo(servicio, jugadorId, fila, desde, ahora) {
   const bando = fila.jugador_a === jugadorId ? 0 : 1;
   const rivalId = bando === 0 ? fila.jugador_b : fila.jugador_a;
-  const { data: js } = await servicio.from("jugadores").select("id, apodo, elo, duelos").in("id", [jugadorId, rivalId].filter(Boolean));
-  const de = (id) => (js ?? []).find((x) => x.id === id) ?? null;
+  const { data: js } = await servicio.from("jugadores").select("id, apodo, elo, duelos, escudo, temporada").in("id", [jugadorId, rivalId].filter(Boolean));
+  const dia = diaUTC();
+  const de = (id) => {
+    const j = (js ?? []).find((x) => x.id === id);
+    return j ? { apodo: j.apodo, elo: eloVigente(j.elo, j.temporada, dia), duelos: j.duelos, escudo: j.escudo } : null;
+  };
   const yo = de(jugadorId);
   const rival3 = de(rivalId);
+  const mia = (js ?? []).find((x) => x.id === jugadorId);
   const base = {
     id: fila.id,
     estado: fila.estado,
     codigo: fila.codigo,
     bando,
-    yo: yo ? { apodo: yo.apodo, elo: yo.elo, duelos: yo.duelos } : null,
-    rival: rival3 ? { apodo: rival3.apodo, elo: rival3.elo, duelos: rival3.duelos } : null,
-    eloInicial: bando === 0 ? fila.elo_a : fila.elo_b
+    yo,
+    rival: rival3,
+    eloInicial: eloVigente(bando === 0 ? fila.elo_a : fila.elo_b, mia?.temporada, dia)
   };
   if (fila.estado === "esperando" || !fila.datos) return json(base);
   return json({ ...base, ...vistaDuelo(fila.datos, bando, desde, ahora) });

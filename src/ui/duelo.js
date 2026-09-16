@@ -13,9 +13,12 @@
 
 import { CONFIG } from '../data/config.js';
 import { DUELO } from '../data/duelo.js';
-import { rangoDe, nombreDeRango, emblemaDe, LIGAS } from '../data/ligas.js';
+import {
+  rangoDe, nombreDeRango, emblemaDe, LIGAS, ESCUDO, eloVigente, temporadaDe, finDeTemporada,
+} from '../data/ligas.js';
+import { diaUTC } from '../data/misiones.js';
 import { hayPartida } from './emparejado.js';
-import { funcion } from './supabase.js';
+import { funcion, rpc } from './supabase.js';
 import { cargarPerfil, mazoActivo } from './almacen.js';
 import { aListaDeMazo } from '../data/coleccion.js';
 
@@ -72,15 +75,64 @@ export function abandonarEspera() {
  * ELO con nombre, y la barra son los puntos dentro de la división.
  */
 function ligaHTML() {
-  const elo = Number(cargarPerfil().elo ?? 1200);
+  const p = cargarPerfil();
+  const hoy = diaUTC();
+  // Vigente: si la temporada cambió y aún no se ha cerrado ningún duelo, el
+  // servidor todavía guarda el ELO viejo. Se pinta ya el reiniciado, que es
+  // lo que va a valer en cuanto se juegue uno.
+  const elo = eloVigente(Number(p.elo ?? 1200), p.temporada, hoy);
   const r = rangoDe(elo);
   const arriba = r.liga.id === LIGAS[LIGAS.length - 1].id;
+  const escudo = Math.max(0, Math.min(ESCUDO.derrotas, Number.isInteger(p.escudo) ? p.escudo : ESCUDO.derrotas));
+  const quedan = Math.max(1, Math.ceil((Date.parse(`${finDeTemporada(hoy)}T00:00:00Z`) - Date.now()) / 86400000));
+  // El escudo, como pastillas: las llenas son derrotas que aún no bajan de
+  // liga. En la Extinción no hay escudo que valga: de ahí se baja al Cretácico.
+  const pastillas = arriba ? '' : `<span class="duelo-escudo" title="Derrotas de margen antes de bajar de liga">${
+    Array.from({ length: ESCUDO.derrotas }, (_, i) => `<i class="${i < escudo ? 'llena' : ''}"></i>`).join('')
+  } escudo</span>`;
   return `<div class="duelo-liga">
     <img class="duelo-emblema" src="${emblemaDe(r.liga)}" alt="" width="44" height="44" decoding="async">
     <span class="duelo-liga-nombre">${escapar(nombreDeRango(elo))}</span>
-    <span class="duelo-liga-nota">${arriba ? 'La cola de los que llegaron al final.' : `${r.puntos} de 100 para subir`}</span>
+    <span class="duelo-liga-nota">${arriba ? `${r.puntos} puntos en la cola de los que llegaron al final.` : `${r.puntos} de 100 para subir`}</span>
     ${arriba ? '' : `<span class="duelo-barra"><i style="width:${r.puntos}%"></i></span>`}
+    <span class="duelo-liga-pie">${pastillas}
+      <span class="duelo-temporada">Temporada ${temporadaDe(hoy) + 1} · ${quedan === 1 ? 'termina mañana' : `${quedan} días`}</span>
+      <button class="chip" data-duelo="tabla">${tabla ? 'Cerrar la tabla' : 'La Extinción'}</button>
+    </span>
+  </div>${tablaHTML()}`;
+}
+
+/**
+ * La tabla de la Extinción: nombre y puesto, y los puntos por encima del
+ * umbral, que es lo único de la liga que se enseña con número. Los ELO llegan
+ * crudos con su temporada y aquí se pasan por el mismo reinicio que el propio:
+ * como el reinicio conserva el orden, el puesto es el que manda el servidor.
+ */
+let tabla = null;
+function tablaHTML() {
+  if (!tabla) return '';
+  if (tabla.error) return `<p class="cu-nota mal">${escapar(tabla.error)}</p>`;
+  const hoy = diaUTC();
+  const desde = LIGAS[LIGAS.length - 1].desde;
+  const filas = (tabla.filas ?? []).map((f, i) => {
+    const puntos = Math.max(0, eloVigente(Number(f.elo), f.temporada, hoy) - desde);
+    return `<li class="${f.yo ? 'yo' : ''}"><span class="cu-puesto">${i + 1}</span><span class="duelo-tabla-nombre">${escapar(f.apodo ?? '—')}</span><span class="duelo-tabla-puntos">${puntos}</span></li>`;
+  });
+  return `<div class="duelo-tabla">
+    <p class="duelo-nota">La Extinción · ${tabla.total ?? filas.length} ${(tabla.total ?? filas.length) === 1 ? 'jugador' : 'jugadores'}</p>
+    ${filas.length ? `<ol class="cu-ranking duelo-ranking">${filas.join('')}</ol>` : '<p class="duelo-nota">Todavía no ha llegado nadie al final.</p>'}
   </div>`;
+}
+
+async function abrirTabla() {
+  if (tabla) { tabla = null; pintarDuelo(); return; }
+  tabla = { filas: [], total: 0 };
+  try {
+    tabla = await rpc('tabla_extincion', { p_desde: LIGAS[LIGAS.length - 1].desde });
+  } catch (e) {
+    tabla = { error: e.message };
+  }
+  pintarDuelo();
 }
 
 export function pintarDuelo() {
@@ -123,6 +175,7 @@ function alPulsar(e) {
   if (que === 'retar') empezar(() => retarDuelo(miMazo()));
   if (que === 'aceptar') aceptar();
   if (que === 'cancelar') { abandonarEspera(); aviso = null; pintarDuelo(); }
+  if (que === 'tabla') abrirTabla();
 }
 
 const miMazo = () => aListaDeMazo(mazoActivo());

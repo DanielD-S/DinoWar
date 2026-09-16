@@ -225,7 +225,7 @@ export const CATALOGO = Object.freeze([
   M('duelo_ganar', 'Mano a mano', 'Gana 1 duelo', 'duelosGanados', 1, 45),
 
   // La de expedición mide partidas JUGADAS y no primeras victorias: los nodos
-  // se acaban, y quien ha recorrido los dos mapas sólo estrena rival una vez
+  // se acaban, y quien ha recorrido los cuatro mapas sólo estrena rival una vez
   // por semana. Una misión que la mitad del año no se puede cumplir no pide
   // algo, sobra. Por eso `expedicionNuevos` se queda para los logros.
   M('expedicion_dos', 'Prospección', 'Juega 2 partidas de expedición', 'expediciones', 2, 40),
