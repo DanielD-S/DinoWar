@@ -6,8 +6,10 @@ dice qué escribir.
 
 La idea es una sola: **el prompt son dos bloques fijos y un hueco**. El bloque de
 ESTILO y el de PROHIBICIONES se copian literales, carácter por carácter, en cada
-carta. Lo único que cambia es el SUJETO. La consistencia entre 68 ilustraciones
-no sale de describir bien el estilo cada vez: sale de no reescribirlo nunca.
+carta. Lo único que cambia es el SUJETO. La consistencia entre las ilustraciones
+del set no sale de describir bien el estilo cada vez: sale de no reescribirlo
+nunca. El número exacto no se escribe aquí —se quedó atrás una vez, decía 68—:
+lo dice `ls assets/dinos`.
 
 ## Lo que NO hay que pedir
 
@@ -274,6 +276,237 @@ que se va, lo que se pierde de vista— para que la mecánica se lea en el dibuj
 - **`elasmosaurus` — Elasmosaurus platyurus.** Escamoso, marino. Sacando el
   cuello larguísimo del agua para vigilar por encima de las olas, el cuerpo
   sumergido apenas insinuado, orilla con saurópodos al fondo.
+
+## Las tres rondas del 16-09-2026: treinta y ocho huecos
+
+Control de mano, rebote y hábitat. Es el bloque de huecos más grande que ha
+tenido el proyecto y trae dos cosas nuevas que el resto del fichero no cubría.
+
+**Lo primero: estas cartas NO son de la Morrison.** El bloque de ESTILO abre
+con «Formación Morrison, Jurásico Superior» y aquí hay Mongolia, Hell Creek,
+el Sahara, la Patagonia, Tendaguru y una isla del Cretácico europeo. En estas
+treinta y ocho **se sustituye esa frase por el escenario que dice cada hueco**
+y se copia literal todo lo demás —luz de última hora, paleta terrosa, cámara
+baja, teleobjetivo, 3:2—, que es de donde sale la consistencia. La vegetación
+de época también cambia con el sitio: donde diga Cretácico, las araucarias y
+las cícadas dejan sitio a las primeras angiospermas de porte arbustivo, pero
+**la prohibición de flores sigue en pie** —se ven como matorral y hoja ancha,
+nunca floridas—.
+
+**Y lo segundo: aquí la mecánica se ve o no se ve.** La ronda de las cien
+cartas ya enseñó que las que descartan tienen que dibujar la PÉRDIDA. Estas
+tres rondas son tres verbos y cada uno tiene su gesto:
+
+| familia | qué hace la carta | qué tiene que verse |
+|---|---|---|
+| MOLIENDA | le quita cartas del mazo al rival | algo que **se entierra o se enturbia**: lo que desaparece bajo ceniza, lodo o agua turbia |
+| REBOTE | devuelve a la mano algo que está en juego | algo que **SE VA del cuadro**: de espaldas, alejándose, saliendo por un lado |
+| GOLPE AL HÁBITAT | daño directo, sin pasar por el combate | **la tierra herida**, no un animal herido: el suelo, el agua, el fuego |
+
+Un rebote dibujado como una pelea es un rebote que nadie entiende: lo que
+separa a esta ronda de las anteriores es que nadie muere, se van.
+
+### La ronda del control — eventos
+
+- **`tormenta_polvo` — Tormenta de polvo.** Frente de polvo ocre de cientos de
+  metros tragándose la llanura, y a los dos lados del cuadro sendas manadas
+  distintas desapareciendo dentro de él a la vez, la del fondo ya sólo silueta;
+  el centro casi sin visibilidad. Los DOS bandos pierden lo que tenían, y por
+  eso la simetría es el sujeto.
+- **`avenida_lodo` — Avenida de lodo.** Una lengua de lodo pardo bajando por
+  una ladera empapada y llevándose por delante troncos y helechos arrancados,
+  que salen del cuadro por el lado bajo; el borde de la colada levantado y
+  vivo, cielo de tormenta recién pasada.
+- **`enterramiento` — Enterramiento rápido.** Un talud de arenisca recién
+  cortado por el agua con un esqueleto articulado asomando a media altura,
+  todavía medio dentro de la roca, la postura intacta. Es lo único de la ronda
+  que devuelve algo, así que el hueso tiene que verse SALIR del sedimento y no
+  hundirse en él.
+- **`cauce_abandonado` — Cauce abandonado.** Un meandro seco y agrietado en
+  primer plano, con su curva entera legible, y justo detrás el cauce nuevo
+  llevando agua clara: el viejo se pierde y el nuevo llega, los dos en el mismo
+  encuadre.
+- **`barrera_troncos` — Barrera de troncos.** Un atasco de troncos arrastrados
+  encajado en el estrechamiento de un río, el agua represada detrás y subiendo
+  turbia, apenas un hilo colándose por debajo. Escenario de la Morrison.
+
+### La ronda del control — criaturas
+
+Mongolia (Nemegt) y Hell Creek, los dos del Cretácico Superior: llanuras de
+inundación y dunas, angiospermas arbustivas sin flor, y la misma luz de última
+hora de la tarde de siempre.
+
+- **`gallimimus` — Gallimimus bullatus.** Plumaje de contorno entero, sin alas
+  grandes, cuello largo y pico desdentado. Nemegt. Una manada entera en
+  desbandada cruzando el cuadro en diagonal, todos a la misma velocidad y
+  ninguno mirando atrás, polvo a la altura del vientre.
+- **`thescelosaurus` — Thescelosaurus neglectus.** Escamoso, sin plumas,
+  compacto. Hell Creek. Metido hasta los hombros en una madriguera excavada en
+  un talud de arena, sólo la cabeza y las manos fuera, mirando hacia la llanura
+  desde la sombra del hueco.
+- **`deinocheirus` — Deinocheirus mirificus.** Plumaje de contorno, joroba
+  dorsal alta y hocico ancho de pato. Nemegt. De pie en agua somera con los dos
+  brazos enormes extendidos hacia delante, las garras rozando la superficie,
+  el cuerpo entero reflejado.
+- **`anzu` — Anzu wyliei.** Plumaje entero con alas emplumadas en los brazos y
+  cresta ósea alta en la cabeza. Hell Creek. Encima de un nido ajeno de arena,
+  con un huevo en la boca y el cuerpo ya girado para irse, la puesta revuelta
+  debajo.
+- **`nigersaurus` — Nigersaurus taqueti.** Escamoso, cuello corto para un
+  saurópodo y hocico recto y anchísimo en boca de aspiradora. Sahara, Cretácico
+  Inferior, llanura de helechos baja y río estacional. Segando a ras de suelo
+  con el hocico paralelo a la tierra, dejando detrás una franja pelada y recta
+  como una guadaña.
+- **`shuvuuia` — Shuvuuia deserti.** Plumón entero, del tamaño de un pollo,
+  brazos muy cortos con un solo dedo grueso, ojos enormes. Dunas del Nemegt al
+  último crepúsculo, con luz todavía en el cielo. Quieto sobre la arena con la
+  cabeza girada y ladeada escuchando algo bajo tierra, una oreja hacia el suelo.
+- **`saurolophus` — Saurolophus angustirostris.** Escamoso, con la espina
+  puntiaguda de la cresta apuntando hacia atrás y arriba. Nemegt. De perfil con
+  la cabeza alzada y la cresta recortada contra el cielo, llamando con la boca
+  abierta, y al fondo dos que ya han levantado la cabeza en respuesta.
+- **`tarbosaurus` — Tarbosaurus bataar.** Escamoso, sin plumas, cráneo macizo y
+  brazos diminutos. Nemegt. Sobre un cadáver de saurópodo ya abierto y seco,
+  con la cabeza dentro de la caja torácica, sin prisa y sin nadie disputándolo.
+- **`psittacosaurus` — Psittacosaurus mongoliensis.** Escamoso, con el pico de
+  loro y un penacho de cerdas largas y rígidas en lo alto de la cola. Nemegt.
+  Agachado en la orilla de un arroyo tragando piedrecitas redondas de la grava,
+  la cola con las cerdas erguida detrás.
+- **`dakotaraptor` — Dakotaraptor steini.** Plumaje entero con alas emplumadas
+  largas en los brazos, del tamaño de un caballo, garra en hoz. Hell Creek. A
+  media distancia detrás del último de una manada de ornitópodos que se aleja,
+  agazapado y quieto entre helechos altos, sin haber cargado todavía.
+
+### La ronda del rebote — eventos
+
+- **`ceniza` — Ceniza volcánica.** Caída densa de ceniza gris sepultando una
+  llanura, todo perdiendo el color a la vez, helechos doblados bajo el peso y
+  medio enterrados, huellas que se borran solas; al fondo, la columna de la
+  erupción. Cielo lechoso sin sol.
+- **`sedimento` — Sedimento en suspensión.** Bajo el agua, muy cerca de la
+  orilla: una nube de limo pardo llenándolo todo desde el fondo, y dentro de
+  ella la silueta de unas patas que ya casi no se distinguen. Luz verde y
+  turbia atravesada por partículas.
+- **`osario` — Osario de la charca.** El fondo seco y agrietado de una charca
+  cubierto de huesos de muchos animales amontonados y entrelazados, blanqueados
+  por el sol, algunos todavía articulados. Vista casi cenital y baja a la vez,
+  sin animal vivo en el cuadro.
+- **`carroneros` — Enjambre de carroñeros.** Una decena de terópodos pequeños y
+  pterosaurios sobre un mismo cadáver, todos a la vez y casi encima unos de
+  otros, alas abiertas, movimiento por todas partes.
+- **`oleada` — Oleada de calor.** Una llanura al mediodía con la calima
+  temblando y deformando el horizonte, suelo agrietándose en polígonos, un
+  charco a punto de irse; cielo blanco de calor. Sin protagonista animal: el
+  sujeto es lo que le pasa a la tierra.
+- **`estampida` — Estampida.** Desbandada general: una docena de dinosaurios
+  pequeños de varias especies huyendo en todas direcciones a la vez, varios ya
+  saliendo del encuadre por los lados y por el borde de abajo, polvo cerrado
+  detrás. Nadie pelea y nadie cae — todos se van.
+- **`migracion` — Migración estacional.** Una columna larga de saurópodos vista
+  de espaldas alejándose hacia el fondo en fila india, el más cercano ya de
+  medio cuerpo, el último apenas un punto; polvo bajo en toda la fila.
+- **`crecida_delta` — Crecida del delta.** Un delta con el agua parda subiendo
+  y tapando las barras de arena, y un ornitópodo grande retirándose hacia
+  tierra alta con el agua por el vientre, de espaldas a la cámara y saliendo
+  por un lado del cuadro.
+
+### La ronda del rebote — recurso
+
+- **`cantera` — Cantera abierta.** Un talud cortado por el agua que ha dejado a
+  la vista una pared entera de roca en estratos limpios, con bloques
+  desprendidos y grava fresca amontonada al pie en primer plano —la abundancia
+  es esa pared abierta—, y arriba la llanura que se ha quedado sin borde.
+  Modificador de RECURSO: la abundancia en primer plano, animales al fondo.
+
+### La ronda del rebote — criaturas
+
+Sahara (Kem Kem y Elrhaz) y Tendaguru. Llanuras costeras y manglares del
+Cretácico para los africanos; para Giraffatitan, bosque abierto de coníferas y
+cícadas del Jurásico de Tanzania, que sí admite el bloque de ESTILO tal cual
+salvo el nombre del sitio.
+
+- **`carcharodontosaurus` — Carcharodontosaurus saharicus.** Escamoso, sin
+  plumas, cráneo larguísimo y estrecho con dientes de sierra a la vista. Kem
+  Kem, llanura costera con palmeras de época y arenisca roja. De frente y muy
+  cerca, arrancando de un mordisco lateral, con el impulso del cuello marcado y
+  el suelo saltando bajo las patas.
+- **`giraffatitan` — Giraffatitan brancai.** Escamoso, cuello vertical
+  altísimo, cresta nasal alta. Tendaguru, Jurásico de Tanzania. Avanzando de
+  frente y ligeramente en diagonal entre una arboleda, y a su paso dos
+  dinosaurios pequeños apartándose de la trayectoria hacia los dos lados del
+  cuadro; el gigante no los mira.
+- **`tupandactylus` — Tupandactylus imperator.** Sin plumas, con picnofibras, y
+  la cresta craneal enorme en forma de vela que le dobla el alto de la cabeza.
+  Laguna del Cretácico brasileño. En picado cerrado sobre un nido de la orilla,
+  alas medio plegadas, la cresta de canto contra el cielo.
+- **`rugops` — Rugops primus.** Escamoso, hocico corto con la superficie del
+  cráneo surcada y picada de agujeros, brazos inútiles. Kem Kem. Solo, con el
+  hocico metido en un costillar ya limpio y volviendo la cabeza hacia la cámara
+  sin soltarlo.
+- **`ouranosaurus` — Ouranosaurus nigeriensis.** Escamoso, con la vela dorsal
+  alta sostenida por espinas largas y el hocico ancho. Elrhaz, Níger, llanura
+  con ríos. Dándose la vuelta para volver por donde vino, la vela de perfil
+  entera contra la luz, ya con el cuerpo girado y las huellas de ida a sus pies.
+- **`deltadromeus` — Deltadromeus agilis.** Escamoso, muy grácil y de patas
+  largas, ligero para su tamaño. Kem Kem. Cruzando el cuadro a toda velocidad
+  por delante de un grupo de dinosaurios pequeños que se abre a los dos lados
+  para dejarle sitio, polvo en línea recta detrás de él.
+
+### La ronda del hábitat — eventos
+
+Los dos son daño directo a la tierra: nada de animales heridos.
+
+- **`incendio` — Incendio estacional.** Un frente de fuego bajo avanzando por
+  una llanura de helechos secos, la línea de llama nítida cruzando el cuadro de
+  lado a lado, humo denso y pardo arriba, y detrás del frente el suelo ya negro
+  y humeante. Morrison, al final de la estación seca.
+- **`acuifero` — Colapso del acuífero.** Un socavón recién abierto donde estaba
+  la charca: el suelo hundido en un cráter de bordes limpios y verticales, el
+  fondo agrietado y sin una gota, y alrededor las huellas de los que venían a
+  beber muriendo en el borde. Morrison, cielo pálido.
+
+### La ronda del hábitat — criaturas
+
+Los tres saurópodos van con el peso como sujeto, y los tres tireóforos con la
+coraza. La Patagonia del Cretácico para los dos titanes; el resto, cada uno con
+su sitio.
+
+- **`patagotitan` — Patagotitan mayorum.** Escamoso, uno de los mayores que han
+  existido. Patagonia, Cretácico, bosque abierto de coníferas y llanura de
+  inundación. Visto de lado y desde muy abajo cruzando barro blando, y en
+  primer plano la huella que acaba de dejar, honda como una charca y ya
+  llenándose de agua.
+- **`dreadnoughtus` — Dreadnoughtus schrani.** Escamoso, cuello y cola largos,
+  cuerpo enorme. Patagonia, Cretácico, orilla de río. Entrando en el cauce y
+  partiendo la corriente en dos, el agua abriéndose contra las patas con
+  espuma, la orilla de detrás ya pisoteada y abierta.
+- **`hatzegopteryx` — Hatzegopteryx thambema.** Sin plumas, con picnofibras;
+  cuello CORTO y grueso —no el de Quetzalcoatlus— y cabeza descomunal. Isla de
+  Haţeg, Cretácico: vegetación baja y fauna enana. A pie sobre un claro,
+  dominando el cuadro entero de alto, con las alas plegadas y la cabeza baja
+  sobre un dinosaurio enano que no le llega al corvejón.
+- **`borealopelta` — Borealopelta markmitchelli.** Escamoso y acorazado, con
+  osteodermos en filas y dos espinas largas saliéndole de los hombros hacia
+  delante. Alberta, Cretácico, cerca de la costa. De frente, plantado y bajo,
+  con las dos espinas de hombro apuntando a la cámara y el cuerpo entero pegado
+  al suelo; un terópodo desenfocado que no termina de acercarse.
+- **`zuul` — Zuul crurivastator.** Escamoso y acorazado, con cuernos cortos
+  detrás de los ojos, el hocico ancho y la maza ósea al final de la cola.
+  Montana, Cretácico. En el instante en que la maza llega a la altura de las
+  patas de un terópodo, a ras de suelo, el impacto todavía sin resolverse.
+- **`sauropelta` — Sauropelta edwardsorum.** Escamoso y acorazado, nodosaurio
+  sin maza, con una hilera de púas largas y cónicas saliendo del cuello hacia
+  los lados. Wyoming, Cretácico Inferior. Replegado sobre sí mismo con el
+  cuello hundido entre los hombros y las púas formando una corona alrededor,
+  visto desde delante y un poco arriba, inexpugnable y quieto.
+
+### Lo que falta y en qué orden
+
+Las treinta y ocho están sin generar. Si hay que priorizar, el orden es el que
+más se ve: **las tres legendarias primero** —Carcharodontosaurus, Giraffatitan y
+Patagotitan, que además son las tres únicas legendarias con criatura que
+tampoco tienen vídeo—, luego las épicas, y el soporte al final, que es lo que
+menos rato pasa en pantalla.
 
 ## Rehacer una criatura
 
