@@ -254,6 +254,15 @@ Y aquí está lo que conviene no volver a aprender:
   mazo de REFERENCIA, que no es un mazo de control. Lo que valen de verdad sólo
   se ve cuando alguien construya el mazo que las quiere, y ése no existe.
 
+**Aplicado y desplegado el 16-09-2026.** Las quince están en `catalogo_cartas`
+y la Edge Function quedó anclada a `4a524c8`, que vive en `main` porque la PR
+#105 se mergeó con MERGE y no con squash. El despliegue se comprobó con la
+receta de `supabase/functions/README.md`: invocada desde la propia base
+contesta `401 {"error":"sesión inválida"}`, que es la prueba de que los once
+importes por URL resolvieron y el código vivo es el nuestro. Del fichero
+desplegado se comprobó antes, byte a byte, que era el anterior con el SHA
+cambiado y nada más: once líneas, las once del anclaje.
+
 ## La ronda del rebote: del campo a la mano, y del descarte al mazo
 
 Quince cartas más (16-09-2026) —seis criaturas, dos de ellas legendarias, y
