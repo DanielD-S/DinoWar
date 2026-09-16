@@ -500,13 +500,16 @@ su sitio.
   cuello hundido entre los hombros y las púas formando una corona alrededor,
   visto desde delante y un poco arriba, inexpugnable y quieto.
 
-### Lo que falta y en qué orden
+### Lo que llegó
 
-Las treinta y ocho están sin generar. Si hay que priorizar, el orden es el que
-más se ve: **las tres legendarias primero** —Carcharodontosaurus, Giraffatitan y
-Patagotitan, que además son las tres únicas legendarias con criatura que
-tampoco tienen vídeo—, luego las épicas, y el soporte al final, que es lo que
-menos rato pasa en pantalla.
+Las treinta y ocho, el mismo 16-09-2026, y los vídeos de las tres legendarias
+con ellas. Veintidós vinieron a 1536×1024. **Las otras dieciséis llegaron
+recortadas y por debajo de 1200 px** —las de extensión `.PNG` en mayúsculas—,
+y cuatro casi cuadradas o verticales: Rugops a 0,92, Anzu a 1,09, Shuvuuia a
+1,12 y Gallimimus y Zuul a 1,21. Se sirven así porque el dibujo es bueno, pero
+en la ventana ancha de la carta a Rugops y a Anzu se les iba la cabeza por
+arriba, y llevan foco en `assets/dinos/indice.json`. Si se regeneran a
+1792×1024, van a `src/dinos/<id>.png` y se quita su foco.
 
 ## Rehacer una criatura
 
