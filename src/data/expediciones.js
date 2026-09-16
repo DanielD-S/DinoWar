@@ -330,6 +330,277 @@ export const EXPEDICIONES = Object.freeze([
       }),
     ]),
   }),
+  // ---------------------------------------------------------- Tendaguru
+  //
+  // La hermana africana de la Morrison: mismo Jurásico Superior, otra orilla
+  // del Tetis. Hasta el 16-09-2026 era imposible sin repetir la Morrison; con
+  // Giraffatitan, Rugops, Nigersaurus y Deltadromeus —africanos los cuatro—
+  // y los tireóforos y eventos de las tres rondas, ya tiene cuerpo propio.
+  // El mapa va de la meseta seca de arriba a la costa del mar cálido de abajo.
+  Object.freeze({
+    id: 'tendaguru',
+    nombre: 'Formación Tendaguru',
+    era: 'Jurásico Superior · 155–145 Ma',
+    mapa: 'mapa_tendaguru',
+    requiere: 'hell_creek',
+    rivales: Object.freeze([
+      rival({
+        id: 'corredores_de_la_meseta',
+        nombre: 'Los corredores de la meseta',
+        lema: 'Ornitópodos enanos a cientos. No paran quietos y no valen nada por separado.',
+        retrato: 'dryosaurus',
+        perfil: 'aleatoria',
+        premio: 80,
+        mazo: [
+          ['dryosaurus', 3], ['eosinopteryx', 3], ['tongtianlong', 3], ['troodon', 3],
+          ['shuangmiaosaurus', 3], ['thescelosaurus', 3], ['psittacosaurus', 3], ['kentrosaurus', 3],
+          ['migracion', 2], ['gregarismo', 3], ['oleada', 3], ['nido', 3],
+        ],
+      }),
+      rival({
+        id: 'llanura_de_marea',
+        nombre: 'La llanura de marea',
+        lema: 'Sube el agua y con ella lo que vive dentro. Baja, y se lleva lo que dejaste.',
+        retrato: 'elasmosaurus',
+        perfil: 'heuristica',
+        premio: 100,
+        mazo: [
+          ['elasmosaurus', 3], ['scanisaurus', 3], ['plesiopleurodon', 2], ['huaxiadraco', 3],
+          ['pteranodon', 3], ['tupandactylus', 2], ['halszkaraptor', 3],
+          ['crecida_delta', 3], ['lago', 2], ['sedimento', 2], ['humedal', 2], ['nido', 3],
+        ],
+      }),
+      rival({
+        id: 'espinas_de_kentrosaurus',
+        nombre: 'Las espinas de Kentrosaurus',
+        lema: 'Púas en la cola, púas en los hombros. Todo lo que lo toca se pincha.',
+        retrato: 'kentrosaurus',
+        perfil: 'heuristica',
+        premio: 120,
+        mazo: [
+          // Con Invictarx —el aura de los tireóforos— y sin la Barrera: medía 91 % y un muro sin aura es un muro bajo.
+          ['kentrosaurus', 3], ['stegosaurus', 3], ['loricatosaurus', 3], ['bienosaurus', 3],
+          ['sauropelta', 3], ['zuul', 3], ['gargoyleosaurus', 3], ['euoplocephalus', 3],
+          ['invictarx', 3], ['nodosaurus', 2],
+          ['rebrote', 3], ['canal_trenzado', 3], ['fractura', 2],
+        ],
+      }),
+      rival({
+        id: 'cazadores_de_la_meseta',
+        nombre: 'Los cazadores de la meseta',
+        lema: 'Abelisaurios y alosaurios en la misma tierra. Aquí nadie caza solo.',
+        retrato: 'rugops',
+        perfil: 'heuristica',
+        premio: 150,
+        mazo: [
+          // Medía 89 % con jauría pequeña y Carroñeros. Entran Monolophosaurus (aura) y Torvosaurus; sale lo que no pega.
+          ['ceratosaurus', 3], ['allosaurus', 3], ['ojoraptorsaurus', 3], ['dromaeosaurus', 3],
+          ['rugops', 3], ['deltadromeus', 2], ['monolophosaurus', 3], ['torvosaurus', 2],
+          ['competencia', 2], ['trampa', 3], ['gregarismo', 3], ['fractura', 2], ['neumaticidad', 2],
+        ],
+      }),
+      rival({
+        id: 'cuellos_de_dicraeosaurus',
+        nombre: 'Los cuellos de Dicraeosaurus',
+        lema: 'Cuellos cortos y espinados, y detrás los largos. Comen a todas las alturas.',
+        retrato: 'amargasaurus',
+        perfil: 'heuristica',
+        premio: 180,
+        mazo: [
+          ['amargasaurus', 3], ['diplodocus', 3], ['apatosaurus', 3], ['camarasaurus', 3],
+          ['mamenchisaurus', 3], ['atlasaurus', 2], ['nigersaurus', 2],
+          ['gastrolitos', 2], ['canal_trenzado', 3], ['migracion', 2], ['rebrote', 3], ['sabana', 1],
+        ],
+      }),
+      rival({
+        id: 'vientos_de_gondwana',
+        nombre: 'Los vientos de Gondwana',
+        lema: 'Polvo, ceniza y lodo. Lo que no aguanta enterrado, no aguanta.',
+        retrato: 'brachylophosaurus',
+        perfil: 'heuristica',
+        premio: 220,
+        mazo: [
+          // Dos veces medido y dos veces blando: con eventos de molienda 97 %, como muro de tireóforos con dos auras 95 %. Un muro que no pega no le gana a la referencia, que se lleva el hábitat. Ahora es el sur de Gondwana que pega: titanes con golpe al hábitat y abelisaurios.
+          ['argentinosaurus', 2], ['dreadnoughtus', 2], ['patagotitan', 1], ['tyrannotitan', 1],
+          ['carnotaurus', 2], ['amargasaurus', 3], ['atlasaurus', 2], ['sanjuansaurus', 3],
+          ['ceratosaurus', 3],
+          ['tormenta_polvo', 2], ['oleada', 2], ['mortandad', 1],
+          ['neumaticidad', 2], ['crecimiento_acelerado', 1], ['competencia', 2], ['fractura', 2],
+          ['gregarismo', 3],
+        ],
+      }),
+      rival({
+        id: 'grandes_carnivoros',
+        nombre: 'Los grandes carnívoros',
+        lema: 'Un carcarodontosáurido, un megalosáurido y un abelisáurido. Elige por cuál morir.',
+        retrato: 'torvosaurus',
+        perfil: 'heuristica',
+        premio: 280,
+        mazo: [
+          // Tendaguru tuvo su espinosáurido (Ostafrikasaurus): entran Spinosaurus y Suchomimus, que a 72 % era un séptimo nodo blando.
+          ['allosaurus', 3], ['torvosaurus', 2], ['tyrannotitan', 1], ['spinosaurus', 1],
+          ['suchomimus', 2], ['ceratosaurus', 3], ['carnotaurus', 2], ['rugops', 3],
+          ['monolophosaurus', 3], ['ojoraptorsaurus', 3],
+          ['competencia', 2], ['fractura', 2], ['gregarismo', 3], ['trampa', 3],
+          ['crecimiento_acelerado', 1], ['neumaticidad', 2],
+        ],
+      }),
+      rival({
+        id: 'coloso_de_tendaguru',
+        nombre: 'El coloso de Tendaguru',
+        lema: 'Doce metros hasta la cabeza. No corre, no se esconde y no hace falta.',
+        retrato: 'giraffatitan',
+        perfil: 'heuristica',
+        premio: 400,
+        mazo: [
+          // Tres legendarias justas, que es el tope de un mazo de jugador.
+          ['giraffatitan', 1], ['brachiosaurus', 1], ['antarctosaurus', 1],
+          ['atlasaurus', 2], ['argentinosaurus', 2], ['dreadnoughtus', 2], ['mamenchisaurus', 3],
+          ['amargasaurus', 3], ['camarasaurus', 3], ['apatosaurus', 3], ['kentrosaurus', 3],
+          ['allosaurus', 3],
+          ['gastrolitos', 2], ['neumaticidad', 2], ['crecimiento_acelerado', 1],
+          ['canal_trenzado', 3], ['rebrote', 3], ['manantial', 1], ['humedal', 2], ['vega', 2],
+          ['gregarismo', 3],
+        ],
+      }),
+    ]),
+  }),
+
+  // ------------------------------------------------------------ Kem Kem
+  //
+  // El Sáhara del Cretácico medio: un sistema de ríos enorme con más
+  // depredadores que presas, que es el enigma de la formación. El camino baja
+  // por el río desde las dunas hasta el estuario, y el último rival es el
+  // carcarodontosáurido que le da nombre al diente del dorso de la tienda.
+  Object.freeze({
+    id: 'kem_kem',
+    nombre: 'Formación Kem Kem',
+    era: 'Cretácico medio · 100–95 Ma',
+    mapa: 'mapa_kem_kem',
+    requiere: 'tendaguru',
+    rivales: Object.freeze([
+      rival({
+        id: 'pescadores_del_delta',
+        nombre: 'Los pescadores del delta',
+        lema: 'Hocicos largos metidos en el agua. Lo que muerden no vuelve a la orilla.',
+        retrato: 'suchomimus',
+        perfil: 'aleatoria',
+        premio: 100,
+        mazo: [
+          ['suchomimus', 2], ['sanjuansaurus', 3], ['halszkaraptor', 3], ['pteranodon', 3],
+          ['huaxiadraco', 3], ['elasmosaurus', 3], ['scanisaurus', 3],
+          ['crecida_delta', 3], ['lago', 2], ['inundacion', 3], ['nido', 3],
+        ],
+      }),
+      rival({
+        id: 'abelisaurios_del_echkar',
+        nombre: 'Los abelisaurios del Echkar',
+        lema: 'Cráneos rugosos y brazos de adorno. Todo lo que tienen lo llevan en la boca.',
+        retrato: 'rugops',
+        perfil: 'heuristica',
+        premio: 130,
+        mazo: [
+          // Medía 98,8 % —cinco tipos de terópodo pequeño y ningún cuerpo—. Entran el aura y dos Suchomimus.
+          ['rugops', 3], ['carnotaurus', 2], ['ceratosaurus', 3], ['sanjuansaurus', 3],
+          ['ojoraptorsaurus', 3], ['monolophosaurus', 3], ['suchomimus', 2], ['velociraptor', 3],
+          ['gregarismo', 3], ['trampa', 3], ['competencia', 2], ['neumaticidad', 2],
+          ['crecimiento_acelerado', 1],
+        ],
+      }),
+      rival({
+        id: 'vela_de_ouranosaurus',
+        nombre: 'La vela de Ouranosaurus',
+        lema: 'Ornitópodos con vela por las llanuras del Elrhaz. Se van antes de que llegues.',
+        retrato: 'ouranosaurus',
+        perfil: 'heuristica',
+        premio: 160,
+        mazo: [
+          ['ouranosaurus', 3], ['iguanodon', 3], ['parasaurolophus', 3], ['brachylophosaurus', 3],
+          ['saurolophus', 2], ['thescelosaurus', 3], ['rhinorex', 2],
+          ['nido', 3], ['gregarismo', 3], ['rebrote', 3], ['oleada', 3], ['canal_trenzado', 3],
+        ],
+      }),
+      rival({
+        id: 'segadora_del_elrhaz',
+        nombre: 'La segadora del Elrhaz',
+        lema: 'Quinientos dientes a ras de suelo. Detrás de Nigersaurus no queda helecho.',
+        retrato: 'nigersaurus',
+        perfil: 'heuristica',
+        premio: 200,
+        mazo: [
+          ['nigersaurus', 2], ['amargasaurus', 3], ['diplodocus', 3], ['athenar', 3],
+          ['plateosauravus', 3], ['atlasaurus', 2], ['dreadnoughtus', 1],
+          ['gastrolitos', 2], ['canal_trenzado', 3], ['rebrote', 3], ['migracion', 2],
+          ['cauce_abandonado', 3], ['sabana', 1],
+        ],
+      }),
+      rival({
+        id: 'alas_del_sahara',
+        nombre: 'Las alas del Sáhara',
+        lema: 'Sombras de diez metros sobre las dunas. Llegan con la tormenta.',
+        retrato: 'tupandactylus',
+        perfil: 'heuristica',
+        premio: 240,
+        mazo: [
+          // Sólo pterosaurios medía 96 %: vuelan y no aguantan. Ahora es el mazo del golpe al hábitat con cuerpos debajo.
+          ['hatzegopteryx', 3], ['tupandactylus', 2], ['quetzalcoatlus', 2], ['huaxiadraco', 3],
+          ['dreadnoughtus', 2], ['nigersaurus', 2], ['atlasaurus', 2], ['camarasaurus', 3],
+          ['brachylophosaurus', 3],
+          ['tormenta_polvo', 2], ['oleada', 2], ['neumaticidad', 2], ['crecimiento_acelerado', 1],
+          ['fractura', 2], ['competencia', 2], ['gregarismo', 3],
+        ],
+      }),
+      rival({
+        id: 'rio_de_spinosaurus',
+        nombre: 'El río de Spinosaurus',
+        lema: 'El río es suyo. Lo que entra en el agua ya no es tuyo.',
+        retrato: 'spinosaurus',
+        perfil: 'heuristica',
+        premio: 290,
+        mazo: [
+          // Medía 72 % como séptimo nodo: demasiada molienda y ningún aura. Entran Scanisaurus, Nigersaurus y Atlasaurus.
+          ['spinosaurus', 1], ['mosasaurus', 1], ['suchomimus', 2], ['plesiopleurodon', 2],
+          ['elasmosaurus', 3], ['scanisaurus', 3], ['carnotaurus', 2], ['deltadromeus', 2],
+          ['nigersaurus', 2], ['atlasaurus', 2],
+          ['inundacion', 2], ['lago', 2], ['humedal', 2], ['vega', 2],
+          ['competencia', 2], ['fractura', 2], ['neumaticidad', 2], ['crecimiento_acelerado', 1],
+          ['gregarismo', 3],
+        ],
+      }),
+      rival({
+        id: 'corredor_del_delta',
+        nombre: 'El corredor del delta',
+        lema: 'Deltadromeus abre camino y la jauría entra detrás. Nadie se queda a mirar.',
+        retrato: 'deltadromeus',
+        perfil: 'heuristica',
+        premio: 340,
+        mazo: [
+          // A 84 % era un sexto nodo blando: entran Deinocheirus, Monolophosaurus y Suchomimus.
+          ['deltadromeus', 2], ['gallimimus', 3], ['anzu', 3], ['dakotaraptor', 2],
+          ['deinocheirus', 2], ['monolophosaurus', 3], ['suchomimus', 2], ['velociraptor', 3],
+          ['dromaeosaurus', 3], ['ojoraptorsaurus', 3],
+          ['estampida', 2], ['gregarismo', 3], ['fractura', 2], ['trampa', 3], ['competencia', 2],
+          ['neumaticidad', 2], ['crecimiento_acelerado', 1],
+        ],
+      }),
+      rival({
+        id: 'diente_de_sierra',
+        nombre: 'El diente de sierra',
+        lema: 'Carcharodontosaurus. El nombre lo dice: dientes de tiburón, y del tamaño de un T. rex.',
+        retrato: 'carcharodontosaurus',
+        perfil: 'heuristica',
+        premio: 450,
+        mazo: [
+          // A 40 % no era un jefe final: fuera Ouranosaurus, dentro el aura de los terópodos y la emboscada.
+          ['carcharodontosaurus', 1], ['tyrannotitan', 1], ['spinosaurus', 1],
+          ['deltadromeus', 2], ['rugops', 3], ['carnotaurus', 2], ['suchomimus', 2], ['torvosaurus', 2],
+          ['allosaurus', 3], ['nigersaurus', 2], ['monolophosaurus', 3], ['ojoraptorsaurus', 3],
+          ['competencia', 2], ['fractura', 2], ['gregarismo', 3], ['trampa', 3],
+          ['neumaticidad', 2], ['crecimiento_acelerado', 1], ['mortandad', 1],
+        ],
+      }),
+    ]),
+  }),
 ]);
 
 // ------------------------------------------------------- los de la semana
@@ -342,19 +613,19 @@ export const EXPEDICIONES = Object.freeze([
  */
 export const VISITANTES = Object.freeze([
   rival({
-    id: 'visitante_spinosaurus',
-    nombre: 'El señor del Kem Kem',
-    lema: 'Del río no sale nada vivo. Tampoco tus cartas.',
-    retrato: 'spinosaurus',
+    id: 'visitante_judith',
+    nombre: 'El río Judith',
+    lema: 'Corazas, mazas y golas por las llanuras de Montana. Nada aquí es blando.',
+    retrato: 'zuul',
     perfil: 'heuristica',
     premio: 150,
     mazo: [
-      ['spinosaurus', 1], ['suchomimus', 2], ['carnotaurus', 2], ['sanjuansaurus', 3],
-      // Con Allosaurus en vez de Scanisaurus y los eventos de presión se le gana
-      // el 52 %; como estaba al principio, el 73 %, la semana regalada.
-      ['elasmosaurus', 3], ['allosaurus', 3], ['plesiopleurodon', 2], ['torvosaurus', 2],
-      ['fractura', 2], ['competencia', 1], ['crecimiento_acelerado', 1],
-      ['trampa', 3], ['inundacion', 3], ['lago', 2], ['humedal', 2], ['vega', 2],
+      // El del Kem Kem se fue con su mapa (16-09-2026): un visitante de la
+      // misma formación que una expedición es la expedición repetida.
+      ['zuul', 3], ['sauropelta', 3], ['borealopelta', 2], ['euoplocephalus', 3],
+      ['lokiceratops', 2], ['medusaceratops', 2], ['wendiceratops', 2], ['chasmosaurus', 3],
+      ['brachylophosaurus', 3], ['parasaurolophus', 3],
+      ['gregarismo', 3], ['rebrote', 3], ['canal_trenzado', 3], ['competencia', 2], ['ceniza', 2],
     ],
   }),
   rival({
@@ -412,19 +683,23 @@ export const VISITANTES = Object.freeze([
     ],
   }),
   rival({
-    id: 'visitante_tendaguru',
-    nombre: 'La colina de Tendaguru',
-    lema: 'La Morrison tuvo una hermana en África, y allí los cuellos eran más largos.',
-    retrato: 'brachiosaurus',
+    id: 'visitante_nemegt',
+    nombre: 'Las dunas del Nemegt',
+    lema: 'Tarbosaurus manda en el desierto de Mongolia. Lo que no corre, se entierra.',
+    retrato: 'tarbosaurus',
     perfil: 'heuristica',
     premio: 150,
     mazo: [
-      ['brachiosaurus', 1], ['atlasaurus', 2], ['mamenchisaurus', 3], ['amargasaurus', 3],
-      ['kentrosaurus', 3], ['stegosaurus', 3], ['dryosaurus', 3], ['ceratosaurus', 3],
-      ['ornitholestes', 3], ['allosaurus', 3], ['torvosaurus', 2], ['manantial', 1],
-      ['lago', 2], ['bosque', 1], ['gastrolitos', 2],
-      ['neumaticidad', 2], ['crecimiento_acelerado', 1], ['competencia', 2],
-      ['canal_trenzado', 3], ['rebrote', 3], ['gregarismo', 3], ['fractura', 2],
+      // El de Tendaguru se fue con su mapa (16-09-2026). Éste es el Cretácico
+      // de Mongolia con las cartas de la ronda del control. Medía 77 % con
+      // Shuvuuia, Psittacosaurus y Saurolophus, y 75 % sólo con el aura: lo
+      // que lo baja es cambiar los cuerpos flojos por emboscada y contadores.
+      ['tarbosaurus', 2], ['deinocheirus', 2], ['dakotaraptor', 2], ['monolophosaurus', 3],
+      ['therizinosaurus', 3], ['velociraptor', 3], ['halszkaraptor', 3], ['dromaeosaurus', 3],
+      ['ojoraptorsaurus', 3],
+      // La Sequía no es de adorno: Therizinosaurus cobra +3 con un clima puesto.
+      ['aridez', 1], ['tormenta_polvo', 2], ['osario', 2], ['gregarismo', 3], ['competencia', 2],
+      ['fractura', 2], ['neumaticidad', 2], ['crecimiento_acelerado', 1], ['trampa', 3],
     ],
   }),
 ]);

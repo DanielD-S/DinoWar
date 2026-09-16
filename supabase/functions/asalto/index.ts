@@ -27,10 +27,10 @@ import {
 } from '../_compartido/validarAsalto.js';
 import { validarSolitario } from '../_compartido/validarSolitario.js';
 import {
-  crearDuelo, aplicarAccion, vistaDuelo, comprobarTiempo, rendirse, resultado, terminado,
+  crearDuelo, aplicarAccion, vistaDuelo, comprobarTiempo, rendirse, resultado, terminado, partesDe,
 } from '../_compartido/duelo.js';
 import { validarMazoLegal } from '../_compartido/validarPartida.js';
-import { eloTras } from '../../../src/data/ligas.js';
+import { eloTras, temporadaDe, eloVigente, conEscudo } from '../../../src/data/ligas.js';
 import { CUENCA } from '../../../src/data/tribu.js';
 import { ECONOMIA, abrirSobre } from '../../../src/data/coleccion.js';
 import { avancesDelParte, diaUTC, POR_ID } from '../../../src/data/misiones.js';
@@ -444,49 +444,64 @@ async function asegurarDatos(servicio, fila, ahora: number) {
   return releida ?? fila;
 }
 
-/** Cierra el duelo: ELO, historial y monedas, una sola vez. */
+/**
+ * Cierra el duelo: ELO, escudo, temporada, historial y monedas, una sola vez.
+ * Las reglas de la liga viven en ligas.js; aquí se aplican en orden: primero
+ * el reinicio de temporada sobre el ELO de PARTIDA —el de al empezar, que
+ * guarda la fila—, luego el movimiento del duelo, luego el escudo.
+ */
 async function cerrarDuelo(servicio, fila) {
   const r = resultado(fila.datos);
-  const { data: js } = await servicio.from('jugadores').select('id, duelos')
+  const { data: js } = await servicio.from('jugadores').select('id, duelos, escudo, temporada')
     .in('id', [fila.jugador_a, fila.jugador_b]);
-  const duelosDe = (id: string) => (js ?? []).find((x) => x.id === id)?.duelos ?? 0;
-  const nuevos = eloTras(fila.elo_a, fila.elo_b, r.ganador === 0 ? 1 : 0,
-    duelosDe(fila.jugador_a), duelosDe(fila.jugador_b));
-  // Las misiones y los logros de cada bando. Aquí no hay parte: el duelo no
-  // se re-juega. Lo que sí se sabe es que se jugó y quién ganó, y con eso
-  // avanzan las de jugar, las de ganar y las de duelo.
+  const de = (id: string) => (js ?? []).find((x) => x.id === id) ?? {};
+  const ja = de(fila.jugador_a);
+  const jb = de(fila.jugador_b);
   const dia = diaUTC();
-  const parteDe = (gano: boolean) => ({
-    partidas: 1, victorias: gano ? 1 : 0, duelos: 1, duelosGanados: gano ? 1 : 0,
-  });
-  const pa = parteDe(r.ganador === 0);
-  const pb = parteDe(r.ganador === 1);
+  const eloA = eloVigente(fila.elo_a, ja.temporada, dia);
+  const eloB = eloVigente(fila.elo_b, jb.temporada, dia);
+  const nuevos = eloTras(eloA, eloB, r.ganador === 0 ? 1 : 0, ja.duelos ?? 0, jb.duelos ?? 0);
+  const ea = conEscudo(eloA, nuevos.a, ja.escudo);
+  const eb = conEscudo(eloB, nuevos.b, jb.escudo);
+  // Las misiones y los logros de cada bando salen del parte que el duelo fue
+  // anotando fase a fase —bajas, clados, clima— más los dos contadores
+  // propios del duelo. Antes sólo avanzaban las de jugar y ganar.
+  const [pa, pb] = partesDe(fila.datos);
   const { error } = await servicio.rpc('duelo_cerrar', {
     p_id: fila.id, p_ganador: r.ganador, p_motivo: r.motivo, p_turnos: fila.datos.estado.turno,
-    p_elo_a: nuevos.a, p_elo_b: nuevos.b, p_monedas_victoria: ECONOMIA.monedasVictoria,
+    p_elo_a: ea.elo, p_elo_b: eb.elo, p_monedas_victoria: ECONOMIA.monedasVictoria,
     p_dia: dia,
     p_avances_a: avancesConPremio(dia, pa), p_avances_b: avancesConPremio(dia, pb),
     p_logros_a: avancesDeLogros(pa), p_logros_b: avancesDeLogros(pb),
+    p_escudo_a: ea.escudo, p_escudo_b: eb.escudo, p_temporada: temporadaDe(dia),
   });
   if (error) console.error('duelo_cerrar', error.message);
   const { data } = await servicio.from('duelos').select('*').eq('id', fila.id).single();
   return data ?? fila;
 }
 
-/** Lo que recibe el cliente: su vista, el rival, los ELO de antes y de ahora. */
+/**
+ * Lo que recibe el cliente: su vista, el rival, los ELO de antes y de ahora.
+ * Los ELO van ya VIGENTES —con el reinicio de temporada aplicado si toca—
+ * para que la liga que se pinta antes del cierre sea la misma que después.
+ */
 async function responderDuelo(servicio, jugadorId: string, fila, desde: number, ahora: number) {
   const bando = fila.jugador_a === jugadorId ? 0 : 1;
   const rivalId = bando === 0 ? fila.jugador_b : fila.jugador_a;
-  const { data: js } = await servicio.from('jugadores').select('id, apodo, elo, duelos')
+  const { data: js } = await servicio.from('jugadores').select('id, apodo, elo, duelos, escudo, temporada')
     .in('id', [jugadorId, rivalId].filter(Boolean));
-  const de = (id: string | null) => (js ?? []).find((x) => x.id === id) ?? null;
+  const dia = diaUTC();
+  const de = (id: string | null) => {
+    const j = (js ?? []).find((x) => x.id === id);
+    return j ? { apodo: j.apodo, elo: eloVigente(j.elo, j.temporada, dia), duelos: j.duelos, escudo: j.escudo } : null;
+  };
   const yo = de(jugadorId);
   const rival = de(rivalId);
+  const mia = (js ?? []).find((x) => x.id === jugadorId);
   const base = {
     id: fila.id, estado: fila.estado, codigo: fila.codigo, bando,
-    yo: yo ? { apodo: yo.apodo, elo: yo.elo, duelos: yo.duelos } : null,
-    rival: rival ? { apodo: rival.apodo, elo: rival.elo, duelos: rival.duelos } : null,
-    eloInicial: bando === 0 ? fila.elo_a : fila.elo_b,
+    yo, rival,
+    eloInicial: eloVigente(bando === 0 ? fila.elo_a : fila.elo_b, mia?.temporada, dia),
   };
   if (fila.estado === 'esperando' || !fila.datos) return json(base);
   return json({ ...base, ...vistaDuelo(fila.datos, bando, desde, ahora) });

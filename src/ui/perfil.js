@@ -71,6 +71,11 @@ function aFormaLocal(d) {
     activo,
     sobresAbiertos: Number(d.sobres_abiertos ?? 0),
     elo: Number(d.elo ?? 1200),
+    // La liga: las derrotas de margen que quedan y la temporada en que se
+    // escribió el ELO. Un servidor sin la 0032 no manda ninguno: escudo entero
+    // y temporada null, que `eloVigente` toma por la de hoy.
+    escudo: Number.isInteger(d.escudo) ? d.escudo : 3,
+    temporada: Number.isInteger(d.temporada) ? d.temporada : null,
     apodo: d.apodo ?? null,
     // Cuántas veces más puedes cambiarte el nombre. Lo dice el servidor, que es
     // quien lleva la cuenta: si lo llevara la pantalla, recargar la regalaría.

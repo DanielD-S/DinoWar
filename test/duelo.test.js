@@ -19,7 +19,12 @@ import { DUELO, FIN_DUELO } from '../src/data/duelo.js';
 import { desdeMiLado } from '../supabase/functions/_compartido/duelo.js';
 import { hayPartida } from '../src/ui/emparejado.js';
 import { enMazo, enMano, comprometidas } from '../src/ui/ocultas.js';
-import { LIGAS, ELO, ligaDe, rangoDe, nombreDeRango, eloTras } from '../src/data/ligas.js';
+import {
+  LIGAS, ELO, ESCUDO, TEMPORADA, ligaDe, rangoDe, nombreDeRango, eloTras,
+  conEscudo, temporadaDe, finDeTemporada, reinicioDe, eloVigente,
+} from '../src/data/ligas.js';
+import { partesDe } from '../supabase/functions/_compartido/duelo.js';
+import { VOCABULARIO } from '../src/data/misiones.js';
 
 const M = MAZO.map(([id, n]) => [id, n]);
 
@@ -300,4 +305,75 @@ test('El ELO se mueve como debe: gana el favorito y casi no cambia; gana el otro
   assert.equal(novato.a - 1200, 2 * (par.a - 1200));
   // Y nadie baja del suelo.
   assert.equal(eloTras(ELO.suelo, 2000, 0).a, ELO.suelo);
+});
+
+// ------------------------------------------------- escudo y temporadas
+
+test('El escudo: tres derrotas de margen en el umbral de la liga, y se rellena al subir', () => {
+  const umbral = LIGAS[1].desde; // Jurásico
+  // Perder en el umbral con escudo: te quedas en el umbral y gastas una.
+  let r = conEscudo(umbral + 5, umbral - 20, ESCUDO.derrotas);
+  assert.equal(r.elo, umbral);
+  assert.equal(r.escudo, ESCUDO.derrotas - 1);
+  // Sin escudo, se baja de verdad.
+  r = conEscudo(umbral + 5, umbral - 20, 0);
+  assert.equal(r.elo, umbral - 20);
+  assert.equal(r.escudo, 0);
+  // Perder DENTRO de la liga no gasta escudo: sólo protege el umbral de liga.
+  r = conEscudo(umbral + 200, umbral + 170, 1);
+  assert.equal(r.elo, umbral + 170);
+  assert.equal(r.escudo, 1);
+  // Subir de liga lo rellena.
+  r = conEscudo(LIGAS[2].desde - 5, LIGAS[2].desde + 10, 0);
+  assert.equal(r.elo, LIGAS[2].desde + 10);
+  assert.equal(r.escudo, ESCUDO.derrotas);
+  // Un escudo que no viene —cuenta de antes de la 0032— cuenta como entero.
+  assert.equal(conEscudo(umbral + 5, umbral - 20, null).elo, umbral);
+});
+
+test('Las temporadas duran lo que dicen, empiezan en lunes y el ELO se reinicia a medio camino', () => {
+  assert.equal(new Date(`${TEMPORADA.inicio}T00:00:00Z`).getUTCDay(), 1, 'la primera empieza en lunes');
+  assert.equal(temporadaDe(TEMPORADA.inicio), 0);
+  assert.equal(temporadaDe('2026-01-01'), 0, 'antes del inicio es la primera, no una negativa');
+  const fin = finDeTemporada(TEMPORADA.inicio);
+  assert.equal(temporadaDe(fin), 1);
+  assert.equal((Date.parse(`${fin}T00:00:00Z`) - Date.parse(`${TEMPORADA.inicio}T00:00:00Z`)) / 86400000, TEMPORADA.dias);
+  // El reinicio: a medio camino del inicial, y nunca bajo el suelo.
+  assert.equal(reinicioDe(1800), 1500);
+  assert.equal(reinicioDe(1000), 1100);
+  assert.equal(reinicioDe(ELO.suelo), Math.max(ELO.suelo, reinicioDe(ELO.suelo)));
+  // Vigente: el guardado si es de esta temporada; el reiniciado si es de una anterior.
+  assert.equal(eloVigente(1800, 1, fin), 1800);
+  assert.equal(eloVigente(1800, 0, fin), 1500);
+  assert.equal(eloVigente(1800, null, fin), 1800, 'sin temporada guardada no se reinicia nada');
+  // Una sola vez aunque hayan pasado tres temporadas.
+  const lejos = finDeTemporada(finDeTemporada(fin));
+  assert.equal(eloVigente(1800, 0, lejos), 1500);
+});
+
+test('Un duelo deja el parte de cada bando: bajas, clados y clima, además de jugar y ganar', () => {
+  const { d } = jugarEntero(11);
+  const [pa, pb] = partesDe(d);
+  for (const p of [pa, pb]) for (const clave of VOCABULARIO) assert.ok(clave in p, clave);
+  assert.equal(pa.partidas + pb.partidas, 2);
+  assert.equal(pa.victorias + pb.victorias, 1);
+  assert.equal(pa.duelos, 1);
+  assert.equal(pa.duelosGanados + pb.duelosGanados, 1);
+  // Una partida entera despliega criaturas de los dos lados y alguien se lleva bajas.
+  assert.ok(pa.desplegados > 0 && pb.desplegados > 0, 'nadie desplegó nada');
+  assert.ok(pa.bajas + pb.bajas > 0, 'nadie derribó nada en una partida entera');
+  const clados = Object.keys(pa).filter((k) => k.startsWith('clado:')).reduce((n, k) => n + pa[k], 0);
+  assert.equal(clados, pa.desplegados, 'cada criatura desplegada es de un clado');
+  // Lo que anota el duelo no toca el estado del motor.
+  assert.ok(!('partes' in d.estado));
+});
+
+test('Un duelo cerrado por rendición deja el parte igual, con la victoria para el otro', () => {
+  const d = crearDuelo(5, M, M, 1000);
+  rendirse(d, 0);
+  const [pa, pb] = partesDe(d);
+  assert.equal(pa.victorias, 0);
+  assert.equal(pb.victorias, 1);
+  assert.equal(pb.duelosGanados, 1);
+  assert.equal(pa.partidas, 1);
 });

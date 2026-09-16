@@ -3258,3 +3258,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .exp-cartela-texto { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
 .exp-cartela-botones { display: flex; flex-direction: column; gap: 6px; width: 100%; margin-top: 6px; }
 .exp-cartela-botones .boton-grande[disabled] { opacity: .45; }
+
+/* La liga: el escudo de descenso como tres pastillas, la temporada y la tabla
+   de la Extinción. Las pastillas llenas son derrotas de margen que quedan. */
+.duelo-liga-pie { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 10.5px; color: var(--tenue); margin-top: 4px; }
+.duelo-escudo { display: inline-flex; align-items: center; gap: 3px; }
+.duelo-escudo i { width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--acento-claro); display: inline-block; }
+.duelo-escudo i.llena { background: var(--acento-vivo); border-color: var(--acento-vivo); }
+.duelo-liga-pie .chip { margin-left: auto; }
+.duelo-tabla { margin: 0 0 8px; }
+.duelo-ranking li { display: grid; grid-template-columns: 26px 1fr auto; gap: 8px; align-items: center; font-size: 12px; }
+.duelo-ranking li.yo { color: var(--acento-claro); font-weight: 700; }
+.duelo-tabla-puntos { font-variant-numeric: tabular-nums; color: var(--tenue); }
