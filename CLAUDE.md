@@ -1076,9 +1076,11 @@ para las legendarias CON CRIATURA (`c.dino`): las de soporte —climas, eventos,
 recursos, Biomasa— no llevan vídeo a propósito, que no hay animal que enseñar,
 y pedirlo igual dejaba un 404 en la consola por cada Mortandad o Manantial que
 salía en un sobre. Las nueve primeras legendarias con criatura lo tienen todas;
-**Carcharodontosaurus y Giraffatitan, que llegaron el 16-09-2026, todavía no**,
-y salen del sobre volteando la carta sin más, que es lo que hace el juego
-cuando el fichero no está. Hubo un vídeo de relleno para las que no tenían el
+**las TRES que llegaron el 16-09-2026 —Carcharodontosaurus, Giraffatitan y
+Patagotitan— todavía no**, y salen del sobre volteando la carta sin más, que es
+lo que hace el juego cuando el fichero no está. Son doce legendarias con
+criatura y catorce ficheros en `assets/video/` contando los cinco de jefe: la
+cuenta no se escribe aquí, se mira con `ls`. Hubo un vídeo de relleno para las que no tenían el
 suyo y se quitó: el autor prefiere que una legendaria sin vídeo salga sin
 vídeo.
 
