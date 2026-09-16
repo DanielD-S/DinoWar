@@ -390,14 +390,17 @@ export const VISITANTES = Object.freeze([
     perfil: 'heuristica',
     premio: 150,
     mazo: [
+      // Tenía diecisiete criaturas y treinta de soporte, y se ganaba el 59 %:
+      // medio mazo mirando mientras la otra mitad esperaba a la cuarta
+      // Biomasa. Ahora son veinticuatro, con ceratosáurido, azhdárquido y
+      // pliosaurio, que de Gondwana también son.
       ['argentinosaurus', 2], ['antarctosaurus', 1], ['tyrannotitan', 1], ['carnotaurus', 2],
-      ['amargasaurus', 3], ['sanjuansaurus', 3], ['plateosauravus', 3], ['atlasaurus', 2],
-      // Todo lo caro cuesta 4: sin rampa, la mitad de la mano se queda mirando.
-      ['carrona', 1], ['humedal', 2], ['vega', 2], ['manantial', 1], ['lago', 2],
-      ['elasmosaurus', 3],
-      ['neumaticidad', 2], ['crecimiento_acelerado', 1], ['gastrolitos', 2],
-      ['mortandad', 1], ['competencia', 2],
-      ['canal_trenzado', 3], ['rebrote', 3], ['gregarismo', 3], ['fractura', 2],
+      ['amargasaurus', 3], ['sanjuansaurus', 3], ['atlasaurus', 2], ['ceratosaurus', 3],
+      ['elasmosaurus', 3], ['quetzalcoatlus', 1],
+      // Todo lo grande cuesta 4: sin rampa, la mano se queda quieta.
+      ['carrona', 1], ['humedal', 2], ['vega', 2], ['manantial', 1], ['sabana', 3],
+      ['neumaticidad', 2], ['crecimiento_acelerado', 1], ['mortandad', 1],
+      ['competencia', 2], ['fractura', 2], ['nido', 3], ['gregarismo', 3],
     ],
   }),
   rival({
