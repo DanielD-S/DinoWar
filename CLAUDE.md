@@ -277,8 +277,8 @@ Cinco decisiones que conviene conocer antes de discutirlas:
   un nodo vencido paga lo de una victoria normal.
 - **Los visitantes tienen que costar parecido.** Rotan por semana, y uno que se
   gana el 73 % y otro el 37 % hacen que una semana sea la de no jugar. Se
-  ajustaron midiendo hasta rondar el 50 %; los cinco de hoy caen entre el 44 y
-  el 53 %.
+  ajustaron midiendo hasta rondar el 50 %; los cinco de hoy caen entre el 48 y
+  el 58,5 %, y el más suelto es el del mar, que ya estaba así.
 - **Las expediciones se encadenan con `requiere`, y no hizo falta regla nueva.**
   `requisitoDe()` devuelve, para el PRIMER nodo de un mapa encadenado, el
   ÚLTIMO del que lo abre. Es el requisito de siempre apuntando a otro sitio, así
