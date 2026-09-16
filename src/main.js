@@ -56,9 +56,7 @@ import { presentarPartida, PRESENTACION_DUELO } from './ui/presentacion.js';
 import { desbloquear, alternarMute, estaSilenciado, sonido, cerrarAudio, musica, precargarMusica, enSegundoPlano } from './ui/audio.js';
 import { montarTacto } from './ui/tacto.js';
 import { arte } from './ui/art.js';
-import {
-  mostrarMarca, empezarCarga, precargarPiezas, precargarIntro, mostrarIntro,
-} from './ui/carga.js';
+import { mostrarMarca, empezarCarga, precargarPiezas } from './ui/carga.js';
 import { pedirMazoInicial } from './ui/iniciales.js';
 import { montarInstalar } from './ui/instalar.js';
 import {
@@ -206,11 +204,6 @@ async function presentarse(nombre, marca = null) {
   const trabajo = (async () => {
     await precargarPiezas(PIEZAS_DEL_MENU);
     carga.avanzar();
-    // El intro empieza a bajar AQUÍ y no antes: las piezas del menú son lo
-    // que la barra está esperando de verdad, y 1,2 MB compitiendo con ellas
-    // retrasan el momento en que el juego está listo. A partir de aquí quedan
-    // dos viajes al servidor, que es tiempo de sobra para un vídeo.
-    precargarIntro();
     await entrarEnLaCuenca(nombre);
     carga.avanzar();
     const p = await sincronizar();
@@ -242,16 +235,11 @@ async function presentarse(nombre, marca = null) {
   // cerró antes de elegir, porque lo que manda es lo que dice el servidor.
   const nueva = p.sembrado === false;
 
-  // El intro va con la pantalla siguiente YA PUESTA debajo. El vídeo se retira
-  // con un fundido, y si debajo quedara la carga se la vería reaparecer medio
-  // segundo antes de dar paso al menú.
-  if (nueva) irA(APP.INICIALES); else irAlMenu();
-  await mostrarIntro(document.body);
-
   if (nueva) {
+    irA(APP.INICIALES);
     await pedirMazoInicial(document.getElementById('iniciales'));
-    irAlMenu();
   }
+  irAlMenu();
   return p;
 }
 

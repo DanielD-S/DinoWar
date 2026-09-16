@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: 9d9eedf389161f5d
+// huella: 02cf0c114f3f8dca
 //
 // Lleva dentro estos 24 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -2007,6 +2007,16 @@ var BALANCE = Object.freeze({
     [RAREZA.EPICO]: 2,
     [RAREZA.LEGENDARIO]: 1
   }),
+  // Criaturas legendarias que caben en un mazo, CONTADAS ENTRE TODAS. El tope
+  // por carta ya es 1, así que sin esto un mazo con la colección entera se
+  // lleva las nueve legendarias del set más las de jefe: catorce bombas por
+  // 55 cartas, y quien las tenga juega otro juego. Es un tope de FAMILIA y no
+  // de rareza —las legendarias de soporte no entran— porque lo que se acumula
+  // es el cuerpo: las nueve criaturas suman 57 de Ataque y 63 de Vida.
+  //
+  // Decisión del autor (16-09-2026). Las de jefe cuentan: son legendarias de
+  // criatura como las demás, y ganarlas cooperando no las hace otra cosa.
+  legendariasDinoPorMazo: 3,
   // ------------------------------------------------------------- el cuerpo
   //
   // Una carta son DOS cifras: Ataque y Vida. La Defensa existió y se quitó.
@@ -4216,6 +4226,19 @@ var limiteDe = (cardId) => {
   const c = carta(cardId);
   return c.copiasMax ?? BALANCE.copiasPorRareza[c.rareza];
 };
+var LEGENDARIAS_DINO_MAX = BALANCE.legendariasDinoPorMazo;
+var esLegendariaDino = (cardId) => {
+  const c = carta(cardId);
+  return c.tipo === TIPO.DINOSAURIO && c.rareza === RAREZA.LEGENDARIO;
+};
+var legendariasDinoEn = (mazo) => {
+  const pares = Array.isArray(mazo) ? mazo : Object.entries(mazo);
+  let n = 0;
+  for (const [cardId, copias] of pares) {
+    if (existeCarta(cardId) && copias > 0 && esLegendariaDino(cardId)) n += copias;
+  }
+  return n;
+};
 var ECONOMIA = Object.freeze({
   // Un sobre son cinco cartas. El precio está por encima de lo que devuelve
   // fundirlo entero (unas 77 monedas, que lo comprueba un test), porque si no
@@ -4524,6 +4547,10 @@ function validarMazoLegal(mazo) {
     const tope = limiteDe(cardId);
     if (copias > tope) throw new PartidaInvalida("copias por encima del tope de la carta", cardId);
     total += copias;
+  }
+  const legendarias = legendariasDinoEn(mazo);
+  if (legendarias > LEGENDARIAS_DINO_MAX) {
+    throw new PartidaInvalida("demasiadas criaturas legendarias", legendarias);
   }
   if (total !== BALANCE.tamanoMazo) {
     throw new PartidaInvalida("el mazo no suma las cartas exactas", total);
@@ -5078,7 +5105,15 @@ var EXPEDICIONES = Object.freeze([
           ["dromaeosaurus", 3],
           ["troodon", 3],
           ["velociraptor", 3],
-          ["mosasaurus", 1],
+          // Llevaba un Mosasaurus, y con él eran CUATRO criaturas legendarias:
+          // un mazo que desde el tope de tres (16-09-2026) ningún jugador puede
+          // construir, y un rival de expedición no juega con cartas prohibidas.
+          // Se va el que menos pinta en Hell Creek —el único marino— y entra un
+          // marginocéfalo más, que las dos auras de la lista ya están puestas.
+          // Medido con `node sim/expediciones.mjs`, 400 partidas: se le ganaba
+          // el 21,8 % y se le gana el 24,5 %. Sigue siendo con diferencia el
+          // nodo más duro del juego, que es lo que tiene que ser.
+          ["alaskacephale", 1],
           ["carrona", 1],
           ["mortandad", 1],
           ["competencia", 2],

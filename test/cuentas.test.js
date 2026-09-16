@@ -14,10 +14,17 @@ import { readFileSync } from 'node:fs';
 import { generar, SALIDA, coleccionables } from '../tools/generar-cartas.mjs';
 import { validarSolitario } from '../supabase/functions/_compartido/validarSolitario.js';
 import { perfilValido, PartidaInvalida } from '../supabase/functions/_compartido/validarPartida.js';
-import { ECONOMIA, coleccionInicial } from '../src/data/coleccion.js';
+import {
+  ECONOMIA, coleccionInicial, mazoPorDefecto, legendariasDinoEn,
+} from '../src/data/coleccion.js';
 import { BALANCE } from '../src/data/balance.js';
 import { PERFIL } from '../src/engine/ai.js';
 import { jugarSolo, MAZO_OK } from './helpers.js';
+import { CARTAS, CARTAS_DE_JEFE } from '../src/data/cards.js';
+
+/** Las criaturas legendarias, para montar un mazo que se pase del tope. */
+const LEGENDARIAS = [...Object.values(CARTAS), ...Object.values(CARTAS_DE_JEFE)]
+  .filter((c) => c.tipo === 'DINOSAURIO' && c.rareza === 'LEGENDARIO').map((c) => c.id);
 
 // -------------------------------------------------------------- el catálogo
 
@@ -121,6 +128,42 @@ test('El perfil de IA que llega del cliente tiene que ser uno de los que hay', (
   assert.equal(perfilValido(PERFIL.ALEATORIA), PERFIL.ALEATORIA);
   // Una IA inventada haría que el servidor reprodujese otra partida.
   assert.throws(() => perfilValido('la_que_me_deja_ganar'), PartidaInvalida);
+});
+
+test('El tope de criaturas legendarias lo comprueban los DOS lados', () => {
+  // Si sólo lo mirara el navegador, un cliente hostil guardaría el mazo por la
+  // puerta de atrás; si sólo lo mirara el servidor, el jugador se encontraría
+  // un «no se pudo guardar» sin motivo. Las dos mitades, la misma regla.
+  //
+  // El mazo de prueba suma las 55 exactas a propósito: si le faltaran cartas,
+  // el test pasaría por el motivo equivocado.
+  const mazo = new Map(Object.entries(mazoPorDefecto()));
+  const faltan = LEGENDARIAS.filter((id) => !mazo.has(id)).slice(0, 3);
+  for (const id of faltan) mazo.set(id, 1);
+  let sobran = faltan.length;
+  for (const [id, n] of mazo) {
+    if (sobran === 0) break;
+    if (LEGENDARIAS.includes(id)) continue;
+    const quita = Math.min(n, sobran);
+    mazo.set(id, n - quita);
+    sobran -= quita;
+  }
+  const lista = [...mazo].filter(([, n]) => n > 0);
+  assert.equal(lista.reduce((a, [, n]) => a + n, 0), BALANCE.tamanoMazo);
+  assert.equal(legendariasDinoEn(lista), BALANCE.legendariasDinoPorMazo + 1);
+  assert.throws(
+    () => validarSolitario({ ...PARTIDA, mazo: lista }),
+    (e) => e instanceof PartidaInvalida && /legendarias/.test(e.message),
+  );
+
+  // Y el SQL, que es el que decide si un mazo se GUARDA.
+  const sql = readFileSync('supabase/migrations/0031_tope_legendarias.sql', 'utf8');
+  assert.match(sql, /c\.tipo = 'DINOSAURIO' and c\.rareza = 'LEGENDARIO'/);
+  // El número sale del catálogo y no escrito a mano en la función: una copia
+  // más del mismo dato es una copia más que un día discrepa.
+  assert.match(sql, /legendarias_dino_max/);
+  assert.match(readFileSync(SALIDA, 'utf8'),
+    new RegExp(`add column if not exists legendarias_dino_max int not null default ${BALANCE.legendariasDinoPorMazo};`));
 });
 
 // ------------------------------------------- que la propiedad no se caiga

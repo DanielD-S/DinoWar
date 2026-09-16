@@ -243,6 +243,17 @@ export const BALANCE = Object.freeze({
     [RAREZA.LEGENDARIO]: 1,
   }),
 
+  // Criaturas legendarias que caben en un mazo, CONTADAS ENTRE TODAS. El tope
+  // por carta ya es 1, así que sin esto un mazo con la colección entera se
+  // lleva las nueve legendarias del set más las de jefe: catorce bombas por
+  // 55 cartas, y quien las tenga juega otro juego. Es un tope de FAMILIA y no
+  // de rareza —las legendarias de soporte no entran— porque lo que se acumula
+  // es el cuerpo: las nueve criaturas suman 57 de Ataque y 63 de Vida.
+  //
+  // Decisión del autor (16-09-2026). Las de jefe cuentan: son legendarias de
+  // criatura como las demás, y ganarlas cooperando no las hace otra cosa.
+  legendariasDinoPorMazo: 3,
+
 
   // ------------------------------------------------------------- el cuerpo
   //

@@ -315,7 +315,15 @@ export const EXPEDICIONES = Object.freeze([
           ['medusaceratops', 2],
           ['ankylosaurus', 1], ['edmontosaurus', 1], ['carnotaurus', 2], ['quetzalcoatlus', 2],
           ['pachycephalosaurus', 3], ['dromaeosaurus', 3], ['troodon', 3], ['velociraptor', 3],
-          ['mosasaurus', 1], ['carrona', 1],
+          // Llevaba un Mosasaurus, y con él eran CUATRO criaturas legendarias:
+          // un mazo que desde el tope de tres (16-09-2026) ningún jugador puede
+          // construir, y un rival de expedición no juega con cartas prohibidas.
+          // Se va el que menos pinta en Hell Creek —el único marino— y entra un
+          // marginocéfalo más, que las dos auras de la lista ya están puestas.
+          // Medido con `node sim/expediciones.mjs`, 400 partidas: se le ganaba
+          // el 21,8 % y se le gana el 24,5 %. Sigue siendo con diferencia el
+          // nodo más duro del juego, que es lo que tiene que ser.
+          ['alaskacephale', 1], ['carrona', 1],
           ['mortandad', 1], ['competencia', 2], ['crecimiento_acelerado', 1], ['neumaticidad', 2],
           ['fractura', 2], ['gregarismo', 3], ['trampa', 3],
         ],

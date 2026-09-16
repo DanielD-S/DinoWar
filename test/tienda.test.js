@@ -72,15 +72,15 @@ test('Lo gratuito no se compra y se equipa sin comprarlo (0026)', () => {
   }
 });
 
-test('Las legendarias y las de jefe llevan la lámina holográfica, con la ilustración aislada', () => {
+test('No hay lámina holográfica: se quitó y no vuelve sin decirlo', () => {
+  // Brillaba sobre la ilustración de las legendarias y las dos de jefe, en
+  // todas partes. La quitó el autor el 16-09-2026. No se vendía, así que aquí
+  // no hay nada que devolver a nadie: lo que se vigila es que no reaparezca a
+  // medias —la regla sin el aislamiento, o el keyframe sin la regla—.
   const css = readFileSync('carta.css', 'utf8');
-  const regla = css.match(/\.con-marco\.rareza-LEGENDARIO \.c-arte::before,\s*\.con-marco\.jefe \.c-arte::before \{([^}]*)\}/)?.[1];
-  assert.ok(regla, 'no hay lámina holográfica');
-  assert.match(regla, /mix-blend-mode: color-dodge/);
-  // Sin imagen: la textura que hubo traía una línea dibujada que, al moverse,
-  // cruzaba la ilustración como una costura. Un degradado no tiene.
-  assert.doesNotMatch(regla, /url\(/, 'la lámina vuelve a llevar una imagen');
-  assert.match(css, /\.con-marco\.jefe \.c-arte \{ overflow: hidden; isolation: isolate; \}/);
+  assert.doesNotMatch(css, /@keyframes holografico/, 'vuelve la animación de la lámina');
+  assert.doesNotMatch(css, /\.c-arte::before/, 'vuelve la lámina sobre la ilustración');
+  assert.doesNotMatch(css, /isolation: isolate/, 'queda el aislamiento que sólo pedía la lámina');
 });
 
 test('Los packs de sobres no llevan descuento: n sobres cuestan n veces uno', () => {

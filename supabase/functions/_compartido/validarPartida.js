@@ -18,7 +18,7 @@ import { decidir, PERFIL } from '../../../src/engine/ai.js';
 import { semilla } from '../../../src/engine/rng.js';
 import { BALANCE } from '../../../src/data/balance.js';
 import { existeCarta, carta } from '../../../src/data/cards.js';
-import { limiteDe } from '../../../src/data/coleccion.js';
+import { limiteDe, legendariasDinoEn, LEGENDARIAS_DINO_MAX } from '../../../src/data/coleccion.js';
 import { parteVacio, anotarEventos, nuevosEventos, cerrarParte } from '../../../src/data/misiones.js';
 
 /** Topes de gasto. Un cliente hostil manda listas enormes para quemar CPU. */
@@ -36,7 +36,8 @@ export class PartidaInvalida extends Error {
 }
 
 /**
- * Un mazo LEGAL: las cartas exactas y ninguna por encima de su rareza.
+ * Un mazo LEGAL: las cartas exactas, ninguna por encima de su rareza y como
+ * mucho `LEGENDARIAS_DINO_MAX` criaturas legendarias entre todas.
  *
  * No comprueba que sean tuyas y no puede: la propiedad es una consulta a la
  * base de datos y esto es una función pura. De eso se encarga
@@ -59,6 +60,14 @@ export function validarMazoLegal(mazo) {
     const tope = limiteDe(cardId);
     if (copias > tope) throw new PartidaInvalida('copias por encima del tope de la carta', cardId);
     total += copias;
+  }
+  // El tope de familia. No sale de la rareza carta a carta, así que un
+  // servidor que sólo mire `limiteDe` deja pasar las nueve legendarias juntas
+  // y el navegador no: la partida se juega y no se cobra, que es el fallo
+  // silencioso de siempre.
+  const legendarias = legendariasDinoEn(mazo);
+  if (legendarias > LEGENDARIAS_DINO_MAX) {
+    throw new PartidaInvalida('demasiadas criaturas legendarias', legendarias);
   }
   if (total !== BALANCE.tamanoMazo) {
     throw new PartidaInvalida('el mazo no suma las cartas exactas', total);

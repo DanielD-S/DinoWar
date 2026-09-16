@@ -56,9 +56,10 @@ CRF = 27
 TOPE = 10.0
 # Lo que NO es una carta y por tanto no se recorta: el tope existe porque en un
 # sobre lo que importa es el último fotograma —es el lienzo de la carta— y diez
-# segundos de espera ya son muchos. Una cinemática es una pieza montada y
-# cortarle el principio la destroza.
-SIN_TOPE = {'intro'}
+# segundos de espera ya son muchos. Una pieza montada que no es una carta se
+# destroza si se le corta el principio. Hoy está vacío: el intro del arranque
+# era el único y se quitó.
+SIN_TOPE = set()
 
 # La marca de agua, en PROPORCIÓN del cuadro y no en píxeles: Kling la escala
 # con la resolución de salida. Medido sobre dos entregas —1176×784 y 1916×1080—
