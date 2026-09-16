@@ -215,7 +215,7 @@ const API = Object.freeze({
  * sólo lo lleva al ritmo.
  *
  * Los que no tienen compás se saltan SIN esperar. Importa: el motor emite
- * treinta y un tipos y la mayoría son contabilidad —RENTA, PRODUCCION,
+ * decenas de tipos y la mayoría son contabilidad —RENTA, PRODUCCION,
  * RECHAZADA— que no debe costar ni un milisegundo de turno.
  */
 export async function animarEventos(eventos) {

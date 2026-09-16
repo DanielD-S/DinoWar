@@ -447,10 +447,13 @@ function pintarSobres(tirada = null, nuevas = new Set(), antesDeAbrir = {}) {
   // falta» es la que de verdad le importa a quien abre el sobre. Con sólo la
   // primera, el 4 % de las legendarias parecía la respuesta a la segunda.
   //
-  // La espera se calcula sobre las que le faltan al jugador, no sobre las ocho
-  // legendarias del set, porque eso es lo que hace el sobre: si sólo te falta
-  // una, cada legendaria que salga es ésa. Y por eso el número mejora según
+  // La espera se calcula sobre las que le faltan al jugador, no sobre TODAS las
+  // de esa rareza, porque eso es lo que hace el sobre: si sólo te falta una,
+  // cada legendaria que salga es ésa. Y por eso el número mejora según
   // completas la rareza, que es la parte que el jugador nota.
+  //
+  // Aquí no se escribe cuántas hay de cada rareza, y es a propósito: decía «las
+  // ocho legendarias del set» y eran dieciocho. Todo sale de `POR_RAREZA`.
   const faltanDe = (r) => POR_RAREZA[r].filter((id) => (p.cartas[id] ?? 0) < limiteDe(id)).length;
   const espera = (r) => Math.max(1, Math.round(faltanDe(r) / (PROBABILIDAD[r] * ECONOMIA.cartasPorSobre)));
 

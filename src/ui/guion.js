@@ -1,6 +1,8 @@
 // DinoWar — el GUIÓN: qué se ve cuando pasa cada cosa.
 //
-// El motor emite treinta y un tipos de evento. Hasta ahora se animaban CUATRO
+// El motor emite decenas de tipos de evento —el número exacto no se escribe
+// aquí, que ya se quedó atrás una vez: lo cuenta `test/guion.test.js` leyendo
+// el propio motor—. Hasta ahora se animaban CUATRO
 // —choque, avance, golpe al hábitat y muerte— porque el animador era una
 // sucesión de `if` escrita a mano contra esos cuatro. Todo lo demás cambiaba el
 // tablero de golpe y salía como un renglón de texto abajo.
