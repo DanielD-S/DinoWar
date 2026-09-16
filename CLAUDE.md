@@ -421,6 +421,54 @@ están midiendo sobre un mazo que cualquier construcción bate con holgura. No e
 un bug: es que el mazo de referencia se escribió para medir CARTAS y se ha
 quedado como si midiera el juego.
 
+### Las dos cartas de Ataque 0, medidas a 1 y a 2
+
+Se propuso subirles el Ataque a las únicas dos criaturas que lo tienen en cero
+—**Brachylophosaurus 0/10 c2**, que con el trío se pone en 6, y **Loricatosaurus
+0/8 c3**, que cura 2 al hábitat al entrar—. Medido por los tres caminos, y la
+respuesta es que **las cartas mejoran y el juego empeora**.
+
+Con `sim/carta.mjs`, 300 partidas, las dos están hoy por debajo de la raya:
+
+| Ataque | Brachylophosaurus | Loricatosaurus |
+|---|---|---|
+| **0 (hoy)** | 46,7 % | 46,0 % |
+| 1 | 53,0 % | 49,3 % |
+| 2 | 58,7 % | 55,3 % |
+
+O sea que a 0 no son cartas calibradas, son cartas FLOJAS, y a 1 quedan en la
+raya. Eso es cierto y no basta, porque los otros dos medidores dicen lo otro.
+
+**Los seis objetivos no se mueven.** `npm run sim`, 2.000 partidas por variante:
+3 de 6 en las tres. El jugador inicial incluso BAJA —47,5 % a 0, 46,3 % a 1,
+46,8 % a 2—, la bola de nieve roza el objetivo a 1 (70,8 % contra 72,1 %) sin
+llegar, y el reparto de vías se queda en 44/56/0 pase lo que pase.
+
+**Y el torneo de arquetipos se polariza**, que es el motivo para no hacerlo:
+
+| cruce | A0 | A1 | A2 |
+|---|---|---|---|
+| ENTIERRO vs Referencia | 74,0 % | 77,5 % | **85,5 %** |
+| ENTIERRO vs Control | 61,0 % | 68,0 % | **77,0 %** |
+| MOLIENDA vs Control | 62,5 % | 69,5 % | **74,5 %** |
+| Control vs ENTIERRO | 39,0 % | 32,0 % | **23,0 %** |
+| Referencia vs HÁBITAT | 24,5 % | 20,5 % | **16,5 %** |
+
+El peor cruce del torneo pasa del 24,5 % al 14,5 %. La razón es de una línea:
+**las dos cartas son MUROS y los muros están en tres de los cinco mazos.**
+Subirles el Ataque se lo regala a los que ya ganaban y no a los dos que no los
+llevan —Referencia y Control—, y el Control, que ya era el arquetipo flojo,
+queda inviable.
+
+Y de rebote la EXTINCIÓN baja (28 % → 25 % de las victorias de la Molienda
+contra el Control): un muro que mata gana por trofeos antes de que el molino
+llegue. Es exactamente lo que ya enseñó la Biomasa cuando se bajó de catorce a
+nueve.
+
+Si algún día se toca, **Loricatosaurus a 1 es casi gratis** —49,3 %, sigue
+neutral— y Brachylophosaurus **no es un descuido**: su trío lo lleva de 0 a 6, y
+con base 1 serían 7 de Ataque por 2 de coste.
+
 ### Cuántas cartas pide un set sano
 
 La aritmética sale del propio juego. Un mazo son 55; con nueve de Biomasa
