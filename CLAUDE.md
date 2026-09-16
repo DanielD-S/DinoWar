@@ -438,21 +438,112 @@ Los agujeros, por lo que bloquean:
 
 | hueco | hoy | falta |
 |---|---|---|
-| **Soporte de hábitat** | **3 copias en todo el set** | 4-5 cartas |
-| Tireóforo tribal | 24 copias (pide 28) | 2 cartas |
+| ~~Soporte de hábitat~~ | 13 → **56 copias** | hecho, y no bastó (ver abajo) |
+| ~~Tireóforo tribal~~ | 24 → **32 copias** | hecho, de rebote |
 | Ornitópodo tribal | 27 copias (pide 28) | 1 carta |
 | Aperturas de coste 0 | 12 copias | 2-3 cartas |
 | Daño dirigido al rival | 5 copias | 3-4 cartas |
 
-El del hábitat es el que más pesa: **es la única vía de victoria para la que no
-se puede construir un mazo**. La molienda ya tiene el suyo, los trofeos lo
+El del hábitat era el que más pesaba: **es la única vía de victoria para la que
+no se puede construir un mazo**. La molienda ya tiene el suyo, los trofeos lo
 tienen de siempre, y el hábitat gana de rebote —cuando el muro no llega— pero
-nadie puede ir a por él a propósito. Con una carta de evento y dos criaturas no
-hay paquete.
+nadie puede ir a por él a propósito. Se atacó con las ocho cartas de la ronda
+del hábitat, y el resultado está medido más abajo: el paquete cuadruplica el
+daño directo y la vía **sigue sin abrirse**. No era falta de cartas, o no sólo:
+70 de hábitat contra 10 trofeos no es una carrera pareja.
 
 Pterosaurio (10 copias) y Marino (9) NO entran en esa cuenta a propósito: el set
 los tiene como fauna que compartía paisaje, no como clados jugables, y forzarlos
 a tribal pediría seis o siete cartas cada uno para algo que no ha pedido nadie.
+
+## La ronda del hábitat: el paquete existe, la carrera no es pareja
+
+Ocho cartas (16-09-2026) para el agujero que la tabla de aquí arriba señalaba
+como el peor: **el hábitat era la única vía de victoria sin mazo posible**,
+porque el set entero llevaba TRES copias de daño directo contra los 70 que hay
+que bajar. Cinco cartas de ataque —Incendio estacional 5, Colapso del acuífero
+2 por dinosaurio tuyo hasta 6, Patagotitan 4, Dreadnoughtus 3, Hatzegopteryx
+2— y, porque el autor lo pidió en cuanto vio el paquete, sus **tres cartas de
+freno**: Borealopelta con guardia 2, Zuul con guardia 1 y Sauropelta, que cura
+4 al entrar.
+
+Lo que movió en el set: daño directo al hábitat **de 13 copias a 56**,
+curación de 18 a 30, guardia de 3 a 10. Y de rebote el Tireóforo pasa de 24
+copias a 32, que era otro de los huecos de la tabla.
+
+### Lo que NO consiguió, que es la parte que hay que leer
+
+Se construyó el mazo de HÁBITAT y se midió con `node sim/arquetipos.mjs`, y el
+resultado es el mismo por los dos caminos que se probaron:
+
+| mazo | contra | gana | por qué gana |
+|---|---|---|---|
+| HÁBITAT | Referencia | 75,0 % | **trofeos 58 %**, hábitat 17 % |
+| HÁBITAT | Control | 61,0 % | **trofeos 57 %**, hábitat 4 % |
+| HÁBITAT | Molienda | 48,3 % | trofeos 26 %, hábitat 22 % |
+| HÁBITAT | Entierro | 47,7 % | trofeos 29 %, hábitat 18 % |
+
+El 17 % de victorias por hábitat contra la referencia es **la misma proporción
+que la propia referencia** saca (22 %). O sea que el paquete hizo un buen mazo
+y no abrió ninguna vía, que es exactamente el fallo contra el que avisa la
+cabecera de `arquetipos.mjs`.
+
+**Primer intento: quitarle los dientes.** Se rehízo el mazo con muros que no
+matan —Brachylophosaurus 0/10, Loricatosaurus 0/8, Mamenchisaurus 1/11— para
+que no pudiera ganar por trofeos aunque quisiera. Salió al revés: gana el
+33,7 % en vez del 75 %, y sus victorias por hábitat BAJAN del 17 % al 11 %. Un
+mazo que no mata tampoco baja el hábitat.
+
+**Y ahí está el motivo, contado por el propio motor.** Instrumentando de dónde
+sale cada punto de hábitat, por partida contra la referencia:
+
+| mazo | de combate | directo | total | de 70 |
+|---|---|---|---|---|
+| REFERENCIA | 42,1 | 5,0 | 47,1 | |
+| CONTROL | 49,9 | 8,1 | 58,0 | |
+| **HÁBITAT** | 43,5 | **20,5** | **64,0** | |
+
+El paquete funciona: **cuadruplica el daño directo**, de 5 a 20,5 por partida.
+Lo que no puede es llevar el peso. Contra 70 de hábitat, 20 puntos son menos de
+un tercio, y no hay margen para más: **el set entero suma 56 de daño directo**
+—y eso metiendo las 17 copias en un mazo de 55, del que se ven unas 34 en trece
+turnos—. Un mazo que fuera a por el hábitat con lo que hay se queda, en el
+mejor de los casos, en la mitad del camino.
+
+La prueba de que el problema no son las cartas la da el CONTROL: gana el 40 %
+de sus partidas por hábitat con 8,1 de daño directo. **Las victorias por
+hábitat son función de la VELOCIDAD, no del daño directo** — se gana por
+hábitat cuando el rival no llega a poner cuerpos, y el mazo lento que le está
+pegando a la cifra a propósito le da tiempo a ponerlos.
+
+Conclusión, dicha para no volver a medirla: **con 70 de hábitat contra 10
+trofeos la carrera no es pareja, y eso es una constante de balance, no una
+carta.** Lo que el paquete sí hizo es que el hábitat pase de rebote a
+REMATE — 64 de 70 por partida, contra los 47 de antes—. Para que sea un PLAN
+hay dos caminos, y los dos son decisión del autor: bajar los 70, o meter otras
+diez o quince copias de daño directo, que es media ronda más.
+
+### El freno sí muerde, y sólo en su carril
+
+Las tres cartas defensivas se midieron por separado, metiéndolas en la
+referencia —ocho cartas dentro, ocho fuera, nada más cambia— y cruzándola
+contra el mazo de HÁBITAT:
+
+| la referencia… | el de hábitat gana | sus victorias por hábitat | hábitat que le baja |
+|---|---|---|---|
+| sin las tres | 75,0 % | 16 % | 64,0 de 70 |
+| con las tres | 73,3 % | **6 %** | **55,2 de 70** |
+
+Es lo que tiene que hacer un contador: **le quita nueve puntos de hábitat por
+partida y le cierra la vía —del 16 % al 6 %— sin cambiar quién gana.** El mazo
+de hábitat sigue ganando el 73 %, pero por trofeos. Un freno que además le
+ganara la partida no sería un freno, sería la carta obligatoria.
+
+Y el reparto de esos nueve puntos dice algo del diseño: los 20 de daño DIRECTO
+no se mueven (20,5 → 20,0) y todo el descuento sale del combate (43,5 → 35,2).
+Es correcto: **la guardia resta a cada golpe que llega por el campo y el golpe
+directo no pasa por ahí.** El paquete de ataque perfora las guardias; lo que
+las guardias hacen es que el hábitat no se caiga también por el otro lado.
 
 ## Las diez cartas de Biomasa son las tierras, y se autolimitan
 
@@ -2072,9 +2163,19 @@ Dicho para que nadie lo descubra tarde:
   74,7 % contra la Molienda y el 76,3 % contra el Entierro. Se escribió para
   medir CARTAS y se usa como si midiera el juego; mientras siga así, los seis
   objetivos de `BALANCE.md` hablan de un mazo que cualquier construcción bate.
-- **Y falta un paquete de HÁBITAT.** Es la única de las tres vías para la que
-  no se puede construir un mazo: tres copias en todo el set. Ver «Cuántas
-  cartas pide un set sano», más arriba.
+- **El paquete de HÁBITAT ya existe y la vía sigue cerrada.** Las ocho cartas
+  de la ronda del hábitat llevaron el daño directo de 13 copias a 56 y
+  cuadruplicaron lo que baja por partida —de 5 a 20,5—, y el mazo construido
+  para ellas gana el 75 % a la referencia con el 58 % de sus victorias por
+  TROFEOS y sólo el 17 % por hábitat, que es lo mismo que saca la propia
+  referencia. Rehacerlo con muros que no matan lo empeora por los dos lados.
+  El techo es aritmético: el set entero suma 56 de daño directo contra 70 de
+  hábitat, y de un mazo de 55 se ven 34 cartas en trece turnos. **Los dos
+  caminos —bajar los 70, o media ronda más de daño directo— son decisión del
+  autor**, y los números para decidirlo están en «La ronda del hábitat».
+  Lo que sí quedó cerrado es el carril defensivo: las tres cartas de freno
+  le quitan nueve puntos por partida y le bajan las victorias por hábitat del
+  16 % al 6 % sin cambiar quién gana.
 - **La inmunidad al clima no muerde.** Torvosaurus y Nodosaurus dicen «no le
   afectan los efectos del clima», y hoy los dos únicos efectos del clima sobre una
   criatura son BUENOS: el Canal da +1 de Vida y el Bosque cura saurópodos. O sea
