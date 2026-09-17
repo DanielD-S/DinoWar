@@ -87,7 +87,7 @@ ver los seis números idénticos y creer que el cambio no hace nada.
 
 | herramienta | qué juega | punto ciego |
 |---|---|---|
-| `npm run sim` | el mazo de REFERENCIA, 32 entradas | las 114 cartas que no están en él. La Llanura se rediseñó dos veces y `BALANCE.md` no se movió un decimal |
+| `npm run sim` | el mazo de REFERENCIA, 31 entradas | las 108 cartas que no están en él. La Llanura se rediseñó dos veces y `BALANCE.md` no se movió un decimal |
 | `node sim/carta.mjs <id>` | el mazo de referencia CON esa carta contra el mismo SIN ella | una carta sola: no dice nada de sinergias entre dos nuevas |
 | `node sim/cobertura.mjs` | mazos aleatorios de todo el set | su ajuste filtra a CRIATURAS: ningún clima ni evento aparece |
 | `node sim/climas.js` | fuerza cada clima al campo | no dice si la carta es buena, sólo qué le hace al juego mientras está puesta |
@@ -462,7 +462,64 @@ el 76,3 % contra dos mazos construidos en una tarde. Es el que juega la IA en
 solitario y el que mide `BALANCE.md`, así que los seis objetivos del balance se
 están midiendo sobre un mazo que cualquier construcción bate con holgura. No es
 un bug: es que el mazo de referencia se escribió para medir CARTAS y se ha
-quedado como si midiera el juego.
+quedado como si midiera el juego. **Se rehízo ese mismo día**, y lo que se
+aprendió está en la sección que sigue.
+
+### La vara del 16-09: el mazo de referencia, rehecho midiendo
+
+Ocho candidatos, 600 partidas espejo y 200 por cruce contra los cuatro
+arquetipos. Lo que se buscaba: un mazo que quede cerca del 50 % contra las
+construcciones y que siga midiendo el espejo. Las dos cosas tiran en sentido
+contrario y eso es lo primero que se aprendió:
+
+| candidato | espejo | inicial | vías | vs Molienda | vs Entierro | vs Hábitat |
+|---|---|---|---|---|---|---|
+| el del 13-09 | 4/6 | 49 % | 42/58 | 29,5 % | 26,0 % | 24,5 % |
+| agresivo (Suchomimus ×2, Allosaurus ×3, Deltadromeus ×2) | 1/6 | 43 % | **6/94** | 78,5 % | 76,0 % | 71,5 % |
+| tribal de dos auras (marginocéfalos) | 3/6 | 44 % | 43/58 | 77,0 % | 89,0 % | 88,0 % |
+| el del 13-09 con muros en vez de cuerpos flojos | 3/6 | 42 % | 54/46 | 26,5 % | 26,0 % | 23,0 % |
+| **el elegido** | 3/6 | 43 % | 24/77 | **51,5 %** | **50,0 %** | **48,0 %** |
+
+- **Un mazo que gana el 75 % a todo rompe el espejo por el otro lado**: el
+  94 % de sus partidas consigo mismo acaban por hábitat, y Monolophosaurus
+  sale descalibrado. Lo que hace vara no es ser fuerte, es quedar en la raya.
+- **Los muros solos no hacen vara.** Cambiar los cinco cuerpos que no pesaban
+  por Loricatosaurus, Mamenchisaurus y Stegoceras deja el cruce donde estaba.
+  Lo que mueve el cruce son los cuerpos de ATAQUE medianos: el elegido es el
+  del 13-09 con Suchomimus, Deltadromeus, Monolophosaurus, un Allosaurus, un
+  Iguanodon y un Apatosaurus en el sitio de Ornitholestes ×2, Huaxiadraco,
+  Riparovenator, Camarasaurus y un Dryosaurus.
+- **El soporte no mueve nada** (±3 puntos con Neumaticidad y Ceniza en vez de
+  Trampa, Gastrolitos y Bruma), así que se quedó el de antes. Importa porque
+  `iniciales.js` saca de ahí el soporte de los tres mazos iniciales: con el
+  mismo soporte, `catalogo_iniciales` no cambia. La 0006 cambia igual, pero
+  sólo en `catalogo_inicial` —la tabla de la colección de salida de antes de
+  la 0023, que ya no lee nadie desde que se borró `private.sembrar`—.
+- **Contra el Control queda al 69 %**, y no es fallo de la vara: el Control
+  es el arquetipo flojo y el del 13-09 ya le ganaba el 52 %.
+
+Lo que cuesta, medido antes de aceptarlo:
+
+- **El jugador inicial baja al 45,4 %** (2.000 partidas; 47,5 % antes). Se
+  midió de dónde sale y NO es del motor: con la IA al azar, el mazo viejo y
+  el nuevo dan el 47–48 %; con la heurística, 47,7 % y 43,0 %. Es la
+  heurística la que como SEGUNDO jugador saca cuatro puntos más a este mazo.
+  El desempate del chequeo y el orden de la revelación favorecen al primero,
+  así que el sitio donde mirar es `ai.js` y cómo `sim/partida.js` alterna las
+  dos IAs. Lo de «es del turno y no del mazo» era cierto a medias.
+- **Los tres iniciales pasan del 45–55 % al 31–33 % contra la referencia.**
+  No es que sean más flojos: la vara es más dura. Entre ellos siguen en el
+  45–47 %, que es lo que se calibra.
+- **Las curvas de expedición suben 10–20 puntos**, porque
+  `sim/expediciones.mjs` juega el mazo de referencia como jugador. Los
+  rivales no se retocaron: las cifras nuevas están en «Las Expediciones» y
+  la escalera sigue en el mismo orden. Es la vara la que cambió, no el mapa.
+
+Y lo que `BALANCE.md` dice ahora: **3 de 6**, como antes, con otro perfil.
+Cero descalibradas y duración en objetivo; el inicial en 45,4 %, la bola de
+nieve en 71,2 % —rozando el 70— y las vías en 25/75/0. La extinción sigue en
+cero en el espejo porque el mazo no muele: está medida en el arquetipo que la
+lleva (22–26 %), no aquí.
 
 ### Las dos cartas de Ataque 0, medidas a 1 y a 2
 
@@ -760,8 +817,9 @@ Deltadromeus, Ouranosaurus, los tireóforos nuevos). Con ellas se fueron los
 visitantes de esas dos formaciones —un visitante de la misma formación que
 una expedición es la expedición repetida— y entraron el río Judith y el
 Nemegt. Curvas medidas con `node sim/expediciones.mjs` (lo que le gana EL
-JUGADOR): Tendaguru 100 → 91 → 88 → 72 → 70 → 62 → 48 → 22; Kem Kem 92 → 89
-→ 77 → 66 → 67 → 44 → 42 → 28. Tres mazos escritos «para ser duros» midieron
+JUGADOR, con el mazo de referencia del 13-09): Tendaguru 100 → 91 → 88 → 72
+→ 70 → 62 → 48 → 22; Kem Kem 92 → 89 → 77 → 66 → 67 → 44 → 42 → 28. Tres
+mazos escritos «para ser duros» midieron
 95–99 % y hubo que rehacerlos: el de eventos de molienda (la lección del
 invierno del impacto, otra vez), el MURO de tireóforos con dos auras de Vida
 —un muro de 0–2 de Ataque no muere, pero pierde por hábitat—, y la jauría de
@@ -771,6 +829,20 @@ Los dos visitantes nuevos: el río Judith al 47 % y el Nemegt al 64 % tras
 tres vueltas —77, 75, 71, 64: las cartas de Mongolia son cuerpos flojos y lo
 único que lo bajó fue Dakotaraptor, la emboscada y la Sequía para el
 Therizinosaurus—. Es el más suelto de los cinco, como lo era el del mar.
+
+**Y esa misma noche cambió la vara** (ver «La vara del 16-09»): el mazo de
+referencia que `sim/expediciones.mjs` juega como jugador es ahora el que
+queda al 50 % contra los arquetipos, y las curvas medidas con él suben
+10–20 puntos sin tocar un rival. Con 400 partidas por nodo: Morrison 100 →
+100 → 97 → 91 → 86 → 82 → 68 → 55; Hell Creek 96 → 95 → 90 → 82 → 62 → 59
+→ 41 → 36; Tendaguru 100 → 95 → 97 → 82 → 90 → 77 → 62 → 44; Kem Kem 96 →
+95 → 92 → 86 → 88 → 60 → 64 → 47. Los visitantes, que se ajustaron para
+rondar el 50 %, quedan entre el 70 y el 81 %. La escalera de cada mapa sigue
+en el mismo orden y los nodos finales siguen siendo los duros; lo que se
+movió es el listón contra el que se mide, y las cifras de los párrafos de
+arriba son las de la vara vieja. Reajustar los rivales —o los visitantes,
+que es donde más se nota— es trabajo aparte y pide decidir primero qué mazo
+representa al jugador, porque el jugador no juega la referencia.
 
 Cinco decisiones que conviene conocer antes de discutirlas:
 
@@ -793,8 +865,8 @@ Cinco decisiones que conviene conocer antes de discutirlas:
   un nodo vencido paga lo de una victoria normal.
 - **Los visitantes tienen que costar parecido.** Rotan por semana, y uno que se
   gana el 73 % y otro el 37 % hacen que una semana sea la de no jugar. Se
-  ajustaron midiendo hasta rondar el 50 %; los cinco de hoy caen entre el 48 y
-  el 58,5 %, y el más suelto es el del mar, que ya estaba así.
+  ajustaron midiendo hasta rondar el 50 %; los cinco caían entre el 48 y el
+  58,5 % con la vara del 13-09, y entre el 70 y el 81 % con la del 16-09.
 - **Las expediciones se encadenan con `requiere`, y no hizo falta regla nueva.**
   `requisitoDe()` devuelve, para el PRIMER nodo de un mapa encadenado, el
   ÚLTIMO del que lo abre. Es el requisito de siempre apuntando a otro sitio, así
@@ -1912,7 +1984,9 @@ por clado— y esa es su colección de salida entera. Los datos están en
   cambian las 28 criaturas: lo que se mide es el clado. Medidos con
   `node sim/iniciales.mjs 400`, todos los cruces entre iniciales quedan entre
   el 45 y el 55 %. Veintitrés muros de saurópodo ganaban el 69 %; los
-  comentarios de cada lista dicen qué se cambió y cuánto movió.
+  comentarios de cada lista dicen qué se cambió y cuánto movió. Contra la
+  referencia del 16-09 ganan el 31–33 % (45–55 % contra la del 13-09): es la
+  vara la que endureció, y lo que se calibra es el cruce entre ellos.
 - Los otros dos no se regalan. Sus cartas siguen saliendo en los sobres, y la
   idea es que un día se puedan ganar con misiones.
 
@@ -1987,6 +2061,17 @@ recompensa viaja en la llamada como la meta y el premio de una misión, y
   despliegue de la función que empezó a apuntarlos (2026-09-15 02:38 UTC):
   victorias, duelos, asaltos, daño, expediciones y cartas de jefe. El golpe
   final no se puede reconstruir y no se contó.
+- **Los logros de «entera» miden un contador POR MAPA** (`expedicion:<id>`,
+  0033, 16-09-2026), no `expedicionNuevos`: ése suma también las primeras
+  victorias del visitante de la semana, y con él siete nodos y un visitante
+  pagaban «la Morrison entera». El contador lo escribe la Edge Function con
+  el mapa del rival que devolvió la re-jugada (el visitante no tiene mapa y no
+  cuenta), y el vocabulario lo saca de `EXPEDICIONES`: un mapa nuevo trae su
+  contador solo. La Morrison cambió de contador conservando el progreso de
+  cada cuenta; Hell Creek, Tendaguru y Kem Kem pagan SOBRES y no un mazo,
+  porque sólo hay dos iniciales que no elegiste y ya los dan la Morrison y los
+  25 duelos. La 0033 recuenta lo ya recorrido de `expediciones_victorias` y lo
+  pasa por `avanzar_logros`, que es quien entrega.
 - **`avanzar_logros` ya no da por cobrado un tipo de recompensa que no
   entiende.** La 0027 lo marcaba cobrado y no entregaba nada: por eso toda
   recompensa nueva pide antes su `when` en SQL y después desplegar.
@@ -2270,9 +2355,9 @@ Dicho para que nadie lo descubra tarde:
 - **Los cuatro mapas tienen rivales y no hay un quinto dibujado.** Una
   expedición nueva pide un mapa (`tools/expediciones.py`, prompts en
   `PROMPTS.md`) y ocho mazos medidos; el set da hoy para una de Mongolia (el
-  Nemegt es visitante) o de la Patagonia (también visitante). Y sólo la
-  Morrison tiene logro de «entera»: Hell Creek, Tendaguru y Kem Kem no, porque
-  añadir un logro es una migración con la copia de `private.catalogo_logros()`.
+  Nemegt es visitante) o de la Patagonia (también visitante). Los cuatro
+  tienen su logro de «entera» (0033); uno nuevo pide el suyo, con la copia de
+  `private.catalogo_logros()` en una migración.
 
 - **Hay cinco jefes y el calendario da la vuelta cada 35 días** (15-09-2026):
   Saurophaganax, Barosaurus, Supersaurus, Hesperosaurus y Harpactognathus, con
@@ -2302,27 +2387,27 @@ Dicho para que nadie lo descubra tarde:
   un correo que no es tuyo. Para activarla hace falta un SMTP propio: el
   integrado de Supabase manda 2 correos a la hora y sólo a direcciones del
   equipo.
-- **El balance cumple 3 de 6** (`BALANCE.md`, mazo de referencia del 13-09-2026):
-  cero cartas descalibradas y las vías en 44/56, pero el jugador inicial se
-  queda en 47,5 % —lleva ahí desde la v2, es del turno y no del mazo—, la bola
-  de nieve en 72 % y la extinción en 0 %. Y **114 de las 131** cartas del set
-  siguen fuera del mazo de referencia, o sea sin calibración comprobada.
-  `BALANCE.md` NO se movió con ninguna de las dos rondas nuevas y no tenía por
-  qué: el mazo de referencia no lleva ninguna de las treinta, así que
-  regenerarlo habría gastado 2.000 partidas para volver a imprimir los mismos
-  seis números. Es exactamente el punto ciego que avisa la tabla de los
-  simuladores.
-- **La extinción ya NO está en cero, y `BALANCE.md` sigue diciendo que sí.** Se
-  construyeron los mazos y se midieron (`sim/arquetipos.mjs`): la vía es el
-  22-26 % de las victorias del mazo hecho para ella. Lo que sigue en cero es lo
-  que mide `BALANCE.md`, que es el mazo de REFERENCIA jugando contra sí mismo —
-  y ése no lleva ninguna de las treinta cartas nuevas. Las dos cosas son
-  ciertas a la vez y conviene no confundirlas: la vía existe, el mazo que mide
-  el balance no la usa.
-- **El mazo de referencia se ha quedado corto como vara de medir.** Pierde el
-  74,7 % contra la Molienda y el 76,3 % contra el Entierro. Se escribió para
-  medir CARTAS y se usa como si midiera el juego; mientras siga así, los seis
-  objetivos de `BALANCE.md` hablan de un mazo que cualquier construcción bate.
+- **El balance cumple 3 de 6** (`BALANCE.md`, mazo de referencia del
+  16-09-2026): cero cartas descalibradas y la duración en objetivo; el
+  jugador inicial en 45,4 %, la bola de nieve en 71,2 % y las vías en
+  25/75/0. La referencia nueva queda al 48–52 % contra Molienda, Entierro y
+  Hábitat (la del 13-09 perdía el 70–75 %), así que los seis números vuelven
+  a hablar del juego y no de un mazo que cualquier construcción bate. Lo que
+  no cambió: **108 de las 139** cartas siguen fuera de él, o sea sin
+  calibración comprobada, y la extinción sigue en 0 % en el ESPEJO porque el
+  mazo no muele —la vía existe y está medida en `sim/arquetipos.mjs`, 22–26 %
+  de las victorias del mazo hecho para ella—. Las dos cosas son ciertas a la
+  vez y conviene no confundirlas.
+- **Las curvas de expedición están medidas con la vara nueva y los rivales
+  no se retocaron.** Los mapas suben 10–20 puntos y los visitantes, que se
+  ajustaron al 50 %, quedan al 70–81 %. Antes de reajustarlos hay que decidir
+  qué mazo representa al jugador en `sim/expediciones.mjs`: la referencia es
+  una vara, no lo que juega la gente.
+- **El jugador inicial no es sólo del turno.** Con la IA al azar los dos
+  mazos de referencia dan el 47–48 %; con la heurística, el nuevo baja al
+  43–45 %. Hay algo en `ai.js` o en cómo `sim/partida.js` alterna las dos
+  IAs que le da al segundo jugador cuatro puntos con cuerpos medianos, y no
+  se ha buscado.
 - **El paquete de HÁBITAT ya existe y la vía sigue cerrada.** Las ocho cartas
   de la ronda del hábitat llevaron el daño directo de 13 copias a 56 y
   cuadruplicaron lo que baja por partida —de 5 a 20,5—, y el mazo construido

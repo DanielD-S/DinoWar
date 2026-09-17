@@ -10,7 +10,7 @@
 
 El set tiene **139 cartas distintas**. Un mazo son **55 cartas exactas**, así que no caben todas: el de referencia lleva 28 dinosaurios, 13 eventos, 4 de recurso y 1 de clima.
 
-Fuera del mazo de referencia, y por tanto sin medir aquí: Torvosaurus tanneri, Nodosaurus textilis, Neumaticidad ósea, Competencia trófica, Mortandad estacional, Llanura de inundación, Bosque de coníferas ribereño, Deriva árida, Tormenta de polvo, Avenida de lodo, Enterramiento rápido, Cauce abandonado, Barrera de troncos, Ceniza volcánica, Sedimento en suspensión, Osario de la charca, Enjambre de carroñeros, Oleada de calor, Estampida, Migración estacional, Crecida del delta, Cantera abierta, Incendio estacional, Colapso del acuífero, Carroña abundante, Lago efímero, Manada de paso, Frutos de cícada, Crecida estacional, Bruma de valle, Estación de lluvias, Sequía prolongada, Plesiopleurodon wellesi, Ojoraptorsaurus boerei, Dromaeosaurus albertensis, Athenar bermani, Sanjuansaurus gordilloi, Suchomimus tenerensis, Eosinopteryx brevipenna, Troodon formosus, Carnotaurus sastrei, Spinosaurus aegyptiacus, Mosasaurus hoffmannii, Halszkaraptor escuilliei, Tongtianlong limosus, Scanisaurus nazarowi, Monolophosaurus jiangi, Invictarx zephyri, Medusaceratops lokii, Platyceratops tatarinovi, Loricatosaurus priscus, Therizinosaurus cheloniformis, Alaskacephale gangloffi, Titanoceratops ouranos, Atlasaurus imelakei, Stegoceras validum, Maiasaura peeblesorum, Edmontosaurus annectens, Plateosauravus cullingworthi, Gargoyleosaurus parkpinorum, Wendiceratops pinhornensis, Antarctosaurus wichmannianus, Liaoceratops yanzigouensis, Rhinorex condrupus, Bienosaurus lufengensis, Shuangmiaosaurus gilmorei, Chasmosaurus belli, Tyrannosaurus rex, Brachiosaurus altithorax, Argentinosaurus huinculensis, Mamenchisaurus hochuanensis, Ankylosaurus magniventris, Euoplocephalus tutus, Triceratops horridus, Parasaurolophus walkeri, Pteranodon longiceps, Quetzalcoatlus northropi, Elasmosaurus platyurus, Gallimimus bullatus, Thescelosaurus neglectus, Deinocheirus mirificus, Anzu wyliei, Nigersaurus taqueti, Shuvuuia deserti, Saurolophus angustirostris, Tarbosaurus bataar, Psittacosaurus mongoliensis, Dakotaraptor steini, Carcharodontosaurus saharicus, Giraffatitan brancai, Tupandactylus imperator, Rugops primus, Ouranosaurus nigeriensis, Deltadromeus agilis, Patagotitan mayorum, Dreadnoughtus schrani, Hatzegopteryx thambema, Borealopelta markmitchelli, Zuul crurivastator, Sauropelta edwardsorum, Arboleda de ginkgos, Juncal de equisetos, Bosque de galería, Helechal arborescente, Vega de aluvión, Humedal de tierras bajas, Manantial perenne. Se juegan igual, pero su calibración no está comprobada.
+Fuera del mazo de referencia, y por tanto sin medir aquí: Ornitholestes hermanni, Camarasaurus grandis, Torvosaurus tanneri, Nodosaurus textilis, Riparovenator milnerae, Huaxiadraco corollatus, Neumaticidad ósea, Competencia trófica, Mortandad estacional, Llanura de inundación, Bosque de coníferas ribereño, Deriva árida, Tormenta de polvo, Avenida de lodo, Enterramiento rápido, Cauce abandonado, Barrera de troncos, Ceniza volcánica, Sedimento en suspensión, Osario de la charca, Enjambre de carroñeros, Oleada de calor, Estampida, Migración estacional, Crecida del delta, Cantera abierta, Incendio estacional, Colapso del acuífero, Carroña abundante, Lago efímero, Manada de paso, Frutos de cícada, Crecida estacional, Bruma de valle, Estación de lluvias, Sequía prolongada, Plesiopleurodon wellesi, Ojoraptorsaurus boerei, Dromaeosaurus albertensis, Athenar bermani, Sanjuansaurus gordilloi, Eosinopteryx brevipenna, Troodon formosus, Carnotaurus sastrei, Spinosaurus aegyptiacus, Mosasaurus hoffmannii, Halszkaraptor escuilliei, Tongtianlong limosus, Scanisaurus nazarowi, Invictarx zephyri, Medusaceratops lokii, Platyceratops tatarinovi, Loricatosaurus priscus, Therizinosaurus cheloniformis, Alaskacephale gangloffi, Titanoceratops ouranos, Atlasaurus imelakei, Stegoceras validum, Maiasaura peeblesorum, Edmontosaurus annectens, Plateosauravus cullingworthi, Gargoyleosaurus parkpinorum, Wendiceratops pinhornensis, Antarctosaurus wichmannianus, Liaoceratops yanzigouensis, Rhinorex condrupus, Bienosaurus lufengensis, Shuangmiaosaurus gilmorei, Chasmosaurus belli, Tyrannosaurus rex, Brachiosaurus altithorax, Argentinosaurus huinculensis, Mamenchisaurus hochuanensis, Ankylosaurus magniventris, Euoplocephalus tutus, Triceratops horridus, Parasaurolophus walkeri, Pteranodon longiceps, Quetzalcoatlus northropi, Elasmosaurus platyurus, Gallimimus bullatus, Thescelosaurus neglectus, Deinocheirus mirificus, Anzu wyliei, Nigersaurus taqueti, Shuvuuia deserti, Saurolophus angustirostris, Tarbosaurus bataar, Psittacosaurus mongoliensis, Dakotaraptor steini, Carcharodontosaurus saharicus, Giraffatitan brancai, Tupandactylus imperator, Rugops primus, Ouranosaurus nigeriensis, Patagotitan mayorum, Dreadnoughtus schrani, Hatzegopteryx thambema, Borealopelta markmitchelli, Zuul crurivastator, Sauropelta edwardsorum, Arboleda de ginkgos, Juncal de equisetos, Bosque de galería, Helechal arborescente, Vega de aluvión, Humedal de tierras bajas, Manantial perenne. Se juegan igual, pero su calibración no está comprobada.
 
 **Qué revisar sobre todo:** los eventos de presión y las cartas de recurso.
 Son lo único del set que no describe un animal sino una presión sobre él, y
@@ -27,9 +27,9 @@ es legendario.
 
 | Rareza | Copias máximas | Cartas distintas | En el mazo de referencia |
 |---|---|---|---|
-| Común | 3 | 39 | 28 |
-| Rara | 3 | 42 | 20 |
-| Épica | 2 | 39 | 5 |
+| Común | 3 | 39 | 25 |
+| Rara | 3 | 42 | 22 |
+| Épica | 2 | 39 | 6 |
 | Legendaria | 1 | 19 | 2 |
 
 ---
@@ -38,27 +38,27 @@ es legendario.
 
 | Taxón | Clado | Rareza | Copias | Coste | Ataque | Vida | Sed |
 |---|---|---|---|---|---|---|---|
-| *Dryosaurus altus* | Ornitópodo | Común | 3 | 0 | 1 | 2 | undefined |
-| *Ornitholestes hermanni* | Terópodo | Común | 2 | 1 | 2 | 2 | undefined |
+| *Dryosaurus altus* | Ornitópodo | Común | 2 | 0 | 1 | 2 | undefined |
+| *Ornitholestes hermanni* | Terópodo | Común | 0 | 1 | 2 | 2 | undefined |
 | *Ceratosaurus nasicornis* | Terópodo | Común | 2 | 2 | 4 | 2 | undefined |
 | *Stegosaurus stenops* | Tireóforo | Común | 1 | 2 | 1 | 5 | undefined |
-| *Allosaurus fragilis* | Terópodo | Rara | 2 | 3 | 5 | 5 | undefined |
-| *Camarasaurus grandis* | Saurópodo | Rara | 1 | 3 | 1 | 8 | undefined |
+| *Allosaurus fragilis* | Terópodo | Rara | 3 | 3 | 5 | 5 | undefined |
+| *Camarasaurus grandis* | Saurópodo | Rara | 0 | 3 | 1 | 8 | undefined |
 | *Diplodocus carnegii* | Saurópodo | Rara | 1 | 2 | 3 | 8 | undefined |
-| *Apatosaurus louisae* | Saurópodo | Rara | 1 | 3 | 2 | 10 | undefined |
+| *Apatosaurus louisae* | Saurópodo | Rara | 2 | 3 | 2 | 10 | undefined |
 | *Torvosaurus tanneri* | Terópodo | Épica | 0 | 4 | 8 | 5 | undefined |
 | *Nodosaurus textilis* | Tireóforo | Épica | 0 | 3 | 3 | 8 | undefined |
-| *Riparovenator milnerae* | Terópodo | Épica | 1 | 3 | 3 | 3 | undefined |
+| *Riparovenator milnerae* | Terópodo | Épica | 0 | 3 | 3 | 3 | undefined |
 | *Lokiceratops rangiformis* | Marginocéfalo | Épica | 1 | 3 | 4 | 7 | undefined |
 | *Brachylophosaurus canadensis* | Ornitópodo | Rara | 1 | 2 | 0 | 10 | undefined |
 | *Tyrannotitan chubutensis* | Terópodo | Legendaria | 1 | 4 | 10 | 7 | undefined |
-| *Huaxiadraco corollatus* | Pterosaurio | Rara | 1 | 2 | 2 | 4 | undefined |
+| *Huaxiadraco corollatus* | Pterosaurio | Rara | 0 | 2 | 2 | 4 | undefined |
 | *Plesiopleurodon wellesi* | Reptil marino | Épica | 0 | 3 | 8 | 4 | undefined |
 | *Ojoraptorsaurus boerei* | Terópodo | Rara | 0 | 2 | 2 | 4 | undefined |
 | *Dromaeosaurus albertensis* | Terópodo | Común | 0 | 2 | 3 | 3 | undefined |
 | *Athenar bermani* | Saurópodo | Común | 0 | 2 | 2 | 3 | undefined |
 | *Sanjuansaurus gordilloi* | Terópodo | Rara | 0 | 2 | 3 | 3 | undefined |
-| *Suchomimus tenerensis* | Terópodo | Épica | 0 | 3 | 7 | 7 | undefined |
+| *Suchomimus tenerensis* | Terópodo | Épica | 1 | 3 | 7 | 7 | undefined |
 | *Eosinopteryx brevipenna* | Terópodo | Común | 0 | 0 | 1 | 1 | undefined |
 | *Troodon formosus* | Terópodo | Común | 0 | 1 | 1 | 2 | undefined |
 | *Carnotaurus sastrei* | Terópodo | Épica | 0 | 3 | 7 | 3 | undefined |
@@ -67,7 +67,7 @@ es legendario.
 | *Halszkaraptor escuilliei* | Terópodo | Rara | 0 | 1 | 2 | 2 | undefined |
 | *Tongtianlong limosus* | Terópodo | Común | 0 | 1 | 1 | 1 | undefined |
 | *Scanisaurus nazarowi* | Reptil marino | Rara | 0 | 4 | 3 | 3 | undefined |
-| *Monolophosaurus jiangi* | Terópodo | Rara | 0 | 4 | 3 | 3 | undefined |
+| *Monolophosaurus jiangi* | Terópodo | Rara | 1 | 4 | 3 | 3 | undefined |
 | *Invictarx zephyri* | Tireóforo | Rara | 0 | 3 | 1 | 1 | undefined |
 | *Medusaceratops lokii* | Marginocéfalo | Épica | 0 | 3 | 2 | 10 | undefined |
 | *Platyceratops tatarinovi* | Marginocéfalo | Común | 0 | 1 | 1 | 2 | undefined |
@@ -99,7 +99,7 @@ es legendario.
 | *Euoplocephalus tutus* | Tireóforo | Rara | 0 | 3 | 2 | 8 | undefined |
 | *Triceratops horridus* | Marginocéfalo | Épica | 0 | 4 | 5 | 8 | undefined |
 | *Pachycephalosaurus wyomingensis* | Marginocéfalo | Rara | 2 | 2 | 3 | 4 | undefined |
-| *Iguanodon bernissartensis* | Ornitópodo | Rara | 2 | 2 | 3 | 5 | undefined |
+| *Iguanodon bernissartensis* | Ornitópodo | Rara | 3 | 2 | 3 | 5 | undefined |
 | *Parasaurolophus walkeri* | Ornitópodo | Rara | 0 | 3 | 2 | 8 | undefined |
 | *Pteranodon longiceps* | Pterosaurio | Común | 0 | 0 | 2 | 2 | undefined |
 | *Quetzalcoatlus northropi* | Pterosaurio | Épica | 0 | 3 | 5 | 4 | undefined |
@@ -119,7 +119,7 @@ es legendario.
 | *Tupandactylus imperator* | Pterosaurio | Épica | 0 | 3 | 3 | 4 | undefined |
 | *Rugops primus* | Terópodo | Rara | 0 | 2 | 3 | 3 | undefined |
 | *Ouranosaurus nigeriensis* | Ornitópodo | Rara | 0 | 2 | 2 | 6 | undefined |
-| *Deltadromeus agilis* | Terópodo | Épica | 0 | 3 | 6 | 4 | undefined |
+| *Deltadromeus agilis* | Terópodo | Épica | 1 | 3 | 6 | 4 | undefined |
 | *Patagotitan mayorum* | Saurópodo | Legendaria | 0 | 4 | 4 | 13 | undefined |
 | *Dreadnoughtus schrani* | Saurópodo | Épica | 0 | 4 | 4 | 11 | undefined |
 | *Hatzegopteryx thambema* | Pterosaurio | Rara | 0 | 3 | 5 | 3 | undefined |
@@ -129,7 +129,7 @@ es legendario.
 
 *Camarasaurus* es inmune a la Sed: sus isótopos indican que migraba.
 
-### *Dryosaurus altus* · Ornitópodo · Común · 3 copias
+### *Dryosaurus altus* · Ornitópodo · Común · 2 copias
 
 **0 de coste · 1 de Ataque · 2 de Vida**
 
@@ -139,7 +139,7 @@ es legendario.
 
 *Sin blindaje:* Cursorial y grácil: su defensa es correr, no aguantar.
 
-### *Ornitholestes hermanni* · Terópodo · Común · 2 copias
+### *Ornitholestes hermanni* · Terópodo · Común · fuera del mazo de referencia
 
 **1 de coste · 2 de Ataque · 2 de Vida**
 
@@ -169,7 +169,7 @@ es legendario.
 
 *De sus 5 de Vida, 3 son blindaje:* Placas dorsales y osteodermos en la garganta; el blindaje mejor documentado del set.
 
-### *Allosaurus fragilis* · Terópodo · Rara · 2 copias
+### *Allosaurus fragilis* · Terópodo · Rara · 3 copias
 
 **3 de coste · 5 de Ataque · 5 de Vida**
 
@@ -179,7 +179,7 @@ es legendario.
 
 *De sus 5 de Vida, 1 son blindaje:* Cráneo y esqueleto robustos, sin armadura dérmica.
 
-### *Camarasaurus grandis* · Saurópodo · Rara · 1 copia
+### *Camarasaurus grandis* · Saurópodo · Rara · fuera del mazo de referencia
 
 **3 de coste · 1 de Ataque · 8 de Vida**
 
@@ -199,7 +199,7 @@ es legendario.
 
 *De sus 8 de Vida, 2 son blindaje:* Talla equivalente, cuerpo más grácil.
 
-### *Apatosaurus louisae* · Saurópodo · Rara · 1 copia
+### *Apatosaurus louisae* · Saurópodo · Rara · 2 copias
 
 **3 de coste · 2 de Ataque · 10 de Vida**
 
@@ -229,7 +229,7 @@ es legendario.
 
 *De sus 8 de Vida, 4 son blindaje:* Osteodermos en bandas sobre todo el dorso: coraza en el sentido literal.
 
-### *Riparovenator milnerae* · Terópodo · Épica · 1 copia
+### *Riparovenator milnerae* · Terópodo · Épica · fuera del mazo de referencia
 
 **3 de coste · 3 de Ataque · 3 de Vida**
 
@@ -269,7 +269,7 @@ es legendario.
 
 *De sus 7 de Vida, 1 son blindaje:* Doce metros de depredador sin una sola placa dérmica.
 
-### *Huaxiadraco corollatus* · Pterosaurio · Rara · 1 copia
+### *Huaxiadraco corollatus* · Pterosaurio · Rara · fuera del mazo de referencia
 
 **2 de coste · 2 de Ataque · 4 de Vida**
 
@@ -319,7 +319,7 @@ es legendario.
 
 `INFERIDO` · Herrerasáurido de la Formación Ischigualasto, Argentina, Carniense (~231 Ma). Los herrerasáuridos son saurisquios muy basales; su colocación entre los terópodos se discute.
 
-### *Suchomimus tenerensis* · Terópodo · Épica · fuera del mazo de referencia
+### *Suchomimus tenerensis* · Terópodo · Épica · 1 copia
 
 **3 de coste · 7 de Ataque · 7 de Vida**
 
@@ -391,7 +391,7 @@ es legendario.
 
 `INFERIDO` · Plesiosaurio elasmosáurido del Cretácico Superior del Báltico. No es un dinosaurio, y su validez como género está discutida.
 
-### *Monolophosaurus jiangi* · Terópodo · Rara · fuera del mazo de referencia
+### *Monolophosaurus jiangi* · Terópodo · Rara · 1 copia
 
 **4 de coste · 3 de Ataque · 3 de Vida**
 
@@ -647,7 +647,7 @@ es legendario.
 
 `DEBATIDO` · Paquicefalosáurido de Hell Creek y Lance, Maastrichtiense. La cúpula de 25 cm de hueso macizo se ha interpretado como arma de topetazo; las lesiones en cúpulas de varios ejemplares lo apoyan, la estructura interna lo discute.
 
-### *Iguanodon bernissartensis* · Ornitópodo · Rara · 2 copias
+### *Iguanodon bernissartensis* · Ornitópodo · Rara · 3 copias
 
 **2 de coste · 3 de Ataque · 5 de Vida**
 
@@ -807,7 +807,7 @@ es legendario.
 
 `DEBATIDO` · Iguanodontio del Aptiense de Níger con las espinas neurales alargadas. Si sostenían una vela de piel o una joroba de grasa lleva discutiéndose desde su descripción en 1976, y las dos hipótesis siguen vivas.
 
-### *Deltadromeus agilis* · Terópodo · Épica · fuera del mazo de referencia
+### *Deltadromeus agilis* · Terópodo · Épica · 1 copia
 
 **3 de coste · 6 de Ataque · 4 de Vida**
 

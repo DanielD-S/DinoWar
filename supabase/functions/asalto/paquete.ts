@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: f2a5092d63e07122
+// huella: 38f2fcfcfd3ff190
 //
 // Lleva dentro estos 24 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -32,10 +32,10 @@
 // fuente: src/data/tribu.js
 // fuente: src/data/eventos.js
 // fuente: src/data/coleccion.js
+// fuente: src/data/expediciones.js
 // fuente: src/data/misiones.js
 // fuente: supabase/functions/_compartido/validarPartida.js
 // fuente: supabase/functions/_compartido/validarAsalto.js
-// fuente: src/data/expediciones.js
 // fuente: supabase/functions/_compartido/validarSolitario.js
 // fuente: src/data/duelo.js
 // fuente: supabase/functions/_compartido/duelo.js
@@ -2777,39 +2777,58 @@ var BALANCE = Object.freeze({
   })
 });
 var MAZO = Object.freeze([
-  // ------------------------------------------------- la ronda de las cien
-  // Rehecho el 13-09-2026 con el set en 101 cartas: el de antes medía un juego
-  // de 28 cartas cuando ya había 101. Entran once de la ronda nueva y salen
-  // las tres que la IA no jugaba —Sequía 0,53, Bruma 0,00, Competencia 0,00—.
+  // ------------------------------------------------- la vara del 16-09-2026
+  // Rehecho con el set en 139 cartas. El del 13-09 medía bien el espejo —4 de
+  // 6 a 600 partidas— y perdía el 70–75 % contra cualquier mazo construido
+  // (Molienda 29,5 %, Entierro 26 %, Hábitat 24,5 %): una vara que cualquier
+  // construcción bate no mide el juego, mide su propio mazo.
   //
-  // Medido sobre 1.000 partidas por candidato, ocho candidatos. Lo que se
-  // aprendió: los cuerpos baratos y agresivos (Velociraptor a 0, Kentrosaurus,
-  // Pachycephalosaurus) no hunden al jugador inicial más que los grandes, y
-  // meter Inundación o Manada de paso para buscar la extinción no la mueve del
-  // 0–2 % y deja las dos cartas descalibradas. La Biomasa a 9 copias (5+2+2)
-  // frente a 7 no sube al jugador inicial esta vez: 45,2 % con 9 y 46,9 % con
-  // 7 en el mazo viejo, que a 1.000 partidas es ruido (±1,6). Cero cartas
-  // descalibradas y las vías a 53/47, que el mazo viejo tenía en 36/64.
+  // Medido sobre ocho candidatos, 600 partidas espejo y 200 por cruce contra
+  // los cuatro arquetipos de `sim/arquetipos.mjs`. Lo que se aprendió:
+  // - Los cuerpos AGRESIVOS con auras y disparos (Suchomimus ×2, Allosaurus
+  //   ×3, Deltadromeus ×2, Monolophosaurus ×2) ganan el 70–78 % a los cuatro
+  //   arquetipos y rompen el espejo: el 94 % de las victorias por hábitat, el
+  //   jugador inicial en el 42 % y Monolophosaurus descalibrado (0,63).
+  // - Los MUROS solos no hacen vara: el de hoy con Loricatosaurus,
+  //   Mamenchisaurus y Stegoceras en vez de los cuerpos que no pesan sigue
+  //   perdiendo el 74 % contra Molienda y Entierro.
+  // - El tribal de dos auras (marginocéfalos) gana el 77–90 %: lo más fuerte
+  //   del set, y por eso mismo no sirve para medir lo demás.
+  // - El SOPORTE no mueve nada: con Neumaticidad ×2 y Ceniza en vez de
+  //   Trampa, Gastrolitos y Bruma, el cruce cambia ±3 puntos. Se queda el de
+  //   antes, que además es el de los tres mazos iniciales (0006 sin tocar).
+  // Éste queda a 51,5 % contra Molienda, 50 % contra Entierro, 48 % contra
+  // Hábitat y 69 % contra el Control, que es el arquetipo flojo. Salen los
+  // cinco cuerpos que no pesaban —Ornitholestes ×2, Huaxiadraco,
+  // Riparovenator, Camarasaurus— y un Dryosaurus; entran Suchomimus,
+  // Deltadromeus, Monolophosaurus, un Allosaurus, un Iguanodon y un
+  // Apatosaurus.
+  //
+  // Y lo que cuesta, dicho aquí: el jugador inicial baja del 47,7 % al 43 %.
+  // Se midió por qué y NO es del motor —con la IA al azar los dos mazos dan
+  // el 47–48 %— sino de la heurística, que como segundo jugador saca cuatro
+  // puntos más a este mazo que al de antes. El desempate del chequeo y el
+  // orden de la revelación favorecen al PRIMERO, así que el sitio donde
+  // mirar es `ai.js` y el orden en que `sim/partida.js` alterna las dos IAs.
   //
   // dinosaurios — 28
-  ["dryosaurus", 3],
-  ["ornitholestes", 2],
+  ["dryosaurus", 2],
   ["ceratosaurus", 2],
   ["stegosaurus", 1],
   ["kentrosaurus", 2],
   ["velociraptor", 2],
-  ["allosaurus", 2],
-  ["camarasaurus", 1],
+  ["allosaurus", 3],
   ["amargasaurus", 2],
-  ["iguanodon", 2],
+  ["iguanodon", 3],
   ["pachycephalosaurus", 2],
-  ["riparovenator", 1],
   ["lokiceratops", 1],
-  ["huaxiadraco", 1],
   ["brachylophosaurus", 1],
   ["diplodocus", 1],
-  ["apatosaurus", 1],
+  ["apatosaurus", 2],
   ["tyrannotitan", 1],
+  ["suchomimus", 1],
+  ["deltadromeus", 1],
+  ["monolophosaurus", 1],
   // soporte — 18
   //
   // Un clima solo, el Monzón: sólo cabe uno en el campo. Crecimiento acelerado
@@ -5316,346 +5335,6 @@ function abrirSobre(azar, tengo = null, sesgo = ECONOMIA.sesgoFaltan) {
   return salida;
 }
 
-// src/data/misiones.js
-var MISIONES = Object.freeze({
-  porDia: 3,
-  // Una victoria por debajo de esto es una partida que fue a por el rival desde
-  // el principio. La media ronda los 15 turnos (`BALANCE.md`), así que 11 pide
-  // intención sin pedir suerte.
-  turnosRelampago: 11
-});
-var porClado = (clado) => `clado:${clado}`;
-var VOCABULARIO = Object.freeze([
-  "partidas",
-  // jugadas, se ganen o no
-  "victorias",
-  "relampago",
-  // victorias en MISIONES.turnosRelampago turnos o menos
-  "bajas",
-  // criaturas rivales derribadas
-  "desplegados",
-  // tus criaturas que llegaron al campo
-  "climas",
-  // climas tuyos que se impusieron
-  "danoHabitat",
-  // daño que le hiciste al hábitat rival
-  "trofeos",
-  ...Object.values(CLADO).map(porClado),
-  // Los que no salen de re-jugar: los apunta el servidor al cerrar un asalto
-  // (sabe el daño y si el jefe cayó) o un duelo (sabe quién ganó). Un parte de
-  // partida contra la IA los deja a cero.
-  "asaltos",
-  // asaltos al jefe jugados
-  "danoJefe",
-  // daño hecho al jefe
-  "jefesVencidos",
-  // asaltos que dejaron al jefe a cero: el golpe final
-  "duelos",
-  // duelos jugados, se ganen o no
-  "duelosGanados",
-  "expediciones",
-  // partidas contra un rival de expedición, se ganen o no
-  "expedicionNuevos",
-  // rivales de expedición vencidos por primera vez
-  // Los de las cartas de jefe. Ni el parte ni la Edge Function: los apunta
-  // `reclamar_jefe` en SQL (0028) cuando la carta entra por primera vez.
-  "jefe:saurophaganax",
-  "jefe:barosaurus",
-  "jefe:supersaurus",
-  "jefe:hesperosaurus",
-  "jefe:harpactognathus",
-  "cartasJefe"
-  // cartas de jefe DISTINTAS que tienes
-]);
-var ES_VOCABULARIO = new Set(VOCABULARIO);
-function parteVacio() {
-  const p = {};
-  for (const clave of VOCABULARIO) p[clave] = 0;
-  return p;
-}
-function anotarEventos(parte, eventos, bando = 0) {
-  const rival3 = bando === 0 ? 1 : 0;
-  for (const e of eventos) {
-    switch (e.tipo) {
-      // Una criatura rival que se cae es una baja tuya. `dueno` es de quién ERA,
-      // no quién la mató: matarte una propia con tu Mortandad no cuenta.
-      case "MUERTE":
-        if (e.dueno === rival3) parte.bajas += 1;
-        break;
-      // El daño al hábitat se cuenta por el bando que lo RECIBE.
-      case "HABITAT":
-        if (e.bando === rival3) parte.danoHabitat += e.cantidad ?? 0;
-        break;
-      // REVELADA y no la acción de desplegar: lo que cuenta es la criatura que
-      // LLEGÓ al campo. Una carta comprometida y luego rechazada se pagó igual,
-      // pero no se desplegó, y una misión que la contara mentiría.
-      case "REVELADA": {
-        if (e.jugador !== bando || !existeCarta(e.cardId)) break;
-        const c = carta(e.cardId);
-        if (c.tipo !== TIPO.DINOSAURIO) break;
-        parte.desplegados += 1;
-        const clave = porClado(c.clado);
-        if (clave in parte) parte[clave] += 1;
-        break;
-      }
-      // El clima es del campo, no de un bando, pero lo pone alguien: cuenta
-      // para quien lo jugó.
-      case "CAMPO":
-        if (e.jugador === bando && existeCarta(e.cardId) && carta(e.cardId).tipo === TIPO.CLIMA) parte.climas += 1;
-        break;
-      default:
-        break;
-    }
-  }
-  return parte;
-}
-function nuevosEventos(estado, desde) {
-  return estado.eventos.length >= desde ? estado.eventos.slice(desde) : estado.eventos.slice(0);
-}
-function cerrarParte(parte, { ganada, turnos, trofeos }) {
-  parte.partidas += 1;
-  parte.trofeos += trofeos ?? 0;
-  if (ganada) {
-    parte.victorias += 1;
-    if (turnos <= MISIONES.turnosRelampago) parte.relampago += 1;
-  }
-  return parte;
-}
-var M = (id, nombre, texto, mide, meta, premio) => Object.freeze({
-  id,
-  nombre,
-  texto,
-  mide,
-  meta,
-  premio
-});
-var CATALOGO = Object.freeze([
-  // Las de jugar: se cumplen solas si juegas, y están para que un día malo
-  // pague algo. Son las baratas a propósito.
-  M("jugar_tres", "Trabajo de campo", "Juega 3 partidas", "partidas", 3, 25),
-  M("ganar_una", "Una buena jornada", "Gana 1 partida", "victorias", 1, 25),
-  M("ganar_dos", "Racha", "Gana 2 partidas", "victorias", 2, 45),
-  // Las de jugar de una MANERA: piden armar el mazo pensando en ellas, que es
-  // lo que las hace valer la pena. Los números salen de una partida normal de
-  // 15 turnos, donde se despliegan entre 8 y 12 criaturas.
-  M("bajas_seis", "Depredaci\xF3n", "Derriba 6 criaturas rivales", "bajas", 6, 40),
-  M("habitat_diez", "Asedio", "Hazle 10 de da\xF1o al h\xE1bitat rival", "danoHabitat", 10, 40),
-  M("trofeos_seis", "Registro f\xF3sil", "Consigue 6 trofeos", "trofeos", 6, 40),
-  M("desplegar_doce", "Ecosistema", "Despliega 12 criaturas", "desplegados", 12, 35),
-  M("climas_tres", "Meteorolog\xEDa", "Imp\xF3n 3 climas", "climas", 3, 35),
-  // Las de clado: una por familia. Empujan a probar cartas que no están en el
-  // mazo de siempre, que es el otro problema del set —39 de 66 cartas fuera del
-  // mazo de referencia—. Los pterosaurios y los marinos piden menos: hay muchas
-  // menos cartas suyas y no caben cinco en cualquier mazo.
-  M("teropodos", "Caza mayor", "Despliega 5 ter\xF3podos", porClado(CLADO.TEROPODO), 5, 40),
-  M("sauropodos", "Manada", "Despliega 5 saur\xF3podos", porClado(CLADO.SAUROPODO), 5, 40),
-  M("tireoforos", "Coraza", "Despliega 4 tire\xF3foros", porClado(CLADO.TIREOFORO), 4, 40),
-  M("ornitopodos", "Ramoneo", "Despliega 5 ornit\xF3podos", porClado(CLADO.ORNITOPODO), 5, 40),
-  M("marginocefalos", "Testarazo", "Despliega 4 marginoc\xE9falos", porClado(CLADO.MARGINOCEFALO), 4, 40),
-  M("pterosaurios", "Sombra en el cielo", "Despliega 3 pterosaurios", porClado(CLADO.PTEROSAURIO), 3, 45),
-  M("marinos", "Mar de Sundance", "Despliega 3 reptiles marinos", porClado(CLADO.MARINO), 3, 45),
-  // Las del jefe y las de duelo. No salen de una partida contra la IA: hay que
-  // bajar a la cuenca o buscar rival, y un día sin jefe abierto o sin nadie
-  // conectado es un día en que ésa de las tres no se cumple. Se aceptó así:
-  // es lo que las hace pedir algo. Pagan por debajo de la relámpago para que
-  // el peor día posible siga cabiendo en el techo.
-  M("asalto_uno", "Bajar a la cuenca", "Asalta al jefe 1 vez", "asaltos", 1, 40),
-  M("dano_jefe", "Al hueso", "Hazle 40 de da\xF1o al jefe", "danoJefe", 40, 45),
-  M("duelo_uno", "Cara a cara", "Juega 1 duelo", "duelos", 1, 40),
-  M("duelo_ganar", "Mano a mano", "Gana 1 duelo", "duelosGanados", 1, 45),
-  // La de expedición mide partidas JUGADAS y no primeras victorias: los nodos
-  // se acaban, y quien ha recorrido los cuatro mapas sólo estrena rival una vez
-  // por semana. Una misión que la mitad del año no se puede cumplir no pide
-  // algo, sobra. Por eso `expedicionNuevos` se queda para los logros.
-  M("expedicion_dos", "Prospecci\xF3n", "Juega 2 partidas de expedici\xF3n", "expediciones", 2, 40),
-  // La difícil del día. Una sola, y paga como tal.
-  // El texto dice «1 partida» y no «una» a propósito: el guardián de
-  // `misiones.test.js` pide que el texto cite la meta, igual que el de las
-  // cartas pide que cite su número, y con la letra no lo encuentra.
-  M(
-    "relampago",
-    "Golpe seco",
-    `Gana 1 partida en ${MISIONES.turnosRelampago} turnos o menos`,
-    "relampago",
-    1,
-    60
-  )
-]);
-var POR_ID = Object.freeze(Object.fromEntries(CATALOGO.map((m) => [m.id, m])));
-function semillaDelDia(dia) {
-  let h = 2166136261;
-  for (let i = 0; i < dia.length; i++) {
-    h ^= dia.charCodeAt(i);
-    h = Math.imul(h, 16777619) >>> 0;
-  }
-  return h || 1;
-}
-function siguiente2(r) {
-  let t = r + 1831565813 >>> 0;
-  let x = Math.imul(t ^ t >>> 15, 1 | t);
-  x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x;
-  return { r: t, valor: ((x ^ x >>> 14) >>> 0) / 4294967296 };
-}
-function misionesDelDia(dia) {
-  const lista = CATALOGO.slice();
-  let r = semillaDelDia(String(dia));
-  const cuantas = Math.min(MISIONES.porDia, lista.length);
-  for (let i = 0; i < cuantas; i++) {
-    const s = siguiente2(r);
-    r = s.r;
-    const j = i + Math.floor(s.valor * (lista.length - i));
-    const tmp = lista[i];
-    lista[i] = lista[j];
-    lista[j] = tmp;
-  }
-  return Object.freeze(lista.slice(0, cuantas));
-}
-var diaUTC = (ahora = /* @__PURE__ */ new Date()) => ahora.toISOString().slice(0, 10);
-function avancesDelParte(dia, parte) {
-  return misionesDelDia(dia).map((m) => ({ id: m.id, avance: parte[m.mide] ?? 0 })).filter((a) => a.avance > 0);
-}
-
-// supabase/functions/_compartido/validarPartida.js
-var LIMITES = Object.freeze({
-  acciones: 4e3,
-  // una partida normal no pasa de unos cientos
-  pasosPorFase: 200
-  // el mismo tope que usa el simulador
-});
-var PartidaInvalida = class extends Error {
-  constructor(motivo, detalle = null) {
-    super(motivo);
-    this.name = "PartidaInvalida";
-    this.detalle = detalle;
-  }
-};
-function validarMazoLegal(mazo) {
-  if (!Array.isArray(mazo) || mazo.length === 0) throw new PartidaInvalida("mazo ausente");
-  let total = 0;
-  for (const entrada of mazo) {
-    if (!Array.isArray(entrada) || entrada.length !== 2) throw new PartidaInvalida("mazo mal formado");
-    const [cardId, copias] = entrada;
-    if (typeof cardId !== "string" || !existeCarta(cardId)) {
-      throw new PartidaInvalida("carta desconocida", cardId);
-    }
-    if (!Number.isInteger(copias) || copias <= 0) throw new PartidaInvalida("copias inv\xE1lidas", cardId);
-    const tope = limiteDe(cardId);
-    if (copias > tope) throw new PartidaInvalida("copias por encima del tope de la carta", cardId);
-    total += copias;
-  }
-  const legendarias = legendariasDinoEn(mazo);
-  if (legendarias > LEGENDARIAS_DINO_MAX) {
-    throw new PartidaInvalida("demasiadas criaturas legendarias", legendarias);
-  }
-  if (total !== BALANCE.tamanoMazo) {
-    throw new PartidaInvalida("el mazo no suma las cartas exactas", total);
-  }
-  return true;
-}
-function perfilValido(nombre, porDefecto = PERFIL.HEURISTICA) {
-  if (nombre === void 0 || nombre === null) return porDefecto;
-  const conocidos = Object.values(PERFIL);
-  if (!conocidos.includes(nombre)) throw new PartidaInvalida("perfil de IA desconocido", nombre);
-  return nombre;
-}
-function validarPartida(envio, opciones = {}) {
-  if (!envio || typeof envio !== "object") throw new PartidaInvalida("env\xEDo vac\xEDo");
-  const { semilla: seed, mazo, acciones } = envio;
-  const { mazoRival = null, habitatRival = null, perfil = PERFIL.HEURISTICA } = opciones;
-  if (!Number.isInteger(seed)) throw new PartidaInvalida("semilla inv\xE1lida");
-  if (!Array.isArray(acciones)) throw new PartidaInvalida("faltan las jugadas");
-  if (acciones.length > LIMITES.acciones) {
-    throw new PartidaInvalida("demasiadas jugadas", acciones.length);
-  }
-  validarMazoLegal(mazo);
-  let s = crearPartida(seed, [mazo, mazoRival]);
-  const habitatInicial = habitatRival ?? s.jugadores[1].habitat;
-  s.jugadores[1].habitat = habitatInicial;
-  let rngIA = semilla(seed ^ 1542469173);
-  const pendientes = acciones.slice();
-  const parte = parteVacio();
-  const aplicar = (estado, accion) => {
-    const desde = estado.eventos.length;
-    const siguiente3 = reduce(estado, accion);
-    anotarEventos(parte, nuevosEventos(siguiente3, desde));
-    return siguiente3;
-  };
-  const siguienteDelJugador = (estado) => {
-    if (pendientes.length) return pendientes.shift();
-    if (estado.fase === FASE.DESCARTE) {
-      throw new PartidaInvalida("faltan jugadas: la partida no llega al final");
-    }
-    return { tipo: ACCION.PASAR, jugador: 0 };
-  };
-  while (s.fase !== FASE.FIN) {
-    if (s.fase === FASE.DESPLIEGUE || s.fase === FASE.DESCARTE) {
-      const faseInicial = s.fase;
-      let pasos = 0;
-      while (s.fase === faseInicial) {
-        let actuo = false;
-        let tuyas = 0;
-        while (s.fase === faseInicial && legales(s, 0).length > 0) {
-          const a = { ...siguienteDelJugador(s), jugador: 0 };
-          const motivo = validar(s, a);
-          if (motivo) throw new PartidaInvalida("jugada ilegal", { accion: a.tipo, motivo });
-          s = aplicar(s, a);
-          actuo = true;
-          if (a.tipo === ACCION.PASAR || a.tipo === ACCION.DESCARTAR) break;
-          if (++tuyas > LIMITES.pasosPorFase) throw new PartidaInvalida("la fase no converge");
-        }
-        let suyas = 0;
-        while (s.fase === faseInicial && legales(s, 1).length > 0) {
-          const d = decidir(vistaDe(s, 1), 1, rngIA, perfil);
-          rngIA = d.rng;
-          if (!d.accion) break;
-          s = aplicar(s, d.accion);
-          actuo = true;
-          if (d.accion.tipo === ACCION.PASAR || d.accion.tipo === ACCION.DESCARTAR) break;
-          if (++suyas > LIMITES.pasosPorFase) throw new PartidaInvalida("la fase no converge");
-        }
-        if (!actuo) break;
-        if (++pasos > LIMITES.pasosPorFase) throw new PartidaInvalida("la fase no converge");
-      }
-      if (s.fase === faseInicial) throw new PartidaInvalida("la fase se qued\xF3 bloqueada");
-      continue;
-    }
-    s = aplicar(s, { tipo: ACCION.AVANZAR });
-  }
-  cerrarParte(parte, {
-    ganada: s.ganador === 0,
-    turnos: s.turno,
-    trofeos: s.jugadores[0].trofeos
-  });
-  return {
-    parte,
-    ganada: s.ganador === 0,
-    danoAlHabitat: habitatInicial - Math.max(0, s.jugadores[1].habitat),
-    trofeos: s.jugadores[0].trofeos,
-    turnos: s.turno,
-    motivoFin: s.motivoFin
-  };
-}
-
-// supabase/functions/_compartido/validarAsalto.js
-var AsaltoInvalido = PartidaInvalida;
-function jefeDelEvento(eventoId) {
-  const evento2 = CALENDARIO.find((e) => e.id === eventoId && e.tipo === TIPO_EVENTO.JEFE);
-  if (!evento2) throw new AsaltoInvalido("ese evento no es una caza", eventoId);
-  const jefe = JEFES[evento2.jefe];
-  if (!jefe) throw new AsaltoInvalido("jefe inexistente", evento2.jefe);
-  return { evento: evento2, jefe };
-}
-function validarAsalto(envio) {
-  if (!envio || typeof envio !== "object") throw new AsaltoInvalido("env\xEDo vac\xEDo");
-  const { jefe } = jefeDelEvento(envio.jefeEvento);
-  const r = validarPartida(envio, {
-    mazoRival: jefe.mazo.map((e) => [...e]),
-    habitatRival: habitatDeAsalto(),
-    perfil: PERFIL.HEURISTICA
-  });
-  return { ...r, dano: danoDeAsalto(r) };
-}
-
 // src/data/expediciones.js
 var RELLENO = ["biomasa", "araucarias", "cicadas", "ginkgos", "equisetos", "galeria", "helechal"];
 var topeDe = (id) => carta(id).copiasMax ?? BALANCE.copiasPorRareza[carta(id).rareza];
@@ -6744,6 +6423,350 @@ for (const [id, { rival: r }] of TODOS2) {
   carta(r.retrato);
 }
 
+// src/data/misiones.js
+var MISIONES = Object.freeze({
+  porDia: 3,
+  // Una victoria por debajo de esto es una partida que fue a por el rival desde
+  // el principio. La media ronda los 15 turnos (`BALANCE.md`), así que 11 pide
+  // intención sin pedir suerte.
+  turnosRelampago: 11
+});
+var porClado = (clado) => `clado:${clado}`;
+var VOCABULARIO = Object.freeze([
+  "partidas",
+  // jugadas, se ganen o no
+  "victorias",
+  "relampago",
+  // victorias en MISIONES.turnosRelampago turnos o menos
+  "bajas",
+  // criaturas rivales derribadas
+  "desplegados",
+  // tus criaturas que llegaron al campo
+  "climas",
+  // climas tuyos que se impusieron
+  "danoHabitat",
+  // daño que le hiciste al hábitat rival
+  "trofeos",
+  ...Object.values(CLADO).map(porClado),
+  // Los que no salen de re-jugar: los apunta el servidor al cerrar un asalto
+  // (sabe el daño y si el jefe cayó) o un duelo (sabe quién ganó). Un parte de
+  // partida contra la IA los deja a cero.
+  "asaltos",
+  // asaltos al jefe jugados
+  "danoJefe",
+  // daño hecho al jefe
+  "jefesVencidos",
+  // asaltos que dejaron al jefe a cero: el golpe final
+  "duelos",
+  // duelos jugados, se ganen o no
+  "duelosGanados",
+  "expediciones",
+  // partidas contra un rival de expedición, se ganen o no
+  "expedicionNuevos",
+  // rivales de expedición vencidos por primera vez
+  // Y uno por MAPA, para los logros de «entera»: `expedicionNuevos` suma también
+  // los visitantes de la semana, así que ocho primeras victorias no son un mapa.
+  // Lo escribe la Edge Function con el mapa del rival que devolvió la re-jugada.
+  ...EXPEDICIONES.map((e) => `expedicion:${e.id}`),
+  // Los de las cartas de jefe. Ni el parte ni la Edge Function: los apunta
+  // `reclamar_jefe` en SQL (0028) cuando la carta entra por primera vez.
+  "jefe:saurophaganax",
+  "jefe:barosaurus",
+  "jefe:supersaurus",
+  "jefe:hesperosaurus",
+  "jefe:harpactognathus",
+  "cartasJefe"
+  // cartas de jefe DISTINTAS que tienes
+]);
+var ES_VOCABULARIO = new Set(VOCABULARIO);
+function parteVacio() {
+  const p = {};
+  for (const clave of VOCABULARIO) p[clave] = 0;
+  return p;
+}
+function anotarEventos(parte, eventos, bando = 0) {
+  const rival3 = bando === 0 ? 1 : 0;
+  for (const e of eventos) {
+    switch (e.tipo) {
+      // Una criatura rival que se cae es una baja tuya. `dueno` es de quién ERA,
+      // no quién la mató: matarte una propia con tu Mortandad no cuenta.
+      case "MUERTE":
+        if (e.dueno === rival3) parte.bajas += 1;
+        break;
+      // El daño al hábitat se cuenta por el bando que lo RECIBE.
+      case "HABITAT":
+        if (e.bando === rival3) parte.danoHabitat += e.cantidad ?? 0;
+        break;
+      // REVELADA y no la acción de desplegar: lo que cuenta es la criatura que
+      // LLEGÓ al campo. Una carta comprometida y luego rechazada se pagó igual,
+      // pero no se desplegó, y una misión que la contara mentiría.
+      case "REVELADA": {
+        if (e.jugador !== bando || !existeCarta(e.cardId)) break;
+        const c = carta(e.cardId);
+        if (c.tipo !== TIPO.DINOSAURIO) break;
+        parte.desplegados += 1;
+        const clave = porClado(c.clado);
+        if (clave in parte) parte[clave] += 1;
+        break;
+      }
+      // El clima es del campo, no de un bando, pero lo pone alguien: cuenta
+      // para quien lo jugó.
+      case "CAMPO":
+        if (e.jugador === bando && existeCarta(e.cardId) && carta(e.cardId).tipo === TIPO.CLIMA) parte.climas += 1;
+        break;
+      default:
+        break;
+    }
+  }
+  return parte;
+}
+function nuevosEventos(estado, desde) {
+  return estado.eventos.length >= desde ? estado.eventos.slice(desde) : estado.eventos.slice(0);
+}
+function cerrarParte(parte, { ganada, turnos, trofeos }) {
+  parte.partidas += 1;
+  parte.trofeos += trofeos ?? 0;
+  if (ganada) {
+    parte.victorias += 1;
+    if (turnos <= MISIONES.turnosRelampago) parte.relampago += 1;
+  }
+  return parte;
+}
+var M = (id, nombre, texto, mide, meta, premio) => Object.freeze({
+  id,
+  nombre,
+  texto,
+  mide,
+  meta,
+  premio
+});
+var CATALOGO = Object.freeze([
+  // Las de jugar: se cumplen solas si juegas, y están para que un día malo
+  // pague algo. Son las baratas a propósito.
+  M("jugar_tres", "Trabajo de campo", "Juega 3 partidas", "partidas", 3, 25),
+  M("ganar_una", "Una buena jornada", "Gana 1 partida", "victorias", 1, 25),
+  M("ganar_dos", "Racha", "Gana 2 partidas", "victorias", 2, 45),
+  // Las de jugar de una MANERA: piden armar el mazo pensando en ellas, que es
+  // lo que las hace valer la pena. Los números salen de una partida normal de
+  // 15 turnos, donde se despliegan entre 8 y 12 criaturas.
+  M("bajas_seis", "Depredaci\xF3n", "Derriba 6 criaturas rivales", "bajas", 6, 40),
+  M("habitat_diez", "Asedio", "Hazle 10 de da\xF1o al h\xE1bitat rival", "danoHabitat", 10, 40),
+  M("trofeos_seis", "Registro f\xF3sil", "Consigue 6 trofeos", "trofeos", 6, 40),
+  M("desplegar_doce", "Ecosistema", "Despliega 12 criaturas", "desplegados", 12, 35),
+  M("climas_tres", "Meteorolog\xEDa", "Imp\xF3n 3 climas", "climas", 3, 35),
+  // Las de clado: una por familia. Empujan a probar cartas que no están en el
+  // mazo de siempre, que es el otro problema del set —39 de 66 cartas fuera del
+  // mazo de referencia—. Los pterosaurios y los marinos piden menos: hay muchas
+  // menos cartas suyas y no caben cinco en cualquier mazo.
+  M("teropodos", "Caza mayor", "Despliega 5 ter\xF3podos", porClado(CLADO.TEROPODO), 5, 40),
+  M("sauropodos", "Manada", "Despliega 5 saur\xF3podos", porClado(CLADO.SAUROPODO), 5, 40),
+  M("tireoforos", "Coraza", "Despliega 4 tire\xF3foros", porClado(CLADO.TIREOFORO), 4, 40),
+  M("ornitopodos", "Ramoneo", "Despliega 5 ornit\xF3podos", porClado(CLADO.ORNITOPODO), 5, 40),
+  M("marginocefalos", "Testarazo", "Despliega 4 marginoc\xE9falos", porClado(CLADO.MARGINOCEFALO), 4, 40),
+  M("pterosaurios", "Sombra en el cielo", "Despliega 3 pterosaurios", porClado(CLADO.PTEROSAURIO), 3, 45),
+  M("marinos", "Mar de Sundance", "Despliega 3 reptiles marinos", porClado(CLADO.MARINO), 3, 45),
+  // Las del jefe y las de duelo. No salen de una partida contra la IA: hay que
+  // bajar a la cuenca o buscar rival, y un día sin jefe abierto o sin nadie
+  // conectado es un día en que ésa de las tres no se cumple. Se aceptó así:
+  // es lo que las hace pedir algo. Pagan por debajo de la relámpago para que
+  // el peor día posible siga cabiendo en el techo.
+  M("asalto_uno", "Bajar a la cuenca", "Asalta al jefe 1 vez", "asaltos", 1, 40),
+  M("dano_jefe", "Al hueso", "Hazle 40 de da\xF1o al jefe", "danoJefe", 40, 45),
+  M("duelo_uno", "Cara a cara", "Juega 1 duelo", "duelos", 1, 40),
+  M("duelo_ganar", "Mano a mano", "Gana 1 duelo", "duelosGanados", 1, 45),
+  // La de expedición mide partidas JUGADAS y no primeras victorias: los nodos
+  // se acaban, y quien ha recorrido los cuatro mapas sólo estrena rival una vez
+  // por semana. Una misión que la mitad del año no se puede cumplir no pide
+  // algo, sobra. Por eso `expedicionNuevos` se queda para los logros.
+  M("expedicion_dos", "Prospecci\xF3n", "Juega 2 partidas de expedici\xF3n", "expediciones", 2, 40),
+  // La difícil del día. Una sola, y paga como tal.
+  // El texto dice «1 partida» y no «una» a propósito: el guardián de
+  // `misiones.test.js` pide que el texto cite la meta, igual que el de las
+  // cartas pide que cite su número, y con la letra no lo encuentra.
+  M(
+    "relampago",
+    "Golpe seco",
+    `Gana 1 partida en ${MISIONES.turnosRelampago} turnos o menos`,
+    "relampago",
+    1,
+    60
+  )
+]);
+var POR_ID = Object.freeze(Object.fromEntries(CATALOGO.map((m) => [m.id, m])));
+function semillaDelDia(dia) {
+  let h = 2166136261;
+  for (let i = 0; i < dia.length; i++) {
+    h ^= dia.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h || 1;
+}
+function siguiente2(r) {
+  let t = r + 1831565813 >>> 0;
+  let x = Math.imul(t ^ t >>> 15, 1 | t);
+  x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x;
+  return { r: t, valor: ((x ^ x >>> 14) >>> 0) / 4294967296 };
+}
+function misionesDelDia(dia) {
+  const lista = CATALOGO.slice();
+  let r = semillaDelDia(String(dia));
+  const cuantas = Math.min(MISIONES.porDia, lista.length);
+  for (let i = 0; i < cuantas; i++) {
+    const s = siguiente2(r);
+    r = s.r;
+    const j = i + Math.floor(s.valor * (lista.length - i));
+    const tmp = lista[i];
+    lista[i] = lista[j];
+    lista[j] = tmp;
+  }
+  return Object.freeze(lista.slice(0, cuantas));
+}
+var diaUTC = (ahora = /* @__PURE__ */ new Date()) => ahora.toISOString().slice(0, 10);
+function avancesDelParte(dia, parte) {
+  return misionesDelDia(dia).map((m) => ({ id: m.id, avance: parte[m.mide] ?? 0 })).filter((a) => a.avance > 0);
+}
+
+// supabase/functions/_compartido/validarPartida.js
+var LIMITES = Object.freeze({
+  acciones: 4e3,
+  // una partida normal no pasa de unos cientos
+  pasosPorFase: 200
+  // el mismo tope que usa el simulador
+});
+var PartidaInvalida = class extends Error {
+  constructor(motivo, detalle = null) {
+    super(motivo);
+    this.name = "PartidaInvalida";
+    this.detalle = detalle;
+  }
+};
+function validarMazoLegal(mazo) {
+  if (!Array.isArray(mazo) || mazo.length === 0) throw new PartidaInvalida("mazo ausente");
+  let total = 0;
+  for (const entrada of mazo) {
+    if (!Array.isArray(entrada) || entrada.length !== 2) throw new PartidaInvalida("mazo mal formado");
+    const [cardId, copias] = entrada;
+    if (typeof cardId !== "string" || !existeCarta(cardId)) {
+      throw new PartidaInvalida("carta desconocida", cardId);
+    }
+    if (!Number.isInteger(copias) || copias <= 0) throw new PartidaInvalida("copias inv\xE1lidas", cardId);
+    const tope = limiteDe(cardId);
+    if (copias > tope) throw new PartidaInvalida("copias por encima del tope de la carta", cardId);
+    total += copias;
+  }
+  const legendarias = legendariasDinoEn(mazo);
+  if (legendarias > LEGENDARIAS_DINO_MAX) {
+    throw new PartidaInvalida("demasiadas criaturas legendarias", legendarias);
+  }
+  if (total !== BALANCE.tamanoMazo) {
+    throw new PartidaInvalida("el mazo no suma las cartas exactas", total);
+  }
+  return true;
+}
+function perfilValido(nombre, porDefecto = PERFIL.HEURISTICA) {
+  if (nombre === void 0 || nombre === null) return porDefecto;
+  const conocidos = Object.values(PERFIL);
+  if (!conocidos.includes(nombre)) throw new PartidaInvalida("perfil de IA desconocido", nombre);
+  return nombre;
+}
+function validarPartida(envio, opciones = {}) {
+  if (!envio || typeof envio !== "object") throw new PartidaInvalida("env\xEDo vac\xEDo");
+  const { semilla: seed, mazo, acciones } = envio;
+  const { mazoRival = null, habitatRival = null, perfil = PERFIL.HEURISTICA } = opciones;
+  if (!Number.isInteger(seed)) throw new PartidaInvalida("semilla inv\xE1lida");
+  if (!Array.isArray(acciones)) throw new PartidaInvalida("faltan las jugadas");
+  if (acciones.length > LIMITES.acciones) {
+    throw new PartidaInvalida("demasiadas jugadas", acciones.length);
+  }
+  validarMazoLegal(mazo);
+  let s = crearPartida(seed, [mazo, mazoRival]);
+  const habitatInicial = habitatRival ?? s.jugadores[1].habitat;
+  s.jugadores[1].habitat = habitatInicial;
+  let rngIA = semilla(seed ^ 1542469173);
+  const pendientes = acciones.slice();
+  const parte = parteVacio();
+  const aplicar = (estado, accion) => {
+    const desde = estado.eventos.length;
+    const siguiente3 = reduce(estado, accion);
+    anotarEventos(parte, nuevosEventos(siguiente3, desde));
+    return siguiente3;
+  };
+  const siguienteDelJugador = (estado) => {
+    if (pendientes.length) return pendientes.shift();
+    if (estado.fase === FASE.DESCARTE) {
+      throw new PartidaInvalida("faltan jugadas: la partida no llega al final");
+    }
+    return { tipo: ACCION.PASAR, jugador: 0 };
+  };
+  while (s.fase !== FASE.FIN) {
+    if (s.fase === FASE.DESPLIEGUE || s.fase === FASE.DESCARTE) {
+      const faseInicial = s.fase;
+      let pasos = 0;
+      while (s.fase === faseInicial) {
+        let actuo = false;
+        let tuyas = 0;
+        while (s.fase === faseInicial && legales(s, 0).length > 0) {
+          const a = { ...siguienteDelJugador(s), jugador: 0 };
+          const motivo = validar(s, a);
+          if (motivo) throw new PartidaInvalida("jugada ilegal", { accion: a.tipo, motivo });
+          s = aplicar(s, a);
+          actuo = true;
+          if (a.tipo === ACCION.PASAR || a.tipo === ACCION.DESCARTAR) break;
+          if (++tuyas > LIMITES.pasosPorFase) throw new PartidaInvalida("la fase no converge");
+        }
+        let suyas = 0;
+        while (s.fase === faseInicial && legales(s, 1).length > 0) {
+          const d = decidir(vistaDe(s, 1), 1, rngIA, perfil);
+          rngIA = d.rng;
+          if (!d.accion) break;
+          s = aplicar(s, d.accion);
+          actuo = true;
+          if (d.accion.tipo === ACCION.PASAR || d.accion.tipo === ACCION.DESCARTAR) break;
+          if (++suyas > LIMITES.pasosPorFase) throw new PartidaInvalida("la fase no converge");
+        }
+        if (!actuo) break;
+        if (++pasos > LIMITES.pasosPorFase) throw new PartidaInvalida("la fase no converge");
+      }
+      if (s.fase === faseInicial) throw new PartidaInvalida("la fase se qued\xF3 bloqueada");
+      continue;
+    }
+    s = aplicar(s, { tipo: ACCION.AVANZAR });
+  }
+  cerrarParte(parte, {
+    ganada: s.ganador === 0,
+    turnos: s.turno,
+    trofeos: s.jugadores[0].trofeos
+  });
+  return {
+    parte,
+    ganada: s.ganador === 0,
+    danoAlHabitat: habitatInicial - Math.max(0, s.jugadores[1].habitat),
+    trofeos: s.jugadores[0].trofeos,
+    turnos: s.turno,
+    motivoFin: s.motivoFin
+  };
+}
+
+// supabase/functions/_compartido/validarAsalto.js
+var AsaltoInvalido = PartidaInvalida;
+function jefeDelEvento(eventoId) {
+  const evento2 = CALENDARIO.find((e) => e.id === eventoId && e.tipo === TIPO_EVENTO.JEFE);
+  if (!evento2) throw new AsaltoInvalido("ese evento no es una caza", eventoId);
+  const jefe = JEFES[evento2.jefe];
+  if (!jefe) throw new AsaltoInvalido("jefe inexistente", evento2.jefe);
+  return { evento: evento2, jefe };
+}
+function validarAsalto(envio) {
+  if (!envio || typeof envio !== "object") throw new AsaltoInvalido("env\xEDo vac\xEDo");
+  const { jefe } = jefeDelEvento(envio.jefeEvento);
+  const r = validarPartida(envio, {
+    mazoRival: jefe.mazo.map((e) => [...e]),
+    habitatRival: habitatDeAsalto(),
+    perfil: PERFIL.HEURISTICA
+  });
+  return { ...r, dano: danoDeAsalto(r) };
+}
+
 // supabase/functions/_compartido/validarSolitario.js
 function validarSolitario(envio) {
   const expedicion = envio?.rival ? rivalPorId(String(envio.rival)) : null;
@@ -7105,7 +7128,16 @@ var LOGROS = Object.freeze([
   L("demoledor", "Demoledor", "Hazle 300 de da\xF1o a los jefes", "danoJefe", 300, { tipo: RECOMPENSA.SOBRES, n: 5 }),
   // Los grandes: un mazo inicial más. Eran los otros dos que no elegiste al
   // empezar y sólo se podían completar a base de sobres.
-  L("morrison", "La Morrison entera", "Vence por primera vez a los 8 rivales de la Morrison", "expedicionNuevos", 8, { tipo: RECOMPENSA.MAZO }),
+  // Cada mapa mide SU contador y no `expedicionNuevos`, que suma también los
+  // visitantes: con ocho primeras victorias contadas a bulto, siete nodos y un
+  // visitante ya pagaban «la Morrison entera». El de la Morrison cambió de
+  // contador el 16-09-2026 y conserva el progreso que llevara cada cuenta.
+  L("morrison", "La Morrison entera", "Vence por primera vez a los 8 rivales de la Morrison", "expedicion:morrison", 8, { tipo: RECOMPENSA.MAZO }),
+  // Los tres mapas que siguen pagan sobres y no un mazo: sólo hay dos mazos
+  // iniciales que no elegiste, y ya los dan la Morrison y los 25 duelos.
+  L("hell_creek", "Hell Creek entero", "Vence por primera vez a los 8 rivales de Hell Creek", "expedicion:hell_creek", 8, { tipo: RECOMPENSA.SOBRES, n: 4 }),
+  L("tendaguru", "Tendaguru entera", "Vence por primera vez a los 8 rivales de Tendaguru", "expedicion:tendaguru", 8, { tipo: RECOMPENSA.SOBRES, n: 5 }),
+  L("kem_kem", "Kem Kem entero", "Vence por primera vez a los 8 rivales de Kem Kem", "expedicion:kem_kem", 8, { tipo: RECOMPENSA.SOBRES, n: 6 }),
   L("veterano", "Veterano", "Gana 25 duelos", "duelosGanados", 25, { tipo: RECOMPENSA.MAZO }),
   // Y el más grande: el estandarte azul con su cinta.
   L(
@@ -7264,10 +7296,12 @@ async function hacerVictoria(servicio, jugadorId, envio) {
     if (errExp) console.error("aplicar_expedicion", errExp.message);
     else expedicion = exp;
   }
+  const mapa = resultado2.rival ? rivalPorId(resultado2.rival)?.expedicion?.id ?? null : null;
   const parte = {
     ...resultado2.parte,
     expediciones: resultado2.rival ? 1 : 0,
-    expedicionNuevos: expedicion?.primera ? 1 : 0
+    expedicionNuevos: expedicion?.primera ? 1 : 0,
+    ...mapa ? { [`expedicion:${mapa}`]: expedicion?.primera ? 1 : 0 } : {}
   };
   const { data, error } = await servicio.rpc("aplicar_partida", {
     p_jugador: jugadorId,

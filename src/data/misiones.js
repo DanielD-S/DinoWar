@@ -26,6 +26,7 @@
 //    servidor le acreditaría las de hoy. El día lo dice quien paga.
 
 import { CLADO, CLADO_NOMBRE, TIPO, carta, existeCarta } from './cards.js';
+import { EXPEDICIONES } from './expediciones.js';
 
 /** Cuántas misiones se ofrecen al día y qué se considera una victoria rápida. */
 export const MISIONES = Object.freeze({
@@ -72,6 +73,10 @@ export const VOCABULARIO = Object.freeze([
   'duelosGanados',
   'expediciones',     // partidas contra un rival de expedición, se ganen o no
   'expedicionNuevos', // rivales de expedición vencidos por primera vez
+  // Y uno por MAPA, para los logros de «entera»: `expedicionNuevos` suma también
+  // los visitantes de la semana, así que ocho primeras victorias no son un mapa.
+  // Lo escribe la Edge Function con el mapa del rival que devolvió la re-jugada.
+  ...EXPEDICIONES.map((e) => `expedicion:${e.id}`),
   // Los de las cartas de jefe. Ni el parte ni la Edge Function: los apunta
   // `reclamar_jefe` en SQL (0028) cuando la carta entra por primera vez.
   'jefe:saurophaganax',
