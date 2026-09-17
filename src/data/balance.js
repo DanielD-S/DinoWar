@@ -408,26 +408,46 @@ export const BALANCE = Object.freeze({
 // el hueco fue a Stegosaurus: es el otro tireóforo del mazo y su mecánica nueva
 // —+1 de Ataque por cada Stegosaurus propio— premia llevar la tercera.
 export const MAZO = Object.freeze([
-  // ------------------------------------------------- la ronda de las cien
-  // Rehecho el 13-09-2026 con el set en 101 cartas: el de antes medía un juego
-  // de 28 cartas cuando ya había 101. Entran once de la ronda nueva y salen
-  // las tres que la IA no jugaba —Sequía 0,53, Bruma 0,00, Competencia 0,00—.
+  // ------------------------------------------------- la vara del 16-09-2026
+  // Rehecho con el set en 139 cartas. El del 13-09 medía bien el espejo —4 de
+  // 6 a 600 partidas— y perdía el 70–75 % contra cualquier mazo construido
+  // (Molienda 29,5 %, Entierro 26 %, Hábitat 24,5 %): una vara que cualquier
+  // construcción bate no mide el juego, mide su propio mazo.
   //
-  // Medido sobre 1.000 partidas por candidato, ocho candidatos. Lo que se
-  // aprendió: los cuerpos baratos y agresivos (Velociraptor a 0, Kentrosaurus,
-  // Pachycephalosaurus) no hunden al jugador inicial más que los grandes, y
-  // meter Inundación o Manada de paso para buscar la extinción no la mueve del
-  // 0–2 % y deja las dos cartas descalibradas. La Biomasa a 9 copias (5+2+2)
-  // frente a 7 no sube al jugador inicial esta vez: 45,2 % con 9 y 46,9 % con
-  // 7 en el mazo viejo, que a 1.000 partidas es ruido (±1,6). Cero cartas
-  // descalibradas y las vías a 53/47, que el mazo viejo tenía en 36/64.
+  // Medido sobre ocho candidatos, 600 partidas espejo y 200 por cruce contra
+  // los cuatro arquetipos de `sim/arquetipos.mjs`. Lo que se aprendió:
+  // - Los cuerpos AGRESIVOS con auras y disparos (Suchomimus ×2, Allosaurus
+  //   ×3, Deltadromeus ×2, Monolophosaurus ×2) ganan el 70–78 % a los cuatro
+  //   arquetipos y rompen el espejo: el 94 % de las victorias por hábitat, el
+  //   jugador inicial en el 42 % y Monolophosaurus descalibrado (0,63).
+  // - Los MUROS solos no hacen vara: el de hoy con Loricatosaurus,
+  //   Mamenchisaurus y Stegoceras en vez de los cuerpos que no pesan sigue
+  //   perdiendo el 74 % contra Molienda y Entierro.
+  // - El tribal de dos auras (marginocéfalos) gana el 77–90 %: lo más fuerte
+  //   del set, y por eso mismo no sirve para medir lo demás.
+  // - El SOPORTE no mueve nada: con Neumaticidad ×2 y Ceniza en vez de
+  //   Trampa, Gastrolitos y Bruma, el cruce cambia ±3 puntos. Se queda el de
+  //   antes, que además es el de los tres mazos iniciales (0006 sin tocar).
+  // Éste queda a 51,5 % contra Molienda, 50 % contra Entierro, 48 % contra
+  // Hábitat y 69 % contra el Control, que es el arquetipo flojo. Salen los
+  // cinco cuerpos que no pesaban —Ornitholestes ×2, Huaxiadraco,
+  // Riparovenator, Camarasaurus— y un Dryosaurus; entran Suchomimus,
+  // Deltadromeus, Monolophosaurus, un Allosaurus, un Iguanodon y un
+  // Apatosaurus.
+  //
+  // Y lo que cuesta, dicho aquí: el jugador inicial baja del 47,7 % al 43 %.
+  // Se midió por qué y NO es del motor —con la IA al azar los dos mazos dan
+  // el 47–48 %— sino de la heurística, que como segundo jugador saca cuatro
+  // puntos más a este mazo que al de antes. El desempate del chequeo y el
+  // orden de la revelación favorecen al PRIMERO, así que el sitio donde
+  // mirar es `ai.js` y el orden en que `sim/partida.js` alterna las dos IAs.
   //
   // dinosaurios — 28
-  ['dryosaurus', 3], ['ornitholestes', 2], ['ceratosaurus', 2], ['stegosaurus', 1],
-  ['kentrosaurus', 2], ['velociraptor', 2], ['allosaurus', 2], ['camarasaurus', 1],
-  ['amargasaurus', 2], ['iguanodon', 2], ['pachycephalosaurus', 2],
-  ['riparovenator', 1], ['lokiceratops', 1], ['huaxiadraco', 1], ['brachylophosaurus', 1],
-  ['diplodocus', 1], ['apatosaurus', 1], ['tyrannotitan', 1],
+  ['dryosaurus', 2], ['ceratosaurus', 2], ['stegosaurus', 1], ['kentrosaurus', 2],
+  ['velociraptor', 2], ['allosaurus', 3], ['amargasaurus', 2], ['iguanodon', 3],
+  ['pachycephalosaurus', 2], ['lokiceratops', 1], ['brachylophosaurus', 1],
+  ['diplodocus', 1], ['apatosaurus', 2], ['tyrannotitan', 1],
+  ['suchomimus', 1], ['deltadromeus', 1], ['monolophosaurus', 1],
   // soporte — 18
   //
   // Un clima solo, el Monzón: sólo cabe uno en el campo. Crecimiento acelerado
