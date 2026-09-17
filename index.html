@@ -109,8 +109,9 @@
           <button id="btn-ayuda-menu" class="boton-fantasma">Cómo se juega</button>
           <button id="btn-tutorial" class="boton-fantasma">Tutorial</button>
           <!-- Sólo aparece cuando se puede instalar: el navegador lo ofrece
-               (Chrome y Edge) o es un iPhone, donde se explica cómo. Instalada
-               ya, no sale. Lo lleva src/ui/instalar.js. -->
+               (Chrome y Edge), es un iPhone, donde se explica cómo, o es un PC
+               sin aviso —Opera, Firefox—, donde dice en qué navegador abrirlo.
+               Instalada ya, no sale. Lo lleva src/ui/instalar.js. -->
           <button id="btn-instalar" class="boton-fantasma" hidden>Instalar app</button>
         </div>
         <p class="menu-instalar" id="menu-instalar" hidden></p>
@@ -213,6 +214,11 @@
       </div>
 
       <div class="fila-ranuras" id="fila-1" data-bando="1"></div>
+
+      <!-- El LUGAR de cada columna, sorteado al empezar y a la vista de los dos.
+           Es la columna y no la ranura: las dos ranuras enfrentadas lo
+           comparten. render.js lo escribe por partida; tocarlo abre su ficha. -->
+      <div class="fila-lugares" id="fila-lugares"></div>
 
       <div class="franja">
         <button id="btn-campo" class="franja-campo">Sin clima</button>

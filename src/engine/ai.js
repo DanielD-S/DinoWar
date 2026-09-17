@@ -12,6 +12,7 @@ import {
   ataqueEfectivo, vidaActual, espinasDe, danoAlHabitat, campoEs, vuela, mecanicaDe,
 } from './state.js';
 import { QUE, CUANDO, TODOS } from '../data/mecanicas.js';
+import { efectoDeLugar, bonoDeLugar } from '../data/lugares.js';
 import { ACCION, legales } from './actions.js';
 import { DIETA } from '../data/dietas.js';
 import { puedePagar, dietaDeCarta, MODO, modoActual as modoEconomia } from './economia.js';
@@ -157,16 +158,61 @@ function valorEnRanura(vista, j, ranura, mio) {
   return ofensiva + defensiva - perdida;
 }
 
-function statsDeCarta(vista, j, cardId, rivalIid) {
+/**
+ * Las cifras con las que una carta entraría en ESA ranura. Lleva la ranura
+ * porque desde que hay lugares la misma carta no vale lo mismo en cada
+ * columna: el Ataque y la Vida que suma el lugar entran aquí, con la misma
+ * `bonoDeLugar` que usa el motor, para que la IA tase lo que luego pasa.
+ */
+function statsDeCarta(vista, j, cardId, rivalIid, ranura = null) {
   const c = carta(cardId);
+  const lugar = bonoDeLugar(vista, ranura, c.clado);
   return {
-    poder: ataqueHipotetico(vista, j, cardId),
-    vida: c.vida + pasivoHipotetico(vista, j, cardId).vida,
+    poder: Math.max(0, ataqueHipotetico(vista, j, cardId) + lugar.ataque),
+    vida: c.vida + pasivoHipotetico(vista, j, cardId).vida + lugar.vida,
     clado: c.clado,
     vuela: c.rasgo === RASGO.VUELO,
-    espinasPropias: espinasHipoteticas(cardId),
+    espinasPropias: espinasHipoteticas(cardId) + (efectoDeLugar(vista, ranura).espinas ?? 0),
     espinasRecibidas: rivalIid === null ? 0 : espinasDe(vista, rivalIid),
   };
+}
+
+/**
+ * Lo que un LUGAR le añade a poner esta carta en su columna, aparte de las
+ * cifras —que ya van en `statsDeCarta`—. Sin esto la IA vería las cuatro
+ * columnas iguales salvo por el Ataque, y el Cauce seco sería una columna
+ * como otra cualquiera: la ocuparía y se molería sola.
+ *
+ * Es una estimación con el mismo criterio que `valorDeEntrada`: cada punto
+ * de efecto por su peso, y lo que dura, por los turnos que se espera.
+ */
+function valorDeLugar(vista, j, ranura, cardId, mio) {
+  const e = efectoDeLugar(vista, ranura);
+  const V = BALANCE.valorLugar;
+  const b = unidadEn(vista, rival(j), ranura);
+  const abierta = !b || mio.vuela || vuela(vista, b.iid);
+  let valor = 0;
+
+  if (e.roba) valor += e.roba * V.roba;
+  if (e.muele) valor += e.muele * V.muele * IA.horizonte;
+  if (e.cura) valor += e.cura * V.cura * (IA.horizonte - 1);
+  if (e.sinCuracion) {
+    const c = carta(cardId);
+    const curaba = (mecanicaDe(cardId)?.regenera?.propia ?? 0)
+      + (c.rasgo === RASGO.RAMONEO_BAJO ? BALANCE.rasgos.ramoneoBajoCura : 0);
+    valor += curaba * V.sinCuracion * (IA.horizonte - 1);
+  }
+  if (e.espinas && b && !abierta) valor += e.espinas * V.espinas * IA.horizonte;
+  if (e.sobrante && b && !abierta) {
+    const sobra = Math.max(0, mio.poder - vidaActual(vista, b.iid));
+    valor += sobra * (e.sobrante - 1) * V.sobrante * IA.pesoHabitat;
+  }
+  if (abierta && mio.poder > 0) {
+    const turnos = 1 + (IA.horizonte - 1) * 0.5;
+    if (e.golpeHabitat) valor += e.golpeHabitat * V.golpeHabitat * IA.pesoHabitat * turnos;
+    if (e.guardia) valor -= Math.min(e.guardia, mio.poder) * V.guardia * IA.pesoHabitat * turnos;
+  }
+  return valor;
 }
 
 /**
@@ -227,7 +273,7 @@ function valorDeAccion(vista, j, a) {
     case ACCION.DESPLEGAR: {
       const cardId = vista.instancias[a.iid].cardId;
       const b = unidadEn(vista, contrario, a.ranura);
-      const mio = statsDeCarta(vista, j, cardId, b ? b.iid : null);
+      const mio = statsDeCarta(vista, j, cardId, b ? b.iid : null, a.ranura);
       // La habilidad de entrada se suma APARTE y sin multiplicar por los turnos
       // que aguante: se dispara una vez y punto. Ahí está media gracia de esta
       // forma de rasgo — lo pasivo se infla con `IA.horizonte` y por eso el
@@ -237,6 +283,7 @@ function valorDeAccion(vista, j, a) {
       return valorEnRanura(vista, j, a.ranura, mio)
         + valorDeEntrada(cardId)
         + valorDeGuardia(vista, j, cardId)
+        + valorDeLugar(vista, j, a.ranura, cardId, mio)
         - carta(cardId).coste * IA.pesoCoste;
     }
 
@@ -245,9 +292,10 @@ function valorDeAccion(vista, j, a) {
       const cardId = inst.cardId;
       const bDestino = unidadEn(vista, contrario, a.ranura);
       const bOrigen = unidadEn(vista, contrario, inst.ranura);
-      const mio = statsDeCarta(vista, j, cardId, bDestino ? bDestino.iid : null);
-      const mioOrigen = statsDeCarta(vista, j, cardId, bOrigen ? bOrigen.iid : null);
-      return valorEnRanura(vista, j, a.ranura, mio) - valorEnRanura(vista, j, inst.ranura, mioOrigen);
+      const mio = statsDeCarta(vista, j, cardId, bDestino ? bDestino.iid : null, a.ranura);
+      const mioOrigen = statsDeCarta(vista, j, cardId, bOrigen ? bOrigen.iid : null, inst.ranura);
+      return valorEnRanura(vista, j, a.ranura, mio) + valorDeLugar(vista, j, a.ranura, cardId, mio)
+        - valorEnRanura(vista, j, inst.ranura, mioOrigen) - valorDeLugar(vista, j, inst.ranura, cardId, mioOrigen);
     }
 
     case ACCION.EVENTO: {

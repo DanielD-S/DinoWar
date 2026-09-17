@@ -11,7 +11,9 @@ import {
   unidadEn, unidadesDe, todasLasUnidades,
   ataqueEfectivo, vidaActual, danoEntre, danoAlHabitat, espinasDe,
   curacionDe, rentaDe, hayAridez, campoEs, vuela, mecanicaDe, inmuneA, guardiaDe,
+  ajustarGolpeDeLugar, sobranteDeLugar,
 } from './state.js';
+import { efectoDeLugar } from '../data/lugares.js';
 import { alEntrar } from './entradas.js';
 
 export function ev(s, tipo, datos = {}) {
@@ -244,6 +246,18 @@ export function faseRevelacion(s) {
         ev, herir, rival, unidadEn, unidadesDe, CAUSA, vidaActual,
         devolverAMano, enterrar, golpearHabitat,
       });
+
+      // Y lo que el LUGAR de esa columna hace al recibirla. Después de la
+      // entrada de la carta, que es lo que el jugador lee primero.
+      const roba = efectoDeLugar(s, p.ranura).roba ?? 0;
+      if (roba > 0) {
+        const antes = s.jugadores[p.jugador].mano.length;
+        robar(s, p.jugador, roba);
+        ev(s, 'LUGAR', {
+          jugador: p.jugador, ranura: p.ranura, lugar: s.lugares[p.ranura],
+          efecto: 'roba', n: s.jugadores[p.jugador].mano.length - antes, iid: p.iid,
+        });
+      }
 
     } else if (p.tipo === 'MOVIMIENTO') {
       if (inst.ranura === null || s.ranuras[p.jugador][p.ranura] !== null) continue;
@@ -694,16 +708,20 @@ export function faseCombate(s) {
       // Ojo a la condición: duplica el SOBRANTE, que sólo existe si venció al
       // que tenía enfrente. Contra una ranura vacía no hay nada que doblar y su
       // Ataque pasa tal cual, que es la rama de más abajo.
-      const dobla = (uno) => (carta(uno.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE ? 2 : 1);
+      // Y el LUGAR lo multiplica también —la Llanura abierta lo dobla—, sobre
+      // el mismo sobrante y por la misma regla que el rasgo.
+      const dobla = (uno) => (carta(uno.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE ? 2 : 1)
+        * sobranteDeLugar(s, r);
       const sobraA = Math.max(0, dA - vidaActual(s, b.iid));
       const sobraB = Math.max(0, dB - vidaActual(s, a.iid));
       // La guardia también muerde aquí: lo que sobra al matar es daño de un
       // dinosaurio rival como cualquier otro, y cada atacante aporta una sola
       // vez por turno —o sobrante, o golpe a ranura vacía, o sobrevuelo— así
-      // que restar en las tres ramas es restar una vez por dinosaurio.
+      // que restar en las tres ramas es restar una vez por dinosaurio. Y el
+      // lugar de la columna ajusta el golpe en las tres por lo mismo.
       if (BALANCE.cuerpo.sobranteAlHabitat) {
-        alHabitat[1] += Math.max(0, sobraA * dobla(a) - guardiaDe(s, 1));
-        alHabitat[0] += Math.max(0, sobraB * dobla(b) - guardiaDe(s, 0));
+        alHabitat[1] += ajustarGolpeDeLugar(s, r, Math.max(0, sobraA * dobla(a) - guardiaDe(s, 1)));
+        alHabitat[0] += ajustarGolpeDeLugar(s, r, Math.max(0, sobraB * dobla(b) - guardiaDe(s, 0)));
       }
 
       ev(s, 'CHOQUE', { ranura: r, a: a.iid, b: b.iid, danoA: dA, danoB: dB });
@@ -732,6 +750,24 @@ export function faseCombate(s) {
     if (cura > 0 && inst.heridas > 0) {
       inst.heridas = Math.max(0, inst.heridas - cura);
       ev(s, 'CURACION', { iid: inst.iid, dueno: inst.dueno, cura });
+    }
+  }
+
+  // El Cauce seco muerde al final del turno a quien tenga algo puesto en él.
+  // Va después de las bajas: lo que murió en el combate ya no está «aquí».
+  // Orden fijo —columna y luego bando— por lo de siempre: el servidor re-juega.
+  for (let r = 0; r < BALANCE.ranuras; r++) {
+    const muele = efectoDeLugar(s, r).muele ?? 0;
+    if (!muele) continue;
+    for (const bando of [0, 1]) {
+      const u = unidadEn(s, bando, r);
+      if (!u) continue;
+      const antes = s.jugadores[bando].mazo.length;
+      perderDelMazo(s, bando, muele);
+      ev(s, 'LUGAR', {
+        jugador: bando, ranura: r, lugar: s.lugares[r],
+        efecto: 'muele', n: antes - s.jugadores[bando].mazo.length, iid: u.iid,
+      });
     }
   }
 

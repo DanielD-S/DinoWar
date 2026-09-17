@@ -68,3 +68,12 @@ test('Las capturas miden lo que dicen', () => {
 test('El menú tiene el botón de instalar, oculto hasta que sirva', () => {
   assert.match(html, /<button id="btn-instalar" class="boton-fantasma" hidden>/);
 });
+
+test('En un escritorio sin aviso de instalación, la nota dice en qué navegador abrirlo', async () => {
+  // Opera en PC es Chromium sin instalación de PWA y Firefox no la tiene:
+  // ninguno dispara `beforeinstallprompt`, y antes ahí no salía nada.
+  const { notaDeEscritorio } = await import('../src/ui/instalar.js');
+  assert.match(notaDeEscritorio('Mozilla/5.0 (Windows NT 10.0) Chrome/128 OPR/114.0'), /Opera y Firefox.*Chrome o Edge/);
+  assert.match(notaDeEscritorio('Mozilla/5.0 (X11; Linux) Gecko/20100101 Firefox/130.0'), /Opera y Firefox/);
+  assert.match(notaDeEscritorio('Mozilla/5.0 (Windows NT 10.0) Chrome/128 Safari/537.36'), /Chrome o Edge/);
+});

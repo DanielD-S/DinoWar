@@ -12,15 +12,16 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: 38f2fcfcfd3ff190
+// huella: 7e2ddd92e2f7079a
 //
-// Lleva dentro estos 24 ficheros del repositorio. La lista la da
+// Lleva dentro estos 25 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
 // aparece aquí solo. Un test recalcula la huella sobre esta misma lista y falla
 // si el paquete se ha quedado atrás del código.
 // fuente: src/data/mecanicas.js
 // fuente: src/data/cards.js
 // fuente: src/data/balance.js
+// fuente: src/data/lugares.js
 // fuente: src/engine/rng.js
 // fuente: src/engine/state.js
 // fuente: src/engine/entradas.js
@@ -2399,6 +2400,17 @@ var BALANCE = Object.freeze({
   ranuras: Number(
     typeof process !== "undefined" && process.env && process.env.DINOWAR_RANURAS || 4
   ),
+  // ---------------------------------------------------------------- lugares
+  // Cada columna es un LUGAR distinto, sorteado con la semilla al empezar y a
+  // la vista de los dos desde el turno 1 (src/data/lugares.js). Se apagan por
+  // entorno para medir el tablero plano contra el de lugares con las mismas
+  // semillas:
+  //   DINOWAR_LUGARES=0 node sim/run.js --out BALANCE_PLANO.md
+  // Como las ranuras: el navegador no tiene `process` y siempre juega con
+  // ellos, y poner la variable en el servidor le haría re-jugar otro tablero.
+  lugares: Object.freeze({
+    activos: !(typeof process !== "undefined" && process.env && process.env.DINOWAR_LUGARES === "0")
+  }),
   // -------------------------------------------------------------- recursos
   // La renta NO depende de dominar el campo. Es la corrección central de la v2:
   // en la v1, atarla al control hacía que el 87,6 % de las partidas las ganase
@@ -2746,6 +2758,30 @@ var BALANCE = Object.freeze({
     golpeHabitat: 1
     // se multiplica por ia.pesoHabitat, como curaHabitat
   }),
+  // ------------------------------------------------- lo que vale un lugar
+  //
+  // Lo que un lugar suma de Ataque o de Vida la IA lo ve solo: entra en las
+  // cifras hipotéticas con las que tasa cada ranura. Lo demás no cambia una
+  // cifra y hay que tasarlo aparte, con el mismo criterio que las entradas:
+  // sin peso, la IA no distingue una columna de otra y el lugar es decorado.
+  valorLugar: Object.freeze({
+    roba: 1.4,
+    // como `valorEntrada.roba`: una carta en la mano
+    muele: -0.4,
+    // como `muelePropio`: es un coste, por turno que dure
+    cura: 0.5,
+    // un punto de Vida que vuelve, por turno que dure
+    sinCuracion: -0.5,
+    // lo contrario, sólo para quien curaba
+    espinas: 0.35,
+    // como `ia.pesoDano`: daño que no mata, por turno
+    sobrante: 1,
+    // se multiplica por el sobrante esperado y pesoHabitat
+    guardia: 1,
+    // por pesoHabitat: lo que deja de llegar al hábitat
+    golpeHabitat: 1
+    // por pesoHabitat: lo que llega de más
+  }),
   // --------------------------------------------------------------------- IA
   ia: Object.freeze({
     // Con menos mazo que esto, la IA deja de bajar Biomasa. No es afinar su
@@ -2864,6 +2900,145 @@ for (const [cardId, copias] of MAZO) {
 }
 if (TOTAL_MAZO !== BALANCE.tamanoMazo) {
   throw new Error(`MAZO suma ${TOTAL_MAZO} cartas y deber\xEDan ser ${BALANCE.tamanoMazo}`);
+}
+
+// src/data/lugares.js
+var FORMAS = Object.freeze([
+  "ataque",
+  "vida",
+  "cura",
+  "sinCuracion",
+  "espinas",
+  "sobrante",
+  "guardia",
+  "golpeHabitat",
+  "inmovil",
+  "roba",
+  "muele"
+]);
+var lugar = (l) => Object.freeze({ ...l, efecto: Object.freeze(l.efecto) });
+var LUGARES = Object.freeze({
+  ladera_volcanica: lugar({
+    id: "ladera_volcanica",
+    nombre: "Ladera volc\xE1nica",
+    texto: "Lo que est\xE1 aqu\xED pega +2. La ceniza f\xE9rtil lo alimenta todo.",
+    efecto: { ataque: { n: 2 } }
+  }),
+  rio: lugar({
+    id: "rio",
+    nombre: "R\xEDo",
+    texto: "Los reptiles marinos pegan +2 aqu\xED.",
+    efecto: { ataque: { n: 2, clados: [CLADO.MARINO] } }
+  }),
+  cazadero: lugar({
+    id: "cazadero",
+    nombre: "Cazadero",
+    texto: "Los ter\xF3podos pegan +1 aqu\xED.",
+    efecto: { ataque: { n: 1, clados: [CLADO.TEROPODO] } }
+  }),
+  acantilado: lugar({
+    id: "acantilado",
+    nombre: "Acantilado",
+    texto: "Los pterosaurios pegan +2 aqu\xED.",
+    efecto: { ataque: { n: 2, clados: [CLADO.PTEROSAURIO] } }
+  }),
+  pradera_alta: lugar({
+    id: "pradera_alta",
+    nombre: "Pradera alta",
+    texto: "Los ornit\xF3podos y los marginoc\xE9falos pegan +1 aqu\xED.",
+    efecto: { ataque: { n: 1, clados: [CLADO.ORNITOPODO, CLADO.MARGINOCEFALO] } }
+  }),
+  helechal: lugar({
+    id: "helechal",
+    nombre: "Helechal",
+    texto: "Los saur\xF3podos y los ornit\xF3podos tienen +2 de Vida aqu\xED.",
+    efecto: { vida: { n: 2, clados: [CLADO.SAUROPODO, CLADO.ORNITOPODO] } }
+  }),
+  roquedal: lugar({
+    id: "roquedal",
+    nombre: "Roquedal",
+    texto: "Los tire\xF3foros tienen +2 de Vida aqu\xED.",
+    efecto: { vida: { n: 2, clados: [CLADO.TIREOFORO] } }
+  }),
+  laguna: lugar({
+    id: "laguna",
+    nombre: "Laguna",
+    texto: "Lo que est\xE1 aqu\xED tiene +1 de Vida.",
+    efecto: { vida: { n: 1 } }
+  }),
+  bosque_coniferas: lugar({
+    id: "bosque_coniferas",
+    nombre: "Bosque de con\xEDferas",
+    texto: "Lo que est\xE1 aqu\xED cura 1 al final del turno.",
+    efecto: { cura: 1 }
+  }),
+  salinas: lugar({
+    id: "salinas",
+    nombre: "Salinas",
+    texto: "Aqu\xED nadie cura.",
+    efecto: { sinCuracion: true }
+  }),
+  pedregal: lugar({
+    id: "pedregal",
+    nombre: "Pedregal",
+    texto: "Lo que est\xE1 aqu\xED devuelve 1 de da\xF1o a quien lo hiere en combate.",
+    efecto: { espinas: 1 }
+  }),
+  llanura_abierta: lugar({
+    id: "llanura_abierta",
+    nombre: "Llanura abierta",
+    texto: "El da\xF1o que sobra al matar aqu\xED se multiplica por 2.",
+    efecto: { sobrante: 2 }
+  }),
+  desfiladero: lugar({
+    id: "desfiladero",
+    nombre: "Desfiladero",
+    texto: "Cada golpe al h\xE1bitat desde aqu\xED pega 1 menos.",
+    efecto: { guardia: 1 }
+  }),
+  barranco: lugar({
+    id: "barranco",
+    nombre: "Barranco",
+    texto: "Cada golpe al h\xE1bitat desde aqu\xED pega 1 m\xE1s.",
+    efecto: { golpeHabitat: 1 }
+  }),
+  // El barro frena. Lleva también `inmovil`, que hoy no muerde a nadie —no
+  // queda ninguna carta con el rasgo Migrador— y está para el día que vuelva
+  // una: sin el −1 sería un lugar que no hace nada, que es lo que el test de
+  // abajo no deja escribir.
+  cienaga: lugar({
+    id: "cienaga",
+    nombre: "Ci\xE9naga",
+    texto: "El barro frena: lo que est\xE1 aqu\xED pega \u22121, y nadie puede moverse desde aqu\xED ni hacia aqu\xED.",
+    efecto: { ataque: { n: -1 }, inmovil: true }
+  }),
+  nidada: lugar({
+    id: "nidada",
+    nombre: "Nidada",
+    texto: "Cuando una criatura se revela aqu\xED, su due\xF1o roba 1 carta.",
+    efecto: { roba: 1 }
+  }),
+  cauce_seco: lugar({
+    id: "cauce_seco",
+    nombre: "Cauce seco",
+    texto: "Al final del turno, el due\xF1o de lo que est\xE1 aqu\xED pierde 1 carta del mazo.",
+    efecto: { muele: 1 }
+  })
+});
+var LUGARES_IDS = Object.freeze(Object.keys(LUGARES));
+var lugarPorId = (id) => id ? LUGARES[id] ?? null : null;
+var VACIO = Object.freeze({});
+function efectoDeLugar(state, ranura) {
+  if (!state.lugares || ranura === null || ranura === void 0) return VACIO;
+  return lugarPorId(state.lugares[ranura])?.efecto ?? VACIO;
+}
+var alcanzaA = (forma, clado) => !!forma && (!forma.clados || forma.clados.includes(clado));
+function bonoDeLugar(state, ranura, clado) {
+  const e = efectoDeLugar(state, ranura);
+  return {
+    ataque: alcanzaA(e.ataque, clado) ? e.ataque.n : 0,
+    vida: alcanzaA(e.vida, clado) ? e.vida.n : 0
+  };
 }
 
 // src/engine/rng.js
@@ -2988,6 +3163,12 @@ function crearPartida(seedEntrada = 1, mazos = null) {
     const extra = jug.id === 1 ? BALANCE.compensacionSegundoJugador.cartas : 0;
     for (let k = 0; k < BALANCE.manoInicial + extra; k++) jug.mano.push(jug.mazo.shift());
   }
+  let lugares = Array.from({ length: BALANCE.ranuras }, () => null);
+  if (BALANCE.lugares.activos) {
+    const b = barajar([...LUGARES_IDS], rng);
+    rng = b.rng;
+    lugares = b.lista.slice(0, BALANCE.ranuras);
+  }
   return {
     seed: semilla(seedEntrada),
     rng,
@@ -3002,6 +3183,9 @@ function crearPartida(seedEntrada = 1, mazos = null) {
       Array.from({ length: BALANCE.ranuras }, () => null),
       Array.from({ length: BALANCE.ranuras }, () => null)
     ],
+    // El lugar de cada columna, por id; null es una columna sin nada. Es la
+    // COLUMNA y no la ranura: las dos ranuras enfrentadas lo comparten.
+    lugares,
     jugadores,
     eventos: [],
     ganador: null,
@@ -3100,6 +3284,7 @@ function ataqueEfectivo(state, iid) {
   if (m?.cuenta?.ataque) poder += m.cuenta.ataque * cuantasCuentan(state, inst, m.cuenta);
   if (m?.si?.ataque && seCumple(state, inst, m.si)) poder += m.si.ataque;
   poder += aurasSobre(state, inst).ataque;
+  poder += bonoDeLugar(state, inst.ranura, c.clado).ataque;
   return Math.max(0, poder);
 }
 function vidaMaxima(state, iid) {
@@ -3121,6 +3306,7 @@ function vidaMaxima(state, iid) {
   if (m?.cuenta?.vida) v += m.cuenta.vida * cuantasCuentan(state, inst, m.cuenta);
   if (m?.si?.vida && seCumple(state, inst, m.si)) v += m.si.vida;
   v += aurasSobre(state, inst).vida;
+  v += bonoDeLugar(state, inst.ranura, c.clado).vida;
   return Math.max(0, v);
 }
 var vidaActual = (state, iid) => vidaMaxima(state, iid) - state.instancias[iid].heridas;
@@ -3133,8 +3319,16 @@ function delClado(state, inst, clado, min) {
   return n >= min;
 }
 function espinasDe(state, iid) {
-  return mecanicaDe(state.instancias[iid].cardId)?.espinas ?? 0;
+  const inst = state.instancias[iid];
+  return (mecanicaDe(inst.cardId)?.espinas ?? 0) + (efectoDeLugar(state, inst.ranura).espinas ?? 0);
 }
+function ajustarGolpeDeLugar(state, ranura, dano) {
+  if (dano <= 0) return 0;
+  const e = efectoDeLugar(state, ranura);
+  return Math.max(0, dano + (e.golpeHabitat ?? 0) - (e.guardia ?? 0));
+}
+var sobranteDeLugar = (state, ranura) => efectoDeLugar(state, ranura).sobrante ?? 1;
+var columnaInmovil = (state, ranura) => efectoDeLugar(state, ranura).inmovil === true;
 function danoEntre(state, atacanteIid) {
   return Math.max(0, ataqueEfectivo(state, atacanteIid));
 }
@@ -3151,7 +3345,8 @@ function guardiaDe(state, bando) {
 function danoAlHabitat(state, iid, defensor = null) {
   const bruto = ataqueEfectivo(state, iid);
   if (defensor === null) return bruto;
-  return Math.max(0, bruto - guardiaDe(state, defensor));
+  const ranura = state.instancias[iid].ranura;
+  return ajustarGolpeDeLugar(state, ranura, Math.max(0, bruto - guardiaDe(state, defensor)));
 }
 var vuela = (state, iid) => carta(state.instancias[iid].cardId).rasgo === RASGO.VUELO;
 var hayAridez = (state) => campoEs(state, RASGO.CAMPO_ARIDEZ);
@@ -3172,6 +3367,9 @@ function curacionDe(state, iid) {
   for (const o of unidadesDe(state, inst.dueno)) {
     cura += mecanicaDe(o.cardId)?.regenera?.aliados ?? 0;
   }
+  const lugar2 = efectoDeLugar(state, inst.ranura);
+  cura += lugar2.cura ?? 0;
+  if (lugar2.sinCuracion) return 0;
   return cura;
 }
 var NOTA_CUENTA = Object.freeze({
@@ -3704,6 +3902,19 @@ function faseRevelacion(s) {
         enterrar,
         golpearHabitat
       });
+      const roba = efectoDeLugar(s, p.ranura).roba ?? 0;
+      if (roba > 0) {
+        const antes = s.jugadores[p.jugador].mano.length;
+        robar(s, p.jugador, roba);
+        ev(s, "LUGAR", {
+          jugador: p.jugador,
+          ranura: p.ranura,
+          lugar: s.lugares[p.ranura],
+          efecto: "roba",
+          n: s.jugadores[p.jugador].mano.length - antes,
+          iid: p.iid
+        });
+      }
     } else if (p.tipo === "MOVIMIENTO") {
       if (inst.ranura === null || s.ranuras[p.jugador][p.ranura] !== null) continue;
       s.ranuras[p.jugador][inst.ranura] = null;
@@ -4003,12 +4214,12 @@ function faseCombate(s) {
       golpes.push({ iid: b.iid, cantidad: espinasDe(s, a.iid), causa: CAUSA.ESPINAS, por: 0 });
       if (dA > 0 && carta(a.cardId).rasgo === RASGO.DESGARRO) s.instancias[b.iid].sinCuracion = true;
       if (dB > 0 && carta(b.cardId).rasgo === RASGO.DESGARRO) s.instancias[a.iid].sinCuracion = true;
-      const dobla = (uno) => carta(uno.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE ? 2 : 1;
+      const dobla = (uno) => (carta(uno.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE ? 2 : 1) * sobranteDeLugar(s, r);
       const sobraA = Math.max(0, dA - vidaActual(s, b.iid));
       const sobraB = Math.max(0, dB - vidaActual(s, a.iid));
       if (BALANCE.cuerpo.sobranteAlHabitat) {
-        alHabitat[1] += Math.max(0, sobraA * dobla(a) - guardiaDe(s, 1));
-        alHabitat[0] += Math.max(0, sobraB * dobla(b) - guardiaDe(s, 0));
+        alHabitat[1] += ajustarGolpeDeLugar(s, r, Math.max(0, sobraA * dobla(a) - guardiaDe(s, 1)));
+        alHabitat[0] += ajustarGolpeDeLugar(s, r, Math.max(0, sobraB * dobla(b) - guardiaDe(s, 0)));
       }
       ev(s, "CHOQUE", { ranura: r, a: a.iid, b: b.iid, danoA: dA, danoB: dB });
     } else if (a) {
@@ -4034,6 +4245,24 @@ function faseCombate(s) {
     if (cura > 0 && inst.heridas > 0) {
       inst.heridas = Math.max(0, inst.heridas - cura);
       ev(s, "CURACION", { iid: inst.iid, dueno: inst.dueno, cura });
+    }
+  }
+  for (let r = 0; r < BALANCE.ranuras; r++) {
+    const muele = efectoDeLugar(s, r).muele ?? 0;
+    if (!muele) continue;
+    for (const bando of [0, 1]) {
+      const u = unidadEn(s, bando, r);
+      if (!u) continue;
+      const antes = s.jugadores[bando].mazo.length;
+      perderDelMazo(s, bando, muele);
+      ev(s, "LUGAR", {
+        jugador: bando,
+        ranura: r,
+        lugar: s.lugares[r],
+        efecto: "muele",
+        n: antes - s.jugadores[bando].mazo.length,
+        iid: u.iid
+      });
     }
   }
   s.fase = s.jugadores.some((j) => j.mano.length > BALANCE.manoMaxima) ? FASE.DESCARTE : FASE.CHEQUEO;
@@ -4169,8 +4398,10 @@ function validar(s, a) {
   if (a.tipo === ACCION.MOVER) {
     if (inst.dueno !== a.jugador) return "esa unidad no es tuya";
     if (inst.ranura === null) return "esa unidad no est\xE1 en el campo";
-    if (carta(inst.cardId).rasgo !== RASGO.MIGRADOR) return "esa unidad no puede moverse";
     if (!ranuraValida(a.ranura)) return "ranura inexistente";
+    if (columnaInmovil(s, inst.ranura)) return "de ese lugar no se puede salir";
+    if (columnaInmovil(s, a.ranura)) return "a ese lugar no se puede entrar";
+    if (carta(inst.cardId).rasgo !== RASGO.MIGRADOR) return "esa unidad no puede moverse";
     if (s.ranuras[a.jugador][a.ranura] !== null) return "esa ranura est\xE1 ocupada";
     if (ranuraReservada(s, a.jugador, a.ranura)) return "ya has comprometido esa ranura";
     if (jug.pendientes.some((p) => p.iid === a.iid)) return "esa unidad ya se mueve este turno";
@@ -4624,16 +4855,43 @@ function valorEnRanura(vista, j, ranura, mio) {
   const perdida = muere ? IA.pesoPerdida : 0;
   return ofensiva + defensiva - perdida;
 }
-function statsDeCarta(vista, j, cardId, rivalIid) {
+function statsDeCarta(vista, j, cardId, rivalIid, ranura = null) {
   const c = carta(cardId);
+  const lugar2 = bonoDeLugar(vista, ranura, c.clado);
   return {
-    poder: ataqueHipotetico(vista, j, cardId),
-    vida: c.vida + pasivoHipotetico(vista, j, cardId).vida,
+    poder: Math.max(0, ataqueHipotetico(vista, j, cardId) + lugar2.ataque),
+    vida: c.vida + pasivoHipotetico(vista, j, cardId).vida + lugar2.vida,
     clado: c.clado,
     vuela: c.rasgo === RASGO.VUELO,
-    espinasPropias: espinasHipoteticas(cardId),
+    espinasPropias: espinasHipoteticas(cardId) + (efectoDeLugar(vista, ranura).espinas ?? 0),
     espinasRecibidas: rivalIid === null ? 0 : espinasDe(vista, rivalIid)
   };
+}
+function valorDeLugar(vista, j, ranura, cardId, mio) {
+  const e = efectoDeLugar(vista, ranura);
+  const V = BALANCE.valorLugar;
+  const b = unidadEn(vista, rival(j), ranura);
+  const abierta = !b || mio.vuela || vuela(vista, b.iid);
+  let valor = 0;
+  if (e.roba) valor += e.roba * V.roba;
+  if (e.muele) valor += e.muele * V.muele * IA.horizonte;
+  if (e.cura) valor += e.cura * V.cura * (IA.horizonte - 1);
+  if (e.sinCuracion) {
+    const c = carta(cardId);
+    const curaba = (mecanicaDe(cardId)?.regenera?.propia ?? 0) + (c.rasgo === RASGO.RAMONEO_BAJO ? BALANCE.rasgos.ramoneoBajoCura : 0);
+    valor += curaba * V.sinCuracion * (IA.horizonte - 1);
+  }
+  if (e.espinas && b && !abierta) valor += e.espinas * V.espinas * IA.horizonte;
+  if (e.sobrante && b && !abierta) {
+    const sobra = Math.max(0, mio.poder - vidaActual(vista, b.iid));
+    valor += sobra * (e.sobrante - 1) * V.sobrante * IA.pesoHabitat;
+  }
+  if (abierta && mio.poder > 0) {
+    const turnos = 1 + (IA.horizonte - 1) * 0.5;
+    if (e.golpeHabitat) valor += e.golpeHabitat * V.golpeHabitat * IA.pesoHabitat * turnos;
+    if (e.guardia) valor -= Math.min(e.guardia, mio.poder) * V.guardia * IA.pesoHabitat * turnos;
+  }
+  return valor;
 }
 function valorDeGuardia(vista, j, cardId) {
   const g = mecanicaDe(cardId)?.guardia?.habitat ?? 0;
@@ -4681,17 +4939,17 @@ function valorDeAccion(vista, j, a) {
     case ACCION.DESPLEGAR: {
       const cardId = vista.instancias[a.iid].cardId;
       const b = unidadEn(vista, contrario, a.ranura);
-      const mio = statsDeCarta(vista, j, cardId, b ? b.iid : null);
-      return valorEnRanura(vista, j, a.ranura, mio) + valorDeEntrada(cardId) + valorDeGuardia(vista, j, cardId) - carta(cardId).coste * IA.pesoCoste;
+      const mio = statsDeCarta(vista, j, cardId, b ? b.iid : null, a.ranura);
+      return valorEnRanura(vista, j, a.ranura, mio) + valorDeEntrada(cardId) + valorDeGuardia(vista, j, cardId) + valorDeLugar(vista, j, a.ranura, cardId, mio) - carta(cardId).coste * IA.pesoCoste;
     }
     case ACCION.MOVER: {
       const inst = vista.instancias[a.iid];
       const cardId = inst.cardId;
       const bDestino = unidadEn(vista, contrario, a.ranura);
       const bOrigen = unidadEn(vista, contrario, inst.ranura);
-      const mio = statsDeCarta(vista, j, cardId, bDestino ? bDestino.iid : null);
-      const mioOrigen = statsDeCarta(vista, j, cardId, bOrigen ? bOrigen.iid : null);
-      return valorEnRanura(vista, j, a.ranura, mio) - valorEnRanura(vista, j, inst.ranura, mioOrigen);
+      const mio = statsDeCarta(vista, j, cardId, bDestino ? bDestino.iid : null, a.ranura);
+      const mioOrigen = statsDeCarta(vista, j, cardId, bOrigen ? bOrigen.iid : null, inst.ranura);
+      return valorEnRanura(vista, j, a.ranura, mio) + valorDeLugar(vista, j, a.ranura, cardId, mio) - valorEnRanura(vista, j, inst.ranura, mioOrigen) - valorDeLugar(vista, j, inst.ranura, cardId, mioOrigen);
     }
     case ACCION.EVENTO: {
       const cardId = vista.instancias[a.iid].cardId;

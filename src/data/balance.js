@@ -29,6 +29,19 @@ export const BALANCE = Object.freeze({
     (typeof process !== 'undefined' && process.env && process.env.DINOWAR_RANURAS) || 4,
   ),
 
+  // ---------------------------------------------------------------- lugares
+  // Cada columna es un LUGAR distinto, sorteado con la semilla al empezar y a
+  // la vista de los dos desde el turno 1 (src/data/lugares.js). Se apagan por
+  // entorno para medir el tablero plano contra el de lugares con las mismas
+  // semillas:
+  //   DINOWAR_LUGARES=0 node sim/run.js --out BALANCE_PLANO.md
+  // Como las ranuras: el navegador no tiene `process` y siempre juega con
+  // ellos, y poner la variable en el servidor le haría re-jugar otro tablero.
+  lugares: Object.freeze({
+    activos: !(typeof process !== 'undefined' && process.env
+      && process.env.DINOWAR_LUGARES === '0'),
+  }),
+
   // -------------------------------------------------------------- recursos
   // La renta NO depende de dominar el campo. Es la corrección central de la v2:
   // en la v1, atarla al control hacía que el 87,6 % de las partidas las ganase
@@ -362,6 +375,23 @@ export const BALANCE = Object.freeze({
     devuelveRival: 2.2,
     entierra: 0.5,      // alarga tu mazo; poco, salvo cuando ya no queda
     golpeHabitat: 1,    // se multiplica por ia.pesoHabitat, como curaHabitat
+  }),
+
+  // ------------------------------------------------- lo que vale un lugar
+  //
+  // Lo que un lugar suma de Ataque o de Vida la IA lo ve solo: entra en las
+  // cifras hipotéticas con las que tasa cada ranura. Lo demás no cambia una
+  // cifra y hay que tasarlo aparte, con el mismo criterio que las entradas:
+  // sin peso, la IA no distingue una columna de otra y el lugar es decorado.
+  valorLugar: Object.freeze({
+    roba: 1.4,          // como `valorEntrada.roba`: una carta en la mano
+    muele: -0.4,        // como `muelePropio`: es un coste, por turno que dure
+    cura: 0.5,          // un punto de Vida que vuelve, por turno que dure
+    sinCuracion: -0.5,  // lo contrario, sólo para quien curaba
+    espinas: 0.35,      // como `ia.pesoDano`: daño que no mata, por turno
+    sobrante: 1,        // se multiplica por el sobrante esperado y pesoHabitat
+    guardia: 1,         // por pesoHabitat: lo que deja de llegar al hábitat
+    golpeHabitat: 1,    // por pesoHabitat: lo que llega de más
   }),
 
   // --------------------------------------------------------------------- IA

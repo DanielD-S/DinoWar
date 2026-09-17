@@ -25,6 +25,7 @@
 // animador.
 
 import { carta } from '../data/cards.js';
+import { lugarPorId } from '../data/lugares.js';
 
 /**
  * @typedef {object} Compas
@@ -144,6 +145,19 @@ export const GUION = Object.freeze({
     dura: LARGO,
     sonido: 'clima',
     hacer: (e, api) => api.anuncio(carta(e.cardId).binomial, 'clima'),
+  },
+  // Lo que hace un LUGAR por su cuenta: robar al recibir una criatura, moler
+  // al final del turno. Lo que un lugar suma a las cifras no dispara evento:
+  // se ve en la carta, como un aura.
+  LUGAR: {
+    dura: BREVE,
+    sonido: 'mazo',
+    hacer: (e, api) => {
+      const nodo = api.carta(e.iid);
+      if (nodo) api.rotulo(nodo, lugarPorId(e.lugar)?.nombre ?? e.lugar);
+      if (e.efecto === 'roba') api.enMazo(e.jugador, `+${e.n}`);
+      if (e.efecto === 'muele') api.enMazo(e.jugador, `−${e.n}`, 'malo');
+    },
   },
   // Un clima que caduca se va solo; el tablero deja de pintarlo y esto lo dice.
   CAMPO_FIN: {

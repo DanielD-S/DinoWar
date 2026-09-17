@@ -4,6 +4,7 @@
 import { BALANCE, MAZO } from '../data/balance.js';
 import { CARTAS, TIPO, CLADO, RASGO, carta } from '../data/cards.js';
 import { QUE, CUANDO, INMUNE, TODOS, esZona } from '../data/mecanicas.js';
+import { LUGARES_IDS, lugarPorId, efectoDeLugar, bonoDeLugar } from '../data/lugares.js';
 import { barajar, semilla } from './rng.js';
 
 export const FASE = Object.freeze({
@@ -114,6 +115,18 @@ export function crearPartida(seedEntrada = 1, mazos = null) {
     for (let k = 0; k < BALANCE.manoInicial + extra; k++) jug.mano.push(jug.mazo.shift());
   }
 
+  // Los lugares, uno por columna y sin repetir. Se sortean DESPUÉS de los
+  // mazos y las manos, con el mismo rng, así que salen de la semilla y el
+  // servidor los re-juega igual; y al ir detrás, el reparto de cartas de una
+  // semilla es el mismo con lugares que sin ellos, que es lo que permite medir
+  // el tablero plano contra el de lugares con las mismas semillas.
+  let lugares = Array.from({ length: BALANCE.ranuras }, () => null);
+  if (BALANCE.lugares.activos) {
+    const b = barajar([...LUGARES_IDS], rng);
+    rng = b.rng;
+    lugares = b.lista.slice(0, BALANCE.ranuras);
+  }
+
   return {
     seed: semilla(seedEntrada),
     rng,
@@ -128,6 +141,9 @@ export function crearPartida(seedEntrada = 1, mazos = null) {
       Array.from({ length: BALANCE.ranuras }, () => null),
       Array.from({ length: BALANCE.ranuras }, () => null),
     ],
+    // El lugar de cada columna, por id; null es una columna sin nada. Es la
+    // COLUMNA y no la ranura: las dos ranuras enfrentadas lo comparten.
+    lugares,
     jugadores,
     eventos: [],
     ganador: null,
@@ -288,6 +304,9 @@ export function ataqueEfectivo(state, iid) {
   if (m?.si?.ataque && seCumple(state, inst, m.si)) poder += m.si.ataque;
   poder += aurasSobre(state, inst).ataque;
 
+  // Y el lugar donde está puesta.
+  poder += bonoDeLugar(state, inst.ranura, c.clado).ataque;
+
   return Math.max(0, poder);
 }
 
@@ -326,6 +345,10 @@ export function vidaMaxima(state, iid) {
   if (m?.si?.vida && seCumple(state, inst, m.si)) v += m.si.vida;
   v += aurasSobre(state, inst).vida;
 
+  // Y el lugar donde está puesta. Es Vida dinámica como la del clima: al
+  // moverse a otra columna se pierde, y una unidad herida puede caerse ahí.
+  v += bonoDeLugar(state, inst.ranura, c.clado).vida;
+
   return Math.max(0, v);
 }
 
@@ -351,8 +374,30 @@ function delClado(state, inst, clado, min) {
  * daño en alguna carta; lo quiso, y por eso esto es una línea y no un injerto.
  */
 export function espinasDe(state, iid) {
-  return mecanicaDe(state.instancias[iid].cardId)?.espinas ?? 0;
+  const inst = state.instancias[iid];
+  return (mecanicaDe(inst.cardId)?.espinas ?? 0) + (efectoDeLugar(state, inst.ranura).espinas ?? 0);
 }
+
+/** El lugar de una columna, o null en el tablero plano. */
+export const lugarEn = (state, ranura) => lugarPorId(state.lugares?.[ranura] ?? null);
+
+/**
+ * Lo que un lugar hace con un golpe al hábitat que sale de esa columna: el
+ * Desfiladero le quita y el Barranco le pone. Sólo a un golpe que llega: un
+ * Ataque de 0 no pega 1 por estar en el Barranco, y un golpe que la guardia
+ * dejó en cero no baja de ahí.
+ */
+export function ajustarGolpeDeLugar(state, ranura, dano) {
+  if (dano <= 0) return 0;
+  const e = efectoDeLugar(state, ranura);
+  return Math.max(0, dano + (e.golpeHabitat ?? 0) - (e.guardia ?? 0));
+}
+
+/** Por cuánto se multiplica el daño que sobra al matar en esa columna. */
+export const sobranteDeLugar = (state, ranura) => efectoDeLugar(state, ranura).sobrante ?? 1;
+
+/** ¿Este lugar deja moverse desde o hacia esa columna? */
+export const columnaInmovil = (state, ranura) => efectoDeLugar(state, ranura).inmovil === true;
 
 /**
  * Daño que `atacante` inflige a `defensor`, red trófica incluida.
@@ -398,7 +443,8 @@ export function guardiaDe(state, bando) {
 export function danoAlHabitat(state, iid, defensor = null) {
   const bruto = ataqueEfectivo(state, iid);
   if (defensor === null) return bruto;
-  return Math.max(0, bruto - guardiaDe(state, defensor));
+  const ranura = state.instancias[iid].ranura;
+  return ajustarGolpeDeLugar(state, ranura, Math.max(0, bruto - guardiaDe(state, defensor)));
 }
 
 /** ¿Sobrevuela la ranura en vez de chocar con quien tiene enfrente? */
@@ -433,6 +479,12 @@ export function curacionDe(state, iid) {
   for (const o of unidadesDe(state, inst.dueno)) {
     cura += mecanicaDe(o.cardId)?.regenera?.aliados ?? 0;
   }
+
+  // Y el lugar: el Bosque cura a lo que esté en él y las Salinas no dejan
+  // curar a nadie, venga de donde venga la curación.
+  const lugar = efectoDeLugar(state, inst.ranura);
+  cura += lugar.cura ?? 0;
+  if (lugar.sinCuracion) return 0;
   return cura;
 }
 
@@ -522,6 +574,17 @@ export function efectosDe(state, iid) {
       fuente: carta(o.cardId).binomial,
       ataque: a.ataque ?? 0, vida: a.vida ?? 0, veces: 1,
       nota: o.iid === inst.iid ? 'su propio rasgo' : 'aura de un compañero',
+    });
+  }
+
+  // El lugar donde está. Sólo si le cambia las cifras: lo que hace un lugar
+  // sin tocarlas —curar, moler, robar— se lee en la franja de lugares.
+  const bono = bonoDeLugar(state, inst.ranura, c.clado);
+  if (bono.ataque || bono.vida) {
+    fuera.push({
+      fuente: lugarEn(state, inst.ranura).nombre,
+      ataque: bono.ataque, vida: bono.vida, veces: 1,
+      nota: 'el lugar de su columna',
     });
   }
 

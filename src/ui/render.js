@@ -5,6 +5,7 @@ import { enMazo, enMano, comprometidas } from './ocultas.js';
 import {
   CARTAS, TIPO, TIPO_NOMBRE, CLADO_NOMBRE, RAREZA_NOMBRE, RASGO, ES_DINOSAURIO, carta, CARTAS_DE_JEFE,
 } from '../data/cards.js';
+import { lugarPorId } from '../data/lugares.js';
 import {
   unidadEn, unidadesDe, ataqueEfectivo, vidaMaxima, vidaActual,
   efectosDe, adheridasA,
@@ -91,6 +92,60 @@ export function montar() {
       `<div class="ranura" data-bando="${bando}" data-ranura="${r}">${bando === JUGADOR ? r + 1 : ''}</div>`).join('');
   }
   el.filas = [id('fila-0'), id('fila-1')];
+
+  // Los lugares, uno por columna. Nacen vacíos: cada partida trae los suyos y
+  // `pintarLugares` los escribe. Tocar uno abre su ficha con lo que hace.
+  el.lugares = id('fila-lugares');
+  el.lugares.innerHTML = Array.from({ length: BALANCE.ranuras }, (_, r) =>
+    `<button class="lugar" type="button" data-ranura="${r}" hidden></button>`).join('');
+  el.lugares.addEventListener('click', (e) => {
+    const boton = e.target.closest('.lugar');
+    if (!boton || !boton.dataset.lugar) return;
+    abrirFicha(fichaDeLugarHTML(boton.dataset.lugar));
+  });
+}
+
+/** Lo que dice la ficha de un lugar. */
+export function fichaDeLugarHTML(idLugar) {
+  const l = lugarPorId(idLugar);
+  if (!l) return '';
+  return `<div class="ficha-cab">
+      <div class="ficha-binomial recto">${l.nombre}</div>
+      <div class="ficha-clado">Lugar de la columna</div>
+    </div>
+    <div class="ficha-rasgo"><h3>${l.nombre}</h3><p>${l.texto}</p></div>
+    <p class="ficha-nota">El lugar es de la columna, no de la ranura: vale igual para lo tuyo
+    y para lo del rival mientras dure la partida. Se sortea al empezar, con la misma semilla
+    que baraja los mazos, así que los dos lo ven desde el turno 1.</p>`;
+}
+
+/**
+ * El lugar de cada columna. Cambia una vez por partida, pero se pinta en cada
+ * repintado porque el estado de un duelo llega dado la vuelta y ya con los
+ * suyos; es barato y así no hay que acordarse de llamarlo al empezar.
+ */
+function pintarLugares(estado) {
+  const lugares = estado.lugares ?? [];
+  const alguno = lugares.some(Boolean);
+  el.lugares.hidden = !alguno;
+  for (const boton of el.lugares.children) {
+    const r = Number(boton.dataset.ranura);
+    const l = lugarPorId(lugares[r]);
+    boton.hidden = !l;
+    if (!l) { delete boton.dataset.lugar; boton.innerHTML = ''; continue; }
+    if (boton.dataset.lugar === l.id) continue;
+    boton.dataset.lugar = l.id;
+    boton.title = l.texto;
+    boton.innerHTML = `<b>${l.nombre}</b><i>${l.texto}</i>`;
+  }
+  // Y el nombre en la ranura vacía, donde antes ponía «ZONA n»: el CSS lo lee
+  // del atributo, así que aquí basta con escribirlo.
+  for (const bando of [0, 1]) {
+    for (const nodo of el.filas[bando].children) {
+      const l = lugarPorId(lugares[Number(nodo.dataset.ranura)]);
+      if (l) nodo.dataset.lugarNombre = l.nombre; else delete nodo.dataset.lugarNombre;
+    }
+  }
 }
 
 // ----------------------------------------------------------------- cartas
@@ -498,6 +553,7 @@ export function render(estado) {
   el.rPila.classList.toggle('aviso', enMazo(r) <= 4);
 
   pintarHabitat(estado);
+  pintarLugares(estado);
   pintarRanuras(estado);
   pintarFranja(estado);
   pintarMano(estado);
@@ -885,6 +941,14 @@ export function ayudaHTML() {
     <p class="ayuda-p">
       De ahí sale la decisión de cada turno: <b>una fila llena tapa tu hábitat pero regala trofeos;
       una fila corta niega trofeos pero deja pasar el daño</b>. No hay postura segura.
+    </p>
+    <p class="ayuda-p">
+      Y cada columna es un <b>lugar</b> distinto —un río, un bosque, una llanura—, sorteado al
+      empezar y a la vista de los dos desde el turno 1. El lugar es de la columna, no de la
+      ranura: vale igual para lo tuyo y para lo del rival. Un reptil marino pega más en el río,
+      lo que está en el bosque cura cada turno, en la llanura el daño que sobra al matar se
+      dobla. <b>Dónde pones cada carta es una decisión</b>, y el rival la lee igual que tú.
+      Toca el rótulo de un lugar para leer qué hace.
     </p>
 
     <div class="ayuda-h">La Biomasa</div>

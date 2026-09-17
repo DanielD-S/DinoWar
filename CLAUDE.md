@@ -39,6 +39,7 @@ hay que hacer caso cuando el test lo dice.
 |---|---|---|
 | `SET_DE_CARTAS.md` | `node sim/set.js` | CI |
 | `BALANCE.md` | `npm run sim` | — |
+| `LUGARES.md` | `node sim/lugares.mjs` | — |
 | `ECONOMIAS.md` | `node sim/economias.js` | — |
 | `supabase/migrations/0004_catalogo.sql` | `node tools/generar-catalogo.mjs` | `test/catalogo.test.js` |
 | `supabase/functions/asalto/paquete.ts` | `node tools/empaquetar-asalto.mjs` | `test/paquete.test.js` |
@@ -80,7 +81,7 @@ importar, antes de mirar el `tipo`. El orden es: mergear, volver a anclar sobre
 main, y desplegar entonces. `node tools/anclar-desde-url.mjs` lo avisa por
 pantalla cuando el commit no está en main.
 
-## Los seis simuladores, y qué NO ve cada uno
+## Los siete simuladores, y qué NO ve cada uno
 
 Es el error que más veces se ha repetido: cambiar una carta, correr `npm run sim`,
 ver los seis números idénticos y creer que el cambio no hace nada.
@@ -93,6 +94,7 @@ ver los seis números idénticos y creer que el cambio no hace nada.
 | `node sim/climas.js` | fuerza cada clima al campo | no dice si la carta es buena, sólo qué le hace al juego mientras está puesta |
 | `node sim/entradas.js` | un mazo cargado de disparos al entrar | es la COTA, no el balance: el mazo está sesgado a propósito |
 | `node sim/arquetipos.mjs` | mazos ENTEROS construidos por idea, unos contra otros | no dice si una carta suelta está rota: para eso está `carta.mjs` |
+| `node sim/lugares.mjs` | el tablero plano contra el de lugares con las mismas semillas, y cada lugar forzado | juega el mazo de referencia: el Río y el Acantilado salen como columnas vacías porque no lleva marinos ni casi pterosaurios |
 
 **`sim/carta.mjs` es el que responde a «¿esta carta está rota?»**, que es la única
 pregunta que se hace al escribir una carta y la que ninguno de los otros cuatro
@@ -915,6 +917,118 @@ Tres cosas que costaron al llegar el arte, por si vuelven:
 
 El botón de volver del mapa no lleva `data-volver`: `meta.js` ata todos los
 `[data-volver]` al menú, y el mapa vuelve a la pantalla de jugar.
+
+## Los lugares: terreno por columna
+
+El tablero eran cuatro ranuras enfrentadas y las cuatro iguales: la única
+diferencia entre ponerte en la 1 o en la 3 era qué tenía el rival enfrente. Lo
+único que cambiaba el campo era el clima, y lo cambiaba entero y para los dos.
+Desde el 17-09-2026 **cada columna es un LUGAR distinto** —un río, un bosque,
+una llanura—, sorteado al empezar con la misma semilla que baraja los mazos y a
+la vista de los dos desde el turno 1. Idea del autor, con Marvel Snap delante:
+allí las localizaciones se descubren una por turno; aquí van todas a la vista
+desde el principio, porque el despliegue ya es a ciegas y esconder también el
+mapa sería demasiada niebla.
+
+Son DATOS, [`src/data/lugares.js`](src/data/lugares.js), con un vocabulario de
+once FORMAS —`ataque`, `vida`, `cura`, `sinCuracion`, `espinas`, `sobrante`,
+`guardia`, `golpeHabitat`, `inmovil`, `roba`, `muele`— que el motor aplica
+donde toca: las cifras en `ataqueEfectivo` y `vidaMaxima`, la curación en
+`curacionDe`, el sobrante y el golpe al hábitat en `faseCombate`, el robo en la
+revelación y la molienda al final del turno. Poner un lugar nuevo es escribir un
+objeto; una forma nueva son los cuatro sitios de siempre —aplicarla, enseñarla
+en `efectosDe`, tasarla en `ai.js` (`valorDeLugar` y `BALANCE.valorLugar`), y
+nombrarla en `FORMAS`— y `test/lugares.test.js` exige que toda forma la use
+algún lugar y que todo lugar use sólo formas del vocabulario. Hoy son 17.
+
+Seis decisiones que no se deducen del código:
+
+- **El lugar es de la COLUMNA, no de la ranura.** Las dos ranuras enfrentadas
+  lo comparten y vale igual para los dos bandos, como el clima. Por eso el
+  duelo no tiene que darle la vuelta: `desdeMiLado` cambia los bandos y las
+  columnas se quedan donde están, y `test/lugares.test.js` lo comprueba.
+- **Se sortean DESPUÉS de los mazos y las manos**, con el mismo rng. Salen de
+  la semilla, así que el servidor los re-juega igual sin que viajen en la
+  petición; y al ir detrás, el reparto de cartas de una semilla es idéntico con
+  lugares y sin ellos. Es lo que permite medir el tablero plano contra el de
+  lugares con las mismas semillas y leer la diferencia como de los lugares.
+- **Ninguno pregunta nada**, como todo lo que pasa en la revelación: el efecto
+  está fijo y se aplica en la fase que toque.
+- **Los escenarios de test son PLANOS.** `tablero()` en `test/helpers.js` borra
+  los lugares: un test mide una carta, y un lugar sorteado por la semilla 42 le
+  cambiaría las cifras sin que nadie lo pidiera. Cuatro tests de reglas
+  fallaron por eso el primer día. Quien quiera un lugar lo pone a mano en
+  `s.lugares[r]`, y el simulador lo fuerza por el sexto parámetro de
+  `jugarPartida`.
+- **La IA los tasa, o no existen.** Lo que suma Ataque o Vida entra solo en
+  `statsDeCarta`, que ahora lleva la ranura; lo demás —robar, moler, curar,
+  espinas, sobrante, guardia, golpe— pasa por `valorDeLugar` con su peso en
+  `BALANCE.valorLugar`. Sin eso el Cauce seco sería una columna como otra y la
+  IA se molería sola. Es la misma lección que `valorEntrada` y la Llanura.
+- **La Ciénaga resta 1 además de inmovilizar**, porque `inmovil` hoy no muerde
+  a nadie: no queda ninguna carta con el rasgo Migrador. Sin el −1 sería un
+  lugar que no hace nada, que es lo que el test no deja escribir. La regla del
+  movimiento queda puesta para el día que vuelva un migrador, y va ANTES que
+  el rasgo en `validar`: es la columna la que no deja.
+
+Y lo que se apaga por entorno para medir, como las ranuras y el sobrante:
+`DINOWAR_LUGARES=0 node sim/run.js`. En el navegador no hay `process` y
+siempre juega con ellos; ponerlo en el servidor le haría re-jugar otro tablero.
+
+### Medidos antes de darlos por buenos
+
+`node sim/lugares.mjs`, y lo que salió está en `LUGARES.md`. Las dos preguntas:
+
+**¿Qué le hacen al juego?** Casi nada, y eso es lo que tenía que salir. Plano
+contra sorteo, 2.000 partidas por tanda y DOS semillas, porque a 600 partidas
+la bola de nieve parecía bajar 3,5 puntos y no era verdad:
+
+| semilla | tablero | turnos | inicial | bola | vías |
+|---|---|---|---|---|---|
+| 1 | plano | 11,1 | 45,6 % | 71,7 % | 26 / 74 / 0 |
+| 1 | lugares | 10,6 | 46,0 % | 70,6 % | 28 / 72 / 0 |
+| 5001 | plano | 11,0 | 46,7 % | 71,6 % | 27 / 73 / 0 |
+| 5001 | lugares | 10,7 | 45,6 % | 72,3 % | 28 / 72 / 1 |
+
+La duración baja cuatro décimas las dos veces; el inicial y la bola de nieve
+se mueven un punto y en direcciones OPUESTAS según la semilla, o sea ruido. Los
+seis números de `BALANCE.md` siguen hablando del mismo juego: **ningún lugar por
+sí solo domina la partida** cuando cae en una columna de cuatro. Si alguien
+mide una baja de la bola de nieve con los lugares, que mire cuántas partidas y
+cuántas semillas: la de 600 era de 3,5 puntos y se fue con la muestra.
+
+**¿Cuál no cambia nada y cuál decide solo?** Cada lugar forzado en las CUATRO
+columnas (300 partidas) enseña lo que haría si fuera el tablero entero:
+
+| lugar | en las cuatro | atracción a solas |
+|---|---|---|
+| **Ladera volcánica** (+2 a todos) | 8,6 turnos, **94 % hábitat** | **1,74** |
+| Nidada (roba 1 al revelar) | 8,9 turnos, 83 % trofeos | 1,41 |
+| Barranco (+1 al hábitat) | 9,2 turnos, 89 % hábitat | 1,52 |
+| Cauce seco (muele 1 por turno) | **43 % extinción**, bola 57 % | **0,63** |
+| Desfiladero (−1 al hábitat) | 12,8 turnos | **0,54** |
+| Ciénaga (−1 a todos) | 12,6 turnos | 0,58 |
+| Bosque, Cazadero | sin mover el juego | 1,36 |
+| Río, Acantilado, Salinas | idénticos al plano | 1,00 |
+
+- **La ladera es el más influyente**, con diferencia: +2 en las cuatro
+  columnas convierte la partida en una carrera al hábitat de ocho turnos. En
+  una columna es el sitio al que van todos (1,74). Se dejó en +2 porque el
+  sorteo entero no mueve el balance; si algún día hay que tocar uno, es éste.
+- **El Cauce seco es el único que abre la extinción** —del 0 % al 43 % con el
+  tablero entero— y la IA lo evita (0,63), que es lo que debe: ocupar la
+  columna cuesta mazo. Es también el único que baja la bola de nieve.
+- **El Desfiladero es el más evitado** (0,54): un punto de guardia en una
+  columna vale menos que cualquier otra columna. Puede que la IA lo tase de
+  más; medido en victorias no se ha mirado.
+- **Río y Acantilado salen en 1,00 porque el mazo de referencia no lleva
+  marinos ni pterosaurios.** No es que no hagan nada: es que aquí no hay a
+  quién. Lo mismo que la molienda en `sim/carta.mjs`, un piso más abajo.
+
+Y lo que NO mide, por si alguien lo lee de más: todo esto es el mazo de
+referencia contra sí mismo. Lo que un lugar vale para un mazo que lo busca —un
+mazo de marinos con el Río, uno de molienda con el Cauce— sólo se verá cuando
+exista ese mazo.
 
 ## Las dos cartas de jefe viven fuera del set
 
@@ -2315,6 +2429,13 @@ inicio». El menú lleva un botón «Instalar app» (`src/ui/instalar.js`) que s
 aparece cuando sirve: guarda el `beforeinstallprompt` y lo lanza al tocarlo;
 en iPhone, que no tiene ese aviso, explica el gesto; instalado, no sale.
 
+**Opera en PC no instala PWA.** Es Chromium, pero quitó esa parte, así que
+nunca dispara el aviso y el botón no podía salir —en Android sí lo hace—.
+Firefox tampoco lo tiene. Desde el 17-09-2026, en escritorio sin aviso el botón
+sale igual y al pulsarlo dice «En Opera y Firefox no se puede instalar; ábrelo
+en Chrome o Edge» (`notaDeEscritorio`). Mejor eso que un hueco. En un móvil
+sin aviso sigue sin salir: ahí «ábrelo en Chrome» es más difícil de seguir.
+
 - **El manifest es texto de cara al público**: es lo que enseña la ventana de
   instalación y lo que leería una tienda. Decía «sin cuenta, sin conexión»
   meses después de que las dos cosas dejaran de ser ciertas.
@@ -2397,9 +2518,9 @@ Dicho para que nadie lo descubra tarde:
   integrado de Supabase manda 2 correos a la hora y sólo a direcciones del
   equipo.
 - **El balance cumple 3 de 6** (`BALANCE.md`, mazo de referencia del
-  16-09-2026): cero cartas descalibradas y la duración en objetivo; el
-  jugador inicial en 45,4 %, la bola de nieve en 71,2 % y las vías en
-  25/75/0. La referencia nueva queda al 48–52 % contra Molienda, Entierro y
+  16-09-2026 y lugares del 17-09): cero cartas descalibradas y la duración en
+  objetivo; el jugador inicial en 46,3 %, la bola de nieve en 71,2 % y las
+  vías en 29/71/0 (45,4 %, 71,2 % y 25/75/0 con el tablero plano). La referencia nueva queda al 48–52 % contra Molienda, Entierro y
   Hábitat (la del 13-09 perdía el 70–75 %), así que los seis números vuelven
   a hablar del juego y no de un mazo que cualquier construcción bate. Lo que
   no cambió: **108 de las 139** cartas siguen fuera de él, o sea sin

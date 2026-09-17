@@ -1811,6 +1811,32 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .ranura.ocupada { border-color: transparent; background: none; }
 
+/* Los lugares: uno por columna, entre la fila del rival y la franja del clima.
+   Es la columna la que tiene lugar, así que va alineado con las ranuras —la
+   misma rejilla— y no con la franja. Nombre siempre; el texto sólo donde cabe. */
+.fila-lugares {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;
+  flex: 0 0 auto;
+}
+.fila-lugares[hidden] { display: none; }
+.lugar {
+  min-width: 0; padding: 3px 3px 2px; border-radius: 6px;
+  border: 1px solid var(--linea);
+  background: linear-gradient(180deg, rgba(217,164,65,.08), rgba(217,164,65,.02));
+  color: var(--acento-claro); font: inherit; cursor: pointer; text-align: center;
+  line-height: 1.15;
+}
+.lugar b {
+  display: block; font-size: 8.5px; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.lugar i { display: none; font-style: normal; font-size: 9px; color: var(--tenue); margin-top: 2px; }
+.lugar:active { border-color: var(--bio); }
+@media (min-width: 560px) {
+  .lugar i { display: block; }
+}
+
 /* Franja de campo activo. */
 .franja {
   display: flex; align-items: center; gap: 8px;

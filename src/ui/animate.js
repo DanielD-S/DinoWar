@@ -4,6 +4,7 @@
 
 import { BALANCE } from '../data/balance.js';
 import { CLADO_NOMBRE, carta } from '../data/cards.js';
+import { lugarPorId } from '../data/lugares.js';
 import { CAUSA } from '../engine/state.js';
 import { el, JUGADOR, RIVAL, render } from './render.js';
 import { compasDe, seVe } from './guion.js';
@@ -368,6 +369,10 @@ export function lineasDeLog(eventos) {
         break;
       case 'CAMPO_FIN':
         push(`El clima <b>${carta(e.cardId).binomial}</b> remite`);
+        break;
+      case 'LUGAR':
+        push(`<b>${lugarPorId(e.lugar)?.nombre ?? e.lugar}</b>: <b>${bando(e.jugador)}</b> `
+          + (e.efecto === 'roba' ? `roba ${e.n}` : `pierde ${e.n} del mazo`), e.jugador);
         break;
       case 'RECURSO':
         push(`<b>${bando(e.jugador)}</b> juega <b>${carta(e.cardId).binomial}</b> y sube a ${e.biomasa} de Biomasa`, e.jugador);

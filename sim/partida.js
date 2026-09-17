@@ -15,6 +15,11 @@ const MAX_ACCIONES_POR_FASE = 200;
  * @param {Array<[string, number]>|null} [mazo] mazo que llevan LOS DOS bandos.
  *   Sin él juegan el de referencia. Sirve para medir un mazo distinto sin
  *   tocar `src/data/balance.js`.
+ * @param {Array<string|null>} [lugares] los lugares de las columnas, forzados.
+ *   Sin ellos salen los de la semilla; con una lista de nulls el tablero es
+ *   plano. Es lo que permite medir los lugares contra el mismo reparto de
+ *   cartas: se sortean después de los mazos, así que forzarlos no cambia
+ *   ninguna mano.
  */
 export function jugarPartida(
   seed,
@@ -22,8 +27,10 @@ export function jugarPartida(
   observador = null,
   redactar = true,
   mazo = null,
+  lugares = undefined,
 ) {
   let s = crearPartida(seed, mazo ? [mazo, mazo] : null);
+  if (lugares !== undefined) s.lugares = [...lugares];
   // RNG de decisión independiente del de la partida: cambiar la IA no cambia
   // los repartos, así que las comparaciones A/B son limpias.
   let rng = semilla(seed ^ 0x5bf03635);
@@ -56,7 +63,12 @@ export function jugarPartida(
           anotarManos();
           actuo = true;
           if (d.accion.tipo !== ACCION.PASAR && d.accion.tipo !== ACCION.DESCARTAR && d.accion.iid !== undefined) {
-            jugadas.push({ turno: s.turno, jugador: j, cardId: s.instancias[d.accion.iid].cardId });
+            // La ranura sólo la llevan los despliegues: es lo que mide qué
+            // lugar atrae y cuál se evita.
+            jugadas.push({
+              turno: s.turno, jugador: j, cardId: s.instancias[d.accion.iid].cardId,
+              ranura: d.accion.tipo === ACCION.DESPLEGAR ? d.accion.ranura : null,
+            });
           }
         }
         if (!actuo) break;
