@@ -1788,13 +1788,17 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* Las filas se reparten el hueco que queda: fijar su alto en vh desbordaba la
    pantalla en 360×640, que es la más pequeña que el juego declara soportar. */
+/* `minmax(0, 1fr)` y no `1fr`: `1fr` es `minmax(auto, 1fr)`, y el «auto» deja
+   que el contenido mínimo de una celda —un nombre de lugar en una línea—
+   ensanche su columna y encoja las otras tres. Se vio con «Bosque de
+   coníferas»: la primera ranura salía el doble de ancha que la cuarta. */
 .fila-ranuras {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px;
   flex: 1 1 0; min-height: 92px; max-height: 172px;
 }
 
 .ranura {
-  position: relative; height: 100%; min-height: 0;
+  position: relative; height: 100%; min-height: 0; min-width: 0;
   border-radius: 7px;
   border: 1px dashed #3a2f22;
   background: rgba(244,236,224,.015);
@@ -1815,7 +1819,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
    Es la columna la que tiene lugar, así que va alineado con las ranuras —la
    misma rejilla— y no con la franja. Nombre siempre; el texto sólo donde cabe. */
 .fila-lugares {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px;
   flex: 0 0 auto;
 }
 .fila-lugares[hidden] { display: none; }
@@ -1826,10 +1830,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   color: var(--acento-claro); font: inherit; cursor: pointer; text-align: center;
   line-height: 1.15;
 }
+/* El nombre cabe en dos líneas y no se corta con puntos: «Bosque de coníferas»
+   a 8,5 px son 26 letras y a 85 px de columna no entran en una. */
 .lugar b {
-  display: block; font-size: 8.5px; font-weight: 600;
-  letter-spacing: .1em; text-transform: uppercase;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  font-size: 8.5px; font-weight: 600; line-height: 1.2;
+  letter-spacing: .08em; text-transform: uppercase;
+  overflow: hidden; overflow-wrap: anywhere;
 }
 .lugar i { display: none; font-style: normal; font-size: 9px; color: var(--tenue); margin-top: 2px; }
 .lugar:active { border-color: var(--bio); }
