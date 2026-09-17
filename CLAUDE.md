@@ -1030,6 +1030,15 @@ referencia contra sí mismo. Lo que un lugar vale para un mazo que lo busca —u
 mazo de marinos con el Río, uno de molienda con el Cauce— sólo se verá cuando
 exista ese mazo.
 
+**En producción desde el 17-09-2026.** La PR #116 se mergeó con MERGE y no con
+squash, la Edge Function quedó anclada a `de7ccf8`, el commit de merge, que vive
+en `main`, y se desplegó por MCP como función v31: el `ezbr_sha256` pasó de
+`01935043…` a `e01728d6…`, y el despliegue resolvió los 25 importes por URL
+—el paquete lleva `lugares.js` desde esta tanda—, que es lo que falla primero
+cuando jsDelivr no ve un fichero. La prueba de humo con la extensión `http`
+no se pudo hacer desde aquí: el SQL de la sesión era de sólo lectura y no deja
+crear la extensión. Queda por confirmar con una partida cobrada.
+
 ## Las dos cartas de jefe viven fuera del set
 
 `CARTAS_DE_JEFE` no está en `CARTAS`, y eso las ha dejado fuera de todas las
