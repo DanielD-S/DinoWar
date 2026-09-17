@@ -7,7 +7,7 @@ import { TIPO, OBJETIVO, CLADO, RASGO, carta } from '../data/cards.js';
 import {
   FASE, FASES_INTERACTIVAS, rival,
   ranuraValida, unidadesDe, ranurasLibres, buscablesDe, buscaEnElMazo, ataqueEfectivo,
-  puedeReciclar, campoEs, mecanicaDe, inmuneA,
+  puedeReciclar, campoEs, mecanicaDe, inmuneA, columnaInmovil,
 } from './state.js';
 import { INMUNE } from '../data/mecanicas.js';
 import { barajar } from './rng.js';
@@ -131,8 +131,13 @@ export function validar(s, a) {
   if (a.tipo === ACCION.MOVER) {
     if (inst.dueno !== a.jugador) return 'esa unidad no es tuya';
     if (inst.ranura === null) return 'esa unidad no está en el campo';
-    if (carta(inst.cardId).rasgo !== RASGO.MIGRADOR) return 'esa unidad no puede moverse';
     if (!ranuraValida(a.ranura)) return 'ranura inexistente';
+    // La Ciénaga: ni se sale de ella ni se entra, sea quien sea. Va antes del
+    // rasgo porque es la columna la que no deja, y así la interfaz puede decir
+    // el motivo que de verdad manda.
+    if (columnaInmovil(s, inst.ranura)) return 'de ese lugar no se puede salir';
+    if (columnaInmovil(s, a.ranura)) return 'a ese lugar no se puede entrar';
+    if (carta(inst.cardId).rasgo !== RASGO.MIGRADOR) return 'esa unidad no puede moverse';
     if (s.ranuras[a.jugador][a.ranura] !== null) return 'esa ranura está ocupada';
     if (ranuraReservada(s, a.jugador, a.ranura)) return 'ya has comprometido esa ranura';
     if (jug.pendientes.some((p) => p.iid === a.iid)) return 'esa unidad ya se mueve este turno';

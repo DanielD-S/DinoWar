@@ -17,6 +17,10 @@ export function tablero(seed = 42) {
     jug.mano = [];
     jug.biomasa = 0;
   }
+  // Tablero PLANO: un escenario mide una carta, y un lugar sorteado por la
+  // semilla le cambiaría las cifras sin que el test lo haya pedido. Quien
+  // quiera un lugar lo pone a mano en `s.lugares[r]`.
+  s.lugares = s.lugares.map(() => null);
   return s;
 }
 

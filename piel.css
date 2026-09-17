@@ -94,7 +94,11 @@
 .ranura:not(.ocupada)::before {
   content: 'ZONA ' counter(zona);
   font-size: 8px; letter-spacing: .13em; color: rgba(217,164,65,.5); font-weight: 500;
+  max-width: 92%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+/* Con lugares, la ranura vacía dice el suyo en vez de «ZONA n»: es lo que
+   decide dónde soltar la carta, y el número ya lo lleva la fila de lugares. */
+.ranura[data-lugar-nombre]:not(.ocupada)::before { content: attr(data-lugar-nombre); text-transform: uppercase; }
 .ranura:not(.ocupada)::after {
   content: ''; width: 14px; height: 1px; margin-top: 4px; background: rgba(217,164,65,.28);
 }

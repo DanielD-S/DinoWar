@@ -9,6 +9,7 @@
 import { writeFileSync } from 'node:fs';
 import { BALANCE, MAZO, TOTAL_MAZO, mazoConBiomasa } from '../src/data/balance.js';
 import { CARTAS, TIPO, CLADO_NOMBRE } from '../src/data/cards.js';
+import { LUGARES, LUGARES_IDS } from '../src/data/lugares.js';
 import { MOTIVO_FIN } from '../src/engine/state.js';
 import { PERFIL } from '../src/engine/ai.js';
 import { jugarPartida, foto, lider } from './partida.js';
@@ -70,6 +71,10 @@ export function correr({ n, seed, perfiles, mazo = null }) {
     jugadasTotales: 0,
     ventajaAcertada: 0, ventajaTotal: 0,
     unidadesPorTurno: [], trofeosFinales: [], biomaFinal: [],
+    // Qué lugar atrae y cuál se evita: en cuántas columnas ha salido cada uno
+    // y cuántos despliegues recibieron esas columnas, contra el total.
+    lugares: Object.fromEntries(LUGARES_IDS.map((l) => [l, { columnas: 0, despliegues: 0 }])),
+    columnas: 0, despliegues: 0,
     duracionMs: 0,
   };
 
@@ -90,6 +95,15 @@ export function correr({ n, seed, perfiles, mazo = null }) {
     for (const c of robadas) m.copiasRobadas[c] += 1;
     for (const c of new Set(robadas)) m.robadaEnPartida[c] += 1;
     for (const j of jugadas) { m.jugadasPorCarta[j.cardId] += 1; m.jugadasTotales += 1; }
+
+    m.columnas += estado.lugares.length;
+    for (const l of estado.lugares) if (l) m.lugares[l].columnas += 1;
+    for (const j of jugadas) {
+      if (j.ranura === null || j.ranura === undefined) continue;
+      m.despliegues += 1;
+      const l = estado.lugares[j.ranura];
+      if (l) m.lugares[l].despliegues += 1;
+    }
 
     for (const f of fotos) m.unidadesPorTurno.push((f.unidades[0] + f.unidades[1]) / 2);
 
@@ -155,7 +169,23 @@ export function resumir(m, mazo = MAZO) {
     unidades: media(m.unidadesPorTurno),
     trofeosMedios: media(m.trofeosFinales),
     biomaMinimo: media(m.biomaFinal),
+    lugares: atraccionDeLugares(m),
   };
+}
+
+/**
+ * Cuánto atrae cada lugar: despliegues por columna con ese lugar, dividido por
+ * los despliegues por columna en general. 1,00 = una columna como otra
+ * cualquiera; 1,30 = la IA va a por él; 0,70 = lo evita. Es la misma idea que
+ * el índice de las cartas, mirada por columnas.
+ */
+export function atraccionDeLugares(m) {
+  const base = m.columnas === 0 ? 0 : m.despliegues / m.columnas;
+  return LUGARES_IDS.map((id) => {
+    const l = m.lugares[id];
+    const porColumna = l.columnas === 0 ? 0 : l.despliegues / l.columnas;
+    return { id, columnas: l.columnas, indice: base === 0 ? 0 : porColumna / base };
+  }).sort((a, b) => b.indice - a.indice);
 }
 
 export function veredicto(r) {
@@ -187,6 +217,7 @@ function informe(m, r) {
   L.push(`- Partidas: **${m.n}** · semilla base **${m.seed}** · perfiles **${m.perfiles.join(' vs ')}**`);
   L.push(`- Ranuras: **${BALANCE.ranuras}** · Habitat: **${BALANCE.vidaHabitat}** · Trofeos para ganar: **${BALANCE.trofeosParaGanar}**`);
   L.push(`- Renta: **${BALANCE.rentaPorTurno}/turno hasta ${BALANCE.rentaTope}**, ${BALANCE.rentaAcumula ? 'acumula' : 'no acumula'} · Mazo: **${TOTAL_MAZO}**`);
+  L.push(`- Lugares: **${BALANCE.lugares.activos ? `${LUGARES_IDS.length} en el set, ${BALANCE.ranuras} por partida` : 'apagados (tablero plano)'}**`);
   L.push(`- Tiempo: ${(m.duracionMs / 1000).toFixed(1)} s`);
   L.push('');
 
@@ -246,6 +277,19 @@ function informe(m, r) {
       + ` | ${(100 * f.uso).toFixed(0)} % | ${ok(sano)} |`);
   }
   L.push('');
+
+  if (BALANCE.lugares.activos) {
+    L.push('## Los lugares');
+    L.push('');
+    L.push('`Atracción` = despliegues por columna con ese lugar / despliegues por columna en general. 1,00 = una columna como otra; > 1,30 = la IA va a por él; < 0,70 = lo evita. Mide a dónde van las cartas, no quién gana: para eso está `node sim/lugares.mjs`.');
+    L.push('');
+    L.push('| Lugar | Qué hace | Partidas | Atracción |');
+    L.push('|---|---|---|---|');
+    for (const l of r.lugares) {
+      L.push(`| ${LUGARES[l.id].nombre} | ${LUGARES[l.id].texto} | ${l.columnas} | ${l.indice.toFixed(2)} |`);
+    }
+    L.push('');
+  }
 
   if (!v.cumple) {
     L.push('## Diagnóstico');
