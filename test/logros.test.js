@@ -126,6 +126,12 @@ test('La Edge Function manda los logros en la partida, el asalto y el duelo', ()
   // servidor sabe y el parte no: van escritos ahí.
   assert.match(EDGE, /jefesVencidos: fila\?\.cayo \? 1 : 0/);
   assert.match(EDGE, /expedicionNuevos: expedicion\?\.primera \? 1 : 0/);
+  // Y el contador del MAPA, que es lo que miden los logros de «entera»: sin
+  // él, siete nodos y un visitante pagarían un mapa.
+  assert.match(EDGE, /\[`expedicion:\$\{mapa\}`\]: expedicion\?\.primera \? 1 : 0/);
+  for (const l of LOGROS.filter((x) => x.mide.startsWith('expedicion:'))) {
+    assert.equal(l.meta, 8, `«${l.id}» pide ${l.meta} y un mapa son 8 nodos`);
+  }
 });
 
 test('Los sobres gratis se descuentan antes que las monedas, y el mazo extra pide uno que no tengas', () => {

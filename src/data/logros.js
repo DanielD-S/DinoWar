@@ -70,7 +70,16 @@ export const LOGROS = Object.freeze([
 
   // Los grandes: un mazo inicial más. Eran los otros dos que no elegiste al
   // empezar y sólo se podían completar a base de sobres.
-  L('morrison', 'La Morrison entera', 'Vence por primera vez a los 8 rivales de la Morrison', 'expedicionNuevos', 8, { tipo: RECOMPENSA.MAZO }),
+  // Cada mapa mide SU contador y no `expedicionNuevos`, que suma también los
+  // visitantes: con ocho primeras victorias contadas a bulto, siete nodos y un
+  // visitante ya pagaban «la Morrison entera». El de la Morrison cambió de
+  // contador el 16-09-2026 y conserva el progreso que llevara cada cuenta.
+  L('morrison', 'La Morrison entera', 'Vence por primera vez a los 8 rivales de la Morrison', 'expedicion:morrison', 8, { tipo: RECOMPENSA.MAZO }),
+  // Los tres mapas que siguen pagan sobres y no un mazo: sólo hay dos mazos
+  // iniciales que no elegiste, y ya los dan la Morrison y los 25 duelos.
+  L('hell_creek', 'Hell Creek entero', 'Vence por primera vez a los 8 rivales de Hell Creek', 'expedicion:hell_creek', 8, { tipo: RECOMPENSA.SOBRES, n: 4 }),
+  L('tendaguru', 'Tendaguru entera', 'Vence por primera vez a los 8 rivales de Tendaguru', 'expedicion:tendaguru', 8, { tipo: RECOMPENSA.SOBRES, n: 5 }),
+  L('kem_kem', 'Kem Kem entero', 'Vence por primera vez a los 8 rivales de Kem Kem', 'expedicion:kem_kem', 8, { tipo: RECOMPENSA.SOBRES, n: 6 }),
   L('veterano', 'Veterano', 'Gana 25 duelos', 'duelosGanados', 25, { tipo: RECOMPENSA.MAZO }),
   // Y el más grande: el estandarte azul con su cinta.
   L('leyenda', 'Leyenda del duelo', 'Gana 50 duelos', 'duelosGanados', 50,

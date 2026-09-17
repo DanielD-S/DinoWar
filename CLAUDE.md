@@ -1987,6 +1987,17 @@ recompensa viaja en la llamada como la meta y el premio de una misión, y
   despliegue de la función que empezó a apuntarlos (2026-09-15 02:38 UTC):
   victorias, duelos, asaltos, daño, expediciones y cartas de jefe. El golpe
   final no se puede reconstruir y no se contó.
+- **Los logros de «entera» miden un contador POR MAPA** (`expedicion:<id>`,
+  0033, 16-09-2026), no `expedicionNuevos`: ése suma también las primeras
+  victorias del visitante de la semana, y con él siete nodos y un visitante
+  pagaban «la Morrison entera». El contador lo escribe la Edge Function con
+  el mapa del rival que devolvió la re-jugada (el visitante no tiene mapa y no
+  cuenta), y el vocabulario lo saca de `EXPEDICIONES`: un mapa nuevo trae su
+  contador solo. La Morrison cambió de contador conservando el progreso de
+  cada cuenta; Hell Creek, Tendaguru y Kem Kem pagan SOBRES y no un mazo,
+  porque sólo hay dos iniciales que no elegiste y ya los dan la Morrison y los
+  25 duelos. La 0033 recuenta lo ya recorrido de `expediciones_victorias` y lo
+  pasa por `avanzar_logros`, que es quien entrega.
 - **`avanzar_logros` ya no da por cobrado un tipo de recompensa que no
   entiende.** La 0027 lo marcaba cobrado y no entregaba nada: por eso toda
   recompensa nueva pide antes su `when` en SQL y después desplegar.
@@ -2270,9 +2281,9 @@ Dicho para que nadie lo descubra tarde:
 - **Los cuatro mapas tienen rivales y no hay un quinto dibujado.** Una
   expedición nueva pide un mapa (`tools/expediciones.py`, prompts en
   `PROMPTS.md`) y ocho mazos medidos; el set da hoy para una de Mongolia (el
-  Nemegt es visitante) o de la Patagonia (también visitante). Y sólo la
-  Morrison tiene logro de «entera»: Hell Creek, Tendaguru y Kem Kem no, porque
-  añadir un logro es una migración con la copia de `private.catalogo_logros()`.
+  Nemegt es visitante) o de la Patagonia (también visitante). Los cuatro
+  tienen su logro de «entera» (0033); uno nuevo pide el suyo, con la copia de
+  `private.catalogo_logros()` en una migración.
 
 - **Hay cinco jefes y el calendario da la vuelta cada 35 días** (15-09-2026):
   Saurophaganax, Barosaurus, Supersaurus, Hesperosaurus y Harpactognathus, con
