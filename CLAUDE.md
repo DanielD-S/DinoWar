@@ -515,6 +515,10 @@ Lo que cuesta, medido antes de aceptarlo:
   rivales no se retocaron: las cifras nuevas están en «Las Expediciones» y
   la escalera sigue en el mismo orden. Es la vara la que cambió, no el mapa.
 
+**En producción desde el 16-09-2026** (PR #115, función v30 anclada a
+`dfbc21f`; de la 0006 se aplicó sólo el bloque de `catalogo_inicial`, que es
+lo único que cambia y una tabla que ya no lee nadie).
+
 Y lo que `BALANCE.md` dice ahora: **3 de 6**, como antes, con otro perfil.
 Cero descalibradas y duración en objetivo; el inicial en 45,4 %, la bola de
 nieve en 71,2 % —rozando el 70— y las vías en 25/75/0. La extinción sigue en
@@ -2071,7 +2075,12 @@ recompensa viaja en la llamada como la meta y el premio de una misión, y
   cada cuenta; Hell Creek, Tendaguru y Kem Kem pagan SOBRES y no un mazo,
   porque sólo hay dos iniciales que no elegiste y ya los dan la Morrison y los
   25 duelos. La 0033 recuenta lo ya recorrido de `expediciones_victorias` y lo
-  pasa por `avanzar_logros`, que es quien entrega.
+  pasa por `avanzar_logros`, que es quien entrega. **Aplicada y desplegada el
+  16-09-2026**: función v30 anclada a `dfbc21f` (el commit de merge de la PR
+  #115, en `main`), `ezbr_sha256` de `e6cc5de9…` a `01935043…`, y la receta
+  de `supabase/functions/README.md` contesta `401 {"error":"sesión
+  inválida"}`. El recuento no entregó nada: nadie había vencido aún a un
+  rival de esos tres mapas.
 - **`avanzar_logros` ya no da por cobrado un tipo de recompensa que no
   entiende.** La 0027 lo marcaba cobrado y no entregaba nada: por eso toda
   recompensa nueva pide antes su `when` en SQL y después desplegar.
