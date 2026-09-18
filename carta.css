@@ -87,6 +87,63 @@
   box-shadow: none;
   border-radius: 5.4% / 3.9%;
 }
+/* ================================================== el marco LEGENDARIO
+   Desde el 18-09-2026 las criaturas legendarias llevan un marco propio, y no
+   el mismo dibujo con otro metal que las otras tres rarezas. Trae dentro lo
+   que hasta ahora eran piezas sueltas —el aro del coste, el círculo del
+   Ataque y el triángulo de la Vida—, con el interior hueco, así que sus tres
+   chapas se apagan: dibujarlas encima sería ponerle un aro a un aro.
+
+   La banda del nombre y la caja de la habilidad son PAPEL pintado en el PNG,
+   no huecos, así que ahí la tinta va oscura. Las tres cifras caen sobre hueco,
+   o sea sobre el fondo de la carta, y siguen en claro. Es la única carta del
+   juego con las dos tintas a la vez.
+
+   La geometría la midió `python tools/marcos.py` sobre el PNG, como manda la
+   regla de que la decide el dibujo y no el CSS. Lo único que no mide la
+   herramienta son la banda y la caja, porque en este marco no son magenta:
+   ésos se midieron sobre el papel.
+
+   Y la caja es más baja que la de las otras rarezas —20,9 % del alto contra
+   22,8 %— porque la ventana creció del 37,7 % al 45,9 %. Por eso el texto y el
+   título bajan de cuerpo aquí y sólo aquí: con los de siempre, cuatro cartas
+   del set se cortaban por abajo. */
+.carta.con-marco.m-dino_legendaria {
+  --ban-x0: 24%;    --ban-x1: 13%;    --ban-y0: 6.4%;   --ban-al: 6.2%;
+  --ven-x0: 13.3%;  --ven-x1: 12.5%;  --ven-y0: 13%;    --ven-alto: 45.9%;
+  --pla-x0: 13%;    --pla-x1: 13%;    --pla-y0: 60.5%;  --pla-y1: 18.6%;
+  --cos-cx: 12.11%; --cos-cy: 9.24%;
+  /* El triángulo va por su centro de MASA (90,2 %) y no por el de su caja
+     (88,3 %), por lo mismo que la chapa suelta: una cifra centrada en el
+     rectángulo se ve flotando sobre la punta. */
+  --atq-x: 18.55%;  --atq-y: 89.45%;  --vid-x: 81.05%;  --vid-y: 90.2%;
+}
+.carta.con-marco.m-dino_legendaria .c-chapa { display: none; }
+.carta.con-marco.m-dino_legendaria .c-cuerpo { padding: 2% 4% 1.5%; }
+/* Sobre papel: el nombre, el título y el texto. */
+.carta.con-marco.m-dino_legendaria .c-genero {
+  color: #38200c; text-shadow: 0 1px 0 rgba(255, 247, 225, .5);
+}
+.carta.con-marco.m-dino_legendaria .c-hab { color: #5d2d08; }
+.carta.con-marco.m-dino_legendaria .c-nombre { color: #38200c; }
+.carta.con-marco.m-dino_legendaria .c-texto { color: #2e2113; }
+/* Sobre hueco: las tres cifras. Y los dos estados del Ataque, que en las otras
+   rarezas los cuenta la chapa y aquí no hay chapa que cambiar: los cuenta el
+   color de la cifra, como ya hace la Vida herida. */
+.carta.con-marco.m-dino_legendaria .c-coste,
+.carta.con-marco.m-dino_legendaria .st-a b,
+.carta.con-marco.m-dino_legendaria .st-v b { color: #ffe9b0; }
+.carta.con-marco.m-dino_legendaria .st-v.herido b { color: #f0a488; }
+.carta.con-marco.m-dino_legendaria .st-a.mejorado b { color: var(--bio); }
+.carta.con-marco.m-dino_legendaria .st-a.mermado b { color: var(--peligro); }
+/* Los cuerpos del visor, que es donde el texto de la habilidad se pinta. */
+.carta--visor.con-marco.m-dino_legendaria .c-texto {
+  font: 400 10.5px/12px 'Libre Baskerville', Georgia, serif;
+}
+.carta--visor.con-marco.m-dino_legendaria .c-texto.largo { font-size: 9.5px; line-height: 10.8px; }
+.carta--visor.con-marco.m-dino_legendaria .c-cuerpo { gap: 3px; }
+.carta--visor.con-marco.m-dino_legendaria .c-hab { line-height: 18px; }
+
 /* El especular ya viene pintado en el PNG; el de CSS encima lo emborronaba. */
 .carta.con-marco::before { background: none; }
 
