@@ -265,7 +265,9 @@ function marcoCarta(estado, cardId, {
   // se ve.
   const chapas = '<span class="c-marco"></span><span class="c-chapa c-chapa-b"></span>'
     + (dino ? '<span class="c-chapa c-chapa-a"></span><span class="c-chapa c-chapa-v"></span>' : '')
-    + (esEntera(cardId) ? '<span class="c-velo"></span>' : '');
+    + (esEntera(cardId)
+      ? `<span class="c-fondo"${hayFoto(cardId) ? ` style="background-image:url('${rutaFoto(cardId)}')"` : ''}></span><span class="c-velo"></span>`
+      : '');
 
   return `
     ${chapas}

@@ -1466,13 +1466,24 @@ variante «full art» de cualquier TCG, y lo que se decidió al hacerla:
   `.c-arte::after`: ese pseudoelemento ya es el brillo de las legendarias en la
   colección y el sobre. Viaja en toda carta que PUEDA ser entera, y sin la
   clase no se ve.
-- **Las fotos siguen siendo apaisadas 3:2 y la ventana es 0,73 vertical**, así
-  que hoy se ve el 49 % del ancho y siete de las diecisiete llevan `foco` en
-  `assets/dinos/indice.json` para no cortar la cabeza. Es un parche: lo que
-  pide la carta entera es una ilustración vertical con encuadre de héroe, y el
-  encargo está escrito en `assets/PROMPTS.md`, «La ilustración a sangre», con
-  el hueco de cada una de las diecisiete. Al llegar cada una, quitarle el
-  `foco`.
+- **Las fotos siguen siendo apaisadas 3:2 y la ventana es 0,73 vertical.**
+  El primer intento las puso a sangre con `cover` y enseñaba el 49 % del
+  ancho: el Antarctosaurus se quedaba en barriga y el Ankylosaurus sin cabeza
+  —el autor lo vio en el móvil y lo dijo—. Ahora la foto va ENTERA como una
+  banda nítida a lo ancho (`object-fit: contain`, al 30 % del hueco libre) y
+  detrás la misma foto ampliada y desenfocada (`.c-fondo`, un `<span>` con la
+  foto de fondo) rellena la carta, como un reproductor con un vídeo en
+  vertical. Lo que pide de verdad la carta entera es una ilustración
+  vertical con encuadre de héroe: el encargo está en `assets/PROMPTS.md`,
+  «La ilustración a sangre», con el hueco de cada una de las diecisiete, y
+  una 3:4 entra en el mismo hueco casi a sangre sin tocar nada. **Un `foco`
+  en `indice.json` es un estilo en línea y pisa la posición de la banda**: a
+  las enteras no se les pone.
+- **Las cifras y las chapas son DOS pares de variables** (`--atq-y`/`--vid-y`
+  contra `--ataque-y`/`--vida-y`). Al bajar las chapas al 90 % las cifras se
+  quedaron al 87 %, montadas en el canto, y no se vio en el banco a 268 px:
+  se vio en el móvil, donde la ficha pinta la carta a 600. Quien mueva una
+  chapa mueve las dos parejas.
 - **Es también el molde del cosmético de «arte alternativo»**: el mismo
   mecanismo —una clase que cambia la geometría sin tocar la composición— vale
   para vender una versión a sangre de cualquier carta el día que la tienda lo
