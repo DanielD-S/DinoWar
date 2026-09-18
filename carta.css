@@ -362,3 +362,95 @@
   flex: none; -webkit-line-clamp: 1;
   font-size: min(16px, calc(100cqi / (0.7 * var(--hn, 12))));
 }
+
+/* ============================================================ la carta ENTERA
+   Las criaturas legendarias y las cinco de jefe van A SANGRE: la ilustración
+   cubre la carta, el marco de latón se reduce a un filete dorado y el nombre y
+   la habilidad se posan sobre velos translúcidos. Es la variante «full art» de
+   cualquier TCG, y aquí es una VARIANTE: la clase `entera` la pone `render.js`
+   sólo si la carta lo es Y tiene foto (una silueta a sangre sería un rectángulo
+   de color), así que sin foto la carta sale con su marco de siempre y nada de
+   lo de abajo se aplica.
+
+   Todo lo que se mueve es la GEOMETRÍA de los mismos huecos —la ventana pasa a
+   ocupar la carta entera, la banda se ensancha, la caja baja hasta apoyarse en
+   las chapas— y no la composición: `marcoCarta()` emite lo mismo. Las chapas
+   de coste, Ataque y Vida se quedan donde estaban, y por eso la caja termina
+   al 86 %: las dos chapas de abajo montan sobre su borde, que es lo que hace
+   que parezcan puestas sobre la carta y no flotando en el arte. */
+.carta.con-marco.entera {
+  --ven-x0: 0; --ven-x1: 0; --ven-y0: 0; --ven-alto: 100%;
+  --ban-x0: 25%; --ban-x1: 6%; --ban-y0: 4.6%; --ban-al: 8%;
+  --pla-x0: 6%; --pla-x1: 6%; --pla-y0: 60%; --pla-y1: 14%;
+  /* Las chapas de Ataque y Vida bajan al 90 %: en el marco dibujado van
+     donde el PNG les dejó el hueco; aquí son libres, y más abajo dejan sitio
+     a un título de dos líneas sin taparlo. Miden un 5,6 % de alto a cada
+     lado del centro, así que empiezan al 86 %, y la caja se organiza para
+     que nada escrito pase de ahí. */
+  --ataque-y: 91.5%; --vida-y: 90.1%;
+  /* El filete: oro para las legendarias, bronce oscuro para el jefe. */
+  --filete: linear-gradient(160deg, #f7e2a0 0%, #b98a2e 30%, #f3d27a 52%, #8c5d1a 78%, #eccb70 100%);
+}
+.carta.con-marco.entera.jefe {
+  --filete: linear-gradient(160deg, #d9b56a 0%, #6b4a1c 30%, #c9a05a 52%, #3d2a10 78%, #b8904c 100%);
+}
+.carta.con-marco.entera.carta--visor { --pla-y0: 55%; }
+/* La caja se llena desde arriba y deja el pie a las chapas: un título de una
+   línea no se va al centro, donde chocaría con ellas. El relleno de abajo es
+   la franja que las chapas ocupan sobre la caja. */
+.entera .c-cuerpo { justify-content: flex-start; padding: 4% 5% 6%; }
+.carta.con-marco.entera.carta--visor .c-cuerpo { padding: 3% 5% 4%; }
+
+/* La ventana es la carta: mismo radio, y una línea oscura por dentro del
+   filete para que el oro no se funda con un cielo claro. */
+.entera .c-arte {
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .55);
+}
+.entera .c-arte .foto { filter: saturate(1.06) contrast(1.04); }
+
+/* El marco dibujado se apaga y el mismo <span> pinta el filete: un degradado
+   metálico recortado a un anillo con dos máscaras (la de fuera menos la de
+   dentro). `padding` es el grosor, en porcentaje del ancho: 6 px en el visor,
+   dos en la mano. */
+.entera .c-marco {
+  background-image: none;
+  background: var(--filete);
+  padding: 2.2%; box-sizing: border-box; border-radius: inherit;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+/* El velo de arriba: la sombra que deja leer el nombre y el coste sobre
+   cualquier cielo. Es un <span> propio y no `.c-arte::after`, porque ese
+   pseudoelemento ya lo usa el brillo de las legendarias en la colección. */
+.c-velo { display: none; }
+.entera .c-velo {
+  display: block; position: absolute; left: 0; right: 0; top: 0; height: 26%;
+  z-index: 2; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(180deg, rgba(8, 6, 4, .78) 0%, rgba(8, 6, 4, .42) 50%, transparent 100%);
+}
+
+/* La banda ya no tiene fondo dibujado: el nombre va sobre el velo, con una
+   sombra que lo despega del arte. */
+.entera .c-genero {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .9), 0 0 6px rgba(0, 0, 0, .6);
+}
+
+/* La caja: un cristal oscuro con filo de oro, apoyado en las chapas. El
+   `backdrop-filter` es lo que la hace translúcida sin dejar de leerse; sin él
+   sería un rectángulo negro, o un texto sobre la foto. */
+.entera .c-cuerpo {
+  background: linear-gradient(180deg, rgba(14, 10, 6, .62), rgba(14, 10, 6, .88) 40%);
+  border-top: 1px solid rgba(244, 217, 155, .6);
+  border-radius: 3% / 2%;
+  -webkit-backdrop-filter: blur(5px) saturate(1.05);
+  backdrop-filter: blur(5px) saturate(1.05);
+  box-shadow: 0 -6px 14px -8px rgba(0, 0, 0, .9);
+}
+/* Las chapas montan sobre la caja: suben un piso, y las cifras con ellas. */
+.entera .c-chapa { z-index: 4; }
+.entera .c-stats { z-index: 5; }
+.entera .c-coste { z-index: 5; }

@@ -10,7 +10,7 @@ import {
   unidadEn, unidadesDe, ataqueEfectivo, vidaMaxima, vidaActual,
   efectosDe, adheridasA,
 } from '../engine/state.js';
-import { arte, hayFoto, rutaFoto, hayEntera, rutaEntera } from './art.js';
+import { arte, hayFoto, rutaFoto, hayEntera, rutaEntera, esEntera } from './art.js';
 import { legales, ACCION } from '../engine/actions.js';
 import { volar, temporizar } from './efectos.js';
 import { prever, SUERTE } from './prevision.js';
@@ -259,8 +259,13 @@ function marcoCarta(estado, cardId, {
 
   // Tres capas más: el marco por encima del arte, y las chapas donde caen las
   // cifras y el coste. carta.css explica la medida.
+  // Y el velo de las cartas enteras: la sombra bajo el nombre cuando la
+  // ilustración va a sangre. Se emite siempre que la carta PUEDA ser entera
+  // —la clase llega con la foto, a veces después de pintar— y sin la clase no
+  // se ve.
   const chapas = '<span class="c-marco"></span><span class="c-chapa c-chapa-b"></span>'
-    + (dino ? '<span class="c-chapa c-chapa-a"></span><span class="c-chapa c-chapa-v"></span>' : '');
+    + (dino ? '<span class="c-chapa c-chapa-a"></span><span class="c-chapa c-chapa-v"></span>' : '')
+    + (esEntera(cardId) ? '<span class="c-velo"></span>' : '');
 
   return `
     ${chapas}
@@ -311,6 +316,7 @@ function claseMarco(cardId) {
  */
 function clasesCarta(cardId, variante, clases = []) {
   return `carta carta--${variante}${claseFamilia(cardId)} rareza-${carta(cardId).rareza} con-marco${claseMarco(cardId)}`
+    + `${esEntera(cardId) && hayFoto(cardId) ? ' entera' : ''}`
     + `${clases.length ? ' ' + clases.join(' ') : ''}`;
 }
 
