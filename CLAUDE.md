@@ -2974,6 +2974,50 @@ un mazo roto. Por debajo de veinte sí lo sería.
   `duelo_retar` y `duelo_aceptar` no ponen `torneo`. Es correcto —un duelo
   privado no es del torneo— pero conviene saberlo antes de buscar el bug.
 
+### En producción desde el 18-09-2026, y cómo se comprobó
+
+La PR #135 se mergeó con MERGE (`3d550f0`) y **no hubo despliegue**: el
+paquete de la Edge Function sale idéntico, así que la función sigue en la v34
+anclada a `9cbac5b`. Aplicado en dos pasos, el catálogo primero y la 0038
+después.
+
+De la 0006 regenerada se aplicó **sólo el bloque de torneos**, y no por pereza:
+el ensayo de siempre —el que hay que repetir porque la 0006 BORRA lo que ya no
+está en el set y `coleccion` tiene una clave foránea contra esa tabla— salió
+con **cero altas y cero bajas**, comprobado por hash en vez de a ojo: el md5 de
+los 144 `card_id` ordenados es `b437f371…` en producción y el mismo que sale del
+código. Con eso, el resto del fichero es un no-op entero.
+
+Y dos cosas que costaron, una al aplicar y otra que conviene copiar:
+
+- **`insert … on conflict do update` no vale para añadirle columnas a una fila
+  que ya existe.** El generador escribe el upsert de `catalogo_economia` con
+  las trece columnas; aplicar sólo el trozo de torneos con
+  `insert … (id) values (1) on conflict do update` revienta con
+  «null value in column "precio_sobre" violates not-null», porque Postgres
+  construye y valida la fila PROPUESTA antes de resolver el conflicto. Es un
+  `update` a secas, y el `add column … default` de arriba ya deja los valores
+  buenos de todos modos.
+- **El cuerpo de una PL/pgSQL no se analiza hasta que se la llama**, así que
+  `apply_migration` da por buena una función que falla en ejecución —la lección
+  de `aplicar_asalto` y su «almacen is ambiguous»—. Se probaron las cuatro
+  nuevas con un `do $$ … $$` que hace el recorrido entero y **termina con un
+  `raise` para deshacerlo todo**: una racha de cinco victorias sobre un jugador
+  de verdad cierra y paga los 2 sobres (`sobres_gratis` 0→2), un segundo cierre
+  no vuelve a pagar, dos jugadores sin racha se emparejan como siempre con
+  `torneo` en null, y uno con racha cae en la otra cola **con el mazo cerrado de
+  la racha y no con el que mandó el cliente** —que es la decisión 2 de la
+  cabecera, comprobada en producción y no supuesta—. Después, `rachas` en 0 y
+  `sobres_gratis` en 0: no quedó nada.
+
+Comprobado además contra el código: 7 torneos, 614 pares en
+`catalogo_torneo_cartas` con el md5 `20634b9c…` idéntico al del fichero
+generado, los 6 premios, `50/5/3` de entrada y topes, y la semana 2959 con
+`a_dentelladas` de torneo, que es lo mismo que dice `torneoDe()` en el
+navegador. Los permisos, como manda la regla de revocar antes de conceder:
+`entrar_en_torneo`, `retirar_racha` y `mi_racha` sólo para `authenticated`;
+las cuatro de `private` y las dos de duelo, para nadie.
+
 ## Instalarlo como app
 
 El juego es una PWA: `manifest.json`, iconos en `assets/` y `sw.js`. Se instala
