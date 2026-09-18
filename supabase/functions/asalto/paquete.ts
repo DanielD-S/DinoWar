@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: 90b26c08375df1e6
+// huella: f28c05df01b62bd0
 //
 // Lleva dentro estos 25 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -5670,7 +5670,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Muchos, peque\xF1os y nerviosos. Corren m\xE1s de lo que pegan.",
         retrato: "dryosaurus",
         perfil: "aleatoria",
-        premio: 30,
+        premio: 20,
         mazo: [
           ["dryosaurus", 3],
           ["eosinopteryx", 3],
@@ -5692,7 +5692,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Tire\xF3foros que no avanzan: esperan a que te rompas contra ellos.",
         retrato: "stegosaurus",
         perfil: "heuristica",
-        premio: 40,
+        premio: 25,
         mazo: [
           ["stegosaurus", 3],
           ["kentrosaurus", 3],
@@ -5714,7 +5714,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Ter\xF3podos peque\xF1os en jaur\xEDa. Si los dejas crecer, muerden.",
         retrato: "ornitholestes",
         perfil: "heuristica",
-        premio: 50,
+        premio: 30,
         mazo: [
           ["ornitholestes", 3],
           ["ceratosaurus", 3],
@@ -5738,7 +5738,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Todo dientes y ninguna paciencia. Si sobrevives al turno 5, es tuyo.",
         retrato: "ceratosaurus",
         perfil: "heuristica",
-        premio: 60,
+        premio: 35,
         mazo: [
           ["ceratosaurus", 3],
           ["ornitholestes", 3],
@@ -5761,7 +5761,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Lo que vuela y lo que nada. Llegan por donde no miras.",
         retrato: "huaxiadraco",
         perfil: "heuristica",
-        premio: 80,
+        premio: 50,
         mazo: [
           ["plesiopleurodon", 2],
           ["scanisaurus", 3],
@@ -5783,7 +5783,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Saur\xF3podos que se curan y no se caen. Hay que ganarles por f\xF3siles.",
         retrato: "diplodocus",
         perfil: "heuristica",
-        premio: 100,
+        premio: 60,
         mazo: [
           ["diplodocus", 3],
           ["apatosaurus", 3],
@@ -5806,7 +5806,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "El barro se lo traga todo. Cuida tu mazo: aqu\xED se pierde por extinci\xF3n.",
         retrato: "allosaurus",
         perfil: "heuristica",
-        premio: 120,
+        premio: 70,
         mazo: [
           ["trampa", 3],
           ["mortandad", 1],
@@ -5831,7 +5831,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "El Allosaurus m\xE1s famoso de la Morrison: diecinueve heridas y ninguna le par\xF3.",
         retrato: "allosaurus",
         perfil: "heuristica",
-        premio: 200,
+        premio: 120,
         mazo: [
           ["allosaurus", 3],
           ["torvosaurus", 2],
@@ -5890,7 +5890,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Lo que corretea entre los helechos. Ninguno te mata; todos juntos, s\xED.",
         retrato: "platyceratops",
         perfil: "heuristica",
-        premio: 60,
+        premio: 35,
         mazo: [
           ["platyceratops", 3],
           ["liaoceratops", 3],
@@ -5914,7 +5914,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Osteodermos y mazas. Lo que les pega se lleva la mitad de vuelta.",
         retrato: "ankylosaurus",
         perfil: "heuristica",
-        premio: 80,
+        premio: 50,
         mazo: [
           ["ankylosaurus", 1],
           ["euoplocephalus", 3],
@@ -5940,7 +5940,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Cr\xE1neos de veinte cent\xEDmetros de grosor. Golpean al llegar y siguen andando.",
         retrato: "pachycephalosaurus",
         perfil: "heuristica",
-        premio: 100,
+        premio: 60,
         mazo: [
           ["pachycephalosaurus", 3],
           ["stegoceras", 3],
@@ -5963,7 +5963,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Hadrosaurios a cientos. No pegan: te cansan y se curan.",
         retrato: "edmontosaurus",
         perfil: "heuristica",
-        premio: 120,
+        premio: 70,
         mazo: [
           ["edmontosaurus", 1],
           ["parasaurolophus", 3],
@@ -5988,7 +5988,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "La v\xEDa mar\xEDtima parte el continente en dos. Llega por agua y por aire.",
         retrato: "mosasaurus",
         perfil: "heuristica",
-        premio: 150,
+        premio: 90,
         mazo: [
           ["mosasaurus", 1],
           ["elasmosaurus", 3],
@@ -6012,7 +6012,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Golas que se cubren unas a otras. Cuanto m\xE1s entran, m\xE1s pega cada una.",
         retrato: "triceratops",
         perfil: "heuristica",
-        premio: 180,
+        premio: 110,
         mazo: [
           // Sin Medusaceratops y sin Crecimiento acelerado: con los dos ganaba
           // el 85 %. Dos auras de clado apiladas sobre marginocéfalos baratos
@@ -6037,7 +6037,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Ceniza en el cielo y nada que comer. Aqu\xED no se gana: se dura m\xE1s.",
         retrato: "quetzalcoatlus",
         perfil: "heuristica",
-        premio: 220,
+        premio: 130,
         mazo: [
           // La Mortandad es asimétrica a propósito: 3 de daño a todo el campo
           // barre una mano de criaturas baratas y a éstas no las despeina.
@@ -6067,7 +6067,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Ocho toneladas de tiranosaurio en el \xFAltimo mill\xF3n de a\xF1os del Mesozoico.",
         retrato: "tyrannosaurus",
         perfil: "heuristica",
-        premio: 350,
+        premio: 210,
         mazo: [
           ["tyrannosaurus", 1],
           ["triceratops", 2],
@@ -6123,7 +6123,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Ornit\xF3podos enanos a cientos. No paran quietos y no valen nada por separado.",
         retrato: "dryosaurus",
         perfil: "aleatoria",
-        premio: 80,
+        premio: 50,
         mazo: [
           ["dryosaurus", 3],
           ["eosinopteryx", 3],
@@ -6145,7 +6145,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Sube el agua y con ella lo que vive dentro. Baja, y se lleva lo que dejaste.",
         retrato: "elasmosaurus",
         perfil: "heuristica",
-        premio: 100,
+        premio: 60,
         mazo: [
           ["elasmosaurus", 3],
           ["scanisaurus", 3],
@@ -6167,7 +6167,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "P\xFAas en la cola, p\xFAas en los hombros. Todo lo que lo toca se pincha.",
         retrato: "kentrosaurus",
         perfil: "heuristica",
-        premio: 120,
+        premio: 70,
         mazo: [
           // Con Invictarx —el aura de los tireóforos— y sin la Barrera: medía 91 % y un muro sin aura es un muro bajo.
           ["kentrosaurus", 3],
@@ -6191,7 +6191,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Abelisaurios y alosaurios en la misma tierra. Aqu\xED nadie caza solo.",
         retrato: "rugops",
         perfil: "heuristica",
-        premio: 150,
+        premio: 90,
         mazo: [
           // Medía 89 % con jauría pequeña y Carroñeros. Entran Monolophosaurus (aura) y Torvosaurus; sale lo que no pega.
           ["ceratosaurus", 3],
@@ -6215,7 +6215,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Cuellos cortos y espinados, y detr\xE1s los largos. Comen a todas las alturas.",
         retrato: "amargasaurus",
         perfil: "heuristica",
-        premio: 180,
+        premio: 110,
         mazo: [
           ["amargasaurus", 3],
           ["diplodocus", 3],
@@ -6237,7 +6237,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Polvo, ceniza y lodo. Lo que no aguanta enterrado, no aguanta.",
         retrato: "brachylophosaurus",
         perfil: "heuristica",
-        premio: 220,
+        premio: 130,
         mazo: [
           // Dos veces medido y dos veces blando: con eventos de molienda 97 %, como muro de tireóforos con dos auras 95 %. Un muro que no pega no le gana a la referencia, que se lleva el hábitat. Ahora es el sur de Gondwana que pega: titanes con golpe al hábitat y abelisaurios.
           ["argentinosaurus", 2],
@@ -6265,7 +6265,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Un carcarodontos\xE1urido, un megalos\xE1urido y un abelis\xE1urido. Elige por cu\xE1l morir.",
         retrato: "torvosaurus",
         perfil: "heuristica",
-        premio: 280,
+        premio: 170,
         mazo: [
           // Tendaguru tuvo su espinosáurido (Ostafrikasaurus): entran Spinosaurus y Suchomimus, que a 72 % era un séptimo nodo blando.
           ["allosaurus", 3],
@@ -6292,7 +6292,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Doce metros hasta la cabeza. No corre, no se esconde y no hace falta.",
         retrato: "giraffatitan",
         perfil: "heuristica",
-        premio: 400,
+        premio: 240,
         mazo: [
           // Tres legendarias justas, que es el tope de un mazo de jugador.
           ["giraffatitan", 1],
@@ -6339,7 +6339,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Hocicos largos metidos en el agua. Lo que muerden no vuelve a la orilla.",
         retrato: "suchomimus",
         perfil: "aleatoria",
-        premio: 100,
+        premio: 60,
         mazo: [
           ["suchomimus", 2],
           ["sanjuansaurus", 3],
@@ -6360,7 +6360,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Cr\xE1neos rugosos y brazos de adorno. Todo lo que tienen lo llevan en la boca.",
         retrato: "rugops",
         perfil: "heuristica",
-        premio: 130,
+        premio: 80,
         mazo: [
           // Medía 98,8 % —cinco tipos de terópodo pequeño y ningún cuerpo—. Entran el aura y dos Suchomimus.
           ["rugops", 3],
@@ -6384,7 +6384,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Ornit\xF3podos con vela por las llanuras del Elrhaz. Se van antes de que llegues.",
         retrato: "ouranosaurus",
         perfil: "heuristica",
-        premio: 160,
+        premio: 95,
         mazo: [
           ["ouranosaurus", 3],
           ["iguanodon", 3],
@@ -6406,7 +6406,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Quinientos dientes a ras de suelo. Detr\xE1s de Nigersaurus no queda helecho.",
         retrato: "nigersaurus",
         perfil: "heuristica",
-        premio: 200,
+        premio: 120,
         mazo: [
           ["nigersaurus", 2],
           ["amargasaurus", 3],
@@ -6429,7 +6429,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Sombras de diez metros sobre las dunas. Llegan con la tormenta.",
         retrato: "tupandactylus",
         perfil: "heuristica",
-        premio: 240,
+        premio: 145,
         mazo: [
           // Sólo pterosaurios medía 96 %: vuelan y no aguantan. Ahora es el mazo del golpe al hábitat con cuerpos debajo.
           ["hatzegopteryx", 3],
@@ -6456,7 +6456,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "El r\xEDo es suyo. Lo que entra en el agua ya no es tuyo.",
         retrato: "spinosaurus",
         perfil: "heuristica",
-        premio: 290,
+        premio: 175,
         mazo: [
           // Medía 72 % como séptimo nodo: demasiada molienda y ningún aura. Entran Scanisaurus, Nigersaurus y Atlasaurus.
           ["spinosaurus", 1],
@@ -6486,7 +6486,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Deltadromeus abre camino y la jaur\xEDa entra detr\xE1s. Nadie se queda a mirar.",
         retrato: "deltadromeus",
         perfil: "heuristica",
-        premio: 340,
+        premio: 205,
         mazo: [
           // A 84 % era un sexto nodo blando: entran Deinocheirus, Monolophosaurus y Suchomimus.
           ["deltadromeus", 2],
@@ -6514,7 +6514,7 @@ var EXPEDICIONES = Object.freeze([
         lema: "Carcharodontosaurus. El nombre lo dice: dientes de tibur\xF3n, y del tama\xF1o de un T. rex.",
         retrato: "carcharodontosaurus",
         perfil: "heuristica",
-        premio: 450,
+        premio: 270,
         mazo: [
           // A 40 % no era un jefe final: fuera Ouranosaurus, dentro el aura de los terópodos y la emboscada.
           ["carcharodontosaurus", 1],
@@ -6548,7 +6548,7 @@ var VISITANTES = Object.freeze([
     lema: "Corazas, mazas y golas por las llanuras de Montana. Nada aqu\xED es blando.",
     retrato: "zuul",
     perfil: "heuristica",
-    premio: 150,
+    premio: 90,
     mazo: [
       // El del Kem Kem se fue con su mapa (16-09-2026): un visitante de la
       // misma formación que una expedición es la expedición repetida.
@@ -6575,8 +6575,14 @@ var VISITANTES = Object.freeze([
     lema: "Un mar interior entero detr\xE1s. Aguanta la marea o te arrastra.",
     retrato: "mosasaurus",
     perfil: "heuristica",
-    premio: 150,
+    premio: 90,
     mazo: [
+      // Tenía 22 criaturas y NUEVE cartas de soporte, así que el relleno le
+      // metía 24 Biomasa: casi la mitad del mazo era tierra. Está medido desde
+      // hace meses que catorce ya gana el 39,8 %. Se probó dejarlo en DOCE y se
+      // pasó de frenada —el jugador bajaba al 31 %—, así que quedan 21: los
+      // Hatzegopteryx que le faltaban, que le dan lo que no tenía —golpes al
+      // hábitat que no pasan por el campo— y nada más.
       ["mosasaurus", 1],
       ["elasmosaurus", 3],
       ["plesiopleurodon", 2],
@@ -6584,6 +6590,7 @@ var VISITANTES = Object.freeze([
       ["quetzalcoatlus", 2],
       ["pteranodon", 3],
       ["huaxiadraco", 3],
+      ["hatzegopteryx", 3],
       ["argentinosaurus", 2],
       ["amargasaurus", 3],
       ["canal_trenzado", 3],
@@ -6598,7 +6605,7 @@ var VISITANTES = Object.freeze([
     lema: "Arena, viento y garras. Lo que sobrevive aqu\xED no necesita beber.",
     retrato: "therizinosaurus",
     perfil: "heuristica",
-    premio: 150,
+    premio: 90,
     mazo: [
       // La Sequía no está de adorno: el Therizinosaurus cobra +3 de Ataque
       // mientras haya un clima en el campo, y su carta se llama Garra de sequía.
@@ -6630,7 +6637,7 @@ var VISITANTES = Object.freeze([
     lema: "Gondwana cri\xF3 los cuerpos m\xE1s grandes que ha habido. Y lo que los cazaba.",
     retrato: "argentinosaurus",
     perfil: "heuristica",
-    premio: 150,
+    premio: 90,
     mazo: [
       // Tenía diecisiete criaturas y treinta de soporte, y se ganaba el 59 %:
       // medio mazo mirando mientras la otra mitad esperaba a la cuarta
@@ -6667,25 +6674,43 @@ var VISITANTES = Object.freeze([
     lema: "Tarbosaurus manda en el desierto de Mongolia. Lo que no corre, se entierra.",
     retrato: "tarbosaurus",
     perfil: "heuristica",
-    premio: 150,
+    premio: 90,
     mazo: [
       // El de Tendaguru se fue con su mapa (16-09-2026). Éste es el Cretácico
       // de Mongolia con las cartas de la ronda del control. Medía 77 % con
       // Shuvuuia, Psittacosaurus y Saurolophus, y 75 % sólo con el aura: lo
       // que lo baja es cambiar los cuerpos flojos por emboscada y contadores.
+      //
+      // Y el 18-09-2026, otra vuelta: era el más suelto de los cinco contra lo
+      // que de verdad tiene una cuenta nueva —se le ganaba el 63 %— y hubo que
+      // ir por los tres lados a la vez, porque quitarle relleno solo no bastó
+      // (63 → 58,5 → 56,5). Se fue el Velociraptor, que además es del
+      // Djadochta y no del Nemegt, y entró Anzu: el mismo hueco de la curva
+      // con cuerpo de verdad y sin pagar una carta de descarte. Y dos
+      // Mamenchisaurus, el único saurópodo asiático del set, que aquí hace de
+      // Nemegtosaurus: un muro de 1/11 que obliga a gastar turnos. Queda en el
+      // 53 %.
       ["tarbosaurus", 2],
       ["deinocheirus", 2],
       ["dakotaraptor", 2],
       ["monolophosaurus", 3],
       ["therizinosaurus", 3],
-      ["velociraptor", 3],
+      ["anzu", 3],
       ["halszkaraptor", 3],
       ["dromaeosaurus", 3],
       ["ojoraptorsaurus", 3],
+      ["mamenchisaurus", 2],
       // La Sequía no es de adorno: Therizinosaurus cobra +3 con un clima puesto.
+      // Y ahí estaba el fallo: con UN clima en 55 cartas, seis cuerpos
+      // condicionales —tres Therizinosaurus a 1/6 y tres Halszkaraptor a 2/2—
+      // jugaban casi siempre apagados. Con cinco climas más se encienden, y de
+      // paso el relleno de Biomasa baja de 13 a 4. El Nemegt era húmedo, con
+      // ríos y lagos: la Crecida y el Monzón le pegan tanto como la Sequía.
       ["aridez", 1],
-      ["tormenta_polvo", 2],
-      ["osario", 2],
+      ["sabana", 3],
+      ["llanura", 2],
+      ["tormenta_polvo", 3],
+      ["osario", 3],
       ["gregarismo", 3],
       ["competencia", 2],
       ["fractura", 2],
@@ -7425,10 +7450,16 @@ var LOGROS = Object.freeze([
     5,
     { tipo: RECOMPENSA.COSMETICO, id: "dorso_cazador" }
   ),
+  // Los de constancia. Los sobres bajaron un 35 % el 18-09-2026, con el sobre
+  // de 100 a 300: regalaban 23 y ahora 15. Siguen siendo el grifo de UNA VEZ
+  // más grande que hay —quince sobres son dieciocho días de juego normal— y
+  // por eso se recortaron a la vez que los premios de primera victoria. Los
+  // dos MAZOS no se tocan: no son sobres, son las cartas concretas de los
+  // otros dos iniciales, y son el único camino que hay a ellos.
   // Los de constancia.
   L("campeon", "Campe\xF3n", "Gana 10 duelos", "duelosGanados", 10, { tipo: RECOMPENSA.TITULO, id: "titulo_campeon" }),
-  L("explorador", "Explorador", "Gana 10 partidas", "victorias", 10, { tipo: RECOMPENSA.SOBRES, n: 3 }),
-  L("demoledor", "Demoledor", "Hazle 300 de da\xF1o a los jefes", "danoJefe", 300, { tipo: RECOMPENSA.SOBRES, n: 5 }),
+  L("explorador", "Explorador", "Gana 10 partidas", "victorias", 10, { tipo: RECOMPENSA.SOBRES, n: 2 }),
+  L("demoledor", "Demoledor", "Hazle 300 de da\xF1o a los jefes", "danoJefe", 300, { tipo: RECOMPENSA.SOBRES, n: 3 }),
   // Los grandes: un mazo inicial más. Eran los otros dos que no elegiste al
   // empezar y sólo se podían completar a base de sobres.
   // Cada mapa mide SU contador y no `expedicionNuevos`, que suma también los
@@ -7438,9 +7469,9 @@ var LOGROS = Object.freeze([
   L("morrison", "La Morrison entera", "Vence por primera vez a los 8 rivales de la Morrison", "expedicion:morrison", 8, { tipo: RECOMPENSA.MAZO }),
   // Los tres mapas que siguen pagan sobres y no un mazo: sólo hay dos mazos
   // iniciales que no elegiste, y ya los dan la Morrison y los 25 duelos.
-  L("hell_creek", "Hell Creek entero", "Vence por primera vez a los 8 rivales de Hell Creek", "expedicion:hell_creek", 8, { tipo: RECOMPENSA.SOBRES, n: 4 }),
-  L("tendaguru", "Tendaguru entera", "Vence por primera vez a los 8 rivales de Tendaguru", "expedicion:tendaguru", 8, { tipo: RECOMPENSA.SOBRES, n: 5 }),
-  L("kem_kem", "Kem Kem entero", "Vence por primera vez a los 8 rivales de Kem Kem", "expedicion:kem_kem", 8, { tipo: RECOMPENSA.SOBRES, n: 6 }),
+  L("hell_creek", "Hell Creek entero", "Vence por primera vez a los 8 rivales de Hell Creek", "expedicion:hell_creek", 8, { tipo: RECOMPENSA.SOBRES, n: 3 }),
+  L("tendaguru", "Tendaguru entera", "Vence por primera vez a los 8 rivales de Tendaguru", "expedicion:tendaguru", 8, { tipo: RECOMPENSA.SOBRES, n: 3 }),
+  L("kem_kem", "Kem Kem entero", "Vence por primera vez a los 8 rivales de Kem Kem", "expedicion:kem_kem", 8, { tipo: RECOMPENSA.SOBRES, n: 4 }),
   L("veterano", "Veterano", "Gana 25 duelos", "duelosGanados", 25, { tipo: RECOMPENSA.MAZO }),
   // Y el más grande: el estandarte azul con su cinta.
   L(

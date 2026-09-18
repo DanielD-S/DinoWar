@@ -16,7 +16,7 @@ import { validarSolitario } from '../supabase/functions/_compartido/validarSolit
 import { PartidaInvalida } from '../supabase/functions/_compartido/validarPartida.js';
 import { validarMazoLegal } from '../supabase/functions/_compartido/validarPartida.js';
 import { PERFIL } from '../src/engine/ai.js';
-import { MAZO } from '../src/data/balance.js';
+import { MAZO, BALANCE } from '../src/data/balance.js';
 import { jugarSolo } from './helpers.js';
 
 const TODOS = [...EXPEDICIONES.flatMap((e) => e.rivales), ...VISITANTES];
@@ -153,3 +153,4 @@ test('La Edge Function saca rival, premio y requisito de los datos, en las dos v
     assert.match(ts, /resultado\.ganada && resultado\.rival/, `${f}: sólo se paga lo que la re-jugada dio por ganado`);
   }
 });
+

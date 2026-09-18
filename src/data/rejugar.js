@@ -10,13 +10,17 @@
 // Ahora rejugar paga **el premio del nodo partido por cinco**, y nunca menos
 // que una victoria normal. Tres decisiones que no se deducen de los números:
 //
-// - **El divisor se elige para que la MEDIA no suba.** El premio medio de los
-//   37 rivales es 166, así que con las victorias a 30 el divisor que deja la
-//   media en una victoria es cinco: sale 39, o sea 1,3 victorias. Lo que
-//   cambia no es cuánto se gana en total, es que el nodo ELEGIDO importa —de
-//   30 en los flojos a 90 en el último de Kem Kem—. Empezó siendo un tercio
-//   con las victorias a 50, y bajó a un quinto el 18-09-2026 cuando bajaron
-//   las victorias: es el mismo criterio con otros números.
+// - **El divisor se elige para que la MEDIA no suba.** Con las victorias a 30
+//   la media de rejugar los 37 rivales tiene que quedarse cerca de una, y sale
+//   39, o sea 1,3 victorias. Lo que cambia no es cuánto se gana en total, es
+//   que el nodo ELEGIDO importa —de 30 en los flojos a 90 en el último de Kem
+//   Kem—.
+// - **Y el divisor va ATADO a los premios de primera victoria.** Fue 3 con las
+//   victorias a 50, 5 al bajarlas a 30, y volvió a 3 el 18-09-2026 cuando los
+//   premios se recortaron un 40 %: `0,6 ÷ 3` es exactamente `1 ÷ 5`, así que
+//   los pagos por rejugar no se movieron ni una moneda. Quien toque los
+//   premios o `monedasVictoria` tiene que volver a hacer esta cuenta, o el
+//   recorte de un grifo se cuela en el otro sin que nadie lo pida.
 // - **Nunca menos de una victoria normal**, que es lo que evita que esto sea
 //   un recorte encubierto: los nodos baratos siguen pagando sus 50. El SQL
 //   paga la DIFERENCIA, y por eso `aplicar_expedicion` conserva su firma y no
@@ -35,7 +39,7 @@ import { ECONOMIA } from './coleccion.js';
 
 export const REJUGAR = Object.freeze({
   // Rejugar paga el premio del nodo partido por esto.
-  divisor: 5,
+  divisor: 3,
   // Victorias pagadas por nodo y día.
   porDia: 3,
 });
