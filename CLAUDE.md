@@ -1415,8 +1415,10 @@ que el resto de gestos.
 
 ## Los marcos de carta: la geometría la decide el PNG
 
-Ocho marcos en `assets/marcos/`: cinco de criatura —cuatro rarezas y el jefe,
-misma geometría, distinto material— y uno por familia de soporte, sin rareza.
+Ocho marcos en `assets/marcos/`: cinco de criatura —cuatro rarezas y el jefe— y
+uno por familia de soporte, sin rareza. Cuatro de los cinco de criatura comparten
+geometría y sólo cambian de material; **el legendario estrenó la suya el
+18-09-2026** y tiene su sección aquí abajo.
 Los originales son PNG de 1024×1536 con los huecos en magenta `#FF00FF`, fuera
 del repositorio; `python tools/marcos.py escribir` los keyea a WebP y **mide
 los huecos**, y esos números son los que van en `carta.css`. No se estiman.
@@ -1441,27 +1443,84 @@ rarezas con ese PNG como referencia y el material como único cambio.
 `test/marcos.test.js` vigila que cada clase que emite `claseMarco()` tenga
 fichero y que ningún WebP sobre.
 
-### La carta ENTERA: las legendarias y los jefes van a sangre
+### El marco legendario: las legendarias estrenan el suyo
+
+Hasta el 18-09-2026 los cinco marcos de criatura eran el MISMO dibujo con otro
+material. Ese día las legendarias estrenaron uno propio, encargado al generador
+en tres vueltas con el autor delante, y con él pasan tres cosas que ningún otro
+marco del juego hace:
+
+- **Trae los huecos de las cifras dentro.** El aro del coste, el círculo del
+  Ataque y el triángulo de la Vida van dibujados en el PNG, con el interior
+  hueco, así que `.c-chapa` se apaga: ponerle la chapa suelta encima sería un
+  aro sobre un aro. Y sin chapa que cambiar, **los dos estados del Ataque los
+  cuenta el COLOR de la cifra** —`mejorado` y `mermado`—, como la Vida herida
+  ya hacía.
+- **La banda y la caja son PAPEL pintado**, no huecos, así que ahí la tinta va
+  oscura; las tres cifras caen sobre hueco, o sea sobre el fondo de la carta, y
+  siguen en claro. Es la única carta del juego con las dos tintas a la vez.
+- **La ventana crece del 37,7 % al 45,9 %** del alto, y la caja se encoge del
+  22,8 % al 20,9 %. Por eso el texto baja a 10,5/12 px y el título a 18 en el
+  visor, y las cuatro cartas más largas del set a 9,5/10,8: comprobado sobre
+  las 144, no se corta ninguna línea. Si algún día se quiere el texto al cuerpo
+  de siempre, la que tiene que ceder dos puntos es la ventana.
+
+La geometría la midió `python tools/marcos.py` sobre el PNG, como manda la
+regla; lo único que no mide son la banda y la caja, porque en este marco no son
+magenta. Ésas se midieron sobre el papel.
+
+Lo que costó, por si vuelve a encargarse uno:
+
+- **Dos de las tres entregas llegaron con el damero pintado** en vez de magenta
+  o alfa, y con un filete blanco de un píxel pegado al canto. Las dos cosas hay
+  que decirlas en el encargo.
+- **La segunda puso PAPEL dentro del aro, el círculo y el triángulo.** En el
+  visor se lee precioso y en la colección a 83 px las cifras se pierden: tinta
+  oscura sobre papel claro, y encima en el filo de la caja. El hueco vacío
+  sobre fondo oscuro gana a cualquier tamaño.
+- **El banderín de rareza se comía la banda del nombre.** Con el banderín en la
+  esquina, la banda llegaba al 70 % del ancho y «Carcharodontosaurus» dejaba de
+  leerse a 83 px. Los cuatro rombos se fueron a la piedra del pie y la banda
+  llega al 87 %.
+- **La proporción sigue sin cuadrar.** El PNG llegó a 1014×1551 —0,654— y la
+  carta es 0,732, así que el CSS lo estira un 12 % a lo ancho y el aro y el
+  círculo salen elípticos. Los ocho marcos de hoy tienen el mismo defecto en
+  menor medida (9,8 %); se acaba pidiéndolos a **1148×1568**, que es 82:112
+  exacto.
+
+Quedan los otros siete en este estilo —las tres rarezas, el jefe y las tres
+familias de soporte—, con esta misma geometría y el material como único cambio;
+las de soporte, sin banda y sin los dos huecos de cifras.
+
+### La carta ENTERA: las cinco de jefe van a sangre
 
 Desde el 18-09-2026 (decisión del autor, con las cartas de Crown War delante:
 «el arte de la carta, bordes, full art es bastante bueno, profesional,
-pulcro»), las **criaturas legendarias y las cinco de jefe** se pintan enteras:
+pulcro»), **las cinco cartas de jefe** se pintan enteras:
 la ilustración cubre la carta, el marco de latón se apaga y en su sitio hay un
-filete dorado —bronce en el jefe—, el nombre va sobre un velo oscuro y la
-habilidad en una caja de cristal translúcido apoyada en las chapas. Es la
-variante «full art» de cualquier TCG, y lo que se decidió al hacerla:
+filete de bronce, el nombre va sobre un velo oscuro y la habilidad en una caja
+de cristal translúcido apoyada en las chapas. Es la variante «full art» de
+cualquier TCG.
+
+**Las criaturas LEGENDARIAS lo fueron el mismo día y dejaron de serlo**, al
+estrenar marco propio: las dos cosas se pelean por la misma carta —una la
+enmarca y la otra le quita el marco— y ganó el marco, porque la rareza se lee y
+las cifras tienen dónde apoyarse. Las de jefe se quedan a sangre porque viven
+fuera del set y no tienen rareza que enseñar. `test/entera.test.js` guarda esa
+frontera. Lo que se decidió al hacerla:
 
 - **Es una clase, `entera`, y no un marco nuevo.** `marcoCarta()` emite lo
   mismo; `carta.css` mueve la GEOMETRÍA de los huecos —la ventana a la carta
   entera, la banda más ancha, la caja abajo, las chapas de cifras al 90 %— y
   el mismo `<span class="c-marco">` pinta el filete con un degradado
   recortado a anillo por dos máscaras. Cero ficheros nuevos, y
-  `test/marcos.test.js` sigue igual: el marco legendario existe y se usa de
+  `test/marcos.test.js` sigue igual: el marco de jefe existe y se usa de
   reserva.
-- **Sólo con foto.** `esEntera()` en `art.js` dice qué cartas lo son;
-  `clasesCarta()` pone la clase si además `hayFoto()`, y `refrescarFotos()`
-  la añade cuando el índice llega después de pintar. Una silueta SVG a sangre
-  sería un rectángulo de color con un nombre encima.
+- **Sólo con foto.** `esEntera()` en `art.js` dice qué cartas lo son —hoy, las
+  de `CARTAS_DE_JEFE` y nada más—; `clasesCarta()` pone la clase si además
+  `hayFoto()`, y `refrescarFotos()` la añade cuando el índice llega después de
+  pintar. Una silueta SVG a sangre sería un rectángulo de color con un nombre
+  encima.
 - **El velo del nombre es un `<span class="c-velo">` propio**, no
   `.c-arte::after`: ese pseudoelemento ya es el brillo de las legendarias en la
   colección y el sobre. Viaja en toda carta que PUEDA ser entera, y sin la
@@ -1492,10 +1551,16 @@ variante «full art» de cualquier TCG, y lo que se decidió al hacerla:
 
 Lo que se miró al lado de Crown War y NO se copió: su estilo pintado tipo
 anime —el fotorrealismo es lo que nos distingue—, su tipografía sin sistema, y
-que la rareza no se lea en la carta. Y lo que queda por hacer de aquello es la
-ventana grande para TODAS las cartas —marcos nuevos con el arte al 55 % del
-alto y las cifras montadas sobre él—, que son ocho PNG del generador y
-re-medir `carta.css`; se dejó para después de ver cómo funciona esto.
+que la rareza no se lea en la carta. La ventana grande para TODAS las cartas
+—que era lo que quedaba de aquello— se empezó por el marco legendario de aquí
+arriba; faltan los otros siete.
+
+Y una cosa que se midió antes de descartarla: **llevar la carta entera a todo
+el set no funciona.** Las criaturas ganan en el visor, sí, pero a 83 px el
+filete son 1,8 px por lado y la rareza deja de leerse en la colección, que es
+donde hace falta para armar un mazo; y las de soporte se rompen, porque no
+llevan banda de nombre y arriba queda una franja vacía con el coste solo.
+Medido con las siete familias delante antes de decidir el marco.
 
 Las piezas del menú —la barra de «Empezar partida» y las cinco placas— y el
 sobre y el dorso son del mismo generador y el mismo material, pero no llegaron

@@ -4,7 +4,7 @@
 // más información honesta que la silueta. Ninguna lleva plumas — ningún taxón de
 // este set tiene evidencia tegumentaria que las respalde (§2 de la spec).
 
-import { carta, CARTAS_DE_JEFE, TIPO, RAREZA } from '../data/cards.js';
+import { carta, CARTAS_DE_JEFE } from '../data/cards.js';
 
 const SILUETAS = {
   // Terópodo grande: cuerpo horizontal, cráneo profundo, cola contrapesada.
@@ -296,17 +296,18 @@ export const focoDe = (cardId) => focos.get(cardId) ?? null;
 /**
  * Cartas ENTERAS —a sangre—: la ilustración cubre la carta y el marco se
  * reduce a un filete, con el nombre y la habilidad sobre velos translúcidos.
- * Son las criaturas legendarias y las cinco de jefe: lo más raro del set lleva
- * la ilustración más grande, que es lo que un sobre quiere enseñar. La clase
- * sólo se pone cuando HAY foto (`render.js` y `refrescarFotos`): una silueta
- * SVG a sangre sería un rectángulo de color, así que sin foto la carta sale
- * con su marco de siempre.
+ * Son las CINCO DE JEFE y nada más. Las legendarias lo fueron hasta el
+ * 18-09-2026, y dejaron de serlo cuando estrenaron marco propio: las dos cosas
+ * se pelean por la misma carta —una la enmarca y la otra le quita el marco— y
+ * el marco ganó porque la rareza se lee y las cifras tienen dónde apoyarse.
+ * Las de jefe se quedan a sangre porque viven fuera del set y no tienen rareza
+ * que enseñar.
+ *
+ * La clase sólo se pone cuando HAY foto (`render.js` y `refrescarFotos`): una
+ * silueta SVG a sangre sería un rectángulo de color, así que sin foto la carta
+ * sale con su marco de siempre.
  */
-export const esEntera = (cardId) => {
-  if (CARTAS_DE_JEFE[cardId]) return true;
-  const c = carta(cardId);
-  return c.tipo === TIPO.DINOSAURIO && c.rareza === RAREZA.LEGENDARIO;
-};
+export const esEntera = (cardId) => Boolean(CARTAS_DE_JEFE[cardId]);
 
 /**
  * Mira una sola vez qué ilustraciones hay servidas. No rechaza nunca: no tener
