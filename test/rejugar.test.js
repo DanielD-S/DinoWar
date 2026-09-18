@@ -9,17 +9,22 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 
 import { REJUGAR, pagoDeRejugar, extraDeRejugar } from '../src/data/rejugar.js';
 import { ECONOMIA } from '../src/data/coleccion.js';
 import { EXPEDICIONES, VISITANTES } from '../src/data/expediciones.js';
 
 const TODOS = [...EXPEDICIONES.flatMap((e) => e.rivales), ...VISITANTES];
-// El divisor lo manda la última migración que reescribe la función, no la que
-// la estrenó: la 0035 la creó con 3 y la 0036 la dejó en 5 al bajar las
-// victorias. Comparar contra la 0035 diría que los números se separaron.
-const SQL = readFileSync(new URL('../supabase/migrations/0036_economia_mas_dura.sql', import.meta.url), 'utf8');
+// El divisor lo manda la ÚLTIMA migración que reescribe la función, no la que
+// la estrenó: la 0035 la creó con 3, la 0036 la dejó en 5 al bajar las
+// victorias y la 0037 la devolvió a 3 al recortar los premios. Apuntar a una
+// concreta obliga a acordarse de cambiar esta línea, que es justo lo que nadie
+// hace: se busca sola, como la copia del catálogo de logros.
+const SQL = readdirSync(new URL('../supabase/migrations', import.meta.url))
+  .filter((f) => f.endsWith('.sql')).sort()
+  .map((f) => readFileSync(new URL(`../supabase/migrations/${f}`, import.meta.url), 'utf8'))
+  .filter((x) => x.includes('c_divisor')).pop();
 
 test('Los dos números viven en el SQL con el mismo valor que en los datos', () => {
   assert.match(SQL, new RegExp(`c_divisor\\s+constant int := ${REJUGAR.divisor};`));

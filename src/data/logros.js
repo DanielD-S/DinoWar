@@ -63,10 +63,16 @@ export const LOGROS = Object.freeze([
   L('cazador_mayor', 'Cazador mayor', 'Reclama las 5 cartas de jefe', 'cartasJefe', 5,
     { tipo: RECOMPENSA.COSMETICO, id: 'dorso_cazador' }),
 
+  // Los de constancia. Los sobres bajaron un 35 % el 18-09-2026, con el sobre
+  // de 100 a 300: regalaban 23 y ahora 15. Siguen siendo el grifo de UNA VEZ
+  // más grande que hay —quince sobres son dieciocho días de juego normal— y
+  // por eso se recortaron a la vez que los premios de primera victoria. Los
+  // dos MAZOS no se tocan: no son sobres, son las cartas concretas de los
+  // otros dos iniciales, y son el único camino que hay a ellos.
   // Los de constancia.
   L('campeon', 'Campeón', 'Gana 10 duelos', 'duelosGanados', 10, { tipo: RECOMPENSA.TITULO, id: 'titulo_campeon' }),
-  L('explorador', 'Explorador', 'Gana 10 partidas', 'victorias', 10, { tipo: RECOMPENSA.SOBRES, n: 3 }),
-  L('demoledor', 'Demoledor', 'Hazle 300 de daño a los jefes', 'danoJefe', 300, { tipo: RECOMPENSA.SOBRES, n: 5 }),
+  L('explorador', 'Explorador', 'Gana 10 partidas', 'victorias', 10, { tipo: RECOMPENSA.SOBRES, n: 2 }),
+  L('demoledor', 'Demoledor', 'Hazle 300 de daño a los jefes', 'danoJefe', 300, { tipo: RECOMPENSA.SOBRES, n: 3 }),
 
   // Los grandes: un mazo inicial más. Eran los otros dos que no elegiste al
   // empezar y sólo se podían completar a base de sobres.
@@ -77,9 +83,9 @@ export const LOGROS = Object.freeze([
   L('morrison', 'La Morrison entera', 'Vence por primera vez a los 8 rivales de la Morrison', 'expedicion:morrison', 8, { tipo: RECOMPENSA.MAZO }),
   // Los tres mapas que siguen pagan sobres y no un mazo: sólo hay dos mazos
   // iniciales que no elegiste, y ya los dan la Morrison y los 25 duelos.
-  L('hell_creek', 'Hell Creek entero', 'Vence por primera vez a los 8 rivales de Hell Creek', 'expedicion:hell_creek', 8, { tipo: RECOMPENSA.SOBRES, n: 4 }),
-  L('tendaguru', 'Tendaguru entera', 'Vence por primera vez a los 8 rivales de Tendaguru', 'expedicion:tendaguru', 8, { tipo: RECOMPENSA.SOBRES, n: 5 }),
-  L('kem_kem', 'Kem Kem entero', 'Vence por primera vez a los 8 rivales de Kem Kem', 'expedicion:kem_kem', 8, { tipo: RECOMPENSA.SOBRES, n: 6 }),
+  L('hell_creek', 'Hell Creek entero', 'Vence por primera vez a los 8 rivales de Hell Creek', 'expedicion:hell_creek', 8, { tipo: RECOMPENSA.SOBRES, n: 3 }),
+  L('tendaguru', 'Tendaguru entera', 'Vence por primera vez a los 8 rivales de Tendaguru', 'expedicion:tendaguru', 8, { tipo: RECOMPENSA.SOBRES, n: 3 }),
+  L('kem_kem', 'Kem Kem entero', 'Vence por primera vez a los 8 rivales de Kem Kem', 'expedicion:kem_kem', 8, { tipo: RECOMPENSA.SOBRES, n: 4 }),
   L('veterano', 'Veterano', 'Gana 25 duelos', 'duelosGanados', 25, { tipo: RECOMPENSA.MAZO }),
   // Y el más grande: el estandarte azul con su cinta.
   L('leyenda', 'Leyenda del duelo', 'Gana 50 duelos', 'duelosGanados', 50,

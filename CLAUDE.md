@@ -924,8 +924,8 @@ Cinco decisiones que conviene conocer antes de discutirlas:
   un nodo vencido paga lo de una victoria normal.
 - **Los visitantes tienen que costar parecido.** Rotan por semana, y uno que se
   gana el 73 % y otro el 37 % hacen que una semana sea la de no jugar. Se
-  ajustaron midiendo hasta rondar el 50 %; los cinco caían entre el 48 y el
-  58,5 % con la vara del 13-09, y entre el 70 y el 81 % con la del 16-09.
+  ajustaron midiendo hasta rondar el 50 %; ver «La vara de un visitante no es
+  la referencia», aquí abajo.
 - **Las expediciones se encadenan con `requiere`, y no hizo falta regla nueva.**
   `requisitoDe()` devuelve, para el PRIMER nodo de un mapa encadenado, el
   ÚLTIMO del que lo abre. Es el requisito de siempre apuntando a otro sitio, así
@@ -947,24 +947,77 @@ discute otra vez:
   80 %. Con la extinción en el 0 %, las ranuras gastadas en moler son ranuras
   que no pegan.
 
+### La vara de un visitante no es la referencia: es el mazo inicial
+
+Quedaba escrito como trabajo abierto —«los visitantes quedan al 70–81 % y
+antes de reajustarlos hay que decidir qué mazo representa al jugador»—. Se
+midió contra las dos varas a la vez (200 partidas por casilla, 18-09-2026) y
+la respuesta estaba en los números: **contra lo que de verdad tiene una cuenta
+nueva ya estaban casi calibrados.**
+
+| visitante | vs referencia | Cazadores | Gigantes | Manadas | media inicial |
+|---|---|---|---|---|---|
+| El río Judith | 69,5 % | 49,0 | 40,5 | 47,5 | **45,7 %** |
+| Lo que sube del mar | 74,5 % | 64,5 | 51,0 | 59,0 | **58,2 %** |
+| El desierto de Gobi | 76,5 % | 41,0 | 58,0 | 62,0 | **53,7 %** |
+| Los gigantes del sur | 67,0 % | 60,5 | 41,0 | 50,5 | **50,7 %** |
+| Las dunas del Nemegt | 82,0 % | 64,0 | 59,5 | 66,0 | **63,2 %** |
+
+- **La vara de un visitante es el mazo INICIAL, y no se discute: es quién se
+  lo encuentra.** No pide haber recorrido nada, sale desde el primer día y
+  paga lo mismo a todo el mundo una vez por semana. Calibrarlo al 50 % contra
+  la referencia —que es el mazo que queda a la par de los arquetipos— lo
+  habría dejado en el 25–30 % para una cuenta nueva, o sea un muro semanal
+  para justo quien más necesita las 90 monedas. Los NODOS de los mapas son
+  otra cosa y siguen medidos contra la referencia: ahí sí hay una rampa y un
+  requisito que dice por dónde vas.
+- **Sólo había que tocar dos**, y se tocaron: el del mar (58,2 → 49,3) y el
+  del Nemegt (63,2 → 53,0). Los cinco quedan **entre el 45,7 y el 53,7 %**,
+  que es la banda que pide la regla de «costar parecido». Los otros tres no se
+  tocaron a propósito: medir no es excusa para reescribir lo que ya estaba.
+- **El RELLENO era la palanca de dificultad y nadie lo sabía.** `completar()`
+  rellena con Biomasa hasta las 55, así que un rival escrito con 22 criaturas
+  y 9 cartas de soporte se lleva **24 de Biomasa**, casi la mitad del mazo, y
+  está medido desde hace meses que catorce ya lo hunden al 39,8 %. Era el caso
+  del mar. Mirando la tabla entera, el relleno explica la curva de los mapas
+  sin que nadie lo decidiera: los cuatro nodos finales llevan 15, 12, 9 y 16;
+  los primeros, entre 19 y 25. Por eso `sim/expediciones.mjs` lo imprime ahora
+  en su propia columna.
+- **Y no es un tope que se pueda poner en un test.** Se intentó —«ningún rival
+  con más de un tercio de relleno»— y saltó con la cría de Dryosaurus, que
+  lleva 19 y se le gana el 100 % porque es el primer nodo y tiene que ser así;
+  y con el mar recalibrado, que necesita 21 para quedarse en el 49 %. El
+  relleno no es un defecto, es un dial: lo que se calibra es la tasa de
+  victorias, y eso lo dice el simulador, no un test unitario. Un guardián que
+  obligue a descalibrar mazos es peor que ninguno.
+- **Lo que costó afinarlos**, por si vuelve: el del mar pasó de 24 a 12 de
+  relleno y se fue al otro extremo —el jugador bajaba al 31,3 %—, y hubo que
+  dejarlo en 21. El del Nemegt no se arregló con relleno: de 13 a 8 bajó 4,7
+  puntos y de 8 a 6 otros 2, y lo que lo movió de verdad fue cambiar cuerpos
+  —fuera Velociraptor, dentro Anzu y dos Mamenchisaurus— más cinco climas que
+  encienden sus seis cuerpos condicionales. **Quitar relleno sube un mazo
+  flojo; lo que lo hace duro son los cuerpos.**
+
 ### Rejugar un nodo paga según el rival
 
-Antes: la primera victoria pagaba el premio del nodo —de 30 a 450— y volver a
-ganarle pagaba las 50 planas de cualquier partida. O sea que **El último rey,
-que se gana el 47 % de las veces, pagaba lo mismo que el primer nodo de la
-Morrison, que se gana el 100 %**: los 32 nodos eran contenido de un solo uso y
-lo óptimo era repetir el MÁS FÁCIL. Desde el 18-09-2026 (`0035`,
-`src/data/rejugar.js`) rejugar paga **un tercio del premio del nodo**, y nunca
-menos que una victoria normal.
+Antes: la primera victoria pagaba el premio del nodo y volver a ganarle pagaba
+las planas de cualquier partida. O sea que **El último rey, que se gana el
+47 % de las veces, pagaba lo mismo que el primer nodo de la Morrison, que se
+gana el 100 %**: los 32 nodos eran contenido de un solo uso y lo óptimo era
+repetir el MÁS FÁCIL. Desde el 18-09-2026 (`0035`, `src/data/rejugar.js`)
+rejugar paga **el premio del nodo partido por `REJUGAR.divisor`**, y nunca
+menos que una victoria normal: hoy son 30 en los flojos y 90 en el último de
+Kem Kem.
 
-- **Un tercio, no la mitad, porque la media no puede subir.** El premio medio
-  de los 37 rivales es 166, así que un tercio son 55, casi las 50 de siempre:
-  lo que cambia es el REPARTO —50 en los flojos, 150 en el último de Kem Kem—
-  y no el grifo. Con la mitad, un jugador normal ganaba un 180 % más al día.
-  `test/rejugar.test.js` falla si la media se va por encima de 1,35 victorias.
-- **Sólo la mitad de atrás de cada mapa paga más de 50**, que es el premio de
-  haber llegado: por debajo de 150 de premio, un tercio no llega a la victoria
-  normal y manda el suelo.
+- **El divisor se elige para que la MEDIA no suba**, y por eso se ha movido
+  dos veces sin que los pagos cambien: 3 con las victorias a 50, 5 al bajarlas
+  a 30, y 3 otra vez al recortar los premios un 40 %. Es siempre la misma
+  cuenta —la media de rejugar los 37 rivales tiene que quedarse en una
+  victoria y pico, hoy 1,29— y `test/rejugar.test.js` falla si se va por
+  encima de 1,35. Lo que cambia es el REPARTO, no el grifo.
+- **Sólo la mitad de atrás de cada mapa paga más que una victoria normal**,
+  que es el premio de haber llegado: por debajo de 90 de premio, el divisor no
+  llega al suelo y manda el suelo.
 - **Tope de tres por nodo y día.** Sin él, rejugar el mejor nodo cincuenta
   veces daría 7.500 monedas diarias contra las 2.500 de ahora. Con él hay que
   rotar, que es lo que hace que el mapa se vuelva a jugar. El tope de
@@ -978,7 +1031,7 @@ menos que una victoria normal.
   lo que enseña la cartela del mapa, y la migración para quien paga. Es la
   trampa de «regenerar no es aplicar» por otra puerta.
 - Y de rebote sube el **entrenamiento** del Duelo, que juega los dos últimos
-  nodos de cada mapa: ganarle a uno de ésos paga ahora entre 67 y 150.
+  nodos de cada mapa: ganarle a uno de ésos paga entre 40 y 90.
 
 El arte llega aparte (`tools/expediciones.py`, prompts en `PROMPTS.md`) y puede
 no estar: el mapa es un degradado y los medallones son círculos de CSS
@@ -2606,11 +2659,23 @@ Cinco cosas que conviene saber antes de volver a tocarlo:
   economía de antes sin que falle ningún test de los otros. Por eso
   `test/grifos.test.js` mide el TECHO en sobres —entre 1 y 2 al día— y no las
   constantes por separado.
-- **Lo de UNA VEZ no se recortó**, y es lo que más pesa ahora: los premios de
-  primera victoria suman 6.130 (20 sobres) y los logros regalan 23 sobres más
-  dos mazos iniciales. Con el sobre a 300 ya valen tres veces menos que antes,
-  y son finitos: se agotan y no vuelven. Si algún día la curva sigue
-  pareciendo corta, ése es el sitio donde queda por cortar, no el grifo diario.
+- **Y lo de UNA VEZ se recortó después** (`0037`, el mismo día). Quedó fuera
+  del primer corte y medido aparte resultó ser el grifo más grande que había:
+  6.130 monedas de primeras victorias (20,4 sobres) más 23 sobres de logros,
+  o sea **43 de los 135 sobres de la colección entera por contenido que se
+  hace una vez**. Ahora son 3.685 (12,3 sobres) y 15 de logros: 27 de 135.
+  Los premios bajaron un 40 % conservando la rampa —de 20 en el primer nodo
+  de la Morrison a 270 en el último de Kem Kem— y los sobres de logros un
+  35 %. Los dos MAZOS no se tocan: no son sobres, son las cartas de los otros
+  dos iniciales y el único camino que hay a ellos.
+- **Recortar los premios movía el otro grifo sin querer, y por eso el divisor
+  de rejugar volvió de 5 a 3.** Rejugar paga `premio ÷ divisor` con el suelo
+  de una victoria, así que bajar los premios al 0,6 habría bajado también lo
+  que paga rejugar. `0,6 ÷ 3` es exactamente `1 ÷ 5`: los pagos por rejugar no
+  se movieron ni una moneda —30 en los flojos, 90 en el último de Kem Kem,
+  media 1,29 victorias— y lo único que bajó fue la primera victoria, que es lo
+  que se quería. **Quien toque los premios o `monedasVictoria` tiene que
+  rehacer esta cuenta.**
 - **El divisor de rejugar depende de lo que pague una victoria.** No es un
   número suelto: se elige para que la media de rejugar los 37 rivales no se
   separe de una victoria. Con victorias a 50 era 3; con 30 es 5, y la media
@@ -2849,11 +2914,13 @@ Dicho para que nadie lo descubra tarde:
   mazo no muele —la vía existe y está medida en `sim/arquetipos.mjs`, 22–26 %
   de las victorias del mazo hecho para ella—. Las dos cosas son ciertas a la
   vez y conviene no confundirlas.
-- **Las curvas de expedición están medidas con la vara nueva y los rivales
-  no se retocaron.** Los mapas suben 10–20 puntos y los visitantes, que se
-  ajustaron al 50 %, quedan al 70–81 %. Antes de reajustarlos hay que decidir
-  qué mazo representa al jugador en `sim/expediciones.mjs`: la referencia es
-  una vara, no lo que juega la gente.
+- **Los 32 NODOS de los mapas siguen medidos sólo contra la referencia.** Los
+  visitantes ya no: se midieron contra los tres mazos iniciales, que es quien
+  se los encuentra, y quedaron recalibrados el 18-09-2026 (ver «La vara de un
+  visitante no es la referencia»). Para los nodos la pregunta sigue abierta,
+  aunque pesa menos: un nodo tiene rampa y requisito, así que quien llega al
+  séptimo de Kem Kem ya no juega con un mazo inicial. Lo que falta es saber
+  con qué juega, y eso no se sabrá hasta que haya más de diez cuentas.
 - **El jugador inicial no es sólo del turno.** Con la IA al azar los dos
   mazos de referencia dan el 47–48 %; con la heurística, el nuevo baja al
   43–45 %. Hay algo en `ai.js` o en cómo `sim/partida.js` alterna las dos
