@@ -1013,8 +1013,10 @@ Seis decisiones que no se deducen del código:
   `.ranura[data-lugar-arte]` en piel.css son la ventana que mide la
   herramienta, no una estimación. `test/lugares.test.js` exige que todo
   lugar tenga su regla, que el índice sólo nombre lugares con fichero y que
-  ningún WebP esté en disco fuera del índice. Hoy el índice está vacío: el
-  arte no ha llegado.
+  ningún WebP esté en disco fuera del índice. **Las diecisiete llegaron el
+  18-09-2026**, en cuatro tandas (PRs #125 a #128), todas a 1145×1374 y sin
+  nada centrado que el recorte a 0,72 partiera; la Nidada, la única con
+  «algo», trae los huevos repartidos y aguanta el recorte.
 
 Y lo que se apaga por entorno para medir, como las ranuras y el sobrante:
 `DINOWAR_LUGARES=0 node sim/run.js`. En el navegador no hay `process` y

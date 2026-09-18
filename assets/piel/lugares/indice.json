@@ -10,6 +10,12 @@
     "laguna",
     "bosque_coniferas",
     "salinas",
-    "pedregal"
+    "pedregal",
+    "llanura_abierta",
+    "desfiladero",
+    "barranco",
+    "cienaga",
+    "nidada",
+    "cauce_seco"
   ]
 }
