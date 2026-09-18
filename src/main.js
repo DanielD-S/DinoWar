@@ -37,6 +37,7 @@ import {
   montarDuelo, enseñarDuelo, pintarDuelo, abandonarEspera, siguienteEntrenamiento,
   jugarEnDuelo, estadoDuelo, rendirseEnDuelo,
 } from './ui/duelo.js';
+import { montarTorneo, enseñarTorneo, entrarEnTorneo } from './ui/torneo.js';
 import { DUELO } from './data/duelo.js';
 import { rangoDe, nombreDeRango, emblemaDe } from './data/ligas.js';
 import { estaDentro } from './ui/supabase.js';
@@ -296,6 +297,8 @@ function abrirJugar() {
   enseñarMisiones(false);
   el.btnDuelo.setAttribute('aria-expanded', 'false');
   enseñarDuelo(false);
+  el.btnTorneo.setAttribute('aria-expanded', 'false');
+  enseñarTorneo(false);
   refrescarMisiones();
   irA(APP.JUGAR);
 }
@@ -1429,18 +1432,46 @@ function iniciar() {
     // Nadie en la cola: un rival duro de las expediciones, sin ELO de por medio.
     cuandoEntrene: (rivalId) => nuevaPartida(null, null, rivalId, true),
   });
-  el.btnDuelo.addEventListener('click', () => {
-    const abierto = el.btnDuelo.getAttribute('aria-expanded') === 'true';
-    el.btnDuelo.setAttribute('aria-expanded', String(!abierto));
-    if (!abierto) { el.btnMisiones.setAttribute('aria-expanded', 'false'); enseñarMisiones(false); }
-    enseñarDuelo(!abierto);
+  // Las TRES placas con panel se excluyen: abrir una pliega las otras dos. Con
+  // dos bastaba un `if` cruzado; con tres, una función.
+  const paneles = () => [
+    { boton: el.btnDuelo, enseñar: enseñarDuelo },
+    { boton: el.btnMisiones, enseñar: enseñarMisiones },
+    { boton: el.btnTorneo, enseñar: enseñarTorneo },
+  ];
+  const alternarPanel = (cual) => {
+    const abierto = cual.getAttribute('aria-expanded') === 'true';
+    for (const p of paneles()) {
+      const si = p.boton === cual && !abierto;
+      p.boton.setAttribute('aria-expanded', String(si));
+      p.enseñar(si);
+    }
+  };
+  // El torneo: la regla de la semana y la racha. Armar el mazo es la pantalla
+  // de mazos en MODO torneo —la colección filtrada a lo que entra y el
+  // validador del torneo—; elegir uno entra y cobra en la misma llamada.
+  montarTorneo({
+    cuandoArme: (t) => {
+      abrirMazos({
+        torneo: t,
+        alElegir: (cartas) => {
+          entrarEnTorneo(cartas).then((entro) => {
+            abrirJugar();
+            el.btnTorneo.setAttribute('aria-expanded', 'true');
+            enseñarTorneo(true);
+            if (entro) pintarMenu();
+          });
+        },
+      });
+      irA(APP.MAZOS);
+    },
+    // Dentro de una racha, buscar rival es el mismo botón del Duelo: el
+    // servidor ya sabe que ese duelo es del torneo por la racha abierta.
+    cuandoBusque: () => { alternarPanel(el.btnDuelo); },
   });
-  el.btnMisiones.addEventListener('click', () => {
-    const abierto = el.btnMisiones.getAttribute('aria-expanded') === 'true';
-    el.btnMisiones.setAttribute('aria-expanded', String(!abierto));
-    if (!abierto) { el.btnDuelo.setAttribute('aria-expanded', 'false'); enseñarDuelo(false); }
-    enseñarMisiones(!abierto);
-  });
+  el.btnDuelo.addEventListener('click', () => alternarPanel(el.btnDuelo));
+  el.btnMisiones.addEventListener('click', () => alternarPanel(el.btnMisiones));
+  el.btnTorneo.addEventListener('click', () => alternarPanel(el.btnTorneo));
   // Salir de la pantalla de jugar es salir de la cola: quedarse esperando
   // rival desde el menú sería empezar una partida sin estar mirando.
   el.btnJugarVolver.addEventListener('click', () => { abandonarEspera(); pintarMenu(); irA(APP.MENU); });

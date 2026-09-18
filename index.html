@@ -146,6 +146,9 @@
                servidor. La placa abre y cierra su panel, como la de misiones. -->
           <button id="btn-duelo" class="placa placa-duelo" aria-expanded="false"><i aria-hidden="true"></i>Duelo</button>
           <button id="btn-misiones" class="placa placa-misiones" aria-expanded="false"><i aria-hidden="true"></i>Misiones</button>
+          <!-- El torneo de la semana: una regla fija de construcción y una
+               racha. Abre su panel como las otras dos, y las tres se excluyen. -->
+          <button id="btn-torneo" class="placa placa-torneo" aria-expanded="false"><i aria-hidden="true"></i>Torneo</button>
         </div>
         <!-- Las tres misiones del día. Las elige el calendario y el progreso lo
              lleva el servidor: el navegador sólo las pinta. Nace vacío y se
@@ -155,6 +158,9 @@
         <!-- El panel del Duelo: tu liga, buscar rival, retar con código. Lo
              pinta src/ui/duelo.js. -->
         <div class="menu-misiones menu-duelo oculta" id="menu-duelo"></div>
+        <!-- El panel del torneo: la regla de la semana, la escalera de premios
+             y cómo va tu racha. Lo pinta src/ui/torneo.js. -->
+        <div class="menu-misiones menu-torneo oculta" id="menu-torneo"></div>
         <button id="btn-jugar-volver" class="boton-fantasma jugar-volver">Volver</button>
       </div>
     </div>

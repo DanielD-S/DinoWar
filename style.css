@@ -1254,7 +1254,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   display: flex; flex-direction: column; align-items: center; gap: 6px;
   container-type: inline-size;
   font-family: 'Cinzel', Georgia, serif; font-weight: 700; letter-spacing: .01em;
-  /* «En solitario» son once letras y es la larga de las tres. */
+  /* «En solitario» son once letras y es la larga de las CUATRO. A cuatro
+     placas en 360 px cada una mide unos 78, así que el `cqi` manda y el
+     rótulo cabe sin partirse. */
   font-size: min(11px, 12.5cqi); line-height: 1; white-space: nowrap;
   color: #e9d9b5; text-shadow: 0 1px 2px rgba(0,0,0,.9);
   position: relative;
@@ -1298,6 +1300,87 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   filter: drop-shadow(0 3px 5px rgba(0,0,0,.5)) brightness(1.14);
 }
 #jugar.misiones-abiertas .placa-misiones { color: var(--acento-vivo); }
+
+/* La placa del TORNEO no tiene arte todavía y por eso no declara `--placa`:
+   el guardián de `marcado.test.js` exige fichero a toda placa que lo declare,
+   y una ruta a un WebP que no existe deja un hueco en la fila. Mientras
+   llega, es un dibujo de CSS con el mismo latón que el resto —un medallón con
+   su aro y la cinta debajo—, que es lo que se hizo con la placa de la tienda
+   antes de que tuviera la suya. */
+/* Con `.placa-torneo i` no basta: `.jugar-placas .placa i` pesa más y escribe
+   `background: var(--placa)…`, que sin `--placa` es una declaración inválida y
+   deja la pieza transparente. Sólo se veía la cinta del `::after`. */
+.jugar-placas .placa-torneo i {
+  background: radial-gradient(circle at 50% 42%, #f0dcae 0 17%, #c79a4e 18% 30%, #8a6a32 31% 35%, transparent 36%),
+              radial-gradient(circle at 50% 42%, transparent 0 40%, #d8b56e 41% 45%, transparent 46%),
+              linear-gradient(160deg, #6a5024, #3a2c16);
+  /* Las otras tres placas son PIEDRA CUADRADA con marco de latón, así que el
+     medallón va dentro de una y no suelto: si no, la fila se lee como tres
+     botones y un icono. */
+  border: 2px solid #8a6a32; border-radius: 7px;
+  box-shadow: inset 0 0 0 1px rgba(244,236,224,.14), 0 3px 5px rgba(0,0,0,.5);
+  filter: none;
+}
+.placa-torneo i::after {
+  content: ''; position: absolute; left: 50%; top: 58%; width: 26%; height: 30%;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, #b8402f, #7d2a1e);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
+  opacity: .9;
+}
+#jugar.torneo-abierto .placa-torneo i { filter: drop-shadow(0 3px 5px rgba(0,0,0,.5)) brightness(1.14); }
+#jugar.torneo-abierto .placa-torneo { color: var(--acento-vivo); }
+
+/* ------------------------------------------------------- el torneo */
+/* La cartela del torneo: nombre, lema y la regla. La regla va en su propia
+   línea y con el latón encendido porque es lo único que hay que leer para
+   saber si tu mazo entra. */
+.torneo-cartela { margin: 6px 0 10px; }
+.torneo-nombre {
+  font-family: 'Cinzel', Georgia, serif; font-size: 16px; margin: 0 0 2px;
+  color: var(--texto); letter-spacing: .02em;
+}
+.torneo-lema { font-size: 11.5px; line-height: 1.35; color: var(--tenue); margin: 0 0 5px; }
+.torneo-regla {
+  font-size: 12px; font-weight: 600; color: var(--acento-claro); margin: 0;
+  padding: 5px 8px; border-left: 2px solid var(--acento-claro);
+  background: rgba(244,236,224,.04); border-radius: 0 var(--radio) var(--radio) 0;
+}
+
+/* La escalera de premios. Es una fila de casillas y no una tabla: lo que se
+   mira es dónde estás, no cuánto paga cada una. */
+.torneo-escalera {
+  display: flex; gap: 4px; list-style: none; margin: 8px 0; padding: 0;
+}
+.torneo-escalera li {
+  flex: 1; min-width: 0; text-align: center; padding: 5px 2px;
+  border: 1px solid var(--linea); border-radius: var(--radio);
+  background: rgba(244,236,224,.03);
+}
+.torneo-escalera li b { display: block; font-size: 13px; color: var(--tenue); }
+.torneo-escalera li span {
+  display: block; font-size: 9px; line-height: 1.2; color: var(--tenue-2);
+}
+.torneo-escalera li.hecho { border-color: var(--acento-claro); }
+.torneo-escalera li.hecho b { color: var(--acento-claro); }
+.torneo-escalera li.aqui {
+  background: rgba(214,170,94,.14); box-shadow: 0 0 0 1px var(--acento-claro) inset;
+}
+.torneo-escalera li.aqui span { color: var(--texto); }
+
+/* El marcador de la racha: victorias a la izquierda, derrotas a la derecha.
+   Las pastillas son las mismas del escudo de la liga. */
+.torneo-marcador {
+  display: flex; justify-content: space-between; gap: 8px; margin: 6px 0;
+  font-size: 11px; color: var(--tenue);
+}
+.torneo-marcador i {
+  display: inline-block; width: 7px; height: 7px; margin-right: 2px; border-radius: 50%;
+  border: 1px solid var(--acento-claro); vertical-align: middle;
+}
+.torneo-victorias i.llena { background: var(--acento-claro); }
+.torneo-derrotas i { border-color: #b8402f; }
+.torneo-derrotas i.llena { background: #b8402f; }
 
 /* Volver: centrado y separado, que es la salida de la pantalla. */
 .jugar-volver { flex: none; align-self: center; min-width: 128px; margin-top: 2px; }

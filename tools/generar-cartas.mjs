@@ -23,6 +23,7 @@ import { limiteDe } from '../src/data/coleccion.js';
 import { MAZOS_INICIALES } from '../src/data/iniciales.js';
 import { COSMETICOS } from '../src/data/cosmeticos.js';
 import { CRAFTEO } from '../src/data/crafteo.js';
+import { CATALOGO as TORNEOS_CATALOGO, PREMIOS, TORNEOS, cartasLegales } from '../src/data/torneos.js';
 
 export const SALIDA = 'supabase/migrations/0006_catalogo_cartas.sql';
 
@@ -130,6 +131,46 @@ export function generar() {
   L.push('  crear   int not null check (crear > 0)');
   L.push(');');
   L.push('');
+  L.push('-- Los TORNEOS. `entrar_en_torneo` (0038) cobra la entrada de AQUÍ y valida');
+  L.push('-- el mazo contra la lista de cartas legales de AQUÍ: si la regla viajara en');
+  L.push('-- la petición, el mazo se autorizaría a sí mismo. Sale de src/data/torneos.js.');
+  L.push('--');
+  L.push('-- La regla NO se traduce a SQL: se vuelca ya resuelta, como una LISTA de ids');
+  L.push('-- legales. Traducir `soloClados` o `costeMax` a un `where` pediría columnas de');
+  L.push('-- clado y coste en `catalogo_cartas` y un segundo sitio donde el vocabulario');
+  L.push('-- puede quedarse atrás del de `torneos.js`. Una lista generada no se');
+  L.push('-- contradice con su origen: o está o no está.');
+  L.push('create table if not exists public.catalogo_torneos (');
+  L.push('  id          text primary key,');
+  L.push('  nombre      text not null,');
+  L.push('  -- Sitio en la rotación. La semana la calcula el servidor y el torneo de');
+  L.push('  -- hoy es el de `semana mod (cuántos hay)`, el mismo cálculo que hace');
+  L.push('  -- `torneoDe()` en el navegador.');
+  L.push('  orden       int  not null unique,');
+  L.push('  -- Copias por carta si el torneo las recorta; null es el tope de rareza de');
+  L.push('  -- siempre. Es el único campo de la regla que una lista de ids no expresa.');
+  L.push('  copias_max  int  check (copias_max > 0)');
+  L.push(');');
+  L.push('');
+  L.push('create table if not exists public.catalogo_torneo_cartas (');
+  L.push('  torneo   text not null references public.catalogo_torneos (id) on delete cascade,');
+  L.push('  card_id  text not null references public.catalogo_cartas (card_id),');
+  L.push('  primary key (torneo, card_id)');
+  L.push(');');
+  L.push('');
+  L.push('-- Lo que paga una racha por victorias. Lo cobra `duelo_cerrar` al cerrarla.');
+  L.push('create table if not exists public.catalogo_torneo_premios (');
+  L.push('  victorias int primary key check (victorias >= 0),');
+  L.push('  monedas   int not null check (monedas >= 0),');
+  L.push('  sobres    int not null check (sobres >= 0)');
+  L.push(');');
+  L.push('');
+  L.push('-- La entrada y los dos topes de la racha, con el resto de los precios.');
+  L.push('alter table public.catalogo_economia');
+  L.push(`  add column if not exists torneo_entrada int not null default ${TORNEOS.entrada},`);
+  L.push(`  add column if not exists torneo_victorias int not null default ${TORNEOS.victoriasParaCerrar},`);
+  L.push(`  add column if not exists torneo_derrotas int not null default ${TORNEOS.derrotasParaCerrar};`);
+  L.push('');
 
   // NADA DE `truncate`. Aquí hubo un `truncate public.catalogo_cartas cascade`
   // y era una bomba: `coleccion` tiene una clave foránea contra esta tabla, así
@@ -193,6 +234,34 @@ export function generar() {
   L.push('on conflict (rareza) do update set fundir = excluded.fundir, crear = excluded.crear;');
   L.push('');
 
+  // Los torneos. El orden importa: primero los torneos, luego sus cartas —que
+  // apuntan a los dos catálogos—, y las bajas al revés.
+  L.push('insert into public.catalogo_torneos (id, nombre, orden, copias_max) values');
+  L.push(`${TORNEOS_CATALOGO.map((t, i) => `  (${sql(t.id)}, ${sql(t.nombre)}, ${i}, `
+    + `${t.regla.copiasMax ?? 'null'})`).join(',\n')}`);
+  L.push('on conflict (id) do update set nombre = excluded.nombre,');
+  L.push('  orden = excluded.orden, copias_max = excluded.copias_max;');
+  L.push('');
+  const legales = TORNEOS_CATALOGO.flatMap((t) => cartasLegales(t).map((id) => ({ t: t.id, id })));
+  L.push('insert into public.catalogo_torneo_cartas (torneo, card_id) values');
+  L.push(`${legales.map(({ t, id }) => `  (${sql(t)}, ${sql(id)})`).join(',\n')}`);
+  L.push('on conflict (torneo, card_id) do nothing;');
+  L.push('');
+  L.push('delete from public.catalogo_torneo_cartas where (torneo, card_id) not in (values');
+  L.push(`${legales.map(({ t, id }) => `  (${sql(t)}, ${sql(id)})`).join(',\n')}`);
+  L.push(');');
+  L.push('');
+  L.push('delete from public.catalogo_torneos where id not in (');
+  L.push(`${TORNEOS_CATALOGO.map((t) => `  ${sql(t.id)}`).join(',\n')}`);
+  L.push(');');
+  L.push('');
+  L.push('insert into public.catalogo_torneo_premios (victorias, monedas, sobres) values');
+  L.push(`${PREMIOS.map((p, i) => `  (${i}, ${p.monedas}, ${p.sobres})`).join(',\n')}`);
+  L.push('on conflict (victorias) do update set monedas = excluded.monedas, sobres = excluded.sobres;');
+  L.push('');
+  L.push(`delete from public.catalogo_torneo_premios where victorias > ${PREMIOS.length - 1};`);
+  L.push('');
+
   // Las bajas de cartas van al final y en este orden: `catalogo_inicial` apunta
   // a `catalogo_cartas`, así que quitar del set una carta que todavía figura en
   // la colección de salida fallaría contra su propia clave foránea.
@@ -204,11 +273,13 @@ export function generar() {
 
   L.push('insert into public.catalogo_economia');
   L.push('  (id, precio_sobre, cartas_por_sobre, monedas_inicio, monedas_victoria,');
-  L.push('   monedas_derrota, tamano_mazo, mazos_maximo, legendarias_dino_max)');
+  L.push('   monedas_derrota, tamano_mazo, mazos_maximo, legendarias_dino_max,');
+  L.push('   torneo_entrada, torneo_victorias, torneo_derrotas)');
   L.push(`values (1, ${ECONOMIA.precioSobre}, ${ECONOMIA.cartasPorSobre}, `
     + `${ECONOMIA.monedasInicio}, ${ECONOMIA.monedasVictoria}, `
     + `${ECONOMIA.monedasDerrota}, ${BALANCE.tamanoMazo}, ${MAZOS_MAXIMO}, `
-    + `${BALANCE.legendariasDinoPorMazo})`);
+    + `${BALANCE.legendariasDinoPorMazo}, ${TORNEOS.entrada}, `
+    + `${TORNEOS.victoriasParaCerrar}, ${TORNEOS.derrotasParaCerrar})`);
   L.push('on conflict (id) do update set');
   L.push('  precio_sobre = excluded.precio_sobre,');
   L.push('  cartas_por_sobre = excluded.cartas_por_sobre,');
@@ -217,12 +288,16 @@ export function generar() {
   L.push('  monedas_derrota = excluded.monedas_derrota,');
   L.push('  tamano_mazo = excluded.tamano_mazo,');
   L.push('  mazos_maximo = excluded.mazos_maximo,');
-  L.push('  legendarias_dino_max = excluded.legendarias_dino_max;');
+  L.push('  legendarias_dino_max = excluded.legendarias_dino_max,');
+  L.push('  torneo_entrada = excluded.torneo_entrada,');
+  L.push('  torneo_victorias = excluded.torneo_victorias,');
+  L.push('  torneo_derrotas = excluded.torneo_derrotas;');
   L.push('');
 
   L.push('-- El catálogo lo lee cualquiera que haya entrado: son las reglas del');
   L.push('-- juego, no datos de nadie. Escribirlo, sólo las migraciones.');
-  for (const t of ['catalogo_cartas', 'catalogo_inicial', 'catalogo_iniciales', 'catalogo_cosmeticos', 'catalogo_crafteo', 'catalogo_economia']) {
+  for (const t of ['catalogo_cartas', 'catalogo_inicial', 'catalogo_iniciales', 'catalogo_cosmeticos', 'catalogo_crafteo', 'catalogo_economia',
+    'catalogo_torneos', 'catalogo_torneo_cartas', 'catalogo_torneo_premios']) {
     L.push(`alter table public.${t} enable row level security;`);
     L.push(`drop policy if exists "el catálogo es público" on public.${t};`);
     L.push(`create policy "el catálogo es público" on public.${t}`);

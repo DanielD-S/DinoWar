@@ -48,13 +48,21 @@ test('La migración del catálogo se puede aplicar sobre una base con jugadores'
   // de las dos cosas.
   const sql = readFileSync(SALIDA, 'utf8');
   assert.doesNotMatch(sql, /truncate/i, 'una migración de catálogo no vacía tablas');
-  for (const tabla of ['catalogo_cartas', 'catalogo_inicial', 'catalogo_iniciales', 'catalogo_cosmeticos', 'catalogo_crafteo', 'catalogo_economia']) {
+  const TABLAS = [
+    'catalogo_cartas', 'catalogo_inicial', 'catalogo_iniciales', 'catalogo_cosmeticos',
+    'catalogo_crafteo', 'catalogo_economia',
+    'catalogo_torneos', 'catalogo_torneo_cartas', 'catalogo_torneo_premios',
+  ];
+  for (const tabla of TABLAS) {
     // `\b` y no un espacio: `catalogo_inicial` no puede coincidir dentro de
     // `catalogo_iniciales`, y el insert de la economía sigue con un salto de línea.
     assert.match(sql, new RegExp(`insert into public\\.${tabla}\\b`), `${tabla} no se rellena`);
   }
   // Y cada insert cierra con su `on conflict`, que es lo que lo hace repetible.
-  assert.equal((sql.match(/on conflict/g) ?? []).length, 6);
+  // La cuenta sale de la lista y no es un número a mano: una tabla nueva en el
+  // generador traía el test abajo sin que el fallo dijera cuál era.
+  assert.equal((sql.match(/insert into public\./g) ?? []).length, TABLAS.length);
+  assert.equal((sql.match(/on conflict/g) ?? []).length, TABLAS.length);
 });
 
 test('Todas las cartas coleccionables están en el SQL con su rareza', () => {

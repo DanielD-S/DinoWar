@@ -288,6 +288,44 @@ export async function equiparCosmetico(id) {
   return p;
 }
 
+// ----------------------------------------------------------------- torneos
+//
+// Las tres llamadas del torneo. Van aquí y no en `torneo.js` por lo mismo que
+// las de la tienda: este fichero es la costura que sabe si hay servidor. Y sin
+// servidor NO hay torneo — una racha es una fila con dinomonedas de por medio,
+// así que inventarla en local sería prometer un premio que nadie va a pagar.
+
+const SIN_SERVIDOR = 'Los torneos necesitan conexión.';
+
+/** Cómo va la racha de esta semana, y qué torneo toca según el servidor. */
+export async function miRacha() {
+  if (modo === MODO.LOCAL) throw new Error(SIN_SERVIDOR);
+  await sesionValida();
+  return rpc('mi_racha', {});
+}
+
+/**
+ * Entrar en el torneo con un mazo. El servidor valida Y cobra en la misma
+ * llamada: si el mazo no vale, no se toca una moneda. Devuelve la racha, y de
+ * paso refresca el perfil, que acaba de perder la entrada.
+ */
+export async function entrarEnTorneo(torneoId, cartas) {
+  if (modo === MODO.LOCAL) throw new Error(SIN_SERVIDOR);
+  await sesionValida();
+  const r = await rpc('entrar_en_torneo', { p_torneo: torneoId, p_mazo: cartas });
+  if (r?.perfil) guardarPerfil(aFormaLocal(r.perfil));
+  return r?.racha ?? null;
+}
+
+/** Retirarse de la racha y cobrar lo que lleve. */
+export async function retirarRacha() {
+  if (modo === MODO.LOCAL) throw new Error(SIN_SERVIDOR);
+  await sesionValida();
+  const r = await rpc('retirar_racha', {});
+  if (r?.perfil) guardarPerfil(aFormaLocal(r.perfil));
+  return r?.cierre ?? null;
+}
+
 /** Funde el excedente: las copias que ya no caben en ningún mazo. */
 export async function fundir() {
   // Da ESQUIRLAS, no dinomonedas (src/data/crafteo.js): las monedas salen de
