@@ -1671,7 +1671,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .propio .hud-etiqueta { color: var(--acento-claro); }
 
 .hud-recs { display: flex; gap: 12px; }
-.rec { display: flex; align-items: baseline; gap: 3px; white-space: nowrap; }
+.rec { display: flex; align-items: baseline; gap: 3px; white-space: nowrap; position: relative; border-radius: 4px; }
+/* A dos trofeos del final el contador se enciende y late, el tuyo y el suyo. */
+.rec.cerca b { color: var(--bio); text-shadow: 0 0 6px rgba(217,164,65,.7); animation: latir-oro 1.6s ease-in-out infinite; }
+@keyframes latir-oro { 0%, 100% { text-shadow: 0 0 4px rgba(217,164,65,.4); } 50% { text-shadow: 0 0 10px rgba(217,164,65,.95); } }
 .rec b { font-size: 13px; font-weight: 500; }
 .rec .meta { font-size: 10px; color: var(--tenue-2); margin-left: -2px; }
 .rec i { font-style: normal; font-size: 11px; color: var(--tenue); }
@@ -1749,6 +1752,19 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .habitat-num .tope { color: var(--tenue-2); }
 .habitat.golpe .habitat-num { animation: latido .45s ease-out; }
 @keyframes latido { 0%,100% { transform: none; } 40% { transform: scale(1.4); } }
+/* Y la barra destella con el número: un velo blanco sobre el relleno que se
+   apaga en medio segundo. Va en un `::after` y no en `filter`, que piel.css ya
+   usa el filtro del relleno rival para girarle el tono. */
+.habitat-barra i { position: relative; }
+.habitat-barra i::after { content: ''; position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+.habitat.golpe .habitat-barra i::after { animation: destello-barra .45s ease-out; }
+@keyframes destello-barra { 0% { opacity: .75; } 100% { opacity: 0; } }
+/* Por debajo del cuarto, la barra late: la partida puede acabar por aquí en
+   un turno. El tuyo en rojo; el del rival en oro, que para ti es buena noticia. */
+.habitat.peligro .habitat-barra i { animation: latir-barra 1.4s ease-in-out infinite; }
+.habitat.propio.peligro .habitat-num b { color: var(--peligro); }
+.habitat.rival.peligro .habitat-num b { color: var(--bio); }
+@keyframes latir-barra { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
 
 /* Pila de mazo: una carta pequeña boca abajo (`i`) con el contador encima
    (`b`). Era una cajita apaisada de 32×22 con el número, y el dorso de la
@@ -1759,10 +1775,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
    La pila fija el alto de la fila de hábitat, así que su tamaño sale del
    presupuesto vertical del campo y no sólo de la estética: a 360×640 las
    filas de ranuras quedan en 128 px con la pila a 36, y la carta de 112 cabe. */
-.pila { position: relative; width: 30px; height: 36px; flex: 0 0 auto; }
+.pila { position: relative; width: 30px; height: 36px; flex: 0 0 auto; --grosor: 4; }
+/* El taco de debajo asoma tanto como mazo queda: `--grosor` va de 4 a 0 y lo
+   escribe render.js con la cuenta. A 55 cartas es un taco; con cuatro, una
+   carta suelta. Es el reloj de la extinción, que se ve sin leer el número. */
 .pila::before {
-  content: ''; position: absolute; left: 3px; top: 2px; width: 26px; height: 34px;
+  content: ''; position: absolute; width: 26px; height: 34px;
+  left: calc(1px + var(--grosor) * 1.5px); top: calc(var(--grosor) * 1px);
   border-radius: 3px; background: #241b11; box-shadow: 0 0 0 1px #45372a;
+  transition: left .4s ease-out, top .4s ease-out;
 }
 .pila i {
   position: absolute; left: 0; top: 0; width: 26px; height: 34px; border-radius: 3px;
@@ -1775,7 +1796,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   font-size: 9px; font-weight: 600; color: var(--texto); text-align: center;
 }
 .habitat.propio .pila b { box-shadow: 0 0 0 1px var(--bio); }
-.pila.aviso b { color: var(--peligro); box-shadow: 0 0 0 1px var(--peligro); }
+.pila.aviso b { color: var(--peligro); box-shadow: 0 0 0 1px var(--peligro); animation: latir-mazo 1.4s ease-in-out infinite; }
+@keyframes latir-mazo {
+  0%, 100% { box-shadow: 0 0 0 1px var(--peligro); }
+  50%      { box-shadow: 0 0 0 2px var(--peligro), 0 0 8px rgba(200,103,74,.7); }
+}
 
 /* Descarte: una ficha plana al lado del mazo, y se puede abrir. */
 .descarte-ficha {
@@ -2192,7 +2217,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .carta--mano, .carta--mano .c-arte > * { transition: none; }
   .carta--mano { --tx: 0; --ty: 0; }
   .carta.dispara, .carta.crece, .carta.merma, .carta.cura, .carta.rebota,
-  .pulso { animation: none; }
+  .pulso, .carta--mano.nueva, .pila.aviso b, .habitat.peligro .habitat-barra i,
+  .habitat.golpe .habitat-barra i::after, .rec.cerca b { animation: none; }
   .rotulo-rasgo, .anuncio { animation-duration: .01s; animation-timing-function: step-end; }
 }
 
@@ -2297,6 +2323,23 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .carta--mano .st { justify-content: flex-start; gap: 2px; }
 .carta--mano.impagable { opacity: .45; }
 .carta--mano.impagable .c-coste { border-color: var(--peligro); color: var(--peligro); }
+/* Lo que se puede jugar AHORA se enciende: lo dice `legales`, así que cuenta
+   la fase, la Biomasa, los huecos y los objetivos. Una carta pagable sin hueco
+   se queda apagada sin atenuarse: no es que no llegues, es que no hay sitio.
+   Va en `filter`, como la sombra, porque el aro de rareza ocupa el box-shadow. */
+.carta--mano.jugable {
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,.55)) drop-shadow(0 0 5px rgba(217,164,65,.6));
+}
+.carta--mano.jugable .c-coste { box-shadow: 0 0 6px rgba(217,164,65,.8); }
+/* La recién robada destella al aterrizar. La animación arranca cuando se le
+   quita `en-vuelo` —el fantasma acaba de llegar— y `backwards`, no `both`,
+   para que al terminar mande otra vez la cascada (el brillo de jugable). */
+.carta--mano.nueva:not(.en-vuelo) { animation: recien-robada 1.1s ease-out backwards; }
+@keyframes recien-robada {
+  0%   { filter: drop-shadow(0 3px 6px rgba(0,0,0,.55)) brightness(1.7) drop-shadow(0 0 12px rgba(244,236,224,.95)); }
+  35%  { filter: drop-shadow(0 3px 6px rgba(0,0,0,.55)) brightness(1.15) drop-shadow(0 0 8px rgba(217,164,65,.8)); }
+  100% { filter: drop-shadow(0 3px 6px rgba(0,0,0,.55)); }
+}
 /* `--alzar` y no `transform`: la carta de la mano compone el gesto de coger y
    la inclinación del puntero en una sola propiedad, y escribir `transform` aquí
    habría borrado la inclinación justo al levantarla, que es cuando se mira. */
@@ -2346,6 +2389,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   animation: subeDano .8s ease-out forwards;
 }
 /* «sin daño» no es un golpe: ni el tamaño ni el rojo de una cifra de daño. */
+/* «3 turnos» sobre la pila: cabe en una línea o no cabe. */
+.dano-flotante.turnos { font-size: 10px; white-space: nowrap; }
 .dano-flotante.nulo { font-size: 10px; font-weight: 700; color: var(--tenue); white-space: nowrap; }
 
 @keyframes subeDano {
