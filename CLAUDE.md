@@ -1102,6 +1102,37 @@ uno sin decidir. Y ningún compás puede pasar de 600 ms: con el campo lleno se
 disparan diez habilidades, y a medio segundo cada una eso deja de ser ritmo y
 pasa a ser una espera.
 
+## El marcador reacciona: mazo-reloj, mano encendida y contadores que laten
+
+Tres cosas de interfaz (18-09-2026), todas sin motor y por tanto sin re-anclar:
+
+- **La pila del mazo es un reloj.** El taco de debajo asoma según `--grosor`
+  (4 a 0, lo escribe `pintarPila` con la cuenta sobre `BALANCE.tamanoMazo`):
+  a 55 es un taco y con cuatro es una carta suelta. Al cruzar `MAZO_AVISO`
+  —cuatro turnos de robo, que la extinción ya es una vía real— flota una vez
+  «N turnos» y después el contador late en rojo hasta el final. Se avisa
+  UNA vez por cruce, con `avisoMazo` por bando; al empezar otra partida la
+  cuenta vuelve a 55 y el aviso se rearma solo.
+- **La mano dice qué se puede jugar AHORA.** `jugable` sale de `legales()`
+  filtrado a las acciones que juegan una carta —desplegar, evento, clima,
+  recurso, Biomasa—, así que la mano no repite ninguna regla: cuenta la fase,
+  la Biomasa, los huecos y los objetivos. Una carta pagable sin hueco se queda
+  apagada sin atenuarse, que es otra cosa que «no llegas». La robada destella
+  al aterrizar: el CSS arranca la animación cuando `volar` le quita
+  `en-vuelo`, y `render.js` retira `nueva` pasado el vuelo más `NUEVA_MS`.
+  Las retiradas del campo no destellan: ya sabías cuál era.
+- **Trofeos y hábitat.** Cada MUERTE hace flotar «+1» sobre el contador del
+  otro bando a la vez que cae la carta —en `animarCombate`, no en el
+  repintado, que llega medio segundo después—, y hay gesto `enTrofeos` en el
+  API del guión para lo que venga. A dos trofeos del final el contador se
+  enciende (`cerca`). El hábitat destella la barra con el número al recibir
+  golpe —un `::after` blanco sobre el relleno, no un `filter`, que piel.css
+  usa el filtro del relleno rival para girarle el tono— y por debajo del
+  cuarto late (`peligro`): el tuyo en rojo y el del rival en oro.
+
+Todo lo que late va apagado con `prefers-reduced-motion`, en el mismo bloque
+que el resto de gestos.
+
 ## Los marcos de carta: la geometría la decide el PNG
 
 Ocho marcos en `assets/marcos/`: cinco de criatura —cuatro rarezas y el jefe,

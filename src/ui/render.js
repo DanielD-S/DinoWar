@@ -11,7 +11,8 @@ import {
   efectosDe, adheridasA,
 } from '../engine/state.js';
 import { arte, hayFoto, rutaFoto, hayEntera, rutaEntera } from './art.js';
-import { volar } from './efectos.js';
+import { legales, ACCION } from '../engine/actions.js';
+import { volar, temporizar } from './efectos.js';
 
 export const JUGADOR = 0;
 export const RIVAL = 1;
@@ -428,7 +429,51 @@ function pintarHabitat(estado) {
     const v = Math.max(0, estado.jugadores[bando].habitat);
     num.textContent = v;
     barra.style.width = `${Math.min(100, (100 * v) / topeHabitat[bando])}%`;
+    // Por debajo del cuarto la barra late: la partida se puede acabar por
+    // aquí en un turno, y eso hay que verlo sin leer el número.
+    barra.closest('.habitat')?.classList.toggle('peligro', v <= topeHabitat[bando] * PELIGRO_HABITAT);
   }
+}
+
+/** La fracción del hábitat por debajo de la cual la barra avisa. */
+const PELIGRO_HABITAT = 0.25;
+
+/** A cuántos trofeos del final se enciende el contador. */
+const TROFEOS_CERCA = 2;
+
+/**
+ * Con cuántas cartas el mazo avisa. Quedarse sin mazo es perder —el descarte
+ * no se rebaraja— y con un robo por turno cuatro cartas son cuatro turnos.
+ */
+const MAZO_AVISO = 4 * BALANCE.robo.normal;
+
+/** Si el mazo pasa de aquí a avisar, se dice una vez; después sólo late. */
+const avisoMazo = [false, false];
+
+/**
+ * La pila como RELOJ: el grosor del taco baja con el mazo —a 55 cartas es un
+ * taco y con cuatro es una carta suelta— y al cruzar el umbral flota una vez
+ * cuántos turnos quedan. Después el contador late en rojo hasta el final.
+ */
+function pintarPila(bando, pila, n) {
+  pila.style.setProperty('--grosor', String(Math.min(4, Math.ceil((4 * n) / BALANCE.tamanoMazo))));
+  const aviso = n <= MAZO_AVISO;
+  pila.classList.toggle('aviso', aviso);
+  const turnos = Math.ceil(n / BALANCE.robo.normal);
+  pila.title = aviso ? (turnos === 1 ? 'Queda 1 turno de mazo' : `Quedan ${turnos} turnos de mazo`) : '';
+  if (aviso && !avisoMazo[bando]) {
+    flotar(pila, turnos === 1 ? '1 turno' : `${turnos} turnos`, `turnos ${bando === JUGADOR ? 'malo' : 'bueno'}`);
+  }
+  avisoMazo[bando] = aviso;
+}
+
+/** Un texto que flota y se va sobre un nodo del marcador. */
+function flotar(nodo, texto, clase = '') {
+  const n = document.createElement('span');
+  n.className = `dano-flotante${clase ? ` ${clase}` : ''}`;
+  n.textContent = texto;
+  nodo.appendChild(n);
+  temporizar(() => n.remove(), 900);
 }
 
 function pintarFranja(estado) {
@@ -516,19 +561,49 @@ function pintarMano(estado) {
     if (el.mano.querySelector(`[data-iid="${iid}"]`)) continue;
     const nodo = nodoCarta(estado, estado.instancias[iid].cardId, { variante: 'mano', iid });
     el.mano.appendChild(nodo);
-    volar(nodo, salidas.get(String(iid)) ?? el.pPila?.getBoundingClientRect(), {
-      retardo: nuevas * 70, dorso: !salidas.has(String(iid)),
+    const robada = !salidas.has(String(iid));
+    const vuelo = volar(nodo, salidas.get(String(iid)) ?? el.pPila?.getBoundingClientRect(), {
+      retardo: nuevas * 70, dorso: robada,
     });
+    // La robada se enciende un momento al aterrizar —el CSS arranca el
+    // destello cuando se le quita `en-vuelo`— y se apaga sola. Una retirada
+    // no: ya la tenías y sabes cuál es.
+    if (robada) {
+      nodo.classList.add('nueva');
+      temporizar(() => nodo.classList.remove('nueva'), vuelo + NUEVA_MS);
+    }
     nuevas += 1;
   }
 
-  // Sin abanico: la mano es una fila y el orden es el del mazo. Lo único que
-  // se calcula aquí es qué cartas no puedes pagar.
+  // Sin abanico: la mano es una fila y el orden es el del mazo. Lo que se
+  // calcula aquí es qué cartas no puedes pagar y cuáles puedes JUGAR ahora:
+  // lo segundo sale de `legales`, que ya sabe de fase, de Biomasa, de huecos
+  // libres y de objetivos, así que la mano no repite ninguna regla. Una carta
+  // pagable sin hueco no se enciende: eso es «no hay sitio», no «no llegas».
   const biomasa = estado.jugadores[JUGADOR].biomasa;
+  const jugables = new Set(legalesDeMano(estado).map(String));
   for (const iid of mano) {
     const nodo = el.mano.querySelector(`[data-iid="${iid}"]`);
     if (!nodo) continue;
     nodo.classList.toggle('impagable', carta(nodo.dataset.card).coste > biomasa);
+    nodo.classList.toggle('jugable', jugables.has(String(iid)));
+  }
+}
+
+/** Cuánto dura encendida una carta recién robada, después de aterrizar. */
+const NUEVA_MS = 1100;
+
+/** Las acciones que JUEGAN una carta de la mano; mover, retirar o reciclar no. */
+const JUEGA = new Set([ACCION.DESPLEGAR, ACCION.EVENTO, ACCION.CLIMA, ACCION.RECURSO, ACCION.BIOMASA]);
+
+/** Los iid de la mano que se pueden jugar ahora mismo. */
+function legalesDeMano(estado) {
+  try {
+    return legales(estado, JUGADOR).filter((a) => JUEGA.has(a.tipo)).map((a) => a.iid);
+  } catch {
+    // La vista de un duelo puede llegar a medias; sin lista no se enciende
+    // nada, que es lo que hacía la mano hasta hoy.
+    return [];
   }
 }
 
@@ -551,8 +626,11 @@ export function render(estado) {
   el.turno.textContent = `Turno ${estado.turno}`;
 
   // Quedarse sin mazo es perder: hay que poder verlo venir.
-  el.pPila.classList.toggle('aviso', enMazo(p) <= 4);
-  el.rPila.classList.toggle('aviso', enMazo(r) <= 4);
+  pintarPila(JUGADOR, el.pPila, enMazo(p));
+  pintarPila(RIVAL, el.rPila, enMazo(r));
+  // Y a dos trofeos del final, el contador se enciende: el tuyo y el suyo.
+  el.pTrof.closest('.rec')?.classList.toggle('cerca', p.trofeos >= BALANCE.trofeosParaGanar - TROFEOS_CERCA);
+  el.rTrof.closest('.rec')?.classList.toggle('cerca', r.trofeos >= BALANCE.trofeosParaGanar - TROFEOS_CERCA);
 
   pintarHabitat(estado);
   pintarLugares(estado);

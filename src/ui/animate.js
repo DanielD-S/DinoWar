@@ -28,7 +28,7 @@ export function cancelarAnimaciones() {
   limpiarEfectos();
   for (const n of document.querySelectorAll('.dano-flotante, .rotulo-rasgo, .anuncio')) n.remove();
   for (const n of document.querySelectorAll(`.${MARCAS.join(', .')}`)) n.classList.remove(...MARCAS);
-  for (const n of document.querySelectorAll('.habitat.golpe, .pila.pulso')) {
+  for (const n of document.querySelectorAll('.habitat.golpe, .pulso')) {
     n.classList.remove('golpe', 'pulso');
   }
 }
@@ -189,6 +189,7 @@ function sobreContador(nodo, texto, clase) {
 const habitatNodo = (bando) => el.campo.querySelector(
   bando === JUGADOR ? '.habitat.propio' : '.habitat.rival',
 );
+const trofeosNodo = (bando) => (bando === JUGADOR ? el.pTrof : el.rTrof);
 
 /**
  * Lo que el guión puede tocar. Es deliberadamente corto: si para contar una
@@ -208,6 +209,7 @@ const API = Object.freeze({
   enMazo: (j, texto, clase) => sobreContador(j === JUGADOR ? el.pPila : el.rPila, texto, clase),
   enMano: (j, texto, clase) => sobreContador(j === JUGADOR ? el.pMano : el.rMano, texto, clase),
   enHabitat: (j, texto, clase) => sobreContador(habitatNodo(j), texto, clase),
+  enTrofeos: (j, texto, clase) => sobreContador(trofeosNodo(j), texto, clase),
 });
 
 /**
@@ -332,6 +334,9 @@ export async function animarCombate(estadoPrevio, estadoPosterior, eventos, alTe
       const nodo = cartaNodo(m.iid);
       polvo(nodo);
       nodo?.classList.add('muere');
+      // Cada muerte es un trofeo del otro bando: el contador lo dice a la vez
+      // que cae la carta, y no cuando el repintado cambie la cifra.
+      sobreContador(trofeosNodo(m.dueno === JUGADOR ? RIVAL : JUGADOR), '+1', 'bueno');
     }
     await pausa(460);
     if (mia !== generacion) return;

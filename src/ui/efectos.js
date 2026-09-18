@@ -30,7 +30,7 @@ const temporizadores = new Set();
 export const reducido = () => (typeof matchMedia === 'function'
   && matchMedia('(prefers-reduced-motion: reduce)').matches);
 
-function temporizar(fn, ms) {
+export function temporizar(fn, ms) {
   const t = setTimeout(() => { temporizadores.delete(t); fn(); }, ms);
   temporizadores.add(t);
   return t;
