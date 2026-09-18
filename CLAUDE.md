@@ -362,6 +362,32 @@ BORRA lo que ya no está en el set y `coleccion` tiene una clave foránea contra
 esa tabla: una consulta que lista qué se añadiría y qué se borraría. Salieron
 las 8 altas y CERO bajas.
 
+### Un commit recién mergeado deja a jsDelivr FRÍO, y el primer despliegue muere
+
+Pasó al desplegar la economía nueva (18-09-2026) y conviene no volver a
+diagnosticarlo: el primer intento murió con
+
+    Failed to bundle the function (reason: Fetch '…/src/engine/entradas.js'
+    timed out after 10s at …/src/engine/ai.js)
+
+y **el segundo intento, idéntico, funcionó**. No era el commit ni el fichero:
+era que jsDelivr no había visto nunca ese SHA, y la primera petición de cada
+fichero dispara la descarga desde GitHub con el empaquetador esperando diez
+segundos. El propio intento fallido es lo que calienta la caché.
+
+- **Un TIMEOUT no es un 404 ni un 403.** El 403 pegado a un fichero (la
+  sección de abajo) se arregla re-anclando a otro commit; un timeout se
+  arregla reintentando el mismo despliegue. Distinguirlos ahorra un ciclo.
+- **Y el empaquetado que resuelve es la prueba de que los importes están.** El
+  bundle se descarga en el despliegue y se sirve desde `ezbr`: el runtime no
+  vuelve a pedir nada a jsDelivr. Así que un `deploy` que termina bien ya
+  demuestra lo que la prueba de humo del 401 demostraba, y el `ezbr_sha256`
+  nuevo demuestra que entró código nuevo.
+- Desde un contenedor con el egreso filtrado —como el de Claude Code en la
+  web— **no se puede precalentar**: `cdn.jsdelivr.net` y `*.supabase.co`
+  pueden estar bloqueados los dos, y entonces el único camino es reintentar
+  el despliegue por MCP.
+
 ### jsDelivr puede envenenar la caché de UN fichero, y se ve como un fallo del commit
 
 Lo que costó este despliegue, por si vuelve. El primer intento murió con
@@ -2590,6 +2616,15 @@ Cinco cosas que conviene saber antes de volver a tocarlo:
   separe de una victoria. Con victorias a 50 era 3; con 30 es 5, y la media
   sale 39, o sea 1,3 victorias, con el mejor nodo en 3. Cambiar
   `monedasVictoria` obliga a revisar `REJUGAR.divisor` y su migración.
+- **Aplicado y desplegado el 18-09-2026.** La PR #131 se mergeó con MERGE, así
+  que `e3619ad` vive en `main`; la función quedó anclada a ese commit y se
+  desplegó por MCP como **v33**, con el `ezbr_sha256` pasando de `6106f548…` a
+  `a1861577…`. Del fichero desplegado se comprobó ANTES, con `diff`, que era el
+  anterior con el SHA cambiado y nada más: once líneas, las once del anclaje.
+  El primer intento de despliegue murió por un timeout de jsDelivr con el
+  commit frío y el segundo pasó (ver «Un commit recién mergeado deja a jsDelivr
+  FRÍO»). La prueba de humo del 401 no se pudo hacer desde aquí: la extensión
+  `http` no está instalada y la sesión SQL era de sólo lectura.
 - **Al aplicar, el orden importa y la ventana no es simétrica.** Los números
   viven en `catalogo_economia` (la 0006 regenerada) y el sobre lo cobra
   `aplicar_sobre` de ahí, mientras el BOTÓN dice lo que trae el cliente. Con el
