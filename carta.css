@@ -387,12 +387,14 @@
      a un título de dos líneas sin taparlo. Miden un 5,6 % de alto a cada
      lado del centro, así que empiezan al 86 %, y la caja se organiza para
      que nada escrito pase de ahí. */
-  --ataque-y: 91.5%; --vida-y: 90.1%;
+  --ataque-y: 91.5%; --vida-y: 91.7%;
   /* …y las CIFRAS con ellas: van en otro par de variables y se quedaron al
-     87 % la primera vez, montadas sobre el canto de su chapa. La de Vida va
-     1,7 puntos por debajo del centro de la chapa, como en el marco dibujado,
-     que el centro de masa del triángulo está más abajo que el de su caja. */
-  --atq-y: 91.5%; --vid-y: 91.8%;
+     87 % la primera vez, montadas sobre el canto de su chapa. Las dos chapas
+     van alineadas por la BASE, no por el centro: en el marco dibujado el
+     triángulo iba 1,4 puntos más alto porque así lo dejó el PNG, y a sangre
+     se veía flotar sobre el círculo. La cifra de la Vida va 1,3 puntos por
+     debajo del centro de su caja, donde cae el centro de masa del triángulo. */
+  --atq-y: 91.5%; --vid-y: 93%;
   /* El filete: oro para las legendarias, bronce oscuro para el jefe. */
   --filete: linear-gradient(160deg, #f7e2a0 0%, #b98a2e 30%, #f3d27a 52%, #8c5d1a 78%, #eccb70 100%);
 }
