@@ -138,12 +138,14 @@ function pintarLugares(estado) {
     boton.title = l.texto;
     boton.innerHTML = `<b>${l.nombre}</b><i>${l.texto}</i>`;
   }
-  // Y el nombre en la ranura vacía, donde antes ponía «ZONA n»: el CSS lo lee
-  // del atributo, así que aquí basta con escribirlo.
+  // Y en las ranuras de la columna: el nombre en la vacía, donde antes ponía
+  // «ZONA n», y el id para que piel.css les ponga el color del lugar. El CSS
+  // lo lee de los atributos, así que aquí basta con escribirlos.
   for (const bando of [0, 1]) {
     for (const nodo of el.filas[bando].children) {
       const l = lugarPorId(lugares[Number(nodo.dataset.ranura)]);
-      if (l) nodo.dataset.lugarNombre = l.nombre; else delete nodo.dataset.lugarNombre;
+      if (l) { nodo.dataset.lugarNombre = l.nombre; nodo.dataset.lugar = l.id; }
+      else { delete nodo.dataset.lugarNombre; delete nodo.dataset.lugar; }
     }
   }
 }

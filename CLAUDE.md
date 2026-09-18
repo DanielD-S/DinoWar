@@ -971,6 +971,18 @@ Seis decisiones que no se deducen del código:
   movimiento queda puesta para el día que vuelva un migrador, y va ANTES que
   el rasgo en `validar`: es la columna la que no deja.
 
+- **Cada lugar tiene un COLOR, y vive en `piel.css`, no en `lugares.js`.**
+  El botón de la tira iba con un velo translúcido sobre el medallón del
+  campo, que es ámbar y brillante en el centro: las dos columnas de en medio
+  no se leían y las de los lados sí. Ahora el botón es opaco y teñido, y las
+  dos ranuras de la columna llevan el mismo tinte —el rótulo de la vacía y un
+  halo alrededor de las dos—, que es lo que une la carta puesta con su lugar.
+  El tinte NO está en el dato porque `lugares.js` entra en el paquete de la
+  Edge Function y un color allí costaría re-anclar y desplegar por algo que
+  sólo pinta; `test/lugares.test.js` exige que todo lugar tenga el suyo y que
+  no haya dos iguales. El nombre se queda en crema: la sal y el cielo son casi
+  blancos y un rótulo de 8,5 px en ese color no se leería.
+
 Y lo que se apaga por entorno para medir, como las ranuras y el sobrante:
 `DINOWAR_LUGARES=0 node sim/run.js`. En el navegador no hay `process` y
 siempre juega con ellos; ponerlo en el servidor le haría re-jugar otro tablero.
