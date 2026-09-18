@@ -137,6 +137,41 @@
 .lugar[data-lugar="salinas"],          .ranura[data-lugar="salinas"]          { --lugar-tinte: #f0ead8; }
 .lugar[data-lugar="cauce_seco"],       .ranura[data-lugar="cauce_seco"]       { --lugar-tinte: #cfa66e; }
 
+/* La TEXTURA del lugar, dentro de la ranura vacía. Va por dentro del marco de
+   latón de `ranura_vacia.webp`: los cuatro números son la ventana que mide
+   `python tools/lugares.py` —x 11..319 e y 12..439 de 332×454— pasados a
+   tamaño y posición de fondo, y no se estiman. La textura va en la capa de
+   arriba y la pieza de la ranura debajo, así que el marco sigue siendo el
+   marco; y sólo se pinta cuando `render.js` escribe `data-lugar-arte`, que a
+   su vez sólo lo hace si el índice dice que el fichero existe: una textura
+   que no está no es un 404, es la piedra de siempre. El rótulo del nombre
+   lleva un fondo oscuro para leerse encima de cualquier suelo. */
+.ranura[data-lugar-arte]:not(.ocupada) {
+  background:
+    var(--lugar-arte) 45.8% 44.4% / 92.8% 94.1% no-repeat,
+    url('assets/piel/ranura_vacia.webp') center / 100% 100% no-repeat;
+}
+.ranura[data-lugar-arte]:not(.ocupada)::before {
+  background: rgba(20,16,12,.72); padding: 1px 5px; border-radius: 3px;
+}
+.ranura[data-lugar-arte="ladera_volcanica"] { --lugar-arte: url('assets/piel/lugares/ladera_volcanica.webp'); }
+.ranura[data-lugar-arte="nidada"]           { --lugar-arte: url('assets/piel/lugares/nidada.webp'); }
+.ranura[data-lugar-arte="llanura_abierta"]  { --lugar-arte: url('assets/piel/lugares/llanura_abierta.webp'); }
+.ranura[data-lugar-arte="pradera_alta"]     { --lugar-arte: url('assets/piel/lugares/pradera_alta.webp'); }
+.ranura[data-lugar-arte="helechal"]         { --lugar-arte: url('assets/piel/lugares/helechal.webp'); }
+.ranura[data-lugar-arte="bosque_coniferas"] { --lugar-arte: url('assets/piel/lugares/bosque_coniferas.webp'); }
+.ranura[data-lugar-arte="laguna"]           { --lugar-arte: url('assets/piel/lugares/laguna.webp'); }
+.ranura[data-lugar-arte="rio"]              { --lugar-arte: url('assets/piel/lugares/rio.webp'); }
+.ranura[data-lugar-arte="acantilado"]       { --lugar-arte: url('assets/piel/lugares/acantilado.webp'); }
+.ranura[data-lugar-arte="desfiladero"]      { --lugar-arte: url('assets/piel/lugares/desfiladero.webp'); }
+.ranura[data-lugar-arte="cienaga"]          { --lugar-arte: url('assets/piel/lugares/cienaga.webp'); }
+.ranura[data-lugar-arte="cazadero"]         { --lugar-arte: url('assets/piel/lugares/cazadero.webp'); }
+.ranura[data-lugar-arte="barranco"]         { --lugar-arte: url('assets/piel/lugares/barranco.webp'); }
+.ranura[data-lugar-arte="pedregal"]         { --lugar-arte: url('assets/piel/lugares/pedregal.webp'); }
+.ranura[data-lugar-arte="roquedal"]         { --lugar-arte: url('assets/piel/lugares/roquedal.webp'); }
+.ranura[data-lugar-arte="salinas"]          { --lugar-arte: url('assets/piel/lugares/salinas.webp'); }
+.ranura[data-lugar-arte="cauce_seco"]       { --lugar-arte: url('assets/piel/lugares/cauce_seco.webp'); }
+
 /* El botón: fondo oscuro teñido, borde del color y una tira del color arriba.
    El nombre se queda en crema y no en el tinte: la sal y el cielo son casi
    blancos y la ciénaga casi marrón, y un rótulo de 8,5 px en cualquiera de

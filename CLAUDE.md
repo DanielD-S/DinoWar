@@ -1002,6 +1002,20 @@ Seis decisiones que no se deducen del código:
   Sólo cambia qué eventos salen, no un resultado: una partida jugada con la
   v31 y cobrada por la v32 da el mismo ganador y el mismo daño.
 
+- **La ranura vacía puede llevar la TEXTURA de su lugar** (18-09-2026), por
+  dentro del marco de latón. Los originales van a `src/piel/lugares/<id>.png`
+  —prompts en `assets/PROMPTS.md`, «Los lugares: la textura de la ranura»—
+  y `python tools/lugares.py escribir` los recorta a la ventana de la ranura,
+  los apaga un poco para que el rótulo se lea, los escala y escribe
+  `assets/piel/lugares/indice.json`. El juego lee el ÍNDICE y sólo pide los
+  ficheros que nombra, como las expediciones: una textura que falta no es un
+  404, es la piedra de siempre. Los cuatro porcentajes de
+  `.ranura[data-lugar-arte]` en piel.css son la ventana que mide la
+  herramienta, no una estimación. `test/lugares.test.js` exige que todo
+  lugar tenga su regla, que el índice sólo nombre lugares con fichero y que
+  ningún WebP esté en disco fuera del índice. Hoy el índice está vacío: el
+  arte no ha llegado.
+
 Y lo que se apaga por entorno para medir, como las ranuras y el sobrante:
 `DINOWAR_LUGARES=0 node sim/run.js`. En el navegador no hay `process` y
 siempre juega con ellos; ponerlo en el servidor le haría re-jugar otro tablero.
