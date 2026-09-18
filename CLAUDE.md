@@ -995,7 +995,12 @@ Seis decisiones que no se deducen del código:
   hábitat pasa por `golpeConLugar()` en `resolve.js`, que hace la misma cuenta
   que `danoAlHabitat` y además avisa, porque `danoAlHabitat` la usa la IA y no
   puede emitir nada. `test/lugares.test.js` prueba los seis y que en el
-  tablero plano no sale ninguno.
+  tablero plano no sale ninguno. **En producción desde el 18-09-2026**: la
+  PR #121 se mergeó con MERGE, la función quedó anclada a `cbdf802`, el
+  commit de merge, y se desplegó por MCP como v32 (`ezbr_sha256` de
+  `e01728d6…` a `6106f548…`); el despliegue resolvió los importes por URL.
+  Sólo cambia qué eventos salen, no un resultado: una partida jugada con la
+  v31 y cobrada por la v32 da el mismo ganador y el mismo daño.
 
 Y lo que se apaga por entorno para medir, como las ranuras y el sobrante:
 `DINOWAR_LUGARES=0 node sim/run.js`. En el navegador no hay `process` y
