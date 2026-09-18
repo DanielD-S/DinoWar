@@ -1757,3 +1757,69 @@ referencias que sus hermanos de la tienda.
 
 Llegaron las cinco el 15-09-2026. El estandarte vino a 0,454 de proporción y
 se estrecha un 10 % al pintarse.
+
+## Los lugares: la textura de la ranura
+
+Cada columna del tablero es un LUGAR —el Río, la Ciénaga, el Cauce seco— y la
+ranura vacía de su columna puede llevar el suelo de ese lugar dibujado por
+dentro del marco de latón. Hoy todas llevan la misma piedra; el color del
+lugar lo pone el CSS. Diecisiete piezas, una por lugar, y el juego funciona
+igual con las que haya: las que no lleguen siguen con la piedra.
+
+**Lo que NO hay que pedir:** ni marco, ni animales, ni texto, ni cielo, ni
+horizonte. Es un SUELO visto desde arriba, como si se mirara la columna a
+vista de pájaro: lo que pisa el dinosaurio. Un paisaje con horizonte se lee
+como una ilustración y no como terreno, y compite con la carta que se pone
+encima.
+
+Formato: **cuadrado, 1024×1024**. La herramienta lo recorta al centro a la
+proporción de la ventana de la ranura (0,72) y lo apaga un poco, que el
+nombre del lugar va escrito encima.
+
+### El bloque de ESTILO (copiar literal)
+
+> Textura de suelo prehistórico vista desde arriba, cenital, ocupando toda la
+> imagen sin horizonte ni cielo. Render fotorrealista, luz cálida y rasante de
+> última hora de la tarde que marca el relieve, sombras largas y suaves. Paleta
+> apagada y terrosa, contraste bajo, sin ningún elemento brillante ni
+> saturado. Detalle fino y uniforme, sin un centro de atención: es un fondo,
+> no una escena.
+
+### El bloque de PROHIBICIONES (copiar literal)
+
+> Sin animales, sin huellas de dinosaurio, sin personas, sin objetos, sin
+> texto, sin letras, sin marco, sin borde, sin viñeta, sin cielo, sin
+> horizonte, sin agua reflejando el cielo, sin nada centrado.
+
+### Los diecisiete sujetos (uno por pieza, con el nombre de fichero)
+
+| fichero | sujeto |
+|---|---|
+| `ladera_volcanica` | ladera de ceniza volcánica gris oscura con vetas de lava apagada y grietas naranjas tenues, piedra pómez suelta |
+| `rio` | lecho de río somero visto desde arriba, agua clara y lenta sobre cantos rodados, orilla de arena fina a un lado |
+| `cazadero` | claro de tierra batida y polvorienta con hierba seca pisoteada, algún hueso viejo medio enterrado, sin sangre |
+| `acantilado` | borde rocoso de acantilado visto desde arriba, roca estratificada gris y ocre, líquenes, una franja de vacío en sombra |
+| `pradera_alta` | pradera de hierba corta y helechos bajos, verde apagado con parches secos, brisa que peina la hierba |
+| `helechal` | alfombra densa de helechos grandes vistos desde arriba, verde profundo, humedad, sombra fresca entre las frondas |
+| `roquedal` | campo de rocas grises redondeadas y bloques caídos, musgo en las juntas, arena entre las piedras |
+| `laguna` | orilla de laguna somera, agua turquesa apagada y muy quieta sobre fondo de limo claro, juncos en un borde |
+| `bosque_coniferas` | suelo de bosque de coníferas: acículas caídas, piñas, raíces gruesas, sombra verde con motas de luz |
+| `salinas` | costra de sal blanca agrietada en polígonos, resplandor apagado, bordes de barro seco rosado |
+| `pedregal` | pedregal de lascas afiladas de pizarra y sílex, cantos oscuros y cortantes, sin tierra a la vista |
+| `llanura_abierta` | llanura de tierra ocre compactada con hierba rala, grietas de sequía, horizonte AUSENTE, todo suelo |
+| `desfiladero` | fondo estrecho de desfiladero visto desde arriba, roca a ambos lados en sombra profunda, gravilla en el centro |
+| `barranco` | barranco de tierra roja erosionada, cárcavas y surcos de escorrentía, arcilla cuarteada |
+| `cienaga` | ciénaga de barro negro y agua estancada verdosa, burbujas, hierbas podridas, brillo mate y húmedo |
+| `nidada` | nido de dinosaurio: cuenco de tierra y ramas con huevos alargados y moteados, medio enterrados en arena tibia |
+| `cauce_seco` | cauce de río seco, barro cuarteado en placas curvadas, cantos blanqueados, polvo, nada verde |
+
+### Después de generar
+
+- Todo a `src/piel/lugares/` con el nombre exacto de la tabla: es el `id` de
+  `src/data/lugares.js` y una pieza mal nombrada no falla, sólo no sale nunca
+  (la herramienta avisa).
+- `python tools/lugares.py escribir` recorta, apaga, escala a 240 de ancho y
+  escribe `assets/piel/lugares/indice.json` con los ids que hay. El juego lee
+  el índice y sólo pide esos ficheros.
+- Mientras no lleguen, la ranura vacía lleva la piedra de siempre y el color
+  del lugar en el rótulo y el halo, que ya están.

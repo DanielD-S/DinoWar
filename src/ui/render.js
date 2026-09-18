@@ -106,7 +106,19 @@ export function montar() {
     if (!boton || !boton.dataset.lugar) return;
     abrirFicha(fichaDeLugarHTML(boton.dataset.lugar));
   });
+  // Qué lugares tienen textura servida. Se pregunta al índice y NO a cada
+  // fichero: una textura que no existe no es un 404 en la consola, es una
+  // ranura con la piedra de siempre. Sin índice, ninguna.
+  fetch(`${RUTA_LUGARES}indice.json`, { cache: 'no-cache' })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((j) => { texturasDeLugar = new Set(j?.piezas ?? []); })
+    .catch(() => {});
 }
+
+/** Dónde viven las texturas de los lugares, con su índice al lado. */
+const RUTA_LUGARES = 'assets/piel/lugares/';
+/** Los ids de lugar con textura en disco, según el índice. Nace vacío. */
+let texturasDeLugar = new Set();
 
 /** Lo que dice la ficha de un lugar. */
 export function fichaDeLugarHTML(idLugar) {
@@ -149,6 +161,9 @@ function pintarLugares(estado) {
       const l = lugarPorId(lugares[Number(nodo.dataset.ranura)]);
       if (l) { nodo.dataset.lugarNombre = l.nombre; nodo.dataset.lugar = l.id; }
       else { delete nodo.dataset.lugarNombre; delete nodo.dataset.lugar; }
+      // Y la textura, sólo si el índice dice que está: el CSS la pinta por el atributo.
+      if (l && texturasDeLugar.has(l.id)) nodo.dataset.lugarArte = l.id;
+      else delete nodo.dataset.lugarArte;
     }
   }
 }

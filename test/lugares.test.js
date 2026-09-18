@@ -5,7 +5,7 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 
 import { BALANCE } from '../src/data/balance.js';
 import { CLADO, RASGO, CARTAS, TIPO } from '../src/data/cards.js';
@@ -75,6 +75,27 @@ test('Todo lugar tiene su color en piel.css, y no sobra ninguno', () => {
     assert.ok(css.includes(`.ranura[data-lugar="${id}"]`), `la ranura de ${id} no lleva color`);
     assert.ok(tinte, id);
   }
+});
+
+test('Las texturas de lugar: el índice, los ficheros y las reglas del CSS dicen lo mismo', () => {
+  // El juego pide sólo lo que el índice nombra —así una textura que falta no
+  // es un 404— y el CSS pinta por el id. Tres listas que tienen que cuadrar:
+  // todo id del set tiene su regla; todo lo que el índice nombra es un lugar y
+  // está en disco; y ningún WebP sobra fuera del índice.
+  const css = readFileSync(new URL('../piel.css', import.meta.url), 'utf8');
+  const reglas = new Map([...css.matchAll(/\.ranura\[data-lugar-arte="([a-z_]+)"\]\s*\{\s*--lugar-arte:\s*url\('assets\/piel\/lugares\/([a-z_]+)\.webp'\)/g)]
+    .map((m) => [m[1], m[2]]));
+  for (const id of LUGARES_IDS) assert.equal(reglas.get(id), id, `piel.css no pinta la textura de ${id}`);
+  for (const id of reglas.keys()) assert.ok(LUGARES[id], `piel.css pinta "${id}", que no es un lugar`);
+
+  const carpeta = new URL('../assets/piel/lugares/', import.meta.url);
+  const indice = JSON.parse(readFileSync(new URL('indice.json', carpeta), 'utf8'));
+  for (const id of indice.piezas) {
+    assert.ok(LUGARES[id], `indice.json nombra "${id}", que no es un lugar`);
+    assert.ok(existsSync(new URL(`${id}.webp`, carpeta)), `indice.json nombra ${id} y no está su webp`);
+  }
+  const enDisco = readdirSync(carpeta).filter((f) => f.endsWith('.webp')).map((f) => f.slice(0, -5));
+  for (const id of enDisco) assert.ok(indice.piezas.includes(id), `${id}.webp está en disco y no en el índice: regenera con tools/lugares.py`);
 });
 
 test('Hay lugares de sobra para llenar las columnas sin repetir', () => {
