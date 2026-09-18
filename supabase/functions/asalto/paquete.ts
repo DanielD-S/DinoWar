@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: 2de943353a526b03
+// huella: 90b26c08375df1e6
 //
 // Lleva dentro estos 25 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -5528,25 +5528,43 @@ var legendariasDinoEn = (mazo) => {
   return n;
 };
 var ECONOMIA = Object.freeze({
-  // Un sobre son cinco cartas. El precio está por encima de lo que devuelve
-  // fundirlo entero (unas 77 monedas, que lo comprueba un test), porque si no
-  // el bucle se alimenta solo y abrir sobres deja de ser una decisión.
-  precioSobre: 100,
+  // Un sobre son cinco cartas.
+  //
+  // El precio subió de 100 a 300 el 18-09-2026, y con él se recortaron todos
+  // los grifos: es la decisión del autor de que comprar sobres jugando sea
+  // posible y CUESTE, para que quede sitio a venderlos por dinero. Lo que
+  // había medido antes: a 100 monedas y con 50 victorias pagadas al día, la
+  // colección entera —139 cartas, 344 copias, unos 135 sobres— se juntaba en
+  // seis días de juego al tope, y una cuenta con veinte partidas tenía ya 128
+  // de las 139 cartas. Con estos números el techo del día son unos 570 y un
+  // sobre 300: dos sobres diarios jugando mucho, uno jugando normal.
+  //
+  // Lo que NO hace el precio es cerrar un bucle: fundir da ESQUIRLAS y no
+  // monedas desde el 15-09-2026, así que no hay cambio de vuelta y abrir
+  // sobres no se paga solo. `ECONOMIA.fusion` sigue aquí sin usarse porque
+  // quitarlo obliga a re-empaquetar, re-anclar y desplegar por nada.
+  precioSobre: 300,
   cartasPorSobre: 5,
   // Las monedas salen de GANAR, no de jugar y tampoco de fundir. Fundir sólo
   // recicla lo que ya no te cabe en ningún mazo.
   //
-  // Perder no paga: dos victorias son un sobre y una derrota no es medio paso
-  // hacia él. El precio de eso es que quien no gana nunca se queda con los dos
-  // sobres de salida y su colección inicial, que es un mazo legal y completo
+  // Perder no paga: diez victorias son un sobre y una derrota no es medio paso
+  // hacia él. El precio de eso es que quien no gana nunca se queda con el
+  // sobre de salida y su colección inicial, que es un mazo legal y completo
   // —jugar nunca se bloquea—, pero la colección deja de crecer sola.
-  monedasInicio: 240,
-  monedasVictoria: 50,
+  //
+  // Las de inicio son exactamente un sobre: con 240 y el precio nuevo, una
+  // cuenta nueva se quedaba sin poder abrir ninguno, que es peor primera
+  // impresión que dos sobres de más.
+  monedasInicio: 300,
+  monedasVictoria: 30,
   monedasDerrota: 0,
-  // Tope de victorias PAGADAS al día. No es una regla de juego —jugar no se
-  // limita— sino una cota al abuso: el servidor re-juega cada partida que cobra
-  // y eso cuesta CPU, así que un cliente hostil no puede pedir mil.
-  victoriasPorDia: 50,
+  // Tope de victorias PAGADAS al día. Nació como cota al abuso —el servidor
+  // re-juega cada partida que cobra y eso cuesta CPU— y ahora es además una
+  // pieza de economía: a 50 eran cinco veces más partidas de las que nadie
+  // juega, así que no frenaba nada. A 10, el techo del día es un sobre y pico.
+  // Jugar NO se limita; lo que se limita es cobrar.
+  victoriasPorDia: 10,
   // Qué parte de cada sobre mira tu colección antes de sortear la carta. Con 1
   // —como fue hasta el 16-09-2026— no sale una copia repetida mientras te falte
   // algo de esa rareza: la colección se completa en unos 116 sobres y el
@@ -6828,42 +6846,42 @@ var M = (id, nombre, texto, mide, meta, premio) => Object.freeze({
 var CATALOGO = Object.freeze([
   // Las de jugar: se cumplen solas si juegas, y están para que un día malo
   // pague algo. Son las baratas a propósito.
-  M("jugar_tres", "Trabajo de campo", "Juega 3 partidas", "partidas", 3, 25),
-  M("ganar_una", "Una buena jornada", "Gana 1 partida", "victorias", 1, 25),
-  M("ganar_dos", "Racha", "Gana 2 partidas", "victorias", 2, 45),
+  M("jugar_tres", "Trabajo de campo", "Juega 3 partidas", "partidas", 3, 15),
+  M("ganar_una", "Una buena jornada", "Gana 1 partida", "victorias", 1, 15),
+  M("ganar_dos", "Racha", "Gana 2 partidas", "victorias", 2, 30),
   // Las de jugar de una MANERA: piden armar el mazo pensando en ellas, que es
   // lo que las hace valer la pena. Los números salen de una partida normal de
   // 15 turnos, donde se despliegan entre 8 y 12 criaturas.
-  M("bajas_seis", "Depredaci\xF3n", "Derriba 6 criaturas rivales", "bajas", 6, 40),
-  M("habitat_diez", "Asedio", "Hazle 10 de da\xF1o al h\xE1bitat rival", "danoHabitat", 10, 40),
-  M("trofeos_seis", "Registro f\xF3sil", "Consigue 6 trofeos", "trofeos", 6, 40),
-  M("desplegar_doce", "Ecosistema", "Despliega 12 criaturas", "desplegados", 12, 35),
-  M("climas_tres", "Meteorolog\xEDa", "Imp\xF3n 3 climas", "climas", 3, 35),
+  M("bajas_seis", "Depredaci\xF3n", "Derriba 6 criaturas rivales", "bajas", 6, 25),
+  M("habitat_diez", "Asedio", "Hazle 10 de da\xF1o al h\xE1bitat rival", "danoHabitat", 10, 25),
+  M("trofeos_seis", "Registro f\xF3sil", "Consigue 6 trofeos", "trofeos", 6, 25),
+  M("desplegar_doce", "Ecosistema", "Despliega 12 criaturas", "desplegados", 12, 20),
+  M("climas_tres", "Meteorolog\xEDa", "Imp\xF3n 3 climas", "climas", 3, 20),
   // Las de clado: una por familia. Empujan a probar cartas que no están en el
   // mazo de siempre, que es el otro problema del set —39 de 66 cartas fuera del
   // mazo de referencia—. Los pterosaurios y los marinos piden menos: hay muchas
   // menos cartas suyas y no caben cinco en cualquier mazo.
-  M("teropodos", "Caza mayor", "Despliega 5 ter\xF3podos", porClado(CLADO.TEROPODO), 5, 40),
-  M("sauropodos", "Manada", "Despliega 5 saur\xF3podos", porClado(CLADO.SAUROPODO), 5, 40),
-  M("tireoforos", "Coraza", "Despliega 4 tire\xF3foros", porClado(CLADO.TIREOFORO), 4, 40),
-  M("ornitopodos", "Ramoneo", "Despliega 5 ornit\xF3podos", porClado(CLADO.ORNITOPODO), 5, 40),
-  M("marginocefalos", "Testarazo", "Despliega 4 marginoc\xE9falos", porClado(CLADO.MARGINOCEFALO), 4, 40),
-  M("pterosaurios", "Sombra en el cielo", "Despliega 3 pterosaurios", porClado(CLADO.PTEROSAURIO), 3, 45),
-  M("marinos", "Mar de Sundance", "Despliega 3 reptiles marinos", porClado(CLADO.MARINO), 3, 45),
+  M("teropodos", "Caza mayor", "Despliega 5 ter\xF3podos", porClado(CLADO.TEROPODO), 5, 25),
+  M("sauropodos", "Manada", "Despliega 5 saur\xF3podos", porClado(CLADO.SAUROPODO), 5, 25),
+  M("tireoforos", "Coraza", "Despliega 4 tire\xF3foros", porClado(CLADO.TIREOFORO), 4, 25),
+  M("ornitopodos", "Ramoneo", "Despliega 5 ornit\xF3podos", porClado(CLADO.ORNITOPODO), 5, 25),
+  M("marginocefalos", "Testarazo", "Despliega 4 marginoc\xE9falos", porClado(CLADO.MARGINOCEFALO), 4, 25),
+  M("pterosaurios", "Sombra en el cielo", "Despliega 3 pterosaurios", porClado(CLADO.PTEROSAURIO), 3, 30),
+  M("marinos", "Mar de Sundance", "Despliega 3 reptiles marinos", porClado(CLADO.MARINO), 3, 30),
   // Las del jefe y las de duelo. No salen de una partida contra la IA: hay que
   // bajar a la cuenca o buscar rival, y un día sin jefe abierto o sin nadie
   // conectado es un día en que ésa de las tres no se cumple. Se aceptó así:
   // es lo que las hace pedir algo. Pagan por debajo de la relámpago para que
   // el peor día posible siga cabiendo en el techo.
-  M("asalto_uno", "Bajar a la cuenca", "Asalta al jefe 1 vez", "asaltos", 1, 40),
-  M("dano_jefe", "Al hueso", "Hazle 40 de da\xF1o al jefe", "danoJefe", 40, 45),
-  M("duelo_uno", "Cara a cara", "Juega 1 duelo", "duelos", 1, 40),
-  M("duelo_ganar", "Mano a mano", "Gana 1 duelo", "duelosGanados", 1, 45),
+  M("asalto_uno", "Bajar a la cuenca", "Asalta al jefe 1 vez", "asaltos", 1, 25),
+  M("dano_jefe", "Al hueso", "Hazle 40 de da\xF1o al jefe", "danoJefe", 40, 30),
+  M("duelo_uno", "Cara a cara", "Juega 1 duelo", "duelos", 1, 25),
+  M("duelo_ganar", "Mano a mano", "Gana 1 duelo", "duelosGanados", 1, 30),
   // La de expedición mide partidas JUGADAS y no primeras victorias: los nodos
   // se acaban, y quien ha recorrido los cuatro mapas sólo estrena rival una vez
   // por semana. Una misión que la mitad del año no se puede cumplir no pide
   // algo, sobra. Por eso `expedicionNuevos` se queda para los logros.
-  M("expedicion_dos", "Prospecci\xF3n", "Juega 2 partidas de expedici\xF3n", "expediciones", 2, 40),
+  M("expedicion_dos", "Prospecci\xF3n", "Juega 2 partidas de expedici\xF3n", "expediciones", 2, 25),
   // La difícil del día. Una sola, y paga como tal.
   // El texto dice «1 partida» y no «una» a propósito: el guardián de
   // `misiones.test.js` pide que el texto cite la meta, igual que el de las
@@ -6874,7 +6892,7 @@ var CATALOGO = Object.freeze([
     `Gana 1 partida en ${MISIONES.turnosRelampago} turnos o menos`,
     "relampago",
     1,
-    60
+    40
   )
 ]);
 var POR_ID = Object.freeze(Object.fromEntries(CATALOGO.map((m) => [m.id, m])));
