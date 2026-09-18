@@ -120,6 +120,8 @@ export function aFormaDePantalla(d) {
     yacimiento: {
       nivel: d.yacimiento?.nivel ?? 1,
       fosiles: d.yacimiento?.fosiles ?? 0,
+      // Lo ya puesto en la mejora del nivel en curso. Un servidor viejo no lo manda.
+      invertido: Number(d.yacimiento?.invertido ?? 0),
       desde: ahora,
     },
     ganadosDesdeLaUltima: 0,   // el servidor no lleva esa cuenta, y no hace falta
@@ -208,10 +210,15 @@ export async function aportar(fosiles, ahora = Date.now()) {
   return Array.isArray(r) ? r[0] : r;
 }
 
+/**
+ * Invierte lo que hay en el depósito en la mejora, hasta lo que falta. El
+ * coste lo sabe el servidor por el catálogo: aquí sólo se pide. Devuelve el
+ * yacimiento tal como queda.
+ */
 export async function mejorarYacimiento(_coste, ahora = Date.now()) {
   if (modo === MODO.LOCAL) return local.mejorarYacimiento(_coste, ahora);
-  await rpc('mejorar_yacimiento');
-  return true;
+  const r = await rpc('mejorar_yacimiento');
+  return Array.isArray(r) ? r[0] : r;
 }
 
 export async function crearTribu(nombre) {

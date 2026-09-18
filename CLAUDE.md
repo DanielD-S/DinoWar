@@ -771,6 +771,33 @@ en `src/data/duelo.js`. No hay proceso que vigile relojes: el primero que
 pregunte después del plazo se encuentra el duelo cerrado. El de la pantalla
 sólo enseña lo que el servidor manda en cada respuesta.
 
+**El Entrenamiento es la partida de emergencia del Duelo** (18-09-2026,
+`src/data/entrenamiento.js`). Con nueve cuentas, buscar rival y no encontrar
+a nadie es el caso normal: tres minutos de reloj y un «prueba más tarde».
+Pasados `ENTRENAMIENTO.ofrecerMs` en la cola —treinta segundos— el panel
+ofrece entrenar contra la IA, y lo vuelve a ofrecer después de rendirse.
+Cuatro cosas que no se deducen del código:
+
+- **Es una partida en solitario de las de siempre**, con un rival de
+  `expediciones.js`: se graba, el servidor la re-juega por el tipo `victoria`
+  y paga las monedas de una victoria normal. No toca el ELO —ni al ganar, ni
+  al perder, ni al retirarse— porque el ELO sólo lo mueve `duelo_cerrar`.
+  Nada nuevo viaja ni se empaqueta: el fichero no entra en la Edge Function y
+  `test/entrenamiento.test.js` lo comprueba.
+- **El rival se sortea entre los dos últimos nodos de cada mapa**, sin
+  repetir el anterior: siempre «El último rey» sería monótono, y uno flojo no
+  sería un sustituto del duelo. «Otra partida» tras un entrenamiento sortea
+  otro (`siguienteEntrenamiento`), no vuelve al mapa: quien vino aquí quería
+  un duelo y sigue sin haber nadie.
+- **Pulsar el botón sale de la cola.** Seguir en ella mientras se entrena
+  emparejaría a una persona con alguien a mitad de otra partida.
+- **Paga lo mismo que cualquier victoria en solitario**, a propósito. Un
+  extra «porque era un duelo» sería buscar, no encontrar y cobrar el extra
+  contra la IA. Y como el rival es un nodo real, si el jugador tenía el
+  anterior vencido y éste sin vencer, cobra su primera victoria como en el
+  mapa: es la misma partida. Cuenta también como expedición jugada para las
+  misiones, que lo es.
+
 **Las ligas son el ELO con nombre**, en `src/data/ligas.js`: Triásico, Jurásico
 y Cretácico con tres divisiones cada uno, y Extinción arriba. El número no se
 enseña nunca; la barra de 0 a 100 dentro de la división, sí. El ELO lo calcula
@@ -1869,6 +1896,18 @@ Lo que cambia de flujo y no sólo de piel:
     el paquete, re-anclar y volver a desplegar. `test/paquete.test.js` y
     `test/anclaje.test.js` lo cazaron al primer intento. Y aquí no hacía
     falta: quien comprueba el mando es SQL con `auth.uid()`, no la función.
+- **La mejora del yacimiento se paga A PLAZOS** (18-09-2026, `0034`). El botón
+  «Mejorar · 300» llevó apagado desde el primer día para todo el mundo, y no
+  era el botón: la mejora se paga del DEPÓSITO y el depósito de nivel 1 se
+  llena a 168, así que 300 no se juntan nunca; la escalera entera, 300·n²,
+  está por encima del tope en todos los niveles y `test/yacimiento.test.js`
+  lo deja escrito. Bajar el coste hasta que quepa habría hecho de cada nivel
+  un día de producción. Lo que hay es «Invertir en la mejora · N», que pone
+  lo que hay hasta lo que falta, en `yacimientos.invertido`, y sube el nivel
+  al juntar el coste. No se puede sacar: es una obra, no una hucha. La firma
+  de `mejorar_yacimiento()` no cambió y `tribu.js` tampoco, así que ni
+  catálogo nuevo ni re-anclaje; `estado_cuenca` se reescribió con
+  `pg_get_functiondef` para añadir la clave, como la 0018.
 - **La placa de la Cuenca lleva un punto con lo que te espera dentro.** La capa
   cooperativa no avisaba de nada: te aceptaban, te echaban, caía el jefe y
   tenías una carta esperando, y sólo lo veías si entrabas a mirar. `avisos_cuenca`

@@ -43,7 +43,7 @@ const escapar = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt
  * @param {object} o
  * @param {{nombre: string, subtitulo: string, retrato: string, emblema: string|null}} o.yo
  * @param {{nombre: string, subtitulo: string, retrato: string, emblema: string|null}} o.rival
- * @param {string} o.modo       «Solitario», «Expedición», «Asalto», «Duelo»
+ * @param {string} o.modo       «Solitario», «Expedición», «Entrenamiento», «Asalto», «Duelo»
  * @param {string} o.objetivo   a qué se juega, en una línea
  */
 export function presentacionHTML({ yo, rival, modo, objetivo }) {
