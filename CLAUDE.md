@@ -769,6 +769,15 @@ DOS semillas (1 y 5001) en las que importaban, y la respuesta es que no:
   que le queda fuera es el reparto, y sólo por la extinción al 1 %: el mazo
   espejo no muele, y esa vía está medida donde se mide (`sim/arquetipos.mjs`).
 
+**Aplicado y desplegado el 18-09-2026.** La PR #138 se mergeó con MERGE, así
+que `811cff6` vive en `main`; la función quedó anclada a ese commit y se
+desplegó por MCP como **v35**, con el `ezbr_sha256` pasando de `15d0deda…` a
+`16d1cca9…`. Del fichero se comprobó ANTES, con el SHA normalizado, que era el
+desplegado con el anclaje cambiado y nada más: once apariciones. Esta vez el
+primer intento pasó sin el timeout de jsDelivr. Y como `vidaHabitat` va en el
+paquete, entre el merge y este despliegue el cliente jugaba a 90 y el servidor
+re-jugaba a 70: unos minutos en los que una victoria por hábitat no cobraba.
+
 ### El freno sí muerde, y sólo en su carril
 
 Las tres cartas defensivas se midieron por separado, metiéndolas en la
