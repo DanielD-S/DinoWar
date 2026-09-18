@@ -643,12 +643,18 @@ export function render(estado) {
   salidas.clear();
 }
 
-/** Lo que dice la etiqueta de cada suerte, y de qué color. */
+/**
+ * Lo que dice la etiqueta de cada suerte, y de qué color. Siempre desde TU
+ * lado y con el sujeto puesto: «mata» a secas se leía como que la tuya moría,
+ * y un «−3» sobre tu carta como que perdías tres. Lo que pega al hábitat lo
+ * dice con el verbo —«pega 3» la tuya, «te pega 4» la suya— y las cifras con
+ * signo se quedan para las barras de hábitat, donde el signo sí es tuyo.
+ */
 const ETIQUETA = {
-  [SUERTE.MATA]: ['mata', 'bueno'],
+  [SUERTE.MATA]: ['lo mata', 'bueno'],
   [SUERTE.MUERE]: ['muere', 'malo'],
   [SUERTE.AMBOS]: ['ambos caen', 'neutro'],
-  [SUERTE.CHOCA]: ['choca', 'neutro'],
+  [SUERTE.CHOCA]: ['aguanta', 'neutro'],
 };
 
 /**
@@ -668,13 +674,13 @@ function pintarPrevision(estado) {
       let tono = 'neutro';
       if (bando === JUGADOR && col?.mia) {
         if (col.mia.suerte === SUERTE.AVANZA) {
-          texto = col.mia.dano > 0 ? `−${col.mia.dano}` : 'sin daño';
+          texto = col.mia.dano > 0 ? `pega ${col.mia.dano}` : 'no pega';
           tono = col.mia.dano > 0 ? 'bueno' : 'neutro';
         } else {
           [texto, tono] = ETIQUETA[col.mia.suerte];
         }
       } else if (bando === RIVAL && col?.rival) {
-        texto = col.rival.dano > 0 ? `−${col.rival.dano}` : 'sin daño';
+        texto = col.rival.dano > 0 ? `te pega ${col.rival.dano}` : 'no te pega';
         tono = col.rival.dano > 0 ? 'malo' : 'neutro';
       }
       if (texto === null) {
@@ -1084,8 +1090,8 @@ export function ayudaHTML() {
       dobla. <b>Dónde pones cada carta es una decisión</b>, y el rival la lee igual que tú.
       Toca el rótulo de un lugar para leer qué hace.</p>
     <p><b>Antes de pulsar Listo, cada columna dice lo que va a pasar si nadie cambia nada</b>: sobre tu
-      carta, «mata», «muere», «ambos caen», «choca» o el «−N» que le entra al hábitat rival; sobre la
-      suya, el «−N» que te entra a ti; y junto a cada hábitat, cuánto bajará en total. Cuenta tus
+      carta, «lo mata», «muere», «ambos caen», «aguanta» o «pega N» al hábitat rival; sobre la suya,
+      «te pega N»; y junto a cada hábitat, cuánto bajará en total. Cuenta tus
       despliegues de este turno y NO los del rival, que van a ciegas: es lo que ves, no lo que él trama.
     </p>
 
