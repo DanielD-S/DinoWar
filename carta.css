@@ -388,13 +388,18 @@
      lado del centro, así que empiezan al 86 %, y la caja se organiza para
      que nada escrito pase de ahí. */
   --ataque-y: 91.5%; --vida-y: 90.1%;
+  /* …y las CIFRAS con ellas: van en otro par de variables y se quedaron al
+     87 % la primera vez, montadas sobre el canto de su chapa. La de Vida va
+     1,7 puntos por debajo del centro de la chapa, como en el marco dibujado,
+     que el centro de masa del triángulo está más abajo que el de su caja. */
+  --atq-y: 91.5%; --vid-y: 91.8%;
   /* El filete: oro para las legendarias, bronce oscuro para el jefe. */
   --filete: linear-gradient(160deg, #f7e2a0 0%, #b98a2e 30%, #f3d27a 52%, #8c5d1a 78%, #eccb70 100%);
 }
 .carta.con-marco.entera.jefe {
   --filete: linear-gradient(160deg, #d9b56a 0%, #6b4a1c 30%, #c9a05a 52%, #3d2a10 78%, #b8904c 100%);
 }
-.carta.con-marco.entera.carta--visor { --pla-y0: 55%; }
+.carta.con-marco.entera.carta--visor { --pla-y0: 58%; }
 /* La caja se llena desde arriba y deja el pie a las chapas: un título de una
    línea no se va al centro, donde chocaría con ellas. El relleno de abajo es
    la franja que las chapas ocupan sobre la caja. */
@@ -404,10 +409,32 @@
 /* La ventana es la carta: mismo radio, y una línea oscura por dentro del
    filete para que el oro no se funda con un cielo claro. */
 .entera .c-arte {
-  border-radius: inherit;
+  border-radius: inherit; background: transparent; z-index: 1;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .55);
 }
-.entera .c-arte .foto { filter: saturate(1.06) contrast(1.04); }
+
+/* La foto es APAISADA (3:2) y la carta es vertical (0,73): a sangre con
+   `cover` se veía el 49 % del ancho y el animal se quedaba en barriga. Así
+   que la foto va ENTERA, como una banda nítida a lo ancho, y detrás la misma
+   foto ampliada y desenfocada rellena la carta —lo que hacen los
+   reproductores con un vídeo en vertical—. El nombre y la caja caen sobre la
+   parte desenfocada, y una ilustración vertical de verdad (3:4, ver
+   PROMPTS.md) entra en el mismo hueco casi a sangre sin tocar nada: `contain`
+   la deja a ras de alto con un 1 % de aire a los lados.
+
+   La banda va al 30 % del hueco libre, no centrada: deja el nombre entero
+   sobre el fondo y termina donde empieza la caja. */
+.entera .c-arte .foto {
+  object-fit: contain; object-position: 50% 30%;
+  filter: saturate(1.06) contrast(1.04) drop-shadow(0 3px 8px rgba(0, 0, 0, .7));
+}
+.carta.con-marco.entera.carta--visor .c-arte .foto { object-position: 50% 22%; }
+.c-fondo { display: none; }
+.entera .c-fondo {
+  display: block; position: absolute; inset: -10%; z-index: 0; pointer-events: none;
+  background-color: #14100c; background-size: cover; background-position: 50% 40%;
+  filter: blur(9px) saturate(.9) brightness(.62);
+}
 
 /* El marco dibujado se apaga y el mismo <span> pinta el filete: un degradado
    metálico recortado a un anillo con dos máscaras (la de fuera menos la de

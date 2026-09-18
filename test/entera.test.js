@@ -34,6 +34,7 @@ test('sin foto detectada la carta sale con su marco: la clase `entera` no se emi
   assert.ok(!/class="[^"]*\bentera\b/.test(html), 'la clase entera sólo va con foto');
   assert.ok(html.includes('m-dino_legendaria'), 'el marco legendario sigue puesto de reserva');
   assert.ok(html.includes('c-velo'), 'el velo viaja siempre: la clase puede llegar con la foto');
+  assert.ok(html.includes('c-fondo'), 'el fondo desenfocado también');
 });
 
 test('una carta que no puede ser entera no lleva velo', () => {
@@ -45,4 +46,6 @@ test('carta.css tiene la geometría de la carta entera y apaga el marco dibujado
   assert.match(css, /\.entera \.c-marco\s*\{[^}]*background-image:\s*none/);
   assert.match(css, /\.entera \.c-cuerpo\s*\{[^}]*backdrop-filter/);
   assert.match(css, /\.entera \.c-velo\s*\{[^}]*display:\s*block/);
+  assert.match(css, /\.entera \.c-arte \.foto\s*\{[^}]*object-fit:\s*contain/, 'la foto apaisada va entera, no recortada');
+  assert.match(css, /\.entera \.c-fondo\s*\{[^}]*blur/);
 });

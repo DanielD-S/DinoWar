@@ -349,7 +349,12 @@ export function refrescarFotos() {
     const ficha = svg.closest('.ficha-cab');
     // La carta entera se decide con la foto delante: si la silueta ya estaba
     // pintada cuando llegó el índice, la clase se pone aquí.
-    if (esEntera(cardId)) svg.closest('.carta')?.classList.add('entera');
+    if (esEntera(cardId)) {
+      const c = svg.closest('.carta');
+      c?.classList.add('entera');
+      const fondo = c?.querySelector('.c-fondo');
+      if (fondo) fondo.style.backgroundImage = `url('${rutaFoto(cardId)}')`;
+    }
     svg.replaceWith(document.createRange().createContextualFragment(arte(cardId)));
     // La ficha ofrece «ver la ilustración» sólo si la hay: si acaba de
     // aparecer, el chip tiene que aparecer con ella.
