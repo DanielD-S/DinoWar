@@ -17,7 +17,7 @@
 //
 // Al cambiar cualquier fichero servido hay que subir VERSION: activa la limpieza
 // de las cachés anteriores.
-const VERSION = 'dinowar-v143';
+const VERSION = 'dinowar-v144';
 const ESENCIALES = [
   './', './index.html', './style.css', './piel.css', './carta.css', './efectos.css', './manifest.json', './src/main.js',
   // Lo primero que se ve. La marca y la pantalla de carga tienen que estar
@@ -30,7 +30,7 @@ const ESENCIALES = [
   './assets/piel/portada.webp', './assets/piel/boton_ancho.webp',
   './assets/piel/fondo_jugar.webp',
   './assets/piel/placa_solitario.webp', './assets/piel/placa_duelo.webp',
-  './assets/piel/placa_misiones.webp',
+  './assets/piel/placa_misiones.webp', './assets/piel/placa_torneo.webp',
   './assets/piel/placa_coleccion.webp', './assets/piel/placa_sobres.webp', './assets/piel/placa_mazos.webp',
   './assets/piel/placa_cuenca.webp', './assets/piel/placa_cuenta.webp',
   './assets/fuentes/inter-latin.woff2',

@@ -2963,9 +2963,15 @@ un mazo roto. Por debajo de veinte sí lo sería.
   filtra la colección a lo que entra, usa `copiasMaxEn()` para el tope de cada
   carta y valida con la regla. Enseñar lo que la regla veta habría sido un
   botón apagado en cada carta de la colección.
-- **La placa del torneo no tiene arte y por eso no declara `--placa`**: el
-  guardián de `marcado.test.js` exige fichero a toda placa que lo declare. Es
-  un dibujo de CSS mientras llega, como la de la tienda antes de tener la suya.
+- **La placa del torneo tiene arte desde el 18-09-2026**: un cráneo de
+  terópodo sobre peana con corona de helechos y cinta de lacre, la cuarta de
+  la fila de jugar y de la misma familia que las tres de antes. Llegó como
+  ellas —recortada, con alfa, a 1254×1254— y va en `PIEZAS_CON_ALFA` de
+  `tools/placas.py`. Nació como un dibujo de CSS sin `--placa` porque el
+  guardián de `marcado.test.js` exige fichero a toda placa que lo declare, y
+  ese dibujo se fue con el WebP. Sale a 256×263, siete píxeles más alta que
+  la del Duelo por el rombo y la cinta, y el `100% 100%` de la regla la
+  encaja en el cuadrado: es un 3 % que no se ve.
 - **Al aplicar, el orden es la 0006 regenerada y luego la 0038**, que lee sus
   tablas. La ventana entre SQL y cliente no es peligrosa por una vez: con el
   SQL puesto y el cliente sin publicar no hay panel que llame a nada, y al
