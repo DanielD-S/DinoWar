@@ -44,6 +44,7 @@ hay que hacer caso cuando el test lo dice.
 | `supabase/migrations/0004_catalogo.sql` | `node tools/generar-catalogo.mjs` | `test/catalogo.test.js` |
 | `supabase/functions/asalto/paquete.ts` | `node tools/empaquetar-asalto.mjs` | `test/paquete.test.js` |
 | `supabase/migrations/0006_catalogo_cartas.sql` | `node tools/generar-cartas.mjs` | `test/cuentas.test.js` |
+| La lista de cartas legales de cada torneo, dentro de la 0006 | `node tools/generar-cartas.mjs` | `test/cuentas.test.js` |
 | `BALANCE.md` de la variante | `node sim/cuerpos.js` | — |
 | `RECOSTE.md` y `RECOSTE.xlsx` | `node tools/tabla.mjs escribir`, `python tools/excel.py escribir` | `test/cuentas.test.js` |
 | `tools/mecanicas.json` | `node tools/mecanicas.mjs` | — |
@@ -702,6 +703,36 @@ carta.** Lo que el paquete sí hizo es que el hábitat pase de rebote a
 REMATE — 64 de 70 por partida, contra los 47 de antes—. Para que sea un PLAN
 hay dos caminos, y los dos son decisión del autor: bajar los 70, o meter otras
 diez o quince copias de daño directo, que es media ronda más.
+
+### Bajar el hábitat a 60 no ayuda: lo que ayuda es SUBIRLO
+
+Se propuso bajar los 70 a 60 para abrir la vía del hábitat. Medido con
+`npm run sim`, 2.000 partidas por variante y la misma semilla (18-09-2026), el
+diagnóstico estaba al revés:
+
+| hábitat | duración | inicial | bola de nieve | trofeos / hábitat / extinción | objetivos |
+|---|---|---|---|---|---|
+| 60 | 9,89 ❌ | 47,2 % | 71,4 % | 19 / 80 / 0 | 2 de 6 |
+| 65 | 10,34 | 47,0 % | 71,3 % | 24 / 76 / 0 | 3 de 6 |
+| **70 (hoy)** | 10,75 | 46,3 % | 71,2 % | 29 / 71 / 0 | **3 de 6** |
+| 80 | 11,49 | 46,4 % | 70,3 % | 39 / 61 / 1 | 3 de 6 |
+| **90** | 12,09 | 45,3 % | **70,0 % ✅** | **47 / 52 / 1** | **4 de 6** |
+| 100 | 12,60 | 44,8 % | 69,5 % ✅ | 57 / 42 / 1 | 4 de 6 |
+
+**El hábitat no es la vía cerrada: es la vía que se lleva el 71 % de las
+partidas.** Lo que está cerrado es CONSTRUIR un mazo que vaya a por él a
+propósito, que es otra cosa — el mazo de HÁBITAT gana el 75 % y el 58 % de sus
+victorias son por trofeos. Bajar el umbral empuja en la dirección en que ya
+sobra: a 60 la partida se acorta por debajo del objetivo y los trofeos se
+hunden al 19 %.
+
+A **90** la bola de nieve entra en objetivo por primera vez, el reparto queda
+47/52 —las dos vías principales casi parejas— y el balance pasa a 4 de 6. Lo
+que cuesta: el jugador inicial baja un punto más, las ocho cartas de la ronda
+del hábitat valen menos (56 de daño directo contra 90 en vez de contra 70), los
+jefes escalan solos porque `habitatDeAsalto()` es ×3, y es `BALANCE.vidaHabitat`,
+que va dentro del paquete de la Edge Function: re-anclar y desplegar. **No se
+ha tocado: es decisión del autor.**
 
 ### El freno sí muerde, y sólo en su carril
 
@@ -2815,6 +2846,134 @@ implementado: no hay pasarela de pago ni producto de sobres en el catálogo.
   guarda para los packs de DINERO, que es donde sube el gasto medio: en
   monedas, un pack con descuento aceleraría el progreso.
 
+## Los torneos: una regla fija, una racha, y una entrada que se paga
+
+Decisión del autor del 18-09-2026, con la intención dicha en una frase: **darle
+a las dinomonedas otro sitio donde gastarse**. Hasta hoy las monedas sólo
+compraban sobres, así que ahorrar era lo único que se podía hacer con ellas;
+con una entrada barata —`TORNEOS.entrada`, hoy **50**, menos de dos victorias—
+entrar es una decisión: seis entradas son un sobre.
+
+Y el motivo de diseño es el otro: **108 de las 139 cartas están fuera del mazo
+de referencia**, o sea sin calibración comprobada y, lo que importa más, sin un
+motivo para jugarlas. Un torneo es una semana en la que construir con ellas no
+es una excentricidad, es la única forma de entrar.
+
+**Un torneo es una REGLA DE CONSTRUCCIÓN y nada más.** No cambia el motor, no
+cambia el tablero, no cambia los umbrales de victoria. Se juega el mismo Duelo
+de siempre contra gente que entró al mismo torneo.
+
+Los datos están en [`src/data/torneos.js`](src/data/torneos.js) y la migración
+es la `0038`. Siete decisiones que no se deducen del código:
+
+- **La regla es un DATO**, con un vocabulario de cinco FORMAS —`soloClados`,
+  `costeMax`, `sinRareza`, `sinTipo`, `copiasMax`— y `test/torneos.test.js`
+  exige que todo torneo use sólo formas del vocabulario y que toda forma la use
+  algún torneo. Un campo mal escrito, `costeMaxx: 2`, no es un error de
+  sintaxis: es una semana entera en la que la regla no filtra nada.
+- **Sólo filtran el MAZO, y ahí está la frontera que decide el coste.** Una
+  regla que filtra cartas es una función pura sobre una lista, así que el motor
+  no se entera de que los torneos existen y **la Edge Function no se toca: ni
+  una línea, ni re-empaquetar, ni re-anclar, ni desplegar** —comprobado, el
+  `paquete.ts` sale idéntico—. Las reglas que cambiarían la PARTIDA están
+  pensadas y NO están: un lugar fijo en las cuatro columnas, un clima desde el
+  turno 1, el hábitat a 50, el mazo a 35. Ésas viajarían a
+  `_compartido/duelo.js` y costarían el ciclo entero cada vez que se toca un
+  torneo. Primero que el formato demuestre que se juega.
+- **La regla no se traduce a SQL: se vuelca ya RESUELTA**, como una lista de
+  ids legales en `catalogo_torneo_cartas` (617 filas para los siete). Traducir
+  `soloClados` o `costeMax` a un `where` pediría columnas de clado y coste en
+  `catalogo_cartas` y un segundo sitio donde el vocabulario puede quedarse
+  atrás. Una lista generada no se contradice con su origen: o está o no está.
+  `copiasMax` es la excepción —no quita cartas, cambia cuántas caben— y viaja
+  como número en `catalogo_torneos.copias_max`.
+- **La RACHA, y no un cuadro de eliminatorias.** Se gana 5 antes de perder 3, y
+  el premio sube con las victorias. Es el formato de la Arena de Hearthstone y
+  está elegido por una razón operativa: con nueve cuentas no hay forma de
+  juntar a dieciséis personas a la misma hora. Una racha es asíncrona y
+  funciona con la gente que haya. Y **se puede retirar cobrando lo que lleve**,
+  porque si no encuentras rival para la quinta, la entrada sería un peaje.
+- **NINGUNA FIRMA CAMBIA.** `duelo_buscar` y `duelo_cerrar` se recrean con el
+  mismo prototipo: el torneo no llega por parámetro, lo deduce el servidor de
+  la racha abierta del jugador. Es más seguro —el cliente no puede decir en
+  qué torneo está— y es lo que permite lo del punto anterior. El emparejado
+  separa las dos colas con `torneo is not distinct from v_torneo`, que compara
+  los nulos como iguales: un duelo de torneo y uno normal no se cruzan nunca.
+- **El mazo se CIERRA al entrar**, no al buscar rival. `duelo_buscar` recibe un
+  mazo del cliente y, si hay racha abierta, lo ignora y usa el de la racha. Sin
+  eso la regla se comprobaría una vez y se podría cambiar de mazo entre duelos,
+  que es justo lo que un formato de regla fija no es. Y se guarda la lista
+  entera y no el id del mazo, porque el mazo guardado se puede editar después.
+- **La entrada se valida y se cobra EN LA MISMA llamada.** Un mazo ilegal no
+  cobra nada. Hace falta porque **una cuenta nueva no puede jugar un torneo**:
+  la colección de salida son 55 cartas exactas, así que cualquier filtro la
+  deja por debajo de un mazo legal —medido: sin legendarias le quedan 53, con
+  coste máximo 3 entre 51 y 54—. No es un descuido del catálogo, es aritmética,
+  y el panel lo dice con el número que falta en vez de tragarse las monedas.
+
+### Los siete, y a qué parte dormida del set apunta cada uno
+
+Rotan de uno en uno por semana con `semanaDe()`, la misma de los visitantes, así
+que el ciclo dura siete semanas y **no cae en fase con los cinco visitantes**:
+nadie ve la misma pareja dos semanas seguidas.
+
+| torneo | regla | qué despierta |
+|---|---|---|
+| Cada hueso uno | `copiasMax: 1` | 55 cartas DISTINTAS en vez de las ~19 de un mazo normal: el 40 % del set en una partida |
+| Sin colmillos | `costeMax: 2` + sin legendarias | 80 cartas, 231 copias. El tope de tres legendarias deja de mandar |
+| El cielo y el mar | sólo pterosaurios y marinos | 9 cartas y 22 copias que no pueden ser tribal fuera de aquí, y con ellas el **Río y el Acantilado**, los dos lugares que miden 1,00 exacto en `LUGARES.md` |
+| El muro | sólo tireóforos y saurópodos | 27 cartas, 65 copias. El único sitio donde no matar no te hace perder por trofeos |
+| Sin trampas | sin eventos | los 29 eventos fuera: los rasgos y las mecánicas peleando solos |
+| A dentelladas | sin eventos, climas ni recursos | los 41 de apoyo fuera. Los cinco climas no existen, así que las inmunidades al clima tampoco estorban |
+| Los pequeños | `costeMax: 1` | 49 cartas, 131 copias. A coste 1 el cuello de botella deja de ser la renta y pasa a ser la MANO |
+
+El guardián comprueba lo que de verdad puede romper esto: que cada torneo deje
+armar 55 cartas con el set entero y que deje **al menos 20 copias de criatura**.
+El suelo lo pone «El cielo y el mar» con 22, y está ahí a sabiendas: ese torneo
+es un formato de apoyo a propósito —22 copias de criatura y 33 de soporte— y no
+un mazo roto. Por debajo de veinte sí lo sería.
+
+### Los premios, y por qué no son monedas
+
+| victorias | 0-1 | 2 | 3 | 4 | 5 |
+|---|---|---|---|---|---|
+| paga | nada | 50 ⛁ | 100 ⛁ | 1 sobre | 2 sobres |
+
+- **Devolver la entrada a las DOS victorias** es lo que hace que una racha
+  mediocre no duela. Por debajo se pierde, que es lo que hace que entrar sea
+  una decisión y no un trámite.
+- **Por encima se paga en SOBRES y no en monedas.** Pagar monedas sería un
+  grifo más en una economía que se acaba de endurecer a propósito, y además
+  desharía lo que la entrada quiere hacer, que es que las monedas se gasten.
+  El sobre va por `sobres_gratis`, el mismo cajón que usan los logros.
+- **Una racha perfecta por semana son 2 sobres**, o sea 0,29 al día contra el
+  techo diario de 1,9 que vigila `test/grifos.test.js`. El test de los torneos
+  lo comprueba por su cuenta —no más de medio sobre al día— y además calcula la
+  ESPERANZA de una racha al 50 % de victorias recorriendo el árbol entero: si
+  entrar saliera muy a cuenta, dejaría de ser una decisión y pasaría a ser
+  obligatorio.
+
+### Lo que hay que saber para tocarlo
+
+- **`src/data/torneos.js` está FUERA del paquete de la Edge Function**, y tiene
+  que seguir estándolo. Por eso `validarMazoEnTorneo()` vive ahí y no en
+  `coleccion.js`, que sí va dentro: es la misma decisión que se tomó con
+  `crafteo.js` y con `mando.js`.
+- **El editor de mazos tiene MODO torneo**: `abrirMazos({ torneo, alElegir })`
+  filtra la colección a lo que entra, usa `copiasMaxEn()` para el tope de cada
+  carta y valida con la regla. Enseñar lo que la regla veta habría sido un
+  botón apagado en cada carta de la colección.
+- **La placa del torneo no tiene arte y por eso no declara `--placa`**: el
+  guardián de `marcado.test.js` exige fichero a toda placa que lo declare. Es
+  un dibujo de CSS mientras llega, como la de la tienda antes de tener la suya.
+- **Al aplicar, el orden es la 0006 regenerada y luego la 0038**, que lee sus
+  tablas. La ventana entre SQL y cliente no es peligrosa por una vez: con el
+  SQL puesto y el cliente sin publicar no hay panel que llame a nada, y al
+  revés el panel dice «no se pudo preguntar por el torneo» y no cobra.
+- **Un reto con código NO cuenta para la racha**, aunque tengas una abierta:
+  `duelo_retar` y `duelo_aceptar` no ponen `torneo`. Es correcto —un duelo
+  privado no es del torneo— pero conviene saberlo antes de buscar el bug.
+
 ## Instalarlo como app
 
 El juego es una PWA: `manifest.json`, iconos en `assets/` y `sw.js`. Se instala
@@ -2903,7 +3062,11 @@ Dicho para que nadie lo descubra tarde:
   es una ventana de ELO que se ensancha con la espera, en esa misma función
   SQL. Escudo, temporadas y tabla ya existen (16-09-2026); lo que no hay es
   historial de temporadas pasadas —el reinicio pisa el ELO y no apunta dónde
-  se terminó— ni recompensa de fin de temporada.
+  se terminó— ni recompensa de fin de temporada. Hay propuesta escrita para
+  eso —sobres más una moneda nueva, farmeable SÓLO al cerrar temporada y que
+  compra cosméticos— y lo primero que pide es una tabla `temporadas` escrita
+  en el mismo sitio donde hoy se aplica `reinicioDe`, porque hasta que eso
+  exista no hay dónde mirar en qué liga terminaste.
 - **El CAPTCHA está activado** (Turnstile, desde el 13-09-2026). Si un día
   nadie puede entrar, lo primero es ese interruptor en Authentication → Attack
   Protection, y que el proveedor siga siendo Turnstile.
@@ -2947,6 +3110,17 @@ Dicho para que nadie lo descubra tarde:
   Lo que sí quedó cerrado es el carril defensivo: las tres cartas de freno
   le quitan nueve puntos por partida y le bajan las victorias por hábitat del
   16 % al 6 % sin cambiar quién gana.
+- **Los torneos existen y no se han jugado.** Las reglas están medidas contra
+  el set —cada una deja armar 55 cartas y 20 copias de criatura— pero ningún
+  simulador dice qué pasa DENTRO de un torneo: `sim/arquetipos.mjs` juega
+  mazos libres. Lo que un formato hace con el metajuego sólo se sabrá cuando
+  alguien juegue una racha. Y con nueve cuentas hay un riesgo operativo que
+  conviene mirar antes de añadir más: la cola del torneo es una cola APARTE
+  de la del duelo normal, así que parte a la gente en dos.
+- **Y las reglas que cambiarían la partida siguen sin existir** —lugar fijo,
+  clima fijo, hábitat o mazo alterados—. No es que no se hayan pensado: es que
+  cada una mete a `_compartido/duelo.js` en el negocio y con ello el ciclo de
+  empaquetar, anclar y desplegar cada vez que se toca un torneo.
 - **La inmunidad al clima no muerde.** Torvosaurus y Nodosaurus dicen «no le
   afectan los efectos del clima», y hoy los dos únicos efectos del clima sobre una
   criatura son BUENOS: el Canal da +1 de Vida y el Bosque cura saurópodos. O sea

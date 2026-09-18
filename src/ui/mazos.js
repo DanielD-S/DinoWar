@@ -26,6 +26,7 @@ import {
   TAM_MAZO, LEGENDARIAS_DINO_MAX, limiteDe, validarMazo,
   esLegendariaDino, legendariasDinoEn,
 } from '../data/coleccion.js';
+import { cartaLegal, copiasMaxEn, textoDeRegla, validarMazoEnTorneo } from '../data/torneos.js';
 import { cargarPerfil } from './almacen.js';
 import { guardarMazo, usarMazo, borrarMazo } from './perfil.js';
 import { fichaHTML, abrirFicha, cartaHTML } from './render.js';
@@ -57,7 +58,7 @@ let dom = null;
 let pintarMenu = () => {};
 let largo = null;    // { t, x, y } mientras el dedo sigue abajo
 let abrioLarga = 0;  // cuándo abrió la ficha la última pulsación larga
-let editando = null;        // { indice, nombre, cartas, pestana, filtro } mientras se edita
+let editando = null;        // { indice, nombre, cartas, pestana, filtro, torneo } mientras se edita
 let confirmando = null;     // índice del mazo con el «¿borrar?» abierto
 
 const esDino = (c) => c.tipo === TIPO.DINOSAURIO;
@@ -71,11 +72,31 @@ export function montarMazos({ titulo, cuerpo, pie, alPintarMenu }) {
   pintarMenu = alPintarMenu;
 }
 
-export function abrirMazos() {
+/**
+ * Con qué torneo se está armando, o null. Es un modo del EDITOR y no un estado
+ * de la pantalla: se entra desde el panel del torneo y se sale al guardar, y
+ * mientras dura, la colección se filtra a lo que entra y el validador es el
+ * del torneo. Lo pone `abrirMazos({ torneo, alElegir })`.
+ *
+ * `alElegir` es lo que se hace con el mazo escogido: en un torneo, entrar con
+ * él. No se «usa» —el mazo activo es el de fuera del torneo y cambiarlo sería
+ * un efecto secundario que nadie pidió—: el mazo de una racha lo guarda el
+ * servidor al entrar y no vuelve a leerse de aquí.
+ */
+let torneo = null;
+let alElegir = null;
+
+export function abrirMazos(opciones = {}) {
   editando = null;
   confirmando = null;
+  torneo = opciones.torneo ?? null;
+  alElegir = opciones.alElegir ?? null;
   pintarMazos();
 }
+
+/** Valida con la regla del torneo si se está armando para uno. */
+const validar = (mazo, cartas) =>
+  (torneo ? validarMazoEnTorneo(mazo, cartas, torneo) : validarMazo(mazo, cartas));
 
 /** El set, más las cartas de jefe que ya tengas: como en la colección. */
 function catalogo(p) {
@@ -148,7 +169,7 @@ function pintarMazos() {
   dom.titulo.textContent = 'Mazos';
 
   dom.cuerpo.innerHTML = p.mazos.map((m, i) => {
-    const v = validarMazo(m.cartas, p.cartas);
+    const v = validar(m.cartas, p.cartas);
     const activo = i === p.activo;
     const portada = portadaDe(m.cartas);
     const emb = emblemaDe(m.cartas);
@@ -157,7 +178,7 @@ function pintarMazos() {
       ? `<span class="mazo-pregunta">¿Borrar «${escapar(m.nombre)}»?</span>
          <button class="accion mal" data-borrar-si="${i}">Sí, borrar</button>
          <button class="accion" data-borrar-no>No</button>`
-      : `<button class="accion" data-usar="${i}" ${activo || !v.valido ? 'disabled' : ''}>${activo ? 'En uso' : 'Usar'}</button>
+      : `<button class="accion" data-usar="${i}" ${(alElegir ? !v.valido : activo || !v.valido) ? 'disabled' : ''}>${alElegir ? 'Entrar con éste' : (activo ? 'En uso' : 'Usar')}</button>
          <button class="accion" data-editar="${i}">Editar</button>
          <button class="accion" data-duplicar="${i}">Duplicar</button>
          <button class="accion" data-borrar="${i}" ${p.mazos.length <= 1 ? 'disabled' : ''}>Borrar</button>`;
@@ -177,7 +198,11 @@ function pintarMazos() {
     </article>`;
   }).join('');
 
-  dom.pie.innerHTML = `<p class="meta-nota">El mazo en uso es el que llevas a la partida.
+  dom.pie.innerHTML = torneo
+    ? `<p class="meta-nota">Armando para «${escapar(torneo.nombre)}». ${escapar(textoDeRegla(torneo))}
+       Un mazo que no cumpla la regla no entra, aunque sea legal fuera del torneo.</p>
+       <button class="boton-grande" data-nuevo>Mazo nuevo</button>`
+    : `<p class="meta-nota">El mazo en uso es el que llevas a la partida.
     Son ${TAM_MAZO} cartas exactas, y de cada carta caben tantas copias como diga su rareza.</p>
     <button class="boton-grande" data-nuevo>Mazo nuevo</button>`;
 
@@ -188,7 +213,10 @@ function pintarMazos() {
     const duplicar = b('duplicar');
     const borrar = b('borrar');
     const si = b('borrar-si');
-    if (usar && !usar.disabled) {
+    if (usar && !usar.disabled && alElegir) {
+      usar.disabled = true;
+      alElegir(p.mazos[Number(usar.dataset.usar)].cartas);
+    } else if (usar && !usar.disabled) {
       usar.disabled = true;
       usarMazo(Number(usar.dataset.usar))
         .catch((err) => { dom.pie.innerHTML += `<p class="meta-nota mal">${escapar(err.message)}</p>`; })
@@ -284,7 +312,10 @@ function soltarLargo() {
  * cuanto el mazo se llenara de legendarias.
  */
 function topeDe(cardId, mazo, p) {
-  const tope = Math.min(limiteDe(cardId), p.cartas[cardId] ?? 0);
+  // En un torneo manda el tope del torneo, que puede ser MENOR que el de
+  // rareza —el singleton deja una copia de una común que admite siete—.
+  const suyo = torneo ? copiasMaxEn(torneo, cardId) : limiteDe(cardId);
+  const tope = Math.min(suyo, p.cartas[cardId] ?? 0);
   if (!esLegendariaDino(cardId)) return tope;
   const n = mazo[cardId] ?? 0;
   const queda = Math.max(0, LEGENDARIAS_DINO_MAX - legendariasDinoEn(mazo));
@@ -318,15 +349,19 @@ function celda(c, n, p) {
 
 function pintarEditor() {
   const p = cargarPerfil();
-  const v = validarMazo(editando.cartas, p.cartas);
+  const v = validar(editando.cartas, p.cartas);
   editando.filtro ??= filtroVacio();
   const f = editando.filtro;
   const pestana = editando.pestana ?? (v.total === 0 ? 'anadir' : 'mazo');
-  dom.titulo.textContent = editando.indice < 0 ? 'Mazo nuevo' : 'Editar mazo';
+  dom.titulo.textContent = torneo ? torneo.nombre : (editando.indice < 0 ? 'Mazo nuevo' : 'Editar mazo');
 
   // Sólo lo que tienes: un editor que enseña lo que no puedes poner es un
   // catálogo, y para eso está la colección.
-  const tuyas = catalogo(p).filter((c) => (p.cartas[c.id] ?? 0) > 0);
+  // Y, en un torneo, sólo lo que entra: enseñar lo que la regla veta sería
+  // ofrecer un botón que no se puede pulsar en cada carta de la colección.
+  const tuyas = catalogo(p)
+    .filter((c) => (p.cartas[c.id] ?? 0) > 0)
+    .filter((c) => !torneo || cartaLegal(torneo, c.id));
   const enMazo = tuyas.filter((c) => (editando.cartas[c.id] ?? 0) > 0);
   const base = pestana === 'mazo' ? enMazo : tuyas;
   const lista = base.filter((c) => pasaFiltro(c, f));
@@ -372,6 +407,7 @@ function pintarEditor() {
     : `<div class="col-rejilla mazo-rejilla">${lista.map((c) => celda(c, editando.cartas[c.id] ?? 0, p)).join('')}</div>`}`;
 
   dom.pie.innerHTML = `
+    ${torneo ? `<p class="meta-nota">${escapar(textoDeRegla(torneo))}</p>` : ''}
     ${v.problemas.length ? `<p class="meta-nota mal">${escapar(v.problemas[0])}</p>` : '<p class="meta-nota">Listo para jugar.</p>'}
     <div class="fila">
       <button class="boton-secundario" data-rellenar ${v.total >= TAM_MAZO ? 'disabled' : ''}>Autocompletar</button>
@@ -487,7 +523,8 @@ function autocompletar(p) {
   const emb = emblemaDe(editando.cartas);
   const tramo = (c) => (emb && emb.filtra(c) && esDino(c) ? 0 : esDino(c) ? 1 : 2);
   const disponible = catalogo(p)
-    .map((c) => ({ id: c.id, c, tope: Math.min(limiteDe(c.id), p.cartas[c.id] ?? 0) }))
+    .filter((c) => !torneo || cartaLegal(torneo, c.id))
+    .map((c) => ({ id: c.id, c, tope: topeDe(c.id, editando.cartas, p) }))
     .filter((x) => x.tope > 0)
     .sort((a, b) => tramo(a.c) - tramo(b.c) || a.c.coste - b.c.coste);
 
