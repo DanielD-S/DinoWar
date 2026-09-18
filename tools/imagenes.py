@@ -38,6 +38,9 @@ RAIZ = Path(__file__).resolve().parent.parent
 ORIGEN = RAIZ / 'src' / 'dinos'
 DESTINO = RAIZ / 'assets' / 'dinos'
 
+# Las ilustraciones son apaisadas 3:2 salvo las de las cartas ENTERAS —las
+# criaturas legendarias y las de jefe—, que van a sangre y se piden en 3:4
+# vertical. Aquí da igual: se reduce el LADO MAYOR y no se recorta.
 # Lado mayor en píxeles. Las cartas del tablero miden 56 px y la ficha 74, así
 # que 460 da margen de sobra para pantallas de densidad 3x sin que una partida
 # se coma varios megabytes.

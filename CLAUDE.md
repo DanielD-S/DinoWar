@@ -769,6 +769,15 @@ DOS semillas (1 y 5001) en las que importaban, y la respuesta es que no:
   que le queda fuera es el reparto, y sólo por la extinción al 1 %: el mazo
   espejo no muele, y esa vía está medida donde se mide (`sim/arquetipos.mjs`).
 
+**Aplicado y desplegado el 18-09-2026.** La PR #138 se mergeó con MERGE, así
+que `811cff6` vive en `main`; la función quedó anclada a ese commit y se
+desplegó por MCP como **v35**, con el `ezbr_sha256` pasando de `15d0deda…` a
+`16d1cca9…`. Del fichero se comprobó ANTES, con el SHA normalizado, que era el
+desplegado con el anclaje cambiado y nada más: once apariciones. Esta vez el
+primer intento pasó sin el timeout de jsDelivr. Y como `vidaHabitat` va en el
+paquete, entre el merge y este despliegue el cliente jugaba a 90 y el servidor
+re-jugaba a 70: unos minutos en los que una victoria por hábitat no cobraba.
+
 ### El freno sí muerde, y sólo en su carril
 
 Las tres cartas defensivas se midieron por separado, metiéndolas en la
@@ -1431,6 +1440,51 @@ medio punto. Se genera el común, se mide, y sólo cuando convence se hacen las
 rarezas con ese PNG como referencia y el material como único cambio.
 `test/marcos.test.js` vigila que cada clase que emite `claseMarco()` tenga
 fichero y que ningún WebP sobre.
+
+### La carta ENTERA: las legendarias y los jefes van a sangre
+
+Desde el 18-09-2026 (decisión del autor, con las cartas de Crown War delante:
+«el arte de la carta, bordes, full art es bastante bueno, profesional,
+pulcro»), las **criaturas legendarias y las cinco de jefe** se pintan enteras:
+la ilustración cubre la carta, el marco de latón se apaga y en su sitio hay un
+filete dorado —bronce en el jefe—, el nombre va sobre un velo oscuro y la
+habilidad en una caja de cristal translúcido apoyada en las chapas. Es la
+variante «full art» de cualquier TCG, y lo que se decidió al hacerla:
+
+- **Es una clase, `entera`, y no un marco nuevo.** `marcoCarta()` emite lo
+  mismo; `carta.css` mueve la GEOMETRÍA de los huecos —la ventana a la carta
+  entera, la banda más ancha, la caja abajo, las chapas de cifras al 90 %— y
+  el mismo `<span class="c-marco">` pinta el filete con un degradado
+  recortado a anillo por dos máscaras. Cero ficheros nuevos, y
+  `test/marcos.test.js` sigue igual: el marco legendario existe y se usa de
+  reserva.
+- **Sólo con foto.** `esEntera()` en `art.js` dice qué cartas lo son;
+  `clasesCarta()` pone la clase si además `hayFoto()`, y `refrescarFotos()`
+  la añade cuando el índice llega después de pintar. Una silueta SVG a sangre
+  sería un rectángulo de color con un nombre encima.
+- **El velo del nombre es un `<span class="c-velo">` propio**, no
+  `.c-arte::after`: ese pseudoelemento ya es el brillo de las legendarias en la
+  colección y el sobre. Viaja en toda carta que PUEDA ser entera, y sin la
+  clase no se ve.
+- **Las fotos siguen siendo apaisadas 3:2 y la ventana es 0,73 vertical**, así
+  que hoy se ve el 49 % del ancho y siete de las diecisiete llevan `foco` en
+  `assets/dinos/indice.json` para no cortar la cabeza. Es un parche: lo que
+  pide la carta entera es una ilustración vertical con encuadre de héroe, y el
+  encargo está escrito en `assets/PROMPTS.md`, «La ilustración a sangre», con
+  el hueco de cada una de las diecisiete. Al llegar cada una, quitarle el
+  `foco`.
+- **Es también el molde del cosmético de «arte alternativo»**: el mismo
+  mecanismo —una clase que cambia la geometría sin tocar la composición— vale
+  para vender una versión a sangre de cualquier carta el día que la tienda lo
+  quiera. Hoy no se vende nada: es lo que distingue a lo más raro del set,
+  que es lo que el holográfico hacía antes de quitarse.
+
+Lo que se miró al lado de Crown War y NO se copió: su estilo pintado tipo
+anime —el fotorrealismo es lo que nos distingue—, su tipografía sin sistema, y
+que la rareza no se lea en la carta. Y lo que queda por hacer de aquello es la
+ventana grande para TODAS las cartas —marcos nuevos con el arte al 55 % del
+alto y las cifras montadas sobre él—, que son ocho PNG del generador y
+re-medir `carta.css`; se dejó para después de ver cómo funciona esto.
 
 Las piezas del menú —la barra de «Empezar partida» y las cinco placas— y el
 sobre y el dorso son del mismo generador y el mismo material, pero no llegaron

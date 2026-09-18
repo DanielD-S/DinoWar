@@ -511,6 +511,63 @@ en la ventana ancha de la carta a Rugops y a Anzu se les iba la cabeza por
 arriba, y llevan foco en `assets/dinos/indice.json`. Si se regeneran a
 1792×1024, van a `src/dinos/<id>.png` y se quita su foco.
 
+## La ilustración a sangre: encuadre de héroe para las cartas ENTERAS
+
+Desde el 18-09-2026 las criaturas legendarias y las cinco de jefe se pintan
+ENTERAS: la ilustración cubre la carta, el marco es un filete y el nombre y la
+habilidad van sobre velos translúcidos (`carta.css`, «la carta ENTERA»). Es la
+misma idea que las «full art» de cualquier TCG, y pide OTRO encuadre: la
+ventana ya no es apaisada 3:2, es la carta, **82:112 vertical (0,73)**. Una
+foto apaisada de 3:2 puesta ahí enseña el 49 % de su ancho, y por eso hoy
+esas diecisiete van con un `foco` a mano en `assets/dinos/indice.json`.
+
+Lo que se pide para ellas —y sólo para ellas; el resto del set sigue en 3:2—:
+
+- **Vertical, 3:4.** Pide **1024×1536** (o 1536×2048) y recorta a 3:4 si el
+  generador no lo da exacto. `tools/imagenes.py` reduce el lado mayor a 1200
+  y no recorta: entra 900×1200.
+- **El animal llena el cuadro.** Busto o tres cuartos, el cuerpo ocupando al
+  menos el 60 % del alto, la cabeza en el tercio superior, la mirada o la
+  acción hacia el espectador. El fondo es segundo plano: horizonte bajo,
+  desenfocado, sin nada que compita. Es lo contrario de la regla de las
+  apaisadas, donde el sujeto va centrado y con aire: aquí el aire sobra.
+- **Dos franjas tranquilas.** La de arriba, el **20 % superior**, lleva un
+  velo oscuro y encima el coste y el nombre: cielo, neblina, copas lejanas,
+  nada de detalle. La de abajo, el **30 % inferior**, lleva la caja de la
+  habilidad translúcida: suelo, agua, polvo, sin la cabeza ni las patas
+  delanteras. La cabeza cae entre el 20 % y el 45 % del alto.
+- **Nada toca los cantos** salvo por abajo: el cuerpo puede salir del cuadro
+  por el borde inferior, que lo tapa la caja. Por los lados y por arriba, no.
+- El bloque de ESTILO y el de PROHIBICIONES, literales, como siempre. Sólo
+  cambia la última frase del de estilo: «Composición vertical 3:4, plano de
+  héroe» en vez de «Composición apaisada 3:2».
+
+Las diecisiete, con lo que ya se sabe de cada una por su foto de hoy:
+
+| id | qué pedir en el hueco |
+|---|---|
+| `tyrannosaurus` | la que hay ya está bien encuadrada: de frente, boca abierta, a la carga; sólo pasarla a vertical |
+| `tyrannotitan` | tres cuartos, avanzando por un cauce seco, cabeza baja |
+| `carcharodontosaurus` | busto de perfil tres cuartos, fauces abiertas, sobre roca |
+| `spinosaurus` | de frente en el agua hasta el pecho, la vela llenando el tercio central |
+| `mosasaurus` | subiendo hacia la cámara desde el azul, la cabeza arriba, la cola perdida abajo |
+| `maiasaura` | cabeza y cuello inclinados sobre el nido, huevos en la franja de abajo |
+| `edmontosaurus` | busto de frente entre coníferas nevadas, aliento visible |
+| `antarctosaurus` | cuello y cabeza bajando hacia la cámara, el cuerpo perdido atrás |
+| `brachiosaurus` | cabeza y cuello de perfil contra el cielo, copas de araucaria a la altura de la cabeza |
+| `giraffatitan` | igual que Brachiosaurus pero de frente, el cuello vertical llenando el centro |
+| `patagotitan` | cabeza y pecho de frente a ras de suelo, contrapicado |
+| `ankylosaurus` | de frente, la cabeza acorazada y las púas de los hombros, la maza fuera del cuadro |
+| `jefe_saurophaganax` | busto tres cuartos, rugiendo, contraluz de atardecer |
+| `jefe_barosaurus` | cuello en diagonal de abajo a arriba, la cabeza en el tercio superior |
+| `jefe_supersaurus` | contrapicado de las patas delanteras y el pecho, la cabeza pequeña arriba |
+| `jefe_hesperosaurus` | placas del lomo de perfil llenando el centro, la cabeza abajo a la izquierda |
+| `jefe_harpactognathus` | bajando en picado hacia la cámara, alas abiertas hasta los lados |
+
+Al llegar: `src/dinos/<id>.png`, `python tools/imagenes.py`, subir `VERSION` en
+`sw.js`, y **borrar el `foco` de esa carta** en `indice.json`: era el parche de
+la foto apaisada y sobre una vertical bien encuadrada estorba.
+
 ## Rehacer una criatura
 
 El bloque de estilo vale igual; el hueco es el binomio más una acción. Dos

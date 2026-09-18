@@ -41,6 +41,11 @@ y por abajo, y una más estrecha recorta por los lados. Con 3:2 de origen lo
 peor que pasa es perder un 11 % de alto en la ficha o un 11 % de ancho en la
 colección: el animal cabe siempre si no toca los bordes.
 
+Las cartas ENTERAS —las criaturas legendarias y las de jefe— son la excepción
+desde el 18-09-2026: su ventana es la carta, 82:112 vertical, y para ellas se
+pide la ilustración en **3:4** (ver «La ilustración a sangre» en PROMPTS.md).
+La herramienta las trata igual: reduce el lado mayor a 1200 y no recorta.
+
 El héroe del menú es aparte: es vertical y grande. Si se quiere una imagen
 propia en vez de reutilizar una carta, hace falta **1290×1960** como mínimo.
 
