@@ -54,6 +54,9 @@ PIEZAS_CON_ALFA = {
     'placa_solitario': ('placa_solitario.webp', 256),
     'placa_duelo': ('placa_duelo.webp', 256),
     'placa_misiones': ('placa_misiones.webp', 256),
+    # La cuarta de la fila de jugar (18-09-2026): el torneo. Llegó como las
+    # otras tres, recortada y a 1254×1254.
+    'placa_torneo': ('placa_torneo.webp', 256),
     # La pantalla de carga. El logo y los tres textos son imágenes a petición
     # del autor: llegaron dibujados con el mismo latón que el resto, y a 900 px
     # de ancho van nítidos a densidad 3x en una franja de 300.

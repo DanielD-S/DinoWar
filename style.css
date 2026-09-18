@@ -1301,33 +1301,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 #jugar.misiones-abiertas .placa-misiones { color: var(--acento-vivo); }
 
-/* La placa del TORNEO no tiene arte todavía y por eso no declara `--placa`:
-   el guardián de `marcado.test.js` exige fichero a toda placa que lo declare,
-   y una ruta a un WebP que no existe deja un hueco en la fila. Mientras
-   llega, es un dibujo de CSS con el mismo latón que el resto —un medallón con
-   su aro y la cinta debajo—, que es lo que se hizo con la placa de la tienda
-   antes de que tuviera la suya. */
-/* Con `.placa-torneo i` no basta: `.jugar-placas .placa i` pesa más y escribe
-   `background: var(--placa)…`, que sin `--placa` es una declaración inválida y
-   deja la pieza transparente. Sólo se veía la cinta del `::after`. */
-.jugar-placas .placa-torneo i {
-  background: radial-gradient(circle at 50% 42%, #f0dcae 0 17%, #c79a4e 18% 30%, #8a6a32 31% 35%, transparent 36%),
-              radial-gradient(circle at 50% 42%, transparent 0 40%, #d8b56e 41% 45%, transparent 46%),
-              linear-gradient(160deg, #6a5024, #3a2c16);
-  /* Las otras tres placas son PIEDRA CUADRADA con marco de latón, así que el
-     medallón va dentro de una y no suelto: si no, la fila se lee como tres
-     botones y un icono. */
-  border: 2px solid #8a6a32; border-radius: 7px;
-  box-shadow: inset 0 0 0 1px rgba(244,236,224,.14), 0 3px 5px rgba(0,0,0,.5);
-  filter: none;
-}
-.placa-torneo i::after {
-  content: ''; position: absolute; left: 50%; top: 58%; width: 26%; height: 30%;
-  transform: translateX(-50%);
-  background: linear-gradient(180deg, #b8402f, #7d2a1e);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
-  opacity: .9;
-}
+/* La cuarta placa de la fila de jugar, la del torneo. Llegó el 18-09-2026,
+   como las otras tres: recortada y a 1254×1254, servida a 256 por
+   tools/placas.py. Hasta entonces fue un dibujo de CSS. */
+.placa-torneo { --placa: url('assets/piel/placa_torneo.webp'); }
 #jugar.torneo-abierto .placa-torneo i { filter: drop-shadow(0 3px 5px rgba(0,0,0,.5)) brightness(1.14); }
 #jugar.torneo-abierto .placa-torneo { color: var(--acento-vivo); }
 
