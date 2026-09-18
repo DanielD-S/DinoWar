@@ -6,7 +6,7 @@ import { CARTAS, CLADO, RAREZA } from './cards.js';
 export const BALANCE = Object.freeze({
   // ------------------------------------------------------------- victorias
   trofeosParaGanar: 10,      // registro fósil
-  vidaHabitat: 70,            // colapso del habitat
+  vidaHabitat: 90,            // colapso del habitat
   // la tercera, extinción, no tiene número: es quedarse sin cartas al robar
 
   // ---------------------------------------------------------------- campo

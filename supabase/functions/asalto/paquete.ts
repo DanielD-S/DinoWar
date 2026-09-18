@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: f28c05df01b62bd0
+// huella: 39664a2b3a47dc72
 //
 // Lleva dentro estos 25 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -2378,7 +2378,7 @@ var BALANCE = Object.freeze({
   // ------------------------------------------------------------- victorias
   trofeosParaGanar: 10,
   // registro fósil
-  vidaHabitat: 70,
+  vidaHabitat: 90,
   // colapso del habitat
   // la tercera, extinción, no tiene número: es quedarse sin cartas al robar
   // ---------------------------------------------------------------- campo

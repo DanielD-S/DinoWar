@@ -15,7 +15,7 @@ y se revela **a la vez**: la tensión del juego es la información oculta, no el
 | Vía | Cómo |
 |---|---|
 | **Registro fósil** | Reúne 10 trofeos. Cada dinosaurio rival que muere te da uno. |
-| **Colapso del hábitat** | Derriba el hábitat rival, que empieza con 70 de Vida. |
+| **Colapso del hábitat** | Derriba el hábitat rival, que empieza con 90 de Vida. |
 | **Extinción** | Quien se queda sin mazo pierde. El descarte **no se rebaraja**, y hay cartas que le comen el mazo al rival. |
 
 Sobre 2.000 partidas las tres se reparten **45 % / 24 % / 31 %**: ninguna es decorado.
