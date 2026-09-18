@@ -1824,11 +1824,16 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .fila-lugares[hidden] { display: none; }
 .lugar {
-  min-width: 0; padding: 3px 3px 2px; border-radius: 6px;
+  min-width: 0; padding: 4px 3px 3px; border-radius: 6px;
   border: 1px solid var(--linea);
-  background: linear-gradient(180deg, rgba(217,164,65,.08), rgba(217,164,65,.02));
-  color: var(--acento-claro); font: inherit; cursor: pointer; text-align: center;
+  /* Fondo OPACO, no un velo: la tira va justo encima del medallón del campo,
+     que es ámbar y brillante en el centro, y con un velo translúcido las dos
+     columnas de en medio se leían y las de los lados no. El color de cada
+     lugar lo pone piel.css sobre este fondo. */
+  background: #1a130d;
+  color: var(--texto); font: inherit; cursor: pointer; text-align: center;
   line-height: 1.15;
+  box-shadow: 0 1px 3px rgba(0,0,0,.55);
 }
 /* El nombre cabe en dos líneas y no se corta con puntos: «Bosque de coníferas»
    a 8,5 px son 26 letras y a 85 px de columna no entran en una. */

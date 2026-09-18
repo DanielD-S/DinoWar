@@ -5,6 +5,7 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 
 import { BALANCE } from '../src/data/balance.js';
 import { CLADO, RASGO, CARTAS, TIPO } from '../src/data/cards.js';
@@ -56,6 +57,23 @@ test('Todo número del efecto sale en el texto, y el id coincide con la llave', 
     for (const n of numeros(l.efecto)) {
       assert.match(l.texto, new RegExp(`(^|[^\\d])${Math.abs(n)}(?!\\d)`), `${id}: el texto no cita el ${n}`);
     }
+  }
+});
+
+test('Todo lugar tiene su color en piel.css, y no sobra ninguno', () => {
+  // El color es de la piel y no del dato —lugares.js entra en la Edge
+  // Function— así que nadie lo comprueba al cargar: un lugar nuevo sin tinte
+  // saldría con el fondo pelado y sin que nada avisara.
+  const css = readFileSync(new URL('../piel.css', import.meta.url), 'utf8');
+  const tintes = [...css.matchAll(/\.lugar\[data-lugar="([a-z_]+)"\][^{]*\{\s*--lugar-tinte:\s*(#[0-9a-f]{6})/g)];
+  const porId = new Map(tintes.map((m) => [m[1], m[2]]));
+  for (const id of LUGARES_IDS) assert.ok(porId.has(id), `${id} no tiene --lugar-tinte en piel.css`);
+  for (const id of porId.keys()) assert.ok(LUGARES[id], `piel.css tiñe "${id}", que no es un lugar`);
+  assert.equal(new Set(porId.values()).size, porId.size, 'dos lugares con el mismo color');
+  // Y la ranura lleva el mismo tinte que el botón: es el color de la COLUMNA.
+  for (const [id, tinte] of porId) {
+    assert.ok(css.includes(`.ranura[data-lugar="${id}"]`), `la ranura de ${id} no lleva color`);
+    assert.ok(tinte, id);
   }
 });
 

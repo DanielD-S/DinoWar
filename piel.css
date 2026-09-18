@@ -107,6 +107,66 @@
   content: ''; width: 14px; height: 1px; margin-top: 4px; background: rgba(217,164,65,.28);
 }
 
+/* ----------------------------------------------------------------- lugares
+   Cada lugar tiene un COLOR, y el color es de la columna: lo llevan el botón
+   de la tira y las dos ranuras enfrentadas, para que se vea de un vistazo qué
+   columna es cuál sin leer el rótulo. Va aquí y no en `lugares.js` a
+   propósito: ese fichero entra en el paquete de la Edge Function, y un color
+   allí costaría re-empaquetar, re-anclar y desplegar por una cosa que sólo
+   pinta. `test/lugares.test.js` exige que todo lugar del set tenga su tinte
+   aquí y que no sobre ninguno.
+
+   Los diecisiete están repartidos por el círculo —lava, huevo, trigo, lima,
+   helecho, pino, laguna, río, cielo, violeta, barro, sangre, rosa, óxido,
+   piedra, sal, arena— para que cuatro cualesquiera se distingan. */
+.lugar[data-lugar="ladera_volcanica"], .ranura[data-lugar="ladera_volcanica"] { --lugar-tinte: #ff5a1f; }
+.lugar[data-lugar="nidada"],           .ranura[data-lugar="nidada"]           { --lugar-tinte: #f2a93b; }
+.lugar[data-lugar="llanura_abierta"],  .ranura[data-lugar="llanura_abierta"]  { --lugar-tinte: #e5cf4a; }
+.lugar[data-lugar="pradera_alta"],     .ranura[data-lugar="pradera_alta"]     { --lugar-tinte: #b6d445; }
+.lugar[data-lugar="helechal"],         .ranura[data-lugar="helechal"]         { --lugar-tinte: #5cbf5a; }
+.lugar[data-lugar="bosque_coniferas"], .ranura[data-lugar="bosque_coniferas"] { --lugar-tinte: #2a9a62; }
+.lugar[data-lugar="laguna"],           .ranura[data-lugar="laguna"]           { --lugar-tinte: #3fcfc4; }
+.lugar[data-lugar="rio"],              .ranura[data-lugar="rio"]              { --lugar-tinte: #3a9de6; }
+.lugar[data-lugar="acantilado"],       .ranura[data-lugar="acantilado"]       { --lugar-tinte: #a9bfd9; }
+.lugar[data-lugar="desfiladero"],      .ranura[data-lugar="desfiladero"]      { --lugar-tinte: #8b80d0; }
+.lugar[data-lugar="cienaga"],          .ranura[data-lugar="cienaga"]          { --lugar-tinte: #8c8a3b; }
+.lugar[data-lugar="cazadero"],         .ranura[data-lugar="cazadero"]         { --lugar-tinte: #d0362f; }
+.lugar[data-lugar="barranco"],         .ranura[data-lugar="barranco"]         { --lugar-tinte: #ee5f8a; }
+.lugar[data-lugar="pedregal"],         .ranura[data-lugar="pedregal"]         { --lugar-tinte: #b8763a; }
+.lugar[data-lugar="roquedal"],         .ranura[data-lugar="roquedal"]         { --lugar-tinte: #a8a294; }
+.lugar[data-lugar="salinas"],          .ranura[data-lugar="salinas"]          { --lugar-tinte: #f0ead8; }
+.lugar[data-lugar="cauce_seco"],       .ranura[data-lugar="cauce_seco"]       { --lugar-tinte: #cfa66e; }
+
+/* El botón: fondo oscuro teñido, borde del color y una tira del color arriba.
+   El nombre se queda en crema y no en el tinte: la sal y el cielo son casi
+   blancos y la ciénaga casi marrón, y un rótulo de 8,5 px en cualquiera de
+   los dos no se leería. El color va en lo que rodea al texto, no en el texto.
+   Las dos primeras declaraciones son el fallback sin `color-mix`. */
+.lugar[data-lugar] {
+  border-color: var(--lugar-tinte);
+  box-shadow: inset 0 2px 0 var(--lugar-tinte), 0 1px 3px rgba(0,0,0,.55);
+  border-color: color-mix(in srgb, var(--lugar-tinte) 70%, #1a130d);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--lugar-tinte) 34%, #1a130d),
+    color-mix(in srgb, var(--lugar-tinte) 14%, #1a130d));
+  text-shadow: 0 1px 1px rgba(0,0,0,.7);
+}
+.lugar[data-lugar]:active { border-color: var(--lugar-tinte); }
+/* Las ranuras de la columna: el rótulo de la vacía en su color, con sombra
+   para que se lea también sobre el medallón, y un halo suave del mismo color
+   alrededor de las dos —ocupadas o no—, que es lo que une la carta puesta con
+   su lugar. El halo es blando a propósito: el aro de rareza de la carta es un
+   `box-shadow` de un píxel a la misma altura y un anillo duro aquí se pisaría
+   con él. */
+.ranura[data-lugar] {
+  box-shadow: 0 0 14px -2px var(--lugar-tinte);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--lugar-tinte) 30%, transparent), 0 0 14px -2px var(--lugar-tinte);
+}
+.ranura[data-lugar]:not(.ocupada)::before {
+  color: var(--lugar-tinte); font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,.9), 0 0 4px rgba(0,0,0,.7);
+}
+.ranura[data-lugar]:not(.ocupada)::after { background: var(--lugar-tinte); opacity: .6; }
+
 /* -------------------------------------------------------------- el hábitat
    Canal y relleno, dos piezas que repiten en horizontal porque la barra crece
    con la pantalla. El relleno se recorta con el ancho, que es lo que ya hace
