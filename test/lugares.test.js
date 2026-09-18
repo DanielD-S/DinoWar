@@ -265,6 +265,74 @@ test('muele: el cauce seco muele 1 a quien tenga algo ahí al final del turno, a
   assert.equal(r.eventos.filter((e) => e.tipo === 'LUGAR' && e.efecto === 'muele').length, 2);
 });
 
+test('Cada lugar que ACTÚA lo cuenta un evento LUGAR: cura, sin curación, espinas, sobrante, guardia y golpe', () => {
+  // Es el mismo guardián que las habilidades al entrar: sin evento, el lugar
+  // curaba y pinchaba en silencio y el jugador sólo lo veía en los números.
+  // Dos cuerpos sin nada que altere el combate: Lokiceratops 4/7 y Platyceratops 1/2.
+  const grande = 'lokiceratops';
+  const chico = 'platyceratops';
+  const tipos = (r) => r.eventos.filter((e) => e.tipo === 'LUGAR').map((e) => `${e.efecto}@${e.ranura}`);
+
+  // Bosque: el herido se cura y el evento dice cuánto puso el bosque.
+  let s = tablero();
+  s.lugares[0] = 'bosque_coniferas';
+  const herido = poner(s, grande, 0, 0, { heridas: 2 });
+  poner(s, chico, 1, 0);
+  let r = ejecutar(s, FASE.COMBATE);
+  assert.ok(tipos(r).includes('cura@0'), tipos(r));
+  assert.equal(r.eventos.find((e) => e.tipo === 'LUGAR' && e.efecto === 'cura').iid, herido);
+
+  // Salinas: habría curado por lo suyo y no le dejan; eso también se dice.
+  s = tablero();
+  s.lugares[1] = 'salinas';
+  const regenera = Object.values(CARTAS).find((c) => c.tipo === TIPO.DINOSAURIO && c.mecanica?.regenera?.propia > 0);
+  if (regenera) {
+    poner(s, regenera.id, 0, 1, { heridas: 1 });
+    r = ejecutar(s, FASE.COMBATE);
+    assert.ok(tipos(r).includes('sinCuracion@1'), tipos(r));
+  }
+
+  // Pedregal: dos que chocan y el terreno pincha, una vez por columna y sin bando.
+  s = tablero();
+  s.lugares[2] = 'pedregal';
+  poner(s, grande, 0, 2);
+  poner(s, grande, 1, 2);
+  r = ejecutar(s, FASE.COMBATE);
+  const esp = r.eventos.filter((e) => e.tipo === 'LUGAR' && e.efecto === 'espinas');
+  assert.equal(esp.length, 1);
+  assert.equal(esp[0].jugador, undefined);
+
+  // Llanura: el grande mata al chico y lo que sobra se dobla.
+  s = tablero();
+  s.lugares[3] = 'llanura_abierta';
+  poner(s, grande, 0, 3);
+  poner(s, chico, 1, 3);
+  r = ejecutar(s, FASE.COMBATE);
+  assert.ok(tipos(r).includes('sobrante@3'), tipos(r));
+  assert.equal(r.eventos.find((e) => e.tipo === 'LUGAR' && e.efecto === 'sobrante').jugador, 0);
+
+  // Desfiladero y Barranco: el golpe a la ranura vacía pega 1 menos o 1 más, y se dice.
+  s = tablero();
+  s.lugares[0] = 'desfiladero';
+  s.lugares[1] = 'barranco';
+  poner(s, grande, 0, 0);
+  poner(s, grande, 0, 1);
+  r = ejecutar(s, FASE.COMBATE);
+  assert.ok(tipos(r).includes('guardia@0'), tipos(r));
+  assert.ok(tipos(r).includes('golpeHabitat@1'), tipos(r));
+  const avances = r.eventos.filter((e) => e.tipo === 'AVANCE');
+  const ataque = CARTAS[grande].ataque;
+  assert.equal(avances.find((e) => e.ranura === 0).dano, ataque - 1);
+  assert.equal(avances.find((e) => e.ranura === 1).dano, ataque + 1);
+
+  // Y en el tablero plano no se dice nada: ningún LUGAR sin lugar.
+  s = tablero();
+  poner(s, grande, 0, 0, { heridas: 2 });
+  poner(s, grande, 1, 0);
+  r = ejecutar(s, FASE.COMBATE);
+  assert.deepEqual(tipos(r), []);
+});
+
 test('La Vida de lugar es dinámica: sin la laguna debajo, una unidad al límite se cae', () => {
   const s = tablero();
   s.lugares[0] = 'laguna';

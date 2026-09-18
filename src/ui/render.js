@@ -13,6 +13,7 @@ import {
 import { arte, hayFoto, rutaFoto, hayEntera, rutaEntera } from './art.js';
 import { legales, ACCION } from '../engine/actions.js';
 import { volar, temporizar } from './efectos.js';
+import { prever, SUERTE } from './prevision.js';
 
 export const JUGADOR = 0;
 export const RIVAL = 1;
@@ -49,6 +50,7 @@ export function montar() {
     btnCuenta: id('btn-cuenta'),
     menuCuenta: id('menu-cuenta'),
     rHabitat: id('r-habitat'), pHabitat: id('p-habitat'), rBarra: id('r-barra'), pBarra: id('p-barra'),
+    rPrev: id('r-prev'), pPrev: id('p-prev'),
     rPila: id('r-pila'), pPila: id('p-pila'),
     turno: id('turno'), relojes: [id('p-reloj'), id('r-reloj')],
     campo: id('campo'), franjaCampo: id('btn-campo'), franjaNota: id('franja-nota'),
@@ -635,9 +637,61 @@ export function render(estado) {
   pintarHabitat(estado);
   pintarLugares(estado);
   pintarRanuras(estado);
+  pintarPrevision(estado);
   pintarFranja(estado);
   pintarMano(estado);
   salidas.clear();
+}
+
+/** Lo que dice la etiqueta de cada suerte, y de qué color. */
+const ETIQUETA = {
+  [SUERTE.MATA]: ['mata', 'bueno'],
+  [SUERTE.MUERE]: ['muere', 'malo'],
+  [SUERTE.AMBOS]: ['ambos caen', 'neutro'],
+  [SUERTE.CHOCA]: ['choca', 'neutro'],
+};
+
+/**
+ * La previsión del combate sobre el tablero: en cada carta tuya, lo que le
+ * pasa si nadie cambia nada —mata, muere, ambos caen, choca, o «−N» al hábitat
+ * rival—; en la carta rival que te llega, «−N» a tu hábitat; y junto a cada
+ * cifra de hábitat, cuánto bajará. Sólo en el despliegue y antes de Listo:
+ * fuera de ahí `prever` devuelve null y aquí se borra todo.
+ */
+function pintarPrevision(estado) {
+  const p = prever(estado, JUGADOR);
+  for (const bando of [JUGADOR, RIVAL]) {
+    for (const nodo of el.filas[bando].children) {
+      const r = Number(nodo.dataset.ranura);
+      const col = p?.columnas[r];
+      let texto = null;
+      let tono = 'neutro';
+      if (bando === JUGADOR && col?.mia) {
+        if (col.mia.suerte === SUERTE.AVANZA) {
+          texto = col.mia.dano > 0 ? `−${col.mia.dano}` : 'sin daño';
+          tono = col.mia.dano > 0 ? 'bueno' : 'neutro';
+        } else {
+          [texto, tono] = ETIQUETA[col.mia.suerte];
+        }
+      } else if (bando === RIVAL && col?.rival) {
+        texto = col.rival.dano > 0 ? `−${col.rival.dano}` : 'sin daño';
+        tono = col.rival.dano > 0 ? 'malo' : 'neutro';
+      }
+      if (texto === null) {
+        delete nodo.dataset.prevision;
+        delete nodo.dataset.previsionTono;
+      } else {
+        nodo.dataset.prevision = texto;
+        nodo.dataset.previsionTono = tono;
+      }
+    }
+  }
+  for (const [bando, nodo] of [[JUGADOR, el.pPrev], [RIVAL, el.rPrev]]) {
+    if (!nodo) continue;
+    const baja = p?.habitat[bando] ?? 0;
+    nodo.textContent = baja > 0 ? `−${baja}` : '';
+    nodo.classList.toggle('malo', bando === JUGADOR && baja > 0);
+  }
 }
 
 export function mensaje(texto, aviso = false) {
@@ -1028,7 +1082,11 @@ export function ayudaHTML() {
       ranura: vale igual para lo tuyo y para lo del rival. Un reptil marino pega más en el río,
       lo que está en el bosque cura cada turno, en la llanura el daño que sobra al matar se
       dobla. <b>Dónde pones cada carta es una decisión</b>, y el rival la lee igual que tú.
-      Toca el rótulo de un lugar para leer qué hace.
+      Toca el rótulo de un lugar para leer qué hace.</p>
+    <p><b>Antes de pulsar Listo, cada columna dice lo que va a pasar si nadie cambia nada</b>: sobre tu
+      carta, «mata», «muere», «ambos caen», «choca» o el «−N» que le entra al hábitat rival; sobre la
+      suya, el «−N» que te entra a ti; y junto a cada hábitat, cuánto bajará en total. Cuenta tus
+      despliegues de este turno y NO los del rival, que van a ciegas: es lo que ves, no lo que él trama.
     </p>
 
     <div class="ayuda-h">La Biomasa</div>

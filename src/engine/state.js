@@ -463,7 +463,7 @@ export function rentaDe(state) {
 }
 
 /** Cuántas heridas cura una unidad al final del turno. */
-export function curacionDe(state, iid) {
+export function curacionPropia(state, iid) {
   const inst = state.instancias[iid];
   const c = carta(inst.cardId);
   let cura = 0;
@@ -480,12 +480,19 @@ export function curacionDe(state, iid) {
     cura += mecanicaDe(o.cardId)?.regenera?.aliados ?? 0;
   }
 
-  // Y el lugar: el Bosque cura a lo que esté en él y las Salinas no dejan
-  // curar a nadie, venga de donde venga la curación.
-  const lugar = efectoDeLugar(state, inst.ranura);
-  cura += lugar.cura ?? 0;
-  if (lugar.sinCuracion) return 0;
   return cura;
+}
+
+/**
+ * Curación total: lo propio más lo del lugar. El Bosque cura a lo que esté en
+ * él y las Salinas no dejan curar a nadie, venga de donde venga la curación.
+ * `curacionPropia` queda aparte para que el combate pueda decir cuándo fue el
+ * lugar el que curó, o el que no dejó.
+ */
+export function curacionDe(state, iid) {
+  const lugar = efectoDeLugar(state, state.instancias[iid].ranura);
+  if (lugar.sinCuracion) return 0;
+  return curacionPropia(state, iid) + (lugar.cura ?? 0);
 }
 
 /**

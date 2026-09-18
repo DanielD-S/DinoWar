@@ -1840,6 +1840,25 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .ranura.ocupada { border-color: transparent; background: none; }
 
+/* La PREVISIÓN del combate: una etiqueta al pie de la carta con lo que le va
+   a pasar si nadie cambia nada. La escribe render.js en `data-prevision` y
+   sólo mientras se despliega; con `.ocupada` en el selector para pesar más
+   que la raya de la ranura vacía de piel.css y que el «+» del destino. */
+.ranura.ocupada[data-prevision]::after {
+  content: attr(data-prevision);
+  position: absolute; left: 50%; bottom: 3px; z-index: 5; transform: translateX(-50%);
+  padding: 1px 5px; border-radius: 3px;
+  background: rgba(20,16,12,.92); box-shadow: 0 0 0 1px var(--acento-claro);
+  color: var(--acento-claro); font-size: 8px; font-weight: 600; letter-spacing: .08em;
+  text-transform: uppercase; white-space: nowrap; pointer-events: none;
+}
+.ranura.ocupada[data-prevision-tono="bueno"]::after { box-shadow: 0 0 0 1px #8cc878; color: #b7e0a6; }
+.ranura.ocupada[data-prevision-tono="malo"]::after { box-shadow: 0 0 0 1px var(--peligro); color: #f0a08a; }
+/* Y junto a la cifra del hábitat, cuánto va a bajar. */
+.habitat-num .prev { font-style: normal; font-size: 10px; font-weight: 600; color: #b7e0a6; margin-left: 3px; }
+.habitat-num .prev.malo { color: #f0a08a; }
+.habitat-num .prev:empty { display: none; }
+
 /* Los lugares: uno por columna, entre la fila del rival y la franja del clima.
    Es la columna la que tiene lugar, así que va alineado con las ranuras —la
    misma rejilla— y no con la franja. Nombre siempre; el texto sólo donde cabe. */
@@ -1849,6 +1868,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .fila-lugares[hidden] { display: none; }
 .lugar {
+  position: relative; /* el rótulo del guión cuelga de aquí cuando el lugar actúa */
   min-width: 0; padding: 4px 3px 3px; border-radius: 6px;
   border: 1px solid var(--linea);
   /* Fondo OPACO, no un velo: la tira va justo encima del medallón del campo,
@@ -1870,6 +1890,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .lugar i { display: none; font-style: normal; font-size: 9px; color: var(--tenue); margin-top: 2px; }
 .lugar:active { border-color: var(--bio); }
+/* El lugar ACTÚA —cura, pincha, dobla, quita o pone al golpe— y se enciende un
+   momento, con el rótulo del guión encima. Igual que `.carta.dispara`. */
+.lugar.dispara { animation: lugar-dispara .52s ease-out; }
+@keyframes lugar-dispara {
+  0%   { box-shadow: 0 0 0 0 var(--lugar-tinte, var(--bio)); filter: brightness(1.6); }
+  100% { box-shadow: 0 0 0 6px transparent; filter: none; }
+}
 @media (min-width: 560px) {
   .lugar i { display: block; }
 }
@@ -2120,6 +2147,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   animation: rotular 1.1s ease-out both;
 }
 .rotulo-rasgo.bueno { box-shadow: 0 0 0 1px #8cc878; color: #b7e0a6; }
+.rotulo-rasgo.malo { box-shadow: 0 0 0 1px var(--peligro); color: #f0a08a; }
 @keyframes rotular {
   0%   { opacity: 0; transform: translate(-50%, calc(-50% + 8px)) scale(.92); }
   15%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }

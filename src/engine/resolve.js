@@ -9,8 +9,8 @@ import { MODO, modoActual as economiaModo, rentaTipada, ingresar } from './econo
 import {
   FASE, MOTIVO_FIN, CAUSA, rival,
   unidadEn, unidadesDe, todasLasUnidades,
-  ataqueEfectivo, vidaActual, danoEntre, danoAlHabitat, espinasDe,
-  curacionDe, rentaDe, hayAridez, campoEs, vuela, mecanicaDe, inmuneA, guardiaDe,
+  ataqueEfectivo, vidaActual, danoEntre, espinasDe,
+  curacionDe, curacionPropia, rentaDe, hayAridez, campoEs, vuela, mecanicaDe, inmuneA, guardiaDe,
   ajustarGolpeDeLugar, sobranteDeLugar,
 } from './state.js';
 import { efectoDeLugar } from '../data/lugares.js';
@@ -649,6 +649,30 @@ export function descartarAlAzar(s, j, n) {
  * y se aplica a la vez, así que un intercambio mutuo puede matar a los dos.
  * Ranura enfrentada vacía = el ocupante golpea el habitat contrario.
  */
+/** Un lugar que hace algo por su cuenta lo dice: el guión lo enseña sobre él. */
+function avisarLugar(s, r, datos) {
+  ev(s, 'LUGAR', { ranura: r, lugar: s.lugares[r], ...datos });
+}
+
+/**
+ * Un golpe al hábitat que sale de esa columna, pasado por su lugar —el
+ * Desfiladero le quita, el Barranco le pone— y CONTADO: si el lugar lo
+ * cambió, queda un evento LUGAR con lo que quitó o puso. Es la misma cuenta
+ * que `danoAlHabitat`, que no puede emitir nada porque la usa la IA.
+ */
+function golpeConLugar(s, r, bando, sinLugar) {
+  const con = ajustarGolpeDeLugar(s, r, sinLugar);
+  if (con !== sinLugar) {
+    avisarLugar(s, r, {
+      jugador: bando, efecto: con > sinLugar ? 'golpeHabitat' : 'guardia', n: Math.abs(con - sinLugar),
+    });
+  }
+  return con;
+}
+
+/** Lo que pegaría al hábitat sin contar el lugar: el Ataque menos la guardia del defensor. */
+const golpeSinLugar = (s, iid, defensor) => Math.max(0, ataqueEfectivo(s, iid) - guardiaDe(s, defensor));
+
 export function faseCombate(s) {
   // Primer turno sin combate: se despliega, se revela, y nadie pega.
   if (s.turno < BALANCE.turnoPrimerCombate) {
@@ -672,7 +696,7 @@ export function faseCombate(s) {
     if (volA || volB) {
       for (const [uno, bando, vuela1] of [[a, 0, volA], [b, 1, volB]]) {
         if (!uno) continue;
-        const d = danoAlHabitat(s, uno.iid, rival(bando));
+        const d = golpeConLugar(s, r, bando, golpeSinLugar(s, uno.iid, rival(bando)));
         alHabitat[rival(bando)] += d;
         ev(s, vuela1 ? 'SOBREVUELO' : 'AVANCE', { ranura: r, iid: uno.iid, bando, dano: d });
       }
@@ -692,6 +716,10 @@ export function faseCombate(s) {
       golpes.push({ iid: a.iid, cantidad: dB, causa: CAUSA.COMBATE, por: 1 });
       golpes.push({ iid: a.iid, cantidad: espinasDe(s, b.iid), causa: CAUSA.ESPINAS, por: 1 });
       golpes.push({ iid: b.iid, cantidad: espinasDe(s, a.iid), causa: CAUSA.ESPINAS, por: 0 });
+      // Las espinas del lugar las llevan los DOS, así que se dicen una vez
+      // por columna y sin bando: es el terreno el que pincha.
+      const espinasLugar = efectoDeLugar(s, r).espinas ?? 0;
+      if (espinasLugar > 0) avisarLugar(s, r, { efecto: 'espinas', n: espinasLugar });
 
       // Desgarro: la herida no cierra en el mismo turno en que se abre.
       if (dA > 0 && carta(a.cardId).rasgo === RASGO.DESGARRO) s.instancias[b.iid].sinCuracion = true;
@@ -720,19 +748,22 @@ export function faseCombate(s) {
       // que restar en las tres ramas es restar una vez por dinosaurio. Y el
       // lugar de la columna ajusta el golpe en las tres por lo mismo.
       if (BALANCE.cuerpo.sobranteAlHabitat) {
-        alHabitat[1] += ajustarGolpeDeLugar(s, r, Math.max(0, sobraA * dobla(a) - guardiaDe(s, 1)));
-        alHabitat[0] += ajustarGolpeDeLugar(s, r, Math.max(0, sobraB * dobla(b) - guardiaDe(s, 0)));
+        const porLugar = sobranteDeLugar(s, r);
+        for (const [sobra, uno, bando] of [[sobraA, a, 0], [sobraB, b, 1]]) {
+          if (sobra > 0 && porLugar !== 1) avisarLugar(s, r, { jugador: bando, efecto: 'sobrante', n: porLugar });
+          alHabitat[rival(bando)] += golpeConLugar(s, r, bando, Math.max(0, sobra * dobla(uno) - guardiaDe(s, rival(bando))));
+        }
       }
 
       ev(s, 'CHOQUE', { ranura: r, a: a.iid, b: b.iid, danoA: dA, danoB: dB });
 
     } else if (a) {
-      const d = danoAlHabitat(s, a.iid, 1);
+      const d = golpeConLugar(s, r, 0, golpeSinLugar(s, a.iid, 1));
       alHabitat[1] += d;
       ev(s, 'AVANCE', { ranura: r, iid: a.iid, bando: 0, dano: d });
 
     } else if (b) {
-      const d = danoAlHabitat(s, b.iid, 0);
+      const d = golpeConLugar(s, r, 1, golpeSinLugar(s, b.iid, 0));
       alHabitat[0] += d;
       ev(s, 'AVANCE', { ranura: r, iid: b.iid, bando: 1, dano: d });
     }
@@ -747,9 +778,16 @@ export function faseCombate(s) {
   for (const inst of todasLasUnidades(s)) {
     if (inst.sinCuracion) { inst.sinCuracion = false; continue; }
     const cura = curacionDe(s, inst.iid);
+    const lugar = efectoDeLugar(s, inst.ranura);
     if (cura > 0 && inst.heridas > 0) {
+      // Lo que curó el lugar, como mucho lo que había que curar.
+      const delLugar = Math.min(lugar.cura ?? 0, inst.heridas);
       inst.heridas = Math.max(0, inst.heridas - cura);
       ev(s, 'CURACION', { iid: inst.iid, dueno: inst.dueno, cura });
+      if (delLugar > 0) avisarLugar(s, inst.ranura, { jugador: inst.dueno, efecto: 'cura', n: delLugar, iid: inst.iid });
+    } else if (lugar.sinCuracion && inst.heridas > 0 && curacionPropia(s, inst.iid) > 0) {
+      // Habría curado y las Salinas no dejaron: eso también se ve.
+      avisarLugar(s, inst.ranura, { jugador: inst.dueno, efecto: 'sinCuracion', n: 0, iid: inst.iid });
     }
   }
 
