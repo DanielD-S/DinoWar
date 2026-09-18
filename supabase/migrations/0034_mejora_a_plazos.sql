@@ -23,8 +23,11 @@ alter table public.yacimientos
 
 -- Invierte lo que hay en el depósito, hasta lo que falta. Si con eso se llega
 -- al coste, sube el nivel y lo invertido vuelve a cero. Misma firma que antes
--- —sin argumentos— para que un cliente viejo siga llamando a lo mismo.
-create or replace function public.mejorar_yacimiento()
+-- —sin argumentos— para que un cliente viejo siga llamando a lo mismo; pero
+-- devuelve una columna más, y Postgres no deja cambiar el tipo de salida con
+-- `create or replace`: hay que tirarla antes.
+drop function if exists public.mejorar_yacimiento();
+create function public.mejorar_yacimiento()
 returns table (nivel int, fosiles int, invertido int)
 language plpgsql security definer set search_path = public as $$
 declare
