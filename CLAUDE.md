@@ -2668,6 +2668,14 @@ Cinco cosas que conviene saber antes de volver a tocarlo:
   de la Morrison a 270 en el último de Kem Kem— y los sobres de logros un
   35 %. Los dos MAZOS no se tocan: no son sobres, son las cartas de los otros
   dos iniciales y el único camino que hay a ellos.
+- **Aplicado y desplegado el 18-09-2026.** La PR #133 se mergeó con MERGE, así
+  que `9cbac5b` vive en `main`; la función quedó anclada a ese commit y se
+  desplegó por MCP como **v34**, con el `ezbr_sha256` pasando de `a1861577…` a
+  `15d0deda…`. Del fichero desplegado se comprobó ANTES, con `diff` sobre el
+  SHA normalizado, que era el anterior con el anclaje cambiado y nada más:
+  once apariciones, ni una línea de código. Y otra vez el **timeout de
+  jsDelivr con el commit frío** en el primer intento, que pasó al segundo sin
+  tocar nada: es el caso ya documentado y conviene no volver a diagnosticarlo.
 - **Recortar los premios movía el otro grifo sin querer, y por eso el divisor
   de rejugar volvió de 5 a 3.** Rejugar paga `premio ÷ divisor` con el suelo
   de una victoria, así que bajar los premios al 0,6 habría bajado también lo
