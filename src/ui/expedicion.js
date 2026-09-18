@@ -16,6 +16,8 @@
 // formaciones no lo paga. El día que sean diez, sí.
 
 import { EXPEDICIONES, visitanteDe, claveDeVictoria, requisitoDe, rivalPorId } from '../data/expediciones.js';
+import { REJUGAR, pagoDeRejugar } from '../data/rejugar.js';
+import { ECONOMIA } from '../data/coleccion.js';
 import { traerExpediciones, expedicionesEnCache } from './perfil.js';
 import { arte } from './art.js';
 
@@ -196,9 +198,15 @@ function abrirCartela(rivalId) {
   const estado = estadoDe(r.id);
   const req = requisitoDe(r.id);
   const esVisitante = !encontrado.expedicion;
+  // Vencido, lo que importa ya no es el premio de la primera sino lo que paga
+  // volver: un tercio del suyo, y nunca menos que una victoria normal. Los
+  // nodos del final de cada mapa pagan el triple que uno cualquiera, que es lo
+  // que hace que el mapa se vuelva a jugar.
+  const vuelta = pagoDeRejugar(r.premio);
   const premio = estado === 'vencido'
-    ? (esVisitante ? 'Ya lo venciste esta semana: ganar paga lo de una victoria normal.'
-      : 'Ya vencido: ganar paga lo de una victoria normal.')
+    ? (vuelta > ECONOMIA.monedasVictoria
+      ? `Ya vencido · rejugar paga <b>+${vuelta} ◈</b>, hasta ${REJUGAR.porDia} veces al día.`
+      : `Ya vencido: rejugar paga lo de una victoria normal, +${vuelta} ◈.`)
     : `Primera victoria: <b>+${r.premio} ◈</b>${esVisitante ? ' esta semana' : ''}`;
   const cerrado = estado === 'bloqueado'
     ? `<p class="exp-cartela-aviso">Vence antes a ${escapar(rivalPorId(req).rival.nombre)}.</p>` : '';

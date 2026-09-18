@@ -921,6 +921,39 @@ discute otra vez:
   80 %. Con la extinción en el 0 %, las ranuras gastadas en moler son ranuras
   que no pegan.
 
+### Rejugar un nodo paga según el rival
+
+Antes: la primera victoria pagaba el premio del nodo —de 30 a 450— y volver a
+ganarle pagaba las 50 planas de cualquier partida. O sea que **El último rey,
+que se gana el 47 % de las veces, pagaba lo mismo que el primer nodo de la
+Morrison, que se gana el 100 %**: los 32 nodos eran contenido de un solo uso y
+lo óptimo era repetir el MÁS FÁCIL. Desde el 18-09-2026 (`0035`,
+`src/data/rejugar.js`) rejugar paga **un tercio del premio del nodo**, y nunca
+menos que una victoria normal.
+
+- **Un tercio, no la mitad, porque la media no puede subir.** El premio medio
+  de los 37 rivales es 166, así que un tercio son 55, casi las 50 de siempre:
+  lo que cambia es el REPARTO —50 en los flojos, 150 en el último de Kem Kem—
+  y no el grifo. Con la mitad, un jugador normal ganaba un 180 % más al día.
+  `test/rejugar.test.js` falla si la media se va por encima de 1,35 victorias.
+- **Sólo la mitad de atrás de cada mapa paga más de 50**, que es el premio de
+  haber llegado: por debajo de 150 de premio, un tercio no llega a la victoria
+  normal y manda el suelo.
+- **Tope de tres por nodo y día.** Sin él, rejugar el mejor nodo cincuenta
+  veces daría 7.500 monedas diarias contra las 2.500 de ahora. Con él hay que
+  rotar, que es lo que hace que el mapa se vuelva a jugar. El tope de
+  victorias pagadas del día (`ECONOMIA.victoriasPorDia`) sigue por encima.
+- **`aplicar_expedicion` conserva su firma**, que la llama la Edge Function y
+  cambiarla obliga a re-empaquetar, re-anclar y desplegar. Por eso paga la
+  DIFERENCIA sobre la victoria normal —que ya cobra `aplicar_partida`— y lee
+  las 50 de `catalogo_economia` en vez de recibirlas. **Este cambio es SQL y
+  cliente: no hubo despliegue.**
+- **Los números están en dos sitios y un test los compara**: `rejugar.js` para
+  lo que enseña la cartela del mapa, y la migración para quien paga. Es la
+  trampa de «regenerar no es aplicar» por otra puerta.
+- Y de rebote sube el **entrenamiento** del Duelo, que juega los dos últimos
+  nodos de cada mapa: ganarle a uno de ésos paga ahora entre 67 y 150.
+
 El arte llega aparte (`tools/expediciones.py`, prompts en `PROMPTS.md`) y puede
 no estar: el mapa es un degradado y los medallones son círculos de CSS
 mientras tanto. El juego sabe qué piezas hay por `assets/piel/expediciones/indice.json`,

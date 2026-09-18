@@ -966,8 +966,15 @@ function premioTexto(n, cobro = null) {
   // La primera victoria contra un rival del mapa se dice aparte, como las
   // misiones: sumada al premio, «+130» no diría de dónde sale cada parte.
   const exp = cobro?.expedicion;
+  // Rejugar un nodo vencido paga un tercio de su premio y nunca menos que una
+  // victoria; el SQL manda la diferencia, así que un extra de 0 es un nodo
+  // flojo y no un fallo. Con el tope del día gastado se dice, que si no unas
+  // monedas que no llegan se leen como un error.
+  const porRejugar = !exp?.rejugada ? ''
+    : exp.premio > 0 ? ` · rival ya vencido: +${exp.premio}`
+      : exp.veces >= (exp.tope ?? 0) && exp.tope ? ` · ya cobraste las ${exp.tope} vueltas de hoy a ese rival` : '';
   const porExpedicion = exp?.primera ? ` · primera victoria: +${exp.premio}`
-    : exp?.cerrado ? ' · ese rival aún estaba cerrado: sin premio de primera victoria' : '';
+    : exp?.cerrado ? ' · ese rival aún estaba cerrado: sin premio de primera victoria' : porRejugar;
   const base = (n > 0 ? `+${n} dinomonedas` : 'Sin dinomonedas: sólo las da ganar') + porExpedicion;
   const porMisiones = Number(cobro?.misiones ?? 0);
   const cuantas = cobro?.cumplidas?.length ?? 0;
