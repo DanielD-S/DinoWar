@@ -714,9 +714,9 @@ diagnóstico estaba al revés:
 |---|---|---|---|---|---|
 | 60 | 9,89 ❌ | 47,2 % | 71,4 % | 19 / 80 / 0 | 2 de 6 |
 | 65 | 10,34 | 47,0 % | 71,3 % | 24 / 76 / 0 | 3 de 6 |
-| **70 (hoy)** | 10,75 | 46,3 % | 71,2 % | 29 / 71 / 0 | **3 de 6** |
+| 70 (hasta el 18-09) | 10,75 | 46,3 % | 71,2 % | 29 / 71 / 0 | 3 de 6 |
 | 80 | 11,49 | 46,4 % | 70,3 % | 39 / 61 / 1 | 3 de 6 |
-| **90** | 12,09 | 45,3 % | **70,0 % ✅** | **47 / 52 / 1** | **4 de 6** |
+| **90 (hoy)** | 12,09 | 45,3 % | **70,0 % ✅** | **47 / 52 / 1** | **4 de 6** |
 | 100 | 12,60 | 44,8 % | 69,5 % ✅ | 57 / 42 / 1 | 4 de 6 |
 
 **El hábitat no es la vía cerrada: es la vía que se lleva el 71 % de las
@@ -730,9 +730,44 @@ A **90** la bola de nieve entra en objetivo por primera vez, el reparto queda
 47/52 —las dos vías principales casi parejas— y el balance pasa a 4 de 6. Lo
 que cuesta: el jugador inicial baja un punto más, las ocho cartas de la ronda
 del hábitat valen menos (56 de daño directo contra 90 en vez de contra 70), los
-jefes escalan solos porque `habitatDeAsalto()` es ×3, y es `BALANCE.vidaHabitat`,
-que va dentro del paquete de la Edge Function: re-anclar y desplegar. **No se
-ha tocado: es decisión del autor.**
+jefes escalan solos porque `habitatDeAsalto()` es ×3 —de 210 a 270—, y es
+`BALANCE.vidaHabitat`, que va dentro del paquete de la Edge Function: re-anclar
+y desplegar. **Decidido por el autor el 18-09-2026: hábitat a 90, trofeos en
+10.** Lo que hay que saber de esa decisión está en la sección que sigue.
+
+### Subir los trofeos con el hábitat NO: se midió 80·15 y es lo peor
+
+Con el hábitat a 90 se preguntó si había que subir también los trofeos para
+que las dos vías crecieran a la par. Se midió, 2.000 partidas por casilla y
+DOS semillas (1 y 5001) en las que importaban, y la respuesta es que no:
+
+| hábitat · trofeos | duración | inicial | bola | trofeos / hábitat / extinción |
+|---|---|---|---|---|
+| **90 · 10** | 12,09 | 45,3 % | 70,0 % ✅ | **47 / 52 / 1** |
+| 90 · 11 | 12,72 | 46,5 % | 69,5 % | 34 / 64 / 2 |
+| 90 · 12 | 13,13 | 46,8 % | 68,7 % | 23 / 74 / 3 |
+| 90 · 13 | 13,40 | 46,8 % | 67,7 % | 15 / 81 / 4 |
+| 90 · 15 | 13,67 | 47,4 % | 67,5 % | 5 / 88 / 7 |
+| 80 · 12 | 12,27 | 47,0 % | 68,8 % | 17 / 82 / 2 |
+| 80 · 14 | 12,54 | 47,9 % | 67,9 % | 6 / 91 / 3 |
+| 80 · 15 | 12,61 | 48,0 % → 45,5 % | 67,6 % → 70,3 % | **3 / 93 / 4** |
+
+- **Cada trofeo de más se lleva un tercio de la vía de trofeos.** Once ya
+  la baja de 47 a 34; a quince prácticamente no existe. Los 10 trofeos de
+  hoy no son un número suelto: son los que una partida de doce turnos llega a
+  juntar, y subirlos es cerrar la vía por el otro lado.
+- **80·15 pareció bueno una tarde y era ruido.** Con la semilla 1 daba el
+  inicial en 48,0 % y la bola en 67,6 %, dos objetivos cumplidos que ninguna
+  otra casilla cumplía; con la 5001 salieron 45,5 y 70,3, o sea lo de siempre.
+  Lo que NO cambió con la semilla fue el reparto: 3 % de trofeos las dos
+  veces. Ésa es la señal estable, y es la peor de la tabla. **Un resultado
+  que cambia de signo con la semilla no es un resultado**, y con 2.000
+  partidas el inicial y la bola se mueven hasta 2,5 puntos: cualquier cifra
+  que se acerque a un objetivo por menos de eso pide una segunda semilla.
+- **90·10 es la casilla**: la bola en objetivo con las dos semillas (70,0 y
+  71,0), el inicial en 45,3–45,8, las dos vías principales a la par. Lo único
+  que le queda fuera es el reparto, y sólo por la extinción al 1 %: el mazo
+  espejo no muele, y esa vía está medida donde se mide (`sim/arquetipos.mjs`).
 
 ### El freno sí muerde, y sólo en su carril
 
@@ -1966,10 +2001,11 @@ Lo que cambia de flujo y no sólo de piel:
   cuando el servidor contesta, baja la barra hasta lo que queda. La
   transición es literalmente lo que le has quitado. `pintarFin()` lo vacía en
   las partidas normales.
-- **El jefe pelea con el TRIPLE de hábitat** (`habitatDeAsalto()`, 210) y el
-  marcador tiene que saberlo: el tope estaba fijo en `BALANCE.vidaHabitat`, así
-  que el jefe se leía «210 / 70» y su barra salía al 300 % —llena y quieta
-  hasta bajar de 70, o sea las dos terceras partes del asalto sin moverse—.
+- **El jefe pelea con el TRIPLE de hábitat** (`habitatDeAsalto()`; 210 cuando
+  el hábitat era 70, 270 desde el 18-09-2026) y el marcador tiene que saberlo:
+  el tope estaba fijo en `BALANCE.vidaHabitat`, así que el jefe se leía
+  «210 / 70» y su barra salía al 300 % —llena y quieta hasta bajar de 70, o
+  sea las dos terceras partes del asalto sin moverse—.
   `fijarTopesHabitat()` lo pone al empezar cada partida; el tope NO está en el
   estado del motor, igual que subirle el hábitat al jefe tampoco: es una
   decisión de la partida, no una regla nueva. El servidor usa el mismo
@@ -3124,10 +3160,12 @@ Dicho para que nadie lo descubra tarde:
   un correo que no es tuyo. Para activarla hace falta un SMTP propio: el
   integrado de Supabase manda 2 correos a la hora y sólo a direcciones del
   equipo.
-- **El balance cumple 3 de 6** (`BALANCE.md`, mazo de referencia del
-  16-09-2026 y lugares del 17-09): cero cartas descalibradas y la duración en
-  objetivo; el jugador inicial en 46,3 %, la bola de nieve en 71,2 % y las
-  vías en 29/71/0 (45,4 %, 71,2 % y 25/75/0 con el tablero plano). La referencia nueva queda al 48–52 % contra Molienda, Entierro y
+- **El balance cumple 4 de 6** (`BALANCE.md`, mazo de referencia del
+  16-09-2026, lugares del 17-09 y hábitat a 90 desde el 18-09): cero cartas
+  descalibradas, la duración en objetivo (12,1 turnos) y la bola de nieve en
+  la raya (70,0 %; 71,0 % con la semilla 5001); el jugador inicial en 45,3 %
+  y las vías en 47/52/1, que fallan sólo por la extinción. Con el hábitat a
+  70 eran 3 de 6: 46,3 %, 71,2 % y 29/71/0. La referencia nueva queda al 48–52 % contra Molienda, Entierro y
   Hábitat (la del 13-09 perdía el 70–75 %), así que los seis números vuelven
   a hablar del juego y no de un mazo que cualquier construcción bate. Lo que
   no cambió: **108 de las 139** cartas siguen fuera de él, o sea sin
@@ -3153,10 +3191,12 @@ Dicho para que nadie lo descubra tarde:
   para ellas gana el 75 % a la referencia con el 58 % de sus victorias por
   TROFEOS y sólo el 17 % por hábitat, que es lo mismo que saca la propia
   referencia. Rehacerlo con muros que no matan lo empeora por los dos lados.
-  El techo es aritmético: el set entero suma 56 de daño directo contra 70 de
-  hábitat, y de un mazo de 55 se ven 34 cartas en trece turnos. **Los dos
-  caminos —bajar los 70, o media ronda más de daño directo— son decisión del
-  autor**, y los números para decidirlo están en «La ronda del hábitat».
+  El techo es aritmético: el set entero suma 56 de daño directo contra 90 de
+  hábitat desde el 18-09-2026 (contra 70 cuando se midió), y de un mazo de 55
+  se ven 34 cartas en trece turnos. Bajar el umbral se midió y empeora (ver
+  «Bajar el hábitat a 60 no ayuda»); lo que queda es **media ronda más de
+  daño directo**, y con el hábitat a 90 hace más falta que antes. Los
+  números están en «La ronda del hábitat».
   Lo que sí quedó cerrado es el carril defensivo: las tres cartas de freno
   le quitan nueve puntos por partida y le bajan las victorias por hábitat del
   16 % al 6 % sin cambiar quién gana.
