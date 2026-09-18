@@ -28,7 +28,7 @@ function inicial(ahora) {
   return {
     v: 1,
     arranque: ahora,
-    yacimiento: { nivel: 1, fosiles: 0, desde: ahora },
+    yacimiento: { nivel: 1, fosiles: 0, invertido: 0, desde: ahora },
     almacen: 600,          // para el primer par de asaltos, que si no la
                            // pantalla se abre con todo bloqueado
     aportado: 0,
@@ -49,6 +49,7 @@ function sanear(bruto, ahora) {
     yacimiento: {
       nivel: Math.min(CUENCA.nivelMaximo, Math.max(1, Math.floor(num(bruto.yacimiento?.nivel, 1)))),
       fosiles: Math.max(0, Math.floor(num(bruto.yacimiento?.fosiles, 0))),
+      invertido: Math.max(0, Math.floor(num(bruto.yacimiento?.invertido, 0))),
       desde: num(bruto.yacimiento?.desde, ahora),
     },
     almacen: Math.max(0, Math.floor(num(bruto.almacen, base.almacen))),
@@ -157,7 +158,7 @@ export function estadoDeTribu(ahora = Date.now()) {
   // El yacimiento acumula con la pestaña cerrada, por diferencia de reloj.
   const y = acumular(c.yacimiento, ahora);
   const activo = jefeActivo(c.arranque, ahora);
-  c = { ...c, yacimiento: { nivel: c.yacimiento.nivel, fosiles: y.fosiles, desde: y.desde } };
+  c = { ...c, yacimiento: { ...c.yacimiento, fosiles: y.fosiles, desde: y.desde } };
   c = avanzarCompaneros(c, ahora, activo);
 
   // El tope de asaltos es por día de cuenca, no por sesión.
@@ -216,19 +217,26 @@ export function aportar(fosiles, ahora = Date.now()) {
   return cantidad;
 }
 
-/** Sube el yacimiento. Se paga con los mismos fósiles que se aportan. */
+/**
+ * Invierte en la mejora lo que hay en el depósito, hasta lo que falta; al
+ * juntar el coste sube el nivel. Se paga con los mismos fósiles que se
+ * aportan, y a plazos porque el depósito nunca llega al coste de una vez.
+ */
 export function mejorarYacimiento(coste, ahora = Date.now()) {
   const c = cargar(ahora);
-  if (c.yacimiento.fosiles < coste || c.yacimiento.nivel >= CUENCA.nivelMaximo) return false;
-  guardar({
-    ...c,
-    yacimiento: {
-      ...c.yacimiento,
-      nivel: c.yacimiento.nivel + 1,
-      fosiles: c.yacimiento.fosiles - coste,
-    },
-  });
-  return true;
+  const y = c.yacimiento;
+  if (y.fosiles <= 0 || y.nivel >= CUENCA.nivelMaximo) return null;
+  const pongo = Math.min(y.fosiles, Math.max(0, coste - y.invertido));
+  if (pongo <= 0) return null;
+  const sube = y.invertido + pongo >= coste;
+  const yacimiento = {
+    ...y,
+    nivel: sube ? y.nivel + 1 : y.nivel,
+    fosiles: y.fosiles - pongo,
+    invertido: sube ? 0 : y.invertido + pongo,
+  };
+  guardar({ ...c, yacimiento });
+  return yacimiento;
 }
 
 /** Le hace daño al jefe y cobra el asalto del almacén común. */

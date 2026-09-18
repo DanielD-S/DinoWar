@@ -2917,6 +2917,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .cu-botones { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 .cu-botones .boton-secundario { flex: 1 1 auto; min-width: 46%; }
+/* La mejora a plazos: lo invertido sobre el coste del nivel que viene. */
+.cu-mejora { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: .85rem; color: var(--tenue); }
+.cu-mejora b { color: var(--texto); }
+.cu-mejora-barra { flex: 1 1 100px; height: 5px; border-radius: 3px; background: rgba(0,0,0,.45); overflow: hidden; }
+.cu-mejora-barra i { display: block; height: 100%; background: var(--acento-claro, #e0b35a); border-radius: 3px; }
 
 /* El aviso de que esto todavía no es multijugador. Va al final y en voz baja,
    pero va: descubrirlo jugando sería peor. */

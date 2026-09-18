@@ -1896,6 +1896,18 @@ Lo que cambia de flujo y no sólo de piel:
     el paquete, re-anclar y volver a desplegar. `test/paquete.test.js` y
     `test/anclaje.test.js` lo cazaron al primer intento. Y aquí no hacía
     falta: quien comprueba el mando es SQL con `auth.uid()`, no la función.
+- **La mejora del yacimiento se paga A PLAZOS** (18-09-2026, `0034`). El botón
+  «Mejorar · 300» llevó apagado desde el primer día para todo el mundo, y no
+  era el botón: la mejora se paga del DEPÓSITO y el depósito de nivel 1 se
+  llena a 168, así que 300 no se juntan nunca; la escalera entera, 300·n²,
+  está por encima del tope en todos los niveles y `test/yacimiento.test.js`
+  lo deja escrito. Bajar el coste hasta que quepa habría hecho de cada nivel
+  un día de producción. Lo que hay es «Invertir en la mejora · N», que pone
+  lo que hay hasta lo que falta, en `yacimientos.invertido`, y sube el nivel
+  al juntar el coste. No se puede sacar: es una obra, no una hucha. La firma
+  de `mejorar_yacimiento()` no cambió y `tribu.js` tampoco, así que ni
+  catálogo nuevo ni re-anclaje; `estado_cuenca` se reescribió con
+  `pg_get_functiondef` para añadir la clave, como la 0018.
 - **La placa de la Cuenca lleva un punto con lo que te espera dentro.** La capa
   cooperativa no avisaba de nada: te aceptaban, te echaban, caía el jefe y
   tenías una carta esperando, y sólo lo veías si entrabas a mirar. `avisos_cuenca`

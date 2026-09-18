@@ -199,6 +199,11 @@ function bloqueYacimiento(c, ahora) {
   const pct = Math.min(100, (fosiles / tope) * 100);
   const coste = costeDeMejora(nivel);
   const falta = faltaParaLlenar(c.yacimiento, ahora);
+  // La mejora se paga A PLAZOS: el depósito nunca llega al coste de una vez
+  // —168 de tope contra 300 a nivel 1—, así que se invierte lo que hay, las
+  // veces que haga falta. El botón dice lo que va a poner ahora mismo.
+  const invertido = Math.max(0, c.yacimiento.invertido ?? 0);
+  const pongo = coste === null ? 0 : Math.min(fosiles, Math.max(0, coste - invertido));
 
   return `<section class="cu-bloque cu-yac">
     <div class="cu-yac-escena" style="--escena: url('assets/piel/cuenca/yacimiento_${estadoDelYacimiento(nivel)}.webp')">
@@ -220,10 +225,13 @@ function bloqueYacimiento(c, ahora) {
       ${coste === null
         ? '<span class="cu-nota">Yacimiento al máximo.</span>'
         : `<button class="boton-secundario" data-accion="mejorar" data-coste="${coste}"
-                   ${fosiles >= coste ? '' : 'disabled'}>Mejorar · ${numero(coste)}</button>`}
+                   ${pongo > 0 ? '' : 'disabled'}>Invertir en la mejora · ${numero(pongo)}</button>`}
     </div>
+    ${coste === null ? '' : `<p class="cu-linea cu-mejora">Nivel ${nivel + 1}: <b>${numero(invertido)}</b> / ${numero(coste)} invertidos
+      <span class="cu-mejora-barra" role="img" aria-label="${numero(invertido)} de ${numero(coste)}"><i style="width:${Math.min(100, (invertido / coste) * 100).toFixed(1)}%"></i></span></p>`}
     <p class="cu-nota">Los fósiles que aportas ya no suben tu yacimiento, y al revés.
-      Ayudar hoy o producir más mañana: ésa es toda la decisión.</p>
+      Ayudar hoy o producir más mañana: ésa es toda la decisión. La mejora se
+      paga a plazos, y lo invertido no se puede sacar.</p>
   </section>`;
 }
 
