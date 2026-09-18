@@ -51,27 +51,45 @@ export const legendariasDinoEn = (mazo) => {
 };
 
 export const ECONOMIA = Object.freeze({
-  // Un sobre son cinco cartas. El precio está por encima de lo que devuelve
-  // fundirlo entero (unas 77 monedas, que lo comprueba un test), porque si no
-  // el bucle se alimenta solo y abrir sobres deja de ser una decisión.
-  precioSobre: 100,
+  // Un sobre son cinco cartas.
+  //
+  // El precio subió de 100 a 300 el 18-09-2026, y con él se recortaron todos
+  // los grifos: es la decisión del autor de que comprar sobres jugando sea
+  // posible y CUESTE, para que quede sitio a venderlos por dinero. Lo que
+  // había medido antes: a 100 monedas y con 50 victorias pagadas al día, la
+  // colección entera —139 cartas, 344 copias, unos 135 sobres— se juntaba en
+  // seis días de juego al tope, y una cuenta con veinte partidas tenía ya 128
+  // de las 139 cartas. Con estos números el techo del día son unos 570 y un
+  // sobre 300: dos sobres diarios jugando mucho, uno jugando normal.
+  //
+  // Lo que NO hace el precio es cerrar un bucle: fundir da ESQUIRLAS y no
+  // monedas desde el 15-09-2026, así que no hay cambio de vuelta y abrir
+  // sobres no se paga solo. `ECONOMIA.fusion` sigue aquí sin usarse porque
+  // quitarlo obliga a re-empaquetar, re-anclar y desplegar por nada.
+  precioSobre: 300,
   cartasPorSobre: 5,
 
   // Las monedas salen de GANAR, no de jugar y tampoco de fundir. Fundir sólo
   // recicla lo que ya no te cabe en ningún mazo.
   //
-  // Perder no paga: dos victorias son un sobre y una derrota no es medio paso
-  // hacia él. El precio de eso es que quien no gana nunca se queda con los dos
-  // sobres de salida y su colección inicial, que es un mazo legal y completo
+  // Perder no paga: diez victorias son un sobre y una derrota no es medio paso
+  // hacia él. El precio de eso es que quien no gana nunca se queda con el
+  // sobre de salida y su colección inicial, que es un mazo legal y completo
   // —jugar nunca se bloquea—, pero la colección deja de crecer sola.
-  monedasInicio: 240,
-  monedasVictoria: 50,
+  //
+  // Las de inicio son exactamente un sobre: con 240 y el precio nuevo, una
+  // cuenta nueva se quedaba sin poder abrir ninguno, que es peor primera
+  // impresión que dos sobres de más.
+  monedasInicio: 300,
+  monedasVictoria: 30,
   monedasDerrota: 0,
 
-  // Tope de victorias PAGADAS al día. No es una regla de juego —jugar no se
-  // limita— sino una cota al abuso: el servidor re-juega cada partida que cobra
-  // y eso cuesta CPU, así que un cliente hostil no puede pedir mil.
-  victoriasPorDia: 50,
+  // Tope de victorias PAGADAS al día. Nació como cota al abuso —el servidor
+  // re-juega cada partida que cobra y eso cuesta CPU— y ahora es además una
+  // pieza de economía: a 50 eran cinco veces más partidas de las que nadie
+  // juega, así que no frenaba nada. A 10, el techo del día es un sobre y pico.
+  // Jugar NO se limita; lo que se limita es cobrar.
+  victoriasPorDia: 10,
 
   // Qué parte de cada sobre mira tu colección antes de sortear la carta. Con 1
   // —como fue hasta el 16-09-2026— no sale una copia repetida mientras te falte

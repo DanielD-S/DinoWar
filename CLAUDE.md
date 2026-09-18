@@ -2544,11 +2544,105 @@ luego el rival; alternar los bandos cambia el resultado en 2 de cada 40
 partidas. El validador del servidor tiene que reproducir ese orden o cobra un
 daño que el jugador no vio.
 
+## La economía, endurecida (18-09-2026)
+
+Decisión del autor: **comprar sobres jugando tiene que ser posible y costar**,
+para que quede sitio a venderlos por dinero. Lo que había, medido antes de
+tocarlo, y que es el motivo entero:
+
+| | antes | ahora |
+|---|---|---|
+| Sobre | 100 | **300** |
+| Victoria | 50 | **30** |
+| Victorias pagadas al día | 50 | **10** |
+| Monedas de inicio | 240 | **300** (un sobre justo) |
+| Misiones del día | 85–150 | **50–100** |
+| Rejugar un nodo | premio ÷ 3 | **premio ÷ 5** |
+| Techo del día | 2.650 = 26 sobres | **580 = 1,9 sobres** |
+| Día normal (6 victorias) | 400 = 4 sobres | **255 = 0,85 sobres** |
+| Colección entera (135 sobres) | 6 días al tope | **70 al tope, 159 normal** |
+
+Y el dato que lo cerró, de producción y no de una simulación: **una cuenta con
+VEINTE partidas jugadas tenía 128 de las 139 cartas distintas y 3.016 monedas
+sin gastar.** Esa colección no vino de comprar sobres: vino de los logros —23
+sobres gratis y dos mazos iniciales— y de los premios de primera victoria.
+
+Cinco cosas que conviene saber antes de volver a tocarlo:
+
+- **El tope de victorias pagadas dejó de ser sólo anti abuso.** Nació para que
+  un cliente hostil no hiciera re-jugar mil partidas al servidor, y a 50 era
+  cinco veces más de lo que nadie juega, así que no frenaba nada. A 10 es una
+  pieza de economía: el techo del día es un sobre y pico. **Jugar no se limita,
+  se limita cobrar**, y eso hay que decirlo en pantalla o se lee como un
+  candado.
+- **Los grifos son cuatro y cualquiera los deshace solo.** Precio, victoria,
+  tope y misiones: bajar el precio a 200 o subir el tope a 25 devuelve la
+  economía de antes sin que falle ningún test de los otros. Por eso
+  `test/grifos.test.js` mide el TECHO en sobres —entre 1 y 2 al día— y no las
+  constantes por separado.
+- **Lo de UNA VEZ no se recortó**, y es lo que más pesa ahora: los premios de
+  primera victoria suman 6.130 (20 sobres) y los logros regalan 23 sobres más
+  dos mazos iniciales. Con el sobre a 300 ya valen tres veces menos que antes,
+  y son finitos: se agotan y no vuelven. Si algún día la curva sigue
+  pareciendo corta, ése es el sitio donde queda por cortar, no el grifo diario.
+- **El divisor de rejugar depende de lo que pague una victoria.** No es un
+  número suelto: se elige para que la media de rejugar los 37 rivales no se
+  separe de una victoria. Con victorias a 50 era 3; con 30 es 5, y la media
+  sale 39, o sea 1,3 victorias, con el mejor nodo en 3. Cambiar
+  `monedasVictoria` obliga a revisar `REJUGAR.divisor` y su migración.
+- **Al aplicar, el orden importa y la ventana no es simétrica.** Los números
+  viven en `catalogo_economia` (la 0006 regenerada) y el sobre lo cobra
+  `aplicar_sobre` de ahí, mientras el BOTÓN dice lo que trae el cliente. Con el
+  SQL aplicado antes de mergear, el botón dice 100 y el servidor cobra 300: el
+  jugador se come un «te faltan monedas» y no pierde nada. Al revés —cliente
+  antes que SQL— el botón pide 300 y el servidor cobra 100, o sea sobres
+  regalados. **Primero el SQL, después el cliente**, y la función después, que
+  lleva `coleccion.js` dentro y es la que paga las victorias.
+
+### Los precios de dinero real, propuestos y sin implementar
+
+Con el sobre a 300 monedas y un día normal dando 255, **un sobre es un día de
+juego**: ése es el ancla que hace que pagar tiente. La escalera propuesta, en
+pesos chilenos, con lo que queda después del IVA del 19 % y de una comisión de
+pasarela del 3,5 %:
+
+| producto | sobres | CLP | CLP/sobre | neto aprox. | días que ahorra |
+|---|---|---|---|---|---|
+| Sobre suelto | 1 | 990 | 990 | ~800 | 1 |
+| Camada | 3 | 2.690 | 897 | ~2.180 | 3,5 |
+| Yacimiento | 8 | 5.990 | 749 | ~4.860 | 9 |
+| Excavación | 20 | 12.990 | 650 | ~10.540 | 24 |
+| Cantera | 45 | 24.990 | 555 | ~20.280 | 53 |
+
+- **La escalera baja de 990 a 555 por sobre**, un 44 %. Los 2.890 por tres que
+  se propusieron primero son un 2,7 % de descuento: no mueven a nadie del
+  sobre suelto, y el descuento por volumen es justo lo que sube el gasto medio.
+- **Cuidado con la comisión FIJA.** Una pasarela que cobre ~300 CLP por
+  transacción se lleva el 30 % de un sobre de 990 y el 1,2 % de una Cantera:
+  con comisión fija, el sobre suelto es escaparate y la venta está en los
+  packs. Los netos de la tabla suponen comisión sólo porcentual, así que **hay
+  que confirmar las tarifas reales antes de fijar precios**.
+- **El suelo a cubrir son 25 USD al mes** (Supabase Pro), unos 24.000 CLP: una
+  Excavación al mes lo paga. Y el techo del gasto es la colección entera, 135
+  sobres, unos 75.000 CLP en tres Canteras: ése es el número que decide si esto
+  es pay to win, y conviene tenerlo escrito antes que descubrirlo.
+
 ## La tienda: cosméticos con dinomonedas
 
-La regla del autor manda sobre todo lo de esta sección: **«no es un pay to
-win, sólo se comprarían cosas estéticas»**. Nada de la tienda cambia una
-carta, un mazo ni lo rápido que se progresa.
+La regla del autor mandó sobre esta sección hasta el 18-09-2026: **«no es un
+pay to win, sólo se comprarían cosas estéticas»**. De lo que HOY hay en la
+tienda sigue siendo cierto: ningún cosmético cambia una carta, un mazo ni lo
+rápido que se progresa.
+
+**Lo que cambió es el plan de dinero real**: ese día el autor decidió vender
+SOBRES por dinero, y con eso la regla deja de describir el juego entero. Está
+dicho aquí sin adornos porque es la clase de decisión que se olvida y luego
+nadie sabe por qué el juego es como es: **quien pague tendrá la colección
+antes que quien juegue**. Lo que lo acota es lo que ya existe —el tope de tres
+legendarias por mazo, el crafteo que deja ELEGIR la carta, y que un mazo
+inicial es legal y completo— y lo que se midió para que jugar siga llevando a
+algún sitio está en «La economía, endurecida». Nada de esto está
+implementado: no hay pasarela de pago ni producto de sobres en el catálogo.
 
 - **El catálogo es un DATO**, [`src/data/cosmeticos.js`](src/data/cosmeticos.js),
   y el generador lo escribe en la 0006 (`catalogo_cosmeticos`). Cada tipo tiene
@@ -2608,8 +2702,10 @@ carta, un mazo ni lo rápido que se progresa.
   pide un sobre al servidor CADA vez, con la ceremonia de cada uno y una sola
   rejilla al final. Así la Edge Function no sabe de packs —no hay que
   re-empaquetar ni re-anclar— y si un sobre falla a medias, los anteriores
-  están pagados y abiertos y se enseñan con el motivo. Si algún día hay
-  dinero real, no se venden por dinero.
+  están pagados y abiertos y se enseñan con el motivo. El precio
+  por sobre es el mismo suelto que en pack, y el descuento por volumen se
+  guarda para los packs de DINERO, que es donde sube el gasto medio: en
+  monedas, un pack con descuento aceleraría el progreso.
 
 ## Instalarlo como app
 

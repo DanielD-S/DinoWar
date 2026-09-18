@@ -710,7 +710,7 @@ delete from public.catalogo_cartas where card_id not in (
 insert into public.catalogo_economia
   (id, precio_sobre, cartas_por_sobre, monedas_inicio, monedas_victoria,
    monedas_derrota, tamano_mazo, mazos_maximo, legendarias_dino_max)
-values (1, 100, 5, 240, 50, 0, 55, 12, 3)
+values (1, 300, 5, 300, 30, 0, 55, 12, 3)
 on conflict (id) do update set
   precio_sobre = excluded.precio_sobre,
   cartas_por_sobre = excluded.cartas_por_sobre,

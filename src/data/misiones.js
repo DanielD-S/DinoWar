@@ -186,6 +186,10 @@ export function cerrarParte(parte, { ganada, turnos, trofeos }) {
 // El `premio` va por dificultad y el techo del día lo vigila un test: tres
 // misiones no pueden pagar más que un sobre y medio, o abrir el juego un rato
 // deja de ser un extra y pasa a ser la forma barata de tenerlo todo.
+//
+// Los premios bajaron un 40 % el 18-09-2026, con el sobre de 100 a 300: el día
+// más caro paga 100 y el más barato 50, o sea entre un sexto y un tercio de
+// sobre. Antes eran entre 0,85 y 1,5 sobres diarios sólo por asomarse.
 
 const M = (id, nombre, texto, mide, meta, premio) => Object.freeze({
   id, nombre, texto, mide, meta, premio,
@@ -194,53 +198,53 @@ const M = (id, nombre, texto, mide, meta, premio) => Object.freeze({
 export const CATALOGO = Object.freeze([
   // Las de jugar: se cumplen solas si juegas, y están para que un día malo
   // pague algo. Son las baratas a propósito.
-  M('jugar_tres', 'Trabajo de campo', 'Juega 3 partidas', 'partidas', 3, 25),
-  M('ganar_una', 'Una buena jornada', 'Gana 1 partida', 'victorias', 1, 25),
-  M('ganar_dos', 'Racha', 'Gana 2 partidas', 'victorias', 2, 45),
+  M('jugar_tres', 'Trabajo de campo', 'Juega 3 partidas', 'partidas', 3, 15),
+  M('ganar_una', 'Una buena jornada', 'Gana 1 partida', 'victorias', 1, 15),
+  M('ganar_dos', 'Racha', 'Gana 2 partidas', 'victorias', 2, 30),
 
   // Las de jugar de una MANERA: piden armar el mazo pensando en ellas, que es
   // lo que las hace valer la pena. Los números salen de una partida normal de
   // 15 turnos, donde se despliegan entre 8 y 12 criaturas.
-  M('bajas_seis', 'Depredación', 'Derriba 6 criaturas rivales', 'bajas', 6, 40),
-  M('habitat_diez', 'Asedio', 'Hazle 10 de daño al hábitat rival', 'danoHabitat', 10, 40),
-  M('trofeos_seis', 'Registro fósil', 'Consigue 6 trofeos', 'trofeos', 6, 40),
-  M('desplegar_doce', 'Ecosistema', 'Despliega 12 criaturas', 'desplegados', 12, 35),
-  M('climas_tres', 'Meteorología', 'Impón 3 climas', 'climas', 3, 35),
+  M('bajas_seis', 'Depredación', 'Derriba 6 criaturas rivales', 'bajas', 6, 25),
+  M('habitat_diez', 'Asedio', 'Hazle 10 de daño al hábitat rival', 'danoHabitat', 10, 25),
+  M('trofeos_seis', 'Registro fósil', 'Consigue 6 trofeos', 'trofeos', 6, 25),
+  M('desplegar_doce', 'Ecosistema', 'Despliega 12 criaturas', 'desplegados', 12, 20),
+  M('climas_tres', 'Meteorología', 'Impón 3 climas', 'climas', 3, 20),
 
   // Las de clado: una por familia. Empujan a probar cartas que no están en el
   // mazo de siempre, que es el otro problema del set —39 de 66 cartas fuera del
   // mazo de referencia—. Los pterosaurios y los marinos piden menos: hay muchas
   // menos cartas suyas y no caben cinco en cualquier mazo.
-  M('teropodos', 'Caza mayor', 'Despliega 5 terópodos', porClado(CLADO.TEROPODO), 5, 40),
-  M('sauropodos', 'Manada', 'Despliega 5 saurópodos', porClado(CLADO.SAUROPODO), 5, 40),
-  M('tireoforos', 'Coraza', 'Despliega 4 tireóforos', porClado(CLADO.TIREOFORO), 4, 40),
-  M('ornitopodos', 'Ramoneo', 'Despliega 5 ornitópodos', porClado(CLADO.ORNITOPODO), 5, 40),
-  M('marginocefalos', 'Testarazo', 'Despliega 4 marginocéfalos', porClado(CLADO.MARGINOCEFALO), 4, 40),
-  M('pterosaurios', 'Sombra en el cielo', 'Despliega 3 pterosaurios', porClado(CLADO.PTEROSAURIO), 3, 45),
-  M('marinos', 'Mar de Sundance', 'Despliega 3 reptiles marinos', porClado(CLADO.MARINO), 3, 45),
+  M('teropodos', 'Caza mayor', 'Despliega 5 terópodos', porClado(CLADO.TEROPODO), 5, 25),
+  M('sauropodos', 'Manada', 'Despliega 5 saurópodos', porClado(CLADO.SAUROPODO), 5, 25),
+  M('tireoforos', 'Coraza', 'Despliega 4 tireóforos', porClado(CLADO.TIREOFORO), 4, 25),
+  M('ornitopodos', 'Ramoneo', 'Despliega 5 ornitópodos', porClado(CLADO.ORNITOPODO), 5, 25),
+  M('marginocefalos', 'Testarazo', 'Despliega 4 marginocéfalos', porClado(CLADO.MARGINOCEFALO), 4, 25),
+  M('pterosaurios', 'Sombra en el cielo', 'Despliega 3 pterosaurios', porClado(CLADO.PTEROSAURIO), 3, 30),
+  M('marinos', 'Mar de Sundance', 'Despliega 3 reptiles marinos', porClado(CLADO.MARINO), 3, 30),
 
   // Las del jefe y las de duelo. No salen de una partida contra la IA: hay que
   // bajar a la cuenca o buscar rival, y un día sin jefe abierto o sin nadie
   // conectado es un día en que ésa de las tres no se cumple. Se aceptó así:
   // es lo que las hace pedir algo. Pagan por debajo de la relámpago para que
   // el peor día posible siga cabiendo en el techo.
-  M('asalto_uno', 'Bajar a la cuenca', 'Asalta al jefe 1 vez', 'asaltos', 1, 40),
-  M('dano_jefe', 'Al hueso', 'Hazle 40 de daño al jefe', 'danoJefe', 40, 45),
-  M('duelo_uno', 'Cara a cara', 'Juega 1 duelo', 'duelos', 1, 40),
-  M('duelo_ganar', 'Mano a mano', 'Gana 1 duelo', 'duelosGanados', 1, 45),
+  M('asalto_uno', 'Bajar a la cuenca', 'Asalta al jefe 1 vez', 'asaltos', 1, 25),
+  M('dano_jefe', 'Al hueso', 'Hazle 40 de daño al jefe', 'danoJefe', 40, 30),
+  M('duelo_uno', 'Cara a cara', 'Juega 1 duelo', 'duelos', 1, 25),
+  M('duelo_ganar', 'Mano a mano', 'Gana 1 duelo', 'duelosGanados', 1, 30),
 
   // La de expedición mide partidas JUGADAS y no primeras victorias: los nodos
   // se acaban, y quien ha recorrido los cuatro mapas sólo estrena rival una vez
   // por semana. Una misión que la mitad del año no se puede cumplir no pide
   // algo, sobra. Por eso `expedicionNuevos` se queda para los logros.
-  M('expedicion_dos', 'Prospección', 'Juega 2 partidas de expedición', 'expediciones', 2, 40),
+  M('expedicion_dos', 'Prospección', 'Juega 2 partidas de expedición', 'expediciones', 2, 25),
 
   // La difícil del día. Una sola, y paga como tal.
   // El texto dice «1 partida» y no «una» a propósito: el guardián de
   // `misiones.test.js` pide que el texto cite la meta, igual que el de las
   // cartas pide que cite su número, y con la letra no lo encuentra.
   M('relampago', 'Golpe seco', `Gana 1 partida en ${MISIONES.turnosRelampago} turnos o menos`,
-    'relampago', 1, 60),
+    'relampago', 1, 40),
 ]);
 
 export const POR_ID = Object.freeze(Object.fromEntries(CATALOGO.map((m) => [m.id, m])));

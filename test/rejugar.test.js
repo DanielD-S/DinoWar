@@ -16,7 +16,10 @@ import { ECONOMIA } from '../src/data/coleccion.js';
 import { EXPEDICIONES, VISITANTES } from '../src/data/expediciones.js';
 
 const TODOS = [...EXPEDICIONES.flatMap((e) => e.rivales), ...VISITANTES];
-const SQL = readFileSync(new URL('../supabase/migrations/0035_rejugar_nodos.sql', import.meta.url), 'utf8');
+// El divisor lo manda la última migración que reescribe la función, no la que
+// la estrenó: la 0035 la creó con 3 y la 0036 la dejó en 5 al bajar las
+// victorias. Comparar contra la 0035 diría que los números se separaron.
+const SQL = readFileSync(new URL('../supabase/migrations/0036_economia_mas_dura.sql', import.meta.url), 'utf8');
 
 test('Los dos números viven en el SQL con el mismo valor que en los datos', () => {
   assert.match(SQL, new RegExp(`c_divisor\\s+constant int := ${REJUGAR.divisor};`));
