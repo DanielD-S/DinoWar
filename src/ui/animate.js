@@ -199,6 +199,7 @@ const trofeosNodo = (bando) => (bando === JUGADOR ? el.pTrof : el.rTrof);
 const API = Object.freeze({
   carta: cartaNodo,
   ranura: ranuraNodo,
+  lugar: (r) => el.lugares?.children[r] ?? null,
   contrario: (j) => (j === JUGADOR ? RIVAL : JUGADOR),
   marcar,
   rotulo,

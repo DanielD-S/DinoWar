@@ -12,7 +12,7 @@
 // porque el servidor re-juega la partida para calcular el daño en vez de
 // creerse lo que le diga el cliente.
 //
-// huella: 7e2ddd92e2f7079a
+// huella: 2de943353a526b03
 //
 // Lleva dentro estos 25 ficheros del repositorio. La lista la da
 // esbuild, no una suposición mía: si mañana la función importa un módulo más,
@@ -3354,7 +3354,7 @@ function rentaDe(state) {
   const extra = campoEs(state, RASGO.CAMPO_SABANA) ? BALANCE.efectosCampo.sabanaBiomasa : 0;
   return BALANCE.rentaPorTurno + extra;
 }
-function curacionDe(state, iid) {
+function curacionPropia(state, iid) {
   const inst = state.instancias[iid];
   const c = carta(inst.cardId);
   let cura = 0;
@@ -3367,10 +3367,12 @@ function curacionDe(state, iid) {
   for (const o of unidadesDe(state, inst.dueno)) {
     cura += mecanicaDe(o.cardId)?.regenera?.aliados ?? 0;
   }
-  const lugar2 = efectoDeLugar(state, inst.ranura);
-  cura += lugar2.cura ?? 0;
-  if (lugar2.sinCuracion) return 0;
   return cura;
+}
+function curacionDe(state, iid) {
+  const lugar2 = efectoDeLugar(state, state.instancias[iid].ranura);
+  if (lugar2.sinCuracion) return 0;
+  return curacionPropia(state, iid) + (lugar2.cura ?? 0);
 }
 var NOTA_CUENTA = Object.freeze({
   [QUE.CLADO]: (n) => `${n} de su clado en el campo`,
@@ -4179,6 +4181,21 @@ function descartarAlAzar(s, j, n) {
   }
   return quitadas;
 }
+function avisarLugar(s, r, datos) {
+  ev(s, "LUGAR", { ranura: r, lugar: s.lugares[r], ...datos });
+}
+function golpeConLugar(s, r, bando, sinLugar) {
+  const con = ajustarGolpeDeLugar(s, r, sinLugar);
+  if (con !== sinLugar) {
+    avisarLugar(s, r, {
+      jugador: bando,
+      efecto: con > sinLugar ? "golpeHabitat" : "guardia",
+      n: Math.abs(con - sinLugar)
+    });
+  }
+  return con;
+}
+var golpeSinLugar = (s, iid, defensor) => Math.max(0, ataqueEfectivo(s, iid) - guardiaDe(s, defensor));
 function faseCombate(s) {
   if (s.turno < BALANCE.turnoPrimerCombate) {
     ev(s, "SIN_COMBATE", { turno: s.turno });
@@ -4195,7 +4212,7 @@ function faseCombate(s) {
     if (volA || volB) {
       for (const [uno, bando, vuela1] of [[a, 0, volA], [b, 1, volB]]) {
         if (!uno) continue;
-        const d = danoAlHabitat(s, uno.iid, rival(bando));
+        const d = golpeConLugar(s, r, bando, golpeSinLugar(s, uno.iid, rival(bando)));
         alHabitat[rival(bando)] += d;
         ev(s, vuela1 ? "SOBREVUELO" : "AVANCE", { ranura: r, iid: uno.iid, bando, dano: d });
       }
@@ -4212,22 +4229,27 @@ function faseCombate(s) {
       golpes.push({ iid: a.iid, cantidad: dB, causa: CAUSA.COMBATE, por: 1 });
       golpes.push({ iid: a.iid, cantidad: espinasDe(s, b.iid), causa: CAUSA.ESPINAS, por: 1 });
       golpes.push({ iid: b.iid, cantidad: espinasDe(s, a.iid), causa: CAUSA.ESPINAS, por: 0 });
+      const espinasLugar = efectoDeLugar(s, r).espinas ?? 0;
+      if (espinasLugar > 0) avisarLugar(s, r, { efecto: "espinas", n: espinasLugar });
       if (dA > 0 && carta(a.cardId).rasgo === RASGO.DESGARRO) s.instancias[b.iid].sinCuracion = true;
       if (dB > 0 && carta(b.cardId).rasgo === RASGO.DESGARRO) s.instancias[a.iid].sinCuracion = true;
       const dobla = (uno) => (carta(uno.cardId).rasgo === RASGO.DEPREDADOR_DOMINANTE ? 2 : 1) * sobranteDeLugar(s, r);
       const sobraA = Math.max(0, dA - vidaActual(s, b.iid));
       const sobraB = Math.max(0, dB - vidaActual(s, a.iid));
       if (BALANCE.cuerpo.sobranteAlHabitat) {
-        alHabitat[1] += ajustarGolpeDeLugar(s, r, Math.max(0, sobraA * dobla(a) - guardiaDe(s, 1)));
-        alHabitat[0] += ajustarGolpeDeLugar(s, r, Math.max(0, sobraB * dobla(b) - guardiaDe(s, 0)));
+        const porLugar = sobranteDeLugar(s, r);
+        for (const [sobra, uno, bando] of [[sobraA, a, 0], [sobraB, b, 1]]) {
+          if (sobra > 0 && porLugar !== 1) avisarLugar(s, r, { jugador: bando, efecto: "sobrante", n: porLugar });
+          alHabitat[rival(bando)] += golpeConLugar(s, r, bando, Math.max(0, sobra * dobla(uno) - guardiaDe(s, rival(bando))));
+        }
       }
       ev(s, "CHOQUE", { ranura: r, a: a.iid, b: b.iid, danoA: dA, danoB: dB });
     } else if (a) {
-      const d = danoAlHabitat(s, a.iid, 1);
+      const d = golpeConLugar(s, r, 0, golpeSinLugar(s, a.iid, 1));
       alHabitat[1] += d;
       ev(s, "AVANCE", { ranura: r, iid: a.iid, bando: 0, dano: d });
     } else if (b) {
-      const d = danoAlHabitat(s, b.iid, 0);
+      const d = golpeConLugar(s, r, 1, golpeSinLugar(s, b.iid, 0));
       alHabitat[0] += d;
       ev(s, "AVANCE", { ranura: r, iid: b.iid, bando: 1, dano: d });
     }
@@ -4242,9 +4264,14 @@ function faseCombate(s) {
       continue;
     }
     const cura = curacionDe(s, inst.iid);
+    const lugar2 = efectoDeLugar(s, inst.ranura);
     if (cura > 0 && inst.heridas > 0) {
+      const delLugar = Math.min(lugar2.cura ?? 0, inst.heridas);
       inst.heridas = Math.max(0, inst.heridas - cura);
       ev(s, "CURACION", { iid: inst.iid, dueno: inst.dueno, cura });
+      if (delLugar > 0) avisarLugar(s, inst.ranura, { jugador: inst.dueno, efecto: "cura", n: delLugar, iid: inst.iid });
+    } else if (lugar2.sinCuracion && inst.heridas > 0 && curacionPropia(s, inst.iid) > 0) {
+      avisarLugar(s, inst.ranura, { jugador: inst.dueno, efecto: "sinCuracion", n: 0, iid: inst.iid });
     }
   }
   for (let r = 0; r < BALANCE.ranuras; r++) {

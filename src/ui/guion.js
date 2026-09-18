@@ -39,6 +39,20 @@ const BREVE = 260;
 const MEDIO = 380;
 const LARGO = 520;
 
+/** Lo que dice el rótulo de cada efecto de lugar. */
+const LUGAR_TEXTO = {
+  roba: (e) => `roba ${e.n}`,
+  muele: (e) => `muele ${e.n}`,
+  cura: (e) => `cura ${e.n}`,
+  sinCuracion: () => 'sin curación',
+  espinas: (e) => `espinas ${e.n}`,
+  sobrante: (e) => `sobrante ×${e.n}`,
+  guardia: (e) => `−${e.n} al golpe`,
+  golpeHabitat: (e) => `+${e.n} al golpe`,
+};
+/** Los que se pintan como daño; el resto, como algo bueno. */
+const LUGAR_MALO = new Set(['muele', 'sinCuracion', 'espinas']);
+
 /** El bando de un evento, mirado por sus campos, que no se llaman igual. */
 const bandoDe = (e) => e.dueno ?? e.jugador ?? e.bando ?? null;
 
@@ -147,14 +161,22 @@ export const GUION = Object.freeze({
     hacer: (e, api) => api.anuncio(carta(e.cardId).binomial, 'clima'),
   },
   // Lo que hace un LUGAR por su cuenta: robar al recibir una criatura, moler
-  // al final del turno. Lo que un lugar suma a las cifras no dispara evento:
-  // se ve en la carta, como un aura.
+  // al final del turno, curar, pinchar, doblar lo que sobra, quitar o poner al
+  // golpe. Se enseña SOBRE EL BOTÓN del lugar, que es lo que une la columna
+  // con su efecto, y en la carta cuando hay una. Lo que un lugar suma a las
+  // cifras no dispara evento: se ve en la carta, como un aura.
   LUGAR: {
     dura: BREVE,
     sonido: 'mazo',
     hacer: (e, api) => {
+      const texto = LUGAR_TEXTO[e.efecto]?.(e) ?? e.efecto;
+      const boton = api.lugar(e.ranura);
+      if (boton) {
+        api.marcar(boton, 'dispara', 520);
+        api.rotulo(boton, texto, LUGAR_MALO.has(e.efecto) ? 'malo' : 'bueno');
+      }
       const nodo = api.carta(e.iid);
-      if (nodo) api.rotulo(nodo, lugarPorId(e.lugar)?.nombre ?? e.lugar);
+      if (nodo && !boton) api.rotulo(nodo, lugarPorId(e.lugar)?.nombre ?? e.lugar);
       if (e.efecto === 'roba') api.enMazo(e.jugador, `+${e.n}`);
       if (e.efecto === 'muele') api.enMazo(e.jugador, `−${e.n}`, 'malo');
     },

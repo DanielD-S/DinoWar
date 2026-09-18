@@ -983,6 +983,20 @@ Seis decisiones que no se deducen del código:
   no haya dos iguales. El nombre se queda en crema: la sal y el cielo son casi
   blancos y un rótulo de 8,5 px en ese color no se leería.
 
+- **Todo lo que un lugar HACE lo cuenta un evento `LUGAR`** (18-09-2026), no
+  sólo robar y moler: `cura`, `sinCuracion`, `espinas`, `sobrante`, `guardia`
+  y `golpeHabitat`, con `efecto` y `n`. Antes la cura del Bosque o el ×2 de
+  la Llanura pasaban en silencio y sólo se veían en los números, que es el
+  mismo agujero que tuvieron las habilidades al entrar. El guión los enseña
+  SOBRE EL BOTÓN del lugar (`api.lugar(r)`, gesto nuevo), que es lo que une
+  la columna con su efecto. Lo que suma a las cifras —Ataque, Vida— sigue sin
+  evento, como un aura. Dos detalles: las espinas del terreno las llevan los
+  dos, así que se dicen una vez por columna y sin `jugador`; y el golpe al
+  hábitat pasa por `golpeConLugar()` en `resolve.js`, que hace la misma cuenta
+  que `danoAlHabitat` y además avisa, porque `danoAlHabitat` la usa la IA y no
+  puede emitir nada. `test/lugares.test.js` prueba los seis y que en el
+  tablero plano no sale ninguno.
+
 Y lo que se apaga por entorno para medir, como las ranuras y el sobrante:
 `DINOWAR_LUGARES=0 node sim/run.js`. En el navegador no hay `process` y
 siempre juega con ellos; ponerlo en el servidor le haría re-jugar otro tablero.
@@ -1101,6 +1115,31 @@ está en `CALLADOS` con su motivo escrito. La primera vez que se corrió encontr
 uno sin decidir. Y ningún compás puede pasar de 600 ms: con el campo lleno se
 disparan diez habilidades, y a medio segundo cada una eso deja de ser ritmo y
 pasa a ser una espera.
+
+## La previsión del combate: lo que pasa si nadie cambia nada
+
+[`src/ui/prevision.js`](src/ui/prevision.js) (18-09-2026). Antes de pulsar
+Listo, cada carta tuya lleva al pie lo que le va a pasar —«mata», «muere»,
+«ambos caen», «choca» o el «−N» que le entra al hábitat rival—, la carta rival
+que te llega lleva el «−N» que te entra a ti, y junto a cada cifra de hábitat
+sale cuánto bajará. Hasta hoy el jugador echaba esas cuentas de cabeza y el
+tablero sólo tenía el borde `pasa` del carril abierto.
+
+- **No inventa reglas: JUEGA el turno sobre una copia** con el mismo motor
+  —los dos listos, revelación, combate— y lee los eventos. Es lo que hace
+  que cuente tus despliegues pendientes, las entradas, las auras y los
+  lugares sin repetir nada. Lo que simula es exactamente lo PÚBLICO: ninguno
+  de los despliegues del rival, que en un duelo la vista no trae y contra la
+  IA todavía no ha hecho. Por eso se llama «si nadie cambia nada».
+- **La vista de un duelo no tiene rng** y la copia se pone uno fijo: lo que
+  sortea la revelación no cambia el combate y la copia no toca nada. Si la
+  revelación no se puede simular —una entrada tuya que muerde un mazo rival
+  que la vista trae como cifra— cae a simular sólo el combate con lo puesto.
+- **Calla cuando no toca**: fuera del despliegue, ya en Listo, en el turno
+  sin combate y con el campo vacío devuelve null y `render.js` borra todo.
+- La etiqueta va en `data-prevision` de la ranura y la pinta un `::after`
+  con `.ocupada` en el selector, para pesar más que la raya de la ranura
+  vacía de piel.css y que el «+» del destino al arrastrar.
 
 ## El marcador reacciona: mazo-reloj, mano encendida y contadores que laten
 
