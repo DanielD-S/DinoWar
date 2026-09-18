@@ -1145,6 +1145,12 @@ tablero sólo tenía el borde `pasa` del carril abierto.
 - La etiqueta va en `data-prevision` de la ranura y la pinta un `::after`
   con `.ocupada` en el selector, para pesar más que la raya de la ranura
   vacía de piel.css y que el «+» del destino al arrastrar.
+- **Va sobre la ventana de la ilustración y con el sujeto puesto.** La
+  primera versión iba al pie y tapaba el Ataque y la Vida, que es justo lo
+  que se mira para entenderla; y decía «mata» y «−3», que el autor leyó como
+  «la mía muere» y «pierdo tres». Ahora es «lo mata», «muere», «ambos caen»,
+  «aguanta», «pega 3» y, en la carta rival, «te pega 4». Las cifras con signo
+  se quedan junto a las barras de hábitat, donde el signo sí es tuyo.
 
 ## El marcador reacciona: mazo-reloj, mano encendida y contadores que laten
 

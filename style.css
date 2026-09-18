@@ -1840,13 +1840,17 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .ranura.ocupada { border-color: transparent; background: none; }
 
-/* La PREVISIÓN del combate: una etiqueta al pie de la carta con lo que le va
-   a pasar si nadie cambia nada. La escribe render.js en `data-prevision` y
-   sólo mientras se despliega; con `.ocupada` en el selector para pesar más
-   que la raya de la ranura vacía de piel.css y que el «+» del destino. */
+/* La PREVISIÓN del combate: una etiqueta sobre la carta con lo que le va a
+   pasar si nadie cambia nada. Va sobre la VENTANA de la ilustración —el
+   centro de la ventana de criatura cae al 36 % del alto— porque es lo único
+   de la carta que no lleva información: al pie tapaba el Ataque y la Vida,
+   que es justo lo que se mira para entenderla. La escribe render.js en
+   `data-prevision` y sólo mientras se despliega; con `.ocupada` en el
+   selector para pesar más que la raya de la ranura vacía de piel.css y que
+   el «+» del destino. */
 .ranura.ocupada[data-prevision]::after {
   content: attr(data-prevision);
-  position: absolute; left: 50%; bottom: 3px; z-index: 5; transform: translateX(-50%);
+  position: absolute; left: 50%; top: 36%; z-index: 5; transform: translate(-50%, -50%);
   padding: 1px 5px; border-radius: 3px;
   background: rgba(20,16,12,.92); box-shadow: 0 0 0 1px var(--acento-claro);
   color: var(--acento-claro); font-size: 8px; font-weight: 600; letter-spacing: .08em;
