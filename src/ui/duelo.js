@@ -13,6 +13,7 @@
 
 import { CONFIG } from '../data/config.js';
 import { DUELO } from '../data/duelo.js';
+import { ENTRENAMIENTO, rivalDeEntrenamiento } from '../data/entrenamiento.js';
 import {
   rangoDe, nombreDeRango, emblemaDe, LIGAS, ESCUDO, eloVigente, temporadaDe, finDeTemporada,
 } from '../data/ligas.js';
@@ -41,13 +42,22 @@ const escapar = (s) => String(s).replace(/[<>&"]/g, (c) => ({ '<': '&lt;', '>': 
 
 let dom = null;
 let alEmparejar = () => {};
+let alEntrenar = () => {};
 let abierto = false;
 /** Lo que se está esperando: null, o { id, codigo, desde, temporizador }. */
 let espera = null;
 let aviso = null;
+/**
+ * Si el entrenamiento se ofrece sin estar en la cola: después de rendirse a
+ * que no hay nadie. Mientras se espera lo decide el reloj, no esto.
+ */
+let ofrecerEntrenar = false;
+/** El último rival de entrenamiento, para no repetirlo dos veces seguidas. */
+let ultimoEntrenamiento = null;
 
-export function montarDuelo({ cuandoEmpareje }) {
+export function montarDuelo({ cuandoEmpareje, cuandoEntrene }) {
   alEmparejar = cuandoEmpareje;
+  alEntrenar = cuandoEntrene ?? (() => {});
   dom = { caja: id('menu-duelo'), jugar: id('jugar') };
   dom.caja.addEventListener('click', alPulsar);
   dom.caja.addEventListener('keydown', (e) => {
@@ -151,10 +161,12 @@ export function pintarDuelo() {
          <button class="boton-fantasma" data-duelo="cancelar">Retirar el reto</button>`
       : `<p class="duelo-estado">Buscando rival… <span class="duelo-reloj">${reloj}</span></p>
          <p class="duelo-nota">Te toca el primero que esté buscando. Si tarda, reta a un amigo con un código.</p>
+         ${Date.now() - espera.desde >= ENTRENAMIENTO.ofrecerMs ? entrenarHTML() : ''}
          <button class="boton-fantasma" data-duelo="cancelar">Dejar de buscar</button>`;
   } else {
     cuerpo = `<div class="duelo-acciones">
       <button class="boton-grande" data-duelo="buscar">Buscar rival</button>
+      ${ofrecerEntrenar ? entrenarHTML() : ''}
       <button class="boton-fantasma" data-duelo="retar">Retar a un amigo</button>
       <label class="duelo-entrar">Tengo un código
         <span><input id="duelo-codigo" maxlength="6" autocomplete="off" autocapitalize="characters"
@@ -167,11 +179,37 @@ export function pintarDuelo() {
     <p class="duelo-nota">Reloj de ${Math.round(DUELO.relojMs / 60000)} minutos por bando y ${Math.round(DUELO.turnoMaxMs / 60000)} por decisión. Ganar paga como contra la IA.</p>`;
 }
 
+/**
+ * El botón de entrenar, con su nota: sale pasado un rato en la cola y después
+ * de rendirse. Contra la IA no hay ELO que ganar ni que perder, y eso se dice
+ * en el sitio, que es lo que el jugador quiere saber antes de pulsarlo.
+ */
+const entrenarHTML = () => `<button class="boton-fantasma duelo-entrenar" data-duelo="entrenar">Entrenar contra la IA mientras tanto</button>
+    <p class="duelo-nota">Un rival duro de las expediciones, al azar. Paga como una victoria normal y no toca tu liga, ni aunque te retires.</p>`;
+
+/** Sale de la cola, si estaba, y empieza una partida contra un rival duro. */
+function entrenar() {
+  abandonarEspera();
+  aviso = null;
+  ofrecerEntrenar = false;
+  abierto = false;
+  pintarDuelo();
+  ultimoEntrenamiento = rivalDeEntrenamiento(ultimoEntrenamiento);
+  alEntrenar(ultimoEntrenamiento);
+}
+
+/** El rival de entrenamiento que sigue al último jugado: para «Otra partida». */
+export function siguienteEntrenamiento() {
+  ultimoEntrenamiento = rivalDeEntrenamiento(ultimoEntrenamiento);
+  return ultimoEntrenamiento;
+}
+
 function alPulsar(e) {
   const b = e.target.closest('[data-duelo]');
   if (!b) return;
   const que = b.dataset.duelo;
-  if (que === 'buscar') empezar(() => buscarDuelo(miMazo()));
+  if (que === 'buscar') { ofrecerEntrenar = false; empezar(() => buscarDuelo(miMazo())); }
+  if (que === 'entrenar') entrenar();
   if (que === 'retar') empezar(() => retarDuelo(miMazo()));
   if (que === 'aceptar') aceptar();
   if (que === 'cancelar') { abandonarEspera(); aviso = null; pintarDuelo(); }
@@ -219,7 +257,8 @@ async function sondear() {
   if (!espera) return;
   if (Date.now() - espera.desde > DUELO.esperaMaxMs && !espera.codigo) {
     abandonarEspera();
-    aviso = 'Nadie ha aparecido en tres minutos. Prueba más tarde, o reta a un amigo.';
+    aviso = 'Nadie ha aparecido en tres minutos. Entrena contra la IA, prueba más tarde o reta a un amigo.';
+    ofrecerEntrenar = true;
     pintarDuelo();
     return;
   }

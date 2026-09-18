@@ -316,6 +316,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .duelo-codigo { font-size: 22px; letter-spacing: .25em; color: var(--acento-vivo); font-family: monospace; }
 .duelo-reloj { color: var(--tenue); font-variant-numeric: tabular-nums; }
 .duelo-nota { font-size: 10.5px; color: var(--tenue); line-height: 1.35; margin: 4px 0 6px; }
+/* El entrenamiento: sale pasado un rato en la cola, entre el reloj y «Dejar de buscar». */
+.duelo-entrenar { display: block; width: 100%; margin-top: 6px; }
+.duelo-entrenar + .duelo-nota { margin-top: 2px; }
 .mision.hecha .mision-barra i { background: linear-gradient(90deg, var(--acento-claro), var(--acento-vivo)); }
 
 @media (prefers-reduced-motion: reduce) { .mision-barra i { transition: none; } }

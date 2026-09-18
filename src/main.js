@@ -34,7 +34,7 @@ import { montarEntrada, abrirEntrada } from './ui/entrada.js';
 import { montarExpedicion, abrirExpedicion } from './ui/expedicion.js';
 import { rivalPorId } from './data/expediciones.js';
 import {
-  montarDuelo, enseñarDuelo, pintarDuelo, abandonarEspera,
+  montarDuelo, enseñarDuelo, pintarDuelo, abandonarEspera, siguienteEntrenamiento,
   jugarEnDuelo, estadoDuelo, rendirseEnDuelo,
 } from './ui/duelo.js';
 import { DUELO } from './data/duelo.js';
@@ -86,6 +86,14 @@ const perfilIA = () => IA_FORZADA ?? (cargarPerfil().dificultad ?? PERFIL.HEURIS
  */
 let expedicionEnCurso = null;
 let ultimaFueExpedicion = false;
+/**
+ * Si la partida es un ENTRENAMIENTO: la de emergencia del Duelo, contra un
+ * rival duro de las expediciones cuando no hay nadie en la cola. Es una
+ * partida en solitario a todos los efectos —se graba, se re-juega y paga como
+ * una victoria— y sólo cambia lo que se dice: el modo, y que «Otra partida»
+ * sortea otro rival duro en vez de volver al mapa.
+ */
+let entrenando = false;
 const perfilRival = () => expedicionEnCurso?.perfil ?? perfilIA();
 /**
  * Quién está enfrente, para el marcador del final: nombre y mazo. Se apunta al
@@ -1242,7 +1250,7 @@ async function asaltoAlJefe() {
   return true;
 }
 
-function nuevaPartida(jefe = null, jefeEvento = null, rivalId = null) {
+function nuevaPartida(jefe = null, jefeEvento = null, rivalId = null, entrenamiento = false) {
   cancelarAnimaciones();
   soltarEntrada();
   registro = [];
@@ -1255,7 +1263,8 @@ function nuevaPartida(jefe = null, jefeEvento = null, rivalId = null) {
   // simulador. Así el balance publicado sigue significando algo.
   asaltando = jefe;
   expedicionEnCurso = rivalId ? (rivalPorId(rivalId)?.rival ?? null) : null;
-  ultimaFueExpedicion = !!expedicionEnCurso;
+  entrenando = entrenamiento && !!expedicionEnCurso;
+  ultimaFueExpedicion = !!expedicionEnCurso && !entrenando;
   ultimaFueAsalto = !!jefe;
   ultimaFueDuelo = false;
   const miMazo = aListaDeMazo(mazoActivo());
@@ -1308,7 +1317,7 @@ function nuevaPartida(jefe = null, jefeEvento = null, rivalId = null) {
   presentar({
     yo: yoPresentado(),
     rival,
-    modo: jefe ? 'Asalto' : expedicionEnCurso ? 'Expedición' : 'Solitario',
+    modo: jefe ? 'Asalto' : entrenando ? 'Entrenamiento' : expedicionEnCurso ? 'Expedición' : 'Solitario',
     objetivo: jefe
       ? 'Hazle todo el daño que puedas'
       : `${BALANCE.trofeosParaGanar} trofeos o su hábitat a cero`,
@@ -1408,7 +1417,11 @@ function iniciar() {
   el.btnSolitario.addEventListener('click', () => { desbloquear(); abrirExpedicion(); irA(APP.EXPEDICION); });
   // La placa del Duelo abre y cierra su panel, como la de misiones, y las dos
   // se excluyen: abrir una pliega la otra.
-  montarDuelo({ cuandoEmpareje: empezarDuelo });
+  montarDuelo({
+    cuandoEmpareje: empezarDuelo,
+    // Nadie en la cola: un rival duro de las expediciones, sin ELO de por medio.
+    cuandoEntrene: (rivalId) => nuevaPartida(null, null, rivalId, true),
+  });
   el.btnDuelo.addEventListener('click', () => {
     const abierto = el.btnDuelo.getAttribute('aria-expanded') === 'true';
     el.btnDuelo.setAttribute('aria-expanded', String(!abierto));
@@ -1434,6 +1447,9 @@ function iniciar() {
     pintarRecord();
     // Tras un duelo, «otra» no es otra contra la IA: es volver a buscar rival.
     if (ultimaFueDuelo) { abrirJugar(); el.btnDuelo.setAttribute('aria-expanded', 'true'); enseñarDuelo(true); return; }
+    // Tras un entrenamiento, «otra» es otro entrenamiento con otro rival
+    // duro: quien vino aquí quería un duelo y sigue sin haber nadie.
+    if (entrenando) { nuevaPartida(null, null, siguienteEntrenamiento(), true); return; }
     // Tras un rival de expedición, «otra» vuelve al mapa: puede que se haya
     // abierto el siguiente nodo, y repetir contra el mismo no es lo que se busca.
     if (ultimaFueExpedicion) { abrirExpedicion(); irA(APP.EXPEDICION); return; }
@@ -1624,6 +1640,7 @@ function empezarDuelo(r) {
   grabacion = null;
   ultimaFueDuelo = true;
   ultimaFueExpedicion = false;
+  entrenando = false;
   ultimaFueAsalto = false;
   fijarTopesHabitat();
   expedicionEnCurso = null;

@@ -771,6 +771,33 @@ en `src/data/duelo.js`. No hay proceso que vigile relojes: el primero que
 pregunte después del plazo se encuentra el duelo cerrado. El de la pantalla
 sólo enseña lo que el servidor manda en cada respuesta.
 
+**El Entrenamiento es la partida de emergencia del Duelo** (18-09-2026,
+`src/data/entrenamiento.js`). Con nueve cuentas, buscar rival y no encontrar
+a nadie es el caso normal: tres minutos de reloj y un «prueba más tarde».
+Pasados `ENTRENAMIENTO.ofrecerMs` en la cola —treinta segundos— el panel
+ofrece entrenar contra la IA, y lo vuelve a ofrecer después de rendirse.
+Cuatro cosas que no se deducen del código:
+
+- **Es una partida en solitario de las de siempre**, con un rival de
+  `expediciones.js`: se graba, el servidor la re-juega por el tipo `victoria`
+  y paga las monedas de una victoria normal. No toca el ELO —ni al ganar, ni
+  al perder, ni al retirarse— porque el ELO sólo lo mueve `duelo_cerrar`.
+  Nada nuevo viaja ni se empaqueta: el fichero no entra en la Edge Function y
+  `test/entrenamiento.test.js` lo comprueba.
+- **El rival se sortea entre los dos últimos nodos de cada mapa**, sin
+  repetir el anterior: siempre «El último rey» sería monótono, y uno flojo no
+  sería un sustituto del duelo. «Otra partida» tras un entrenamiento sortea
+  otro (`siguienteEntrenamiento`), no vuelve al mapa: quien vino aquí quería
+  un duelo y sigue sin haber nadie.
+- **Pulsar el botón sale de la cola.** Seguir en ella mientras se entrena
+  emparejaría a una persona con alguien a mitad de otra partida.
+- **Paga lo mismo que cualquier victoria en solitario**, a propósito. Un
+  extra «porque era un duelo» sería buscar, no encontrar y cobrar el extra
+  contra la IA. Y como el rival es un nodo real, si el jugador tenía el
+  anterior vencido y éste sin vencer, cobra su primera victoria como en el
+  mapa: es la misma partida. Cuenta también como expedición jugada para las
+  misiones, que lo es.
+
 **Las ligas son el ELO con nombre**, en `src/data/ligas.js`: Triásico, Jurásico
 y Cretácico con tres divisiones cada uno, y Extinción arriba. El número no se
 enseña nunca; la barra de 0 a 100 dentro de la división, sí. El ELO lo calcula
