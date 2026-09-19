@@ -70,8 +70,9 @@ test('las CUATRO rarezas de criatura llevan el marco nuevo, y el jefe no', () =>
   }
   assert.ok(!cartaHTML('jefe_saurophaganax', { variante: 'col' }).includes('m-cria'));
   assert.ok(!cartaHTML('trampa', { variante: 'col' }).includes('m-cria'), 'las de soporte tampoco');
-  // El aro del coste es lo único que cambia de una rareza a otra.
+  // El aro del coste es lo único que cambia de una rareza a otra, así que cada
+  // una escribe el suyo —sola o compartiendo regla con la que coincide—.
   for (const r of ['comun', 'rara', 'epica', 'legendaria']) {
-    assert.match(css, new RegExp(`\\.carta\\.con-marco\\.m-dino_${r}\\s*\\{\\s*--cos-cx:`), r);
+    assert.match(css, new RegExp(`\\.carta\\.con-marco\\.m-dino_${r}[^{]*\\{[^}]*--cos-cx:`), r);
   }
 });

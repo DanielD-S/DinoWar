@@ -1471,7 +1471,8 @@ La geometría la midió `python tools/marcos.py` sobre los cuatro PNG, como mand
 la regla; lo único que no mide son la banda y la caja, porque en estos marcos no
 son magenta. Ésas se midieron sobre el papel y coinciden dentro de un punto.
 **Los cuatro caen dentro de medio punto en todo menos en el centro del aro del
-coste** —0,78 puntos entre la legendaria y la épica, que a 268 px son dos—, así
+coste** —0,78 puntos entre la legendaria y la épica, que a 268 px son dos; la
+común y la rara coinciden—, así
 que ése se escribe por rareza y el resto lo comparte `m-cria`, una clase que
 `claseMarco()` emite al lado de la de la rareza. Sin ella cada regla de
 `carta.css` pedía los cuatro selectores y se leía peor que lo que describe.
@@ -1495,12 +1496,18 @@ Lo que costó, por si vuelve a encargarse uno:
   menor medida (9,8 %); se acaba pidiéndolos a **1148×1568**, que es 82:112
   exacto.
 
-Y una cosa que llegó mal en tres de los cuatro y no se arregla desde el código:
-**el banderín de rareza no cuenta la rareza.** La común trae un rombo encendido
-de cuatro, que es lo correcto; la rara y la épica traen los cuatro, igual que la
-legendaria. Se puede vivir con ello —a 83 px la rareza la cuenta el MINERAL, que
-es piedra, cristal azul, amatista y lava, y se distinguen de un vistazo— pero si
-se regeneran, que la rara traiga dos y la épica tres.
+Y una cosa que llegó igual en los cuatro y no se arregla desde el código: **la
+fila de rombos no cuenta la rareza.** La común los trae los cuatro apagados y
+las otras tres los cuatro encendidos, cada una del color de su mineral. Se
+puede vivir con ello —a 83 px la rareza la cuenta el MINERAL, que es acero,
+cristal azul, amatista y lava, y se distinguen de un vistazo— pero si se
+regeneran, lo suyo es uno, dos, tres y cuatro.
+
+Y la escalera de materiales, que es lo que de verdad lee el jugador: **acero y
+piedra sin oro** en la común, **cristal azul** en la rara, **amatista** en la
+épica y **lava y oro** en la legendaria. La primera común que llegó tenía oro y
+un rombo encendido, y por eso se cambió: el oro es lo que distingue a la de
+arriba.
 
 Quedan cuatro en este estilo: el jefe y las tres familias de soporte, con esta
 misma geometría y el material como único cambio; las de soporte, sin banda y sin

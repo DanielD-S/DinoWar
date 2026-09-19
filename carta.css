@@ -127,7 +127,7 @@
 }
 /* El aro del coste es lo único que el generador movió de una rareza a otra:
    0,78 puntos entre la legendaria y la épica, que a 268 px son dos. */
-.carta.con-marco.m-dino_comun { --cos-cx: 12.7%; }
+.carta.con-marco.m-dino_comun,
 .carta.con-marco.m-dino_rara { --cos-cx: 12.5%; }
 .carta.con-marco.m-dino_epica { --cos-cx: 12.89%; }
 .carta.con-marco.m-dino_legendaria { --cos-cx: 12.11%; }
