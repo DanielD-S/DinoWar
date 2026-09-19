@@ -76,3 +76,28 @@ test('las CUATRO rarezas de criatura llevan el marco nuevo, y el jefe no', () =>
     assert.match(css, new RegExp(`\\.carta\\.con-marco\\.m-dino_${r}[^{]*\\{[^}]*--cos-cx:`), r);
   }
 });
+
+test('las tres familias de soporte llevan su marco, con el aro del coste dentro', () => {
+  for (const [id, clase] of [['llanura', 'm-clima'], ['trampa', 'm-evento'],
+    ['rebrote', 'm-recurso'], ['biomasa', 'm-recurso']]) {
+    const html = cartaHTML(id, { variante: 'col' });
+    assert.ok(html.includes(clase), id);
+    assert.ok(html.includes('no-dino'), `${id} sin la clase que comparte la geometría`);
+  }
+  // Los tres marcos midieron el mismo aro dentro de medio punto, así que va una
+  // sola vez y no una por familia, como sí pasa en las criaturas.
+  assert.match(css, /\.carta\.con-marco\.no-dino\s*\{[^}]*--cos-cx:/);
+  // Y viene dibujado: la chapa de Biomasa que lo suplía se apaga, igual que las
+  // tres de las criaturas.
+  assert.match(css, /\.carta\.con-marco\.no-dino \.c-chapa\s*\{\s*display:\s*none/);
+  // Aquí TODO es papel pintado en el PNG —el aro del coste también, al revés
+  // que en las criaturas— así que las tres tintas van oscuras.
+  assert.match(css, /\.carta\.con-marco\.no-dino \.c-nombre\s*\{\s*color:\s*#38200c/);
+  assert.match(css, /\.carta\.con-marco\.no-dino \.c-texto\s*\{\s*color:\s*#2e2113/);
+  assert.match(css, /\.carta\.con-marco\.no-dino \.c-coste\s*\{\s*color:\s*#2b1706/);
+  // La ventana sube hasta el borde: sin banda de nombre, arranca mucho más
+  // arriba que la de una criatura y es más alta.
+  const bloque = css.match(/\.carta\.con-marco\.no-dino\s*\{([^}]*)\}/)[1];
+  assert.ok(Number(bloque.match(/--ven-y0:\s*([\d.]+)%/)[1]) < 6, 'la ventana de soporte arranca arriba');
+  assert.ok(Number(bloque.match(/--ven-alto:\s*([\d.]+)%/)[1]) > 50, 'y es más alta que la de una criatura');
+});

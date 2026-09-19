@@ -1417,8 +1417,9 @@ que el resto de gestos.
 
 Ocho marcos en `assets/marcos/`: cinco de criatura —cuatro rarezas y el jefe— y
 uno por familia de soporte, sin rareza. **Las cuatro rarezas de criatura
-estrenaron un juego nuevo el 18 y el 19-09-2026** y tienen su sección aquí
-abajo; el jefe y las tres de soporte siguen con el dibujo viejo.
+estrenaron un juego nuevo el 18 y el 19-09-2026, y las tres familias de soporte
+el 19**, y tienen sus dos secciones aquí abajo; **el único que sigue con el
+dibujo viejo es el del jefe**.
 Los originales son PNG de 1024×1536 con los huecos en magenta `#FF00FF`, fuera
 del repositorio; `python tools/marcos.py escribir` los keyea a WebP y **mide
 los huecos**, y esos números son los que van en `carta.css`. No se estiman.
@@ -1509,9 +1510,61 @@ piedra sin oro** en la común, **cristal azul** en la rara, **amatista** en la
 un rombo encendido, y por eso se cambió: el oro es lo que distingue a la de
 arriba.
 
-Quedan cuatro en este estilo: el jefe y las tres familias de soporte, con esta
-misma geometría y el material como único cambio; las de soporte, sin banda y sin
-los dos huecos de cifras.
+Queda uno en este estilo: el del JEFE. Las tres familias de soporte llegaron el
+19-09-2026 y tienen su sección aquí abajo.
+
+### El marco del soporte: clima, evento y recurso, con emblema en vez de rareza
+
+Un día después de las criaturas llegaron los tres de soporte, con el mismo
+lenguaje —aro del coste dibujado y caja de PAPEL pintada en el PNG— y tres
+cosas propias:
+
+- **El aro del coste va RELLENO de papel, no hueco**, que es justo al revés
+  que en las criaturas. Así que ahí la tinta va oscura también: en una carta
+  de soporte **las tres tintas son de papel** y no hay ninguna sobre hueco.
+  Se miró a 83 px antes de aceptarlo —que es donde a las criaturas les falló
+  el papel dentro del aro, y por eso allí se dejó vacío— y aquí se lee mejor
+  que el hueco: el disco es grande, la cifra es una sola y no comparte filo
+  con la caja. La chapa de Biomasa que antes hacía de campo oscuro se apaga
+  igual: el aro ya está dibujado.
+
+- **No llevan banda de nombre**, porque el nombre de una carta de soporte y el
+  de su habilidad son la misma cosa y van en la caja. Por eso la **ventana sube
+  hasta el borde**: arranca al 5 % del alto contra el 13 % de una criatura y
+  mide el 51,5 % contra el 45,9 %. Es la ventana más grande del juego.
+- **En el pie va un EMBLEMA de familia y no una fila de rombos**, porque una
+  carta de soporte no tiene rareza que enseñar —los tres marcos son uno por
+  familia, sin rareza, desde que se rehicieron—: un sol para el evento, una
+  espiral para el clima y un helecho para el recurso. Y el material acompaña:
+  **roca oscura con latón y lava ámbar** en el evento, **roca gris azulada con
+  acero pálido y cristal verdeazulado** en el clima, **roca parda con cobre y
+  cristales de óxido verde** en el recurso.
+
+Y tres cosas de la medida, que es donde estuvo el trabajo:
+
+- **La herramienta sólo mide UN hueco aquí**, la ventana, porque el aro es
+  papel: el aro y la caja se midieron sobre el papel, con el mismo recorte por
+  color que en las criaturas. Los tres coinciden dentro de un tercio de punto
+  en el aro (cx 12,38–12,67, cy 8,96–9,28), así que va una sola línea en
+  `.carta.con-marco.no-dino` —la clase que `claseFamilia()` ya emitía— y no
+  una por familia como en las criaturas.
+- **La ventana del CSS se pone por el hueco MÁS ANCHO de los tres**, no por la
+  media: el marco se pinta ENCIMA del arte, así que una ventana de más queda
+  tapada y una de menos deja un filo oscuro dentro del hueco. Los tres se
+  separan hasta punto y medio por la derecha (86,3 % el clima, 87,9 % el
+  recurso) y con la media el clima enseñaba ese filo.
+- **La caja se puso en 22,8 puntos de alto y no en los 20,4 que mide el
+  papel.** Con lo que salía de copiar los márgenes de la criatura, el nombre
+  de dos líneas de TODA carta de soporte perdía medio píxel por abajo en la
+  mano y en el tablero —48 cartas, medido comparando contra `main`— porque
+  ahí la línea son 10 px y dos no entraban. Con 22,8 vuelven a entrar y es el
+  mismo alto que tenía el marco viejo. Las cuatro que ya se cortaban antes
+  —«Canal trenzado», «Bosque ribereño», «Rebrote tras incendio» y «Humedal»—
+  se siguen cortando igual: es que su nombre pide tres líneas y en la
+  colección sólo caben dos. No es de este marco y no se tocó.
+- **El cuerpo del visor baja a 10,5/12 px** como en las criaturas, que la
+  Crecida estacional —112 letras, el texto más largo del set— se cortaba.
+  Comprobado sobre las 144: ninguna desborda.
 
 ### La carta ENTERA: las cinco de jefe van a sangre
 
@@ -1575,8 +1628,8 @@ Lo que se miró al lado de Crown War y NO se copió: su estilo pintado tipo
 anime —el fotorrealismo es lo que nos distingue—, su tipografía sin sistema, y
 que la rareza no se lea en la carta. La ventana grande para TODAS las cartas
 —que era lo que quedaba de aquello— se empezó por el marco legendario de aquí
-arriba; hoy lo llevan las cuatro rarezas de criatura y faltan el jefe y las
-tres familias de soporte.
+arriba; hoy lo llevan las cuatro rarezas de criatura y las tres familias de
+soporte, y falta el del jefe.
 
 Y una cosa que se midió antes de descartarla: **llevar la carta entera a todo
 el set no funciona.** Las criaturas ganan en el visor, sí, pero a 83 px el
