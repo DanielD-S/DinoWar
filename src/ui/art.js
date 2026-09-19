@@ -4,7 +4,7 @@
 // más información honesta que la silueta. Ninguna lleva plumas — ningún taxón de
 // este set tiene evidencia tegumentaria que las respalde (§2 de la spec).
 
-import { carta, CARTAS_DE_JEFE } from '../data/cards.js';
+import { carta } from '../data/cards.js';
 
 const SILUETAS = {
   // Terópodo grande: cuerpo horizontal, cráneo profundo, cola contrapesada.
@@ -296,18 +296,26 @@ export const focoDe = (cardId) => focos.get(cardId) ?? null;
 /**
  * Cartas ENTERAS —a sangre—: la ilustración cubre la carta y el marco se
  * reduce a un filete, con el nombre y la habilidad sobre velos translúcidos.
- * Son las CINCO DE JEFE y nada más. Las legendarias lo fueron hasta el
- * 18-09-2026, y dejaron de serlo cuando estrenaron marco propio: las dos cosas
- * se pelean por la misma carta —una la enmarca y la otra le quita el marco— y
- * el marco ganó porque la rareza se lee y las cifras tienen dónde apoyarse.
- * Las de jefe se quedan a sangre porque viven fuera del set y no tienen rareza
- * que enseñar.
+ *
+ * **Hoy no hay ninguna**, y la lista vacía es el interruptor entero. Lo fueron
+ * las legendarias hasta el 18-09-2026 y las cinco de jefe hasta el 19, y las
+ * dos veces se fue por lo mismo: un marco dibujado y la carta a sangre se
+ * pelean por la misma carta —una la enmarca y la otra le quita el marco— y
+ * ganó el marco, porque la rareza se lee y las cifras tienen dónde apoyarse.
+ * Con el juego de marcos completo no queda carta sin marco propio.
+ *
+ * Lo que sigue en pie es la MAQUINARIA: `clasesCarta()` pone la clase,
+ * `cartaHTML()` emite el velo y el fondo, y `carta.css` mueve la geometría.
+ * Es el molde del cosmético de «arte alternativo» que la tienda tiene escrito
+ * —una versión a sangre que se equipa—, y volver a encenderla para una carta
+ * es añadir su id aquí. Por eso no se borró.
  *
  * La clase sólo se pone cuando HAY foto (`render.js` y `refrescarFotos`): una
  * silueta SVG a sangre sería un rectángulo de color, así que sin foto la carta
  * sale con su marco de siempre.
  */
-export const esEntera = (cardId) => Boolean(CARTAS_DE_JEFE[cardId]);
+const ENTERAS = new Set();
+export const esEntera = (cardId) => ENTERAS.has(cardId);
 
 /**
  * Mira una sola vez qué ilustraciones hay servidas. No rechaza nunca: no tener

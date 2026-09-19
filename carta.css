@@ -157,6 +157,59 @@
 .carta--visor.con-marco.m-cria .c-cuerpo { gap: 3px; }
 .carta--visor.con-marco.m-cria .c-hab { line-height: 18px; }
 
+/* ============================================== el marco del JEFE
+   El último del juego (19-09-2026) y el que cierra el set: hasta ese día las
+   cinco cartas de jefe iban A SANGRE, y como ya pasó con las legendarias un
+   día antes, el marco y la carta entera se pelean por la misma carta y ganó el
+   marco. Lo que queda de aquello está en `esEntera()`, con la lista vacía.
+
+   Comparte la anatomía de las criaturas —banda de género, ventana, caja, aro
+   del coste, círculo del Ataque y triángulo de la Vida— y no su geometría: la
+   ventana es más baja (40,9 % contra 45,9 %) porque la banda arranca más
+   abajo y la piedra del pie es más honda, así que NO entra en `m-cria`.
+
+   Y lo que de verdad lo separa: **los cinco huecos vienen RELLENOS de papel**,
+   como los tres de soporte y al revés que las criaturas. Así que aquí las
+   cinco tintas van oscuras —no hay una sola cifra sobre hueco— y las tres
+   chapas se apagan igual, porque el aro, el círculo y el triángulo ya están
+   dibujados.
+
+   La herramienta sólo mide un hueco en este marco, la ventana; la banda, la
+   caja y las tres figuras se midieron sobre el papel. Las dos cifras van por
+   su centro de MASA y no por el de su caja, como en las criaturas: en el
+   triángulo son once décimas de diferencia y se ve. */
+.carta.con-marco.m-dino_jefe {
+  --ban-x0: 26.2%;  --ban-x1: 15.2%;  --ban-y0: 8.45%;  --ban-al: 5.8%;
+  --ven-x0: 14.2%;  --ven-x1: 13.8%;  --ven-y0: 15.1%;  --ven-alto: 40.9%;
+  --pla-x0: 14.8%;  --pla-x1: 13.5%;  --pla-y0: 58.8%;  --pla-y1: 22.5%;
+  --cos-cx: 12.92%; --cos-cy: 9.19%;
+  --atq-x: 21.49%;  --atq-y: 88.05%;  --vid-x: 76.58%;  --vid-y: 89.02%;
+}
+.carta.con-marco.m-dino_jefe .c-chapa { display: none; }
+.carta.con-marco.m-dino_jefe .c-cuerpo { padding: 2% 4% 1.5%; }
+/* Las cinco tintas, todas sobre papel. */
+.carta.con-marco.m-dino_jefe .c-genero {
+  color: #38200c; text-shadow: 0 1px 0 rgba(255, 247, 225, .5);
+}
+.carta.con-marco.m-dino_jefe .c-hab { color: #5d2d08; }
+.carta.con-marco.m-dino_jefe .c-nombre { color: #38200c; }
+.carta.con-marco.m-dino_jefe .c-texto { color: #2e2113; }
+.carta.con-marco.m-dino_jefe .c-coste,
+.carta.con-marco.m-dino_jefe .st-a b,
+.carta.con-marco.m-dino_jefe .st-v b { color: #2b1706; }
+.carta.con-marco.m-dino_jefe .st-v.herido b { color: #8d2410; }
+.carta.con-marco.m-dino_jefe .st-a.mejorado b { color: #1d5a1b; }
+.carta.con-marco.m-dino_jefe .st-a.mermado b { color: #8d2410; }
+/* Su caja es la más baja del juego —18,7 puntos contra los 20,9 de una
+   criatura— porque la piedra del pie se lleva tres puntos más. Con el cuerpo
+   de siempre, las cinco se cortaban por abajo. */
+.carta--visor.con-marco.m-dino_jefe .c-texto {
+  font: 400 10.5px/12px 'Libre Baskerville', Georgia, serif;
+}
+.carta--visor.con-marco.m-dino_jefe .c-texto.largo { font-size: 9px; line-height: 10.2px; }
+.carta--visor.con-marco.m-dino_jefe .c-cuerpo { gap: 3px; }
+.carta--visor.con-marco.m-dino_jefe .c-hab { line-height: 18px; }
+
 /* El especular ya viene pintado en el PNG; el de CSS encima lo emborronaba. */
 .carta.con-marco::before { background: none; }
 
