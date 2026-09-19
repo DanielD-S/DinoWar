@@ -307,7 +307,10 @@ export const FAMILIA_MARCO = Object.freeze({
 function claseMarco(cardId) {
   const c = carta(cardId);
   if (CARTAS_DE_JEFE[cardId]) return ' m-dino_jefe jefe';
-  if (c.tipo === TIPO.DINOSAURIO) return ` m-dino_${RAREZA_MARCO[c.rareza] ?? 'comun'}`;
+  // Las cuatro rarezas de criatura llevan además `m-cria`: el juego de marcos
+  // del 19-09-2026 comparte geometría entre ellas y no con el del jefe, y sin
+  // una clase común cada regla de carta.css pediría los cuatro selectores.
+  if (c.tipo === TIPO.DINOSAURIO) return ` m-dino_${RAREZA_MARCO[c.rareza] ?? 'comun'} m-cria`;
   return ` m-${FAMILIA_MARCO[c.tipo] ?? 'evento'}`;
 }
 
