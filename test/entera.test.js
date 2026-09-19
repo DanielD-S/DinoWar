@@ -90,9 +90,11 @@ test('las tres familias de soporte llevan su marco, con el aro del coste dentro'
   // Y viene dibujado: la chapa de Biomasa que lo suplía se apaga, igual que las
   // tres de las criaturas.
   assert.match(css, /\.carta\.con-marco\.no-dino \.c-chapa\s*\{\s*display:\s*none/);
-  // La caja es PAPEL pintado en el PNG: ahí la tinta va oscura.
+  // Aquí TODO es papel pintado en el PNG —el aro del coste también, al revés
+  // que en las criaturas— así que las tres tintas van oscuras.
   assert.match(css, /\.carta\.con-marco\.no-dino \.c-nombre\s*\{\s*color:\s*#38200c/);
   assert.match(css, /\.carta\.con-marco\.no-dino \.c-texto\s*\{\s*color:\s*#2e2113/);
+  assert.match(css, /\.carta\.con-marco\.no-dino \.c-coste\s*\{\s*color:\s*#2b1706/);
   // La ventana sube hasta el borde: sin banda de nombre, arranca mucho más
   // arriba que la de una criatura y es más alta.
   const bloque = css.match(/\.carta\.con-marco\.no-dino\s*\{([^}]*)\}/)[1];

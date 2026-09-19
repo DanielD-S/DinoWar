@@ -1516,8 +1516,17 @@ Queda uno en este estilo: el del JEFE. Las tres familias de soporte llegaron el
 ### El marco del soporte: clima, evento y recurso, con emblema en vez de rareza
 
 Un día después de las criaturas llegaron los tres de soporte, con el mismo
-lenguaje —aro del coste dibujado y hueco, caja de PAPEL pintada en el PNG— y
-dos cosas propias:
+lenguaje —aro del coste dibujado y caja de PAPEL pintada en el PNG— y tres
+cosas propias:
+
+- **El aro del coste va RELLENO de papel, no hueco**, que es justo al revés
+  que en las criaturas. Así que ahí la tinta va oscura también: en una carta
+  de soporte **las tres tintas son de papel** y no hay ninguna sobre hueco.
+  Se miró a 83 px antes de aceptarlo —que es donde a las criaturas les falló
+  el papel dentro del aro, y por eso allí se dejó vacío— y aquí se lee mejor
+  que el hueco: el disco es grande, la cifra es una sola y no comparte filo
+  con la caja. La chapa de Biomasa que antes hacía de campo oscuro se apaga
+  igual: el aro ya está dibujado.
 
 - **No llevan banda de nombre**, porque el nombre de una carta de soporte y el
   de su habilidad son la misma cosa y van en la caja. Por eso la **ventana sube
@@ -1533,19 +1542,23 @@ dos cosas propias:
 
 Y tres cosas de la medida, que es donde estuvo el trabajo:
 
-- **Los tres caen dentro de medio punto en TODO**, aro del coste incluido
-  (cx 12,50 los tres; cy entre 9,11 y 9,38). Así que aquí no hace falta una
-  línea por familia como en las criaturas: la geometría va una sola vez, en
-  `.carta.con-marco.no-dino`, que es la clase que `claseFamilia()` ya emitía.
-- **La caja no es magenta y se midió sobre el papel**, como en las criaturas:
-  58,99 % a 79,11 %, o sea **20,1 puntos de papel, más alto que los 19,15 de
-  una criatura** y más arriba.
-- **Y la caja del CSS se puso en 22,8 puntos y no en los 21,8 que salían de
-  copiar los márgenes de la criatura.** Con 21,8 el nombre de dos líneas de
-  TODA carta de soporte perdía medio píxel por abajo en la mano y en el
-  tablero —48 cartas, medido comparando contra `main`— porque ahí la línea son
-  10 px y dos no entraban. Con 22,8 vuelven a entrar y el número es el mismo
-  que tenía el marco viejo. Las cuatro que ya se cortaban antes
+- **La herramienta sólo mide UN hueco aquí**, la ventana, porque el aro es
+  papel: el aro y la caja se midieron sobre el papel, con el mismo recorte por
+  color que en las criaturas. Los tres coinciden dentro de un tercio de punto
+  en el aro (cx 12,38–12,67, cy 8,96–9,28), así que va una sola línea en
+  `.carta.con-marco.no-dino` —la clase que `claseFamilia()` ya emitía— y no
+  una por familia como en las criaturas.
+- **La ventana del CSS se pone por el hueco MÁS ANCHO de los tres**, no por la
+  media: el marco se pinta ENCIMA del arte, así que una ventana de más queda
+  tapada y una de menos deja un filo oscuro dentro del hueco. Los tres se
+  separan hasta punto y medio por la derecha (86,3 % el clima, 87,9 % el
+  recurso) y con la media el clima enseñaba ese filo.
+- **La caja se puso en 22,8 puntos de alto y no en los 20,4 que mide el
+  papel.** Con lo que salía de copiar los márgenes de la criatura, el nombre
+  de dos líneas de TODA carta de soporte perdía medio píxel por abajo en la
+  mano y en el tablero —48 cartas, medido comparando contra `main`— porque
+  ahí la línea son 10 px y dos no entraban. Con 22,8 vuelven a entrar y es el
+  mismo alto que tenía el marco viejo. Las cuatro que ya se cortaban antes
   —«Canal trenzado», «Bosque ribereño», «Rebrote tras incendio» y «Humedal»—
   se siguen cortando igual: es que su nombre pide tres líneas y en la
   colección sólo caben dos. No es de este marco y no se tocó.

@@ -178,17 +178,19 @@
    familia como en las criaturas. La caja no es magenta y se midió sobre el
    papel, con el mismo margen que se le dejó a la de las criaturas. */
 .carta.con-marco.no-dino {
-  --ven-x0: 13%;    --ven-x1: 12.5%;  --ven-y0: 5%;     --ven-alto: 51.5%;
-  --pla-x0: 13%;    --pla-x1: 13%;    --pla-y0: 58%;    --pla-y1: 19.2%;
-  --cos-cx: 12.5%;  --cos-cy: 9.24%;
+  --ven-x0: 13.3%;  --ven-x1: 11.9%;  --ven-y0: 4.7%;   --ven-alto: 52.8%;
+  --pla-x0: 13%;    --pla-x1: 13%;    --pla-y0: 58.4%;  --pla-y1: 18.8%;
+  --cos-cx: 12.51%; --cos-cy: 9.14%;
 }
 /* El aro del coste viene dibujado, así que la chapa de Biomasa se apaga: es el
-   mismo caso que las tres chapas de las criaturas. La cifra cae sobre hueco
-   —el fondo oscuro de la carta— y se queda en claro. */
+   mismo caso que las tres chapas de las criaturas. */
 .carta.con-marco.no-dino .c-chapa { display: none; }
-/* Sobre papel: el nombre y el texto. */
+/* Y aquí TODO cae sobre papel —el aro del coste también— así que las tres
+   tintas van oscuras. Es lo contrario que en las criaturas, donde las cifras
+   caen sobre hueco: ahí el aro está vacío y aquí está relleno. */
 .carta.con-marco.no-dino .c-nombre { color: #38200c; }
 .carta.con-marco.no-dino .c-texto { color: #2e2113; }
+.carta.con-marco.no-dino .c-coste { color: #2b1706; }
 /* La caja se queda con el relleno de siempre —`3% 5% 0`— y NO con el que se
    apretó para las criaturas: aquí lleva el NOMBRE con hasta tres líneas, no un
    título de dos, y el punto y medio de relleno de abajo le comía media línea a
