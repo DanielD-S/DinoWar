@@ -160,11 +160,50 @@
 /* El especular ya viene pintado en el PNG; el de CSS encima lo emborronaba. */
 .carta.con-marco::before { background: none; }
 
-/* --- familia SOPORTE: clima, evento y recurso --- */
+/* ============================================ el marco del SOPORTE
+   Clima, evento y recurso estrenaron el suyo el 19-09-2026, un día después de
+   las criaturas y con las mismas tres cosas dentro: el aro del coste dibujado
+   y hueco, la caja de PAPEL pintada en el PNG, y el emblema de familia —sol,
+   espiral y helecho— en la piedra del pie. Es lo que sustituye a la rareza:
+   una carta de soporte no la enseña, así que lo que tiene que decirse de un
+   vistazo es de qué familia es.
+
+   No llevan banda de nombre, que su nombre y su habilidad son el mismo, y por
+   eso la ventana sube hasta el borde: 51,5 % del alto contra el 45,9 % de una
+   criatura, y arranca al 5 % en vez de al 13 %.
+
+   La geometría la midió `python tools/marcos.py` sobre los tres PNG —ventana y
+   aro del coste, que son los dos huecos magenta— y los tres caen dentro de
+   medio punto en todo, aro incluido, así que aquí no hace falta una línea por
+   familia como en las criaturas. La caja no es magenta y se midió sobre el
+   papel, con el mismo margen que se le dejó a la de las criaturas. */
 .carta.con-marco.no-dino {
-  --ven-x0: 10.3%; --ven-x1: 9.9%;  --ven-y0: 7.0%;  --ven-alto: 47.4%;
-  --pla-x0: 10.2%; --pla-x1: 10.2%; --pla-y0: 57.2%; --pla-y1: 16.7%;
+  --ven-x0: 13%;    --ven-x1: 12.5%;  --ven-y0: 5%;     --ven-alto: 51.5%;
+  --pla-x0: 13%;    --pla-x1: 13%;    --pla-y0: 58%;    --pla-y1: 19.2%;
+  --cos-cx: 12.5%;  --cos-cy: 9.24%;
 }
+/* El aro del coste viene dibujado, así que la chapa de Biomasa se apaga: es el
+   mismo caso que las tres chapas de las criaturas. La cifra cae sobre hueco
+   —el fondo oscuro de la carta— y se queda en claro. */
+.carta.con-marco.no-dino .c-chapa { display: none; }
+/* Sobre papel: el nombre y el texto. */
+.carta.con-marco.no-dino .c-nombre { color: #38200c; }
+.carta.con-marco.no-dino .c-texto { color: #2e2113; }
+/* La caja se queda con el relleno de siempre —`3% 5% 0`— y NO con el que se
+   apretó para las criaturas: aquí lleva el NOMBRE con hasta tres líneas, no un
+   título de dos, y el punto y medio de relleno de abajo le comía media línea a
+   toda carta de soporte de dos líneas en la mano y en el tablero. El visor
+   tiene el suyo aparte. */
+/* Y el cuerpo del visor baja lo mismo que en las criaturas y por lo mismo: la
+   caja perdió un punto de alto al crecer la ventana, y con el cuerpo de
+   siempre la Crecida estacional —112 letras, el texto más largo del set— se
+   cortaba por abajo. */
+.carta--visor.con-marco.no-dino .c-texto {
+  font: 400 10.5px/12px 'Libre Baskerville', Georgia, serif;
+}
+.carta--visor.con-marco.no-dino .c-texto.largo { font-size: 9.5px; line-height: 10.8px; }
+.carta--visor.con-marco.no-dino .c-cuerpo { gap: 3px; }
+.carta--visor.con-marco.no-dino .c-nombre { line-height: 18px; }
 
 .con-marco .c-marco {
   position: absolute; inset: 0; z-index: 2; pointer-events: none;
