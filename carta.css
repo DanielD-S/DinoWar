@@ -49,9 +49,10 @@
 
    La geometría NO la decide esta hoja: la decide el PNG. Se mide con
    `python tools/marcos.py` sobre los ficheros de verdad, nunca se estima, y los
-   números se copian aquí. Las cinco de dinosaurio —cuatro rarezas y el jefe—
-   coinciden entre sí dentro de cuatro décimas, así que basta un juego de
-   números para la familia; las tres de soporte comparten otro.
+   números se copian aquí. Los de aquí abajo son los del marco VIEJO, que hoy
+   usan el jefe y —con los suyos— las tres familias de soporte; las cuatro
+   rarezas de criatura estrenaron otro juego el 19-09-2026 y lo escriben más
+   abajo, en `.m-cria`.
 
    Una criatura reparte su cara en cinco huecos: el anillo del coste arriba a la
    izquierda, la BANDA del nombre a su derecha, la VENTANA de la ilustración, la
@@ -87,10 +88,14 @@
   box-shadow: none;
   border-radius: 5.4% / 3.9%;
 }
-/* ================================================== el marco LEGENDARIO
-   Desde el 18-09-2026 las criaturas legendarias llevan un marco propio, y no
-   el mismo dibujo con otro metal que las otras tres rarezas. Trae dentro lo
-   que hasta ahora eran piezas sueltas —el aro del coste, el círculo del
+/* ============================================ el marco de las CRIATURAS
+   Desde el 19-09-2026 las cuatro rarezas de criatura llevan este juego de
+   marcos —el legendario llegó un día antes y las otras tres detrás— y el jefe
+   se queda con el suyo de siempre, que es el dibujo viejo. La clase que las
+   junta es `m-cria`, que `claseMarco()` emite al lado de la de la rareza:
+   cuatro selectores por regla se leían peor que el CSS que describen.
+
+   Trae dentro lo que hasta ahora eran piezas sueltas —el aro del coste, el círculo del
    Ataque y el triángulo de la Vida—, con el interior hueco, así que sus tres
    chapas se apagan: dibujarlas encima sería ponerle un aro a un aro.
 
@@ -99,50 +104,58 @@
    o sea sobre el fondo de la carta, y siguen en claro. Es la única carta del
    juego con las dos tintas a la vez.
 
-   La geometría la midió `python tools/marcos.py` sobre el PNG, como manda la
-   regla de que la decide el dibujo y no el CSS. Lo único que no mide la
-   herramienta son la banda y la caja, porque en este marco no son magenta:
-   ésos se midieron sobre el papel.
+   La geometría la midió `python tools/marcos.py` sobre los cuatro PNG, como
+   manda la regla de que la decide el dibujo y no el CSS, y los cuatro caen
+   dentro de medio punto en todo menos en el centro del aro del coste, que por
+   eso se escribe por rareza. Lo único que no mide la herramienta son la banda
+   y la caja, porque en estos marcos no son magenta: ésas se midieron sobre el
+   papel, y también coinciden dentro de un punto.
 
-   Y la caja es más baja que la de las otras rarezas —20,9 % del alto contra
+   Y la caja es más baja que la del marco viejo —20,9 % del alto contra
    22,8 %— porque la ventana creció del 37,7 % al 45,9 %. Por eso el texto y el
    título bajan de cuerpo aquí y sólo aquí: con los de siempre, cuatro cartas
    del set se cortaban por abajo. */
-.carta.con-marco.m-dino_legendaria {
+.carta.con-marco.m-cria {
   --ban-x0: 24%;    --ban-x1: 13%;    --ban-y0: 6.4%;   --ban-al: 6.2%;
-  --ven-x0: 13.3%;  --ven-x1: 12.5%;  --ven-y0: 13%;    --ven-alto: 45.9%;
+  --ven-x0: 12.9%;  --ven-x1: 12.5%;  --ven-y0: 13%;    --ven-alto: 45.9%;
   --pla-x0: 13%;    --pla-x1: 13%;    --pla-y0: 60.5%;  --pla-y1: 18.6%;
-  --cos-cx: 12.11%; --cos-cy: 9.24%;
+  --cos-cy: 9.2%;
   /* El triángulo va por su centro de MASA (90,2 %) y no por el de su caja
      (88,3 %), por lo mismo que la chapa suelta: una cifra centrada en el
      rectángulo se ve flotando sobre la punta. */
-  --atq-x: 18.55%;  --atq-y: 89.45%;  --vid-x: 81.05%;  --vid-y: 90.2%;
+  --atq-x: 18.55%;  --atq-y: 89.5%;   --vid-x: 81.05%;  --vid-y: 90.2%;
 }
-.carta.con-marco.m-dino_legendaria .c-chapa { display: none; }
-.carta.con-marco.m-dino_legendaria .c-cuerpo { padding: 2% 4% 1.5%; }
+/* El aro del coste es lo único que el generador movió de una rareza a otra:
+   0,78 puntos entre la legendaria y la épica, que a 268 px son dos. */
+.carta.con-marco.m-dino_comun { --cos-cx: 12.7%; }
+.carta.con-marco.m-dino_rara { --cos-cx: 12.5%; }
+.carta.con-marco.m-dino_epica { --cos-cx: 12.89%; }
+.carta.con-marco.m-dino_legendaria { --cos-cx: 12.11%; }
+.carta.con-marco.m-cria .c-chapa { display: none; }
+.carta.con-marco.m-cria .c-cuerpo { padding: 2% 4% 1.5%; }
 /* Sobre papel: el nombre, el título y el texto. */
-.carta.con-marco.m-dino_legendaria .c-genero {
+.carta.con-marco.m-cria .c-genero {
   color: #38200c; text-shadow: 0 1px 0 rgba(255, 247, 225, .5);
 }
-.carta.con-marco.m-dino_legendaria .c-hab { color: #5d2d08; }
-.carta.con-marco.m-dino_legendaria .c-nombre { color: #38200c; }
-.carta.con-marco.m-dino_legendaria .c-texto { color: #2e2113; }
+.carta.con-marco.m-cria .c-hab { color: #5d2d08; }
+.carta.con-marco.m-cria .c-nombre { color: #38200c; }
+.carta.con-marco.m-cria .c-texto { color: #2e2113; }
 /* Sobre hueco: las tres cifras. Y los dos estados del Ataque, que en las otras
    rarezas los cuenta la chapa y aquí no hay chapa que cambiar: los cuenta el
    color de la cifra, como ya hace la Vida herida. */
-.carta.con-marco.m-dino_legendaria .c-coste,
-.carta.con-marco.m-dino_legendaria .st-a b,
-.carta.con-marco.m-dino_legendaria .st-v b { color: #ffe9b0; }
-.carta.con-marco.m-dino_legendaria .st-v.herido b { color: #f0a488; }
-.carta.con-marco.m-dino_legendaria .st-a.mejorado b { color: var(--bio); }
-.carta.con-marco.m-dino_legendaria .st-a.mermado b { color: var(--peligro); }
+.carta.con-marco.m-cria .c-coste,
+.carta.con-marco.m-cria .st-a b,
+.carta.con-marco.m-cria .st-v b { color: #ffe9b0; }
+.carta.con-marco.m-cria .st-v.herido b { color: #f0a488; }
+.carta.con-marco.m-cria .st-a.mejorado b { color: var(--bio); }
+.carta.con-marco.m-cria .st-a.mermado b { color: var(--peligro); }
 /* Los cuerpos del visor, que es donde el texto de la habilidad se pinta. */
-.carta--visor.con-marco.m-dino_legendaria .c-texto {
+.carta--visor.con-marco.m-cria .c-texto {
   font: 400 10.5px/12px 'Libre Baskerville', Georgia, serif;
 }
-.carta--visor.con-marco.m-dino_legendaria .c-texto.largo { font-size: 9.5px; line-height: 10.8px; }
-.carta--visor.con-marco.m-dino_legendaria .c-cuerpo { gap: 3px; }
-.carta--visor.con-marco.m-dino_legendaria .c-hab { line-height: 18px; }
+.carta--visor.con-marco.m-cria .c-texto.largo { font-size: 9.5px; line-height: 10.8px; }
+.carta--visor.con-marco.m-cria .c-cuerpo { gap: 3px; }
+.carta--visor.con-marco.m-cria .c-hab { line-height: 18px; }
 
 /* El especular ya viene pintado en el PNG; el de CSS encima lo emborronaba. */
 .carta.con-marco::before { background: none; }

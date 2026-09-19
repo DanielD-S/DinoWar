@@ -1416,9 +1416,9 @@ que el resto de gestos.
 ## Los marcos de carta: la geometría la decide el PNG
 
 Ocho marcos en `assets/marcos/`: cinco de criatura —cuatro rarezas y el jefe— y
-uno por familia de soporte, sin rareza. Cuatro de los cinco de criatura comparten
-geometría y sólo cambian de material; **el legendario estrenó la suya el
-18-09-2026** y tiene su sección aquí abajo.
+uno por familia de soporte, sin rareza. **Las cuatro rarezas de criatura
+estrenaron un juego nuevo el 18 y el 19-09-2026** y tienen su sección aquí
+abajo; el jefe y las tres de soporte siguen con el dibujo viejo.
 Los originales son PNG de 1024×1536 con los huecos en magenta `#FF00FF`, fuera
 del repositorio; `python tools/marcos.py escribir` los keyea a WebP y **mide
 los huecos**, y esos números son los que van en `carta.css`. No se estiman.
@@ -1443,12 +1443,14 @@ rarezas con ese PNG como referencia y el material como único cambio.
 `test/marcos.test.js` vigila que cada clase que emite `claseMarco()` tenga
 fichero y que ningún WebP sobre.
 
-### El marco legendario: las legendarias estrenan el suyo
+### El marco de las criaturas: las cuatro rarezas estrenan el suyo
 
 Hasta el 18-09-2026 los cinco marcos de criatura eran el MISMO dibujo con otro
-material. Ese día las legendarias estrenaron uno propio, encargado al generador
-en tres vueltas con el autor delante, y con él pasan tres cosas que ningún otro
-marco del juego hace:
+material. Ese día la legendaria estrenó uno propio —tres vueltas con el
+generador y el autor delante— y al siguiente llegaron la épica, la rara y la
+común con la misma geometría y otro mineral. El jefe se quedó con el dibujo
+viejo hasta que tenga el suyo. Con el juego nuevo pasan tres cosas que ningún
+otro marco del juego hace:
 
 - **Trae los huecos de las cifras dentro.** El aro del coste, el círculo del
   Ataque y el triángulo de la Vida van dibujados en el PNG, con el interior
@@ -1465,9 +1467,14 @@ marco del juego hace:
   las 144, no se corta ninguna línea. Si algún día se quiere el texto al cuerpo
   de siempre, la que tiene que ceder dos puntos es la ventana.
 
-La geometría la midió `python tools/marcos.py` sobre el PNG, como manda la
-regla; lo único que no mide son la banda y la caja, porque en este marco no son
-magenta. Ésas se midieron sobre el papel.
+La geometría la midió `python tools/marcos.py` sobre los cuatro PNG, como manda
+la regla; lo único que no mide son la banda y la caja, porque en estos marcos no
+son magenta. Ésas se midieron sobre el papel y coinciden dentro de un punto.
+**Los cuatro caen dentro de medio punto en todo menos en el centro del aro del
+coste** —0,78 puntos entre la legendaria y la épica, que a 268 px son dos—, así
+que ése se escribe por rareza y el resto lo comparte `m-cria`, una clase que
+`claseMarco()` emite al lado de la de la rareza. Sin ella cada regla de
+`carta.css` pedía los cuatro selectores y se leía peor que lo que describe.
 
 Lo que costó, por si vuelve a encargarse uno:
 
@@ -1488,9 +1495,16 @@ Lo que costó, por si vuelve a encargarse uno:
   menor medida (9,8 %); se acaba pidiéndolos a **1148×1568**, que es 82:112
   exacto.
 
-Quedan los otros siete en este estilo —las tres rarezas, el jefe y las tres
-familias de soporte—, con esta misma geometría y el material como único cambio;
-las de soporte, sin banda y sin los dos huecos de cifras.
+Y una cosa que llegó mal en tres de los cuatro y no se arregla desde el código:
+**el banderín de rareza no cuenta la rareza.** La común trae un rombo encendido
+de cuatro, que es lo correcto; la rara y la épica traen los cuatro, igual que la
+legendaria. Se puede vivir con ello —a 83 px la rareza la cuenta el MINERAL, que
+es piedra, cristal azul, amatista y lava, y se distinguen de un vistazo— pero si
+se regeneran, que la rara traiga dos y la épica tres.
+
+Quedan cuatro en este estilo: el jefe y las tres familias de soporte, con esta
+misma geometría y el material como único cambio; las de soporte, sin banda y sin
+los dos huecos de cifras.
 
 ### La carta ENTERA: las cinco de jefe van a sangre
 
@@ -1503,7 +1517,8 @@ de cristal translúcido apoyada en las chapas. Es la variante «full art» de
 cualquier TCG.
 
 **Las criaturas LEGENDARIAS lo fueron el mismo día y dejaron de serlo**, al
-estrenar marco propio: las dos cosas se pelean por la misma carta —una la
+estrenar marco propio —y al día siguiente lo estrenaron las otras tres
+rarezas—: las dos cosas se pelean por la misma carta —una la
 enmarca y la otra le quita el marco— y ganó el marco, porque la rareza se lee y
 las cifras tienen dónde apoyarse. Las de jefe se quedan a sangre porque viven
 fuera del set y no tienen rareza que enseñar. `test/entera.test.js` guarda esa
@@ -1553,7 +1568,8 @@ Lo que se miró al lado de Crown War y NO se copió: su estilo pintado tipo
 anime —el fotorrealismo es lo que nos distingue—, su tipografía sin sistema, y
 que la rareza no se lea en la carta. La ventana grande para TODAS las cartas
 —que era lo que quedaba de aquello— se empezó por el marco legendario de aquí
-arriba; faltan los otros siete.
+arriba; hoy lo llevan las cuatro rarezas de criatura y faltan el jefe y las
+tres familias de soporte.
 
 Y una cosa que se midió antes de descartarla: **llevar la carta entera a todo
 el set no funciona.** Las criaturas ganan en el visor, sí, pero a 83 px el

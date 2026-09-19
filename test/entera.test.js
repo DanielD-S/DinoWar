@@ -49,14 +49,29 @@ test('carta.css tiene la geometría de la carta entera y apaga el marco dibujado
   assert.match(css, /\.entera \.c-fondo\s*\{[^}]*blur/);
 });
 
-test('el marco legendario trae sus huecos dentro: sus chapas se apagan', () => {
-  assert.match(css, /\.carta\.con-marco\.m-dino_legendaria\s*\{[^}]*--ven-alto:\s*45\.9%/);
-  assert.match(css, /\.carta\.con-marco\.m-dino_legendaria \.c-chapa\s*\{\s*display:\s*none/);
+test('el marco de criatura trae sus huecos dentro: sus chapas se apagan', () => {
+  assert.match(css, /\.carta\.con-marco\.m-cria\s*\{[^}]*--ven-alto:\s*45\.9%/);
+  assert.match(css, /\.carta\.con-marco\.m-cria \.c-chapa\s*\{\s*display:\s*none/);
   // La banda y la caja son papel pintado: ahí la tinta va oscura, y las tres
   // cifras, que caen sobre hueco, se quedan en claro.
-  assert.match(css, /\.carta\.con-marco\.m-dino_legendaria \.c-hab\s*\{\s*color:\s*#5d2d08/);
-  assert.match(css, /\.carta\.con-marco\.m-dino_legendaria \.st-a b[^{]*\{\s*color:\s*#ffe9b0/);
+  assert.match(css, /\.carta\.con-marco\.m-cria \.c-hab\s*\{\s*color:\s*#5d2d08/);
+  assert.match(css, /\.carta\.con-marco\.m-cria \.st-a b[^{]*\{\s*color:\s*#ffe9b0/);
   // Sin chapa que cambiar, los dos estados del Ataque los cuenta el color.
-  assert.match(css, /\.carta\.con-marco\.m-dino_legendaria \.st-a\.mejorado b\s*\{\s*color:/);
-  assert.match(css, /\.carta\.con-marco\.m-dino_legendaria \.st-a\.mermado b\s*\{\s*color:/);
+  assert.match(css, /\.carta\.con-marco\.m-cria \.st-a\.mejorado b\s*\{\s*color:/);
+  assert.match(css, /\.carta\.con-marco\.m-cria \.st-a\.mermado b\s*\{\s*color:/);
+});
+
+test('las CUATRO rarezas de criatura llevan el marco nuevo, y el jefe no', () => {
+  for (const [id, clase] of [['stegosaurus', 'm-dino_comun'], ['allosaurus', 'm-dino_rara'],
+    ['torvosaurus', 'm-dino_epica'], ['tyrannosaurus', 'm-dino_legendaria']]) {
+    const html = cartaHTML(id, { variante: 'col' });
+    assert.ok(html.includes(clase), id);
+    assert.ok(html.includes('m-cria'), `${id} sin la clase que comparte la geometría`);
+  }
+  assert.ok(!cartaHTML('jefe_saurophaganax', { variante: 'col' }).includes('m-cria'));
+  assert.ok(!cartaHTML('trampa', { variante: 'col' }).includes('m-cria'), 'las de soporte tampoco');
+  // El aro del coste es lo único que cambia de una rareza a otra.
+  for (const r of ['comun', 'rara', 'epica', 'legendaria']) {
+    assert.match(css, new RegExp(`\\.carta\\.con-marco\\.m-dino_${r}\\s*\\{\\s*--cos-cx:`), r);
+  }
 });
