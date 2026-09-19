@@ -1416,10 +1416,10 @@ que el resto de gestos.
 ## Los marcos de carta: la geometría la decide el PNG
 
 Ocho marcos en `assets/marcos/`: cinco de criatura —cuatro rarezas y el jefe— y
-uno por familia de soporte, sin rareza. **Las cuatro rarezas de criatura
-estrenaron un juego nuevo el 18 y el 19-09-2026, y las tres familias de soporte
-el 19**, y tienen sus dos secciones aquí abajo; **el único que sigue con el
-dibujo viejo es el del jefe**.
+uno por familia de soporte, sin rareza. **Los ocho se rehicieron entre el 18 y
+el 19-09-2026**, en tres tandas —la legendaria primero, las otras tres rarezas
+detrás, y el mismo día las tres de soporte y el jefe— y cada tanda tiene su
+sección aquí abajo. No queda ninguno del dibujo viejo.
 Los originales son PNG de 1024×1536 con los huecos en magenta `#FF00FF`, fuera
 del repositorio; `python tools/marcos.py escribir` los keyea a WebP y **mide
 los huecos**, y esos números son los que van en `carta.css`. No se estiman.
@@ -1510,8 +1510,8 @@ piedra sin oro** en la común, **cristal azul** en la rara, **amatista** en la
 un rombo encendido, y por eso se cambió: el oro es lo que distingue a la de
 arriba.
 
-Queda uno en este estilo: el del JEFE. Las tres familias de soporte llegaron el
-19-09-2026 y tienen su sección aquí abajo.
+Las tres familias de soporte y el jefe llegaron el 19-09-2026 y tienen sus dos
+secciones aquí abajo.
 
 ### El marco del soporte: clima, evento y recurso, con emblema en vez de rareza
 
@@ -1566,36 +1566,86 @@ Y tres cosas de la medida, que es donde estuvo el trabajo:
   Crecida estacional —112 letras, el texto más largo del set— se cortaba.
   Comprobado sobre las 144: ninguna desborda.
 
-### La carta ENTERA: las cinco de jefe van a sangre
+### El marco del jefe: el que cierra el juego, y el que se llevó el full art
 
-Desde el 18-09-2026 (decisión del autor, con las cartas de Crown War delante:
-«el arte de la carta, bordes, full art es bastante bueno, profesional,
-pulcro»), **las cinco cartas de jefe** se pintan enteras:
-la ilustración cubre la carta, el marco de latón se apaga y en su sitio hay un
-filete de bronce, el nombre va sobre un velo oscuro y la habilidad en una caja
-de cristal translúcido apoyada en las chapas. Es la variante «full art» de
-cualquier TCG.
+El último (19-09-2026). Hasta ese día las cinco cartas de jefe iban A SANGRE,
+y pasó lo mismo que con las legendarias veinticuatro horas antes: **un marco
+dibujado y la carta entera se pelean por la misma carta** —una la enmarca y la
+otra le quita el marco— y ganó el marco. Decidido por el autor con las dos
+versiones delante, a 268 px y a 83. Lo que queda del full art está en la
+sección de abajo, que ya no describe ninguna carta.
 
-**Las criaturas LEGENDARIAS lo fueron el mismo día y dejaron de serlo**, al
-estrenar marco propio —y al día siguiente lo estrenaron las otras tres
-rarezas—: las dos cosas se pelean por la misma carta —una la
-enmarca y la otra le quita el marco— y ganó el marco, porque la rareza se lee y
-las cifras tienen dónde apoyarse. Las de jefe se quedan a sangre porque viven
-fuera del set y no tienen rareza que enseñar. `test/entera.test.js` guarda esa
-frontera. Lo que se decidió al hacerla:
+Comparte la ANATOMÍA de las criaturas —banda de género, ventana, caja, aro del
+coste, círculo del Ataque y triángulo de la Vida— y no su geometría, así que
+**no entra en `m-cria` y escribe la suya**: la ventana mide el 40,9 % del alto
+contra el 45,9 %, porque la banda arranca más abajo (8,45 % contra 6,4 %) y la
+piedra del pie es más honda.
+
+Y lo que de verdad lo separa de los cuatro de criatura: **los cinco huecos
+vienen RELLENOS de papel**, como los tres de soporte. Así que aquí no hay una
+sola cifra sobre hueco y **las cinco tintas van oscuras** —género, título,
+texto, coste y las dos cifras—; las tres chapas se apagan igual, porque el
+aro, el círculo y el triángulo ya están dibujados, y sin chapa que cambiar los
+dos estados del Ataque los cuenta el color.
+
+Tres cosas de la medida:
+
+- **La herramienta sólo mide un hueco aquí**, la ventana. La banda, la caja y
+  las tres figuras se midieron sobre el papel, con el mismo recorte por color
+  que en los de soporte.
+- **Las dos cifras van por su centro de MASA y no por el de su caja**, como en
+  las criaturas: en el triángulo son once décimas y se ven.
+- **Su caja es la más baja del juego** —18,7 puntos de alto contra los 20,9 de
+  una criatura y los 22,8 de una de soporte— porque la piedra del pie se lleva
+  tres puntos más. Con el cuerpo de siempre las cinco se cortaban por abajo, y
+  aun con el de las criaturas (10,5/12 px) el Hesperosaurus seguía perdiendo
+  una línea: su texto baja a **9/10,2** y la caja se ensancha hasta el ancho
+  entero del papel (14,8 % a 86,5 %), que es lo que le quita la cuarta línea.
+  Comprobado sobre las 149 cartas —las 144 del set más las cinco de jefe—: no
+  se corta ningún párrafo.
+
+Y un defecto que ya estaba y que el jefe hereda al dejar el full art: en el
+visor, el título de una línea pierde uno o dos píxeles de las colas por abajo,
+porque `line-height` es 18 px y la caja del glifo mide 19 o 20. Le pasa a 72
+cartas del set desde que existen estos marcos y ahora también a las dos de
+jefe con título largo. Se arregla subiendo el `line-height`, y eso le quita
+sitio al texto: en el Hesperosaurus no hay de dónde, así que se deja como el
+resto hasta que se toque para todos a la vez.
+
+### La carta ENTERA: existió dos días y hoy no la lleva nadie
+
+La variante «full art» de cualquier TCG: la ilustración cubre la carta, el
+marco de latón se apaga y en su sitio hay un filete de bronce, el nombre va
+sobre un velo oscuro y la habilidad en una caja de cristal translúcido apoyada
+en las chapas. La pidió el autor el 18-09-2026 con las cartas de Crown War
+delante —«el arte de la carta, bordes, full art es bastante bueno, profesional,
+pulcro»—.
+
+**Y se fue por el mismo sitio dos veces.** La llevaron las criaturas
+legendarias, que la perdieron ese mismo día al estrenar marco propio; y las
+cinco de jefe, que la perdieron el 19 al estrenar el suyo. Un marco dibujado y
+la carta a sangre **se pelean por la misma carta** —una la enmarca y la otra le
+quita el marco— y las dos veces ganó el marco, porque la rareza se lee y las
+cifras tienen dónde apoyarse. Con el juego de marcos completo no queda carta
+sin marco propio, así que **hoy `esEntera()` no devuelve ninguna**.
+
+Lo que NO se borró es la maquinaria, y el motivo está en el último punto de
+esta lista: es el molde del cosmético de «arte alternativo». Encenderla para
+una carta es añadir su id a `ENTERAS` en `art.js`, una línea, y
+`test/entera.test.js` vigila que siga bastando con eso — que nadie pase por
+aquí a limpiar «código muerto» y se lleve el emisor o el CSS. Lo que se
+decidió al hacerla, y que sigue valiendo el día que vuelva:
 
 - **Es una clase, `entera`, y no un marco nuevo.** `marcoCarta()` emite lo
   mismo; `carta.css` mueve la GEOMETRÍA de los huecos —la ventana a la carta
   entera, la banda más ancha, la caja abajo, las chapas de cifras al 90 %— y
   el mismo `<span class="c-marco">` pinta el filete con un degradado
   recortado a anillo por dos máscaras. Cero ficheros nuevos, y
-  `test/marcos.test.js` sigue igual: el marco de jefe existe y se usa de
-  reserva.
-- **Sólo con foto.** `esEntera()` en `art.js` dice qué cartas lo son —hoy, las
-  de `CARTAS_DE_JEFE` y nada más—; `clasesCarta()` pone la clase si además
-  `hayFoto()`, y `refrescarFotos()` la añade cuando el índice llega después de
-  pintar. Una silueta SVG a sangre sería un rectángulo de color con un nombre
-  encima.
+  `test/marcos.test.js` sigue igual.
+- **Sólo con foto.** `esEntera()` en `art.js` dice qué cartas lo son —hoy,
+  ninguna—; `clasesCarta()` pone la clase si además `hayFoto()`, y
+  `refrescarFotos()` la añade cuando el índice llega después de pintar. Una
+  silueta SVG a sangre sería un rectángulo de color con un nombre encima.
 - **El velo del nombre es un `<span class="c-velo">` propio**, no
   `.c-arte::after`: ese pseudoelemento ya es el brillo de las legendarias en la
   colección y el sobre. Viaja en toda carta que PUEDA ser entera, y sin la
@@ -1618,18 +1668,18 @@ frontera. Lo que se decidió al hacerla:
   quedaron al 87 %, montadas en el canto, y no se vio en el banco a 268 px:
   se vio en el móvil, donde la ficha pinta la carta a 600. Quien mueva una
   chapa mueve las dos parejas.
-- **Es también el molde del cosmético de «arte alternativo»**: el mismo
-  mecanismo —una clase que cambia la geometría sin tocar la composición— vale
-  para vender una versión a sangre de cualquier carta el día que la tienda lo
-  quiera. Hoy no se vende nada: es lo que distingue a lo más raro del set,
-  que es lo que el holográfico hacía antes de quitarse.
+- **Es el molde del cosmético de «arte alternativo»**, y desde el 19-09-2026 es
+  lo ÚNICO que es: el mismo mecanismo —una clase que cambia la geometría sin
+  tocar la composición— vale para vender una versión a sangre de cualquier
+  carta el día que la tienda lo quiera. Ya no distingue a nada por sí sola,
+  porque no la lleva ninguna carta; lo que distingue hoy a cada rareza es el
+  MATERIAL de su marco.
 
 Lo que se miró al lado de Crown War y NO se copió: su estilo pintado tipo
 anime —el fotorrealismo es lo que nos distingue—, su tipografía sin sistema, y
 que la rareza no se lea en la carta. La ventana grande para TODAS las cartas
 —que era lo que quedaba de aquello— se empezó por el marco legendario de aquí
-arriba; hoy lo llevan las cuatro rarezas de criatura y las tres familias de
-soporte, y falta el del jefe.
+arriba y hoy la llevan los ocho.
 
 Y una cosa que se midió antes de descartarla: **llevar la carta entera a todo
 el set no funciona.** Las criaturas ganan en el visor, sí, pero a 83 px el
